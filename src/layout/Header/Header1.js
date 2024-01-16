@@ -90,9 +90,11 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <a href="/">
+                <Link href="/">
+                <a>
                   Home <span className="wsarrow" />
                 </a>
+                </Link>
               </li>
               {/* END DROPDOWN MENU */}
               {/* PAGES */}
