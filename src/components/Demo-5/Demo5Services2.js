@@ -27,8 +27,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #1 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.4s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -47,8 +46,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #2 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.6s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -67,8 +65,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #3 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.8s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -78,7 +75,7 @@ const Demo5Services2 = () => {
                                     </div>
                                     {/* Title */}
                                     <h5 className="h5-sm sbox-2-title steelblue-color">
-                                    Cardiologist
+                                    Orthopaedics
                                     </h5>
                                 </a>
                             </Link>
@@ -87,8 +84,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #4 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="1s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -98,7 +94,7 @@ const Demo5Services2 = () => {
                                     </div>
                                     {/* Title */}
                                     <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        X-Ray Diagnostic
+                                        Dentistry
                                     </h5>
                                 </a>
                             </Link>
@@ -107,8 +103,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #5 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.4s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -118,7 +113,7 @@ const Demo5Services2 = () => {
                                     </div>
                                     {/* Title */}
                                     <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Cardiology
+                                        Physiotherapy
                                     </h5>
                                 </a>
                             </Link>
@@ -127,8 +122,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #6 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.6s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -138,7 +132,7 @@ const Demo5Services2 = () => {
                                     </div>
                                     {/* Title */}
                                     <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        MRI
+                                        Home Care
                                     </h5>
                                 </a>
                             </Link>
@@ -147,8 +141,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #7 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="0.8s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>
@@ -158,7 +151,7 @@ const Demo5Services2 = () => {
                                     </div>
                                     {/* Title */}
                                     <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Laboratory Services
+                                        Medicine Delivery Services
                                     </h5>
                                 </a>
                             </Link>
@@ -167,8 +160,7 @@ const Demo5Services2 = () => {
                     {/* SERVICE BOX #8 */}
                     <div className="col-sm-6 col-lg-3">
                         <div
-                            className="sbox-2 wow fadeInUp"
-                            data-wow-delay="1s"
+                            className="sbox-2"
                         >
                             <Link href="/department-single">
                                 <a>

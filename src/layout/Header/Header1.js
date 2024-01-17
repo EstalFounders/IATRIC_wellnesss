@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import MobileMenu from "../MobileMenu";
+import { Col, Container, Row } from "react-bootstrap";
 
 const Header1 = ({ toggleMenu, toggle }) => {
   return (
@@ -31,44 +32,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
-      <div className="headtoppart bg-blue clearfix">
-        <div className="headerwp clearfix">
-          {/* Address */}
-          <div className="headertopleft">
-            <div className="address clearfix">
-              <span>
-                <i className="fas fa-map-marker-alt" />
-                3037 first floor, sector 57, Gurugram
-              </span>
-              <Link href="#">
-                <a href="tel:123456789" className="callusbtn">
-                  <i className="fas fa-phone" />
-                  (800)-569-7890
-                </a>
-              </Link>
-            </div>
-          </div>
-          {/* Social Links */}
-          <div className="headertopright">
-            <a className="googleicon" title="Google" href="#">
-              <i className="fab fa-instagram" />
-              <span className="mobiletext02">Instagram</span>
-            </a>
-            <a className="linkedinicon" title="Linkedin" href="#">
-              <i className="fab fa-linkedin-in" />
-              <span className="mobiletext02">Linkedin</span>
-            </a>
-            {/* <a className="twittericon" title="Twitter" href="#">
- ̰              <i className="fab fa-twitter" />
-              <span className="mobiletext02">Twitter</span>
-            </a> */}
-            <a className="facebookicon" title="Facebook" href="#">
-              <i className="fab fa-facebook-f" />
-              <span className="mobiletext02">Facebook</span>
-            </a>
-          </div>
-        </div>
-      </div>
+       {/* remove code for header strip as it was not mobile responsive */}
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
       <div className="wsmainfull menu clearfix d-none d-lg-block">
@@ -90,7 +54,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <Link href="/">
+                <Link href="/demo-5">
                 <a>
                   Home <span className="wsarrow" />
                 </a>

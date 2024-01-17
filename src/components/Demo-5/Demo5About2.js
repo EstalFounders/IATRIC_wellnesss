@@ -21,28 +21,28 @@ const Demo5About2 = () => {
                                             <td>Mon – Wed</td>
                                             <td> - </td>
                                             <td className="text-right">
-                                                9:00 AM - 7:00 PM
+                                                9:00 AM - 8:00 PM
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Thursday</td>
                                             <td> - </td>
                                             <td className="text-right">
-                                                9:00 AM - 7:00 PM
+                                                9:00 AM - 8:00 PM
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Friday</td>
                                             <td> - </td>
                                             <td className="text-right">
-                                                9:00 AM - 7:00 PM
+                                                9:00 AM - 8:00 PM
                                             </td>
                                         </tr>
                                         <tr className="last-tr">
                                             <td>Sun - Sun</td>
                                             <td>-</td>
                                             <td className="text-right">
-                                            9:00 AM - 7:00 PM
+                                            9:00 AM - 8:00 PM
                                             </td>
                                         </tr>
                                     </tbody>
@@ -82,7 +82,7 @@ const Demo5About2 = () => {
                                 {/* Text */}
                                 <h4 className="h4-sm emergency-call blue-color">
                                     <i className="fas fa-phone" />
-                                    1-800-123-4560
+                                    9625942020
                                 </h4>
                                 <p className="mt-20">
                                     An magnis nulla dolor at sapien augue erat

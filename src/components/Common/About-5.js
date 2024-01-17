@@ -8,7 +8,7 @@ const About5 = () => {
                     {/* IMAGE BLOCK */}
                     <div className="col-lg-6">
                         <div
-                            className="about-img text-center wow fadeInUp"
+                            className="about-img text-center"
                             data-wow-delay="0.6s"
                         >
                             <img
@@ -21,7 +21,7 @@ const About5 = () => {
                     {/* TEXT BLOCK */}
                     <div className="col-lg-6">
                         <div
-                            className="txt-block pc-30 wow fadeInUp"
+                            className="txt-block pc-30"
                             data-wow-delay="0.4s"
                         >
                             {/* Section ID */}
