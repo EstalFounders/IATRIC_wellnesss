@@ -25,8 +25,7 @@ const Demo5Blog1 = () => {
                     {/* BLOG POST #1 */}
                     <div className="col-lg-4">
                         <div
-                            className="blog-post wow fadeInUp"
-                            data-wow-delay="0.4s"
+                            className="blog-post"
                         >
                             {/* BLOG POST IMAGE */}
                             <div className="blog-post-img">
@@ -64,8 +63,7 @@ const Demo5Blog1 = () => {
                     {/* BLOG POST #2 */}
                     <div className="col-lg-4">
                         <div
-                            className="blog-post wow fadeInUp"
-                            data-wow-delay="0.6s"
+                            className="blog-post"
                         >
                             {/* BLOG POST IMAGE */}
                             <div className="blog-post-img">
@@ -101,8 +99,7 @@ const Demo5Blog1 = () => {
                     {/* BLOG POST #3 */}
                     <div className="col-lg-4">
                         <div
-                            className="blog-post wow fadeInUp"
-                            data-wow-delay="0.8s"
+                            className="blog-post"
                         >
                             {/* BLOG POST IMAGE */}
                             <div className="blog-post-img">

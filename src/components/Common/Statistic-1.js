@@ -9,7 +9,7 @@ const Statistic1 = () => {
           {/* STATISTIC BLOCK #1 */}
           <div className="col-md-6 col-lg-3">
             <div
-              className="statistic-block icon-lg wow fadeInUp"
+              className="statistic-block icon-lg"
               data-wow-delay="0.4s"
             >
               {/* Icon  */}
@@ -24,7 +24,7 @@ const Statistic1 = () => {
           {/* STATISTIC BLOCK #2 */}
           <div className="col-md-6 col-lg-3">
             <div
-              className="statistic-block icon-lg wow fadeInUp"
+              className="statistic-block icon-lg"
               data-wow-delay="0.6s"
             >
               {/* Icon  */}
@@ -39,7 +39,7 @@ const Statistic1 = () => {
           {/* STATISTIC BLOCK #3 */}
           <div className="col-md-6 col-lg-3">
             <div
-              className="statistic-block icon-lg wow fadeInUp"
+              className="statistic-block icon-lg"
               data-wow-delay="0.8s"
             >
               {/* Icon  */}
@@ -54,8 +54,7 @@ const Statistic1 = () => {
           {/* STATISTIC BLOCK #4 */}
           <div className="col-md-6 col-lg-3">
             <div
-              className="statistic-block icon-lg wow fadeInUp"
-              data-wow-delay="1s"
+              className="statistic-block icon-lg"
             >
               {/* Icon  */}
               <span className="flaticon-040-placeholder" />

@@ -8,7 +8,7 @@ const Demo5Pricing3 = () => {
                     {/* PRICING TABLE */}
                     <div className="col-lg-6">
                         <div
-                            className="txt-block pc-30 mb-40 wow fadeInUp"
+                            className="txt-block pc-30 mb-40"
                             data-wow-delay="0.4s"
                         >
                             {/* Section ID */}
@@ -74,8 +74,7 @@ const Demo5Pricing3 = () => {
                     {/* PRICING IMAGE */}
                     <div className="col-lg-6">
                         <div
-                            className="pricing-img wow fadeInUp"
-                            data-wow-delay="0.6s"
+                            className="pricing-img"
                         >
                             <img
                                 className="img-fluid"

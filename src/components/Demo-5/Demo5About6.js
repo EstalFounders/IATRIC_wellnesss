@@ -9,8 +9,7 @@ const Demo5About6 = () => {
                     {/* TEXT BLOCK */}
                     <div className="col-lg-6">
                         <div
-                            className="txt-block pc-30 wow fadeInUp"
-                            data-wow-delay="0.4s"
+                            className="txt-block pc-30"
                         >
                             {/* Section ID */}
                             <span className="section-id blue-color">
@@ -56,7 +55,7 @@ const Demo5About6 = () => {
                     {/* IMAGE BLOCK */}
                     <div className="col-lg-6">
                         <div
-                            className="about-img text-center wow fadeInUp"
+                            className="about-img text-center"
                             data-wow-delay="0.6s"
                         >
                             <img
