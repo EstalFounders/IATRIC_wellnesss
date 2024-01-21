@@ -2307,7 +2307,7 @@
 
   #tabs-2 .nav-pills .nav-link.active,
   #tabs-2 .nav-pills .nav-link.active:hover {
-    border-bottom: 2px solid #a17f45;
+    border-bottom: 2px solid #8E822F;
     border-right: none;
   }
 
@@ -3896,7 +3896,7 @@
 
   #tabs-2 .nav-pills .nav-link.active,
   #tabs-2 .nav-pills .nav-link.active:hover {
-    border-bottom: 2px solid #a17f45;
+    border-bottom: 2px solid #8E822F;
     border-right: none;
   }
 
@@ -3961,13 +3961,13 @@
 
   .gallery-filter button:hover {
     color: #fff;
-    background-color: #a17f45;
+    background-color: #8E822F;
     border-bottom: none;
   }
 
   .gallery-filter button.is-checked {
     color: #fff;
-    background-color: #a17f45;
+    background-color: #8E822F;
     border-bottom: none;
   }
 
@@ -5493,7 +5493,7 @@
 
   #tabs-2 .nav-pills .nav-link.active,
   #tabs-2 .nav-pills .nav-link.active:hover {
-    border-bottom: 2px solid #a17f45;
+    border-bottom: 2px solid #8E822F;
     border-right: none;
   }
 
@@ -5561,13 +5561,13 @@
 
   .gallery-filter button:hover {
     color: #fff;
-    background-color: #a17f45;
+    background-color: #8E822F;
     border-bottom: none;
   }
 
   .gallery-filter button.is-checked {
     color: #fff;
-    background-color: #a17f45;
+    background-color: #8E822F;
     border-bottom: none;
   }
 

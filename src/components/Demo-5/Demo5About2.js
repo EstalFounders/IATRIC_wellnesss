@@ -18,13 +18,13 @@ const Demo5About2 = () => {
                                 <table className="table">
                                     <tbody>
                                         <tr>
-                                            <td>Mon – Wed</td>
+                                            <td>Mon – Sun</td>
                                             <td> - </td>
                                             <td className="text-right">
                                                 9:00 AM - 8:00 PM
                                             </td>
                                         </tr>
-                                        <tr>
+                                        {/* <tr>
                                             <td>Thursday</td>
                                             <td> - </td>
                                             <td className="text-right">
@@ -44,7 +44,7 @@ const Demo5About2 = () => {
                                             <td className="text-right">
                                             9:00 AM - 8:00 PM
                                             </td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>
