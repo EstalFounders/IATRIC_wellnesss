@@ -121,7 +121,7 @@
 }
 
 .demo .btn {
-  background-color: #a17f45;
+  background-color: #8E822F;
   color: #fff;
   font-size: 0.85rem;
   line-height: 1;
@@ -129,7 +129,7 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   padding: 15px 30px;
-  border: 2px solid #a17f45;
+  border: 2px solid #8E822F;
   overflow: hidden;
   position: relative;
   -webkit-border-radius: 6px;
@@ -163,7 +163,7 @@
 }
 
 .demo span.section-id {
-  color: #a17f45;
+  color: #8E822F;
   font-size: 0.825rem;
   font-family: "Lato", sans-serif;
   font-weight: 900;
@@ -304,7 +304,7 @@
 }
 
 .demo .select_link h4 span {
-  color: #a17f45;
+  color: #8E822F;
   font-weight: 900;
   margin-left: 5px;
 }

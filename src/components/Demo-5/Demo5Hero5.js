@@ -9,7 +9,7 @@ const Demo5Hero5 = () => {
                     {/* HERO TEXT */}
                     <div className="col-md-9 col-lg-7 col-xl-6">
                         <div className="hero-5-strip bg-blue white-color">
-                            <h5>Our Clinic Provides</h5>
+                            <h5>Iatric Healthcare Provides</h5>
                         </div>
                         <div className="hero-txt">
                             {/* Title */}

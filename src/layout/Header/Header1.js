@@ -43,8 +43,8 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <a href="#">
               <img
                 src="images/logo.png"
-                width={180}
-                height={40}
+                width={280}
+                height={50}
                 alt="header-logo"
               />
             </a>
@@ -54,7 +54,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <Link href="/demo-5">
+                <Link href="/">
                 <a>
                   Home <span className="wsarrow" />
                 </a>
