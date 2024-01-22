@@ -82,7 +82,7 @@ const Demo5About2 = () => {
                                 {/* Text */}
                                 <h4 className="h4-sm emergency-call blue-color">
                                     <i className="fas fa-phone" />
-                                    9625942020
+                                    +91 9625942020
                                 </h4>
                                 <p className="mt-20">
                                     An magnis nulla dolor at sapien augue erat

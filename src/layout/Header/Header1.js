@@ -21,7 +21,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
           <img
             src="images/logo.png"
             width={180}
-            height={40}
+            height={50}
             alt="mobile-logo"
           />
         </span>
@@ -44,7 +44,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               <img
                 src="images/logo.png"
                 width={280}
-                height={50}
+                height={65}
                 alt="header-logo"
               />
             </a>
