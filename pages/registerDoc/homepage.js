@@ -19,10 +19,10 @@ export default function Homepage() {
 
 
     return (
-        // <AuthenticatedComponent>
+        <AuthenticatedComponent>
         <Layouts header={7} footer={7}>
         <Navbar />
         </Layouts>
-        // </AuthenticatedComponent>
+         </AuthenticatedComponent>
     )
 }
