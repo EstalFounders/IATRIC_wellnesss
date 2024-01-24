@@ -10,6 +10,7 @@ import Header3 from "./Header/Header3";
 import Header4 from "./Header/Header4";
 import Header5 from "./Header/Header5";
 import Header6 from "./Header/Header6";
+import DocLoginHeader from "./Header/DocLoginHeader";
 
 const Layouts = ({ children, header, footer }) => {
   const [toggle, setToggle] = useState(false);
@@ -37,7 +38,8 @@ const Layouts = ({ children, header, footer }) => {
         return <Header5 toggleMenu={() => openClick()} toggle={toggle} />;
       case 6:
         return <Header6 toggleMenu={() => openClick()} toggle={toggle} />;
-
+      case 7:
+        return <DocLoginHeader session={true} />;
       default:
         return <Header1 toggleMenu={() => openClick()} toggle={toggle} />;
     }
@@ -52,7 +54,8 @@ const Layouts = ({ children, header, footer }) => {
         return <Footer4 />;
       case 5:
         return <Footer5 />;
-
+      case 7:
+        return null;
       default:
         return <Footer4 />;
     }

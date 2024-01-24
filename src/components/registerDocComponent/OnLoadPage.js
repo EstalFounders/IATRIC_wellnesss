@@ -8,10 +8,10 @@ import { useState } from "react"
 
 
 export default function OnloadPage() {
-    const [login, setLogin] = useState(true)
-    const toggle = () => {
-        setLogin(!login)
-    }
+    // const [login, setLogin] = useState(true)
+    // const toggle = () => {
+    //     setLogin(!login)
+    // }
 
     return (
         <Row>
@@ -19,21 +19,22 @@ export default function OnloadPage() {
                 {/* doctor header login */}
                 <Row>
                     <Col>
-                        <DocLoginHeader />
+                        <DocLoginHeader session={false} />
                     </Col>
                 </Row>
 
                 <Row className="text-center mt-2">
                     <Col>
-                        <Button variant="secondary" className="text-secondary border m-1" onClick={toggle}><strong><b>Login</b></strong></Button>
-                        <Button variant="success" className="text-success border" onClick={toggle}><strong><b>SignUp</b></strong></Button>
+                        <Button variant="secondary" className="text-secondary border m-1"><strong><b>Login</b></strong></Button>
+                        {/* <Button variant="success" className="text-success border" onClick={toggle}><strong><b>SignUp</b></strong></Button> */}
                     </Col>
                 </Row>
 
                 {/* login form for doctor */}
                 <Row>
                     <Col>
-                        {login ? <Login /> : <SignUp />}
+                    <Login />
+                        {/* {login ? <Login /> : <SignUp />} */}
                     </Col>
                 </Row>
 

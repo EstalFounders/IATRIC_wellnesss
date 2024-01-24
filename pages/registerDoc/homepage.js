@@ -3,31 +3,26 @@ import { useState } from "react"
 import { getSession, signOut } from "next-auth/react"
 import AuthenticatedComponent from "../api/auth/authenticatedcomponent"
 import { useRouter } from "next/router"
+import DocLoginHeader from "../../src/layout/Header/DocLoginHeader"
+import Navbar from "../../src/components/registerDocComponent/NavBarComponent/Navbar"
+import Layouts from "../../src/layout/Layouts"
 
 export default function Homepage() {
     const session = getSession();
     const [login, setLogin] = useState(true)
-    const router = useRouter()
-
+ 
 
     const toggle = () => {
         setLogin(!login)
     }
 
-    const handleSignOut = async () => {
-        try {
-            await signOut();
-            // Additional logic after successful sign-out
-            router.push('/registerDoc/onload'); // Redirect to the login screen
-        } catch (error) {
-            console.error('Error during sign-out:', error);
-        }
-    }
+
 
     return (
-        <AuthenticatedComponent>
-            <div>Welcome</div>
-            <button type="button" className="bg-primary" onClick={handleSignOut}>Log out</button>
-        </AuthenticatedComponent>
+        // <AuthenticatedComponent>
+        <Layouts header={7} footer={7}>
+        <Navbar />
+        </Layouts>
+        // </AuthenticatedComponent>
     )
 }
