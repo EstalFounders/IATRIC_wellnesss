@@ -1,0 +1,54 @@
+// Dropdown.js
+import { signOut } from "next-auth/react";
+import React, { useState } from 'react';
+import { FiCircle } from 'react-icons/fi';
+import styles from '../../../../public/css/RightSideMenu.module.css';
+import { FaAngleDown } from 'react-icons/fa';
+
+const Dropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleItemClick = async (item) => {
+    console.log(`Clicked on ${item}`);
+    if(item == 'logout') 
+    try {
+        await signOut();
+        // Additional logic after successful sign-out
+        router.push("/registerDoc/onload"); // Redirect to the login screen
+      } catch (error) {
+        console.error("Error during sign-out:", error);
+      }
+  };
+
+  return (
+    <div className={styles.dropdown}>
+      <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
+        <strong>Dr Ashima</strong>
+      <FaAngleDown className={styles['arrow-icon']} /> 
+      </div>
+
+      {isOpen && (
+        <div className={styles['dropdown-menu']}>
+          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item1')}>
+            Item 1
+          </div>
+          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item2')}>
+            Item 2
+          </div>
+          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item3')}>
+            Item 3
+          </div>
+          <div className={styles['dropdown-item']} onClick={() => handleItemClick('logout')}>
+            Logout
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Dropdown;
