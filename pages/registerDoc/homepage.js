@@ -17,6 +17,7 @@ import Layouts from "../../src/layout/Layouts";
 import RightSideMenu from "../../src/components/registerDocComponent/NavBarComponent/RightSideMenu";
 import { FaCalendar, FaMoneyBill, FaUsb, FaUser } from "react-icons/fa";
 import RecentAppointment from "../../src/components/registerDocComponent/RecentAppointment/RecentAppointment";
+import RecentDoctors from "../../src/components/registerDocComponent/RecentDoctors/RecentDoctors";
 
 export default function Homepage() {
   const session = getSession();
@@ -26,9 +27,21 @@ export default function Homepage() {
     setLogin(!login);
   };
 
-  const itemsData = [
+  const AppointmentItemsData = [
     { id: 1, name: 'John Doe', gender: 'Male', date: '2024-01-27', disease: 'Flu', status: 'In Progress' },
     { id: 2, name: 'Jane Doe', gender: 'Female', date: '2024-01-28', disease: 'Cold', status: 'Completed' },
+    { id: 2, name: 'Jane Doe', gender: 'Female', date: '2024-01-28', disease: 'Cold', status: 'Completed' },
+    { id: 2, name: 'Jane Doe', gender: 'Female', date: '2024-01-28', disease: 'Cold', status: 'Completed' },
+    { id: 2, name: 'Jane Doe', gender: 'Female', date: '2024-01-28', disease: 'Cold', status: 'Completed' }
+    // Add more items as needed
+  ];
+
+  const DoctorItemsData = [
+    { id: 1, name: 'Dr. Matthew Anderson', area_of_expertise: 'Nerulogy,Immunology,Internel medicine', degree: 'M.D. of Medicine', work_days: 'Tuesday - Thursday', joining_date: '2024-01-27' },
+    { id: 1, name: 'Dr. Matthew Anderson', area_of_expertise: 'Nerulogy,Immunology,Internel medicine', degree: 'M.D. of Medicine', work_days: 'Tuesday - Thursday', joining_date: '2024-01-27' },
+    { id: 1, name: 'Dr. Matthew Anderson', area_of_expertise: 'Nerulogy,Immunology,Internel medicine', degree: 'M.D. of Medicine', work_days: 'Tuesday - Thursday', joining_date: '2024-01-27' },
+    { id: 1, name: 'Dr. Matthew Anderson', area_of_expertise: 'Nerulogy,Immunology,Internel medicine', degree: 'M.D. of Medicine', work_days: 'Tuesday - Thursday', joining_date: '2024-01-27' },
+    { id: 1, name: 'Dr. Matthew Anderson', area_of_expertise: 'Nerulogy,Immunology,Internel medicine', degree: 'M.D. of Medicine', work_days: 'Tuesday - Thursday', joining_date: '2024-01-27' },
     // Add more items as needed
   ];
 
@@ -77,9 +90,15 @@ export default function Homepage() {
       </Col>
       </Row>
       
-      <Row className="w-50 ml-auto mr-auto border p-4 rounded" style={{marginTop: 100}}>
+      <Row className="w-75 ml-auto mr-auto border p-4" style={{marginTop: 100, borderRadius: 20}}>
         <Col className="mt-2">
-        <RecentAppointment data={itemsData} className="text-center" />
+        <RecentAppointment data={AppointmentItemsData} className="text-center" />
+        </Col>
+      </Row>
+
+      <Row className="w-75 ml-auto mr-auto border p-4 mb-4" style={{marginTop: 100, borderRadius: 20}}>
+        <Col className="mt-2">
+        <RecentDoctors data={DoctorItemsData} className="text-center" />
         </Col>
       </Row>
     </Layouts>

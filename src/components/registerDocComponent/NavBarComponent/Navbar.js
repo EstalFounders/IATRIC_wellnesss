@@ -17,7 +17,7 @@ function Navbar() {
       <IconContext.Provider value={{ color: '#ffff' }}>
         <div className={styles.navbar}>
           <Link href='#' className={styles['menu-bars']}>
-            <FaIcons.FaBars color="#000000" onClick={showSidebar} className='ml-4 border' />
+            <FaIcons.FaBars color="#000000" size={30} onClick={showSidebar} className='ml-4 border' />
           </Link>
         </div>
         <nav className={sidebar ? `${styles['nav-menu']} ${styles.active}` : styles['nav-menu']}>

@@ -28,7 +28,7 @@ const Dropdown = () => {
     <div className={styles.dropdown}>
       <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
         <strong>Dr Ashima</strong>
-      <FaAngleDown className={styles['arrow-icon']} /> 
+      <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
       </div>
 
       {isOpen && (
