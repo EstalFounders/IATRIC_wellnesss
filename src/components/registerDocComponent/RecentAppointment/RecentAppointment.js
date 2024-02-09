@@ -24,11 +24,11 @@ const RecentAppointment = ({ data }) => {
           }}
           className="mt-4"
         >
-          <Col style={{color: '#3498db'}}><strong>Name</strong></Col>
-          <Col style={{color: '#e74c3c'}}><strong>Gender</strong></Col>
-          <Col style={{color: '#2ecc71'}}><strong>Date</strong></Col>
-          <Col style={{color: '#f39c12'}}><strong>Disease</strong></Col>
-          <Col style={{color: '#f39c12'}}><strong>Status</strong></Col>
+          <Col style={{color: '#8E822F'}}><b>Name</b></Col>
+          <Col style={{color: '#8E822F'}}><b>Gender</b></Col>
+          <Col style={{color: '#8E822F'}}><b>Date</b></Col>
+          <Col style={{color: '#8E822F'}}><b>Disease</b></Col>
+          <Col style={{color: '#8E822F'}}><b>Status</b></Col>
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {data.map((item) => (

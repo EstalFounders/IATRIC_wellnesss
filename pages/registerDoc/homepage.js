@@ -46,11 +46,11 @@ export default function Homepage() {
   ];
 
   return (
-    <AuthenticatedComponent>
+    // <AuthenticatedComponent>
     <Layouts header={7} footer={7}>
         <Row className="m-4">
             <Col style={{marginTop: 60}}>
-      <CardDeck className="w-75 ml-auto mr-auto mt-4">
+      <CardDeck className="w-50 ml-auto mr-auto mt-4">
         <Card className="rounded-circle">
           <div className="text-center mt-4">
             <FaUser color="#0009C7" size={50} />
@@ -102,6 +102,6 @@ export default function Homepage() {
         </Col>
       </Row>
     </Layouts>
-     </AuthenticatedComponent>
+    //  </AuthenticatedComponent>
   );
 }

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import * as FaIcons from 'react-icons/fa';
 import * as AiIcons from 'react-icons/ai';
-import styles from '../../../../public/css/Navbar.module.css';
+import styles from './Navbar.module.css';
 import { IconContext } from 'react-icons';
 import Link from 'next/link';
 import { SidebarData } from './SideBarData';
@@ -31,7 +31,7 @@ function Navbar() {
               return (
                 <li key={index} className={item.cName}>
                   <Link href={item.path}>
-                    <div>
+                    <div className='mt-4 ml-3'>
                     {item.icon}
                     <span className={styles.span}>{item.title}</span>
                     </div>

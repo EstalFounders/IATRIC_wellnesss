@@ -13,12 +13,13 @@ export default function Login() {
 
     const loginDoc = async () => {
         setLoader(true)
+
         const loginRes = await loginUser({
             email: userInfo.email,
             password: userInfo.password
         })
 
-        console.log(loginRes, 'login resp')
+        console.log(loginRes.ok, 'login resp')
 
         if (loginRes && !loginRes.ok) {
             setLoginErr('Please check your password & email')

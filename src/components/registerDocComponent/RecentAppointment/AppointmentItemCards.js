@@ -6,7 +6,8 @@ const ItemCards = ({ name, gender, date, disease, status }) => {
   return (
     <Row
       style={{
-        // borderBottom: "1px solid #ccc",
+        borderBottom: "1px solid #ccc",
+        borderBottomWidth: 3,
         display: "flex",
         flexDirection: "row",
       }}

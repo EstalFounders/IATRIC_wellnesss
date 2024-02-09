@@ -6,13 +6,13 @@ const ItemCards = ({ name, area_of_expertise, degree, work_days, joining_date })
   return (
     <Row
       style={{
-        // borderBottom: "1px solid #ccc",
+        borderBottom: "1px solid #ccc",
+        borderBottomWidth: 3,
         display: "flex",
         flexDirection: "row",
       }}
     className="mt-4"
     >
-      
       <Col>{name}</Col>
       <Col>{area_of_expertise}</Col>
       <Col>{degree}</Col>

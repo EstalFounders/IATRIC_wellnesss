@@ -44,10 +44,8 @@ export default function SignUp() {
         setLoader(true)
         try {
             const Body = JSON.stringify(formData)
-            const createdUser = await axios.post('/api/signup', {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const createdUser = await fetch('/api/signup', {
+                method: 'POST',
                 body: Body
             })
                 .then((response) => {

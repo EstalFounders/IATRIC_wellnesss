@@ -2,7 +2,7 @@
 import { signOut } from "next-auth/react";
 import React, { useState } from 'react';
 import { FiCircle } from 'react-icons/fi';
-import styles from '../../../../public/css/RightSideMenu.module.css';
+import styles from './RightSideMenu.module.css';
 import { FaAngleDown } from 'react-icons/fa';
 
 const Dropdown = () => {
@@ -27,7 +27,7 @@ const Dropdown = () => {
   return (
     <div className={styles.dropdown}>
       <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
-        <strong>Dr Ashima</strong>
+        <strong>Dr Satvik</strong>
       <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
       </div>
 
