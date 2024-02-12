@@ -30,7 +30,7 @@ const Demo8Hero8 = () => {
                         magna purus feugiat dolor impedit magna
                       </p>
                       {/* Button */}
-                      <Link href="/about-us">
+                      <Link legacyBehavior href="/about-us">
                         <a className="btn btn-lime black-hover">
                           More About Clinic
                         </a>
@@ -81,7 +81,7 @@ const Demo8Hero8 = () => {
                         </p>
                       </div>
                       {/* Button */}
-                      <Link href="/all-services">
+                      <Link legacyBehavior href="/all-services">
                         <a className="btn btn-lime black-hover">
                           Our Core Services
                         </a>
@@ -132,7 +132,7 @@ const Demo8Hero8 = () => {
                         </p>
                       </div>
                       {/* Button */}
-                      <Link href="/all-doctors">
+                      <Link legacyBehavior href="/all-doctors">
                         <a className="btn btn-lime black-hover">
                           Meet the Doctors
                         </a>

@@ -1,3 +1,6 @@
+
+
+import { use } from "react";
 import About5 from "../src/components/Common/About-5";
 import Banner5 from "../src/components/Common/Banner-5";
 import Statistic1 from "../src/components/Common/Statistic-1";
@@ -13,6 +16,8 @@ import Demo5Hero5 from "../src/components/Demo-5/Demo5Hero5";
 import Demo5Pricing3 from "../src/components/Demo-5/Demo5Pricing3";
 import Demo5Services2 from "../src/components/Demo-5/Demo5Services2";
 import Layouts from "../src/layout/Layouts";
+
+
 
 const Demo5 = () => {
   return (

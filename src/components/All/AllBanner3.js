@@ -26,7 +26,7 @@ const AllBanner3 = () => {
                 laoreet gestas neque undo luctus feugiat augue suscipit
               </p>
               {/* Button */}
-              <Link href="#">
+              <Link legacyBehavior href="#">
                 <a className="btn btn-blue blue-hover mt-15">
                   Make An Apointment
                 </a>

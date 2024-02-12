@@ -35,7 +35,7 @@ const Demo9Hero9 = () => {
                         in integer mollis and pretium purus pretium
                       </p>
                       {/* Button */}
-                      <Link href="/about-us">
+                      <Link legacyBehavior href="/about-us">
                         <a className="btn btn-blue blue-hover">
                           More About Clinic
                         </a>
@@ -69,12 +69,12 @@ const Demo9Hero9 = () => {
                         in integer mollis and pretium purus pretium
                       </p>
                       {/* Button */}
-                      <Link href="/who-we-are">
+                      <Link legacyBehavior href="/who-we-are">
                         <a className="btn btn-black tra-black-hover mr-10">
                           Get More Info
                         </a>
                       </Link>
-                      <Link href="/all-services">
+                      <Link legacyBehavior href="/all-services">
                         <a className="btn btn-blue blue-hover">
                           Our Core Services
                         </a>
@@ -143,7 +143,7 @@ const Demo9Hero9 = () => {
         {/* END SLIDER CONTENT */}
         {/* SLIDER NAVIGATION */}
         <div className="carousel-nav white-nav">
-          <Link href="#">
+          <Link legacyBehavior href="#">
             <a
               onClick={(e) => {
                 e.preventDefault();
@@ -157,7 +157,7 @@ const Demo9Hero9 = () => {
               <span className="carousel-control-prev-icon" aria-hidden="true" />
             </a>
           </Link>
-          <Link href="#">
+          <Link legacyBehavior href="#">
             <a
               onClick={(e) => {
                 e.preventDefault();

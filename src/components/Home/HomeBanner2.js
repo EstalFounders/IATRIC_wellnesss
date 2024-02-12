@@ -30,7 +30,7 @@ const HomeBanner2 = () => {
                   unique websites in minutes. You are free to move the blocks
                   between demos
                 </p>
-                <Link href="/demo-1">
+                <Link legacyBehavior href="/demo-1">
                   <a className="btn black-hover" target="_blank">
                     Launch Main Demo
                   </a>

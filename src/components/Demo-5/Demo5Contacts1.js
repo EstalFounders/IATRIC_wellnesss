@@ -34,7 +34,7 @@ const Demo5Contacts1 = () => {
               <p>Phone: +12 9 8765 4321</p>
               <p>
                 Email:
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a href="mailto:yourdomain@mail.com" className="blue-color">
                     hello@yourdomain.com
                   </a>
@@ -48,7 +48,7 @@ const Demo5Contacts1 = () => {
               <p>Phone: +12 9 8765 4321</p>
               <p>
                 Email:
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a href="mailto:yourdomain@mail.com" className="blue-color">
                     hello@yourdomain.com
                   </a>

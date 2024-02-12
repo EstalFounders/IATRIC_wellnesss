@@ -19,7 +19,7 @@ const Demo9Banner4 = () => {
                 laoreet gestas neque undo luctus feugiat a augue suscipit luctus
               </p>
               {/* Button */}
-              <Link href="#">
+              <Link legacyBehavior href="#">
                 <a className="btn btn-blue blue-hover mt-20">
                   Make An Apointment
                 </a>

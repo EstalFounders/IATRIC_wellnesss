@@ -253,7 +253,7 @@ const SinglePostBlogPage = () => {
                       <div className="blog-post-txt">
                         {/* Post Title */}
                         <h5 className="h5-sm steelblue-color">
-                          <Link href="/single-post">
+                          <Link legacyBehavior href="/single-post">
                             <a>Your Health Is In Your Hands</a>
                           </Link>
                         </h5>
@@ -287,7 +287,7 @@ const SinglePostBlogPage = () => {
                       <div className="blog-post-txt">
                         {/* Post Title */}
                         <h5 className="h5-sm steelblue-color">
-                          <Link href="/single-post">
+                          <Link legacyBehavior href="/single-post">
                             <a>How Weather Impacts Your Health</a>
                           </Link>
                         </h5>
@@ -330,7 +330,7 @@ const SinglePostBlogPage = () => {
                         April 20, 2019 at 7:14 PM -
                       </span>
                       <span className="btn-reply">
-                        <Link href="#">
+                        <Link legacyBehavior href="#">
                           <a href="#leave-comment" className="internal-link">
                             <i className="fas fa-reply" />
                             Reply
@@ -365,7 +365,7 @@ const SinglePostBlogPage = () => {
                             April 20, 2019 at 11:35 PM -
                           </span>
                           <span className="btn-reply">
-                            <Link href="#">
+                            <Link legacyBehavior href="#">
                               <a
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -409,7 +409,7 @@ const SinglePostBlogPage = () => {
                         April 29, 2018 at 5:41 PM -
                       </span>
                       <span className="btn-reply">
-                        <Link href="#">
+                        <Link legacyBehavior href="#">
                           <a href="#leave-comment" className="internal-link">
                             <i className="fas fa-reply" />
                             Reply
@@ -449,7 +449,7 @@ const SinglePostBlogPage = () => {
                         June 11, 2018 at 11:19 AM -
                       </span>
                       <span className="btn-reply">
-                        <Link href="#">
+                        <Link legacyBehavior href="#">
                           <a href="#leave-comment" className="internal-link">
                             <i className="fas fa-reply" />
                             Reply
@@ -583,7 +583,7 @@ const SinglePostBlogPage = () => {
                 magna purus
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover">Learn More</a>
               </Link>
             </div>
@@ -645,7 +645,7 @@ const SinglePostBlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Etiam sapien accumsan molestie ante empor ...</a>
                     </Link>
                     <p>43 Comments</p>
@@ -661,7 +661,7 @@ const SinglePostBlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Blandit tempor sapien ipsum, porta justo ...</a>
                     </Link>
                     <p>38 Comments</p>
@@ -677,7 +677,7 @@ const SinglePostBlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Cursus risus laoreet turpis auctor varius ...</a>
                     </Link>
                     <p>29 Comments</p>
@@ -724,7 +724,7 @@ const SinglePostBlogPage = () => {
                 auctor at tempus feugiat dolor lacinia cursus nulla vitae massa
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover mt-10">View Timetable</a>
               </Link>
             </div>

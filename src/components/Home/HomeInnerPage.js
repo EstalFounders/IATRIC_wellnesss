@@ -37,7 +37,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/about-us">
+                        <Link legacyBehavior href="/about-us">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -57,7 +57,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/who-we-are">
+                        <Link legacyBehavior href="/who-we-are">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -77,7 +77,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/all-services">
+                        <Link legacyBehavior href="/all-services">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -97,7 +97,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/service-1">
+                        <Link legacyBehavior href="/service-1">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -119,7 +119,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/service-2">
+                        <Link legacyBehavior href="/service-2">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -141,7 +141,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/all-departments">
+                        <Link legacyBehavior href="/all-departments">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -161,7 +161,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/department-single">
+                        <Link legacyBehavior href="/department-single">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -181,7 +181,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/all-doctors">
+                        <Link legacyBehavior href="/all-doctors">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -201,7 +201,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/doctor-1">
+                        <Link legacyBehavior href="/doctor-1">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -223,7 +223,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/doctor-2">
+                        <Link legacyBehavior href="/doctor-2">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -245,7 +245,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/pricing-1">
+                        <Link legacyBehavior href="/pricing-1">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -267,7 +267,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/pricing-2">
+                        <Link legacyBehavior href="/pricing-2">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -289,7 +289,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/timetable">
+                        <Link legacyBehavior href="/timetable">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -309,7 +309,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/appointment">
+                        <Link legacyBehavior href="/appointment">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -329,7 +329,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/blog-listing">
+                        <Link legacyBehavior href="/blog-listing">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -349,7 +349,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/single-post">
+                        <Link legacyBehavior href="/single-post">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -369,7 +369,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/gallery">
+                        <Link legacyBehavior href="/gallery">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -389,7 +389,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/faqs">
+                        <Link legacyBehavior href="/faqs">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -409,7 +409,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/terms">
+                        <Link legacyBehavior href="/terms">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -429,7 +429,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/contacts-1">
+                        <Link legacyBehavior href="/contacts-1">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>
@@ -451,7 +451,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link href="/contacts-2">
+                        <Link legacyBehavior href="/contacts-2">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>

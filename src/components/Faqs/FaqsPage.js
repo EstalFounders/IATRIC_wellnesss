@@ -35,7 +35,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingOne">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA1(a1 === 1 ? 0 : 1)}
                           data-toggle="collapse"
@@ -67,7 +67,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingTwo">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA1(a1 === 2 ? 0 : 2)}
                           data-toggle="collapse"
@@ -99,7 +99,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingThree">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA1(a1 === 3 ? 0 : 3)}
                           data-toggle="collapse"
@@ -148,7 +148,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingFour">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA1(a1 === 4 ? 0 : 4)}
                           data-toggle="collapse"
@@ -185,7 +185,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingFive">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA2(a2 === 1 ? 0 : 1)}
                           data-toggle="collapse"
@@ -217,7 +217,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingSix">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA2(a2 === 2 ? 0 : 2)}
                           data-toggle="collapse"
@@ -248,7 +248,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingSeven">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA2(a2 === 3 ? 0 : 3)}
                           data-toggle="collapse"
@@ -289,7 +289,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingEight">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA2(a2 === 4 ? 0 : 4)}
                           data-toggle="collapse"
@@ -322,7 +322,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingNine">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA2(a2 === 5 ? 0 : 5)}
                           data-toggle="collapse"
@@ -384,7 +384,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingTen">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA3(a3 === 1 ? 0 : 1)}
                           data-toggle="collapse"
@@ -418,7 +418,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingEleven">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA3(a3 === 2 ? 0 : 2)}
                           data-toggle="collapse"
@@ -458,7 +458,7 @@ const FaqsPage = () => {
                   {/* Card Title */}
                   <div className="card-header" id="headingTwelve">
                     <h5 className="h5-xs">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => setA3(a3 === 3 ? 0 : 3)}
                           data-toggle="collapse"
@@ -528,7 +528,7 @@ const FaqsPage = () => {
                 magna purus
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover">Learn More</a>
               </Link>
             </div>
@@ -586,7 +586,7 @@ const FaqsPage = () => {
                 auctor at tempus feugiat dolor lacinia cursus nulla vitae massa
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover mt-10">View Timetable</a>
               </Link>
             </div>

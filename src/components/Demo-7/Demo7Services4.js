@@ -33,7 +33,7 @@ const Demo7Services4 = () => {
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
-                  <Link href="/single-service">
+                  <Link legacyBehavior href="/single-service">
                     <a>General Dentistry</a>
                   </Link>
                 </h5>
@@ -56,7 +56,7 @@ const Demo7Services4 = () => {
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
-                  <Link href="/single-service">
+                  <Link legacyBehavior href="/single-service">
                     <a>{`Children's Dentistry`}</a>
                   </Link>
                 </h5>
@@ -79,7 +79,7 @@ const Demo7Services4 = () => {
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
-                  <Link href="/single-service">
+                  <Link legacyBehavior href="/single-service">
                     <a>Cosmetic Services</a>
                   </Link>
                 </h5>
@@ -102,7 +102,7 @@ const Demo7Services4 = () => {
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
-                  <Link href="/single-service">
+                  <Link legacyBehavior href="/single-service">
                     <a>Dental Emergency</a>
                   </Link>
                 </h5>

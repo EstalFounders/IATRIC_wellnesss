@@ -48,7 +48,7 @@ const AllAbout1 = () => {
                 magna ipsum and vitae a purus primis ipsum magna ipsum
               </p>
               {/* Button */}
-              <Link href="/timetable">
+              <Link legacyBehavior href="/timetable">
                 <a className="btn btn-sm btn-tra-white mt-25">View Timetable</a>
               </Link>
             </div>
@@ -64,7 +64,7 @@ const AllAbout1 = () => {
                 magna ipsum and vitae a purus primis ipsum magna ipsum
               </p>
               {/* Button */}
-              <Link href="#">
+              <Link legacyBehavior href="#">
                 <a className="btn btn-sm btn-tra-white mt-25">
                   Make an Apointment
                 </a>

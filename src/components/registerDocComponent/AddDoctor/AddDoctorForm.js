@@ -5,6 +5,7 @@ import { Col, Row } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import ImageUploader from "../../../lib/ImageUploader";
 import Preloader from "../../Preloader.js";
+import Popup from "../../Popup.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -37,42 +38,43 @@ const AddDoctorForm = () => {
   const handleSubmit = async (e) => {
     setLoader(true);
     e.preventDefault();
-    
+
     const formData = new FormData();
-    formData.append('name', doctorDetails.name);
-    formData.append('expertise', doctorDetails.expertise);
-    formData.append('degree', doctorDetails.degree);
-    formData.append('language', doctorDetails.language);
-    formData.append('workDays', doctorDetails.workDays);
-    formData.append('overview', doctorDetails.overview);
-    formData.append('educationTraining', doctorDetails.educationTraining);
-  
-    formData.append('profilePicture', profilePicture);
+    formData.append("name", doctorDetails.name);
+    formData.append("expertise", doctorDetails.expertise);
+    formData.append("degree", doctorDetails.degree);
+    formData.append("language", doctorDetails.language);
+    formData.append("workDays", doctorDetails.workDays);
+    formData.append("overview", doctorDetails.overview);
+    formData.append("educationTraining", doctorDetails.educationTraining);
+
+    formData.append("profilePicture", profilePicture);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
     });
 
     try {
-      const response = await fetch('/api/addDoctor', {
+      const response = await fetch("/api/addDoctor", {
         // headers: {
         //     'Content-Type': 'application/json',
         // },
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
-  
+
       if (response.ok) {
-        console.log('Doctor added successfully.');
+        // console.log("Doctor added successfully.");
+        window.alert("Doctor added successfully.")
+        window.location.reload()
         // Reset form fields or navigate to another page
       } else {
-        console.error('Error adding doctor:', response.statusText);
+        console.error("Error adding doctor:", response.statusText);
       }
     } catch (error) {
-      console.error('Error adding doctor:', error.message);
+      console.error("Error adding doctor:", error.message);
     }
     setLoader(false);
   };
-
 
   return (
     <div className={styles.formContainer}>
@@ -87,6 +89,7 @@ const AddDoctorForm = () => {
               name="name"
               value={doctorDetails.name}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -98,6 +101,7 @@ const AddDoctorForm = () => {
               name="expertise"
               value={doctorDetails.expertise}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -109,6 +113,7 @@ const AddDoctorForm = () => {
               name="degree"
               value={doctorDetails.degree}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -120,6 +125,7 @@ const AddDoctorForm = () => {
               name="language"
               value={doctorDetails.language}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -131,6 +137,7 @@ const AddDoctorForm = () => {
               name="workDays"
               value={doctorDetails.workDays}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -141,6 +148,7 @@ const AddDoctorForm = () => {
               name="overview"
               value={doctorDetails.overview}
               onChange={handleChange}
+              required
             />
           </label>
 
@@ -151,6 +159,7 @@ const AddDoctorForm = () => {
               name="educationTraining"
               value={doctorDetails.educationTraining}
               onChange={handleChange}
+              required
             />
           </label>
 

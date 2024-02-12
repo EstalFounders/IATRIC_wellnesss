@@ -32,7 +32,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-1.jpg"
@@ -56,7 +56,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-2.jpg"
@@ -80,7 +80,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-3.jpg"
@@ -104,7 +104,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-4.jpg"
@@ -128,7 +128,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-5.jpg"
@@ -152,7 +152,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-6.jpg"
@@ -176,7 +176,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-7.jpg"
@@ -200,7 +200,7 @@ const AllGallery2 = () => {
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     className="image-link"
                     href="images/gallery/image-8.jpg"

@@ -191,7 +191,7 @@ const AppointmentPage = () => {
                 magna purus
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover">Learn More</a>
               </Link>
             </div>

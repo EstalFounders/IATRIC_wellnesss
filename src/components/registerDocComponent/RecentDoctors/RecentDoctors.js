@@ -3,23 +3,11 @@ import React from "react";
 import ItemCard from "./DocItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 
-const RecentDoctors = ({ data }) => {
-  console.log(data[0].area_of_expertise, "item on recent doctor");
+const RecentDoctors = ({ doctors }) => {
+  console.log(doctors, "doctors");
   return (
     <Row>
       <Col>
-        <Row>
-          <Col>
-            <h4>
-              <b>Recent Doctors</b>
-            </h4>
-          </Col>
-          <Col className="text-right">
-            <Button className="bg-primary" href="/registerDoc/addDoctor">
-              Add Doctor
-            </Button>
-          </Col>
-        </Row>
         <Row
           style={{
             display: "flex",
@@ -44,14 +32,14 @@ const RecentDoctors = ({ data }) => {
           </Col>
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {data.map((item) => (
+          {doctors.map((item) => (
             <ItemCard
               key={item.id} // Ensure each item has a unique key
               name={item.name}
-              area_of_expertise={item.area_of_expertise}
+              area_of_expertise={item.expertise}
               degree={item.degree}
-              work_days={item.work_days}
-              joining_date={item.joining_date}
+              work_days={item.workDays}
+              joining_date={item.joiningDate}
             />
           ))}
         </div>

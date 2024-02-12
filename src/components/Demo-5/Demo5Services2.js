@@ -2,186 +2,168 @@ import Link from "next/link";
 import React from "react";
 
 const Demo5Services2 = () => {
-    return (
-        <section
-            id="services-2"
-            className="bg-lightgrey wide-70 services-section division"
-        >
-            <div className="container">
-                {/* SECTION TITLE */}
-                <div className="row">
-                    <div className="col-lg-10 offset-lg-1 section-title">
-                        {/* Title 	*/}
-                        <h3 className="h3-md steelblue-color">
-                            Choose Department
-                        </h3>
-                        {/* Text */}
-                        <p>
-                            Aliquam a augue suscipit, luctus neque purus ipsum
-                            neque dolor primis libero at tempus, blandit posuere
-                            ligula varius congue cursus porta feugiat
-                        </p>
-                    </div>
-                </div>
-                <div className="row">
-                    {/* SERVICE BOX #1 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-083-stethoscope" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        General Physician
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #2 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-047-head" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                    Dermatalogist
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #3 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-015-blood-donation-1" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                    Orthopaedics
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #4 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-048-lungs" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Dentistry
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #5 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-060-cardiogram-4" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Physiotherapy
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #6 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-031-scanner" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Home Care
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #7 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-076-microscope" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Medicine Delivery Services
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                    {/* SERVICE BOX #8 */}
-                    <div className="col-sm-6 col-lg-3">
-                        <div
-                            className="sbox-2"
-                        >
-                            <Link href="/department-single">
-                                <a>
-                                    {/* Icon  */}
-                                    <div className="sbox-2-icon icon-xl">
-                                        <span className="flaticon-068-ambulance-3" />
-                                    </div>
-                                    {/* Title */}
-                                    <h5 className="h5-sm sbox-2-title steelblue-color">
-                                        Nursing Care
-                                    </h5>
-                                </a>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-                {/* End row */}
+  return (
+    <section
+      id="services-2"
+      className="bg-lightgrey wide-70 services-section division"
+    >
+      <div className="container">
+        {/* SECTION TITLE */}
+        <div className="row">
+          <div className="col-lg-10 offset-lg-1 section-title">
+            {/* Title 	*/}
+            <h3 className="h3-md steelblue-color">Choose Department</h3>
+            {/* Text */}
+            <p>
+              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
+              primis libero at tempus, blandit posuere ligula varius congue
+              cursus porta feugiat
+            </p>
+          </div>
+        </div>
+        <div className="row">
+          {/* SERVICE BOX #1 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-083-stethoscope" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    General Physician
+                  </h5>
+                </a>
+              </Link>
             </div>
-            {/* End container */}
-        </section>
-    );
+          </div>
+          {/* SERVICE BOX #2 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-047-head" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Dermatalogist
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #3 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-015-blood-donation-1" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Orthopaedics
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #4 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-048-lungs" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Dentistry
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #5 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-060-cardiogram-4" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Physiotherapy
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #6 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-031-scanner" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Home Care
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #7 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-076-microscope" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Medicine Delivery Services
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* SERVICE BOX #8 */}
+          <div className="col-sm-6 col-lg-3">
+            <div className="sbox-2">
+              <Link legacyBehavior href="/department-single">
+                <a>
+                  {/* Icon  */}
+                  <div className="sbox-2-icon icon-xl">
+                    <span className="flaticon-068-ambulance-3" />
+                  </div>
+                  {/* Title */}
+                  <h5 className="h5-sm sbox-2-title steelblue-color">
+                    Nursing Care
+                  </h5>
+                </a>
+              </Link>
+            </div>
+          </div>
+        </div>
+        {/* End row */}
+      </div>
+      {/* End container */}
+    </section>
+  );
 };
 
 export default Demo5Services2;

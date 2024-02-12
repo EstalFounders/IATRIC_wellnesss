@@ -6,13 +6,13 @@ import * as IoIcons from 'react-icons/io';
 export const SidebarData = [
   {
     title: 'Home',
-    path: '/',
+    path: '/registerDoc/homepage',
     icon: <AiIcons.AiFillHome />,
     cName: 'nav-text'
   },
-  {
-    title: 'Reports',
-    path: '/reports',
+  { 
+    title: 'Add Doctors',
+    path: '/registerDoc/addDoctor',
     icon: <IoIcons.IoIosPaper />,
     cName: 'nav-text'
   },

@@ -72,7 +72,7 @@ const Footer2 = () => {
               {/* Email */}
               <p className="foo-email mt-20">
                 E:
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a
                     onClick={(e) => {
                       e.preventDefault();

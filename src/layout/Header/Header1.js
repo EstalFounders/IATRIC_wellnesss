@@ -8,7 +8,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
     <header id="header" className="header">
       {/* MOBILE HEADER */}
       <div className="wsmobileheader clearfix">
-        <Link href="#">
+        <Link legacyBehavior href="#">
           <a
             id="wsnavtoggle"
             onClick={() => toggleMenu()}
@@ -25,14 +25,14 @@ const Header1 = ({ toggleMenu, toggle }) => {
             alt="mobile-logo"
           />
         </span>
-        <Link href="#">
+        <Link legacyBehavior href="#">
           <a href="tel:123456789" className="callusbtn">
             <i className="fas fa-phone" />
           </a>
         </Link>
       </div>
       {/* HEADER STRIP */}
-       {/* remove code for header strip as it was not mobile responsive */}
+      {/* remove code for header strip as it was not mobile responsive */}
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
       <div className="wsmainfull menu clearfix d-none d-lg-block">
@@ -54,10 +54,10 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <Link href="/">
-                <a>
-                  Home <span className="wsarrow" />
-                </a>
+                <Link legacyBehavior href="/">
+                  <a>
+                    Home <span className="wsarrow" />
+                  </a>
                 </Link>
               </li>
               {/* END DROPDOWN MENU */}
@@ -73,22 +73,22 @@ const Header1 = ({ toggleMenu, toggle }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Standard Pages:</li>
                         <li>
-                          <Link href="/about-us">
+                          <Link legacyBehavior href="/about-us">
                             <a>About Us</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/who-we-are">
+                          <Link legacyBehavior href="/who-we-are">
                             <a>Who We Are</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/all-services">
+                          <Link legacyBehavior href="/all-services">
                             <a>Our Services</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/service-1">
+                          <Link legacyBehavior href="/service-1">
                             <a>Get In Touch</a>
                           </Link>
                         </li>
@@ -97,17 +97,17 @@ const Header1 = ({ toggleMenu, toggle }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Medical Pages:</li>
                         <li>
-                          <Link href="/all-departments">
+                          <Link legacyBehavior href="/all-departments">
                             <a>Our Departments</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/department-single">
+                          <Link legacyBehavior href="/department-single">
                             <a>Department Single</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/all-doctors">
+                          <Link legacyBehavior href="/all-doctors">
                             <a>Meet the Doctors</a>
                           </Link>
                         </li>
@@ -116,27 +116,27 @@ const Header1 = ({ toggleMenu, toggle }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Special Pages:</li>
                         <li>
-                          <Link href="/pricing-1">
+                          <Link legacyBehavior href="/pricing-1">
                             <a>Pricing Packages #1</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/pricing-2">
+                          <Link legacyBehavior href="/pricing-2">
                             <a>Pricing Packages #2</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/appointment">
+                          <Link legacyBehavior href="/appointment">
                             <a>Make an Appointment</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/faqs">
+                          <Link legacyBehavior href="/faqs">
                             <a>FAQs Page</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/terms">
+                          <Link legacyBehavior href="/terms">
                             <a>Terms of Use</a>
                           </Link>
                         </li>
@@ -145,22 +145,22 @@ const Header1 = ({ toggleMenu, toggle }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Auxiliary Pages:</li>
                         <li>
-                          <Link href="/gallery">
+                          <Link legacyBehavior href="/gallery">
                             <a>Our Gallery</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/blog-listing">
+                          <Link legacyBehavior href="/blog-listing">
                             <a>Blog Listing Page</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/single-post">
+                          <Link legacyBehavior href="/single-post">
                             <a>Single Blog Post</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/contacts-2">
+                          <Link legacyBehavior href="/contacts-2">
                             <a>Contact Us #2</a>
                           </Link>
                         </li>
@@ -295,7 +295,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Etiam sapien risus ante auctor tempus accumsan
                                   an empor ...
@@ -314,7 +314,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Blandit tempor a sapien ipsum, porta risus
                                   auctor justo ...
@@ -333,7 +333,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Cursus risus auctor tempus risus laoreet
                                   turpis auctor varius ...
@@ -359,7 +359,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               </li>
               {/* NAVIGATION MENU BUTTON */}
               <li className="nl-simple header-btn" aria-haspopup="true">
-                <Link href="/appointment">
+                <Link legacyBehavior href="/appointment">
                   <a>Make an Appointment</a>
                 </Link>
               </li>

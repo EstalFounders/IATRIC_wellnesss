@@ -29,7 +29,7 @@ const Demo6Hero6 = () => {
                         in viverra tortor and gravida purus lorem in tortor
                       </p>
                       {/* Button */}
-                      <Link href="/about-us">
+                      <Link legacyBehavior href="/about-us">
                         <a className="btn btn-blue tra-white-hover">
                           More About Clinic
                         </a>
@@ -64,12 +64,12 @@ const Demo6Hero6 = () => {
                         in viverra tortor and gravida purus lorem in tortor
                       </p>
                       {/* Button */}
-                      <Link href="/who-we-are">
+                      <Link legacyBehavior href="/who-we-are">
                         <a className="btn btn-tra-white black-hover mr-10">
                           Get More Info
                         </a>
                       </Link>
-                      <Link href="/all-services">
+                      <Link legacyBehavior href="/all-services">
                         <a className="btn btn-blue blue-hover">
                           Our Core Services
                         </a>
@@ -104,12 +104,12 @@ const Demo6Hero6 = () => {
                         in viverra tortor and gravida purus lorem in tortor
                       </p>
                       {/* Button */}
-                      <Link href="/all-doctors">
+                      <Link legacyBehavior href="/all-doctors">
                         <a className="btn btn-blue blue-hover mr-10">
                           View All Doctors
                         </a>
                       </Link>
-                      <Link href="/timetable">
+                      <Link legacyBehavior href="/timetable">
                         <a className="btn btn-tra-white black-hover">
                           Doctors Timetable
                         </a>

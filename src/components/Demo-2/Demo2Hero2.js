@@ -56,7 +56,7 @@ const Demo2Hero2 = () => {
                         </p>
                       </div>
                       {/* Button */}
-                      <Link href="/about-us">
+                      <Link legacyBehavior href="/about-us">
                         <a className="btn btn-blue blue-hover">
                           More About Clinic
                         </a>
@@ -93,7 +93,7 @@ const Demo2Hero2 = () => {
                         primis in integer mollis pretium purus pretium ligula
                       </p>
                       {/* Button */}
-                      <Link href="/all-departments">
+                      <Link legacyBehavior href="/all-departments">
                         <a className="btn btn-blue blue-hover">
                           Our Departments
                         </a>

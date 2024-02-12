@@ -1,10 +1,10 @@
 import { dbConnect } from "../../../src/lib/db";
 import { compare } from 'bcryptjs'
-import NextAuth, { NextAuthOptions } from 'next-auth'
+import NextAuth from 'next-auth' // Import NextAuth without NextAuthOptions
 import CredentialsProvider from 'next-auth/providers/credentials'
 import User from '../../../src/models/userModel'
 
-const options = NextAuthOptions = {
+const options = {
     providers: [
         CredentialsProvider({
             id: "credentials",
@@ -39,9 +39,6 @@ const options = NextAuthOptions = {
         signIn: "/login"
     },
     session: false,
-    // {
-    //     strategy: "jwt"
-    // },
     callbacks: {
         jwt: async ({ token, user }) => {
             user && (token.user = user)

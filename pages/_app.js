@@ -3,6 +3,7 @@ import { Fragment, useEffect, useState } from "react";
 import Preloader from "../src/components/Preloader";
 import { animation } from "../src/utils";
 import "../styles/globals.css";
+import { NoSsr } from "@mui/material";
 
 function MyApp({ Component, pageProps }) {
   const [loader, setLoader] = useState(true);
@@ -34,7 +35,9 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="images/favicon.ico" type="image/x-icon"></link>
       </Head>
       {loader && <Preloader />}
+      <NoSsr>
       <Component {...pageProps} />
+      </NoSsr>
     </Fragment>
   );
 }

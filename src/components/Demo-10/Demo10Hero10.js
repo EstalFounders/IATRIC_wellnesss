@@ -30,7 +30,7 @@ const Demo10Hero10 = () => {
                         primis mollis
                       </p>
                       {/* Button */}
-                      <Link href="/who-we-are">
+                      <Link legacyBehavior href="/who-we-are">
                         <a className="btn btn-blue tra-black-hover">
                           Get More Info
                         </a>
@@ -79,7 +79,7 @@ const Demo10Hero10 = () => {
                         </p>
                       </div>
                       {/* Button */}
-                      <Link href="/all-doctors">
+                      <Link legacyBehavior href="/all-doctors">
                         <a className="btn btn-blue blue-hover">
                           Meet the Doctors
                         </a>

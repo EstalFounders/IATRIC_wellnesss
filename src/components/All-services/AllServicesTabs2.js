@@ -142,7 +142,7 @@ const AllServicesTabs2 = () => {
                   </div>
                   {/* End Options List */}
                   {/* Button */}
-                  <Link href="/service-1">
+                  <Link legacyBehavior href="/service-1">
                     <a className="btn btn-blue blue-hover mt-30">
                       View More Details
                     </a>
@@ -246,7 +246,7 @@ const AllServicesTabs2 = () => {
                   </div>
                   {/* End Options List */}
                   {/* Button */}
-                  <Link href="/service-1">
+                  <Link legacyBehavior href="/service-1">
                     <a className="btn btn-blue blue-hover mt-30">
                       View More Details
                     </a>
@@ -350,7 +350,7 @@ const AllServicesTabs2 = () => {
                   </div>
                   {/* End Options List */}
                   {/* Button */}
-                  <Link href="/service-1">
+                  <Link legacyBehavior href="/service-1">
                     <a className="btn btn-blue blue-hover mt-30">
                       View More Details
                     </a>
@@ -454,7 +454,7 @@ const AllServicesTabs2 = () => {
                   </div>
                   {/* End Options List */}
                   {/* Button */}
-                  <Link href="/service-1">
+                  <Link legacyBehavior href="/service-1">
                     <a className="btn btn-blue blue-hover mt-30">
                       View More Details
                     </a>

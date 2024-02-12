@@ -6,6 +6,8 @@ import {
 } from "../../src/constant";
 import { storage } from "../../src/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { dbConnect } from "../../src/lib/db";
+import Doctor from "../../src/models/doctorModel";
 
 export const config = {
   api: {
@@ -18,6 +20,8 @@ export default async function handler(req, res) {
     try {
       const form = new multiparty.Form();
       form.parse(req, async function (err, fields, files) {
+        console.log(fields, "fields");
+
         if (err) {
           console.error("Error parsing form data:", err);
           res
@@ -29,7 +33,7 @@ export default async function handler(req, res) {
           // Upload profile picture
           const profilePictureRef = ref(
             storage,
-            `${profilePicture_img_path}/${fields.name}/${uuidv4()}`
+            `${profilePicture_img_path}/${fields.name}${uuidv4()}`
           );
           const profilePictureFile = files.profilePicture[0]; // Get the first file from the array
           await uploadBytes(
@@ -54,15 +58,30 @@ export default async function handler(req, res) {
             diplomasCertificatesFiles.map(async (certificate, index) => {
               const certificateRef = ref(
                 storage,
-                `${certificate_img_path}/${fields.name}/${uuidv4()}`
+                `${certificate_img_path}/${fields.name}${uuidv4()}`
               );
               const certificateFile = certificate[0]; // Get the first file from the array
               await uploadBytes(certificateRef, certificateFile);
               return getDownloadURL(certificateRef);
             })
           );
-          console.log(profilePictureUrl, ' ', diplomasCertificatesUrls)
-          // Save data and URLs to the database or perform other actions
+
+          await dbConnect();
+
+          const stringFields = Object.fromEntries(
+            Object.entries(fields).map(([key, value]) => [
+              key,
+              value.toString(),
+            ])
+          );
+          const addedDoctor = await Doctor.create({
+            ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
+            profilePictureUrl,
+            diplomasCertificatesUrls,
+          });
+
+          console.log("Doctor Added");
+
           res.status(200).json({
             success: true,
             profilePictureUrl,
@@ -81,7 +100,21 @@ export default async function handler(req, res) {
         .status(500)
         .json({ error: "An error occurred while parsing form data." });
     }
-  } else {
-    res.status(405).json({ error: "Method Not Allowed" });
   }
+
+  if (req.method === "GET") {
+    await dbConnect();
+    try {
+      const doctors = await Doctor.find();
+      res.status(200).json(doctors);
+    } catch (err) {
+      console.error("Error fetching doctor data:", error);
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching doctor data." });
+    }
+  }
+  // } else {
+  //   res.status(405).json({ error: "Method Not Allowed" });
+  // }
 }

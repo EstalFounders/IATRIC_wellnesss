@@ -52,37 +52,59 @@ const MobileMenu = () => {
               </a>
               <ul className="sub-menu" style={activeLi("home")}>
                 <li aria-haspopup="true">
-                  <Link href="/demo-1">Home Concept #1</Link>
+                  <Link legacyBehavior href="/demo-1">
+                    Home Concept #1
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-3">Home Concept #3</Link>
+                  <Link legacyBehavior href="/demo-3">
+                    Home Concept #3
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-4">Home Concept #4</Link>
+                  <Link legacyBehavior href="/demo-4">
+                    Home Concept #4
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-5">Home Concept #5</Link>
+                  <Link legacyBehavior href="/demo-5">
+                    Home Concept #5
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-6">Home Concept #6</Link>
+                  <Link legacyBehavior href="/demo-6">
+                    Home Concept #6
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-7">Home Concept #7</Link>
+                  <Link legacyBehavior href="/demo-7">
+                    Home Concept #7
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-8">Home Concept #8</Link>
+                  <Link legacyBehavior href="/demo-8">
+                    Home Concept #8
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-9">Home Concept #9</Link>
+                  <Link legacyBehavior href="/demo-9">
+                    Home Concept #9
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-10">Home Concept #10</Link>
+                  <Link legacyBehavior href="/demo-10">
+                    Home Concept #10
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-11">Home Concept #11</Link>
+                  <Link legacyBehavior href="/demo-11">
+                    Home Concept #11
+                  </Link>
                 </li>
                 <li aria-haspopup="true">
-                  <Link href="/demo-12">Home Concept #12</Link>
+                  <Link legacyBehavior href="/demo-12">
+                    Home Concept #12
+                  </Link>
                 </li>
               </ul>
             </li>{" "}
@@ -108,83 +130,121 @@ const MobileMenu = () => {
                     <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                       <li className="title">Standard Pages:</li>
                       <li>
-                        <Link href="/about-us">About Us Page</Link>
+                        <Link legacyBehavior href="/about-us">
+                          About Us Page
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/who-we-are">Who We Are</Link>
+                        <Link legacyBehavior href="/who-we-are">
+                          Who We Are
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/all-services">Our Services</Link>
+                        <Link legacyBehavior href="/all-services">
+                          Our Services
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/service-1">Service Single #1</Link>
+                        <Link legacyBehavior href="/service-1">
+                          Service Single #1
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/service-2">Service Single #2</Link>
+                        <Link legacyBehavior href="/service-2">
+                          Service Single #2
+                        </Link>
                       </li>
                     </ul>
                     {/* MEGAMENU LINKS */}
                     <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                       <li className="title">Medical Pages:</li>
                       <li>
-                        <Link href="/all-departments">Our Departments</Link>
+                        <Link legacyBehavior href="/all-departments">
+                          Our Departments
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/department-single">Department Single</Link>
+                        <Link legacyBehavior href="/department-single">
+                          Department Single
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/all-doctors">Meet the Doctors</Link>
+                        <Link legacyBehavior href="/all-doctors">
+                          Meet the Doctors
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/doctor-1">
+                        <Link legacyBehavior href="/doctor-1">
                           <a>{`Doctor's`} Profile #1</a>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/doctor-2">
+                        <Link legacyBehavior href="/doctor-2">
                           <a>{`Doctor's`} Profile #2</a>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/timetable">Doctors Timetable</Link>
+                        <Link legacyBehavior href="/timetable">
+                          Doctors Timetable
+                        </Link>
                       </li>
                     </ul>
                     {/* MEGAMENU LINKS */}
                     <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                       <li className="title">Special Pages:</li>
                       <li>
-                        <Link href="/pricing-1">Pricing Packages #1</Link>
+                        <Link legacyBehavior href="/pricing-1">
+                          Pricing Packages #1
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/pricing-2">Pricing Packages #2</Link>
+                        <Link legacyBehavior href="/pricing-2">
+                          Pricing Packages #2
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/appointment">Make an Appointment</Link>
+                        <Link legacyBehavior href="/appointment">
+                          Make an Appointment
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/faqs">FAQs Page</Link>
+                        <Link legacyBehavior href="/faqs">
+                          FAQs Page
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/terms">Terms of Use</Link>
+                        <Link legacyBehavior href="/terms">
+                          Terms of Use
+                        </Link>
                       </li>
                     </ul>
                     {/* MEGAMENU LINKS */}
                     <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                       <li className="title">Auxiliary Pages:</li>
                       <li>
-                        <Link href="/gallery">Our Gallery</Link>
+                        <Link legacyBehavior href="/gallery">
+                          Our Gallery
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/blog-listing">Blog Listing Page</Link>
+                        <Link legacyBehavior href="/blog-listing">
+                          Blog Listing Page
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/single-post">Single Blog Post</Link>
+                        <Link legacyBehavior href="/single-post">
+                          Single Blog Post
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/contacts-1">Contact Us #1</Link>
+                        <Link legacyBehavior href="/contacts-1">
+                          Contact Us #1
+                        </Link>
                       </li>
                       <li>
-                        <Link href="/contacts-2">Contact Us #2</Link>
+                        <Link legacyBehavior href="/contacts-2">
+                          Contact Us #2
+                        </Link>
                       </li>
                     </ul>
                   </div>{" "}
@@ -335,7 +395,7 @@ const MobileMenu = () => {
                           />
                           {/* Text */}
                           <div className="post-summary">
-                            <Link href="/single-post">
+                            <Link legacyBehavior href="/single-post">
                               Etiam sapien risus ante auctor tempus accumsan an
                               empor ...
                             </Link>
@@ -352,7 +412,7 @@ const MobileMenu = () => {
                           />
                           {/* Text */}
                           <div className="post-summary">
-                            <Link href="/single-post">
+                            <Link legacyBehavior href="/single-post">
                               Blandit tempor a sapien ipsum, porta risus auctor
                               justo ...
                             </Link>
@@ -369,7 +429,7 @@ const MobileMenu = () => {
                           />
                           {/* Text */}
                           <div className="post-summary">
-                            <Link href="/single-post">
+                            <Link legacyBehavior href="/single-post">
                               Cursus risus auctor tempus risus laoreet turpis
                               auctor varius ...
                             </Link>
@@ -393,7 +453,9 @@ const MobileMenu = () => {
             </li>
             {/* NAVIGATION MENU BUTTON */}
             <li className="nl-simple header-btn" aria-haspopup="true">
-              <Link href="/appointment">Make an Appointment</Link>
+              <Link legacyBehavior href="/appointment">
+                Make an Appointment
+              </Link>
             </li>
           </ul>
         </nav>{" "}

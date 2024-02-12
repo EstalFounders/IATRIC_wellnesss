@@ -63,7 +63,7 @@ const Demo6Video1 = () => {
               data-wow-delay="0.6s"
             >
               {/* Change the link HERE!!! */}
-              <Link href="#">
+              <Link legacyBehavior href="#">
                 <a
                   className="video-popup1"
                   href="#"

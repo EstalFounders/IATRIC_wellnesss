@@ -21,7 +21,7 @@ const AllFooter2 = () => {
               {/* Email */}
               <p className="foo-email">
                 E:
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a href="mailto:yourdomain@mail.com">hello@yourdomain.com</a>
                 </Link>
               </p>

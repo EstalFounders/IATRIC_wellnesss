@@ -37,7 +37,7 @@ const Demo2Banner2 = () => {
                   suscipit
                 </p>
                 {/* Button */}
-                <Link href="/all-doctors">
+                <Link legacyBehavior href="/all-doctors">
                   <a className="btn btn-tra-white blue-hover">
                     View Our Doctors
                   </a>

@@ -73,7 +73,7 @@ const Footer5 = () => {
               {/* Email */}
               <p className="foo-email mt-20">
                 E:
-                <Link href="#">
+                <Link legacyBehavior href="#">
                   <a href="mailto:yourdomain@mail.com">hello@yourdomain.com</a>
                 </Link>
               </p>

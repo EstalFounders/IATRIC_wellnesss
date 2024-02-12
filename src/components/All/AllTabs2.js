@@ -12,7 +12,7 @@ const AllTabs2 = () => {
               <ul className="nav nav-pills" id="pills-tab">
                 {/* TAB-1 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a
                       className="nav-link active"
                       id="tab11-list"
@@ -25,7 +25,7 @@ const AllTabs2 = () => {
                 </li>
                 {/* TAB-2 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" id="tab12-list" href="#tab-12">
                       <span className="flaticon-005-blood-donation-3" />
                       Full Blood Picture
@@ -34,7 +34,7 @@ const AllTabs2 = () => {
                 </li>
                 {/* TAB-3 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" id="tab13-list" href="#tab-13">
                       <span className="flaticon-031-scanner" />
                       MRI Diagnostic
@@ -43,7 +43,7 @@ const AllTabs2 = () => {
                 </li>
                 {/* TAB-4 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" id="tab14-list" href="#tab-14">
                       <span className="flaticon-048-lungs" />
                       X-Ray Diagnostic
@@ -154,7 +154,7 @@ const AllTabs2 = () => {
                 </div>
                 {/* End Options List */}
                 {/* Button */}
-                <Link href="/service-1">
+                <Link legacyBehavior href="/service-1">
                   <a className="btn btn-blue blue-hover mt-30">
                     View More Details
                   </a>
@@ -258,7 +258,7 @@ const AllTabs2 = () => {
                 </div>
                 {/* End Options List */}
                 {/* Button */}
-                <Link href="/service-1">
+                <Link legacyBehavior href="/service-1">
                   <a className="btn btn-blue blue-hover mt-30">
                     View More Details
                   </a>
@@ -362,7 +362,7 @@ const AllTabs2 = () => {
                 </div>
                 {/* End Options List */}
                 {/* Button */}
-                <Link href="/service-1">
+                <Link legacyBehavior href="/service-1">
                   <a className="btn btn-blue blue-hover mt-30">
                     View More Details
                   </a>
@@ -466,7 +466,7 @@ const AllTabs2 = () => {
                 </div>
                 {/* End Options List */}
                 {/* Button */}
-                <Link href="/service-1">
+                <Link legacyBehavior href="/service-1">
                   <a className="btn btn-blue blue-hover mt-30">
                     View More Details
                   </a>

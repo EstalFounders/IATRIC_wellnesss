@@ -60,7 +60,7 @@ const Doctor1Details = () => {
                 </h4>
                 <h4 className="h4-xs blue-color">
                   <i className="fas fa-envelope-open-text" />
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a href="mailto:yourdomain@mail.com" className="blue-color">
                       hello@yourdomain.com
                     </a>
@@ -69,12 +69,12 @@ const Doctor1Details = () => {
               </div>
               {/* Buttons */}
               <div className="doctor-photo-btn text-center">
-                <Link href="/appointment">
+                <Link legacyBehavior href="/appointment">
                   <a className="btn btn-md btn-blue blue-hover">
                     Book an Appointment
                   </a>
                 </Link>
-                <Link href="/timetable">
+                <Link legacyBehavior href="/timetable">
                   <a className="btn btn-md btn-tra-grey grey-hover">
                     View Timetable
                   </a>
@@ -159,7 +159,7 @@ const Doctor1Details = () => {
                   {/* Certificate Image */}
                   <div className="col-sm-6 col-lg-4">
                     <div className="certificate-image">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => {
                             e.preventDefault();
@@ -180,7 +180,7 @@ const Doctor1Details = () => {
                   {/* Certificate Image */}
                   <div className="col-sm-6 col-lg-4">
                     <div className="certificate-image">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => {
                             e.preventDefault();
@@ -201,7 +201,7 @@ const Doctor1Details = () => {
                   {/* Certificate Image */}
                   <div className="col-sm-6 col-lg-4">
                     <div className="certificate-image">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => {
                             e.preventDefault();
@@ -222,7 +222,7 @@ const Doctor1Details = () => {
                   {/* Certificate Image */}
                   <div className="col-sm-6 col-lg-4">
                     <div className="certificate-image">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => {
                             e.preventDefault();
@@ -243,7 +243,7 @@ const Doctor1Details = () => {
                   {/* Certificate Image */}
                   <div className="col-sm-6 col-lg-4">
                     <div className="certificate-image">
-                      <Link href="#">
+                      <Link legacyBehavior href="#">
                         <a
                           onClick={(e) => {
                             e.preventDefault();

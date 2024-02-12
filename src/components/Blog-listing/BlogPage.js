@@ -35,7 +35,7 @@ const BlogPage = () => {
                 <div className="blog-post-txt">
                   {/* Post Title */}
                   <h5 className="h5-xl steelblue-color">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>5 Benefits Of Integrative Medicine</a>
                     </Link>
                   </h5>
@@ -60,7 +60,7 @@ const BlogPage = () => {
                 <div className="blog-post-img">
                   <div className="video-preview text-center">
                     {/* Change the link HERE!!! */}
-                    <Link href="#">
+                    <Link legacyBehavior href="#">
                       <a
                         className="video-popup1"
                         href="#"
@@ -86,7 +86,7 @@ const BlogPage = () => {
                 <div className="blog-post-txt">
                   {/* Post Title */}
                   <h5 className="h5-xl steelblue-color">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>How Weather Impacts Your Health</a>
                     </Link>
                   </h5>
@@ -120,7 +120,7 @@ const BlogPage = () => {
                 <div className="blog-post-txt">
                   {/* Post Title */}
                   <h5 className="h5-xl steelblue-color">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Your Health Is In Your Hands</a>
                     </Link>
                   </h5>
@@ -158,7 +158,7 @@ const BlogPage = () => {
                 <div className="blog-post-txt">
                   {/* Post Title */}
                   <h5 className="h5-xl steelblue-color">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>
                         {`20 Years of Caring. 15 Fact About MedService,
                         Melbourne's First Choice for Healthcare`}
@@ -286,7 +286,7 @@ const BlogPage = () => {
                 magna purus
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover">Learn More</a>
               </Link>
             </div>
@@ -348,7 +348,7 @@ const BlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Etiam sapien accumsan molestie ante empor ...</a>
                     </Link>
                     <p>43 Comments</p>
@@ -364,7 +364,7 @@ const BlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Blandit tempor sapien ipsum, porta justo ...</a>
                     </Link>
                     <p>38 Comments</p>
@@ -380,7 +380,7 @@ const BlogPage = () => {
                   />
                   {/* Text */}
                   <div className="post-summary">
-                    <Link href="/single-post">
+                    <Link legacyBehavior href="/single-post">
                       <a>Cursus risus laoreet turpis auctor varius ...</a>
                     </Link>
                     <p>29 Comments</p>
@@ -427,7 +427,7 @@ const BlogPage = () => {
                 auctor at tempus feugiat dolor lacinia cursus nulla vitae massa
               </p>
               {/* Button */}
-              <Link href="/about">
+              <Link legacyBehavior href="/about">
                 <a className="btn btn-blue blue-hover mt-10">View Timetable</a>
               </Link>
             </div>

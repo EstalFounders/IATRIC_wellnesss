@@ -12,7 +12,7 @@ const Demo5Tabs1 = () => {
               <ul className="nav nav-pills" id="pills-tab">
                 {/* TAB-1 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link active" href="#tab-1">
                       <span className="flaticon-083-stethoscope" />
                       Pediatrics
@@ -21,7 +21,7 @@ const Demo5Tabs1 = () => {
                 </li>
                 {/* TAB-2 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" href="#tab-2">
                       <span className="flaticon-005-blood-donation-3" />
                       Hematology
@@ -30,7 +30,7 @@ const Demo5Tabs1 = () => {
                 </li>
                 {/* TAB-3 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" href="#tab-3">
                       <span className="flaticon-031-scanner" />
                       MRI
@@ -39,7 +39,7 @@ const Demo5Tabs1 = () => {
                 </li>
                 {/* TAB-4 LINK */}
                 <li className="nav-item icon-xs">
-                  <Link href="#">
+                  <Link legacyBehavior href="#">
                     <a className="nav-link" href="#tab-4">
                       <span className="flaticon-048-lungs" />
                       X-Ray Diagnostics
@@ -144,7 +144,7 @@ const Demo5Tabs1 = () => {
                       </div>
                       {/* End Options List */}
                       {/* Button */}
-                      <Link href="/service-1">
+                      <Link legacyBehavior href="/service-1">
                         <a className="btn btn-blue blue-hover mt-30">
                           View More Details
                         </a>
@@ -248,7 +248,7 @@ const Demo5Tabs1 = () => {
                       </div>
                       {/* End Options List */}
                       {/* Button */}
-                      <Link href="/service-2">
+                      <Link legacyBehavior href="/service-2">
                         <a className="btn btn-blue blue-hover mt-30">
                           View More Details
                         </a>
@@ -352,7 +352,7 @@ const Demo5Tabs1 = () => {
                       </div>
                       {/* End Options List */}
                       {/* Button */}
-                      <Link href="/service-1">
+                      <Link legacyBehavior href="/service-1">
                         <a className="btn btn-blue blue-hover mt-30">
                           View More Details
                         </a>
@@ -458,7 +458,7 @@ const Demo5Tabs1 = () => {
                       </div>
                       {/* End Options List */}
                       {/* Button */}
-                      <Link href="/service-2">
+                      <Link legacyBehavior href="/service-2">
                         <a className="btn btn-blue blue-hover mt-30">
                           View More Details
                         </a>

@@ -39,7 +39,7 @@ const AllContacts2 = () => {
                   <p>Phone: 1-(800)-569-7890</p>
                   <p>
                     Email:
-                    <Link href="#">
+                    <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
                         className="blue-color"
@@ -60,7 +60,7 @@ const AllContacts2 = () => {
                   <p>Phone: 1-(800)-569-7890</p>
                   <p>
                     Email:
-                    <Link href="#">
+                    <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
                         className="blue-color"
@@ -81,7 +81,7 @@ const AllContacts2 = () => {
                   <p>Phone: 1-(800)-569-7890</p>
                   <p>
                     Email:
-                    <Link href="#">
+                    <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
                         className="blue-color"
@@ -102,7 +102,7 @@ const AllContacts2 = () => {
                   <p>Phone: 1-(800)-569-7890</p>
                   <p>
                     Email:
-                    <Link href="#">
+                    <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
                         className="blue-color"

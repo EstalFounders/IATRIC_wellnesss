@@ -80,7 +80,7 @@ const Demo7Hero7 = () => {
                         primis in orci integer
                       </p>
                       {/* Button */}
-                      <Link href="/all-doctors">
+                      <Link legacyBehavior href="/all-doctors">
                         <a className="btn btn-blue blue-hover">
                           Meet the Doctors
                         </a>
@@ -134,7 +134,7 @@ const Demo7Hero7 = () => {
                         </p>
                       </div>
                       {/* Button */}
-                      <Link href="/who-we-are">
+                      <Link legacyBehavior href="/who-we-are">
                         <a className="btn btn-blue blue-hover">Discover More</a>
                       </Link>
                     </div>

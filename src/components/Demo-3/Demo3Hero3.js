@@ -30,7 +30,7 @@ const Demo3Hero3 = () => {
                         primis ultrice in ligula impedit magna purus at pretium
                       </p>
                       {/* Button */}
-                      <Link href="/about-us">
+                      <Link legacyBehavior href="/about-us">
                         <a className="btn btn-md btn-blue blue-hover">
                           More About Clinic
                         </a>

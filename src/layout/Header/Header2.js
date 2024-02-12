@@ -7,7 +7,7 @@ const Header2 = ({ toggleMenu }) => {
     <header id="header" className="header">
       {/* MOBILE HEADER */}
       <div className="wsmobileheader clearfix">
-        <Link href="#">
+        <Link legacyBehavior href="#">
           <a
             id="wsnavtoggle"
             onClick={() => toggleMenu()}
@@ -24,7 +24,7 @@ const Header2 = ({ toggleMenu }) => {
             alt="mobile-logo"
           />
         </span>
-        <Link href="#">
+        <Link legacyBehavior href="#">
           <a href="tel:123456789" className="callusbtn">
             <i className="fas fa-phone" />
           </a>
@@ -40,7 +40,7 @@ const Header2 = ({ toggleMenu }) => {
                 <i className="fas fa-map-marker-alt" />
                 121 King St, Melbourne, VIC 3000
               </span>
-              <Link href="#">
+              <Link legacyBehavior href="#">
                 <a href="tel:123456789" className="callusbtn">
                   <i className="fas fa-phone" />
                   (800)-569-7890
@@ -95,57 +95,57 @@ const Header2 = ({ toggleMenu }) => {
                 </a>
                 <ul className="sub-menu">
                   <li aria-haspopup="true">
-                    <Link href="/demo-1">
+                    <Link legacyBehavior href="/demo-1">
                       <a>Home Concept #1</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-2">
+                    <Link legacyBehavior href="/demo-2">
                       <a>Home Concept #2</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-4">
+                    <Link legacyBehavior href="/demo-4">
                       <a>Home Concept #4</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-5">
+                    <Link legacyBehavior href="/demo-5">
                       <a>Home Concept #5</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-6">
+                    <Link legacyBehavior href="/demo-6">
                       <a>Home Concept #6</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-7">
+                    <Link legacyBehavior href="/demo-7">
                       <a>Home Concept #7</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-8">
+                    <Link legacyBehavior href="/demo-8">
                       <a>Home Concept #8</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-9">
+                    <Link legacyBehavior href="/demo-9">
                       <a>Home Concept #9</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-10">
+                    <Link legacyBehavior href="/demo-10">
                       <a>Home Concept #10</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-11">
+                    <Link legacyBehavior href="/demo-11">
                       <a>Home Concept #11</a>
                     </Link>
                   </li>
                   <li aria-haspopup="true">
-                    <Link href="/demo-12">
+                    <Link legacyBehavior href="/demo-12">
                       <a>Home Concept #12</a>
                     </Link>
                   </li>
@@ -164,27 +164,27 @@ const Header2 = ({ toggleMenu }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Standard Pages:</li>
                         <li>
-                          <Link href="/about-us">
+                          <Link legacyBehavior href="/about-us">
                             <a>About Us Page</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/who-we-are">
+                          <Link legacyBehavior href="/who-we-are">
                             <a>Who We Are</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/all-services">
+                          <Link legacyBehavior href="/all-services">
                             <a>Our Services</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/service-1">
+                          <Link legacyBehavior href="/service-1">
                             <a>Service Single #1</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/service-2">
+                          <Link legacyBehavior href="/service-2">
                             <a>Service Single #2</a>
                           </Link>
                         </li>
@@ -193,32 +193,32 @@ const Header2 = ({ toggleMenu }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Medical Pages:</li>
                         <li>
-                          <Link href="/all-departments">
+                          <Link legacyBehavior href="/all-departments">
                             <a>Our Departments</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/department-single">
+                          <Link legacyBehavior href="/department-single">
                             <a>Department Single</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/all-doctors">
+                          <Link legacyBehavior href="/all-doctors">
                             <a>Meet the Doctors</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/doctor-1">
+                          <Link legacyBehavior href="/doctor-1">
                             <a>{`Doctor's Profile #1`}</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/doctor-2">
+                          <Link legacyBehavior href="/doctor-2">
                             <a>{`Doctor's Profile #2`}</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/timetable">
+                          <Link legacyBehavior href="/timetable">
                             <a>Doctors Timetable</a>
                           </Link>
                         </li>
@@ -227,27 +227,27 @@ const Header2 = ({ toggleMenu }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Special Pages:</li>
                         <li>
-                          <Link href="/pricing-1">
+                          <Link legacyBehavior href="/pricing-1">
                             <a>Pricing Packages #1</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/pricing-2">
+                          <Link legacyBehavior href="/pricing-2">
                             <a>Pricing Packages #2</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/appointment">
+                          <Link legacyBehavior href="/appointment">
                             <a>Make an Appointment</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/faqs">
+                          <Link legacyBehavior href="/faqs">
                             <a>FAQs Page</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/terms">
+                          <Link legacyBehavior href="/terms">
                             <a>Terms of Use</a>
                           </Link>
                         </li>
@@ -256,27 +256,27 @@ const Header2 = ({ toggleMenu }) => {
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                         <li className="title">Auxiliary Pages:</li>
                         <li>
-                          <Link href="/gallery">
+                          <Link legacyBehavior href="/gallery">
                             <a>Our Gallery</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/blog-listing">
+                          <Link legacyBehavior href="/blog-listing">
                             <a>Blog Listing Page</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/single-post">
+                          <Link legacyBehavior href="/single-post">
                             <a>Single Blog Post</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/contacts-1">
+                          <Link legacyBehavior href="/contacts-1">
                             <a>Contact Us #1</a>
                           </Link>
                         </li>
                         <li>
-                          <Link href="/contacts-2">
+                          <Link legacyBehavior href="/contacts-2">
                             <a>Contact Us #2</a>
                           </Link>
                         </li>
@@ -411,7 +411,7 @@ const Header2 = ({ toggleMenu }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Etiam sapien risus ante auctor tempus accumsan
                                   an empor ...
@@ -430,7 +430,7 @@ const Header2 = ({ toggleMenu }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Blandit tempor a sapien ipsum, porta risus
                                   auctor justo ...
@@ -449,7 +449,7 @@ const Header2 = ({ toggleMenu }) => {
                             />
                             {/* Text */}
                             <div className="post-summary">
-                              <Link href="/single-post">
+                              <Link legacyBehavior href="/single-post">
                                 <a>
                                   Cursus risus auctor tempus risus laoreet
                                   turpis auctor varius ...
@@ -475,7 +475,7 @@ const Header2 = ({ toggleMenu }) => {
               </li>
               {/* NAVIGATION MENU BUTTON */}
               <li className="nl-simple header-btn" aria-haspopup="true">
-                <Link href="/appointment">
+                <Link legacyBehavior href="/appointment">
                   <a>Make an Appointment</a>
                 </Link>
               </li>

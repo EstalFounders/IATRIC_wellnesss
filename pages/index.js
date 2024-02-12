@@ -5,7 +5,8 @@ import HomeFooter from "../src/components/Home/HomeFooter";
 import HomeHero from "../src/components/Home/HomeHero";
 import HomeInnerPage from "../src/components/Home/HomeInnerPage";
 import HomeSelect from "../src/components/Home/HomeSelect";
-import Demo5 from '../pages/demo-5'
+import Demo5 from "../pages/demo-5";
+
 
 const Home = () => {
   return (
@@ -13,6 +14,6 @@ const Home = () => {
       <Demo5 />
     </div>
   );
-}
+};
 
 export default Home;

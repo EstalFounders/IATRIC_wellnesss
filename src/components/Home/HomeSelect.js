@@ -20,7 +20,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-1">
+                    <Link legacyBehavior href="/demo-1">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -45,7 +45,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-2">
+                    <Link legacyBehavior href="/demo-2">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -70,7 +70,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-3">
+                    <Link legacyBehavior href="/demo-3">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -95,7 +95,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-4">
+                    <Link legacyBehavior href="/demo-4">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -120,7 +120,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-5">
+                    <Link legacyBehavior href="/demo-5">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -145,7 +145,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-6">
+                    <Link legacyBehavior href="/demo-6">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -170,7 +170,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-7">
+                    <Link legacyBehavior href="/demo-7">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -195,7 +195,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-8">
+                    <Link legacyBehavior href="/demo-8">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -220,7 +220,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-9">
+                    <Link legacyBehavior href="/demo-9">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -245,7 +245,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-10">
+                    <Link legacyBehavior href="/demo-10">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -270,7 +270,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-11">
+                    <Link legacyBehavior href="/demo-11">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
@@ -295,7 +295,7 @@ const HomeSelect = () => {
                 />
                 <div className="item-overlay">
                   <div className="overlay-content">
-                    <Link href="/demo-12">
+                    <Link legacyBehavior href="/demo-12">
                       <a className="btn" target="_blank">
                         Launch Demo
                       </a>
