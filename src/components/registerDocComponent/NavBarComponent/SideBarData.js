@@ -1,43 +1,43 @@
-import React from 'react';
-import * as FaIcons from 'react-icons/fa';
-import * as AiIcons from 'react-icons/ai';
-import * as IoIcons from 'react-icons/io';
+import React from "react";
+import * as FaIcons from "react-icons/fa";
+import * as AiIcons from "react-icons/ai";
+import * as IoIcons from "react-icons/io";
 
 export const SidebarData = [
   {
-    title: 'Home',
-    path: '/registerDoc/homepage',
+    title: "Home",
+    path: "/registerDoc/homepage",
     icon: <AiIcons.AiFillHome />,
-    cName: 'nav-text'
+    cName: "nav-text",
   },
-  { 
-    title: 'Add Doctors',
-    path: '/registerDoc/addDoctor',
+  {
+    title: "Add Doctors",
+    path: "/registerDoc/addDoctor",
     icon: <IoIcons.IoIosPaper />,
-    cName: 'nav-text'
+    cName: "nav-text",
   },
   {
-    title: 'Products',
-    path: '/products',
+    title: "Products",
+    path: "/registerDoc/addDoctor",
     icon: <FaIcons.FaCartPlus />,
-    cName: 'nav-text'
+    cName: "nav-text",
   },
   {
-    title: 'Team',
-    path: '/team',
+    title: "Team",
+    path: "/registerDoc/addDoctor",
     icon: <IoIcons.IoMdPeople />,
-    cName: 'nav-text'
+    cName: "nav-text",
   },
   {
-    title: 'Messages',
-    path: '/messages',
+    title: "Messages",
+    path: "/registerDoc/addDoctor",
     icon: <FaIcons.FaEnvelopeOpenText />,
-    cName: 'nav-text'
+    cName: "nav-text",
   },
   {
-    title: 'Support',
-    path: '/support',
+    title: "Support",
+    path: "/support",
     icon: <IoIcons.IoMdHelpCircle />,
-    cName: 'nav-text'
-  }
+    cName: "nav-text",
+  },
 ];

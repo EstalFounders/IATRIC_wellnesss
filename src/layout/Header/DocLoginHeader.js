@@ -5,12 +5,18 @@ import { useRouter } from "next/router";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
 
+
+
 const DocLoginHeader = ({ session }) => {
   const router = useRouter();
   
   return (
     <Row className="bg-white border-bottom">
-      <Col className="mt-4" md={5}>{session && <Navbar />}</Col>
+      <Col className="mt-4" md={5}>
+        {session && 
+        <Navbar />
+        }
+      </Col>
       <Col className="pl-4" md={6}>
         <Image
           src="/images/logo.png" // Make sure the path is correct starting from the 'public' directory

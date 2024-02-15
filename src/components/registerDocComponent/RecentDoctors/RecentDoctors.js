@@ -39,7 +39,7 @@ const RecentDoctors = ({ doctors }) => {
               area_of_expertise={item.expertise}
               degree={item.degree}
               work_days={item.workDays}
-              joining_date={item.joiningDate}
+              joining_date={new Date(item.joiningDate).toLocaleDateString()}
             />
           ))}
         </div>

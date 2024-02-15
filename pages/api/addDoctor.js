@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid"; // Import v4 as uuidv4
+import { v4 as uuidv4 } from "uuid";
 import multiparty from "multiparty";
 import {
   certificate_img_path,
@@ -9,19 +9,24 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 
+// Global variable to store the database connection
+let isConnected = false;
+
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
+
 export default async function handler(req, res) {
+  console.log('handler calling for get')
+  await dbConnect(); // Ensure database connection is established before handling requests
+
   if (req.method === "POST") {
     try {
       const form = new multiparty.Form();
       form.parse(req, async function (err, fields, files) {
-        console.log(fields, "fields");
-
         if (err) {
           console.error("Error parsing form data:", err);
           res
@@ -48,11 +53,6 @@ export default async function handler(req, res) {
             .filter((key) => key.startsWith("diplomasCertificates"))
             .map((key) => files[key][0]); // Assuming each field has only one file
 
-          // console.log(
-          //   "Diplomas Certificates Files:",
-          //   diplomasCertificatesFiles
-          // );
-
           // Upload diplomas/certificates
           const diplomasCertificatesUrls = await Promise.all(
             diplomasCertificatesFiles.map(async (certificate, index) => {
@@ -65,8 +65,6 @@ export default async function handler(req, res) {
               return getDownloadURL(certificateRef);
             })
           );
-
-          await dbConnect();
 
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
@@ -100,21 +98,16 @@ export default async function handler(req, res) {
         .status(500)
         .json({ error: "An error occurred while parsing form data." });
     }
-  }
-
-  if (req.method === "GET") {
-    await dbConnect();
+  } else if (req.method === "GET") {
+    console.log('get method calling')
     try {
       const doctors = await Doctor.find();
       res.status(200).json(doctors);
     } catch (err) {
-      console.error("Error fetching doctor data:", error);
+      console.error("Error fetching doctor data in server:", err);
       res
         .status(500)
         .json({ error: "An error occurred while fetching doctor data." });
     }
   }
-  // } else {
-  //   res.status(405).json({ error: "Method Not Allowed" });
-  // }
 }

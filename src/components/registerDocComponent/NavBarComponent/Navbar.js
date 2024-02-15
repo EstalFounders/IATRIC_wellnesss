@@ -6,6 +6,7 @@ import styles from "./Navbar.module.css";
 import { IconContext } from "react-icons";
 import Link from "next/link";
 import { SidebarData } from "./SideBarData";
+import { Col, Row } from "react-bootstrap";
 
 function Navbar() {
   const [sidebar, setSidebar] = useState(false);
@@ -16,14 +17,14 @@ function Navbar() {
     <>
       <IconContext.Provider value={{ color: "#ffff" }}>
         <div className={styles.navbar}>
-          <Link legacyBehavior href="#" className={styles["menu-bars"]}>
+          <div className={styles["menu-bars"]}>
             <FaIcons.FaBars
               color="#000000"
               size={30}
               onClick={showSidebar}
               className="ml-4 border"
             />
-          </Link>
+          </div>
         </div>
         <nav
           className={
@@ -34,20 +35,22 @@ function Navbar() {
         >
           <ul className={styles["nav-menu-items"]} onClick={showSidebar}>
             <li className={styles["navbar-toggle"]}>
-              <Link legacyBehavior href="#" className={styles["menu-bars"]}>
+              <div className={styles["menu-bars"]}>
                 <AiIcons.AiOutlineClose />
-              </Link>
+              </div>
             </li>
             {SidebarData.map((item, index) => {
               return (
-                <li key={index} className={item.cName}>
-                  <Link legacyBehavior href={item.path}>
-                    <div className="mt-4 ml-3">
-                      {item.icon}
-                      <span className={styles.span}>{item.title}</span>
-                    </div>
-                  </Link>
-                </li>
+                <Col className="mt-3 ml-4">
+                  <Row>
+                    <Col>
+                      <Link className={styles.span} href={item.path}>
+                        {item.title}
+                      </Link>
+                    </Col>
+                    <Col>{item.icon}</Col>
+                  </Row>
+                </Col>
               );
             })}
           </ul>
