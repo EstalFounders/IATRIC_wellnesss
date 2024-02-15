@@ -41,16 +41,14 @@ function Navbar() {
             </li>
             {SidebarData.map((item, index) => {
               return (
-                <Col className="mt-3 ml-4">
-                  <Row>
-                    <Col>
-                      <Link className={styles.span} href={item.path}>
-                        {item.title}
-                      </Link>
-                    </Col>
-                    <Col>{item.icon}</Col>
-                  </Row>
-                </Col>
+                <li key={index} className={item.cName}>
+                  <Link href={item.path}>
+                    <div className="mt-3 m-3">
+                      {item.icon}
+                      <span className={styles.span}>{item.title}</span>
+                    </div>
+                  </Link>
+                </li>
               );
             })}
           </ul>

@@ -6,10 +6,11 @@ import HomepageComp from "../../src/components/registerDocComponent/HomepageComp
 export default function Homepage() {
   
   return (
-    <AuthenticatedComponent>
+    // <AuthenticatedComponent>
     <Layouts header={7} footer={7}>
      <HomepageComp />
     </Layouts>
-   </AuthenticatedComponent>
+
+  //  {/* </AuthenticatedComponent> */}
   );
 }
