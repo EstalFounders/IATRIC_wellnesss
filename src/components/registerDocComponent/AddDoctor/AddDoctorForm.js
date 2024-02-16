@@ -19,8 +19,20 @@ const AddDoctorForm = () => {
     language: "",
     workDays: "",
     overview: "",
+    location: "None",
+    workExperience: "",
     educationTraining: "",
+    consultationType: "",
   });
+
+  const handleConsultationTypeChange = (e) => {
+    const selectedType = e.target.value;
+    setDoctorDetails({ ...doctorDetails, consultationType: e.target.value });
+  };
+
+  const handleLocationTextChange = (e) => {
+    setDoctorDetails({ ...doctorDetails, location: e.target.value });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +59,9 @@ const AddDoctorForm = () => {
     formData.append("workDays", doctorDetails.workDays);
     formData.append("overview", doctorDetails.overview);
     formData.append("educationTraining", doctorDetails.educationTraining);
-
+    formData.append("workExperience", doctorDetails.workExperience);
+    formData.append("consultationType", doctorDetails.consultationType);
+    formData.append("location", doctorDetails.location);
     formData.append("profilePicture", profilePicture);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
@@ -64,8 +78,8 @@ const AddDoctorForm = () => {
 
       if (response.ok) {
         // console.log("Doctor added successfully.");
-        window.alert("Doctor added successfully.")
-        window.location.reload()
+        window.alert("Doctor added successfully.");
+        window.location.reload();
         // Reset form fields or navigate to another page
       } else {
         console.error("Error adding doctor:", response.statusText);
@@ -128,6 +142,50 @@ const AddDoctorForm = () => {
               required
             />
           </label>
+
+          <label className={styles.label}>
+            <b>Work Experience:</b>
+            <input
+              className={styles.input}
+              type="text"
+              name="workExperience"
+              value={doctorDetails.workExperience}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          {/* <label htmlFor="consultationType" className={styles.label}>
+            Consultation Type:
+          </label> */}
+          <select
+            id="consultationType"
+            className={styles.input}
+            style={{ marginLeft: 10 }}
+            value={doctorDetails.consultationType}
+            onChange={handleConsultationTypeChange}
+          >
+            <option value="">Select Consultation Type</option>
+            <option value="Clinic Visit">Clinic Visit</option>
+            <option value="Online">Online</option>
+            <option value="Both">Both</option>
+          </select>
+          {(doctorDetails.consultationType === "Clinic Visit" ||
+            doctorDetails.consultationType === "Both") && (
+            <div>
+              <label htmlFor="Location" className="ml-3">
+                Location:
+              </label>
+              <input
+                type="text"
+                id="Location"
+                className={styles.input}
+                style={{ marginLeft: 10 }}
+                value={doctorDetails.location}
+                onChange={handleLocationTextChange}
+              />
+            </div>
+          )}
 
           <label className={styles.label}>
             <b>Works Days:</b>

@@ -33,6 +33,18 @@ const doctorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  workExperience: {
+    type: String,
+    required: true,
+  },
+  consultationType: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: String,
+    required: false,
+  },
 
   educationTraining: {
     type: String,

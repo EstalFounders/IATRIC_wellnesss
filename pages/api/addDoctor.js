@@ -72,6 +72,7 @@ export default async function handler(req, res) {
               value.toString(),
             ])
           );
+          console.log(stringFields, 'all fields')
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
             profilePictureUrl,
