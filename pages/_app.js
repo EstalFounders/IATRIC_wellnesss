@@ -24,9 +24,7 @@ function MyApp({ Component, pageProps }) {
           href="https://fonts.googleapis.com/css?family=Lato:400,700,900,900&display=swap"
           rel="stylesheet"
         />
-        <title>
-          MedService - Medical & Medical Health Landing Page Template
-        </title>
+        <title>Iatric Healthcare</title>
         <link
           rel="shortcut icon"
           href="images/favicon.ico"
@@ -36,7 +34,7 @@ function MyApp({ Component, pageProps }) {
       </Head>
       {loader && <Preloader />}
       <NoSsr>
-      <Component {...pageProps} />
+        <Component {...pageProps} />
       </NoSsr>
     </Fragment>
   );

@@ -43,7 +43,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <a href="#">
               <img
                 src="images/logo.png"
-                width={280}
+                width={180}
                 height={65}
                 alt="header-logo"
               />
