@@ -7,14 +7,14 @@ const RecentAppointment = ({ data }) => {
   return (
     <Row>
       <Col>
-      <Row>
+        <Row>
           <Col>
-          <h4>
-            <b>Recent Appointment</b>
-          </h4>
+            <h4>
+              <b>Recent Appointment</b>
+            </h4>
           </Col>
           <Col className="text-right">
-          <Button className="bg-danger">Add Appointment</Button>
+            <Button className="bg-danger">Add Appointment</Button>
           </Col>
         </Row>
         <Row
@@ -24,11 +24,21 @@ const RecentAppointment = ({ data }) => {
           }}
           className="mt-4"
         >
-          <Col style={{color: '#8E822F'}}><b>Name</b></Col>
-          <Col style={{color: '#8E822F'}}><b>Gender</b></Col>
-          <Col style={{color: '#8E822F'}}><b>Date</b></Col>
-          <Col style={{color: '#8E822F'}}><b>Disease</b></Col>
-          <Col style={{color: '#8E822F'}}><b>Status</b></Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Name</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Gender</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Date</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Disease</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Status</b>
+          </Col>
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {data.map((item) => (
@@ -43,9 +53,9 @@ const RecentAppointment = ({ data }) => {
           ))}
         </div>
         <Row className="mt-4">
-            <Col className="text-center">
+          <Col className="text-center">
             <Button>View Appointments</Button>
-            </Col>
+          </Col>
         </Row>
       </Col>
     </Row>

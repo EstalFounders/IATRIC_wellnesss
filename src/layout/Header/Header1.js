@@ -32,7 +32,70 @@ const Header1 = ({ toggleMenu, toggle }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
-      {/* remove code for header strip as it was not mobile responsive */}
+      <div className="headtoppart clearfix" style={{backgroundColor: '#3b5f1d'}}>
+        <div className="headerwp clearfix">
+          {/* Address */}
+          <div className="headertopleft">
+            <div className="address clearfix">
+              <span>
+                <i className="fas fa-map-marker-alt" />
+                Sector 57 Gurgaon Haryana
+              </span>
+              <Link legacyBehavior href="#">
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                  href="tel:9625942020"
+                  className="callusbtn"
+                >
+                  <i className="fas fa-phone" />
+                  +91 9625942020
+                </a>
+              </Link>
+            </div>
+          </div>
+          {/* Social Links */}
+          <div className="headertopright">
+            {/* <a className="googleicon" title="Google" href="#">
+              <i className="fab fa-google" />
+              <span className="mobiletext02">Google</span>
+            </a> */}
+            <a
+              className="linkedinicon"
+              title="Linkedin"
+              target="blank"
+              href="https://www.linkedin.com/in/iatrichealthcare/"
+            >
+              <i className="fab fa-linkedin-in" />
+              <span className="mobiletext02">Linkedin</span>
+            </a>
+            <a
+              className="instagramicon"
+              title="Instagram"
+              target="blank"
+              href="https://www.instagram.com/iatric.healthcare/"
+            >
+              <i className="fab fa-instagram" />
+              <span className="mobiletext02">Instagram</span>
+            </a>
+
+            {/* <a className="twittericon" title="Twitter" href="#">
+              <i className="fab fa-twitter" />
+              <span className="mobiletext02">Twitter</span>
+            </a> */}
+            <a
+              className="facebookicon"
+              title="Facebook"
+              target="blank"
+              href="https://www.facebook.com/iatrichealthcare"
+            >
+              <i className="fab fa-facebook-f" />
+              <span className="mobiletext02">Facebook</span>
+            </a>
+          </div>
+        </div>
+      </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
       <div className="wsmainfull menu clearfix d-none d-lg-block">

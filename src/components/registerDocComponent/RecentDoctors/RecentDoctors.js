@@ -15,19 +15,19 @@ const RecentDoctors = ({ doctors }) => {
           }}
           className="mt-4"
         >
-          <Col style={{ color: "#8E822F" }}>
+          <Col style={{ color: "#8e8333" }}>
             <b>Name</b>
           </Col>
-          <Col style={{ color: "#8E822F" }}>
+          <Col style={{ color: "#8e8333" }}>
             <b>Area of Expertise</b>
           </Col>
-          <Col style={{ color: "#8E822F" }}>
+          <Col style={{ color: "#8e8333" }}>
             <b>Degree</b>
           </Col>
-          <Col style={{ color: "#8E822F" }}>
+          <Col style={{ color: "#8e8333" }}>
             <b>Work Days</b>
           </Col>
-          <Col style={{ color: "#8E822F" }}>
+          <Col style={{ color: "#8e8333" }}>
             <b>Joining Date</b>
           </Col>
         </Row>

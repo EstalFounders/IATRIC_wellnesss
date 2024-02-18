@@ -15,7 +15,7 @@ const Demo5Hero5 = () => {
               {/* Title */}
               <h4 className="steelblue-color">Best Quality</h4>
               <h3 className="steelblue-color">
-                Medical treatment for your and your family
+                Medical treatment for you and your family
               </h3>
               {/* CONTENT BOX #1 */}
               <div className="box-list grey-color">
@@ -23,8 +23,10 @@ const Demo5Hero5 = () => {
                   <i className="fas fa-genderless" />
                 </div>
                 <p>
-                  Risus nec luctus mauris orci auctor purus euismod pretium
-                  purus pretium ligula rutrum tempor sapien and luctus
+                  Get optimal health, anytime, anywhere! One-stop care: Consult
+                  top doctors online, visit our clinic, or get home visits & lab
+                  tests. Our pharmacy & rehab experts support your journey to a
+                  healthier you.
                 </p>
               </div>
               {/* CONTENT BOX #3 */}

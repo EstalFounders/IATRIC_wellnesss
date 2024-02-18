@@ -676,7 +676,7 @@ body {
 }
 
 .bg-blue {
-  background-color: #8E822F;
+  background-color: #8e8333;
 }
 
 
@@ -953,7 +953,7 @@ ul.content-list li:last-child {
 /*  BUTTON SETTINGS
   /*------------------------------------------*/
 .custom-btn {
-  background-color: #8E822F;
+  background-color: #8e8333;
   font-size: 0.915rem;
   line-height: 1;
   font-weight: 400;
@@ -1048,8 +1048,8 @@ ul.content-list li:last-child {
 .btn-blue,
 .white-color .btn-blue {
   color: #fff;
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
 }
 
 .btn-darkgreen,
@@ -1232,8 +1232,8 @@ ul.content-list li:last-child {
 }
 
 .video-btn.play-icon-blue {
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
 }
 
 .video-btn.play-icon-lime {
@@ -1529,7 +1529,7 @@ span.id-color {
 .white-color .blue-color,
 .steelblue-color .blue-color,
 .blue-color span {
-  color: #8E822F;
+  color: #8e8333;
 }
 
 .darkblue-color,
@@ -1700,6 +1700,7 @@ span.id-color {
   padding-left: 15px;
 }
 
+
 .headertopright {
   width: 50%;
   float: right;
@@ -1855,7 +1856,7 @@ span.id-color {
 
 .hero-widget {
   padding: 15px 0;
-  border-bottom: 1px solid #8E822F;
+  border-bottom: 1px solid #8e8333;
   ;
 }
 
@@ -2741,8 +2742,8 @@ p.header-widget-phone {
 }
 
 .abox-4-table.blue-table {
-  background-color: #8E822F;
-  border: 1px solid #8E822F;
+  background-color: #8e8333;
+  border: 1px solid #8e8333;
   color: #fff;
   box-shadow: none;
 }
@@ -2897,8 +2898,8 @@ td.text-right {
 }
 
 .bg-lightgrey .sbox-2:hover {
-  background-color: #8E822F;
-  border: 1px solid #8E822F;
+  background-color: #8e8333;
+  border: 1px solid #8e8333;
 }
 
 .bg-lightgrey .sbox-2:hover .sbox-2-icon,
@@ -3046,7 +3047,7 @@ td.text-right {
   /*------------------------------------------*/
 
 .sbox-2-icon {
-  color: #8E822F;
+  color: #8e8333;
   -webkit-transition: all 300ms ease-in-out;
   -moz-transition: all 300ms ease-in-out;
   -o-transition: all 300ms ease-in-out;
@@ -3055,7 +3056,7 @@ td.text-right {
 }
 
 .sbox-3-icon {
-  background-color: #8E822F;
+  background-color: #8e8333;
   display: inline-block;
   width: 110px;
   height: 110px;
@@ -3093,7 +3094,7 @@ td.text-right {
   /*------------------------------------------*/
 
 .services-7-table {
-  /* background-color: #8E822F; */
+  /* background-color: #8e8333; */
   border: 1px solid #f5f5f5;
   padding: 35px 40px 30px;
   -webkit-border-radius: 6px;
@@ -3111,8 +3112,8 @@ td.text-right {
 }
 
 .services-7-table.blue-table {
-  background-color: #8E822F;
-  border: 1px solid #8E822F;
+  background-color: #8e8333;
+  border: 1px solid #8e8333;
   color: #fff;
   box-shadow: none;
 }
@@ -3283,7 +3284,7 @@ td.text-right {
   /*------------------------------------------*/
 
 #info-8 .txt-block {
-  background-color: #8E822F;
+  background-color: #8e8333;
   padding: 50px 60px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
@@ -3533,8 +3534,8 @@ td.text-right {
 
 .nav-pills .nav-link.active,
 .nav-pills .nav-link.active:hover {
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
   color: #fff;
 }
 
@@ -3543,7 +3544,7 @@ td.text-right {
   background-color: #f8f8f8;
   color: #333;
   border: none;
-  border-right: 2px solid #8E822F;
+  border-right: 2px solid #8e8333;
 }
 
 .nav-pills .nav-link:hover {
@@ -3614,8 +3615,8 @@ td.text-right {
 .gallery-filter button:hover,
 .gallery-filter button:focus {
   background-color: transparent;
-  color: #8E822F;
-  border-bottom: 2px solid #8E822F;
+  color: #8e8333;
+  border-bottom: 2px solid #8e8333;
   outline: 0px none;
 }
 
@@ -3624,9 +3625,9 @@ td.text-right {
   /*------------------------------------------*/
 
 .gallery-filter button.is-checked {
-  color: #8E822F;
+  color: #8e8333;
   cursor: default;
-  border-bottom: 2px solid #8E822F;
+  border-bottom: 2px solid #8e8333;
   outline: 0px none;
 }
 
@@ -4184,7 +4185,7 @@ td.text-right {
 }
 
 .doctor-info .table span i {
-  color: #8E822F;
+  color: #8e8333;
   font-size: 12px;
   margin-right: 3px;
 }
@@ -4866,8 +4867,8 @@ td.text-right {
 }
 
 .post-tags-list span a:hover {
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
   color: #fff;
 }
 
@@ -5280,7 +5281,7 @@ p.contact-notice {
 
 .contact-form .form-control:focus {
   background-color: #fff;
-  border-color: #8E822F;
+  border-color: #8e8333;
   outline: 0px none;
   box-shadow: none;
 }
@@ -5804,8 +5805,8 @@ ul.blog-category-list li:hover {
 }
 
 .badge:hover {
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
 }
 
 .badge:hover a {
@@ -5829,8 +5830,8 @@ ul.blog-category-list li:hover {
 }
 
 .sidebar-table.blue-table {
-  background-color: #8E822F;
-  border: 1px solid #8E822F;
+  background-color: #8e8333;
+  border: 1px solid #8e8333;
   color: #fff;
   box-shadow: none;
 }
@@ -5975,7 +5976,7 @@ ul.blog-category-list li:hover {
 }
 
 .breadcrumb-item a:hover {
-  color: #8E822F;
+  color: #8e8333;
 }
 
 .breadcrumb-item.active {
@@ -6054,8 +6055,8 @@ ul.blog-category-list li:hover {
 .primary-theme .page-link:hover,
 .primary-theme .page-link:focus,
 .primary-theme .page-item.active .page-link {
-  background-color: #8E822F;
-  border-color: #8E822F;
+  background-color: #8e8333;
+  border-color: #8e8333;
 }
 
 /* ==========================================================================
@@ -6117,7 +6118,7 @@ ul.blog-category-list li:hover {
 
 .appointment-form .form-control:focus {
   background-color: #fff;
-  border-color: #8E822F;
+  border-color: #8e8333;
   outline: 0px none;
   box-shadow: none;
 }
@@ -6226,14 +6227,14 @@ ul.blog-category-list li:hover {
 
 #faqs-page #accordion [data-toggle="collapse"].collapsed:after,
 #faqs-page #accordion [data-toggle="collapse"]:after {
-  color: #8E822F;
+  color: #8e8333;
   font-size: 13px;
   top: 25px;
   right: 5px;
 }
 
 #faqs-page #accordion [data-toggle="collapse"].collapsed:after {
-  color: #8E822F;
+  color: #8e8333;
   content: "\f067";
 }
 
@@ -6422,7 +6423,7 @@ nav a#pull {
 }
 
 #stlChanger .chBut {
-  background: #8E822F;
+  background: #8e8333;
   width: 50px;
   height: 50px;
   position: absolute;
@@ -6430,7 +6431,7 @@ nav a#pull {
   left: 0;
   z-index: 1000000;
   text-align: center;
-  border: 1px solid #8E822F;
+  border: 1px solid #8e8333;
   border-left: none;
   border-radius: 6px 0px 0px 6px;
   -webkit-transition: all 300ms ease-in-out;
