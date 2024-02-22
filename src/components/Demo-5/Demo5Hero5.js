@@ -34,10 +34,10 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   <i className="fas fa-genderless" />
                 </div>
-                <p>
+                {/* <p>
                   Nemo ipsam egestas volute turpis dolores ut aliquam quaerat
                   sodales sapien undo pretium purus feugiat dolor impedit
-                </p>
+                </p> */}
               </div>
               {/* Button */}
               <Link legacyBehavior href="/about-us">

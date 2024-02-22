@@ -1,47 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 import Dropdown from "./filterDropdown";
 
-const FilterBar = () => {
+const FilterBar = ({ selectFilter }) => {
+  const updateSelectedOption = (option) => {
+    selectFilter(option);
+  };
+
   return (
     <div className="filter-bar-container">
       <div className="filter-bar">
-
         {/* Search Input */}
         <input
           type="text"
           placeholder="Search by Doctor Name"
           id="searchInput"
-          className="filter-input"
+          className="filter-input mr-4 rounded p-1"
         />
         <Dropdown
-          label="Specialty"
+          label="Sort"
+          options={["Experience: High to low", "Earliest Availability"]}
+          selectFilter={updateSelectedOption}
+        />
+        <Dropdown
+          label="Speciality"
           options={["Option 1", "Option 2", "Option 3"]}
+          selectFilter={updateSelectedOption}
         />
         <Dropdown
           label="Location"
           options={["Option 1", "Option 2", "Option 3"]}
+          selectFilter={updateSelectedOption}
         />
         <Dropdown
           label="Availability"
-          options={["Option 1", "Option 2", "Option 3"]}
+          options={["Today"]}
+          selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Availability"
-          options={["Option 1", "Option 2", "Option 3"]}
+          label="Consultation Type"
+          options={["In Clinic", "Video Consultation"]}
+          selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Availability"
-          options={["Option 1", "Option 2", "Option 3"]}
-        />
-        <Dropdown
-          label="Availability"
-          options={["Option 1", "Option 2", "Option 3"]}
+          label="Gender"
+          options={["Female", "Male"]}
+          selectFilter={updateSelectedOption}
         />
       </div>
       <style jsx>{`
         .filter-bar-container {
-          overflow-x: auto;
-          white-space: nowrap;
           padding: 10px;
           border: 1px solid #ccc;
           max-width: 100%;
@@ -51,13 +58,13 @@ const FilterBar = () => {
         }
 
         .filter-bar {
-          display: inline-flex;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
         }
 
-        @media (max-width: 768px) {
-          .filter-bar-container {
-            height: auto;
-          }
+        .filter-bar > * {
+          margin: 5px;
         }
       `}</style>
     </div>

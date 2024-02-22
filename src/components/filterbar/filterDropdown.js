@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 
-const Dropdown = ({ label, options }) => {
+const Dropdown = ({ label, options, selectFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-    setIsOpen(false);
+    const index = selectedOptions.indexOf(option);
+    if (index === -1) {
+      setSelectedOptions([...selectedOptions, option]);
+    } else {
+      setSelectedOptions(selectedOptions.filter((item) => item !== option));
+    }
+    selectFilter(option);
+    setIsOpen(false); // Close dropdown after selection
   };
 
   return (
@@ -18,15 +24,19 @@ const Dropdown = ({ label, options }) => {
       <button className="dropdown-toggle" onClick={toggleDropdown}>
         {label}
       </button>
-      {isOpen && (
-        <ul className="dropdown-menu">
-          {options.map((option, index) => (
-            <li key={index} onClick={() => handleOptionSelect(option)}>
-              {option}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className={`dropdown-menu ${isOpen ? "open" : ""}`}>
+        {options.map((option) => (
+          <li key={option} onClick={() => handleOptionSelect(option)}>
+            <input
+              type="checkbox"
+              value={option}
+              checked={selectedOptions.includes(option)}
+              readOnly
+            />
+            <label>{option}</label>
+          </li>
+        ))}
+      </ul>
       <style jsx>{`
         .dropdown {
           position: relative;
@@ -35,24 +45,31 @@ const Dropdown = ({ label, options }) => {
 
         .dropdown-toggle {
           background-color: #f0f0f0;
-          color: #333;
+          color: #3b5f1d;
           border: none;
           padding: 10px 20px;
           cursor: pointer;
+          z-index: 100; /* Ensure the dropdown toggle is above other elements */
+        }
+
+        .dropdown-toggle:hover {
+          background-color: #3b5f1d;
+          color: #ffffff;
         }
 
         .dropdown-menu {
+          display: none;
           position: absolute;
           top: 100%;
-          left: 50%; /* Center horizontally */
-          transform: translateX(-50%);
+          left: 0;
           background-color: #fff;
           border: 1px solid #ccc;
           border-top: none;
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          width: 200px; /* Set width as needed */
+          z-index: 99;
+        }
+
+        .dropdown-menu.open {
+          display: block;
         }
 
         .dropdown-menu li {
@@ -62,6 +79,9 @@ const Dropdown = ({ label, options }) => {
 
         .dropdown-menu li:hover {
           background-color: #f0f0f0;
+        }
+        .dropdown-menu li input[type="checkbox"] {
+          margin-right: 10px;
         }
       `}</style>
     </div>

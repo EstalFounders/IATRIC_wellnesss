@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
+import { FaMapMarkedAlt, FaPhone } from "react-icons/fa";
 
 const Header1 = ({ toggleMenu, toggle }) => {
   return (
@@ -32,14 +33,17 @@ const Header1 = ({ toggleMenu, toggle }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
-      <div className="headtoppart clearfix" style={{backgroundColor: '#3b5f1d'}}>
+      <div
+        className="headtoppart clearfix"
+        style={{ backgroundColor: "#3b5f1d" }}
+      >
         <div className="headerwp clearfix">
           {/* Address */}
           <div className="headertopleft">
             <div className="address clearfix">
               <span>
-                <i className="fas fa-map-marker-alt" />
-                Sector 57 Gurgaon Haryana
+                <FaMapMarkedAlt className="mx-1" />
+                Sector 57 Gurgaon Haryana, 201301
               </span>
               <Link legacyBehavior href="#">
                 <a
@@ -49,7 +53,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   href="tel:9625942020"
                   className="callusbtn"
                 >
-                  <i className="fas fa-phone" />
+                  <FaPhone className="mx-1" />
                   +91 9625942020
                 </a>
               </Link>
