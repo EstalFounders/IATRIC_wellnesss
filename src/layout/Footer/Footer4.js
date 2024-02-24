@@ -1,5 +1,7 @@
 import Link from "next/dist/client/link";
 import React from "react";
+import { Col, Row } from "react-bootstrap";
+import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer4 = () => {
   return (
@@ -13,7 +15,7 @@ const Footer4 = () => {
               {/* Footer Logo */}
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
               <img
-                src="images/footer-logo-white.png"
+                src="images/logo.png"
                 width={180}
                 height={40}
                 alt="footer-logo"
@@ -24,40 +26,56 @@ const Footer4 = () => {
                 porta justo at velna auctor congue
               </p>
               {/* Social Icons */}
-              <div className="footer-socials-links mt-20">
-                <ul className="foo-socials text-center clearfix">
-                  <li>
-                    <a href="#" className="ico-facebook">
-                      <i className="fab fa-facebook-f" />
+              <div className="footer-socials-links mt-10">
+                <Row>
+                  <Col
+                    className="border text-center mx-1"
+                    style={{ borderRadius: 20 }}
+                  >
+                    <a
+                      className="linkedinicon mx-2"
+                      title="Linkedin"
+                      target="blank"
+                      href="https://www.linkedin.com/in/iatrichealthcare/"
+                    >
+                      <FaLinkedin />
+                      <span className="mobiletext02">Linkedin</span>
                     </a>
-                  </li>
-                  <li>
-                    <a href="#" className="ico-twitter">
-                      <i className="fab fa-twitter" />
+                  </Col>
+                  <Col
+                    className="border text-center mx-1"
+                    style={{ borderRadius: 20 }}
+                  >
+                    <a
+                      className="instagramicon mx-2"
+                      title="Instagram"
+                      target="blank"
+                      href="https://www.instagram.com/iatric.healthcare/"
+                    >
+                      <FaInstagram />
+                      <span className="mobiletext02">Instagram</span>
                     </a>
-                  </li>
-                  <li>
-                    <a href="#" className="ico-google-plus">
-                      <i className="fab fa-google-plus-g" />
+                  </Col>
+
+                  {/* <a className="twittericon" title="Twitter" href="#">
+              <i className="fab fa-twitter" />
+              <span className="mobiletext02">Twitter</span>
+            </a> */}
+                  <Col
+                    className="border text-center mx-1"
+                    style={{ borderRadius: 20 }}
+                  >
+                    <a
+                      className="facebookicon mx-2"
+                      title="Facebook"
+                      target="blank"
+                      href="https://www.facebook.com/iatrichealthcare"
+                    >
+                      <FaFacebook />
+                      <span className="mobiletext02">Facebook</span>
                     </a>
-                  </li>
-                  <li>
-                    <a href="#" className="ico-tumblr">
-                      <i className="fab fa-tumblr" />
-                    </a>
-                  </li>
-                  {/*
-										<li><a href="#" class="ico-behance"><i class="fab fa-behance"></i></a></li>	
-										<li><a href="#" class="ico-dribbble"><i class="fab fa-dribbble"></i></a></li>											
-										<li><a href="#" class="ico-instagram"><i class="fab fa-instagram"></i></a></li>	
-										<li><a href="#" class="ico-linkedin"><i class="fab fa-linkedin-in"></i></a></li>
-										<li><a href="#" class="ico-pinterest"><i class="fab fa-pinterest-p"></i></a></li>									
-										<li><a href="#" class="ico-youtube"><i class="fab fa-youtube"></i></a></li>											
-										<li><a href="#" class="ico-vk"><i class="fab fa-vk"></i></a></li>
-										<li><a href="#" class="ico-yelp"><i class="fab fa-yelp"></i></a></li>
-										<li><a href="#" class="ico-yahoo"><i class="fab fa-yahoo"></i></a></li>
-									    */}
-                </ul>
+                  </Col>
+                </Row>
               </div>
             </div>
           </div>
@@ -67,17 +85,19 @@ const Footer4 = () => {
               {/* Title */}
               <h5 className="h5-xs">Our Location</h5>
               {/* Address */}
-              <p>121 King Street, Melbourne,</p>
-              <p>Victoria 3000 Australia</p>
+              <p>Sector 57 ,</p>
+              <p>Gurgaon Haryana-122003</p>
               {/* Email */}
               <p className="foo-email mt-20">
                 E:
                 <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com">hello@yourdomain.com</a>
+                  <a href="mailto:yourdomain@mail.com">
+                    iatrichealthcare@gmail.com
+                  </a>
                 </Link>
               </p>
               {/* Phone */}
-              <p>P: +12 9 8765 4321</p>
+              <p>P: +91 96259 42020</p>
             </div>
           </div>
           {/* FOOTER WORKING HOURS */}
@@ -87,16 +107,7 @@ const Footer4 = () => {
               <h5 className="h5-xs">Working Time</h5>
               {/* Working Hours */}
               <p className="p-sm">
-                Mon - Wed - <span>9:00 AM - 7:00 PM</span>
-              </p>
-              <p className="p-sm">
-                Thursday - <span>9:00 AM - 6:30 PM</span>
-              </p>
-              <p className="p-sm">
-                Friday - <span>9:00 AM - 6:00 PM</span>
-              </p>
-              <p className="p-sm">
-                Sat - Sun - <span>Closed</span>
+                Mon - Wed - <span>9:00 AM - 8:00 PM</span>
               </p>
             </div>
           </div>
@@ -121,7 +132,7 @@ const Footer4 = () => {
           <div className="row">
             <div className="col-md-12">
               <p className="footer-copyright">
-                © {new Date().getFullYear()} <span>MedService</span>. All Rights
+                © {new Date().getFullYear()} <span>Iatric Healthcare</span>. All Rights
                 Reserved
               </p>
             </div>

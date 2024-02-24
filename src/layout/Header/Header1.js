@@ -2,7 +2,14 @@ import Link from "next/link";
 import React from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
-import { FaMapMarkedAlt, FaPhone } from "react-icons/fa";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaMapMarkedAlt,
+  FaPhone,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 const Header1 = ({ toggleMenu, toggle }) => {
   return (
@@ -43,7 +50,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
             <div className="address clearfix">
               <span>
                 <FaMapMarkedAlt className="mx-1" />
-                Sector 57 Gurgaon Haryana, 201301
+                Sector 57 , Gurgaon Haryana-122003
               </span>
               <Link legacyBehavior href="#">
                 <a
@@ -53,8 +60,8 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   href="tel:9625942020"
                   className="callusbtn"
                 >
-                  <FaPhone className="mx-1" />
-                  +91 9625942020
+                  <FaWhatsapp className="mx-1" />
+                  +91 96259 42020
                 </a>
               </Link>
             </div>
@@ -71,7 +78,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.linkedin.com/in/iatrichealthcare/"
             >
-              <i className="fab fa-linkedin-in" />
+              <FaLinkedin />
               <span className="mobiletext02">Linkedin</span>
             </a>
             <a
@@ -80,7 +87,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.instagram.com/iatric.healthcare/"
             >
-              <i className="fab fa-instagram" />
+              <FaInstagram />
               <span className="mobiletext02">Instagram</span>
             </a>
 
@@ -94,7 +101,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.facebook.com/iatrichealthcare"
             >
-              <i className="fab fa-facebook-f" />
+              <FaFacebook />
               <span className="mobiletext02">Facebook</span>
             </a>
           </div>

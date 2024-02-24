@@ -23,7 +23,7 @@ const Demo5Hero5 = () => {
                   <i className="fas fa-genderless" />
                 </div>
                 <p>
-                  Get optimal health, anytime, anywhere! One-stop care: Consult
+                  Get optimal health, <strong><b>anytime, anywhere!</b></strong> One-stop care: Consult
                   top doctors online, visit our clinic, or get home visits & lab
                   tests. Our pharmacy & rehab experts support your journey to a
                   healthier you.

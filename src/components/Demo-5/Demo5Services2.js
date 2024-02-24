@@ -80,7 +80,7 @@ const Demo5Services2 = () => {
                 <a>
                   {/* Icon  */}
                   <div className="sbox-2-icon icon-xl">
-                    <span className="flaticon-048-lungs" />
+                    <span className="flaticon-143-teeth" />
                   </div>
                   {/* Title */}
                   <h5 className="h5-sm sbox-2-title steelblue-color">
