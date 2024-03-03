@@ -13,7 +13,7 @@ const Demo5Contacts1 = () => {
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
             <h3 className="h3-md steelblue-color">
-              "Need Help? We&apos;re Here to Talk"
+              Need Help? We&apos;re Here to Talk
             </h3>
             {/* Text */}
             <p>

@@ -76,11 +76,11 @@ const Demo5About2 = () => {
                   {contact_no}
                 </h4>
                 <p className="mt-20">
-                  "Your health is our priority at Iatric Healthcare. Whether you
+                  Your health is our priority at Iatric Healthcare. Whether you
                   have questions, concerns, or need to schedule an appointment,
                   we&apos;re here to assist you every step of the way. Committed
                   to your satisfaction, we eagerly anticipate partnering with
-                  you on your healthcare journey."
+                  you on your healthcare journey.
                 </p>
               </div>
             </div>
