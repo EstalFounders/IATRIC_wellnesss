@@ -19,10 +19,11 @@ const Demo2Gallery1 = () => {
             <h3 className="h3-md steelblue-color">Your Partner in Health</h3>
             {/* Text */}
             <p>
-              We believe in being more than just a healthcare provider. We're
-              your partner in health, walking alongside you on your wellness
-              journey. We offer personalized care, support, and resources to
-              help you achieve your health goals, every step of the way.
+              We believe in being more than just a healthcare provider.
+              We&apos;re your partner in health, walking alongside you on your
+              wellness journey. We offer personalized care, support, and
+              resources to help you achieve your health goals, every step of the
+              way.
             </p>
           </div>
         </div>
