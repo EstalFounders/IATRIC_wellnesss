@@ -14,9 +14,9 @@ const Demo5Doctors1 = () => {
             <p>
               At Iatric Healthcare, we understand the importance of having
               access to reliable healthcare guidance, even beyond traditional
-              office hours. That's why we offer a range of options to connect
-              with a qualified healthcare professional, whenever you need it
-              most.
+              office hours. That&apos;s why we offer a range of options to
+              connect with a qualified healthcare professional, whenever you
+              need it most.
             </p>
           </div>
         </div>

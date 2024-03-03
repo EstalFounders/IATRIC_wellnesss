@@ -16,19 +16,10 @@ const Demo5Pricing3 = () => {
               </h3>
               {/* Text */}
               <p>
-                Investing in your health shouldn't come at the expense of your
-                wallet. At Iatric Healthcare, we understand that financial
-                concerns can often be a barrier to prioritizing well-being.
-                That's why we offer a variety of affordable options to fit your
-                needs and budget. We believe that preventative care and early
-                intervention are key to maintaining optimal health, and we're
-                committed to making these crucial services accessible for
-                everyone. Whether you're looking for routine checkups, chronic
-                disease management, or specialized services, we provide
-                comprehensive care tailored to your individual circumstances,
-                without compromising on quality or breaking the bank. So, take
-                the first step towards a healthier you and explore our range of
-                budget-friendly healthcare solutions.
+                Iatric Healthcare prioritizes affordable &amp; accessible
+                healthcare. We offer budget-friendly options for checkups,
+                chronic care, &amp; specialized services, allowing you to invest
+                in your health without breaking the bank.
               </p>
               <div className="pricing-table mb-40">
                 <table className="table table-hover">
