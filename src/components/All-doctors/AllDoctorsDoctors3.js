@@ -41,7 +41,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-4",
     },
     {
-      id: 4,
+      id: 5,
       name: "Megan Coleman D.M.",
       specialization: "Neurosurgeon",
       gender: "Female",
@@ -50,7 +50,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-4",
     },
     {
-      id: 4,
+      id: 6,
       name: "Megan Coleman D.M.",
       specialization: "Neurosurgeon",
       gender: "Female",
@@ -59,7 +59,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-4",
     },
     {
-      id: 1,
+      id: 7,
       name: "Dr Alex Barnes D.M.",
       specialization: "Chief Medical Officer",
       gender: "Male",
@@ -68,7 +68,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-1",
     },
     {
-      id: 2,
+      id: 8,
       name: "Hannah Harper D.M.",
       specialization: "Anesthesiologist",
       gender: "Female",
@@ -77,7 +77,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-2",
     },
     {
-      id: 3,
+      id: 9,
       name: "Matthew Anderson D.M.",
       specialization: "Cardiology",
       gender: "Male",
@@ -86,7 +86,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-3",
     },
     {
-      id: 4,
+      id: 10,
       name: "Megan Coleman D.M.",
       specialization: "Neurosurgeon",
       gender: "Female",
@@ -95,7 +95,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-4",
     },
     {
-      id: 4,
+      id: 11,
       name: "Megan Coleman D.M.",
       specialization: "Neurosurgeon",
       gender: "Female",
@@ -104,7 +104,7 @@ const AllDoctorsDoctors3 = () => {
       link: "/doctor-4",
     },
     {
-      id: 4,
+      id: 12,
       name: "Megan Coleman D.M.",
       specialization: "Neurosurgeon",
       gender: "Female",

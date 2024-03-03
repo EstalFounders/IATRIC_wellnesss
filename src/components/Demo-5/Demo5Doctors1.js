@@ -12,9 +12,11 @@ const Demo5Doctors1 = () => {
             <h3 className="h3-md steelblue-color">Our Medical Specialists</h3>
             {/* Text */}
             <p>
-              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
-              primis libero at tempus, blandit posuere ligula varius congue
-              cursus porta feugiat
+              At Iatric Healthcare, we understand the importance of having
+              access to reliable healthcare guidance, even beyond traditional
+              office hours. That's why we offer a range of options to connect
+              with a qualified healthcare professional, whenever you need it
+              most.
             </p>
           </div>
         </div>

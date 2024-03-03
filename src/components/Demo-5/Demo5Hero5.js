@@ -20,24 +20,30 @@ const Demo5Hero5 = () => {
               {/* CONTENT BOX #1 */}
               <div className="box-list grey-color">
                 <div className="box-list-icon">
-                  <i className="fas fa-genderless" />
+                  {/* <i className="fas fa-genderless" /> */}
                 </div>
                 <p>
-                  Get optimal health, <strong><b>anytime, anywhere!</b></strong> One-stop care: Consult
-                  top doctors online, visit our clinic, or get home visits & lab
-                  tests. Our pharmacy & rehab experts support your journey to a
-                  healthier you.
+                  Get optimal health,{" "}
+                  <strong style={{color: ''}}>
+                    <b>ANYTIME, ANYWHERE!</b>
+                  </strong>{" "}
+                  One-stop care: Consult top doctors online, visit our clinic,
+                  or get home visits & lab tests. Our pharmacy & rehab experts
+                  support your journey to a healthier you.
                 </p>
               </div>
               {/* CONTENT BOX #3 */}
               <div className="box-list grey-color mb-15">
                 <div className="box-list-icon">
-                  <i className="fas fa-genderless" />
+                  {/* <i className="fas fa-genderless" /> */}
                 </div>
-                {/* <p>
-                  Nemo ipsam egestas volute turpis dolores ut aliquam quaerat
-                  sodales sapien undo pretium purus feugiat dolor impedit
-                </p> */}
+                <p>
+                  {/* Your health is important to us. Whether you have questions,
+                  concerns, or need to schedule an appointment, Iatric
+                  healthcare is here to help! We're committed to your
+                  satisfaction and look forward to partnering with you on your
+                  healthcare journey. */}
+                </p>
               </div>
               {/* Button */}
               <Link legacyBehavior href="/about-us">

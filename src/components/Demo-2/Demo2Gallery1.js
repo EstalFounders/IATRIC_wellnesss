@@ -16,14 +16,13 @@ const Demo2Gallery1 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">
-              Total Health Care Solutions
-            </h3>
+            <h3 className="h3-md steelblue-color">Your Partner in Health</h3>
             {/* Text */}
             <p>
-              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
-              primis libero at tempus, blandit posuere ligula varius congue
-              cursus porta feugiat
+              We believe in being more than just a healthcare provider. We're
+              your partner in health, walking alongside you on your wellness
+              journey. We offer personalized care, support, and resources to
+              help you achieve your health goals, every step of the way.
             </p>
           </div>
         </div>

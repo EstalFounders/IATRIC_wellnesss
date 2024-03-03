@@ -13,13 +13,15 @@ const Demo5Contacts1 = () => {
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
             <h3 className="h3-md steelblue-color">
-              Have a Question? Get In Touch
+              Need Help? We're Here to Talk
             </h3>
             {/* Text */}
             <p>
-              Have a question? Want to book an appointment for yourself or your
-              children? Give us a call or send an email to contact the
-              MedService.
+              Feeling unsure or in need of guidance? At Iatric Healthcare, we're
+              here to listen. Don't hesitate to reach out with any questions,
+              concerns, or simply to discuss your healthcare goals. We're
+              dedicated to providing personalized support and helping you
+              navigate your wellness journey.
             </p>
           </div>
         </div>
@@ -29,20 +31,20 @@ const Demo5Contacts1 = () => {
             {/* General Information */}
             <div className="contact-box mb-40">
               <h5 className="h5-sm steelblue-color">General Information</h5>
-              <p>121 King Street, Melbourne,</p>
-              <p>Victoria 3000 Australia</p>
-              <p>Phone: +12 9 8765 4321</p>
+              <p>Sector 57 ,</p>
+              <p>Gurgaon Haryana-122003</p>
+              <p>Ph: +91 96259 42020</p>
               <p>
-                Email:
+                Email:{" "}
                 <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com" className="blue-color">
-                    hello@yourdomain.com
+                  <a href="iatrichealthcare@gmail.com" className="blue-color">
+                    iatrichealthcare@gmail.com
                   </a>
                 </Link>
               </p>
             </div>
             {/* Patient Experience */}
-            <div className="contact-box mb-40">
+            {/* <div className="contact-box mb-40">
               <h5 className="h5-sm steelblue-color">Patient Experience</h5>
               <p>Hannah Harper - Patient Experience Coordinator</p>
               <p>Phone: +12 9 8765 4321</p>
@@ -54,13 +56,11 @@ const Demo5Contacts1 = () => {
                   </a>
                 </Link>
               </p>
-            </div>
+            </div> */}
             {/* Working Hours */}
             <div className="contact-box mb-40">
               <h5 className="h5-sm steelblue-color">Working Hours</h5>
-              <p>Monday – Friday : 8:00 AM - 8:00 PM</p>
-              <p>Saturday : 10:00 AM - 6:00 PM</p>
-              <p>Sunday : 10:00 AM - 4:00 PM</p>
+              <p>Monday – Sunday : 9:00 AM - 8:00 PM</p>
             </div>
           </div>
           {/* END CONTACTS INFO */}
@@ -134,21 +134,7 @@ const Demo5Contacts1 = () => {
                     </select>
                   </div>
                 </div>
-                {/* Subject */}
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input
-                      id="form_subject"
-                      className="form-control subject"
-                      type="text"
-                      name="subject"
-                      placeholder="Subject*"
-                      required="required"
-                      data-error="Subject is required"
-                    />
-                    <div className="help-block with-errors" />
-                  </div>
-                </div>
+
                 {/* Message */}
                 <div className="col-md-12 input-message">
                   <div className="form-group">
@@ -173,7 +159,7 @@ const Demo5Contacts1 = () => {
                     type="submit"
                     className="btn btn-md btn-blue blue-hover submit"
                   >
-                    Send Your Message
+                    Talk to Us
                   </button>
                 </div>
               </form>

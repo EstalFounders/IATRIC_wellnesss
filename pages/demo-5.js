@@ -1,5 +1,3 @@
-
-
 import { use } from "react";
 import About5 from "../src/components/Common/About-5";
 import Banner5 from "../src/components/Common/Banner-5";
@@ -17,8 +15,6 @@ import Demo5Pricing3 from "../src/components/Demo-5/Demo5Pricing3";
 import Demo5Services2 from "../src/components/Demo-5/Demo5Services2";
 import Layouts from "../src/layout/Layouts";
 
-
-
 const Demo5 = () => {
   return (
     <Layouts header={1} footer={4}>
@@ -30,16 +26,15 @@ const Demo5 = () => {
       {/* END ABOUT-2 */}
       {/* ABOUT-5
 			============================================= */}
-       
+
       <Demo5Services2 />
       <Tabs1 />
       <About5 />
-     
-      
+
       {/* END SERVICES-2 */}
       {/* TABS-1
 			============================================= */}
-     
+
       {/* END TABS-1 */}
       {/* ABOUT-6
 			============================================= */}

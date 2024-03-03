@@ -4,12 +4,11 @@ import Counter from "../Counter";
 const Statistic1 = () => {
   return (
     <div id="statistic-1" className="bg-scroll statistic-section division">
-      <div className="container white-color mr-4">
-        {" "}
-        
+      <div className="container white-color">
+        {/* //remove mr-4 if we uncomment below statistic block */}
         <div className="row">
           {/* STATISTIC BLOCK #1 */}
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-3 mr-auto ml-auto">
             <div className="statistic-block icon-lg" data-wow-delay="0.4s">
               {/* Icon  */}
               <span className="flaticon-062-cardiogram-3" />
@@ -21,7 +20,7 @@ const Statistic1 = () => {
             </div>
           </div>
           {/* STATISTIC BLOCK #2 */}
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-3 mr-auto ml-auto">
             <div className="statistic-block icon-lg" data-wow-delay="0.6s">
               {/* Icon  */}
               <span className="flaticon-137-doctor" />

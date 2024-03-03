@@ -10,32 +10,21 @@ const Demo5About6 = () => {
           <div className="col-lg-6">
             <div className="txt-block pc-30">
               {/* Section ID */}
-              <span className="section-id blue-color">Best Practices</span>
+              <span className="section-id blue-color">
+                <h4>Best Practices</h4>
+              </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
                 Clinic with Innovative Approach to Treatment
               </h3>
               {/* CONTENT BOX #1 */}
-              <div className="box-list">
-                <div className="box-list-icon">
-                  <i className="fas fa-genderless" />
-                </div>
-                <p>
-                  Nemo ipsam egestas volute turpis dolores ut aliquam quaerat
-                  sodales sapien undo pretium purus feugiat dolor impedit
-                </p>
-              </div>
-              {/* CONTENT BOX #2 */}
-              <div className="box-list">
-                <div className="box-list-icon">
-                  <i className="fas fa-genderless" />
-                </div>
-                <p>
-                  Maecenas gravida porttitor nunc, quis vehicula magna luctus
-                  tempor. Quisque vel laoreet turpis urna augue, viverra a augue
-                  eget, dictum tempor diam pulvinar massa purus nulla
-                </p>
-              </div>
+              <p>
+                Skip the long wait times and crowded waiting rooms. Access
+                professional healthcare consultations from the comfort of your
+                home, office, or anywhere with an internet connection. Our
+                flexible scheduling options allow you to fit healthcare into
+                your busy life, at your own pace.
+              </p>
               {/* Button */}
               <Link legacyBehavior href="/all-doctors">
                 <a className="btn btn-blue blue-hover mt-25">

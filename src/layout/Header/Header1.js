@@ -10,6 +10,7 @@ import {
   FaPhone,
   FaWhatsapp,
 } from "react-icons/fa";
+import { contact_no } from "../../constant";
 
 const Header1 = ({ toggleMenu, toggle }) => {
   return (
@@ -61,7 +62,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   className="callusbtn"
                 >
                   <FaWhatsapp className="mx-1" />
-                  +91 96259 42020
+                  {contact_no}
                 </a>
               </Link>
             </div>

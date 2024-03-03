@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { contact_no } from "../../constant";
 
 const Demo5About2 = () => {
   return (
@@ -68,16 +69,18 @@ const Demo5About2 = () => {
             <div className="col-md-6 col-lg-4">
               <div className="abox-2">
                 {/* Title */}
-                <h5 className="h5-md steelblue-color">Contact Us</h5>
+                <h5 className="h5-md steelblue-color">Get in Touch</h5>
                 {/* Text */}
                 <h4 className="h4-sm emergency-call blue-color">
                   <i className="fas fa-phone" />
-                  +91 96259 42020
+                  {contact_no}
                 </h4>
                 <p className="mt-20">
-                  An magnis nulla dolor at sapien augue erat iaculis purus
-                  tempor magna ipsum vitae a purus primis ipsum magna ipsum
-                  tempus feugiat dolor impedit felis magna
+                  Your health is important to us. Whether you have questions,
+                  concerns, or need to schedule an appointment, Iatric
+                  healthcare is here to help! We're committed to your
+                  satisfaction and look forward to partnering with you on your
+                  healthcare journey.
                 </p>
               </div>
             </div>
