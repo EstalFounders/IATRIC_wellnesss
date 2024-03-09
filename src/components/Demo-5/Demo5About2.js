@@ -1,8 +1,23 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { contact_no } from "../../constant";
+import { dial, openSupportWhatsAppWeb } from "../../helper";
+import PopupDialog from "../Common/PopupDialog";
 
 const Demo5About2 = () => {
+  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+  const handleDialDialogOpen = () => {
+    setIsDialDialogOpen(true);
+  };
+  const handleCloseDialDialog = () => {
+    setIsDialDialogOpen(false);
+  };
+
+  const dialOptions = [
+    { label: "Dial", action: dial },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+  ];
+
   return (
     <section id="about-2" className="about-section division">
       <div className="container">
@@ -59,7 +74,10 @@ const Demo5About2 = () => {
                 </p>
                 {/* Button */}
                 <Link legacyBehavior href="/timetable">
-                  <a className="btn btn-sm btn-blue blue-hover mt-25">
+                  <a
+                    className="btn btn-sm btn-blue blue-hover mt-25"
+                    style={{ backgroundColor: "#3b5f1d" }}
+                  >
                     View Timetable
                   </a>
                 </Link>
@@ -73,7 +91,20 @@ const Demo5About2 = () => {
                 {/* Text */}
                 <h4 className="h4-sm emergency-call blue-color">
                   <i className="fas fa-phone" />
-                  {contact_no}
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDialDialogOpen();
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.color = "#3b5f1d";
+                    }} // Change color on hover
+                    onMouseOut={(e) => {
+                      e.target.style.color = "#8e8333";
+                    }}
+                  >
+                    {contact_no}
+                  </a>
                 </h4>
                 <p className="mt-20">
                   Your health is our priority at Iatric Healthcare. Whether you
@@ -86,6 +117,11 @@ const Demo5About2 = () => {
             </div>
           </div>
           {/* End row */}
+          <PopupDialog
+            isOpen={isDialDialogOpen}
+            onClose={handleCloseDialDialog}
+            options={dialOptions}
+          />
         </div>
       </div>
       {/* End container */}

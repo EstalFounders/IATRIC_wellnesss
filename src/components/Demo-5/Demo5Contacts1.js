@@ -1,7 +1,29 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { contact_no, email } from "../../constant";
+import PopupDialog from "../Common/PopupDialog";
+import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { useRouter } from "next/router";
 
 const Demo5Contacts1 = () => {
+  const router = useRouter();
+  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+  const handleDialDialogOpen = () => {
+    setIsDialDialogOpen(true);
+  };
+  const handleCloseDialDialog = () => {
+    setIsDialDialogOpen(false);
+  };
+
+  const handleEmail = () => {
+    router.push(`mailto:${email}`);
+  };
+
+  const dialOptions = [
+    { label: "Dial", action: dial },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+  ];
+
   return (
     <section
       id="contacts-1"
@@ -33,12 +55,42 @@ const Demo5Contacts1 = () => {
               <h5 className="h5-sm steelblue-color">General Information</h5>
               <p>Sector 57 ,</p>
               <p>Gurgaon Haryana-122003</p>
-              <p>Ph: +91 96259 42020</p>
+              <p>
+                Ph:{" "}
+                <Link legacyBehavior href="#">
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDialDialogOpen();
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.color = "#3b5f1d";
+                    }} // Change color on hover
+                    onMouseOut={(e) => {
+                      e.target.style.color = "#000000";
+                    }}
+                  >
+                    {contact_no}
+                  </a>
+                </Link>
+              </p>
               <p>
                 Email:{" "}
                 <Link legacyBehavior href="#">
-                  <a href="iatrichealthcare@gmail.com" className="blue-color">
-                    iatrichealthcare@gmail.com
+                  <a
+                    className="ml-2"
+                    onClick={(e) => {
+                      handleEmail();
+                      e.preventDefault();
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.color = "#3b5f1d";
+                    }} // Change color on hover
+                    onMouseOut={(e) => {
+                      e.target.style.color = "#000000";
+                    }}
+                  >
+                    {email}
                   </a>
                 </Link>
               </p>
@@ -158,6 +210,7 @@ const Demo5Contacts1 = () => {
                   <button
                     type="submit"
                     className="btn btn-md btn-blue blue-hover submit"
+                    style={{ backgroundColor: "#3b5f1d" }}
                   >
                     Talk to Us
                   </button>
@@ -168,6 +221,11 @@ const Demo5Contacts1 = () => {
           {/* END CONTACT FORM */}
         </div>
         {/* End row */}
+        <PopupDialog
+          isOpen={isDialDialogOpen}
+          onClose={handleCloseDialDialog}
+          options={dialOptions}
+        />
       </div>
       {/* End container */}
     </section>

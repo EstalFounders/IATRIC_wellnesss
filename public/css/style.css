@@ -59,6 +59,9 @@ body {
 /*  SPACING & INDENTS
   /*------------------------------------------*/
 
+
+
+
 .wide-100 {
   padding-top: 100px;
   padding-bottom: 100px;
@@ -678,8 +681,6 @@ body {
 .bg-blue {
   background-color: #8e8333;
 }
-
-
 
 .bg-deepblue {
   background-color: #004a91;
@@ -1719,7 +1720,7 @@ span.id-color {
 }
 
 .headertopright a:hover {
-  background-color: #272b37;
+  background-color: #cd486b;
 }
 
 .headertopright a.facebookicon:hover {
@@ -2173,6 +2174,7 @@ p.header-widget-phone {
   -webkit-border-radius: 6px 6px 0 0;
   -moz-border-radius: 6px 6px 0 0;
   border-radius: 6px 6px 0 0;
+  
 }
 
 #hero-5 .hero-txt {

@@ -42,6 +42,8 @@ const Demo5Services2 = () => {
     // Add more services as needed
   ];
 
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   // Calculate the index of the first service to be displayed on the current page
   const indexOfFirstService = (currentPage - 1) * servicesPerPage;
 
@@ -64,6 +66,12 @@ const Demo5Services2 = () => {
     setCurrentPage(currentPage - 1);
   };
 
+  const handleIconClick = (index) => {
+    // Navigate to the corresponding component based on the index
+    const serviceName = services[index];
+    history.push(`/department-single/${serviceName}`);
+  };
+
   return (
     <section
       id="services-2"
@@ -72,7 +80,9 @@ const Demo5Services2 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Our Speciality</h3>
+            <h3 className="h3-md steelblue-color" style={{ color: "#8e8333" }}>
+              Our Speciality
+            </h3>
             <p>content coming soon</p>
           </div>
         </div>
@@ -95,31 +105,99 @@ const Demo5Services2 = () => {
                 <div className="col-sm-6 col-lg-3" key={index}>
                   <div className="sbox-2">
                     <Link legacyBehavior href="/department-single">
-                      <a>
+                      <a onClick={() => handleIconClick(index)}>
                         {/* Adjust icons and titles */}
                         {index === 0 && (
-                          <FaStethoscope size={80} color="#8e8333" />
+                          <FaStethoscope
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
                         )}
                         {index === 1 && (
-                          <MdFaceRetouchingNatural size={80} color="#8e8333" />
+                          <MdFaceRetouchingNatural
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
                         )}
-                        {index === 2 && <GiKneeCap size={80} color="#8e8333" />}
-                        {index === 3 && <FaTooth size={80} color="#8e8333" />}
-                        {index === 4 && <FaHeart size={80} color="#8e8333" />}
+                        {index === 2 && (
+                          <GiKneeCap
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
+                        )}
+                        {index === 3 && (
+                          <FaTooth
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
+                        )}
+                        {index === 4 && (
+                          <FaHeart
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
+                        )}
                         {index === 5 && (
-                          <AiTwotoneHome size={80} color="#8e8333" />
+                          <AiTwotoneHome
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
                         )}
-                        {index === 6 && <FaMedkit size={80} color="#8e8333" />}
+                        {index === 6 && (
+                          <FaMedkit
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
+                        )}
                         {index === 7 && (
-                          <FaUserNurse size={80} color="#8e8333" />
+                          <FaUserNurse
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
                         )}
                         {index === 8 && (
-                          <AiTwotoneHome size={80} color="#8e8333" />
+                          <AiTwotoneHome
+                            size={80}
+                            color={
+                              hoveredIndex === index ? "#fafafa" : "#8e8333"
+                            }
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                          />
                         )}
-                        {index === 9 && <FaMedkit size={80} color="#8e8333" />}
-                        {index === 10 && (
-                          <FaUserNurse size={80} color="#8e8333" />
-                        )}
+
                         <h5 className="h5-sm sbox-2-title steelblue-color">
                           {service}
                         </h5>

@@ -8,12 +8,17 @@ const Demo5Hero5 = () => {
         <div className="row d-flex align-items-center">
           {/* HERO TEXT */}
           <div className="col-md-9 col-lg-7 col-xl-6">
-            <div className="hero-5-strip bg-blue white-color">
+            <div
+              className="hero-5-strip bg-blue white-color"
+              style={{ backgroundColor: "#3b5f1d" }}
+            >
               <h5>Iatric Healthcare Provides</h5>
             </div>
             <div className="hero-txt">
               {/* Title */}
-              <h4 className="steelblue-color">Best Quality</h4>
+              <h4 className="steelblue-color" style={{ color: "#8e8333" }}>
+                Best Quality
+              </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
               </h3>
@@ -24,7 +29,7 @@ const Demo5Hero5 = () => {
                 </div>
                 <p>
                   Get optimal health,{" "}
-                  <strong style={{color: ''}}>
+                  <strong style={{ color: "#8e8333" }}>
                     <b>ANYTIME, ANYWHERE!</b>
                   </strong>{" "}
                   One-stop care: Consult top doctors online, visit our clinic,
@@ -47,7 +52,12 @@ const Demo5Hero5 = () => {
               </div>
               {/* Button */}
               <Link legacyBehavior href="/about-us">
-                <a className="btn btn-blue blue-hover">Discover More</a>
+                <a
+                  className="btn btn-blue blue-hover"
+                  style={{ backgroundColor: "#3b5f1d" }}
+                >
+                  Discover More
+                </a>
               </Link>
             </div>
           </div>

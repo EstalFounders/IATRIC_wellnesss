@@ -8,7 +8,6 @@ const MobileMenu = () => {
     activeLi = (value) =>
       value === activeMenu ? { display: "block" } : { display: "none" },
     activeArrow = (value) => (value === activeMenu ? "ws-activearrow" : "");
-  console.log(activeMenu);
   return (
     <div
       className="wsmainfull menu clearfix cloned d-block d-lg-none"

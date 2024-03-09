@@ -27,7 +27,10 @@ const Demo5About6 = () => {
               </p>
               {/* Button */}
               <Link legacyBehavior href="/all-doctors">
-                <a className="btn btn-blue blue-hover mt-25">
+                <a
+                  className="btn btn-blue blue-hover mt-25"
+                  style={{ backgroundColor: "#3b5f1d" }}
+                >
                   Meet The Doctors
                 </a>
               </Link>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
@@ -11,8 +11,42 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { contact_no } from "../../constant";
+import PopupDialog from "../../components/Common/PopupDialog";
+import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { useRouter } from "next/router";
 
 const Header1 = ({ toggleMenu, toggle }) => {
+  const router = useRouter();
+  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+  const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+
+  const handleDialDialogOpen = () => {
+    setIsDialDialogOpen(true);
+  };
+
+  const handleWhatsAppDialogOpen = () => {
+    setIsWhatsAppDialogOpen(true);
+  };
+
+  const handleCloseDialDialog = () => {
+    setIsDialDialogOpen(false);
+  };
+
+  const handleCloseWhatsAppDialog = () => {
+    setIsWhatsAppDialogOpen(false);
+  };
+
+  const dialOptions = [
+    { label: "Dial", action: dial },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+  ];
+
+  const whatsAppOptions = [
+    { label: "Dial", action: dial },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+    { label: "FORM", action: () => router.push("/appointment") },
+  ];
+
   return (
     <header id="header" className="header">
       {/* MOBILE HEADER */}
@@ -35,7 +69,13 @@ const Header1 = ({ toggleMenu, toggle }) => {
           />
         </span>
         <Link legacyBehavior href="#">
-          <a href="tel:123456789" className="callusbtn">
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              handleDialDialogOpen();
+            }}
+            className="callusbtn"
+          >
             <i className="fas fa-phone" />
           </a>
         </Link>
@@ -53,19 +93,31 @@ const Header1 = ({ toggleMenu, toggle }) => {
                 <FaMapMarkedAlt className="mx-1" />
                 Sector 57 , Gurgaon Haryana-122003
               </span>
-              <Link legacyBehavior href="#">
+              <Link legacyBehavior href="/">
                 <a
                   onClick={(e) => {
                     e.preventDefault();
+                    handleDialDialogOpen();
                   }}
                   href="tel:9625942020"
                   className="callusbtn"
+                  onMouseOver={(e) => {
+                    e.target.style.color = "#8e8333";
+                  }} // Change color on hover
+                  onMouseOut={(e) => {
+                    e.target.style.color = "#ffffff";
+                  }}
                 >
                   <FaWhatsapp className="mx-1" />
                   {contact_no}
                 </a>
               </Link>
             </div>
+            <PopupDialog
+              isOpen={isDialDialogOpen}
+              onClose={handleCloseDialDialog}
+              options={dialOptions}
+            />
           </div>
           {/* Social Links */}
           <div className="headertopright">
@@ -131,7 +183,10 @@ const Header1 = ({ toggleMenu, toggle }) => {
               <li aria-haspopup="true">
                 <Link legacyBehavior href="/">
                   <a>
-                    Home <span className="wsarrow" />
+                    Home{" "}
+                    <span
+                    // className="wsarrow" uncomment to enable down arrow
+                    />
                   </a>
                 </Link>
               </li>
@@ -434,12 +489,32 @@ const Header1 = ({ toggleMenu, toggle }) => {
               </li>
               {/* NAVIGATION MENU BUTTON */}
               <li className="nl-simple header-btn" aria-haspopup="true">
-                <Link legacyBehavior href="/appointment">
-                  <a>Make an Appointment</a>
+                <Link legacyBehavior href="/">
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleWhatsAppDialogOpen();
+                    }}
+                    href="tel:9625942020"
+                    className="callusbtn"
+                    onMouseOver={(e) => {
+                      e.target.style.color = "#8e8333";
+                    }} // Change color on hover
+                    onMouseOut={(e) => {
+                      e.target.style.color = "#ffffff";
+                    }}
+                  >
+                    Make an Appointment
+                  </a>
                 </Link>
               </li>
             </ul>
           </nav>
+          <PopupDialog
+            isOpen={isWhatsAppDialogOpen}
+            onClose={handleCloseWhatsAppDialog}
+            options={whatsAppOptions}
+          />
           {/* END MAIN MENU */}
         </div>
       </div>

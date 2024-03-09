@@ -37,7 +37,7 @@ const Demo5Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-1">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover" style={{ backgroundColor: "#3b5f1d" }} title>
                       View More Info
                     </a>
                   </Link>
@@ -70,7 +70,7 @@ const Demo5Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-2">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover" style={{ backgroundColor: "#3b5f1d" }} title>
                       View More Info
                     </a>
                   </Link>
@@ -103,7 +103,7 @@ const Demo5Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-1">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover" style={{ backgroundColor: "#3b5f1d" }} title>
                       View More Info
                     </a>
                   </Link>
@@ -136,7 +136,7 @@ const Demo5Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-2">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover" style={{ backgroundColor: "#3b5f1d" }} title>
                       View More Info
                     </a>
                   </Link>
@@ -161,7 +161,12 @@ const Demo5Doctors1 = () => {
           <div className="col-md-12 text-center">
             <div className="all-doctors mb-40">
               <Link legacyBehavior href="/all-doctors">
-                <a className="btn btn-blue blue-hover">Meet All Doctors</a>
+                <a
+                  className="btn btn-blue blue-hover"
+                  style={{ backgroundColor: "#3b5f1d" }}
+                >
+                  Meet All Doctors
+                </a>
               </Link>
             </div>
           </div>
