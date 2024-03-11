@@ -6,105 +6,111 @@ const Tabs1 = () => {
   const [services] = useState([
     {
       id: 0,
-      name: "Pediatrics",
+      name: "General Physician",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Pediatrics service...",
+      description: "Description of General Physician service...",
     },
     {
       id: 1,
-      name: "Hematology",
+      name: "Pediatrics",
       image: "images/hematology_700x700.jpg",
-      description: "Description of Hematology service...",
+      description: "Description of Pediatrics service...",
     },
     {
       id: 2,
-      name: "MRI Diagnostic",
+      name: "Cardiology",
       image: "images/hematology_700x700.jpg",
-      description: "Description of MRI Diagnostic service...",
+      description: "Description of Cardiology service...",
     },
     {
       id: 3,
-      name: "X-Ray Diagnostic",
+      name: "Dermatologist",
       image: "images/hematology_700x700.jpg",
-      description: "Description of X-Ray Diagnostic service...",
+      description: "Description of Dermatologist service...",
     },
     {
       id: 4,
-      name: "Service 5",
+      name: "Orthopaedics",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 5...",
+      description: "Description of Orthopaedics...",
     },
     {
       id: 5,
-      name: "Service 6",
+      name: "Gynaecology",
       image: "images/hematology_700x700.jpg",
-      description: "Description of Service 6...",
+      description: "Description of Gynaecology...",
     },
     {
       id: 6,
-      name: "Service 7",
+      name: "Ophthalmology",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 7...",
+      description: "Description of Ophthalmology...",
     },
     {
       id: 7,
-      name: "Service 8",
+      name: "Pulmonology",
       image: "images/hematology_700x700.jpg",
-      description: "Description of Service 8...",
+      description: "Description of Pulmonology...",
     },
     {
       id: 8,
-      name: "Service 9",
+      name: "Psychiatrist",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 9...",
+      description: "Description of Psychiatrist...",
     },
     {
       id: 9,
-      name: "Service 10",
+      name: "Dentistry",
       image: "images/hematology_700x700.jpg",
-      description: "Description of Service 10...",
+      description: "Description of Dentistry...",
     },
     {
       id: 10,
-      name: "Service 11",
+      name: "Physiotherapy",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 11...",
+      description: "Description of Physiotherapy...",
     },
     {
       id: 11,
-      name: "Service 12",
+      name: "Nursing care",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 12...",
+      description: "Description of Nursing care...",
     },
     {
       id: 12,
-      name: "Service 13",
+      name: "Home care",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 13...",
+      description: "Description of Home care...",
     },
     {
       id: 13,
-      name: "Service 14",
+      name: "Medicine Delivery",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 14...",
+      description: "Description of Medicine Delivery...",
     },
     {
       id: 14,
-      name: "Service 15",
+      name: "Lab Investigation",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 15...",
+      description: "Description of Lab Investigation...",
     },
     {
       id: 15,
-      name: "Service 16",
+      name: "Corporate Healthcare",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 16...",
+      description: "Description of Corporate Healthcare...",
     },
     {
       id: 16,
-      name: "Service 17",
+      name: "Healthcamp",
       image: "images/pediatrics_700x700.jpg",
-      description: "Description of Service 17...",
+      description: "Description of Healthcamp...",
+    },
+    {
+      id: 17,
+      name: "Obstetrics",
+      image: "images/pediatrics_700x700.jpg",
+      description: "Description of Obstetrics...",
     },
   ]);
 
@@ -135,16 +141,34 @@ const Tabs1 = () => {
           <div className="col-md-12">
             <Tab.Container defaultActiveKey={`tab-${services[0].id}`}>
               <div id="tabs-nav" className="list-group text-center">
-                <Nav className="nav nav-pills" id="pills-tab" as="ul">
+                <Nav
+                  className="nav nav-pills justify-content-center"
+                  id="pills-tab"
+                  as="ul"
+                >
+                  {currentPage > 1 && (
+                    <FaChevronLeft
+                      className="nav-icon mt-3 mr-4"
+                      onClick={handlePrevPage}
+                      color="#8e8333"
+                      size={30}
+                    />
+                  )}
                   {currentServices.map((service, index) => (
                     <Nav.Item className="nav-item icon-xs" key={index} as="li">
                       <Nav.Link className="nav-link" eventKey={`tab-${index}`}>
-                        {/* <span> */}
                         <b>{service.name}</b>
-                        {/* </span> */}
                       </Nav.Link>
                     </Nav.Item>
                   ))}
+                  {indexOfLastService < services.length && (
+                    <FaChevronRight
+                      className="nav-icon mt-3 mr-4"
+                      onClick={handleNextPage}
+                      color="#8e8333"
+                      size={30}
+                    />
+                  )}
                 </Nav>
               </div>
               <Tab.Content className="tab-content" id="pills-tabContent">
@@ -177,12 +201,13 @@ const Tabs1 = () => {
                 ))}
               </Tab.Content>
             </Tab.Container>
-            <div className="navigation-icons">
+            {/* <div className="navigation-icons text-center mt-1">
               {currentPage > 1 && (
                 <FaChevronLeft
                   className="nav-icon"
                   onClick={handlePrevPage}
                   color="#8e8333"
+                  size={30}
                 />
               )}
               {indexOfLastService < services.length && (
@@ -190,9 +215,10 @@ const Tabs1 = () => {
                   className="nav-icon"
                   onClick={handleNextPage}
                   color="#8e8333"
+                  size={30}
                 />
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

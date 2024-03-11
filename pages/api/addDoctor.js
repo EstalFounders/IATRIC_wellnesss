@@ -18,15 +18,15 @@ export const config = {
   },
 };
 
-
 export default async function handler(req, res) {
-  console.log('handler calling for get')
+  console.log("handler calling for get");
   await dbConnect(); // Ensure database connection is established before handling requests
-
+  console.log(req, 'req')
   if (req.method === "POST") {
     try {
       const form = new multiparty.Form();
       form.parse(req, async function (err, fields, files) {
+        console.log(files, 'files in api')
         if (err) {
           console.error("Error parsing form data:", err);
           res
@@ -41,10 +41,10 @@ export default async function handler(req, res) {
             `${profilePicture_img_path}/${fields.name}${uuidv4()}`
           );
           const profilePictureFile = files.profilePicture[0]; // Get the first file from the array
-          await uploadBytes(
-            profilePictureRef,
-            profilePictureFile.originalFilename
-          );
+          const metadata = {
+            contentType: profilePictureFile.mimetype,
+          };
+          await uploadBytes(profilePictureRef, profilePictureFile , metadata);
 
           // Get profile picture download URL
           const profilePictureUrl = await getDownloadURL(profilePictureRef);
@@ -65,27 +65,27 @@ export default async function handler(req, res) {
               return getDownloadURL(certificateRef);
             })
           );
+          res.status(200).json("completed");
+          // const stringFields = Object.fromEntries(
+          //   Object.entries(fields).map(([key, value]) => [
+          //     key,
+          //     value.toString(),
+          //   ])
+          // );
+          // console.log(stringFields, 'all fields')
+          // const addedDoctor = await Doctor.create({
+          //   ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
+          //   profilePictureUrl,
+          //   diplomasCertificatesUrls,
+          // });
 
-          const stringFields = Object.fromEntries(
-            Object.entries(fields).map(([key, value]) => [
-              key,
-              value.toString(),
-            ])
-          );
-          console.log(stringFields, 'all fields')
-          const addedDoctor = await Doctor.create({
-            ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
-            profilePictureUrl,
-            diplomasCertificatesUrls,
-          });
+          // console.log("Doctor Added");
 
-          console.log("Doctor Added");
-
-          res.status(200).json({
-            success: true,
-            profilePictureUrl,
-            diplomasCertificatesUrls,
-          });
+          // res.status(200).json({
+          //   success: true,
+          //   profilePictureUrl,
+          //   diplomasCertificatesUrls,
+          // });
         } catch (error) {
           console.error("Error uploading files:", error);
           res
@@ -100,7 +100,7 @@ export default async function handler(req, res) {
         .json({ error: "An error occurred while parsing form data." });
     }
   } else if (req.method === "GET") {
-    console.log('get method calling')
+    console.log("get method calling");
     try {
       const doctors = await Doctor.find();
       res.status(200).json(doctors);

@@ -67,10 +67,10 @@ const Demo5About2 = () => {
                 <h5 className="h5-md steelblue-color">Doctors Timetable</h5>
                 {/* Text */}
                 <p>
-                  An magnis nulla dolor at sapien augue iaculis purus tempor
+                  {/* An magnis nulla dolor at sapien augue iaculis purus tempor
                   magna ipsum vitae and purus primis ipsum magna ipsum at tempus
                   feugiat dolor impedit felis magna ipsum primis cubilia laoreet
-                  augue suscipit lectus mauris
+                  augue suscipit lectus mauris */}
                 </p>
                 {/* Button */}
                 <Link legacyBehavior href="/timetable">

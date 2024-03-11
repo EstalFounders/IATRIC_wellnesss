@@ -27,7 +27,7 @@ const Demo5Services2 = () => {
     "Cardiology",
     "Dermatologist",
     "Orthopaedics",
-    "Gynaecology and Obstetrics",
+    "Gynaecology",
     "Ophthalmology",
     "Pulmonology",
     "Psychiatrist",
@@ -39,6 +39,7 @@ const Demo5Services2 = () => {
     "Lab Investigation",
     "Corporate Healthcare",
     "Healthcamp",
+    "Obstetrics",
     // Add more services as needed
   ];
 
@@ -80,9 +81,7 @@ const Demo5Services2 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color" style={{ color: "#8e8333" }}>
-              Our Speciality
-            </h3>
+            <h3 className="h3-md steelblue-color">Our Speciality</h3>
             <p>content coming soon</p>
           </div>
         </div>

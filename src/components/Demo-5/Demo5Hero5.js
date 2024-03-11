@@ -17,7 +17,7 @@ const Demo5Hero5 = () => {
             <div className="hero-txt">
               {/* Title */}
               <h4 className="steelblue-color" style={{ color: "#8e8333" }}>
-                Best Quality
+                <b>Best Quality</b>
               </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
@@ -54,7 +54,7 @@ const Demo5Hero5 = () => {
               <Link legacyBehavior href="/about-us">
                 <a
                   className="btn btn-blue blue-hover"
-                  style={{ backgroundColor: "#3b5f1d" }}
+                  style={{ backgroundColor: "#8e8333" }}
                 >
                   Discover More
                 </a>

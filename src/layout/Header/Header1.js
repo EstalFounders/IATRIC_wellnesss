@@ -76,7 +76,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
             }}
             className="callusbtn"
           >
-            <i className="fas fa-phone" />
+            <FaWhatsapp className="mx-1" />
           </a>
         </Link>
       </div>
@@ -494,14 +494,6 @@ const Header1 = ({ toggleMenu, toggle }) => {
                     onClick={(e) => {
                       e.preventDefault();
                       handleWhatsAppDialogOpen();
-                    }}
-                    href="tel:9625942020"
-                    className="callusbtn"
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#8e8333";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#ffffff";
                     }}
                   >
                     Make an Appointment
