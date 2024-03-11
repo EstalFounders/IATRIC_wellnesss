@@ -59,7 +59,7 @@ export default function HomepageComp() {
       status: "Completed",
     },
     {
-      id: 2,
+      id: 3,
       name: "Jane Doe",
       gender: "Female",
       date: "2024-01-28",
@@ -67,7 +67,7 @@ export default function HomepageComp() {
       status: "Completed",
     },
     {
-      id: 2,
+      id: 4,
       name: "Jane Doe",
       gender: "Female",
       date: "2024-01-28",
@@ -75,7 +75,7 @@ export default function HomepageComp() {
       status: "Completed",
     },
     {
-      id: 2,
+      id: 5,
       name: "Jane Doe",
       gender: "Female",
       date: "2024-01-28",

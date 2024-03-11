@@ -1,41 +1,8 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { DoctorComponent } from "../Common/DoctorComponent";
 
-// Component to represent each doctor
-const DoctorComponent = ({ doctor }) => (
-  <div className="col-md-6 col-lg-3">
-    <div className="doctor-1">
-      {/* Doctor Photo */}
-      <div className="hover-overlay text-center">
-        {/* Photo */}
-        <img
-          className="img-fluid"
-          src={doctor.profilePictureUrl}
-          alt="doctor-foto"
-        />
-        <div className="item-overlay" />
-        {/* Profile Link */}
-        <div className="profile-link">
-          <Link legacyBehavior href={`/doctor/${doctor.id}`}>
-            <a
-              className="btn btn-sm btn-tra-white black-hover"
-              style={{ backgroundColor: "#3b5f1d" }}
-              title
-            >
-              View More Info
-            </a>
-          </Link>
-        </div>
-      </div>
-      {/* Doctor Meta */}
-      <div className="doctor-meta">
-        <h5 className="h5-sm steelblue-color">{doctor.name}</h5>
-        <span className="blue-color">{doctor.specialization}</span>
-        <p className="p-sm grey-color">{doctor.description}</p>
-      </div>
-    </div>
-  </div>
-);
+
 
 const DoctorsSection = () => {
   const [doctors, setDoctors] = useState([]);
@@ -76,7 +43,7 @@ const DoctorsSection = () => {
         {/* END SECTION TITLE */}
         <div className="row">
           {/* Map over the array of doctors to render each doctor component */}
-          {doctors.map((doctor, index) => (
+          {doctors.slice(0,4).map((doctor, index) => (
             <DoctorComponent key={index} doctor={doctor} />
           ))}
         </div>
