@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const doctorSchema = new mongoose.Schema({
+
+
+const doctorSchema = new Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -21,7 +24,6 @@ const doctorSchema = new mongoose.Schema({
   language: {
     type: String,
     required: [true, "language is required"],
-    unique: true,
     trim: true,
   },
 

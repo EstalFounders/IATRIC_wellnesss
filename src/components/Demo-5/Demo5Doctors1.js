@@ -2,8 +2,6 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 
-
-
 const DoctorsSection = () => {
   const [doctors, setDoctors] = useState([]);
 
@@ -43,7 +41,7 @@ const DoctorsSection = () => {
         {/* END SECTION TITLE */}
         <div className="row">
           {/* Map over the array of doctors to render each doctor component */}
-          {doctors.slice(0,4).map((doctor, index) => (
+          {doctors.slice(0, 3).map((doctor, index) => (
             <DoctorComponent key={index} doctor={doctor} />
           ))}
         </div>
