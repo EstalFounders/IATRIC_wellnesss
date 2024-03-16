@@ -219,7 +219,6 @@ export default async function handler(req, res) {
         if (
           profilePictureFile &&
           profilePictureUrl !== existingDoctor.profilePictureUrl
-          && existingDoctor.profilePictureUrl !== ''
         ) {
           const oldProfilePictureRef = ref(
             storage,

@@ -24,7 +24,7 @@ const ItemCards = ({ index, doctor }) => {
   };
 
   const handleSaveDoctor = async (updatedDoctor) => {
-    setLoader(true)
+    setLoader(true);
     console.log("Updated Doctor:", updatedDoctor);
     const id = updatedDoctor._id;
     const formData = new FormData();
@@ -43,15 +43,17 @@ const ItemCards = ({ index, doctor }) => {
     updatedDoctor.diplomasCertificatesUrls.forEach((certificate, index) => {
       formData.append(`diplomasCertificatesUrls[${index}]`, certificate);
     });
-    
+
     const requestOptions = {
       method: "PUT",
       body: formData,
     };
     try {
       const response = await fetch(`${api.addDoctor}?id=${id}`, requestOptions);
+      {
+        response.ok ? setLoader(false) : null;
+      }
       if (response.ok) {
-        setLoader(false)
         console.log(response, "response");
         return window.alert("Doctor has been updated");
       }
