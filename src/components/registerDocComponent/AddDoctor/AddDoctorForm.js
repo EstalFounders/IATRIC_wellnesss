@@ -6,6 +6,7 @@ import { useDropzone } from "react-dropzone";
 import ImageUploader from "../../../lib/ImageUploader";
 import Preloader from "../../Preloader.js";
 import Popup from "../../Popup.js";
+import { api } from "../../../constant.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -68,16 +69,12 @@ const AddDoctorForm = () => {
     });
 
     try {
-      const response = await fetch("/api/addDoctor", {
-        // headers: {
-        //     'Content-Type': 'application/json',
-        // },
+      const response = await fetch(api.addDoctor, {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
-        // console.log("Doctor added successfully.");
         window.alert("Doctor added successfully.");
         window.location.reload();
         // Reset form fields or navigate to another page

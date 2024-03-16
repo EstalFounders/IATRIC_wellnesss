@@ -2,6 +2,7 @@ import Link from "next/link";
 import FilterBar from "../filterbar/filterbar";
 import React, { useState, useEffect } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
+import { api } from "../../constant";
 
 const AllDoctorsDoctors3 = () => {
   const [doctors, setDoctors] = useState([]);
@@ -10,7 +11,7 @@ const AllDoctorsDoctors3 = () => {
     // Fetch data from API when component mounts
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/addDoctor");
+        const response = await fetch(api.addDoctor);
         const data = await response.json();
         setDoctors(data);
       } catch (error) {

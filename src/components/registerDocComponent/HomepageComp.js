@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { FaCalendar, FaMoneyBill, FaUsb, FaUser } from "react-icons/fa";
 import RecentAppointment from "../registerDocComponent/RecentAppointment/RecentAppointment";
 import RecentDoctors from "../registerDocComponent/RecentDoctors/RecentDoctors";
+import { api } from "../../constant";
 
 export default function HomepageComp() {
   const [login, setLogin] = useState(true);
@@ -25,7 +26,7 @@ export default function HomepageComp() {
   useEffect(() => {
     async function fetchDoctors() {
       try {
-        const response = await fetch("/api/addDoctor"); // Fetch data from the API
+        const response = await fetch(api.addDoctor); // Fetch data from the API
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

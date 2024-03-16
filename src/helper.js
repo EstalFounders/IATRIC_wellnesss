@@ -22,3 +22,4 @@ export const openSupportWhatsAppWeb = () => {
     const whatsappWebUrl = `https://web.whatsapp.com/send?phone=${contact_no}`;
     window.open(whatsappWebUrl, '_blank');
   };
+  

@@ -4,7 +4,6 @@ import ItemCard from "./DocItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 
 const RecentDoctors = ({ doctors }) => {
-  console.log(doctors, "doctors");
   return (
     <Row>
       <Col>
@@ -15,32 +14,25 @@ const RecentDoctors = ({ doctors }) => {
           }}
           className="mt-4"
         >
-          <Col style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: "#8e8333" }}>
             <b>Name</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: "#8e8333" }}>
             <b>Area of Expertise</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: "#8e8333" }}>
             <b>Degree</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: "#8e8333" }}>
             <b>Work Days</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: "#8e8333" }}>
             <b>Joining Date</b>
           </Col>
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {doctors.map((item) => (
-            <ItemCard
-              key={item.id} // Ensure each item has a unique key
-              name={item.name}
-              area_of_expertise={item.expertise}
-              degree={item.degree}
-              work_days={item.workDays}
-              joining_date={new Date(item.joiningDate).toLocaleDateString()}
-            />
+            <ItemCard doctor={item} />
           ))}
         </div>
         <Row className="mt-4">

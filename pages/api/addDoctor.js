@@ -5,7 +5,7 @@ import {
   profilePicture_img_path,
 } from "../../src/constant";
 import { storage } from "../../src/lib/firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
@@ -23,7 +23,6 @@ export const config = {
 export default async function handler(req, res) {
   console.log("handler calling for get");
   await dbConnect(); // Ensure database connection is established before handling requests
-  console.log(req, "req");
   if (req.method === "POST") {
     try {
       const form = new multiparty.Form();
@@ -130,6 +129,138 @@ export default async function handler(req, res) {
       res
         .status(500)
         .json({ error: "An error occurred while fetching doctor data." });
+    }
+  } else if (req.method === "PUT") {
+    try {
+      const { id } = req.query;
+
+      // Fetch the doctor by ID
+      const existingDoctor = await Doctor.findById(id);
+      console.log(existingDoctor, 'existing doctor')
+      if (!existingDoctor) {
+        return res.status(404).json({ message: "Doctor not found" });
+      }
+
+      const form = new multiparty.Form();
+      form.parse(req, async function (err, fields, files) {
+        if (err) {
+          console.error("Error parsing form data:", err);
+          return res
+            .status(500)
+            .json({ error: "An error occurred while parsing form data." });
+        }
+        console.log(files, 'files')
+        // Ensure files.profilePicture and files.diplomasCertificates are defined and arrays
+        const profilePictureFile =
+        files.profilePicture && files.profilePicture[0];
+      const diplomasCertificatesFiles = Object.keys(files)
+        .filter((key) => key.startsWith("diplomasCertificates"))
+        .map((key) => files[key][0]); // Assuming each field has only one file
+
+
+        console.log(profilePictureFile, 'profile file')
+        // Upload profile picture if a new one is provided
+        let profilePictureUrl = existingDoctor.profilePictureUrl;
+        if (profilePictureFile) {
+          // Upload profile picture
+          const profilePictureRef = ref(
+            storage,
+            `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}`
+          );
+          const contentType = profilePictureFile.headers["content-type"]; // Extract the content-type from the headers
+          const fileBuffer = fs.readFileSync(profilePictureFile.path); // Read the file into a Buffer
+          const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+          const metadata = {
+            contentType: contentType,
+          };
+          await uploadBytes(profilePictureRef, resizedImageBuffer, metadata); // Upload the Buffer
+
+          // Get profile picture download URL
+          profilePictureUrl = await getDownloadURL(profilePictureRef);
+          console.log(profilePictureUrl, "profilePictureUrl");
+        }
+
+        // Upload diplomas/certificates if new ones are provided
+        let diplomasCertificatesUrls = [];
+        if (diplomasCertificatesFiles.length > 0) {
+          // Upload new diplomas/certificates
+          const diplomasCertificatesUrls =
+            existingDoctor.diplomasCertificatesUrls;
+          if (diplomasCertificatesFiles.length > 0) {
+            // Upload new diplomas/certificates
+            for (const certificateFile of diplomasCertificatesFiles) {
+              const certificateRef = ref(
+                storage,
+                `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
+              );
+              const contentType = certificateFile.headers["content-type"]; // Extract the content-type from the headers
+              const fileBuffer = fs.readFileSync(certificateFile.path); // Read the file into a Buffer
+              const resizedImageBuffer = await resizeImage(
+                fileBuffer,
+                700,
+                700
+              ); // Resize to 700x700
+              const metadata = {
+                contentType: contentType,
+              };
+              await uploadBytes(certificateRef, resizedImageBuffer, metadata); // Upload the Buffer
+              diplomasCertificatesUrls.push(
+                await getDownloadURL(certificateRef)
+              );
+            }
+          }
+          console.log(diplomasCertificatesUrls, "diplomas");
+        } else {
+          // Use existing diplomasCertificatesUrls if no new files are provided
+          diplomasCertificatesUrls = existingDoctor.diplomasCertificatesUrls;
+        }
+
+        // Delete old profile picture from Firebase if a new one is uploaded and it's different from the existing one
+        if (
+          profilePictureFile &&
+          profilePictureUrl !== existingDoctor.profilePictureUrl
+          && existingDoctor.profilePictureUrl !== ''
+        ) {
+          const oldProfilePictureRef = ref(
+            storage,
+            existingDoctor.profilePictureUrl
+          );
+          await deleteObject(oldProfilePictureRef);
+        }
+        console.log("deleted old profile picture");
+
+        // Delete old diplomas certificates from Firebase if new ones are uploaded
+        existingDoctor.diplomasCertificatesUrls.forEach(async (url) => {
+          if (!diplomasCertificatesUrls.includes(url)) {
+            const oldCertificateRef = ref(storage, url);
+            await deleteObject(oldCertificateRef);
+          }
+        });
+        console.log("deleted old diploamas");
+
+        // Update doctor data in MongoDB
+        const stringFields = Object.fromEntries(
+          Object.entries(fields).map(([key, value]) => [key, value.toString()])
+        );
+
+        // Update doctor data in MongoDB
+        const updateData = {
+          ...stringFields,
+          profilePictureUrl,
+          diplomasCertificatesUrls,
+        };
+        const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
+          new: true,
+        });
+        console.log(updatedDoctor, "updated doctor");
+
+        res.status(200).json({ success: true });
+      });
+    } catch (error) {
+      console.error("Error updating doctor:", error);
+      res
+        .status(500)
+        .json({ error: "An error occurred while updating doctor." });
     }
   }
 }
