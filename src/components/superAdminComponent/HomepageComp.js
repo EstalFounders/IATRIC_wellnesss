@@ -10,12 +10,12 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FaCalendar, FaMoneyBill, FaUsb, FaUser } from "react-icons/fa";
-import RecentAppointment from "../registerDocComponent/RecentAppointment/RecentAppointment";
-import RecentDoctors from "../registerDocComponent/RecentDoctors/RecentDoctors";
+import RecentAppointment from "./RecentAppointment/RecentAppointment";
+import RecentDoctors from "./RecentDoctors/RecentDoctors";
 import { api } from "../../constant";
 
 export default function HomepageComp() {
-  const [login, setLogin] = useState(true);
+  const [login, setLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [doctors, setDoctors] = useState([]);
 
@@ -23,24 +23,28 @@ export default function HomepageComp() {
     setLogin(!login);
   };
 
-  useEffect(() => {
-    async function fetchDoctors() {
-      try {
-        const response = await fetch(api.addDoctor); // Fetch data from the API
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json(); // Extract JSON data from the response
-        setDoctors(data); // Update state with fetched data
-      } catch (error) {
-        console.error("Error fetching data client:", error);
-      } finally {
-        setIsLoading(false);
+  async function fetchDoctors() {
+    try {
+      const response = await fetch(api.addDoctor); // Fetch data from the API
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
       }
+      const data = await response.json(); // Extract JSON data from the response
+      setDoctors(data); // Update state with fetched data
+    } catch (error) {
+      console.error("Error fetching data client:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchDoctors(); // Call the fetchDoctors function when the component mounts
   }, []);
+
+  const refreshDoctorList = async () => {
+    await fetchDoctors();
+  };
 
   const AppointmentItemsData = [
     {
@@ -152,7 +156,7 @@ export default function HomepageComp() {
             </h4>
           </Col>
           <Col className="text-right mt-2">
-            <Button className="bg-primary" href="/registerDoc/addDoctor">
+            <Button className="bg-primary" href="/superAdmin/addDoctor">
               Add Doctor
             </Button>
           </Col>
@@ -164,7 +168,10 @@ export default function HomepageComp() {
             <p>No doctors found.</p>
           ) : (
             <Col>
-              <RecentDoctors doctors={doctors} />
+              <RecentDoctors
+                doctors={doctors}
+                refreshDoctorList={refreshDoctorList}
+              />
             </Col>
           )}
         </Row>

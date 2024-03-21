@@ -5,15 +5,17 @@ import DoctorModal from "../DoctorModalComp";
 import DoctorModalComp from "../DoctorModalComp";
 import { api } from "../../../constant";
 import Preloader from "../../Preloader";
+import { MdDelete } from "react-icons/md";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString();
 };
 
-const ItemCards = ({ index, doctor }) => {
+const ItemCards = ({ index, doctor, refreshDoctorList }) => {
   const [showModal, setShowModal] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [doctorInCard, setDoctorInCard] = useState(doctor);
 
   const handleEdit = () => {
     setShowModal(true);
@@ -21,6 +23,25 @@ const ItemCards = ({ index, doctor }) => {
 
   const handleCloseModal = () => {
     setShowModal(false);
+  };
+
+  const handleDelete = async () => {
+    setLoader(true);
+    const id = doctor._id;
+    const requestOptions = {
+      method: "DELETE",
+    };
+    try {
+      const response = await fetch(`${api.addDoctor}?id=${id}`, requestOptions);
+      if (response.ok) {
+        window.alert("Doctor has been deleted");
+        refreshDoctorList(); // Call refreshDoctorList to update the list after deletion
+      }
+    } catch (error) {
+      console.error("Error deleting doctor:", error);
+    } finally {
+      setLoader(false);
+    }
   };
 
   const handleSaveDoctor = async (updatedDoctor) => {
@@ -54,6 +75,7 @@ const ItemCards = ({ index, doctor }) => {
         response.ok ? setLoader(false) : null;
       }
       if (response.ok) {
+        setLoader(false);
         console.log(response, "response");
         return window.alert("Doctor has been updated");
       }
@@ -81,6 +103,11 @@ const ItemCards = ({ index, doctor }) => {
         <Col>{formatDate(doctor.joiningDate)}</Col>
         <Col>
           <FaEdit onClick={handleEdit} style={{ cursor: "pointer" }} />
+          <MdDelete
+            onClick={handleDelete}
+            style={{ cursor: "pointer" }}
+            className="ml-2"
+          />
         </Col>
       </Row>
       <DoctorModalComp
@@ -89,6 +116,7 @@ const ItemCards = ({ index, doctor }) => {
         doctor={doctor}
         onSave={handleSaveDoctor}
       />
+
       {loader && <Preloader />}
     </>
   );

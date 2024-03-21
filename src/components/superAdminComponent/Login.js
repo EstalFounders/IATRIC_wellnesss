@@ -25,7 +25,7 @@ export default function Login() {
             setLoginErr('Please check your password & email')
         } else {
             setLoader(false)
-            router.push('/registerDoc/homepage')
+            router.push('/superAdmin/homepage')
         }
       
     }

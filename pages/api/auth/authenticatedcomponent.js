@@ -12,7 +12,7 @@ const AuthenticatedComponent = ({ children }) => {
 
       if (!session) {
         // Redirect to the login page or show an authentication prompt
-        router.push('/registerDoc/onload');
+        router.push('/superAdmin/onload');
       }
     };
 

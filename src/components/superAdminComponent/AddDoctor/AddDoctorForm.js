@@ -3,18 +3,22 @@ import React, { useEffect, useState } from "react";
 import styles from "./AddDoctorForm.module.css";
 import { Col, Row } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
-import ImageUploader from "../../../lib/ImageUploader";
+import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
 import Popup from "../../Popup.js";
 import { api } from "../../../constant.js";
+import DigitalSignature from "../lib/DigitalSignature.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
   const [profilePicture, setprofilePicture] = useState("");
+  const [doctorStamp, setDoctorStamp] = useState("");
   const [loader, setLoader] = useState(false);
+  const [cpassword, setCPassword] = useState();
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
+    email: "",
     expertise: "",
     degree: "",
     language: "",
@@ -24,7 +28,13 @@ const AddDoctorForm = () => {
     workExperience: "",
     educationTraining: "",
     consultationType: "",
+    password: "",
+    digitalSignature: "",
   });
+
+  const handleSignatureChange = (signatureData) => {
+    setDoctorDetails({ ...doctorDetails, digitalSignature: signatureData });
+  };
 
   const handleConsultationTypeChange = (e) => {
     const selectedType = e.target.value;
@@ -45,6 +55,8 @@ const AddDoctorForm = () => {
       setprofilePicture(newImages.length > 0 ? newImages[0] : "");
     } else if (id === "diplomasCertificates") {
       setDiplomasCertificates(newImages);
+    } else if (id === "doctorStamp") {
+      setDoctorStamp(newImages);
     }
   };
 
@@ -52,8 +64,13 @@ const AddDoctorForm = () => {
     setLoader(true);
     e.preventDefault();
 
+    if (doctorDetails.password != cpassword) {
+      return window.alert("password is not matching");
+    }
+
     const formData = new FormData();
     formData.append("name", doctorDetails.name);
+    formData.append("email", doctorDetails.email);
     formData.append("expertise", doctorDetails.expertise);
     formData.append("degree", doctorDetails.degree);
     formData.append("language", doctorDetails.language);
@@ -62,8 +79,11 @@ const AddDoctorForm = () => {
     formData.append("educationTraining", doctorDetails.educationTraining);
     formData.append("workExperience", doctorDetails.workExperience);
     formData.append("consultationType", doctorDetails.consultationType);
+    formData.append("password", doctorDetails.password);
+    formData.append("digitalSignature", doctorDetails.digitalSignature);
     formData.append("location", doctorDetails.location);
     formData.append("profilePicture", profilePicture);
+    formData.append("doctorStamp", doctorStamp);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
     });
@@ -99,6 +119,18 @@ const AddDoctorForm = () => {
               type="text"
               name="name"
               value={doctorDetails.name}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label className={styles.label}>
+            <b>Email:</b>
+            <input
+              className={styles.input}
+              type="email"
+              name="email"
+              value={doctorDetails.email}
               onChange={handleChange}
               required
             />
@@ -217,6 +249,35 @@ const AddDoctorForm = () => {
               required
             />
           </label>
+          <Row>
+            <Col>
+              <label className={styles.label}>
+                <b>Password:</b>
+                <input
+                  className={styles.input}
+                  type="password"
+                  name="password"
+                  value={doctorDetails.password}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </Col>
+
+            <Col>
+              <label className={styles.label}>
+                <b>Confirm Password:</b>
+                <input
+                  className={styles.input}
+                  type="password"
+                  name="confirm_password"
+                  value={cpassword}
+                  onChange={(e) => setCPassword(e.target.value)}
+                  required
+                />
+              </label>
+            </Col>
+          </Row>
 
           <Row>
             <Col>
@@ -236,6 +297,30 @@ const AddDoctorForm = () => {
                   id="profilePicture"
                   multiple={true}
                   onImagesChange={handleImagesChange}
+                />
+              </label>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <label className={styles.label}>
+                <b>Digital Signature:</b>
+                <DigitalSignature
+                  name={doctorDetails.name}
+                  onSignatureChange={handleSignatureChange}
+                  required
+                />
+              </label>
+            </Col>
+            <Col>
+              <label className={styles.label}>
+                <b>Doctor Stamp:</b>
+                <ImageUploader
+                  id="doctorStamp"
+                  multiple={false}
+                  onImagesChange={handleImagesChange}
+                  required
                 />
               </label>
             </Col>

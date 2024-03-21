@@ -1,16 +1,15 @@
-import AddDoctorForm from "../../src/components/registerDocComponent/AddDoctor/AddDoctorForm";
+import AddDoctorForm from "../../src/components/superAdminComponent/AddDoctor/AddDoctorForm";
 import Layouts from "../../src/layout/Layouts";
 import AuthenticatedComponent from "../api/auth/authenticatedcomponent";
 
-
 const addDoctor = () => {
-  return(
+  return (
     <AuthenticatedComponent>
       <Layouts header={7} footer={7}>
-      <AddDoctorForm />
+        <AddDoctorForm />
       </Layouts>
-     </AuthenticatedComponent>
-  )
-}
+    </AuthenticatedComponent>
+  );
+};
 
 export default addDoctor;

@@ -5,7 +5,12 @@ import {
   profilePicture_img_path,
 } from "../../src/constant";
 import { storage } from "../../src/lib/firebase";
-import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
@@ -22,7 +27,7 @@ export const config = {
 
 export default async function handler(req, res) {
   console.log("handler calling for get");
-  await dbConnect(); // Ensure database connection is established before handling requests
+  const db = await dbConnect(); // Ensure database connection is established before handling requests
   if (req.method === "POST") {
     try {
       const form = new multiparty.Form();
@@ -136,7 +141,7 @@ export default async function handler(req, res) {
 
       // Fetch the doctor by ID
       const existingDoctor = await Doctor.findById(id);
-      console.log(existingDoctor, 'existing doctor')
+      console.log(existingDoctor, "existing doctor");
       if (!existingDoctor) {
         return res.status(404).json({ message: "Doctor not found" });
       }
@@ -149,16 +154,15 @@ export default async function handler(req, res) {
             .status(500)
             .json({ error: "An error occurred while parsing form data." });
         }
-        console.log(files, 'files')
+        console.log(files, "files");
         // Ensure files.profilePicture and files.diplomasCertificates are defined and arrays
         const profilePictureFile =
-        files.profilePicture && files.profilePicture[0];
-      const diplomasCertificatesFiles = Object.keys(files)
-        .filter((key) => key.startsWith("diplomasCertificates"))
-        .map((key) => files[key][0]); // Assuming each field has only one file
+          files.profilePicture && files.profilePicture[0];
+        const diplomasCertificatesFiles = Object.keys(files)
+          .filter((key) => key.startsWith("diplomasCertificates"))
+          .map((key) => files[key][0]); // Assuming each field has only one file
 
-
-        console.log(profilePictureFile, 'profile file')
+        console.log(profilePictureFile, "profile file");
         // Upload profile picture if a new one is provided
         let profilePictureUrl = existingDoctor.profilePictureUrl;
         if (profilePictureFile) {
@@ -261,5 +265,50 @@ export default async function handler(req, res) {
         .status(500)
         .json({ error: "An error occurred while updating doctor." });
     }
+  } else if (req.method === "DELETE") {
+    const { id } = req.query;
+    console.log(id, "id in server");
+    try {
+      const doctor = await Doctor.findById(id);
+      if (!doctor) {
+        return res.status(404).json({ message: "Doctor not found" });
+      }
+
+      // Delete the doctor's entry from the database
+      const result = await Doctor.deleteOne({ _id: id });
+
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "Doctor not found" });
+      }
+
+      if (doctor.profilePictureUrl) {
+        const oldProfilePictureRef = ref(
+          storage,
+          existingDoctor.profilePictureUrl
+        );
+        await deleteObject(oldProfilePictureRef);
+      }
+      console.log("deleted old profile picture");
+
+      // Iterate over the URLs of the images associated with the doctor and delete each image from Google Storage
+      doctor.diplomasCertificatesUrls.forEach(async (url) => {
+        if (!diplomasCertificatesUrls.includes(url)) {
+          const oldCertificateRef = ref(storage, url);
+          await deleteObject(oldCertificateRef);
+        }
+      });
+      
+      console.log("deleted old diploamas");
+
+      return res.status(200).json({ message: "Doctor deleted successfully" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  } else {
+    res.setHeader("Allow", ["DELETE"]);
+    return res
+      .status(405)
+      .json({ message: `Method ${req.method} Not Allowed` });
   }
 }

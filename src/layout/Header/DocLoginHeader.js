@@ -2,20 +2,16 @@ import React, { useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
-import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
-
-
+import Navbar from "../../components/superAdminComponent/NavBarComponent/Navbar";
+import RightSideMenu from "../../components/superAdminComponent/NavBarComponent/RightSideMenu";
 
 const DocLoginHeader = ({ session }) => {
   const router = useRouter();
-  
+
   return (
     <Row className="bg-white border-bottom">
       <Col className="mt-4" md={5}>
-        {session && 
-        <Navbar />
-        }
+        {session && <Navbar />}
       </Col>
       <Col className="pl-4" md={6}>
         <Image
@@ -29,8 +25,8 @@ const DocLoginHeader = ({ session }) => {
       <Col className="mt-4">
         {session && (
           <div>
-         <RightSideMenu />
-         </div>
+            <RightSideMenu />
+          </div>
         )}
       </Col>
     </Row>

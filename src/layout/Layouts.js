@@ -37,7 +37,7 @@ const Layouts = ({ children, header, footer }) => {
       case 5:
         return <Header5 toggleMenu={() => openClick()} toggle={toggle} />;
       case 6:
-        return <Header6 toggleMenu={() => openClick()} toggle={toggle} />;
+        return <DocLoginHeader session={false} />;
       case 7:
         return <DocLoginHeader session={true} />;
       default:

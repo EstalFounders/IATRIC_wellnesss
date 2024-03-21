@@ -3,7 +3,7 @@ import React from "react";
 import ItemCard from "./DocItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 
-const RecentDoctors = ({ doctors }) => {
+const RecentDoctors = ({ doctors, refreshDoctorList }) => {
   return (
     <Row>
       <Col>
@@ -32,7 +32,7 @@ const RecentDoctors = ({ doctors }) => {
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {doctors.map((item) => (
-            <ItemCard key={item.id} doctor={item} />
+            <ItemCard key={item.id} doctor={item} refreshDoctorList={refreshDoctorList} />
           ))}
         </div>
         <Row className="mt-4">
