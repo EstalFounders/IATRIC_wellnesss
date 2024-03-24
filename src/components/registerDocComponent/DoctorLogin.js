@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { loginDoctor } from "../../helper";
+import Preloader from "../Preloader";
 
 // Define CSS styles
 const styles = {
@@ -48,17 +49,21 @@ export default function DoctorLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setloading] = useState("")
 
   const handleSubmit = async (e) => {
+    setloading(true)
     e.preventDefault();
     setError("");
 
     try {
       // Call the function to handle login logic
       const res = await loginDoctor({ email, password });
-      if (res.success) {
+      if (res.ok) {
+        
         // Redirect to homepage if login is successful
-        router.push("/homepage");
+        router.push("/registerDoc/homepage");
+        
       } else {
         setError(res.message);
       }
@@ -66,6 +71,7 @@ export default function DoctorLogin() {
       console.error(error);
       setError("An error occurred. Please try again later.");
     }
+    setloading(false)
   };
 
   return (
@@ -94,6 +100,7 @@ export default function DoctorLogin() {
             Login
           </button>
       </form>
+      {loading ? <Preloader />: null}
       {error && <p style={styles.errorMessage}>{error}</p>}
     </div>
   );

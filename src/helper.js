@@ -1,8 +1,6 @@
 import { signIn } from "next-auth/react";
-import { contact_no } from "./constant";
-import axios from 'axios';
-
-
+import { api, contact_no } from "./constant";
+import axios from "axios";
 
 export const loginUser = async ({ email, password }) => {
   console.log("login user console");
@@ -15,11 +13,18 @@ export const loginUser = async ({ email, password }) => {
   return res;
 };
 
-export async function loginDoctor(credentials) {
+export async function loginDoctor({ email, password }) {
+  const credentials = {
+    email: email,
+    password: password,
+  };
   try {
     // Make a POST request to your backend login route
-    const response = await axios.post("/api/doctorLogin", credentials);
-    return response.data;
+    const response = await fetch(api.doctorLogin, {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    return response;
   } catch (error) {
     return {
       success: false,

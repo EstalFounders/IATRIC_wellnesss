@@ -56,7 +56,7 @@ const AddDoctorForm = () => {
     } else if (id === "diplomasCertificates") {
       setDiplomasCertificates(newImages);
     } else if (id === "doctorStamp") {
-      setDoctorStamp(newImages);
+      setDoctorStamp(newImages.length > 0 ? newImages[0] : "");
     }
   };
 
@@ -88,6 +88,7 @@ const AddDoctorForm = () => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
     });
 
+    
     try {
       const response = await fetch(api.addDoctor, {
         method: "POST",
@@ -195,12 +196,12 @@ const AddDoctorForm = () => {
             onChange={handleConsultationTypeChange}
           >
             <option value="">Select Consultation Type</option>
-            <option value="Clinic Visit">Clinic Visit</option>
-            <option value="Online">Online</option>
-            <option value="Both">Both</option>
+            <option value="Online consultations">Online consultations</option>
+            <option value="Off-line consultations">Off-line consultations</option>
+            <option value="Home visit">Home visit</option>
           </select>
-          {(doctorDetails.consultationType === "Clinic Visit" ||
-            doctorDetails.consultationType === "Both") && (
+          {(doctorDetails.consultationType === "Off-line consultations" ||
+            doctorDetails.consultationType === "Home visit") && (
             <div>
               <label htmlFor="Location" className="ml-3">
                 Location:
@@ -257,7 +258,7 @@ const AddDoctorForm = () => {
                   className={styles.input}
                   type="password"
                   name="password"
-                  value={doctorDetails.password}
+                  value={doctorDetails.password || ""}
                   onChange={handleChange}
                   required
                 />
@@ -271,7 +272,7 @@ const AddDoctorForm = () => {
                   className={styles.input}
                   type="password"
                   name="confirm_password"
-                  value={cpassword}
+                  value={cpassword || ""}
                   onChange={(e) => setCPassword(e.target.value)}
                   required
                 />

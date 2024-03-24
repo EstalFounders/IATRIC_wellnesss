@@ -10,6 +10,12 @@ const doctorSchema = new Schema({
     // trim: true
   },
 
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
   expertise: {
     type: String,
     required: [true, "Area of expertise is required"],
@@ -35,6 +41,7 @@ const doctorSchema = new Schema({
     type: String,
     required: true,
   },
+
   workExperience: {
     type: String,
     required: true,
@@ -52,6 +59,10 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "eduction&training is required"],
   },
+  password: {
+    type: String,
+    required: true
+  },
   profilePictureUrl: {
     type: String,
     required: [true, "Doctor picture is required"],
@@ -59,6 +70,10 @@ const doctorSchema = new Schema({
   diplomasCertificatesUrls: {
     type: Array,
     required: [true, "Doctor certificate is required"],
+  },
+  doctorStampUrl: {
+    type: String,
+    required: [true, "Doctor stamp is required"],
   },
   joiningDate: {
     type: Date,

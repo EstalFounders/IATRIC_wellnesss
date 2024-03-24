@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import multiparty from "multiparty";
 import {
   certificate_img_path,
+  doctorStamp_img_path,
   profilePicture_img_path,
 } from "../../src/constant";
 import { storage } from "../../src/lib/firebase";
@@ -15,6 +16,7 @@ import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
+import bcrypt from "bcryptjs";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -44,12 +46,35 @@ export default async function handler(req, res) {
           // Ensure files.profilePicture and files.diplomasCertificates are defined
           const profilePictureFile =
             files.profilePicture && files.profilePicture[0];
+
+          const doctorStampFile = files.doctorStamp && files.doctorStamp[0];
+
           const diplomasCertificatesFiles = Object.keys(files)
             .filter((key) => key.startsWith("diplomasCertificates"))
             .map((key) => files[key][0]); // Assuming each field has only one file
 
           // Ensure files.profilePicture and files.diplomasCertificates are defined
-          let profilePictureUrl;
+          let profilePictureUrl, doctorStampUrl;
+
+          console.log(doctorStampFile, "doctorsample file");
+
+          // upload doctor stamp
+          if (doctorStampFile) {
+            const doctorStampRef = ref(
+              storage,
+              `${doctorStamp_img_path}/${fields.name[0]}${uuidv4()}`
+            );
+            const contentType = doctorStampFile.headers["content-type"]; // Extract the content-type from the headers
+            const fileBuffer = fs.readFileSync(doctorStampFile.path); // Read the file into a Buffer
+            const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+            const metadata = {
+              contentType: contentType,
+            };
+            await uploadBytes(doctorStampRef, resizedImageBuffer, metadata); // Upload the Buffer
+
+            // Get profile picture download URL
+            doctorStampUrl = await getDownloadURL(doctorStampRef);
+          }
 
           // Upload profile picture
           if (profilePictureFile) {
@@ -91,6 +116,8 @@ export default async function handler(req, res) {
             })
           );
 
+          const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
+
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
               key,
@@ -100,8 +127,10 @@ export default async function handler(req, res) {
 
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
+            password: hashedPassword,
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
+            doctorStampUrl,
           });
 
           console.log("Doctor Added");
@@ -284,7 +313,7 @@ export default async function handler(req, res) {
       if (doctor.profilePictureUrl) {
         const oldProfilePictureRef = ref(
           storage,
-          existingDoctor.profilePictureUrl
+          doctor.profilePictureUrl
         );
         await deleteObject(oldProfilePictureRef);
       }
@@ -297,8 +326,17 @@ export default async function handler(req, res) {
           await deleteObject(oldCertificateRef);
         }
       });
-      
+
       console.log("deleted old diploamas");
+
+      if (doctor.doctorStamp) {
+        const oldProfilePictureRef = ref(
+          storage,
+          doctor.doctorStamp
+        );
+        await deleteObject(oldProfilePictureRef);
+      }
+      console.log("deleted old doctor stamp");
 
       return res.status(200).json({ message: "Doctor deleted successfully" });
     } catch (error) {
