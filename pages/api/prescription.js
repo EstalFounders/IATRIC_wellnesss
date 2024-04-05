@@ -4,8 +4,9 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../src/lib/firebase";
-import { prescription_img_path } from "../../src/constant";
+import { api, prescription_img_path } from "../../src/constant";
 import { sendWhatsAppMessage } from "../../src/helper";
+import { handleWhatsapp } from "./whatsApp";
 
 export const config = {
   api: {
@@ -42,9 +43,12 @@ export default async function handler(req, res) {
 
       // Return the URL of the uploaded PDF file
       const prescriptionUrl = await getDownloadURL(storageRef);
-      const number = 7678527923;
-      sendWhatsAppMessage(number, prescriptionUrl);
 
+      // send pdf url to patient whatsapp
+
+      const number = 7455992234;
+      const resp = handleWhatsapp(number,prescriptionUrl)
+    
       res.status(200).json({ status: "send successfully", prescriptionUrl });
     } catch (error) {
       console.error("Error:", error);

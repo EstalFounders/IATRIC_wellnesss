@@ -12,5 +12,6 @@ export const api = {
     doctorLogin: "/api/doctorLogin",
     medicineInfoExternalCall: "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?drug_name=",
     medicineInfoApiCall: "/api/medicineInfo?medicineName=",
-    prescriptionCall: "/api/prescription"
+    prescriptionCall: "/api/prescription",
+    sendWhatsAppCall: "/api/whatsApp"
 }

@@ -8,8 +8,8 @@ import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../../src/components/registerDocComponent/lib/DoctorPrescriptionGenerator";
 import { api } from "../../src/constant";
-import PdfPasswordPopup from "../../src/components/registerDocComponent/lib/pdfPasswordPopup";
 import bcrypt from "bcryptjs";
+import PdfPasswordPopup from "../../src/components/registerDocComponent/lib/pdfPasswordPopup";
 
 const Homepage = () => {
   const [previewVisible, setPreviewVisible] = useState(false);
