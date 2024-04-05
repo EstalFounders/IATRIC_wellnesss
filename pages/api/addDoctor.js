@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import multiparty from "multiparty";
 import {
   certificate_img_path,
+  doctorSignature_img_path,
   doctorStamp_img_path,
   profilePicture_img_path,
 } from "../../src/constant";
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
     try {
       const form = new multiparty.Form();
       form.parse(req, async function (err, fields, files) {
-        console.log(files, "files in api");
+        console.log(fields, "files in api");
         if (err) {
           console.error("Error parsing form data:", err);
           res
@@ -43,7 +44,10 @@ export default async function handler(req, res) {
           return;
         }
         try {
-          // Ensure files.profilePicture and files.diplomasCertificates are defined
+          // Ensure files.profilePicture and files.diplomasCertificates, doctor stamp, doctor signature are defined
+          const doctorSignatureFile =
+            files.digitalSignature && files.digitalSignature[0];
+
           const profilePictureFile =
             files.profilePicture && files.profilePicture[0];
 
@@ -53,10 +57,26 @@ export default async function handler(req, res) {
             .filter((key) => key.startsWith("diplomasCertificates"))
             .map((key) => files[key][0]); // Assuming each field has only one file
 
-          // Ensure files.profilePicture and files.diplomasCertificates are defined
-          let profilePictureUrl, doctorStampUrl;
+          // Ensure files.profilePicture, doctor stamp, doctor signature are defined
+          let profilePictureUrl, doctorStampUrl, doctorSignatureUrl ;
 
-          console.log(doctorStampFile, "doctorsample file");
+          if (doctorSignatureFile) {
+            const doctorSignatureRef = ref(
+              storage,
+              `${doctorSignature_img_path}/${fields.name[0]}${uuidv4()}`
+            );
+            const contentType = doctorSignatureFile.headers["content-type"]; // Extract the content-type from the headers
+            const fileBuffer = fs.readFileSync(doctorSignatureFile.path); // Read the file into a Buffer
+            const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+            const metadata = {
+              contentType: contentType,
+            };
+            await uploadBytes(doctorSignatureRef, resizedImageBuffer, metadata); // Upload the Buffer
+
+            // Get profile picture download URL
+            doctorSignatureUrl = await getDownloadURL(doctorSignatureRef);
+          }
+
 
           // upload doctor stamp
           if (doctorStampFile) {
@@ -124,13 +144,13 @@ export default async function handler(req, res) {
               value.toString(),
             ])
           );
-
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
             password: hashedPassword,
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
             doctorStampUrl,
+            doctorSignatureUrl
           });
 
           console.log("Doctor Added");

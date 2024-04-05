@@ -7,12 +7,12 @@ import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
 import Popup from "../../Popup.js";
 import { api } from "../../../constant.js";
-import DigitalSignature from "../lib/DigitalSignature.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
   const [profilePicture, setprofilePicture] = useState("");
   const [doctorStamp, setDoctorStamp] = useState("");
+  const [doctorSignature, setDoctorSignature] = useState("");
   const [loader, setLoader] = useState(false);
   const [cpassword, setCPassword] = useState();
 
@@ -29,12 +29,7 @@ const AddDoctorForm = () => {
     educationTraining: "",
     consultationType: "",
     password: "",
-    digitalSignature: "",
   });
-
-  const handleSignatureChange = (signatureData) => {
-    setDoctorDetails({ ...doctorDetails, digitalSignature: signatureData });
-  };
 
   const handleConsultationTypeChange = (e) => {
     const selectedType = e.target.value;
@@ -57,6 +52,8 @@ const AddDoctorForm = () => {
       setDiplomasCertificates(newImages);
     } else if (id === "doctorStamp") {
       setDoctorStamp(newImages.length > 0 ? newImages[0] : "");
+    } else if (id === "doctorSignature") {
+      setDoctorSignature(newImages.length > 0 ? newImages[0] : "");
     }
   };
 
@@ -80,7 +77,7 @@ const AddDoctorForm = () => {
     formData.append("workExperience", doctorDetails.workExperience);
     formData.append("consultationType", doctorDetails.consultationType);
     formData.append("password", doctorDetails.password);
-    formData.append("digitalSignature", doctorDetails.digitalSignature);
+    formData.append("digitalSignature", doctorSignature);
     formData.append("location", doctorDetails.location);
     formData.append("profilePicture", profilePicture);
     formData.append("doctorStamp", doctorStamp);
@@ -88,7 +85,6 @@ const AddDoctorForm = () => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
     });
 
-    
     try {
       const response = await fetch(api.addDoctor, {
         method: "POST",
@@ -197,7 +193,9 @@ const AddDoctorForm = () => {
           >
             <option value="">Select Consultation Type</option>
             <option value="Online consultations">Online consultations</option>
-            <option value="Off-line consultations">Off-line consultations</option>
+            <option value="Off-line consultations">
+              Off-line consultations
+            </option>
             <option value="Home visit">Home visit</option>
           </select>
           {(doctorDetails.consultationType === "Off-line consultations" ||
@@ -307,9 +305,10 @@ const AddDoctorForm = () => {
             <Col md={6}>
               <label className={styles.label}>
                 <b>Digital Signature:</b>
-                <DigitalSignature
-                  name={doctorDetails.name}
-                  onSignatureChange={handleSignatureChange}
+                <ImageUploader
+                  id="doctorSignature"
+                  multiple={false}
+                  onImagesChange={handleImagesChange}
                   required
                 />
               </label>

@@ -1,0 +1,28 @@
+.pdfContainer {
+    /* Styles for the main container of your PDF content */
+    margin: 20px;
+    padding: 20px;
+    font-family: sans-serif;
+  }
+  
+  .pdfContainer h1 {
+    /* Styles for the title within the PDF */
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .pdfContainer p {
+    /* Styles for the paragraph within the PDF */
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  .pdfContainer img {
+    /* Styles for the image within the PDF */
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+  }
+  
+  /* Add more styles as needed for specific elements within your PDF content */
+  

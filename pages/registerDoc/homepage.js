@@ -1,60 +1,131 @@
 // pages/homepage.js
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Col, Row } from "react-bootstrap";
+import MedicineForm from "../../src/components/registerDocComponent/lib/MedicineForm";
+import { FaPlus } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import DocPrescriptionGeneratePdf from "../../src/components/registerDocComponent/lib/DoctorPrescriptionGenerator";
+import { api } from "../../src/constant";
+import PdfPasswordPopup from "../../src/components/registerDocComponent/lib/pdfPasswordPopup";
+import bcrypt from "bcryptjs";
 
 const Homepage = () => {
-  const router = useRouter();
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [medicineForms, setMedicineForms] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [showPasswordPopup, setPasswordPopup] = useState(false);
+  const [doctorPassword, setDoctorPassword] = useState("");
+
+  const [updatedFormDetails, setUpdatedFormDetails] = useState({
+    doctorName: "",
+    pateintName: "",
+    age: "",
+    gender: "Male",
+    patientNo: "",
+    anyDrugAllergy: "No known allergy from medicine",
+    lastDoctorVisit: "Within 1 month",
+    lastHealthTest: "Within 6 months",
+    medicineInfo: [],
+    presentIllness: "",
+    presentIllnessSinceWhen: "",
+    currentStatusPresentIllness: "",
+    doctorStampUrl: "",
+    doctorSignatureUrl: "",
+    // Add more fields as needed
+  });
+
+  const handleMedicineFormChange = (formValues, index) => {
+    console.log(formValues, "form values");
+    const updatedMedicineForms = [...medicineForms];
+    updatedMedicineForms[index] = formValues;
+    setMedicineForms(updatedMedicineForms);
+  };
+
+  const handleOtherFormDetailsChange = (formValues, index) => {
+    const { name, value } = formValues.target;
+    setUpdatedFormDetails((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleDeleteMedicineForm = (index) => {
+    const updatedForms = [...medicineForms];
+    updatedForms.splice(index, 1);
+    setMedicineForms(updatedForms);
+  };
 
   // Function to toggle preview visibility
   const togglePreview = () => {
     setPreviewVisible(!previewVisible);
   };
 
+  const doctorPasswordValidation = (password) => {
+    console.log("Password submitted:", doctorPassword);
+
+    const isPasswordCorrect = bcrypt.compareSync(password, doctorPassword);
+
+    console.log(isPasswordCorrect, "isPassword");
+
+    if (isPasswordCorrect) {
+      setPasswordPopup(false);
+      togglePreview();
+    } else {
+      window.alert("password is not correct");
+    }
+    // Close the popup
+    // setPasswordPopup(false);
+  };
+
   // Function to handle preview button click
   const handlePreview = () => {
-    togglePreview();
+    if (!doctorPassword) {
+      return window.alert("Please select doctor");
+    }
+    setPasswordPopup(true);
+    setUpdatedFormDetails({
+      ...updatedFormDetails,
+      medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+    });
+    // togglePreview();
     // Optionally, you can also perform any other actions here before showing the preview
+    console.log(updatedFormDetails, "updated form details before");
   };
 
   useEffect(() => {
-    // Set session start time in local storage when user logs in
-    localStorage.setItem("sessionStartTime", new Date().getTime());
-
-    // Start a timer for 30 minutes
-    const sessionTimeout = setTimeout(() => {
-      // Redirect to login page after 30 minutes
-      router.push("/registereDoc/login");
-    }, 30 * 60 * 1000); // 30 minutes in milliseconds
-
-    // Clear the timer and remove session start time from local storage when component unmounts
-    return () => clearTimeout(sessionTimeout);
+    // Update medicineInfo whenever medicineForms changes
+    setUpdatedFormDetails({
+      ...updatedFormDetails,
+      medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+    });
   }, []);
 
-  // Check session expiration before any action
   useEffect(() => {
-    const checkSession = () => {
-      const sessionStartTime = localStorage.getItem("sessionStartTime");
-      const sessionTimeout = 30 * 60 * 1000; // 30 minutes in milliseconds
-      const now = new Date().getTime();
-
-      if (now - parseInt(sessionStartTime) >= sessionTimeout) {
-        router.push("/registerDoc/login"); // Redirect to login if session has expired
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch(api.addDoctor);
+        const data = await response.json();
+        setDoctors(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
-    // Check session expiration on each interaction with the homepage
-    document.addEventListener("click", checkSession);
-    document.addEventListener("mousemove", checkSession);
-
-    // Clean up event listeners when component unmounts
-    return () => {
-      document.removeEventListener("click", checkSession);
-      document.removeEventListener("mousemove", checkSession);
-    };
+    fetchDoctors();
   }, []);
+
+  const handleDoctorSelect = (event) => {
+    const selectedDoctor = JSON.parse(event.target.value);
+    setUpdatedFormDetails({
+      ...updatedFormDetails,
+      doctorName: selectedDoctor.name,
+      doctorStampUrl: selectedDoctor.doctorStampUrl,
+      doctorSignatureUrl: selectedDoctor.doctorSignatureUrl,
+    });
+    setDoctorPassword(selectedDoctor.password);
+  };
 
   // CSS for the modal
   const modalStyle = {
@@ -73,6 +144,8 @@ const Homepage = () => {
     backgroundColor: "#fefefe",
     padding: "20px",
     borderRadius: "5px",
+    maxHeight: "90%",
+    overflowY: "auto",
   };
 
   const closeButtonStyle = {
@@ -103,32 +176,58 @@ const Homepage = () => {
       <div style={{ width: "90%", maxWidth: "500px" }}>
         <div style={{ marginBottom: "20px" }}>
           <div style={{ display: "grid", gap: "10px" }}>
+            <div className="row">
+              <div className="col">
+                <select
+                  onChange={handleDoctorSelect}
+                  style={{
+                    padding: "10px",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc",
+                    width: "100%",
+                  }}
+                >
+                  <option value="">Select a Doctor</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor._id} value={JSON.stringify(doctor)}>
+                      {doctor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <Row>
               <Col>
                 <label>
-                  Name:
+                  Patient Name:
                   <input
                     type="text"
+                    name="pateintName"
                     style={{
                       padding: "10px",
                       borderRadius: "5px",
                       border: "1px solid #ccc",
                       width: "100%",
                     }}
+                    required
+                    onChange={handleOtherFormDetailsChange}
                   />
                 </label>
               </Col>
-              <Col>
+              <Col md={2}>
                 <label>
                   Age:
                   <input
-                    type="number"
+                    type="text"
+                    name="age"
                     style={{
                       padding: "10px",
                       borderRadius: "5px",
                       border: "1px solid #ccc",
                       width: "100%",
                     }}
+                    required
+                    onChange={handleOtherFormDetailsChange}
                   />
                 </label>
               </Col>
@@ -136,16 +235,20 @@ const Homepage = () => {
                 <label>
                   Gender:
                   <select
+                    name="gender"
                     style={{
                       padding: "10px",
                       borderRadius: "5px",
                       border: "1px solid #ccc",
                       width: "100%",
                     }}
+                    value={updatedFormDetails.gender}
+                    required
+                    onChange={handleOtherFormDetailsChange}
                   >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                   </select>
                 </label>
               </Col>
@@ -153,21 +256,75 @@ const Homepage = () => {
           </div>
         </div>
         <div style={{ marginBottom: "20px" }}>
+          <h2>Present Illness</h2>
+          <input
+            name="presentIllness"
+            type="text"
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+            pattern="[0-9]{10}"
+            required
+            onChange={handleOtherFormDetailsChange}
+          />
+        </div>
+        <div style={{ marginBottom: "20px" }}>
+          <h2>Present Illness Since When</h2>
+          <input
+            name="presentIllnessSinceWhen"
+            type="text"
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+            pattern="[0-9]{10}"
+            required
+            onChange={handleOtherFormDetailsChange}
+          />
+        </div>
+        <div style={{ marginBottom: "20px" }}>
+          <h2>Currrent Status of Present Illness</h2>
+          <input
+            name="currentStatusPresentIllness"
+            type="text"
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+            pattern="[0-9]{10}"
+            required
+            onChange={handleOtherFormDetailsChange}
+          />
+        </div>
+        <div style={{ marginBottom: "20px" }}>
           <h2>Drug Allergies</h2>
           <label>
             Any Drug Allergies:
             <select
+              name="anyDrugAllergy"
               style={{
                 padding: "10px",
                 borderRadius: "5px",
                 border: "1px solid #ccc",
                 width: "100%",
               }}
+              required
+              onChange={handleOtherFormDetailsChange}
+              value={updatedFormDetails.anyDrugAllergy}
             >
-              <option value="none">No known allergy from medicine</option>
-              <option value="dust">Dust allergy</option>
-              <option value="food">Food allergy</option>
-              <option value="other">Other allergies</option>
+              <option value="No known allergy from medicine">
+                No known allergy from medicine
+              </option>
+              <option value="Dust allergy">Dust allergy</option>
+              <option value="Food allergy">Food allergy</option>
+              <option value="Other allergies">Other allergies</option>
             </select>
           </label>
         </div>
@@ -176,17 +333,21 @@ const Homepage = () => {
           <label>
             When was the last doctor visit:
             <select
+              name="lastDoctorVisit"
               style={{
                 padding: "10px",
                 borderRadius: "5px",
                 border: "1px solid #ccc",
                 width: "100%",
               }}
+              required
+              onChange={handleOtherFormDetailsChange}
+              value={updatedFormDetails.lastDoctorVisit}
             >
               <option value="within_1_month">Within 1 month</option>
-              <option value="within_3_months">Within 3 months</option>
-              <option value="within_6_months">Within 6 months</option>
-              <option value="over_6_months_ago">Over 6 months ago</option>
+              <option value="Within 3 months">Within 3 months</option>
+              <option value="Within 6 months">Within 6 months</option>
+              <option value="Over 6 months ago">Over 6 months ago</option>
             </select>
           </label>
         </div>
@@ -195,455 +356,90 @@ const Homepage = () => {
           <label>
             When was the last health test:
             <select
+              name="lastHealthTest"
               style={{
                 padding: "10px",
                 borderRadius: "5px",
                 border: "1px solid #ccc",
                 width: "100%",
               }}
+              required
+              onChange={handleOtherFormDetailsChange}
+              value={updatedFormDetails.lastHealthTest}
             >
-              <option value="within_6_months">Within 6 months</option>
-              <option value="over_6_months_ago">Over 6 months ago</option>
+              <option value="Within 6 months">Within 6 months</option>
+              <option value="Over 6 months ago">Over 6 months ago</option>
             </select>
           </label>
         </div>
-
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Medicine Form</h2>
-          <div style={{ display: "grid", gap: "10px" }}>
-            <label>
-              Medicine Name:
-              <input
-                type="text"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              />
-            </label>
-            <Row>
-              <Col sm={3}>
-                <label>
-                  Unit:
-                  <select
-                    style={{
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      width: "100%",
-                    }}
-                  >
-                    <option value="tablet">UNIT</option>
-                    <option value="capsule">TABLET</option>
-                    <option value="tea_spoon">CAPSULE</option>
-                    <option value="tea_spoon">TEA SPOON</option>
-                    <option value="tea_spoon">DROP</option>
-                    <option value="tea_spoon">APPLICATION</option>
-                    <option value="tea_spoon">PUFF</option>
-                    <option value="tea_spoon">PACKET</option>
-                    <option value="tea_spoon">SACHET</option>
-                    {/* Add more options as needed */}
-                  </select>
-                </label>
-              </Col>
-              <Col>
-                <label>
-                  No of unit:
-                  <input
-                    type="text"
-                    style={{
-                      padding: "8px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      width: "100%",
-                    }}
-                  />
-                </label>
-              </Col>
-            </Row>
-            <label>
-              Days:
-              <input
-                type="text"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              />
-            </label>
-            <label>
-              Frequency:
-              <select
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              >
-                <option value="daily">DAILY</option>
-                <option value="weekly">WEEKLY</option>
-                <option value="weekly">MONTHLY</option>
-                <option value="weekly">SOS</option>
-                <option value="weekly">AS REQUIRED</option>
-                <option value="weekly">ALTERNATIVE DAYS</option>
-                <option value="weekly">BI WEEKLY</option>
-                <option value="weekly">BI MONTHLY</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
-            <label>
-              Time:
-              <select
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              >
-                <option value="morning">MORNING</option>
-                <option value="afternoon">AFTERNOON</option>
-                <option value="afternoon">EVENING</option>
-                <option value="afternoon">NIGHT</option>
-                <option value="afternoon">SOS</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
-            <label>
-              Medication Schedule:
-              <select
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              >
-                <option value="morning">As Required</option>
-                <option value="afternoon">BEFORE MEAL</option>
-                <option value="afternoon">AFTER MEAL</option>
-                <option value="afternoon">SOS</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
-          </div>
+        <div
+          className="text-center mb-4"
+          onClick={() => setMedicineForms([...medicineForms, {}])}
+        >
+          <b>
+            <strong className="text-primary">Add Medicine</strong>
+          </b>
+          <FaPlus className="ml-1" />
         </div>
+        {medicineForms.map((form, index) => (
+          <div key={index}>
+            <MedicineForm
+              onChange={(formValues) =>
+                handleMedicineFormChange(formValues, index)
+              }
+            />
+            <MdDelete
+              onClick={() => handleDeleteMedicineForm(index)}
+              className="mb-4"
+            />
+          </div>
+        ))}
       </div>
       <div className="mb-4">
-        <button
-          // onClick={handleCreatePrescription}
+        {/* <button
+          onClick={handleCreatePrescription}
           className="bg-success border rounded px-3 text-white py-1"
         >
           Create
-        </button>
+        </button> */}
         <button
           onClick={handlePreview}
-          className="bg-success border rounded px-3 text-white py-1"
+          className="border rounded px-3 text-white py-1"
+          style={{ backgroundColor: "#3a5e1c" }}
         >
-          Preview
+          Create
         </button>
+        {showPasswordPopup && (
+          <PdfPasswordPopup
+            onClose={() => setPasswordPopup(false)}
+            onSubmit={doctorPasswordValidation}
+          />
+        )}
       </div>
       {/* Preview Modal */}
       {previewVisible && (
-        <div
-          className="modal"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            className="modal-content"
-            style={{
-              backgroundColor: "#fefefe",
-              padding: "20px",
-              borderRadius: "5px",
-              maxHeight: "90%",
-              overflowY: "auto",
-            }}
-          >
+        <div className="modal" style={modalStyle}>
+          <div className="modal-content" style={modalContentStyle}>
             <span
               className="close"
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                cursor: "pointer",
-              }}
+              style={closeButtonStyle}
               onClick={togglePreview}
             >
               &times;
             </span>
-            <h2 className="text-secondary">
-              <b>Preview</b>
+            <h2
+              className="text-secondary"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <DocPrescriptionGeneratePdf
+                data={updatedFormDetails}
+                // handlePDF={handleGeneratePDF}
+              />
             </h2>
-            <div style={{ width: "100%" }}>
-              <div style={{ width: "90%", maxWidth: "500px" }}>
-                <div style={{ marginBottom: "20px" }}>
-                  <div style={{ display: "grid", gap: "10px" }}>
-                    <Row>
-                      <Col>
-                        <label>
-                          Name:
-                          <input
-                            type="text"
-                            style={{
-                              padding: "10px",
-                              borderRadius: "5px",
-                              border: "1px solid #ccc",
-                              width: "100%",
-                            }}
-                            readOnly
-                          />
-                        </label>
-                      </Col>
-                      <Col>
-                        <label>
-                          Age:
-                          <input
-                            type="number"
-                            style={{
-                              padding: "10px",
-                              borderRadius: "5px",
-                              border: "1px solid #ccc",
-                              width: "100%",
-                            }}
-                            readOnly
-                          />
-                        </label>
-                      </Col>
-                      <Col>
-                        <label>
-                          Gender:
-                          <select
-                            style={{
-                              padding: "10px",
-                              borderRadius: "5px",
-                              border: "1px solid #ccc",
-                              width: "100%",
-                            }}
-                            disabled
-                          >
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </label>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <h2>Drug Allergies</h2>
-                  <label>
-                    Any Drug Allergies:
-                    <select
-                      style={{
-                        padding: "10px",
-                        borderRadius: "5px",
-                        border: "1px solid #ccc",
-                        width: "100%",
-                      }}
-                      disabled
-                    >
-                      <option value="none">
-                        No known allergy from medicine
-                      </option>
-                      <option value="dust">Dust allergy</option>
-                      <option value="food">Food allergy</option>
-                      <option value="other">Other allergies</option>
-                    </select>
-                  </label>
-                </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <h2>Last Doctor Visit</h2>
-                  <label>
-                    When was the last doctor visit:
-                    <select
-                      style={{
-                        padding: "10px",
-                        borderRadius: "5px",
-                        border: "1px solid #ccc",
-                        width: "100%",
-                      }}
-                      disabled
-                    >
-                      <option value="within_1_month">Within 1 month</option>
-                      <option value="within_3_months">Within 3 months</option>
-                      <option value="within_6_months">Within 6 months</option>
-                      <option value="over_6_months_ago">
-                        Over 6 months ago
-                      </option>
-                    </select>
-                  </label>
-                </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <h2>Last Health Test</h2>
-                  <label>
-                    When was the last health test:
-                    <select
-                      style={{
-                        padding: "10px",
-                        borderRadius: "5px",
-                        border: "1px solid #ccc",
-                        width: "100%",
-                      }}
-                      disabled
-                    >
-                      <option value="within_6_months">Within 6 months</option>
-                      <option value="over_6_months_ago">
-                        Over 6 months ago
-                      </option>
-                    </select>
-                  </label>
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <h2>Medicine Form</h2>
-                  <div style={{ display: "grid", gap: "10px" }}>
-                    <label>
-                      Medicine Name:
-                      <input
-                        type="text"
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                        readOnly
-                      />
-                    </label>
-                    <Row>
-                      <Col sm={3}>
-                        <label>
-                          Unit:
-                          <select
-                            style={{
-                              padding: "10px",
-                              borderRadius: "5px",
-                              border: "1px solid #ccc",
-                              width: "100%",
-                            }}
-                            disabled
-                          >
-                            <option value="tablet">UNIT</option>
-                            <option value="capsule">TABLET</option>
-                            <option value="tea_spoon">CAPSULE</option>
-                            <option value="tea_spoon">TEA SPOON</option>
-                            <option value="tea_spoon">DROP</option>
-                            <option value="tea_spoon">APPLICATION</option>
-                            <option value="tea_spoon">PUFF</option>
-                            <option value="tea_spoon">PACKET</option>
-                            <option value="tea_spoon">SACHET</option>
-                            {/* Add more options as needed */}
-                          </select>
-                        </label>
-                      </Col>
-                      <Col>
-                        <label>
-                          No of unit:
-                          <input
-                            type="text"
-                            style={{
-                              padding: "8px",
-                              borderRadius: "5px",
-                              border: "1px solid #ccc",
-                              width: "100%",
-                            }}
-                            readOnly
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <label>
-                      Days:
-                      <input
-                        type="text"
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                        readOnly
-                      />
-                    </label>
-                    <label>
-                      Frequency:
-                      <select
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                        disabled
-                      >
-                        <option value="daily">DAILY</option>
-                        <option value="weekly">WEEKLY</option>
-                        <option value="weekly">MONTHLY</option>
-                        <option value="weekly">SOS</option>
-                        <option value="weekly">AS REQUIRED</option>
-                        <option value="weekly">ALTERNATIVE DAYS</option>
-                        <option value="weekly">BI WEEKLY</option>
-                        <option value="weekly">BI MONTHLY</option>
-                        {/* Add more options as needed */}
-                      </select>
-                    </label>
-                    <label>
-                      Time:
-                      <select
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                        disabled
-                      >
-                        <option value="morning">MORNING</option>
-                        <option value="afternoon">AFTERNOON</option>
-                        <option value="afternoon">EVENING</option>
-                        <option value="afternoon">NIGHT</option>
-                        <option value="afternoon">SOS</option>
-                        {/* Add more options as needed */}
-                      </select>
-                    </label>
-                    <label>
-                      Medication Schedule:
-                      <select
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                        disabled
-                      >
-                        <option value="morning">As Required</option>
-                        <option value="afternoon">BEFORE MEAL</option>
-                        <option value="afternoon">AFTER MEAL</option>
-                        <option value="afternoon">SOS</option>
-                        {/* Add more options as needed */}
-                      </select>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       )}

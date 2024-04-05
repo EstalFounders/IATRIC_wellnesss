@@ -1,6 +1,7 @@
 import { signIn } from "next-auth/react";
 import { api, contact_no } from "./constant";
 import axios from "axios";
+import client from "./lib/twilioClient";
 
 export const loginUser = async ({ email, password }) => {
   console.log("login user console");
@@ -43,3 +44,20 @@ export const openSupportWhatsAppWeb = () => {
   const whatsappWebUrl = `https://web.whatsapp.com/send?phone=${contact_no}`;
   window.open(whatsappWebUrl, "_blank");
 };
+
+export const sendWhatsAppMessage = async (contactNo, pdfUrl) => {
+    try {
+        const message = await client.messages.create({
+            body: `${pdfUrl}`,
+            from: 'whatsapp:+14155238886',
+            to: `whatsapp:+91${contactNo}`
+        });
+        console.log('Message sent successfully:', message.sid);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+  };
+  
+
+

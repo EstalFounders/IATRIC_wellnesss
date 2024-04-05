@@ -75,6 +75,10 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Doctor stamp is required"],
   },
+  doctorSignatureUrl: {
+    type: String,
+    required: [true, "Doctor signature is required"],
+  },
   joiningDate: {
     type: Date,
     default: Date.now,
