@@ -5,8 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../src/lib/firebase";
 import { api, prescription_img_path } from "../../src/constant";
-import { sendWhatsAppMessage } from "../../src/helper";
-import { handleWhatsapp } from "./whatsApp";
+import { sendWhatsAppMessage } from "./whatsApp";
 
 export const config = {
   api: {
@@ -47,8 +46,12 @@ export default async function handler(req, res) {
       // send pdf url to patient whatsapp
 
       const number = 7455992234;
-      const resp = handleWhatsapp(number,prescriptionUrl)
-    
+      const sendPdfUrl = sendWhatsAppMessage(number, prescriptionUrl);
+
+      if(!sendPdfUrl) {
+        throw new Error("Failed to send whastapp")
+     } 
+
       res.status(200).json({ status: "send successfully", prescriptionUrl });
     } catch (error) {
       console.error("Error:", error);

@@ -1,14 +1,25 @@
-// pages/api/send-whatsapp-message.js
+// pages/api/sendWhatsAppMessage.js
+import client from '../../src/lib/twilioClient';
 
-import { sendWhatsAppMessage } from "../../src/helper";
-
-export async function handleWhatsapp(number, message) {
-  try {
+// export default async function handler(req, res) {
+//  const { number, pdfUrl } = req.body;
+export async function sendWhatsAppMessage(number, pdfUrl)  {
+    console.log(number, 'number', pdfUrl,'pdfUrl')
+ try {
     // Call the sendWhatsAppMessage function
-    const resp = await sendWhatsAppMessage(number, message);
-    console.log(resp,' respone to send whatapp')
-  } catch (error) {
+     try {
+        const message = await client.messages.create({
+            body: `${pdfUrl}`,
+            from: 'whatsapp:+14155238886',
+            to: `whatsapp:+91${number}`
+        });
+        console.log('Message sent successfully:', message.sid);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    // Assuming sendWhatsAppMessage returns a success response
+ } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+ }
 }
+// }
