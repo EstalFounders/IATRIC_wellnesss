@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import bcrypt from "bcryptjs"; // Import bcrypt for password comparison
 import { Row } from "react-bootstrap";
 
-const PdfPasswordPopup = ({ onClose, onSubmit }) => {
+const DoctorPasswordPopup = ({ onClose, onSubmit }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -111,4 +111,4 @@ const PdfPasswordPopup = ({ onClose, onSubmit }) => {
   );
 };
 
-export default PdfPasswordPopup;
+export default DoctorPasswordPopup;
