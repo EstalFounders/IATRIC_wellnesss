@@ -9,7 +9,7 @@ import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../../src/components/registerDocComponent/lib/DoctorPrescriptionGenerator";
 import { api } from "../../src/constant";
 import bcrypt from "bcryptjs";
-import DoctorPasswordPopup from "../../src/components/registerDocComponent/lib/pdfPasswordPopup";
+import DoctorPasswordPopup from "../../src/components/registerDocComponent/lib/DoctorPasswordPopup";
 
 const Homepage = () => {
   const [previewVisible, setPreviewVisible] = useState(false);
