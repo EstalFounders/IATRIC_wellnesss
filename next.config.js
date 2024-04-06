@@ -3,4 +3,9 @@ module.exports = {
   future: {
     webpack5: true,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '20mb',
+    },
+  },
 };

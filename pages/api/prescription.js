@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     try {
       // Read the file into a Buffer
       const fileBuffer = fs.readFileSync(files.prescriptionpdfFile[0].path);
-
+       
       // Upload PDF to Google Cloud Storage
       const storageRef = ref(
         storage,

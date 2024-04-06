@@ -37,7 +37,6 @@ const Homepage = () => {
   });
 
   const handleMedicineFormChange = (formValues, index) => {
-    console.log(formValues, "form values");
     const updatedMedicineForms = [...medicineForms];
     updatedMedicineForms[index] = formValues;
     setMedicineForms(updatedMedicineForms);
@@ -63,11 +62,7 @@ const Homepage = () => {
   };
 
   const doctorPasswordValidation = (password) => {
-    console.log("Password submitted:", doctorPassword);
-
     const isPasswordCorrect = bcrypt.compareSync(password, doctorPassword);
-
-    console.log(isPasswordCorrect, "isPassword");
 
     if (isPasswordCorrect) {
       setPasswordPopup(false);
