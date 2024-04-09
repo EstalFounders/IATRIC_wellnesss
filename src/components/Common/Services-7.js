@@ -14,10 +14,7 @@ const Services7 = () => {
             <div className="row">
               {/* SERVICE BOX #1 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="0.4s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="0.4s">
                   <Link legacyBehavior href="/service-1">
                     <a>
                       {/* Icon */}
@@ -41,10 +38,7 @@ const Services7 = () => {
               {/* END SERVICE BOX #1 */}
               {/* SERVICE BOX #2 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="0.6s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="0.6s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -68,10 +62,7 @@ const Services7 = () => {
               {/* END SERVICE BOX #2 */}
               {/* SERVICE BOX #3 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="0.8s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="0.8s">
                   <Link legacyBehavior href="/service-1">
                     <a>
                       {/* Icon */}
@@ -95,10 +86,7 @@ const Services7 = () => {
               {/* END SERVICE BOX #3*/}
               {/* SERVICE BOX #4 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="1s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="1s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -122,10 +110,7 @@ const Services7 = () => {
               {/* END SERVICE BOX #4 */}
               {/* SERVICE BOX #5 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="1.2s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="1.2s">
                   <Link legacyBehavior href="/service-1">
                     <a>
                       {/* Icon */}
@@ -149,10 +134,7 @@ const Services7 = () => {
               {/* END SERVICE BOX #5 */}
               {/* SERVICE BOX #6 */}
               <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs"
-                  data-wow-delay="1.4s"
-                >
+                <div className="sbox-7 icon-xs" data-wow-delay="1.4s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -187,9 +169,9 @@ const Services7 = () => {
               <h4 className="h4-xs">Opening Hours:</h4>
               {/* Text */}
               <p className="p-sm">
-                Start Your Journey to a Healthier You {""}
-                Don't let a busy schedule or long distances prevent you from
-                receiving the medical attention you deserve.
+                Start Your Journey to a Healthier You Don&apos;t let a busy
+                schedule or long distances prevent you from receiving the
+                medical attention you deserve.
               </p>
               {/* Table */}
               <table className="table">
