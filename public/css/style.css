@@ -2896,7 +2896,7 @@ td.text-right {
 
 .sbox-2:hover h5.sbox-2-title {
   -webkit-transform: translate3d(0, -110px, 0);
-  transform: translate3d(0, -110px, 0);
+  transform: translate3d(0, -130px, 0);
 }
 
 .bg-lightgrey .sbox-2:hover {

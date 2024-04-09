@@ -105,6 +105,8 @@ const Demo5Services2 = () => {
                     className="sbox-2"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
+                    onTouchStart={() => setHoveredIndex(index)}
+                    onTouchEnd={() => setHoveredIndex(null)}
                     style={{ width: "100%" }}
                   >
                     <Link legacyBehavior href="/department-single">

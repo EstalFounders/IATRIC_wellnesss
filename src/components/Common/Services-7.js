@@ -1,7 +1,25 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import PopupDialog from "./PopupDialog";
+import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { Button } from "react-bootstrap";
 
 const Services7 = () => {
+  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+
+  const handleDialDialogOpen = () => {
+    setIsDialDialogOpen(true);
+  };
+
+  const handleCloseDialDialog = () => {
+    setIsDialDialogOpen(false);
+  };
+
+  const dialOptions = [
+    { label: "Dial", action: dial },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+  ];
+
   return (
     <section
       id="services-7"
@@ -200,10 +218,44 @@ const Services7 = () => {
                 Contact Iatric Healthcare today and experience a clinic with a
                 truly innovative approach to treatment.
                 <br />
-                Call/ What’sapp -{" "}
-                <b style={{ fontFamily: "bold" }}>+91 9625942020</b>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDialDialogOpen();
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.color = "#ffffff";
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.color = "#000000";
+                  }}
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "0",
+                    marginTop: "20px",
+                  }}
+                >
+                  Call/WhatsApp -{" "}
+                  <a
+                    href="tel:+919625942020"
+                    style={{
+                      fontFamily: "bold",
+                      textDecoration: "none",
+                      color: "#000000",
+                    }}
+                  >
+                    +91 9625942020
+                  </a>
+                </Button>
               </p>
             </div>
+            <PopupDialog
+              isOpen={isDialDialogOpen}
+              onClose={handleCloseDialDialog}
+              options={dialOptions}
+            />
           </div>
           {/* END INFO TABLE */}
         </div>
