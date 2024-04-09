@@ -1,5 +1,6 @@
 import { fontWeight } from "@mui/system";
 import React from "react";
+import { FaAngleDoubleRight } from "react-icons/fa";
 
 const AboutUsInfo4 = () => {
   return (
@@ -71,7 +72,7 @@ const AboutUsInfo4 = () => {
                     {/* Option #1 */}
                     <div className="box-list">
                       <div className="box-list-icon blue-color">
-                        <i className="fas fa-angle-double-right" />
+                        <FaAngleDoubleRight />
                       </div>
                       <p className="p-sm">
                         <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
@@ -87,7 +88,7 @@ const AboutUsInfo4 = () => {
                     {/* Option #2 */}
                     <div className="box-list">
                       <div className="box-list-icon blue-color">
-                        <i className="fas fa-angle-double-right" />
+                        <FaAngleDoubleRight />
                       </div>
                       <p className="p-sm">
                         {" "}
@@ -103,7 +104,7 @@ const AboutUsInfo4 = () => {
                     {/* Option #3 */}
                     <div className="box-list">
                       <div className="box-list-icon blue-color">
-                        <i className="fas fa-angle-double-right" />
+                        <FaAngleDoubleRight />
                       </div>
                       <p className="p-sm">
                         <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
@@ -118,7 +119,7 @@ const AboutUsInfo4 = () => {
                     {/* Option #4 */}
                     <div className="box-list" style={{ marginTop: "30px" }}>
                       <div className="box-list-icon blue-color">
-                        <i className="fas fa-angle-double-right" />
+                        <FaAngleDoubleRight />
                       </div>
                       <p className="p-sm">
                         <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>

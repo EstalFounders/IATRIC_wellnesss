@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import Popup from "../Popup";
+import { FaPlay } from "react-icons/fa";
 
 const AboutUsVideo2 = () => {
   const [video, setVideo] = useState(false);
@@ -25,7 +26,8 @@ const AboutUsVideo2 = () => {
                   {/* Play Icon */}
                   <div className="video-btn play-icon-blue">
                     <div className="video-block-wrapper">
-                      <i className="fas fa-play" />
+                      {/* <i className="fas fa-play" /> */}
+                      <FaPlay size={50} />
                     </div>
                   </div>
                   {/* Preview */}
