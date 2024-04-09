@@ -10,10 +10,7 @@ const AboutUsInfo4 = () => {
           <div className="row d-flex align-items-center">
             {/* INFO IMAGE */}
             <div className="col-lg-6">
-              <div
-                className="info-4-img text-center"
-                data-wow-delay="0.6s"
-              >
+              <div className="info-4-img text-center" data-wow-delay="0.6s">
                 <img
                   className="img-fluid"
                   src="images/chief_doctor_700x800.jpg"
@@ -23,10 +20,7 @@ const AboutUsInfo4 = () => {
             </div>
             {/* INFO TEXT */}
             <div className="col-lg-6">
-              <div
-                className="txt-block pc-30"
-                data-wow-delay="0.4s"
-              >
+              <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
                   Welcome to Iatric healthcare
@@ -40,8 +34,8 @@ const AboutUsInfo4 = () => {
                   Iatric Healthcare offers a revolutionary approach to medical
                   care, placing your convenience and well-being at the
                   forefront. We understand the challenges of busy schedules and
-                  long wait times, which is why we've designed a system that
-                  delivers expert medical care directly to you.
+                  long wait times, which is why we&apos;ve designed a system
+                  that delivers expert medical care directly to you.
                 </p>
               </div>
             </div>
@@ -55,10 +49,7 @@ const AboutUsInfo4 = () => {
           <div className="row d-flex align-items-center">
             {/* INFO TEXT */}
             <div className="col-lg-6">
-              <div
-                className="txt-block pc-30"
-                data-wow-delay="0.4s"
-              >
+              <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
                   Highest Quality Care
@@ -148,10 +139,7 @@ const AboutUsInfo4 = () => {
             {/* END INFO TEXT */}
             {/* INFO IMAGE */}
             <div className="col-lg-6">
-              <div
-                className="info-4-img text-center"
-                data-wow-delay="0.6s"
-              >
+              <div className="info-4-img text-center" data-wow-delay="0.6s">
                 <img
                   className="img-fluid"
                   src="images/emergency_help_700x800.jpg"
