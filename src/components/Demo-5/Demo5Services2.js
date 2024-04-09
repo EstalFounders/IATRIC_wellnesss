@@ -82,7 +82,6 @@ const Demo5Services2 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             <h3 className="h3-md steelblue-color">Our Speciality</h3>
-            <p>content coming soon</p>
           </div>
         </div>
         <div className="row align-items-center">
@@ -102,7 +101,12 @@ const Demo5Services2 = () => {
               {/* Render current services */}
               {currentServices.map((service, index) => (
                 <div className="col-sm-6 col-lg-3" key={index}>
-                  <div className="sbox-2">
+                  <div
+                    className="sbox-2"
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    style={{ width: "100%" }}
+                  >
                     <Link legacyBehavior href="/department-single">
                       <a onClick={() => handleIconClick(index)}>
                         {/* Adjust icons and titles */}
@@ -112,8 +116,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 1 && (
@@ -122,8 +124,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 2 && (
@@ -132,8 +132,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 3 && (
@@ -142,8 +140,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 4 && (
@@ -152,8 +148,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 5 && (
@@ -162,8 +156,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 6 && (
@@ -172,8 +164,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 7 && (
@@ -182,8 +172,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
                         {index === 8 && (
@@ -192,8 +180,6 @@ const Demo5Services2 = () => {
                             color={
                               hoveredIndex === index ? "#fafafa" : "#8e8333"
                             }
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
                           />
                         )}
 

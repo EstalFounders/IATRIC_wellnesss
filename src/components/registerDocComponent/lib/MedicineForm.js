@@ -95,7 +95,35 @@ const MedicineForm = ({ onChange }) => {
     <div style={{ marginBottom: "20px" }}>
       <div style={{ display: "grid", gap: "10px" }}>
         <div className="row">
-          <div className="col" xs={12} md={8}>
+          <div className="col mt-3" xs={12} md={8}>
+            <label>
+              UNIT:
+              <select
+                name="unit"
+                style={{
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                  width: "100%",
+                }}
+                onChange={handleInputChange}
+                value={unit}
+              >
+                <option value="select">select Unit</option>
+                <option value="UNIT">UNIT</option>
+                <option value="TABLET">TABLET</option>
+                <option value="CAPSULE">CAPSULE</option>
+                <option value="TEA SPOON">TEA SPOON</option>
+                <option value="DROP">DROP</option>
+                <option value="APPLICATION">APPLICATION</option>
+                <option value="PUFF">PUFF</option>
+                <option value="PACKET">PACKET</option>
+                <option value="SACHET">SACHET</option>
+                {/* Add more options as needed */}
+              </select>
+            </label>
+          </div>
+          <div className="col mt-3" xs={12} md={4}>
             <label>
               Medicine Name:
               <input
@@ -112,11 +140,17 @@ const MedicineForm = ({ onChange }) => {
                 onChange={handleInputChange}
               />
             </label>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
             <div className="mb-2">
               <small>Click Find Medicine</small>
             </div>
           </div>
-          <div className="col mt-3" xs={12} md={4}>
+        </div>
+        <div className="row">
+          <div className="col">
             <span
               style={{
                 textDecoration: "underline",
@@ -152,35 +186,7 @@ const MedicineForm = ({ onChange }) => {
         <div className="row">
           <div className="col">
             <label>
-              UNIT:
-              <select
-                name="unit"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-                onChange={handleInputChange}
-                value={unit}
-              >
-                <option value="select">select Unit</option>
-                <option value="UNIT">UNIT</option>
-                <option value="TABLET">TABLET</option>
-                <option value="CAPSULE">CAPSULE</option>
-                <option value="TEA SPOON">TEA SPOON</option>
-                <option value="DROP">DROP</option>
-                <option value="APPLICATION">APPLICATION</option>
-                <option value="PUFF">PUFF</option>
-                <option value="PACKET">PACKET</option>
-                <option value="SACHET">SACHET</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
-          </div>
-          <div className="col">
-            <label>
-              No of unit:
+              Dosage:
               <input
                 type="text"
                 name="numberOfUnits"
@@ -213,7 +219,6 @@ const MedicineForm = ({ onChange }) => {
             </label>
           </div>
         </div>
-
         <div className="row">
           <div className="col">
             <label>

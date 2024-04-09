@@ -90,8 +90,18 @@ const Header1 = ({ toggleMenu, toggle }) => {
           <div className="headertopleft">
             <div className="address clearfix">
               <span>
-                <FaMapMarkedAlt className="mx-1" />
-                Sector 57 , Gurgaon Haryana-122003
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    <FaMapMarkedAlt className="mx-1" />
+                    <b style={{ fontWeight: "bold", fontSize: 14 }}>
+                      Sector 57 , Gurgaon Haryana-122003
+                    </b>
+                  </span>
+                </a>
               </span>
               <Link legacyBehavior href="/">
                 <a
@@ -109,7 +119,9 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   }}
                 >
                   <FaWhatsapp className="mx-1" />
-                  {contact_no}
+                  <b style={{ fontWeight: "bold", fontSize: 14 }}>
+                    {contact_no}
+                  </b>
                 </a>
               </Link>
             </div>
@@ -131,7 +143,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.linkedin.com/in/iatrichealthcare/"
             >
-              <FaLinkedin />
+              <FaLinkedin size={25} />
               <span className="mobiletext02">Linkedin</span>
             </a>
             <a
@@ -140,7 +152,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.instagram.com/iatric.healthcare/"
             >
-              <FaInstagram />
+              <FaInstagram size={25} />
               <span className="mobiletext02">Instagram</span>
             </a>
 
@@ -154,7 +166,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               target="blank"
               href="https://www.facebook.com/iatrichealthcare"
             >
-              <FaFacebook />
+              <FaFacebook size={25} />
               <span className="mobiletext02">Facebook</span>
             </a>
           </div>

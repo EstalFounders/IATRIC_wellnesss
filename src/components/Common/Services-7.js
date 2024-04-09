@@ -15,7 +15,7 @@ const Services7 = () => {
               {/* SERVICE BOX #1 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="0.4s"
                 >
                   <Link legacyBehavior href="/service-1">
@@ -42,7 +42,7 @@ const Services7 = () => {
               {/* SERVICE BOX #2 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="0.6s"
                 >
                   <Link legacyBehavior href="/service-2">
@@ -69,7 +69,7 @@ const Services7 = () => {
               {/* SERVICE BOX #3 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="0.8s"
                 >
                   <Link legacyBehavior href="/service-1">
@@ -96,7 +96,7 @@ const Services7 = () => {
               {/* SERVICE BOX #4 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="1s"
                 >
                   <Link legacyBehavior href="/service-2">
@@ -123,7 +123,7 @@ const Services7 = () => {
               {/* SERVICE BOX #5 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="1.2s"
                 >
                   <Link legacyBehavior href="/service-1">
@@ -150,7 +150,7 @@ const Services7 = () => {
               {/* SERVICE BOX #6 */}
               <div className="col-md-6">
                 <div
-                  className="sbox-7 icon-xs wow fadeInUp"
+                  className="sbox-7 icon-xs"
                   data-wow-delay="1.4s"
                 >
                   <Link legacyBehavior href="/service-2">
@@ -180,15 +180,16 @@ const Services7 = () => {
           {/* INFO TABLE */}
           <div className="col-lg-4">
             <div
-              className="services-7-table blue-table mb-30 wow fadeInUp"
+              className="services-7-table blue-table mb-30"
               data-wow-delay="0.6s"
             >
               {/* Title */}
               <h4 className="h4-xs">Opening Hours:</h4>
               {/* Text */}
               <p className="p-sm">
-                Porta semper lacus cursus and feugiat primis ultrice ligula
-                risus auctor tempus feugiat and dolor lacinia cursus
+                Start Your Journey to a Healthier You {""}
+                Don't let a busy schedule or long distances prevent you from
+                receiving the medical attention you deserve.
               </p>
               {/* Table */}
               <table className="table">
@@ -211,11 +212,14 @@ const Services7 = () => {
                 </tbody>
               </table>
               {/* Title */}
-              <h5 className="h5-sm">Need a personal health plan?</h5>
+              {/* <h5 className="h5-sm">Need a personal health plan?</h5> */}
               {/* Text */}
               <p className="p-sm">
-                Porta semper lacus cursus, and feugiat primis ultrice ligula at
-                risus auctor
+                Contact Iatric Healthcare today and experience a clinic with a
+                truly innovative approach to treatment.
+                <br />
+                Call/ What’sapp -{" "}
+                <b style={{ fontFamily: "bold" }}>+91 9625942020</b>
               </p>
             </div>
           </div>
