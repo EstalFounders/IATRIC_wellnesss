@@ -1,24 +1,26 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { AiTwotoneHome } from "react-icons/ai";
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
 import {
   FaStethoscope,
   FaTooth,
   FaMedkit,
   FaUserNurse,
   FaHeart,
+  FaFemale,
+  FaBaby,
+  FaEye,
 } from "react-icons/fa";
-import { GiKneeCap } from "react-icons/gi";
-import {
-  MdFaceRetouchingNatural,
-  MdKeyboardDoubleArrowLeft,
-  MdKeyboardDoubleArrowRight,
-  MdOutlineDoubleArrow,
-} from "react-icons/md";
+import { GiErlenmeyer, GiKneeCap } from "react-icons/gi";
+import { BiInjection } from "react-icons/bi";
 
 const Demo5Services2 = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 8;
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Dummy data for services
   const services = [
@@ -43,18 +45,13 @@ const Demo5Services2 = () => {
     // Add more services as needed
   ];
 
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
   // Calculate the index of the first service to be displayed on the current page
   const indexOfFirstService = (currentPage - 1) * servicesPerPage;
-
-  // Calculate the index of the last service to be displayed on the current page
-  const indexOfLastService = currentPage * servicesPerPage;
 
   // Get the services to be displayed on the current page
   const currentServices = services.slice(
     indexOfFirstService,
-    indexOfLastService
+    indexOfFirstService + servicesPerPage
   );
 
   // Function to handle clicking on the next page arrow
@@ -67,10 +64,112 @@ const Demo5Services2 = () => {
     setCurrentPage(currentPage - 1);
   };
 
+  // Function to handle clicking on an icon
   const handleIconClick = (index) => {
+    const currentIndex = indexOfFirstService + index;
     // Navigate to the corresponding component based on the index
-    const serviceName = services[index];
+    const serviceName = services[currentIndex];
     history.push(`/department-single/${serviceName}`);
+  };
+
+  // Function to render the icon based on the index
+  const renderIcon = (index) => {
+    const currentIndex = indexOfFirstService + index;
+    if (currentIndex < 8) {
+      switch (currentIndex) {
+        case 0:
+          return (
+            <FaStethoscope
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 1:
+          return (
+            <FaBaby
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 2:
+          return (
+            <GiKneeCap
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 3:
+          return (
+            <FaTooth
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 4:
+          return (
+            <GiKneeCap
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 5:
+          return (
+            <FaFemale
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 6:
+          return (
+            <FaEye
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 7:
+          return (
+            <FaUserNurse
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        default:
+          return null;
+      }
+    } else {
+      switch (currentIndex) {
+        case 8:
+          return (
+            <FaMedkit
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 9:
+          return (
+            <FaHeart
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 11:
+          return (
+            <BiInjection
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        case 14:
+          return (
+            <GiErlenmeyer
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+        default:
+          return null;
+      }
+    }
   };
 
   return (
@@ -111,80 +210,9 @@ const Demo5Services2 = () => {
                   >
                     <Link legacyBehavior href="/department-single">
                       <a onClick={() => handleIconClick(index)}>
-                        {/* Adjust icons and titles */}
-                        {index === 0 && (
-                          <FaStethoscope
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 1 && (
-                          <MdFaceRetouchingNatural
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 2 && (
-                          <GiKneeCap
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 3 && (
-                          <FaTooth
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 4 && (
-                          <FaHeart
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 5 && (
-                          <AiTwotoneHome
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 6 && (
-                          <FaMedkit
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 7 && (
-                          <FaUserNurse
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-                        {index === 8 && (
-                          <AiTwotoneHome
-                            size={80}
-                            color={
-                              hoveredIndex === index ? "#fafafa" : "#8e8333"
-                            }
-                          />
-                        )}
-
+                        {/* Render icon */}
+                        {renderIcon(index)}
+                        {/* Service title */}
                         <h5 className="h5-sm sbox-2-title steelblue-color">
                           {service}
                         </h5>
@@ -197,7 +225,7 @@ const Demo5Services2 = () => {
           </div>
           <div className="col-auto" style={{ marginBottom: 44 }}>
             {/* Next Page Arrow */}
-            {services.length > indexOfLastService && (
+            {services.length > indexOfFirstService + servicesPerPage && (
               <MdKeyboardDoubleArrowRight
                 size={32}
                 onClick={nextPage}
