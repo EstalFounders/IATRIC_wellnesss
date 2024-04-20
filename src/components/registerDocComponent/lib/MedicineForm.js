@@ -70,7 +70,10 @@ const MedicineForm = ({ onChange }) => {
       // Fetch data from DailyMed API
       const response = await fetch(`${api.medicineInfoApiCall}${medicineName}`);
       const data = await response.json();
-      setMedicinesInfo(data.data);
+      console.log(data, "data in client side");
+      if (data && data.length > 0) {
+        setMedicinesInfo(data);
+      }
     } catch (error) {
       console.error("Error fetching medicine information:", error);
       setError("Error fetching medicine information:");
@@ -81,14 +84,8 @@ const MedicineForm = ({ onChange }) => {
 
   const handleMedicineSelect = (event) => {
     const medicine = event.target[event.target.selectedIndex].title;
-    // Extracting medicine name
-    const startIndex = medicine.indexOf("(");
-    const endIndex = medicine.indexOf(")");
-    const medicineName = medicine.substring(0, startIndex).trim();
-    // Extracting salt
-    const salt = medicine.substring(startIndex + 1, endIndex).trim();
-    setMedicineName(medicineName);
-    setMedicineGeneric(salt);
+    setMedicineName(medicine);
+    setMedicineGeneric(event.target.value);
   };
 
   return (
@@ -168,17 +165,17 @@ const MedicineForm = ({ onChange }) => {
         {loading && <div>Loading...</div>}
         {error && <div>Error: {error}</div>}
         {medicinesInfo != "" && !error && (
-          <select onChange={handleMedicineSelect} value={medicineName}>
+          <select onChange={handleMedicineSelect}>
             <option>Select a medicine</option>
             {medicinesInfo.map((medicine) => (
               <option
-                key={medicine.setid}
-                value={medicine.tittle}
-                title={medicine.title} // Set full title as tooltip
+                key={medicine._id}
+                value={medicine.salt}
+                title={medicine.name} // Set full title as tooltip
               >
-                {medicine.title.length > 20
-                  ? `${medicine.title.slice(0, 33)}...`
-                  : medicine.title}
+                {medicine.name.length > 20
+                  ? `${medicine.name.slice(0, 33)}...`
+                  : medicine.name}
               </option>
             ))}
           </select>

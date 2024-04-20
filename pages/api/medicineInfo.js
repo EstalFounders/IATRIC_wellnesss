@@ -1,21 +1,21 @@
-import { api } from "../../src/constant";
+import { dbConnect } from '../../src/lib/db'; // Import the MongoDB connection function
+import Medicine from '../../src/models/medicineInfo';
 
-// pages/api/medicine.js
 export default async function handler(req, res) {
     const { medicineName } = req.query;
   
     try {
-      const response = await fetch(`${api.medicineInfoExternalCall}${medicineName}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
-      }
-      const data = await response.json();
-      
-      // Return the data to the client
-      res.status(200).json(data);
+        const client = await dbConnect(); // Connect to MongoDB
+
+        const regexPattern = new RegExp(`^${medicineName}`, 'i');
+
+        // Search for medicine documents based on the medicineName
+        const result = await Medicine.find({ name: { $regex: regexPattern } });
+
+        // Return the search result to the client
+        res.status(200).json(result);
     } catch (error) {
-      console.error("Error fetching medicine information:", error);
-      res.status(500).json({ error: "Failed to fetch medicine information" });
+        console.error("Error fetching medicine information:", error);
+        res.status(500).json({ error: "Failed to fetch medicine information" });
     }
-  }
-  
+}

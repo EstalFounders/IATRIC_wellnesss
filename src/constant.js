@@ -10,7 +10,6 @@ export const email= 'iatrichealthcare@gmail.com'
 export const api = {
     addDoctor: "/api/addDoctor",
     doctorLogin: "/api/doctorLogin",
-    medicineInfoExternalCall: "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?drug_name=",
     medicineInfoApiCall: "/api/medicineInfo?medicineName=",
     prescriptionCall: "/api/prescription",
     sendWhatsAppCall: "/api/whatsApp"
