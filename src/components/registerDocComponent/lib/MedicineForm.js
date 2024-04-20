@@ -4,6 +4,7 @@ import { api } from "../../../constant";
 
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
+  const [medicineNotFound, setMedicineNotFound] = useState("");
   const [medicineGeneric, setMedicineGeneric] = useState("");
   const [unit, setUnit] = useState("");
   const [numberOfUnits, setNumberOfUnits] = useState("");
@@ -64,7 +65,7 @@ const MedicineForm = ({ onChange }) => {
   const handleFindMedicine = async () => {
     setLoading(true); // Set loading to true before fetching data
     setError(null); // Clear previous error message
-
+    setMedicineNotFound(null) 
     // Call the function to find medicine
     try {
       // Fetch data from DailyMed API
@@ -73,6 +74,9 @@ const MedicineForm = ({ onChange }) => {
       console.log(data, "data in client side");
       if (data && data.length > 0) {
         setMedicinesInfo(data);
+      } else {
+        setMedicinesInfo([]);
+        setMedicineNotFound("no medicine found");
       }
     } catch (error) {
       console.error("Error fetching medicine information:", error);
@@ -137,6 +141,7 @@ const MedicineForm = ({ onChange }) => {
                 onChange={handleInputChange}
               />
             </label>
+            <div className="text-danger">{medicineNotFound}</div>
           </div>
         </div>
         <div className="row">
