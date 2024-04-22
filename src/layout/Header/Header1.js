@@ -24,28 +24,21 @@ const Header1 = ({ toggleMenu, toggle }) => {
     setIsDialDialogOpen(true);
   };
 
-  const handleWhatsAppDialogOpen = () => {
-    setIsWhatsAppDialogOpen(true);
-  };
-
+  
   const handleCloseDialDialog = () => {
     setIsDialDialogOpen(false);
   };
 
-  const handleCloseWhatsAppDialog = () => {
-    setIsWhatsAppDialogOpen(false);
-  };
-
+  
   const dialOptions = [
     { label: "Dial", action: dial },
     { label: "Whatsapp", action: openSupportWhatsAppWeb },
   ];
 
-  const whatsAppOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
-    { label: "FORM", action: () => router.push("/appointment") },
-  ];
+  
+  const openAppointment = () => {
+    router.push("/appointment")
+  }
 
   return (
     <header id="header" className="header">
@@ -505,7 +498,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   <a
                     onClick={(e) => {
                       e.preventDefault();
-                      handleWhatsAppDialogOpen();
+                      openAppointment();
                     }}
                   >
                     Make an Appointment
@@ -514,11 +507,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
               </li>
             </ul>
           </nav>
-          <PopupDialog
-            isOpen={isWhatsAppDialogOpen}
-            onClose={handleCloseWhatsAppDialog}
-            options={whatsAppOptions}
-          />
+          
           {/* END MAIN MENU */}
         </div>
       </div>

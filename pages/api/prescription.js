@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../src/lib/firebase";
 import { api, prescription_img_path } from "../../src/constant";
-import { sendWhatsAppMessage } from "./whatsApp";
+import { sendWhatsAppMessage } from "./helper";
 
 export const config = {
   api: {

@@ -7,10 +7,10 @@ const MedicineForm = ({ onChange }) => {
   const [medicineNotFound, setMedicineNotFound] = useState("");
   const [medicineGeneric, setMedicineGeneric] = useState("");
   const [unit, setUnit] = useState("");
-  const [numberOfUnits, setNumberOfUnits] = useState("");
+  const [dosage, setDosage] = useState("");
   const daysRef = useRef("");
   const [frequency, setFrequency] = useState("");
-  const [frequencyValue, setFrequencyValue] = useState("");
+  const [noOfTimes, setNoOfTimes] = useState("");
   const [time, setTime] = useState("");
   const [medicationSchedule, setMedicationSchedule] = useState("As Required");
   const [loading, setLoading] = useState(false); // State to track loading status
@@ -27,8 +27,8 @@ const MedicineForm = ({ onChange }) => {
       case "unit":
         setUnit(value);
         break;
-      case "numberOfUnits":
-        setNumberOfUnits(value);
+      case "dosage":
+        setDosage(value);
         break;
       case "days":
         daysRef.current = value; // Update the ref directly
@@ -42,8 +42,8 @@ const MedicineForm = ({ onChange }) => {
       case "medicationSchedule":
         setMedicationSchedule(value);
         break;
-      case "frequencyValue":
-        setFrequencyValue(value);
+      case "noOfTimes":
+        setNoOfTimes(value);
         break;
       default:
         break;
@@ -53,10 +53,10 @@ const MedicineForm = ({ onChange }) => {
       medicineName,
       medicineGeneric,
       unit,
-      numberOfUnits,
+      dosage,
       days: daysRef.current, // Access the value directly from the ref
       frequency,
-      frequencyValue,
+      noOfTimes,
       time,
       medicationSchedule,
     });
@@ -191,7 +191,7 @@ const MedicineForm = ({ onChange }) => {
               Dosage:
               <input
                 type="text"
-                name="numberOfUnits"
+                name="dosage"
                 style={{
                   padding: "8px",
                   borderRadius: "5px",
@@ -253,7 +253,7 @@ const MedicineForm = ({ onChange }) => {
             <label>
               No of times:
               <input
-                name="frequencyValue"
+                name="noOfTimes"
                 style={{
                   padding: "10px",
                   borderRadius: "5px",
@@ -302,7 +302,7 @@ const MedicineForm = ({ onChange }) => {
             value={medicationSchedule}
           >
             <option value="select">Select Medication Schedule</option>
-            <option value="BEFORE MEAL">As Required</option>
+            <option value="As Required">As Required</option>
             <option value="BEFORE MEAL">BEFORE MEAL</option>
             <option value="AFTER MEAL">AFTER MEAL</option>
             <option value="SOS">SOS</option>

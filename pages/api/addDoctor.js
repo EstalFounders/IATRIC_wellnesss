@@ -18,6 +18,7 @@ import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
+import generateSlots from "./helper";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
             .map((key) => files[key][0]); // Assuming each field has only one file
 
           // Ensure files.profilePicture, doctor stamp, doctor signature are defined
-          let profilePictureUrl, doctorStampUrl, doctorSignatureUrl ;
+          let profilePictureUrl, doctorStampUrl, doctorSignatureUrl;
 
           if (doctorSignatureFile) {
             const doctorSignatureRef = ref(
@@ -76,7 +77,6 @@ export default async function handler(req, res) {
             // Get profile picture download URL
             doctorSignatureUrl = await getDownloadURL(doctorSignatureRef);
           }
-
 
           // upload doctor stamp
           if (doctorStampFile) {
@@ -150,7 +150,8 @@ export default async function handler(req, res) {
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
             doctorStampUrl,
-            doctorSignatureUrl
+            doctorSignatureUrl,
+            slots: generateSlots(),
           });
 
           console.log("Doctor Added");
@@ -331,10 +332,7 @@ export default async function handler(req, res) {
       }
 
       if (doctor.profilePictureUrl) {
-        const oldProfilePictureRef = ref(
-          storage,
-          doctor.profilePictureUrl
-        );
+        const oldProfilePictureRef = ref(storage, doctor.profilePictureUrl);
         await deleteObject(oldProfilePictureRef);
       }
       console.log("deleted old profile picture");
@@ -350,10 +348,7 @@ export default async function handler(req, res) {
       console.log("deleted old diploamas");
 
       if (doctor.doctorStamp) {
-        const oldProfilePictureRef = ref(
-          storage,
-          doctor.doctorStamp
-        );
+        const oldProfilePictureRef = ref(storage, doctor.doctorStamp);
         await deleteObject(oldProfilePictureRef);
       }
       console.log("deleted old doctor stamp");

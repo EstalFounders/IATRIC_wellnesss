@@ -1,7 +1,56 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 const AppointmentPage = () => {
+  const [doctorChoice, setDoctorChoice] = useState("any");
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("rightNow");
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [consultationType, setConsultationType] = useState("");
+
+  const doctors = [
+    { id: "dr1", name: "Dr. Jonathan Barnes" },
+    { id: "dr2", name: "Dr. Hannah Harper" },
+    { id: "dr3", name: "Dr. Matthew Anderson" },
+  ];
+
+  const handleDoctorChoiceChange = (event) => {
+    const choice = event.target.value;
+    setDoctorChoice(choice);
+    setSelectedDoctor("");
+    setAvailableSlots([]);
+    setShowDatePicker(appointmentTime === "chooseTime" && choice === "any"); // Update to show/hide date picker based on choice
+  };
+
+  const handleDoctorSelection = (event) => {
+    setSelectedDoctor(event.target.value);
+    fetchAvailableSlots(event.target.value);
+  };
+
+  const handleTimeSelection = (event) => {
+    const timeChoice = event.target.value;
+    setAppointmentTime(timeChoice);
+    setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
+  };
+
+  const fetchAvailableSlots = (doctorId) => {
+    // Fetch logic to get slots
+    // This is a dummy implementation
+    setAvailableSlots(["9:00 AM", "10:00 AM", "11:00 AM"]); // Example slots
+  };
+
+  const handleSlotSelection = (slot) => {
+    console.log("Slot selected:", slot);
+    // Handle slot booking logic here
+  };
+
+  // Handler to update the consultation type based on the selected radio button
+  const handleConsultationChange = (event) => {
+    setConsultationType(event.target.value);
+  };
+
   return (
     <div
       id="appointment-page"
@@ -13,7 +62,7 @@ const AppointmentPage = () => {
           <div className="col-lg-8">
             <div className="txt-block pr-30">
               {/* Title */}
-              <h3 className="h3-md steelblue-color">Book an Appointment</h3>
+              <h3 className="h3-md steelblue-color">Make Appointment</h3>
               {/* Text */}
               <p>
                 Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -25,130 +74,218 @@ const AppointmentPage = () => {
                 pretium
               </p>
               {/* APPOINTMENT FORM */}
-              <div id="appointment-form-holder" className="text-center">
+              <div className="text-center">
                 <form
                   onSubmit={(e) => e.preventDefault()}
-                  name="appointmentform"
-                  className="row appointment-form"
+                  className="appointment-form"
                 >
-                  {/* Form Select */}
-                  <div
-                    id="input-department"
-                    className="col-md-12 input-department"
-                  >
-                    <select
-                      id="inlineFormCustomSelect1"
-                      name="department"
-                      className="custom-select department"
-                      required
-                    >
-                      <option>Select Department</option>
-                      <option>Pediatrics Department</option>
-                      <option>Neurology Department</option>
-                      <option>Haematology Department</option>
-                      <option>X-Ray Diagnostic Department</option>
-                      <option>Cardiology Department</option>
-                      <option>MRI Department</option>
-                      <option>Laboratory Services</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  {/* Form Select */}
-                  <div id="input-doctor" className="col-md-12 input-doctor">
-                    <select
-                      id="inlineFormCustomSelect2"
-                      name="doctor"
-                      className="custom-select doctor"
-                      required
-                    >
-                      <option>Select Doctor</option>
-                      <option>Jonathan Barnes D.M.</option>
-                      <option>Hannah Harper D.M.</option>
-                      <option>Matthew Anderson D.M.</option>
-                      <option>Megan Coleman D.M.</option>
-                      <option>Joshua Elledge D.M.</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  {/* Form Select */}
-                  <div id="input-patient" className="col-md-12 input-patient">
-                    <select
-                      id="inlineFormCustomSelect3"
-                      name="patient"
-                      className="custom-select patient"
-                      required
-                    >
-                      <option>Have You Visited Us Before?*</option>
-                      <option>New Patient</option>
-                      <option>Returning Patient</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  {/* Contact Form Input */}
-                  <div id="input-date" className="col-lg-12">
+                  {/* Symptoms Input */}
+                  <div className="col-lg-12">
                     <input
-                      id="datetimepicker"
                       type="text"
-                      name="date"
-                      className="form-control date"
-                      placeholder="Appointment Date"
+                      name="symptoms"
+                      className="form-control"
+                      placeholder="Enter Your Symptoms*"
                       required
                     />
                   </div>
-                  {/* Contact Form Input */}
-                  <div id="input-name" className="col-lg-12">
-                    <input
-                      type="text"
-                      name="name"
-                      className="form-control name"
-                      placeholder="Enter Your Name*"
-                      required
-                    />
-                  </div>
-                  <div id="input-email" className="col-lg-12">
-                    <input
-                      type="text"
-                      name="email"
-                      className="form-control email"
-                      placeholder="Enter Your Email*"
-                      required
-                    />
-                  </div>
-                  <div id="input-phone" className="col-lg-12">
+
+                  {/* Mobile Number Input */}
+                  <div className="col-lg-12">
                     <input
                       type="tel"
                       name="phone"
-                      className="form-control phone"
-                      placeholder="Enter Your Phone Number*"
+                      className="form-control"
+                      placeholder="Enter Your Mobile Number*"
                       required
                     />
                   </div>
-                  <div id="input-message" className="col-lg-12 input-message">
-                    <textarea
-                      className="form-control message"
-                      name="message"
-                      rows={6}
-                      placeholder="Your Message ..."
-                      defaultValue=""
-                    />
-                  </div>
-                  {/* Contact Form Button */}
-                  <div className="col-lg-12 form-btn">
-                    <button
-                      type="submit"
-                      className="btn btn-blue blue-hover submit"
+
+                  {/* consultation type */}
+                  <div
+                    className="col-lg-12"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        marginRight: "20px", // The last label will be corrected with a conditional style
+                      }}
                     >
-                      Request an Appointment
-                    </button>
+                      <input
+                        type="radio"
+                        name="consultationType"
+                        value="audio"
+                        onChange={handleConsultationChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      <strong>Audio</strong>
+                    </label>
+                    <label
+                      style={{
+                        marginRight: "20px",
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="consultationType"
+                        value="video"
+                        onChange={handleConsultationChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Video
+                    </label>
+                    <label
+                      style={{
+                        marginRight: "20px",
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="consultationType"
+                        value="chat"
+                        onChange={handleConsultationChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Chat
+                    </label>
+                    <label
+                      style={{
+                        marginRight: "0", // Last child with no right margin
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="consultationType"
+                        value="homeVisit"
+                        onChange={handleConsultationChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Home Visit
+                    </label>
                   </div>
-                  {/* Contact Form Message */}
-                  <div className="col-lg-12 appointment-form-msg text-center">
-                    <div className="sending-msg">
-                      <span className="loading" />
+
+                  {/* Doctor Choice */}
+                  <div
+                    className="col-lg-12"
+                    style={{ textAlign: "center", marginBottom: "20px" }}
+                  >
+                    <label style={{ marginRight: "20px" }}>
+                      <input
+                        type="radio"
+                        name="doctorChoice"
+                        value="any"
+                        checked={doctorChoice === "any"}
+                        onChange={handleDoctorChoiceChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Any Doctor
+                    </label>
+                    <label style={{ marginLeft: "20px" }}>
+                      <input
+                        type="radio"
+                        name="doctorChoice"
+                        value="choose"
+                        checked={doctorChoice === "choose"}
+                        onChange={handleDoctorChoiceChange}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Choose a Doctor
+                    </label>
+                  </div>
+
+                  {/* Conditional Doctor Selection Dropdown */}
+                  {doctorChoice === "choose" && (
+                    <div className="col-lg-12">
+                      <select
+                        name="doctor"
+                        className="custom-select"
+                        value={selectedDoctor}
+                        onChange={handleDoctorSelection}
+                        required={doctorChoice === "choose"}
+                      >
+                        <option value="">Select Doctor</option>
+                        {doctors.map((doctor) => (
+                          <option key={doctor.id} value={doctor.name}>
+                            {doctor.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
+                  )}
+
+                  {/* Time Selection */}
+                  <div
+                    className="col-lg-12"
+                    style={{ textAlign: "center", marginBottom: "20px" }}
+                  >
+                    <label style={{ marginRight: "30px" }} className="ml-2">
+                      <input
+                        type="radio"
+                        name="appointmentTime"
+                        value="rightNow"
+                        checked={appointmentTime === "rightNow"}
+                        onChange={handleTimeSelection}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Right Now
+                    </label>
+                    <label style={{ marginRight: "30px" }} className="ml-3">
+                      <input
+                        type="radio"
+                        name="appointmentTime"
+                        value="chooseTime"
+                        checked={appointmentTime === "chooseTime"}
+                        onChange={handleTimeSelection}
+                        style={{ marginRight: "10px" }}
+                      />
+                      Choose Time
+                    </label>
+                  </div>
+
+                  {/* Conditional Time Picker or Slots Display */}
+                  {appointmentTime === "chooseTime" &&
+                  doctorChoice === "choose" &&
+                  selectedDoctor ? (
+                    <div className="col-lg-12">
+                      {availableSlots.length > 0 ? (
+                        availableSlots.map((slot, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSlotSelection(slot)}
+                          >
+                            {slot}
+                          </button>
+                        ))
+                      ) : (
+                        <p>No available slots for selected doctor.</p>
+                      )}
+                    </div>
+                  ) : appointmentTime === "chooseTime" &&
+                    doctorChoice === "any" ? (
+                    <div className="col-lg-12">
+                      <input
+                        type="date"
+                        name="datePicker"
+                        className="form-control"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                      />
+                    </div>
+                  ) : null}
+
+                  {/* Submit Button */}
+                  <div className="col-lg-12">
+                    <button type="submit" className="btn btn-blue blue-hover">
+                      Consult
+                    </button>
                   </div>
                 </form>
               </div>
+
               {/* END APPOINTMENT FORM */}
               {/* Text */}
               <p className="p-sm grey-color mb-30">

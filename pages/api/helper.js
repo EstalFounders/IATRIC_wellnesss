@@ -23,3 +23,22 @@ export async function sendWhatsAppMessage(number, pdfUrl)  {
  }
 }
 // }
+
+export default function generateSlots() {
+   const slots = [];
+   const startTime = new Date(); // Temporary start date
+   startTime.setHours(9, 0, 0, 0); // Start at 9 AM
+ 
+   for (let i = 0; i < 24; i++) { // 12 hours * 2 slots per hour
+     const endTime = new Date(startTime.getTime() + 30 * 60000); // 30 minutes later
+     slots.push({
+       startTime: new Date(startTime),
+       endTime: new Date(endTime),
+       isBooked: false
+     });
+     startTime.setMinutes(startTime.getMinutes() + 30); // Move to next slot
+   }
+ 
+   return slots;
+ }
+ 

@@ -92,7 +92,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     return {
       medicine: item.medicineName,
       generic: item.medicineGeneric,
-      dosage: `${item.numberOfUnits} ${item.unit}: ${item.frequencyValue} times ${item.frequency}: ${item.medicationSchedule}`, // Concatenate multiple fields for dosage
+      dosage: `${item.dosage} ${item.unit}: ${item.noOfTimes} times ${item.frequency}: ${item.medicationSchedule}`, // Concatenate multiple fields for dosage
       duration: item.days,
     };
   });

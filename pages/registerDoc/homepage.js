@@ -37,6 +37,7 @@ const Homepage = () => {
   });
 
   const handleMedicineFormChange = (formValues, index) => {
+    console.log(formValues, 'form value in homepage')
     const updatedMedicineForms = [...medicineForms];
     updatedMedicineForms[index] = formValues;
     setMedicineForms(updatedMedicineForms);
