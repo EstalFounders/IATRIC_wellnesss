@@ -1,20 +1,24 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
+import { api } from "../../constant";
 
 const DoctorsSection = () => {
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    // Fetch data from API when component mounts
     const fetchData = async () => {
-      try {
-        const response = await fetch("/api/addDoctor");
-        const data = await response.json();
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+        try {
+          const response = await fetch(api.addDoctor);
+          if (!response.ok) {
+            throw new Error("Failed to fetch");
+          }
+          const data = await response.json();
+          sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          setDoctors(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
     };
 
     fetchData(); // Call the fetchData function

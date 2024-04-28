@@ -8,14 +8,23 @@ const AllDoctorsDoctors3 = () => {
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    // Fetch data from API when component mounts
     const fetchData = async () => {
-      try {
-        const response = await fetch(api.addDoctor);
-        const data = await response.json();
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      // Check if data is stored in session storage
+      const storedDoctors = sessionStorage.getItem("doctors");
+      if (storedDoctors) {
+        setDoctors(JSON.parse(storedDoctors)); // Parse and set to state
+      } else {
+        try {
+          const response = await fetch(api.addDoctor);
+          if (!response.ok) {
+            throw new Error("Failed to fetch");
+          }
+          const data = await response.json();
+          sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          setDoctors(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     };
 

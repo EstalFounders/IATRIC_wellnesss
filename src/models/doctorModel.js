@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-const slotSchema = new Schema({
-  startTime: Date,
-  endTime: Date,
-  isBooked: { type: Boolean, default: false }
-});
 
 const doctorSchema = new Schema({
   name: {
@@ -83,7 +78,7 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Doctor signature is required"],
   },
-  slots: [slotSchema],
+  slots: [{ type: Schema.Types.ObjectId, ref: 'Slot' }],
   joiningDate: {
     type: Date,
     default: Date.now,

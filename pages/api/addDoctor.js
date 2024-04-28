@@ -18,7 +18,8 @@ import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
-import generateSlots from "./helper";
+import { generateSlotsForMonth } from "./helper";
+import Slot from '../../src/models/slots'
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -144,17 +145,23 @@ export default async function handler(req, res) {
               value.toString(),
             ])
           );
+
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
             password: hashedPassword,
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
-            doctorStampUrl,
+            doctorStampUrl, 
             doctorSignatureUrl,
-            slots: generateSlots(),
           });
 
-          console.log("Doctor Added");
+          console.log(addedDoctor._id, "Doctor Added");
+
+          await generateSlotsForMonth(
+            addedDoctor._id,
+            new Date().getFullYear(),
+            new Date().getMonth()
+          );
 
           res.status(200).json({
             success: true,
@@ -324,6 +331,10 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: "Doctor not found" });
       }
 
+      // Delete all slots associated with this doctor
+      const slotsDeletionResult = await Slot.deleteMany({ doctorId: id });
+      console.log(`Deleted ${slotsDeletionResult.deletedCount} slots.`);
+
       // Delete the doctor's entry from the database
       const result = await Doctor.deleteOne({ _id: id });
 
@@ -331,27 +342,36 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: "Doctor not found" });
       }
 
+      // Code to delete profile picture from Google Storage, if any
       if (doctor.profilePictureUrl) {
         const oldProfilePictureRef = ref(storage, doctor.profilePictureUrl);
         await deleteObject(oldProfilePictureRef);
       }
       console.log("deleted old profile picture");
 
-      // Iterate over the URLs of the images associated with the doctor and delete each image from Google Storage
+      // Iterate over the URLs of the diplomas and certificates and delete each image from Google Storage
       doctor.diplomasCertificatesUrls.forEach(async (url) => {
-        if (!diplomasCertificatesUrls.includes(url)) {
-          const oldCertificateRef = ref(storage, url);
-          await deleteObject(oldCertificateRef);
-        }
+        const oldCertificateRef = ref(storage, url);
+        console.log(doctor.diplomasCertificatesUrls, 'doctor diplomaster url')
+        console.log(doctor.diplomasCertificatesUrls, 'doctor diplomaster url')
+        console.log(oldCertificateRef, 'oldcertificate', url, 'url')
+        await deleteObject(oldCertificateRef);
       });
 
-      console.log("deleted old diploamas");
+      console.log("deleted diplomasCertificatesUrls diploamas");
 
-      if (doctor.doctorStamp) {
-        const oldProfilePictureRef = ref(storage, doctor.doctorStamp);
+      // Delete other associated files like doctor stamp and signature
+      if (doctor.doctorStampUrl) {
+        const oldProfilePictureRef = ref(storage, doctor.doctorStampUrl);
         await deleteObject(oldProfilePictureRef);
       }
-      console.log("deleted old doctor stamp");
+
+      if (doctor.doctorSignatureUrl) {
+        const oldProfilePictureRef = ref(storage, doctor.doctorSignatureUrl);
+        await deleteObject(oldProfilePictureRef);
+      }
+
+      console.log("deleted old doctor signature");
 
       return res.status(200).json({ message: "Doctor deleted successfully" });
     } catch (error) {

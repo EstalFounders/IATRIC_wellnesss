@@ -1,5 +1,6 @@
 // pages/api/sendWhatsAppMessage.js
 import client from '../../src/lib/twilioClient';
+import Slot from '../../src/models/slots'
 
 // export default async function handler(req, res) {
 //  const { number, pdfUrl } = req.body;
@@ -24,21 +25,31 @@ export async function sendWhatsAppMessage(number, pdfUrl)  {
 }
 // }
 
-export default function generateSlots() {
-   const slots = [];
-   const startTime = new Date(); // Temporary start date
-   startTime.setHours(9, 0, 0, 0); // Start at 9 AM
- 
-   for (let i = 0; i < 24; i++) { // 12 hours * 2 slots per hour
-     const endTime = new Date(startTime.getTime() + 30 * 60000); // 30 minutes later
-     slots.push({
-       startTime: new Date(startTime),
-       endTime: new Date(endTime),
-       isBooked: false
-     });
-     startTime.setMinutes(startTime.getMinutes() + 30); // Move to next slot
-   }
- 
-   return slots;
+export async function generateSlotsForMonth(doctorId, year, month) {
+const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let slots = [];
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    for (let hour = 9; hour < 17; hour++) {
+      slots.push({
+        doctorId: doctorId,
+        startTime: new Date(year, month, day, hour, 0, 0),
+        endTime: new Date(year, month, day, hour, 30, 0),
+        date: new Date(year, month, day),
+        isBooked: false
+      });
+      slots.push({
+        doctorId: doctorId,
+        startTime: new Date(year, month, day, hour, 30, 0),
+        endTime: new Date(year, month, day, hour + 1, 0, 0),
+        date: new Date(year, month, day),
+        isBooked: false
+      });
+    }
+  }
+
+  // Save all slots and return their IDs
+  const createdSlots = await Slot.insertMany(slots);
+  return createdSlots.map(slot => slot._id);
  }
  

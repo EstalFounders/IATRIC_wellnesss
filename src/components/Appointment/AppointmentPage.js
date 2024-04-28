@@ -1,5 +1,7 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AppointmentPage = () => {
   const [doctorChoice, setDoctorChoice] = useState("any");
@@ -7,48 +9,119 @@ const AppointmentPage = () => {
   const [appointmentTime, setAppointmentTime] = useState("rightNow");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [consultationType, setConsultationType] = useState("");
+  const [doctors, setDoctors] = useState([]); // Initially all doctors are shown
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
-  const doctors = [
-    { id: "dr1", name: "Dr. Jonathan Barnes" },
-    { id: "dr2", name: "Dr. Hannah Harper" },
-    { id: "dr3", name: "Dr. Matthew Anderson" },
-  ];
+  const fetchSlots = async () => {
+    // const formattedDate = selectedDate.toISOString().split("T")[0]; // Format the date as YYYY-MM-DD
+    const formattedDate = selectedDate.toISOString();
+    const doctorId = selectedDoctor;
+    const response = await fetch(
+      `/api/slots/fetchSlot/?doctor=${doctorId}&date=${formattedDate}`
+    );
+    const data = await response.json();
+    if (data.success) {
+      setAvailableSlots(data.data);
+    } else {
+      console.error("Failed to fetch slots:", data.message);
+      setAvailableSlots([]);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedDoctor && selectedDate) {
+      fetchSlots();
+    }
+  }, [selectedDoctor, selectedDate]); // Add fetchSlots to the dependency array if it doesn't change or is wrapped in useCallback
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Check if data is stored in session storage
+      const storedDoctors = sessionStorage.getItem("doctors");
+      if (storedDoctors) {
+        setDoctors(JSON.parse(storedDoctors)); // Parse and set to state
+      } else {
+        try {
+          const response = await fetch(api.addDoctor);
+          if (!response.ok) {
+            throw new Error("Failed to fetch");
+          }
+          const data = await response.json();
+          sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          setDoctors(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData(); // Call the fetchData function
+  }, []); // Empty dependency array ensures the effect runs only once
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
     setDoctorChoice(choice);
     setSelectedDoctor("");
-    setAvailableSlots([]);
+    if (choice === "any") {
+      setSelectedDoctor("");
+    }
     setShowDatePicker(appointmentTime === "chooseTime" && choice === "any"); // Update to show/hide date picker based on choice
   };
 
   const handleDoctorSelection = (event) => {
     setSelectedDoctor(event.target.value);
-    fetchAvailableSlots(event.target.value);
   };
 
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;
     setAppointmentTime(timeChoice);
+    if (timeChoice === "rightNow") {
+      setSelectedDate("");
+    }
     setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
   };
 
-  const fetchAvailableSlots = (doctorId) => {
-    // Fetch logic to get slots
-    // This is a dummy implementation
-    setAvailableSlots(["9:00 AM", "10:00 AM", "11:00 AM"]); // Example slots
-  };
+  // const fetchAvailableSlots = (doctorId) => {
+  //   // Fetch logic to get slots
+  //   // This is a dummy implementation
+  //   setAvailableSlots(["9:00 AM", "10:00 AM", "11:00 AM"]); // Example slots
+  // };
 
   const handleSlotSelection = (slot) => {
     console.log("Slot selected:", slot);
+    setSelectedSlot(slot);
     // Handle slot booking logic here
   };
 
   // Handler to update the consultation type based on the selected radio button
   const handleConsultationChange = (event) => {
-    setConsultationType(event.target.value);
+    const selectedType = event.target.value;
+    setConsultationType(selectedType);
+
+    // Filter doctors based on the selected consultation type
+    if (
+      selectedType === "Online consultations" ||
+      selectedType === "Home visit"
+    ) {
+      const filtered = doctors.filter((doctor) =>
+        doctor.consultationType.includes(selectedType)
+      );
+      setFilteredDoctors(filtered);
+    } else {
+      setFilteredDoctors(doctors);
+    }
+  };
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   return (
@@ -118,7 +191,7 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="consultationType"
-                        value="audio"
+                        value="Online consultations"
                         onChange={handleConsultationChange}
                         style={{ marginRight: "10px" }}
                       />
@@ -132,7 +205,7 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="consultationType"
-                        value="video"
+                        value="Online consultations"
                         onChange={handleConsultationChange}
                         style={{ marginRight: "10px" }}
                       />
@@ -146,7 +219,7 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="consultationType"
-                        value="chat"
+                        value="Online consultations"
                         onChange={handleConsultationChange}
                         style={{ marginRight: "10px" }}
                       />
@@ -160,7 +233,7 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="consultationType"
-                        value="homeVisit"
+                        value="Home visit"
                         onChange={handleConsultationChange}
                         style={{ marginRight: "10px" }}
                       />
@@ -207,9 +280,9 @@ const AppointmentPage = () => {
                         onChange={handleDoctorSelection}
                         required={doctorChoice === "choose"}
                       >
-                        <option value="">Select Doctor</option>
-                        {doctors.map((doctor) => (
-                          <option key={doctor.id} value={doctor.name}>
+                        <option value=""> -- select Doctor -- </option>
+                        {filteredDoctors.map((doctor) => (
+                          <option key={doctor._id} value={doctor._id}>
                             {doctor.name}
                           </option>
                         ))}
@@ -250,29 +323,68 @@ const AppointmentPage = () => {
                   {appointmentTime === "chooseTime" &&
                   doctorChoice === "choose" &&
                   selectedDoctor ? (
-                    <div className="col-lg-12">
-                      {availableSlots.length > 0 ? (
-                        availableSlots.map((slot, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSlotSelection(slot)}
-                          >
-                            {slot}
-                          </button>
-                        ))
-                      ) : (
-                        <p>No available slots for selected doctor.</p>
-                      )}
+                    <div>
+                      <h3>Select a Date to View Available Slots</h3>
+                      <DatePicker
+                        selected={selectedDate}
+                        onChange={(date) => setSelectedDate(date)}
+                        inline
+                        highlightDates={availableSlots.map((slot) => ({
+                          "react-datepicker__day--highlighted": new Date(
+                            slot.startTime
+                          ),
+                        }))}
+                      />
+                      <ul>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "space-around",
+                          }}
+                        >
+                          {availableSlots
+                            .filter((slot) => !slot.isBooked)
+                            .map((slot) => (
+                              <li
+                                key={slot._id}
+                                style={{
+                                  color: "black",
+                                  backgroundColor:
+                                    selectedSlot?._id === slot._id
+                                      ? "#9f9856"
+                                      : "white",
+                                  border: "1px solid black",
+                                  padding: "5px", // Reduced padding
+                                  margin: "5px",
+                                  borderRadius: "5px", // Reduced border-radius for a less rounded look
+                                  width: "30%", // Adjust width to make boxes smaller
+                                  maxWidth: "160px", // Maximum width to ensure they don't grow too large
+                                  textAlign: "center",
+                                  cursor: "pointer",
+                                  transition: "background-color 0.3s",
+                                  fontSize: "0.9rem", // Smaller font size for better readability in small boxes
+                                  lineHeight: "1.4", // Adjust line height for better text spacing
+                                }}
+                                onClick={() => handleSlotSelection(slot)}
+                              >
+                                {formatTime(slot.startTime)} -{" "}
+                                {formatTime(slot.endTime)}
+                              </li>
+                            ))}
+                        </div>
+                      </ul>
                     </div>
                   ) : appointmentTime === "chooseTime" &&
                     doctorChoice === "any" ? (
                     <div className="col-lg-12">
                       <input
-                        type="date"
-                        name="datePicker"
+                        type="datetime-local"
+                        name="dateTimePicker"
                         className="form-control"
-                        value={selectedDate}
+                        value={selectedDate} // Make sure this is in the right format: 'YYYY-MM-DDTHH:mm'
                         onChange={(e) => setSelectedDate(e.target.value)}
+                        required
                       />
                     </div>
                   ) : null}
