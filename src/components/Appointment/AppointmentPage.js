@@ -39,7 +39,7 @@ const AppointmentPage = () => {
   }, [selectedDoctor, selectedDate]); // Add fetchSlots to the dependency array if it doesn't change or is wrapped in useCallback
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDoctors = async () => {
       // Check if data is stored in session storage
       const storedDoctors = sessionStorage.getItem("doctors");
       if (storedDoctors) {
@@ -59,7 +59,7 @@ const AppointmentPage = () => {
       }
     };
 
-    fetchData(); // Call the fetchData function
+    fetchDoctors(); // Call the fetchData function
   }, []); // Empty dependency array ensures the effect runs only once
 
   const handleDoctorChoiceChange = (event) => {
@@ -281,7 +281,12 @@ const AppointmentPage = () => {
                         onChange={handleDoctorSelection}
                         required={doctorChoice === "choose"}
                       >
-                        <option value=""> -- select Doctor -- </option>
+                        <option value="">
+                          {" "}
+                          {consultationType
+                            ? "-- Please select doctor -- "
+                            : " -- Please select consultation type -- "}{" "}
+                        </option>
                         {filteredDoctors.map((doctor) => (
                           <option key={doctor._id} value={doctor._id}>
                             {doctor.name}

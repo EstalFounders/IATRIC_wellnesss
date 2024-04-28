@@ -4,34 +4,22 @@ import { dbConnect } from "../../../src/lib/db";
 
 export default async function handler(req, res) {
   await dbConnect();
-  if (req.method == "GET") {
+  if (req.method === "GET") {
     const { doctor, date } = req.query;
     try {
-      const currentTime = new Date(); // Current date and time
-      const selectedDate = new Date(date);
+      const utcDate = new Date(date); // Assuming 'date' is in ISO format (e.g., 2021-01-01T00:00:00Z)
+      utcDate.setUTCHours(0, 0, 0, 0); // Start of the day in UTC
 
-      // Check if the given date is today, if not, start from the beginning of the given date
-      const startDateTime =
-        selectedDate.setHours(0, 0, 0, 0) === currentTime.setHours(0, 0, 0, 0)
-          ? currentTime
-          : new Date(date);
+      const endOfDay = new Date(utcDate);
+      endOfDay.setUTCHours(23, 59, 59, 999); // End of the day in UTC
 
-      // Resetting currentTime hours to ensure accurate comparison
-      currentTime.setHours(0, 0, 0, 0);
-
-      // Define end of the day for the selected date
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      console.log(doctor, "doctordi in server");
       const slots = await Slot.find({
         doctorId: doctor,
-        // startTime: {
-        //     $gte: startDateTime,
-        //     $lt: endOfDay
-        // }
-        date: JSON.stringify(startDateTime.setHours(0,0,0,0))
-    }).sort("startTime");
+        startTime: {
+          $gte: utcDate,
+          $lte: endOfDay,
+        },
+      }).sort("startTime");
 
       res.status(200).json({ success: true, data: slots });
     } catch (error) {
@@ -42,6 +30,6 @@ export default async function handler(req, res) {
     }
   } else {
     res.setHeader("Allow", ["GET"]);
-    res.status(405).end(`Method ${method} Not Allowed`);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
