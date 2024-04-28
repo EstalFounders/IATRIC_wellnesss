@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         //     $gte: startDateTime,
         //     $lt: endOfDay
         // }
-        date: startDateTime.setHours(0,0,0,0)
+        date: JSON.stringify(startDateTime.setHours(0,0,0,0))
     }).sort("startTime");
 
       res.status(200).json({ success: true, data: slots });
