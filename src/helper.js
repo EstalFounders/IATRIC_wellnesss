@@ -12,6 +12,7 @@ export const loginUser = async ({ email, password }) => {
   return res;
 };
 
+
 export async function loginDoctor({ email, password }) {
   const credentials = {
     email: email,
@@ -44,5 +45,7 @@ export const openSupportWhatsAppWeb = () => {
 };
 
   
+
+
 
 

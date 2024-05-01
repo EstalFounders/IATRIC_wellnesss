@@ -2,23 +2,27 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { api } from "../../constant";
+import { api, consultationTypeConstant, consultationTypeMapping } from "../../constant";
 
 const AppointmentPage = () => {
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("rightNow");
+  const [appointmentTime, setAppointmentTime] = useState("Now");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [consultationType, setConsultationType] = useState("");
   const [doctors, setDoctors] = useState([]); // Initially all doctors are shown
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [symptoms, setSymptoms] = useState("");
+  const [recommendedServices, setRecommendedServices] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [consultationType, setConsultationType] = useState("Call");
 
   const fetchSlots = async () => {
-    // const formattedDate = selectedDate.toISOString().split("T")[0]; // Format the date as YYYY-MM-DD
-    const formattedDate = selectedDate.toISOString();
+    const formattedDate = selectedDate
+      ? selectedDate.toISOString()
+      : new Date().toISOString;
     const doctorId = selectedDoctor;
     const response = await fetch(
       `/api/slots/fetchSlot/?doctor=${doctorId}&date=${formattedDate}`
@@ -31,6 +35,14 @@ const AppointmentPage = () => {
       setAvailableSlots([]);
     }
   };
+
+  useEffect(() => {
+    // Retrieve the label from session storage
+    const savedLabel = sessionStorage.getItem("selectedLabel");
+    if (savedLabel) {
+      setConsultationType(savedLabel);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedDoctor && selectedDate) {
@@ -85,34 +97,69 @@ const AppointmentPage = () => {
     setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
   };
 
-  // const fetchAvailableSlots = (doctorId) => {
-  //   // Fetch logic to get slots
-  //   // This is a dummy implementation
-  //   setAvailableSlots(["9:00 AM", "10:00 AM", "11:00 AM"]); // Example slots
-  // };
-
   const handleSlotSelection = (slot) => {
     console.log("Slot selected:", slot);
     setSelectedSlot(slot);
     // Handle slot booking logic here
   };
 
-  // Handler to update the consultation type based on the selected radio button
   const handleConsultationChange = (event) => {
+    console.log(event.target.value, "event");
     const selectedType = event.target.value;
     setConsultationType(selectedType);
+    filterDoctors(selectedType);
+  };
 
-    // Filter doctors based on the selected consultation type
-    if (
-      selectedType === "Online consultations" ||
-      selectedType === "Home visit"
-    ) {
-      const filtered = doctors.filter((doctor) =>
-        doctor.consultationType.includes(selectedType)
-      );
-      setFilteredDoctors(filtered);
-    } else {
-      setFilteredDoctors(doctors);
+  const filterDoctors = (selectedOption) => {
+    const type = consultationTypeMapping[selectedOption]; // Get the corresponding consultation type from the map
+
+    console.log(selectedDate, type, 'type and selected option', doctors)
+
+    const filtered = doctors.filter((doctor) => {
+      // If the type is "Online consultations" or "Offline consultations", check if the doctor's type includes it
+      if (type === "Online consultations" || type === "Offline consultations") {
+        return doctor.consultationType.includes(type);
+      }
+      // Special handling for "Home visit" to match exactly
+      return doctor.consultationType === "Home visit";
+    });
+
+    setFilteredDoctors(filtered);
+  };
+
+  useEffect(() => {
+    if(doctors) {
+      filterDoctors(consultationType);
+    }
+  }, [doctors]);
+
+  const bookConsultation = async () => {
+    try {
+      // Use the current date and time to fetch slots
+      const data = await fetchSlots();
+
+      if (!data.success) {
+        console.error("Failed to fetch slots:", data.message);
+        return; // Exit if fetch fails
+      }
+
+      // Get current time and filter for any slot that matches 'right now' and is available
+      const now = new Date();
+      const currentSlot = data.data.find((slot) => {
+        const startTime = new Date(slot.startTime);
+        const endTime = new Date(slot.endTime);
+        return !slot.isBooked && now >= startTime && now < endTime;
+      });
+
+      if (currentSlot) {
+        console.log("Doctor is available now, proceeding to book the slot...");
+        // Proceed with booking logic here
+        // E.g., update the slot as booked in the database
+      } else {
+        console.log("No available slots right now for the selected doctor.");
+      }
+    } catch (error) {
+      console.error("Error during booking consultation:", error);
     }
   };
 
@@ -155,11 +202,37 @@ const AppointmentPage = () => {
                 >
                   {/* Symptoms Input */}
                   <div className="col-lg-12">
-                    <input
-                      type="text"
+                    <textarea
                       name="symptoms"
                       className="form-control"
-                      placeholder="Enter Your Symptoms*"
+                      placeholder="Describe your symptoms..."
+                      required
+                      rows="4"
+                      cols="50"
+                      style={{ resize: "vertical" }}
+                      value={symptoms}
+                      onChange={(e) => setSymptoms(e.target.value)} // To update the state as the user types
+                    />
+                  </div>
+
+                  {/* patient name Input */}
+                  <div className="col-lg-12">
+                    <input
+                      type="tel"
+                      name="name"
+                      className="form-control"
+                      placeholder="Name*"
+                      required
+                    />
+                  </div>
+
+                  {/* email Input */}
+                  <div className="col-lg-12">
+                    <input
+                      type="tel"
+                      name="email"
+                      className="form-control"
+                      placeholder="Email*"
                       required
                     />
                   </div>
@@ -168,9 +241,9 @@ const AppointmentPage = () => {
                   <div className="col-lg-12">
                     <input
                       type="tel"
-                      name="phone"
+                      name="mobNo"
                       className="form-control"
-                      placeholder="Enter Your Mobile Number*"
+                      placeholder="Mobile Number*"
                       required
                     />
                   </div>
@@ -184,62 +257,24 @@ const AppointmentPage = () => {
                       marginBottom: "20px",
                     }}
                   >
-                    <label
-                      style={{
-                        marginRight: "20px", // The last label will be corrected with a conditional style
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="consultationType"
-                        value="Online consultations"
-                        onChange={handleConsultationChange}
-                        style={{ marginRight: "10px" }}
-                      />
-                      <strong>Audio</strong>
-                    </label>
-                    <label
-                      style={{
-                        marginRight: "20px",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="consultationType"
-                        value="Online consultations"
-                        onChange={handleConsultationChange}
-                        style={{ marginRight: "10px" }}
-                      />
-                      Video
-                    </label>
-                    <label
-                      style={{
-                        marginRight: "20px",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="consultationType"
-                        value="Online consultations"
-                        onChange={handleConsultationChange}
-                        style={{ marginRight: "10px" }}
-                      />
-                      Chat
-                    </label>
-                    <label
-                      style={{
-                        marginRight: "0", // Last child with no right margin
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="consultationType"
-                        value="Home visit"
-                        onChange={handleConsultationChange}
-                        style={{ marginRight: "10px" }}
-                      />
-                      Home Visit
-                    </label>
+                    {[consultationTypeConstant.call, consultationTypeConstant.video, consultationTypeConstant.clinic, consultationTypeConstant.home_visit].map(
+                      (option, index) => (
+                        <label
+                          key={index}
+                          style={{ marginRight: index === 3 ? "0" : "20px" }}
+                        >
+                          <input
+                            type="radio"
+                            name="consultationType"
+                            value={option}
+                            checked={consultationType === option}
+                            onChange={(e) => handleConsultationChange(e)}
+                            style={{ marginRight: "10px" }}
+                          />
+                          <strong>{option}</strong>
+                        </label>
+                      )
+                    )}
                   </div>
 
                   {/* Doctor Choice */}
@@ -258,17 +293,19 @@ const AppointmentPage = () => {
                       />
                       Any Doctor
                     </label>
-                    <label style={{ marginLeft: "20px" }}>
-                      <input
-                        type="radio"
-                        name="doctorChoice"
-                        value="choose"
-                        checked={doctorChoice === "choose"}
-                        onChange={handleDoctorChoiceChange}
-                        style={{ marginRight: "10px" }}
-                      />
-                      Choose a Doctor
-                    </label>
+                    {consultationType != "Home Visit" && (
+                      <label style={{ marginLeft: "20px" }}>
+                        <input
+                          type="radio"
+                          name="doctorChoice"
+                          value="choose"
+                          checked={doctorChoice === "choose"}
+                          onChange={handleDoctorChoiceChange}
+                          style={{ marginRight: "10px" }}
+                        />
+                        Choose a Doctor
+                      </label>
+                    )}
                   </div>
 
                   {/* Conditional Doctor Selection Dropdown */}
@@ -305,12 +342,12 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="appointmentTime"
-                        value="rightNow"
-                        checked={appointmentTime === "rightNow"}
+                        value="Now"
+                        checked={appointmentTime === "Now"}
                         onChange={handleTimeSelection}
                         style={{ marginRight: "10px" }}
                       />
-                      Right Now
+                      Now
                     </label>
                     <label style={{ marginRight: "30px" }} className="ml-3">
                       <input
@@ -397,7 +434,11 @@ const AppointmentPage = () => {
 
                   {/* Submit Button */}
                   <div className="col-lg-12">
-                    <button type="submit" className="btn btn-blue blue-hover">
+                    <button
+                      type="submit"
+                      className="btn btn-blue blue-hover"
+                      onClick={bookConsultation}
+                    >
                       Consult
                     </button>
                   </div>

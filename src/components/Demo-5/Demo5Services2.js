@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { GiErlenmeyer, GiKneeCap } from "react-icons/gi";
 import { BiInjection } from "react-icons/bi";
+import { services } from "../../constant";
 
 const Demo5Services2 = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,27 +24,7 @@ const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Dummy data for services
-  const services = [
-    "General Physician",
-    "Pediatrics",
-    "Cardiology",
-    "Dermatologist",
-    "Orthopaedics",
-    "Gynaecology",
-    "Ophthalmology",
-    "Pulmonology",
-    "Psychiatrist",
-    "Dentistry",
-    "Physiotherapy",
-    "Nursing care",
-    "Home care",
-    "Medicine Delivery",
-    "Lab Investigation",
-    "Corporate Healthcare",
-    "Healthcamp",
-    "Obstetrics",
-    // Add more services as needed
-  ];
+  
 
   // Calculate the index of the first service to be displayed on the current page
   const indexOfFirstService = (currentPage - 1) * servicesPerPage;

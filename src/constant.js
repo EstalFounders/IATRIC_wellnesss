@@ -12,5 +12,42 @@ export const api = {
     doctorLogin: "/api/doctorLogin",
     medicineInfoApiCall: "/api/medicineInfo?medicineName=",
     prescriptionCall: "/api/prescription",
-    sendWhatsAppCall: "/api/whatsApp"
+    sendWhatsAppCall: "/api/whatsApp",
+    recommendedServies: "/api/lib/recommendedServices"
 }
+
+export const services = [
+    "General Physician",
+    "Pediatrics",
+    "Cardiology",
+    "Dermatologist",
+    "Orthopaedics",
+    "Gynaecology",
+    "Ophthalmology",
+    "Pulmonology",
+    "Psychiatrist",
+    "Dentistry",
+    "Physiotherapy",
+    "Nursing care",
+    "Home care",
+    "Medicine Delivery",
+    "Lab Investigation",
+    "Corporate Healthcare",
+    "Healthcamp",
+    "Obstetrics",
+]
+
+export const consultationTypeMapping = {
+    "Call": "Online consultations",
+    "Video": "Online consultations",
+    "Clinic": "Offline consultations",
+    "Home Visit": "Home visit"
+  };
+
+export const consultationTypeConstant =  {
+    call: "Call",
+    video: "Video",
+    clinic: "Clinic",
+    home_visit:"Home Visit"
+}
+

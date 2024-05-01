@@ -8,8 +8,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import { useTheme } from "@mui/material/styles";
 import styled from "@emotion/styled";
 import { Col, Row } from "react-bootstrap";
-import { FaWhatsapp, FaWpforms } from "react-icons/fa";
+import { FaHome, FaVideo, FaWhatsapp, FaWpforms } from "react-icons/fa";
 import { FiPhoneCall } from "react-icons/fi";
+import { IoMdCall } from "react-icons/io";
+import { BiSolidClinic } from "react-icons/bi";
 
 const StyledDialog = styled(Dialog)`
   min-width: 300px;
@@ -26,7 +28,10 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
   const numberToIcon = {
     0: FiPhoneCall,
     1: FaWhatsapp,
-    2: FaWpforms,
+    2: IoMdCall,
+    3: FaVideo,
+    4: BiSolidClinic,
+    5: FaHome,
     // Add more mappings as needed
   };
 
@@ -38,7 +43,8 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
         </DialogTitle>
         <List>
           {options.map((option, index) => {
-            const IconComponent = numberToIcon[index];
+            console.log(option, "option");
+            const IconComponent = numberToIcon[option.icon]; // Use the icon from the option directly
             return (
               <StyledListItem
                 button
@@ -48,9 +54,9 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
               >
                 <Row>
                   <Col>
-                    <IconComponent />
+                    {IconComponent ? <IconComponent />: ''}
                   </Col>
-                  <Col>{option.label}</Col>
+                  <Col style={{ whiteSpace: "nowrap" }}>{option.label}</Col>
                 </Row>
               </StyledListItem>
             );

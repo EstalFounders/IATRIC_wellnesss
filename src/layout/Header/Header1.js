@@ -3,42 +3,77 @@ import React, { useState } from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
+  FaAudible,
   FaFacebook,
+  FaHome,
   FaInstagram,
   FaLinkedin,
   FaMapMarkedAlt,
   FaPhone,
-  FaWhatsapp,
 } from "react-icons/fa";
-import { contact_no } from "../../constant";
+import {
+  consultationType,
+  consultationTypeConstant,
+  contact_no,
+} from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
-import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
+import { FaWhatsapp } from "react-icons/fa";
 
 const Header1 = ({ toggleMenu, toggle }) => {
   const router = useRouter();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
-  const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+  const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
   };
 
-  
   const handleCloseDialDialog = () => {
     setIsDialDialogOpen(false);
   };
 
-  
-  const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+  const handleConsultationTypeOpenDialog = () => {
+    setIsConsultationTypeOpen(true);
+  };
+
+  const handleConsultationTypeCloseDialog = () => {
+    setIsConsultationTypeOpen(false);
+  };
+
+  const handleNavigate = (label) => {
+    sessionStorage.setItem("selectedLabel", label);
+    router.push("/appointment");
+  };
+
+  const consultationOptions = [
+    {
+      label: consultationTypeConstant.call,
+      action: () => handleNavigate(consultationTypeConstant.call),
+      icon: 2,
+    },
+    {
+      label: consultationTypeConstant.video,
+      action: () => handleNavigate(consultationTypeConstant.video),
+      icon: 3,
+    },
+    {
+      label: consultationTypeConstant.clinic,
+      action: () => handleNavigate(consultationTypeConstant.clinic),
+      icon: 4,
+    },
+    {
+      label: consultationTypeConstant.home_visit,
+      action: () => handleNavigate(consultationTypeConstant.home_visit),
+      icon: 5,
+    },
   ];
 
-  
-  const openAppointment = () => {
-    router.push("/appointment")
-  }
+  const dialOptions = [
+    { label: "Dial", action: dial, icon: 0 },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
+  ];
 
   return (
     <header id="header" className="header">
@@ -498,7 +533,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                   <a
                     onClick={(e) => {
                       e.preventDefault();
-                      openAppointment();
+                      handleConsultationTypeOpenDialog();
                     }}
                   >
                     Make an Appointment
@@ -507,8 +542,15 @@ const Header1 = ({ toggleMenu, toggle }) => {
               </li>
             </ul>
           </nav>
-          
+
           {/* END MAIN MENU */}
+        </div>
+        <div>
+          <PopupDialog
+            isOpen={isConsultationTypeOpen}
+            onClose={handleConsultationTypeCloseDialog}
+            options={consultationOptions}
+          />
         </div>
       </div>
       <MobileMenu />
