@@ -1,30 +1,11 @@
 // pages/api/sendWhatsAppMessage.js
-import client from "../../src/lib/twilioClient";
+import twilioClient from "../../src/lib/twilioClient";
 import Slot from "../../src/models/slots";
 import cron from "node-cron";
+import Doctor from "../../src/models/doctorModel";
+import { consultationTypeMapping } from "../../src/constant";
+import { dbConnect } from "../../src/lib/db";
 
-// export default async function handler(req, res) {
-//  const { number, pdfUrl } = req.body;
-export async function sendWhatsAppMessage(number, pdfUrl) {
-  console.log(number, "number", pdfUrl, "pdfUrl");
-  try {
-    // Call the sendWhatsAppMessage function
-    try {
-      const message = await client.messages.create({
-        body: `${pdfUrl}`,
-        from: "whatsapp:+14155238886",
-        to: `whatsapp:+91${number}`,
-      });
-      console.log("Message sent successfully:", message.sid);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-    // Assuming sendWhatsAppMessage returns a success response
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-// }
 
 export async function generateSlotsForMonth(doctorId, year, month) {
   let slots = [];
@@ -53,5 +34,74 @@ export async function generateSlotsForMonth(doctorId, year, month) {
   await Slot.insertMany(slots);
 }
 
+export async function findAvailableDoctor(selectedDate, genericConsultationType) {
+  await dbConnect()
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
 
+  const endOfDay = new Date(selectedDate);
+  endOfDay.setHours(23, 59, 59, 999);
 
+  // Find doctors who can provide the requested consultation type
+  const doctors = await Doctor.find({
+    consultationType: genericConsultationType,
+  });
+  for (const doctor of doctors) {
+    // Check for available slots for this doctor on the given date
+    const availableSlot = await Slot.findOne({
+      doctorId: doctor._id,
+      date: { $gte: startOfDay, $lte: endOfDay },
+      isBooked: false,
+    });
+    if (availableSlot) {
+      return doctor; // Return the first available doctor's ID with an available slot
+    }
+  }
+
+  return ""; // Return empty if no available doctors are found
+}
+
+export async function checkSlotAvailability(doctorId, startDate, endDate) {
+   try {
+     // Ensure dates are Date objects
+     const start = new Date(startDate);
+     const end = new Date(endDate);
+ 
+     // Find if there is any slot that overlaps with the given time range and is already booked
+     const overlappingSlot = await Slot.findOne({
+       doctorId: doctorId,
+       startTime: { $lt: end },
+       endTime: { $gt: start },
+       isBooked: true
+     });
+ 
+     // If there is an overlapping slot, return false
+     if (overlappingSlot) {
+       console.log(`Slot from ${overlappingSlot.startTime} to ${overlappingSlot.endTime} is already booked.`);
+       return false;
+     }
+ 
+     return true;  // No overlapping slots found, slot is available
+   } catch (error) {
+     console.error("Error checking slot availability:", error);
+     throw error;  // Rethrow the error or handle it as needed
+   }
+ }
+
+ export function createAppointmentMessage(details) {
+   return `👩‍⚕️ *Appointment Confirmation*\n\n` +
+       `Hello ${details.name},\n\n` +
+       `Your upcoming consultation details are as follows:\n` +
+       `- *Doctor ID:* ${details.selectedDoctorId}\n` +
+       `- *Date:* ${details.selectedDate}\n` +
+       `- *Time:* ${details.appointmentTime}\n` +
+       `- *Slot:* ${details.selectedSlot}\n` +
+       `- *Symptoms:* ${details.symptoms}\n` +
+       `- *Consultation Type:* ${details.consultationType}\n` +
+       `- *Email:* ${details.email}\n` +
+       `- *Contact Number:* ${details.patientNo}\n\n` +
+       `Please make sure to be available at the scheduled time. We look forward to assisting you.\n\n` +
+       `Best regards,\n` +
+       `Iatric Healthcare`;
+}
+ 

@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-
-
 module.exports = {
   productionBrowserSourceMaps: true,
   future: {
@@ -11,5 +9,6 @@ module.exports = {
     serverActions: {
       bodySizeLimit: '20mb',
     },
+    websockets: true, // Enable WebSocket support
   },
 };

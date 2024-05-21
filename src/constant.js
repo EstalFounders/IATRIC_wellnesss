@@ -6,6 +6,8 @@ export const prescription_img_path = "images/prescription/";
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
 export const contact_no = "+91 96259 42020";
 export const email= 'iatrichealthcare@gmail.com'
+export const twilioPhoneNumber = '+14155238886'
+export const countryCode = "+91" 
 
 export const api = {
     addDoctor: "/api/addDoctor",
@@ -13,7 +15,8 @@ export const api = {
     medicineInfoApiCall: "/api/medicineInfo?medicineName=",
     prescriptionCall: "/api/prescription",
     sendWhatsAppCall: "/api/whatsApp",
-    recommendedServies: "/api/lib/recommendedServices"
+    recommendedServies: "/api/lib/recommendedServices",
+    bookConsultation: "/api/bookConsultation"
 }
 
 export const services = [

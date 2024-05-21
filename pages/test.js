@@ -26,7 +26,7 @@ const startScheduler = () => {
 
   return (
     <div>
-      <button onClick={runJob}>create Slots</button>
+      <button onClick={runJob}>start slot scheduler</button>
     </div>
   );
 };

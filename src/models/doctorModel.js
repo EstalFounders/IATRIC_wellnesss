@@ -1,46 +1,38 @@
 import mongoose from "mongoose";
-const { Schema } = mongoose;
 
+const { Schema } = mongoose;
 
 const doctorSchema = new Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
-    // trim: true
   },
-
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
-
   expertise: {
     type: String,
     required: [true, "Area of expertise is required"],
-    // trim: true
   },
-
   degree: {
     type: String,
     required: [true, "Degree is required"],
-    // trim: true
   },
   language: {
     type: String,
-    required: [true, "language is required"],
+    required: [true, "Language is required"],
     trim: true,
   },
-
   workDays: {
     type: String,
-    required: [true, "working days is required"],
+    required: [true, "Working days is required"],
   },
   overview: {
     type: String,
     required: true,
   },
-
   workExperience: {
     type: String,
     required: true,
@@ -53,10 +45,9 @@ const doctorSchema = new Schema({
     type: String,
     required: false,
   },
-
   educationTraining: {
     type: String,
-    required: [true, "eduction&training is required"],
+    required: [true, "Education and training are required"],
   },
   password: {
     type: String,
@@ -85,7 +76,7 @@ const doctorSchema = new Schema({
   },
 });
 
-const Doctor =
-  mongoose.models.doctorSchema || mongoose.model("Doctor", doctorSchema);
+// Check if the model already exists to prevent overwriting
+const Doctor = mongoose.models.Doctor || mongoose.model('Doctor', doctorSchema);
 
-module.exports = Doctor;
+export default Doctor;
