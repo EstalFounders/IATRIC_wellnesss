@@ -1,6 +1,6 @@
 // pages/api/ws.js
 
-import { Server } from "socket.io";
+import { Server } from "socket.io-client";
 
 export default function handler(req, res) {
   if (!res.socket.server.io) {
