@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
+import { FaMicrophone, FaVideo, FaVideoSlash } from "react-icons/fa";
+import { PiMicrophoneSlashFill } from "react-icons/pi";
 
 export default function MeetingPage() {
   const [peers, setPeers] = useState([]);
@@ -10,40 +12,52 @@ export default function MeetingPage() {
 
   useEffect(() => {
     const socket = io("/api/ws"); // Connect to the WebSocket server
+    const meetingId = window.location.pathname.split("/").pop();
 
-    // Get user media
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         videoRef.current.srcObject = stream;
 
-        // Listen for new peer connection
-        socket.on("signal", (data) => {
+        socket.emit("joinRoom", meetingId); // Join the room
+
+        socket.on("userJoined", (userId) => {
           const peer = new SimplePeer({
-            initiator: false,
+            initiator: true,
             trickle: false,
             stream,
           });
-          peer.signal(data.signal);
-          peer.on("stream", (remoteStream) => {
-            setPeers((prevPeers) => [...prevPeers, peer]); // Add new peer to peers state
+          peer.on("signal", (signal) => {
+            socket.emit("signal", { signal, meetingId, userId });
           });
+          setPeers((prevPeers) => [...prevPeers, { userId, peer }]);
         });
 
-        // Create peer connection
-        const peer = new SimplePeer({
-          initiator: true,
-          trickle: false,
-          stream,
-        });
-        peer.on("signal", (signal) => {
-          socket.emit("signal", { signal });
+        socket.on("signal", (data) => {
+          const existingPeer = peers.find(
+            (peer) => peer.userId === data.callerId
+          );
+          if (existingPeer) {
+            existingPeer.peer.signal(data.signal);
+          } else {
+            const peer = new SimplePeer({
+              initiator: false,
+              trickle: false,
+              stream,
+            });
+            peer.signal(data.signal);
+            setPeers((prevPeers) => [
+              ...prevPeers,
+              { userId: data.callerId, peer },
+            ]);
+          }
         });
       })
       .catch((error) => console.error("Error accessing media devices:", error));
 
     return () => {
-      peers.forEach((peer) => peer.destroy());
+      peers.forEach((peer) => peer.peer.destroy());
+      socket.emit("leaveRoom", meetingId); // Leave the room
       socket.disconnect();
     };
   }, []);
@@ -67,18 +81,26 @@ export default function MeetingPage() {
       <div className="controls">
         <button onClick={toggleAudio}>
           {audioEnabled ? (
-            <i className="fas fa-microphone"></i>
+            <FaMicrophone size={22} />
           ) : (
-            <i className="fas fa-microphone-slash"></i>
+            <PiMicrophoneSlashFill size={22} />
           )}
         </button>
         <button onClick={toggleVideo}>
-          {videoEnabled ? (
-            <i className="fas fa-video"></i>
-          ) : (
-            <i className="fas fa-video-slash"></i>
-          )}
+          {videoEnabled ? <FaVideo size={22} /> : <FaVideoSlash size={22} />}
         </button>
+      </div>
+
+      <div className="participants">
+        {peers.map((peer) => (
+          <video
+            key={peer.userId}
+            ref={peer.videoRef}
+            autoPlay
+            playsInline
+            className="participant-video"
+          />
+        ))}
       </div>
 
       <style jsx>{`
@@ -101,7 +123,7 @@ export default function MeetingPage() {
 
         .controls {
           position: absolute;
-          bottom: 100px;
+          bottom: 120px;
           left: 50%;
           transform: translateX(-50%);
           background-color: rgba(255, 255, 255, 0.8);
@@ -120,6 +142,22 @@ export default function MeetingPage() {
         .controls button i {
           font-size: 24px;
           color: #333;
+        }
+
+        .participants {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .participant-video {
+          width: 120px;
+          height: 90px;
+          border-radius: 8px;
+          box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>
