@@ -1,17 +1,25 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import io from "socket.io-client";
 import usePeerConnection from "../../src/lib/peer";
-import ReactPlayer from "react-player";
+import {
+  FaMicrophone,
+  FaMicrophoneSlash,
+  FaVideo,
+  FaVideoSlash,
+  FaPhoneSlash,
+} from "react-icons/fa";
 
 const socket = io();
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
-  const [myStream, setMyStream] = useState();
-  const [remoteStream, setRemoteStream] = useState();
+  const [myStream, setMyStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
-  const videoRef = useRef(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
   const {
     peer,
     getOffer,
@@ -47,49 +55,55 @@ const RoomPage = () => {
       });
       setMyStream(stream);
       const offer = await getOffer();
-      console.log('Sending offer:', offer);
+      console.log("Sending offer:", offer);
       socket.emit("user:call", { to: remoteSocketId, offer });
     } catch (error) {
       console.error("Error in handleCallUser:", error);
     }
   }, [remoteSocketId, socket, getOffer, peer]);
 
-  const handleIncomingCall = useCallback(async ({ from, offer }) => {
-    if (!peer) {
-      console.error("Peer connection is not initialized");
-      return;
-    }
-    try {
-      console.log('Incoming call offer:', offer);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      setMyStream(stream);
-      setRemoteSocketId(from);
-      await peer.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await peer.createAnswer();
-      await peer.setLocalDescription(answer);
-      console.log('Sending answer:', answer);
-      socket.emit("call:accepted", { to: from, answer });
-    } catch (error) {
-      console.error("Error in handleIncomingCall:", error);
-    }
-  }, [socket, peer]);
+  const handleIncomingCall = useCallback(
+    async ({ from, offer }) => {
+      if (!peer) {
+        console.error("Peer connection is not initialized");
+        return;
+      }
+      try {
+        console.log("Incoming call offer:", offer);
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true,
+        });
+        setMyStream(stream);
+        setRemoteSocketId(from);
+        await peer.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peer.createAnswer();
+        await peer.setLocalDescription(answer);
+        console.log("Sending answer:", answer);
+        socket.emit("call:accepted", { to: from, answer });
+      } catch (error) {
+        console.error("Error in handleIncomingCall:", error);
+      }
+    },
+    [socket, peer]
+  );
 
-  const handleCallAccepted = useCallback(async ({ from, answer }) => {
-    if (!peer) {
-      console.error("Peer connection is not initialized");
-      return;
-    }
-    try {
-      console.log('Call accepted with answer:', answer);
-      await peer.setRemoteDescription(new RTCSessionDescription(answer));
-      sendStreams();
-    } catch (error) {
-      console.error("Error in handleCallAccepted:", error);
-    }
-  }, [sendStreams, peer]);
+  const handleCallAccepted = useCallback(
+    async ({ from, answer }) => {
+      if (!peer) {
+        console.error("Peer connection is not initialized");
+        return;
+      }
+      try {
+        console.log("Call accepted with answer:", answer);
+        await peer.setRemoteDescription(new RTCSessionDescription(answer));
+        sendStreams();
+      } catch (error) {
+        console.error("Error in handleCallAccepted:", error);
+      }
+    },
+    [sendStreams, peer]
+  );
 
   const handleNegoNeeded = useCallback(async () => {
     if (!peer) {
@@ -107,26 +121,38 @@ const RoomPage = () => {
     };
   }, [handleNegoNeeded, addEventListener, removeEventListener]);
 
-  const handleNegoNeedIncoming = useCallback(async ({ from, offer }) => {
-    if (!peer) {
-      console.error("Peer connection is not initialized");
-      return;
-    }
-    await peer.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    socket.emit("peer:nego:done", { to: from, answer });
-  }, [getAnswer, peer]);
+  const handleNegoNeedIncoming = useCallback(
+    async ({ from, offer }) => {
+      if (!peer) {
+        console.error("Peer connection is not initialized");
+        return;
+      }
+      await peer.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await peer.createAnswer();
+      await peer.setLocalDescription(answer);
+      socket.emit("peer:nego:done", { to: from, answer });
+    },
+    [getAnswer, peer]
+  );
 
-  const handleNegoNeedFinal = useCallback(async ({ answer }) => {
-    if (!peer) {
-      console.error("Peer connection is not initialized");
-      return;
-    }
-    console.log(peer, 'peer in nego need final');
-    await peer.setRemoteDescription(new RTCSessionDescription(answer));
-  }, [peer]);
-  
+  const handleNegoNeedFinal = useCallback(
+    async ({ answer }) => {
+      if (!peer) {
+        console.error("Peer connection is not initialized");
+        return;
+      }
+      console.log(peer, "peer in nego need final");
+      await peer.setRemoteDescription(new RTCSessionDescription(answer));
+    },
+    [peer]
+  );
+
+  const handleStreamUpdate = useCallback(
+    async ({ data }) => {
+      console.log(data, 'data in handle stream update');
+    },
+    [peer]
+  );
 
   useEffect(() => {
     addEventListener("track", async (event) => {
@@ -148,6 +174,7 @@ const RoomPage = () => {
     socket.on("call:accepted", handleCallAccepted);
     socket.on("peer:nego:needed", handleNegoNeedIncoming);
     socket.on("peer:nego:final", handleNegoNeedFinal);
+    socket.on("stream-update", handleStreamUpdate);
   };
 
   useEffect(() => {
@@ -159,6 +186,7 @@ const RoomPage = () => {
       socket.off("call:accepted", handleCallAccepted);
       socket.off("peer:nego:needed", handleNegoNeedIncoming);
       socket.off("peer:nego:final", handleNegoNeedFinal);
+      socket.off("stream-update", handleStreamUpdate);
     };
   }, [
     handleUserJoined,
@@ -166,13 +194,20 @@ const RoomPage = () => {
     handleCallAccepted,
     handleNegoNeedIncoming,
     handleNegoNeedFinal,
+    handleStreamUpdate,
   ]);
 
   useEffect(() => {
-    if (myStream && videoRef.current) {
-      videoRef.current.srcObject = myStream;
+    if (myStream && localVideoRef.current) {
+      localVideoRef.current.srcObject = myStream;
     }
   }, [myStream]);
+
+  useEffect(() => {
+    if (remoteStream && remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);
 
   useEffect(() => {
     if (remoteSocketId) {
@@ -180,101 +215,136 @@ const RoomPage = () => {
     }
   }, [handleCallUser, remoteSocketId]);
 
-  const toggleAudio = () => {
-    if (myStream) {
-      myStream.getAudioTracks()[0].enabled = !audioEnabled;
-      setAudioEnabled(!audioEnabled);
-    }
+  const toggleLocalAudio = () => {
+    const audioTrack = myStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+    setAudioEnabled(audioTrack.enabled);
+
+    // Emit Socket.IO event
+    socket.emit("stream-update", {
+      socketId: socket.id, // Assuming you have mySocketId
+      type: "audio",
+      enabled: audioTrack.enabled,
+    });
   };
 
-  const toggleVideo = () => {
-    if (myStream) {
-      myStream.getVideoTracks()[0].enabled = !videoEnabled;
-      setVideoEnabled(!videoEnabled);
+  const toggleLocalVideo = () => {
+    const videoTrack = myStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+    setVideoEnabled(videoTrack.enabled);
+
+    // Emit Socket.IO event
+    socket.emit("stream-update", {
+      socketId: socket.id,
+      type: "video",
+      enabled: videoTrack.enabled,
+    });
+  };
+
+  const handleDisconnect = () => {
+    const confirmDisconnect = window.confirm("Are you sure you want to quit?");
+    if (confirmDisconnect) {
+      // Logic to disconnect the call
+      if (peer) {
+        peer.close();
+      }
+      socket.disconnect();
     }
   };
 
   return (
     <div className="meeting-container">
-      <div>
+      <div className="video-container">
         {myStream && (
-          <>
-          <h1>My Stream</h1>
-            <ReactPlayer
-              playing
+          <div className={`video-wrapper ${isSpeaking ? "speaking" : ""}`}>
+            <h2>My Stream</h2>
+            <video
+              ref={localVideoRef}
+              className="video-element"
+              autoPlay
               muted
-              height="100px"
-              width="200px"
-              url={myStream}
+              playsInline
             />
-          </>
+            <div className="controls">
+              <button onClick={toggleLocalAudio}>
+                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+              </button>
+              <button onClick={toggleLocalVideo}>
+                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+              </button>
+              <button onClick={handleDisconnect}>
+                <FaPhoneSlash />
+              </button>
+            </div>
+          </div>
         )}
         {remoteStream && (
-          <>
-            <h1>Remote Stream</h1>
-            <ReactPlayer
-              playing
-              muted
-              height="100px"
-              width="200px"
-              url={remoteStream}
+          <div className={`video-wrapper ${isSpeaking ? "speaking" : ""}`}>
+            <h2>Remote Stream</h2>
+            <video
+              ref={remoteVideoRef}
+              className="video-element"
+              autoPlay
+              playsInline
             />
-            {console.log(remoteStream, 'remote stream ')}
-          </>
+            <div className="controls">
+              <button onClick={toggleLocalAudio}>
+                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+              </button>
+              <button onClick={toggleLocalVideo}>
+                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+              </button>
+              <button onClick={handleDisconnect}>
+                <FaPhoneSlash />
+              </button>
+            </div>
+          </div>
         )}
       </div>
-      <div className="participants"></div>
       <style jsx>{`
         .meeting-container {
-          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           width: 100%;
           height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
           background-color: #f0f0f0;
+          padding: 20px;
         }
-
-        .video-element {
-          width: 80%;
-          max-width: 800px;
+        .video-container {
+          display: flex;
+          justify-content: space-around;
+          width: 100%;
+          max-width: 1200px;
+        }
+        .video-wrapper {
+          flex: 1;
+          margin: 10px;
+          position: relative;
           border-radius: 8px;
           box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
         }
-
+        .video-wrapper.speaking {
+          border: 4px solid green;
+        }
+        .video-element {
+          width: 100%;
+          height: 500px;
+          border-radius: 8px;
+        }
         .controls {
           position: absolute;
-          bottom: 120px;
+          bottom: 10px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: rgba(255, 255, 255, 0.8);
-          border-radius: 8px;
-          padding: 8px;
-          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
           display: flex;
           gap: 10px;
         }
-
         .controls button {
           background: none;
           border: none;
           cursor: pointer;
-        }
-
-        .participants {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .participant-video {
-          width: 120px;
-          height: 90px;
-          border-radius: 8px;
-          box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+          font-size: 24px;
         }
       `}</style>
     </div>

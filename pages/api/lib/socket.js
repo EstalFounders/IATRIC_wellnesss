@@ -22,22 +22,23 @@ const SocketHandler = (req, res) => {
         console.log(`Joining room: ${roomId}`);
         socket.join(roomId);
 
-        const otherUsers = Array.from(io.sockets.adapter.rooms.get(roomId) || []).filter(id => id !== socket.id);
+        const otherUsers = Array.from(
+          io.sockets.adapter.rooms.get(roomId) || []
+        ).filter((id) => id !== socket.id);
         if (otherUsers.length > 0) {
           io.to(socket.id).emit("user:joined", { id: otherUsers[0] });
         }
       });
 
       socket.on("user:call", ({ to, offer }) => {
-        console.log('Received user:call event');
-        console.log('Offer:', offer);
+        console.log("Received user:call event");
+        console.log("Offer:", offer);
         console.log(`User call from ${socket.id} to ${to}`);
         io.to(to).emit("incoming:call", { from: socket.id, offer });
       });
-      
 
       socket.on("call:accepted", ({ to, answer }) => {
-        console.log(`Call accepted by ${socket.id} to ${to}`, ' ',answer);
+        console.log(`Call accepted by ${socket.id} to ${to}`, " ", answer);
         io.to(to).emit("call:accepted", { from: socket.id, answer });
       });
 
@@ -49,6 +50,15 @@ const SocketHandler = (req, res) => {
       socket.on("peer:nego:done", ({ to, answer }) => {
         console.log(`Negotiation done from ${socket.id} to ${to}`);
         io.to(to).emit("peer:nego:final", { from: socket.id, answer });
+      });
+
+      socket.on("stream-update", ({ socketId, type, enabled }) => {
+        console.log(
+          `Stream update from ${socketId}: ${type} is now ${enabled}`
+        );
+
+        // Broadcast the stream update to other users in the room
+        socket.broadcast.emit("stream-update", { socketId, type, enabled });
       });
 
       socket.on("disconnect", () => {
