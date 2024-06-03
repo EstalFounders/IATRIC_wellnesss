@@ -58,7 +58,7 @@ const SocketHandler = (req, res) => {
         );
 
         // Broadcast the stream update to other users in the room
-        socket.broadcast.emit("stream-update", { socketId, type, enabled });
+        socket.broadcast.emit("stream-update", {socketId, type, enabled})
       });
 
       socket.on("disconnect", () => {

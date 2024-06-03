@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import io from "socket.io-client";
-import usePeerConnection from "../../src/lib/peer";
+import usePeerConnection from "../../../src/lib/peer";
 import {
   FaMicrophone,
   FaMicrophoneSlash,
@@ -8,6 +8,8 @@ import {
   FaVideoSlash,
   FaPhoneSlash,
 } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { userTypeConstant } from "../../../src/constant";
 
 const socket = io();
 
@@ -17,6 +19,8 @@ const RoomPage = () => {
   const [remoteStream, setRemoteStream] = useState(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
+  const [audioRemoteEnabled, setAudioRemoteEnabled] = useState(true);
+  const [videoRemoteEnabled, setVideoRemoteEnabled] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -29,7 +33,12 @@ const RoomPage = () => {
     removeEventListener,
   } = usePeerConnection();
 
-  const meetingId = window.location.pathname.split("/").pop();
+  const router = useRouter();
+  const { userType, meetingId } = router.query;
+
+  console.log(userType, meetingId, "meeting id user type");
+
+  // const meetingId = window.location.pathname.split("/").pop();
 
   const sendStreams = useCallback(() => {
     if (!peer || !myStream) return;
@@ -148,10 +157,10 @@ const RoomPage = () => {
   );
 
   const handleStreamUpdate = useCallback(
-    async ({ data }) => {
-      console.log(data, 'data in handle stream update');
+    ({ socketId, type, enabled }) => {
+     console.log(`${socketId} of ${type} is ${enabled} now`) 
     },
-    [peer]
+    []
   );
 
   useEffect(() => {
@@ -219,7 +228,7 @@ const RoomPage = () => {
     const audioTrack = myStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioEnabled(audioTrack.enabled);
-
+    
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: socket.id, // Assuming you have mySocketId
@@ -232,10 +241,35 @@ const RoomPage = () => {
     const videoTrack = myStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     setVideoEnabled(videoTrack.enabled);
-
+    console.log(socket.id, "testing socket id ");
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: socket.id,
+      type: "video",
+      enabled: videoTrack.enabled,
+    });
+  };
+
+  const toggleRemoteAudio = () => {
+    const audioTrack = remoteStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+    setAudioRemoteEnabled(audioTrack.enabled);
+    // Emit Socket.IO event
+    socket.emit("stream-update", {
+      socketId: remoteSocketId, // Assuming you have mySocketId
+      type: "audio",
+      enabled: audioTrack.enabled,
+    });
+  };
+
+  const toggleRemoteVideo = () => {
+    const videoTrack = remoteStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+    setVideoRemoteEnabled(videoTrack.enabled);
+    console.log(remoteSocketId, 'remote socket id')
+    // Emit Socket.IO event
+    socket.emit("stream-update", {
+      socketId: remoteSocketId,
       type: "video",
       enabled: videoTrack.enabled,
     });
@@ -254,10 +288,20 @@ const RoomPage = () => {
 
   return (
     <div className="meeting-container">
+      {!remoteSocketId && userType === "patient" && (
+        <div className="message-container">
+          <h2>Please wait for the doctor and feel free to contact us.</h2>
+        </div>
+      )}
+      {!remoteSocketId && userType === "doctor" && (
+        <div className="message-container">
+          <h2>Waiting for the patient to join.</h2>
+        </div>
+      )}
       <div className="video-container">
         {myStream && (
           <div className={`video-wrapper ${isSpeaking ? "speaking" : ""}`}>
-            <h2>My Stream</h2>
+            <h2>Patient</h2>
             <video
               ref={localVideoRef}
               className="video-element"
@@ -265,6 +309,7 @@ const RoomPage = () => {
               muted
               playsInline
             />
+           {userType !== userTypeConstant.doctor && (
             <div className="controls">
               <button onClick={toggleLocalAudio}>
                 {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
@@ -276,28 +321,31 @@ const RoomPage = () => {
                 <FaPhoneSlash />
               </button>
             </div>
+          )}
           </div>
         )}
         {remoteStream && (
           <div className={`video-wrapper ${isSpeaking ? "speaking" : ""}`}>
-            <h2>Remote Stream</h2>
+            <h2>Doctor</h2>
             <video
               ref={remoteVideoRef}
               className="video-element"
               autoPlay
               playsInline
             />
+            {userType !== userTypeConstant.patient && (
             <div className="controls">
-              <button onClick={toggleLocalAudio}>
-                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+              <button onClick={toggleRemoteAudio}>
+                {audioRemoteEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
               </button>
-              <button onClick={toggleLocalVideo}>
-                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+              <button onClick={toggleRemoteVideo}>
+                {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
               </button>
               <button onClick={handleDisconnect}>
                 <FaPhoneSlash />
               </button>
             </div>
+          )}
           </div>
         )}
       </div>

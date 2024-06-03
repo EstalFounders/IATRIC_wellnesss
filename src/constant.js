@@ -54,3 +54,8 @@ export const consultationTypeConstant =  {
     home_visit:"Home Visit"
 }
 
+export const userTypeConstant = {
+    patient: 'patient',
+    doctor: 'doctor'
+}
+
