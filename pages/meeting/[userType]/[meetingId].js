@@ -8,7 +8,6 @@ import {
   FaVideoSlash,
   FaPhoneSlash,
 } from "react-icons/fa";
-import { useRouter } from "next/router";
 import { userTypeConstant } from "../../../src/constant";
 
 const socket = io();
@@ -33,12 +32,12 @@ const RoomPage = () => {
     removeEventListener,
   } = usePeerConnection();
 
-  const router = useRouter();
-  const { userType, meetingId } = router.query;
+  const pathSegments = window.location.pathname.split("/");
+  const userType = pathSegments[pathSegments.length - 2]; // 'patient' in this case
+  const meetingId = pathSegments[pathSegments.length - 1]; // '12345' in this case
 
-  console.log(userType, meetingId, "meeting id user type");
-
-  // const meetingId = window.location.pathname.split("/").pop();
+  console.log("User Type:", userType);
+  console.log("Meeting ID:", meetingId);
 
   const sendStreams = useCallback(() => {
     if (!peer || !myStream) return;
@@ -156,12 +155,9 @@ const RoomPage = () => {
     [peer]
   );
 
-  const handleStreamUpdate = useCallback(
-    ({ socketId, type, enabled }) => {
-     console.log(`${socketId} of ${type} is ${enabled} now`) 
-    },
-    []
-  );
+  const handleStreamUpdate = useCallback(({ socketId, type, enabled }) => {
+    console.log(`${socketId} of ${type} is ${enabled} now`);
+  }, []);
 
   useEffect(() => {
     addEventListener("track", async (event) => {
@@ -228,7 +224,7 @@ const RoomPage = () => {
     const audioTrack = myStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioEnabled(audioTrack.enabled);
-    
+
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: socket.id, // Assuming you have mySocketId
@@ -254,6 +250,7 @@ const RoomPage = () => {
     const audioTrack = remoteStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioRemoteEnabled(audioTrack.enabled);
+    console.log(audioTrack, "audio track in local");
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: remoteSocketId, // Assuming you have mySocketId
@@ -266,7 +263,7 @@ const RoomPage = () => {
     const videoTrack = remoteStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     setVideoRemoteEnabled(videoTrack.enabled);
-    console.log(remoteSocketId, 'remote socket id')
+    console.log(remoteSocketId, "remote socket id");
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: remoteSocketId,
@@ -309,19 +306,19 @@ const RoomPage = () => {
               muted
               playsInline
             />
-           {userType !== userTypeConstant.doctor && (
-            <div className="controls">
-              <button onClick={toggleLocalAudio}>
-                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleLocalVideo}>
-                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+            {userType !== userTypeConstant.doctor && (
+              <div className="controls">
+                <button onClick={toggleLocalAudio}>
+                  {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+                </button>
+                <button onClick={toggleLocalVideo}>
+                  {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
         {remoteStream && (
@@ -334,18 +331,22 @@ const RoomPage = () => {
               playsInline
             />
             {userType !== userTypeConstant.patient && (
-            <div className="controls">
-              <button onClick={toggleRemoteAudio}>
-                {audioRemoteEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleRemoteVideo}>
-                {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+              <div className="controls">
+                <button onClick={toggleRemoteAudio}>
+                  {audioRemoteEnabled ? (
+                    <FaMicrophone />
+                  ) : (
+                    <FaMicrophoneSlash />
+                  )}
+                </button>
+                <button onClick={toggleRemoteVideo}>
+                  {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
