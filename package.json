@@ -5,8 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "cp -r node_modules/socket.io/dist/.next/server./dist/socket.io-server"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
