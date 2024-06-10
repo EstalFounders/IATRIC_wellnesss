@@ -169,7 +169,7 @@ const RoomPage = () => {
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
     socket.emit("room:join", { roomId: meetingId });
-
+    
     socket.on("connect", () => {
       console.log("connected");
     });
@@ -184,7 +184,7 @@ const RoomPage = () => {
 
   useEffect(() => {
     socketInitializer();
-
+    
     return () => {
       socket.off("user:joined", handleUserJoined);
       socket.off("incoming:call", handleIncomingCall);
