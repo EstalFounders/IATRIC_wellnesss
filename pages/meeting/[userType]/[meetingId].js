@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import usePeerConnection from "../../../src/lib/peer";
 import {
   FaMicrophone,
@@ -9,6 +9,7 @@ import {
   FaPhoneSlash,
 } from "react-icons/fa";
 import { userTypeConstant } from "../../../src/constant";
+
 
 const socket = io();
 
@@ -168,6 +169,7 @@ const RoomPage = () => {
 
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
+    
     socket.emit("room:join", { roomId: meetingId });
     
     socket.on("connect", () => {
@@ -184,7 +186,6 @@ const RoomPage = () => {
 
   useEffect(() => {
     socketInitializer();
-    
     return () => {
       socket.off("user:joined", handleUserJoined);
       socket.off("incoming:call", handleIncomingCall);
