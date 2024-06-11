@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
 
 const SocketHandler = (req, res) => {
-  console.log(res, 'socket 4 testing')
   if (res.socket.server.io) {
     console.log("Socket is already running");
   } else {

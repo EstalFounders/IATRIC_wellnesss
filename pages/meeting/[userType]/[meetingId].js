@@ -10,9 +10,8 @@ import {
 } from "react-icons/fa";
 import { api, base_url, userTypeConstant } from "../../../src/constant";
 
-
-
 let socket;
+// const socket = io()
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
@@ -169,8 +168,9 @@ const RoomPage = () => {
   }, [addEventListener]);
 
   const socketInitializer = async () => {
-    await fetch("/api/lib/socket");
+    await fetch("/api/socket");
     socket = io()
+    console.log(socket, 'socket by io')
     socket.emit("room:join", { roomId: meetingId });
 
     socket.on("connect", () => {
