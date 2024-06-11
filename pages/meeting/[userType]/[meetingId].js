@@ -8,10 +8,9 @@ import {
   FaVideoSlash,
   FaPhoneSlash,
 } from "react-icons/fa";
-import { userTypeConstant } from "../../../src/constant";
+import { production_url, userTypeConstant } from "../../../src/constant";
 
-
-const socket = io();
+const socket = io(production_url);
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
@@ -169,9 +168,8 @@ const RoomPage = () => {
 
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
-    
     socket.emit("room:join", { roomId: meetingId });
-    
+
     socket.on("connect", () => {
       console.log("connected");
     });
