@@ -6,7 +6,7 @@ const SocketHandler = (req, res) => {
   } else {
     console.log("Socket is initializing");
     const io = new Server(res.socket.server, {
-      cors: {
+      cors: { 
         origin: "*",
       },
     });

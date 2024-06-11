@@ -8,9 +8,11 @@ import {
   FaVideoSlash,
   FaPhoneSlash,
 } from "react-icons/fa";
-import { production_url, userTypeConstant } from "../../../src/constant";
+import { api, base_url, userTypeConstant } from "../../../src/constant";
 
-const socket = io(production_url);
+
+
+let socket;
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
@@ -168,6 +170,7 @@ const RoomPage = () => {
 
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
+    socket = io()
     socket.emit("room:join", { roomId: meetingId });
 
     socket.on("connect", () => {
@@ -185,12 +188,9 @@ const RoomPage = () => {
   useEffect(() => {
     socketInitializer();
     return () => {
-      socket.off("user:joined", handleUserJoined);
-      socket.off("incoming:call", handleIncomingCall);
-      socket.off("call:accepted", handleCallAccepted);
-      socket.off("peer:nego:needed", handleNegoNeedIncoming);
-      socket.off("peer:nego:final", handleNegoNeedFinal);
-      socket.off("stream-update", handleStreamUpdate);
+      if (socket) {
+        socket.disconnect();
+      }
     };
   }, [
     handleUserJoined,
@@ -200,6 +200,7 @@ const RoomPage = () => {
     handleNegoNeedFinal,
     handleStreamUpdate,
   ]);
+  
 
   useEffect(() => {
     if (myStream && localVideoRef.current) {
