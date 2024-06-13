@@ -67,7 +67,7 @@ const RoomPage = () => {
     } catch (error) {
       console.error("Error in handleCallUser:", error);
     }
-  }, [remoteSocketId, socket, getOffer, peer]);
+  }, [remoteSocketId, getOffer, peer]);
 
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
@@ -92,7 +92,7 @@ const RoomPage = () => {
         console.error("Error in handleIncomingCall:", error);
       }
     },
-    [socket, peer]
+    [peer]
   );
 
   const handleCallAccepted = useCallback(
@@ -139,7 +139,7 @@ const RoomPage = () => {
       await peer.setLocalDescription(answer);
       socket.emit("peer:nego:done", { to: from, answer });
     },
-    [getAnswer, peer]
+    [peer]
   );
 
   const handleNegoNeedFinal = useCallback(
