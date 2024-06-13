@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import usePeerConnection from "../../../src/lib/peer";
 import {
   FaMicrophone,
@@ -9,8 +9,10 @@ import {
   FaPhoneSlash,
 } from "react-icons/fa";
 import { userTypeConstant } from "../../../src/constant";
+import { api, base_url, userTypeConstant } from "../../../src/constant";
 
-const socket = io();
+let socket;
+// const socket = io()
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
@@ -37,6 +39,10 @@ const RoomPage = () => {
   const meetingId = pathSegments[pathSegments.length - 1];
 
   // const meetingId = window.location.pathname.split("/").pop();
+  const meetingId = pathSegments[pathSegments.length - 1]; // '12345' in this case
+
+  console.log("User Type:", userType);
+  console.log("Meeting ID:", meetingId);
 
   const sendStreams = useCallback(() => {
     if (!peer || !myStream) return;
@@ -154,12 +160,9 @@ const RoomPage = () => {
     [peer]
   );
 
-  const handleStreamUpdate = useCallback(
-    ({ socketId, type, enabled }) => {
-     console.log(`${socketId} of ${type} is ${enabled} now`) 
-    },
-    []
-  );
+  const handleStreamUpdate = useCallback(({ socketId, type, enabled }) => {
+    console.log(`${socketId} of ${type} is ${enabled} now`);
+  }, []);
 
   useEffect(() => {
     addEventListener("track", async (event) => {
@@ -169,7 +172,9 @@ const RoomPage = () => {
   }, [addEventListener]);
 
   const socketInitializer = async () => {
-    await fetch("/api/lib/socket");
+    await fetch("/api/socket");
+    socket = io()
+    console.log(socket, 'socket by io')
     socket.emit("room:join", { roomId: meetingId });
     console.log(socket, 'socket')
     socket.on("connect", () => {
@@ -187,12 +192,9 @@ const RoomPage = () => {
   useEffect(() => {
     socketInitializer();
     return () => {
-      socket.off("user:joined", handleUserJoined);
-      socket.off("incoming:call", handleIncomingCall);
-      socket.off("call:accepted", handleCallAccepted);
-      socket.off("peer:nego:needed", handleNegoNeedIncoming);
-      socket.off("peer:nego:final", handleNegoNeedFinal);
-      socket.off("stream-update", handleStreamUpdate);
+      if (socket) {
+        socket.disconnect();
+      }
     };
   }, [
     handleUserJoined,
@@ -202,6 +204,7 @@ const RoomPage = () => {
     handleNegoNeedFinal,
     handleStreamUpdate,
   ]);
+  
 
   useEffect(() => {
     if (myStream && localVideoRef.current) {
@@ -225,7 +228,7 @@ const RoomPage = () => {
     const audioTrack = myStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioEnabled(audioTrack.enabled);
-    
+
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: socket.id, // Assuming you have mySocketId
@@ -251,6 +254,7 @@ const RoomPage = () => {
     const audioTrack = remoteStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioRemoteEnabled(audioTrack.enabled);
+    console.log(audioTrack, "audio track in local");
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: remoteSocketId, // Assuming you have mySocketId
@@ -263,7 +267,7 @@ const RoomPage = () => {
     const videoTrack = remoteStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     setVideoRemoteEnabled(videoTrack.enabled);
-    console.log(remoteSocketId, 'remote socket id')
+    console.log(remoteSocketId, "remote socket id");
     // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: remoteSocketId,
@@ -306,19 +310,19 @@ const RoomPage = () => {
               muted
               playsInline
             />
-           {userType !== userTypeConstant.doctor && (
-            <div className="controls">
-              <button onClick={toggleLocalAudio}>
-                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleLocalVideo}>
-                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+            {userType !== userTypeConstant.doctor && (
+              <div className="controls">
+                <button onClick={toggleLocalAudio}>
+                  {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+                </button>
+                <button onClick={toggleLocalVideo}>
+                  {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
         {remoteStream && (
@@ -331,18 +335,22 @@ const RoomPage = () => {
               playsInline
             />
             {userType !== userTypeConstant.patient && (
-            <div className="controls">
-              <button onClick={toggleRemoteAudio}>
-                {audioRemoteEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleRemoteVideo}>
-                {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+              <div className="controls">
+                <button onClick={toggleRemoteAudio}>
+                  {audioRemoteEnabled ? (
+                    <FaMicrophone />
+                  ) : (
+                    <FaMicrophoneSlash />
+                  )}
+                </button>
+                <button onClick={toggleRemoteVideo}>
+                  {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

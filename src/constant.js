@@ -8,6 +8,8 @@ export const contact_no = "+91 96259 42020";
 export const email= 'iatrichealthcare@gmail.com'
 export const twilioPhoneNumber = '+14155238886'
 export const countryCode = "+91" 
+// export const base_url = "http://localhost:3000/api/lib/socket" 
+
 
 export const api = {
     addDoctor: "/api/addDoctor",
@@ -16,7 +18,8 @@ export const api = {
     prescriptionCall: "/api/prescription",
     sendWhatsAppCall: "/api/whatsApp",
     recommendedServies: "/api/lib/recommendedServices",
-    bookConsultation: "/api/bookConsultation"
+    bookConsultation: "/api/bookConsultation",
+    socket: "/api/lib/socket"
 }
 
 export const services = [
