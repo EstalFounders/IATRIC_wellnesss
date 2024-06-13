@@ -8,7 +8,6 @@ import {
   FaVideoSlash,
   FaPhoneSlash,
 } from "react-icons/fa";
-import { useRouter } from "next/router";
 import { userTypeConstant } from "../../../src/constant";
 
 const socket = io();
@@ -33,10 +32,9 @@ const RoomPage = () => {
     removeEventListener,
   } = usePeerConnection();
 
-  const router = useRouter();
-  const { userType, meetingId } = router.query;
-
-  console.log(userType, meetingId, "meeting id user type");
+  const pathSegments = window.location.pathname.split("/");
+  const userType = pathSegments[pathSegments.length - 2]; // 'patient' in this case
+  const meetingId = pathSegments[pathSegments.length - 1];
 
   // const meetingId = window.location.pathname.split("/").pop();
 
@@ -173,7 +171,7 @@ const RoomPage = () => {
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
     socket.emit("room:join", { roomId: meetingId });
-
+    console.log(socket, 'socket')
     socket.on("connect", () => {
       console.log("connected");
     });
@@ -188,7 +186,6 @@ const RoomPage = () => {
 
   useEffect(() => {
     socketInitializer();
-
     return () => {
       socket.off("user:joined", handleUserJoined);
       socket.off("incoming:call", handleIncomingCall);
