@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import io from "socket.io-client";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import usePeerConnection from "../../../src/lib/peer";
 import {
   FaMicrophone,
@@ -9,11 +8,11 @@ import {
   FaPhoneSlash,
 } from "react-icons/fa";
 import { userTypeConstant } from "../../../src/constant";
-
-const socket = io();
+import initializeSocket from "../../../src/lib/socket";
 
 const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [myStream, setMyStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -21,6 +20,9 @@ const RoomPage = () => {
   const [audioRemoteEnabled, setAudioRemoteEnabled] = useState(true);
   const [videoRemoteEnabled, setVideoRemoteEnabled] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [doctorConnected, setDoctorConnected] = useState(false);
+  const [patientConnected, setPatientConnected] = useState(true);
+
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const {
@@ -33,10 +35,8 @@ const RoomPage = () => {
   } = usePeerConnection();
 
   const pathSegments = window.location.pathname.split("/");
-  const userType = pathSegments[pathSegments.length - 2]; // 'patient' in this case
+  const userType = pathSegments[pathSegments.length - 2]; // 'patient' or 'doctor'
   const meetingId = pathSegments[pathSegments.length - 1];
-
-  // const meetingId = window.location.pathname.split("/").pop();
 
   const sendStreams = useCallback(() => {
     if (!peer || !myStream) return;
@@ -44,11 +44,6 @@ const RoomPage = () => {
       peer.addTrack(track, myStream);
     }
   }, [myStream, peer]);
-
-  const handleUserJoined = useCallback(({ id }) => {
-    console.log(`User with id ${id} joined room`);
-    setRemoteSocketId(id);
-  }, []);
 
   const handleCallUser = useCallback(async () => {
     if (!peer) {
@@ -67,7 +62,20 @@ const RoomPage = () => {
     } catch (error) {
       console.error("Error in handleCallUser:", error);
     }
-  }, [remoteSocketId, getOffer, peer]);
+  }, [remoteSocketId, getOffer, peer, socket]);
+
+  const handleUserJoined = useCallback(
+    ({ id }) => {
+      console.log(`User with id ${id} joined room`);
+      setRemoteSocketId(id);
+      if (userType === userTypeConstant.doctor) {
+        setPatientConnected(true);
+      } else {
+        setDoctorConnected(true);
+      }
+    },
+    [userType]
+  );
 
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
@@ -92,7 +100,7 @@ const RoomPage = () => {
         console.error("Error in handleIncomingCall:", error);
       }
     },
-    [peer]
+    [socket, peer]
   );
 
   const handleCallAccepted = useCallback(
@@ -148,53 +156,56 @@ const RoomPage = () => {
         console.error("Peer connection is not initialized");
         return;
       }
-      console.log(peer, "peer in nego need final");
       await peer.setRemoteDescription(new RTCSessionDescription(answer));
     },
     [peer]
   );
 
-  const handleStreamUpdate = useCallback(
-    ({ socketId, type, enabled }) => {
-     console.log(`${socketId} of ${type} is ${enabled} now`) 
-    },
-    []
-  );
+  const handleStreamUpdate = useCallback(({ socketId, type, enabled }) => {
+    console.log(`${socketId} of ${type} is ${enabled} now`);
+  }, []);
 
   useEffect(() => {
-    addEventListener("track", async (event) => {
-      const [remoteStream] = event.streams;
-      setRemoteStream(remoteStream);
-    });
-  }, [addEventListener]);
+    const socketInitializer = async () => {
+      try {
+        if (!socket) {
+          const socketInstance = await initializeSocket();
+          setSocket(socketInstance);
 
-  const socketInitializer = async () => {
-    await fetch("/api/lib/socket");
-    socket.emit("room:join", { roomId: meetingId });
-    console.log(socket, 'socket')
-    socket.on("connect", () => {
-      console.log("connected");
-    });
+          socketInstance.emit("room:join", { roomId: meetingId });
+          console.log("Socket instance:", socketInstance);
 
-    socket.on("user:joined", handleUserJoined);
-    socket.on("incoming:call", handleIncomingCall);
-    socket.on("call:accepted", handleCallAccepted);
-    socket.on("peer:nego:needed", handleNegoNeedIncoming);
-    socket.on("peer:nego:final", handleNegoNeedFinal);
-    socket.on("stream-update", handleStreamUpdate);
-  };
+          socketInstance.on("connect", () => {
+            console.log("connected");
+          });
 
-  useEffect(() => {
+          socketInstance.on("user:joined", handleUserJoined);
+          socketInstance.on("incoming:call", handleIncomingCall);
+          socketInstance.on("call:accepted", handleCallAccepted);
+          socketInstance.on("peer:nego:needed", handleNegoNeedIncoming);
+          socketInstance.on("peer:nego:final", handleNegoNeedFinal);
+          socketInstance.on("stream-update", handleStreamUpdate);
+        }
+      } catch (error) {
+        console.error("Socket initialization failed:", error);
+      }
+    };
+
     socketInitializer();
+
     return () => {
-      socket.off("user:joined", handleUserJoined);
-      socket.off("incoming:call", handleIncomingCall);
-      socket.off("call:accepted", handleCallAccepted);
-      socket.off("peer:nego:needed", handleNegoNeedIncoming);
-      socket.off("peer:nego:final", handleNegoNeedFinal);
-      socket.off("stream-update", handleStreamUpdate);
+      if (socket) {
+        socket.off("user:joined", handleUserJoined);
+        socket.off("incoming:call", handleIncomingCall);
+        socket.off("call:accepted", handleCallAccepted);
+        socket.off("peer:nego:needed", handleNegoNeedIncoming);
+        socket.off("peer:nego:final", handleNegoNeedFinal);
+        socket.off("stream-update", handleStreamUpdate);
+      }
     };
   }, [
+    meetingId,
+    socket,
     handleUserJoined,
     handleIncomingCall,
     handleCallAccepted,
@@ -202,6 +213,13 @@ const RoomPage = () => {
     handleNegoNeedFinal,
     handleStreamUpdate,
   ]);
+
+  useEffect(() => {
+    addEventListener("track", async (event) => {
+      const [remoteStream] = event.streams;
+      setRemoteStream(remoteStream);
+    });
+  }, [addEventListener]);
 
   useEffect(() => {
     if (myStream && localVideoRef.current) {
@@ -216,19 +234,19 @@ const RoomPage = () => {
   }, [remoteStream]);
 
   useEffect(() => {
-    if (remoteSocketId) {
+    console.log(doctorConnected, ' ',patientConnected)
+    if (doctorConnected && patientConnected) {
       handleCallUser();
     }
-  }, [handleCallUser, remoteSocketId]);
+  }, [doctorConnected, patientConnected, handleCallUser]);
 
   const toggleLocalAudio = () => {
     const audioTrack = myStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioEnabled(audioTrack.enabled);
-    
-    // Emit Socket.IO event
+
     socket.emit("stream-update", {
-      socketId: socket.id, // Assuming you have mySocketId
+      socketId: socket.id,
       type: "audio",
       enabled: audioTrack.enabled,
     });
@@ -238,8 +256,6 @@ const RoomPage = () => {
     const videoTrack = myStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     setVideoEnabled(videoTrack.enabled);
-    console.log(socket.id, "testing socket id ");
-    // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: socket.id,
       type: "video",
@@ -251,9 +267,8 @@ const RoomPage = () => {
     const audioTrack = remoteStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
     setAudioRemoteEnabled(audioTrack.enabled);
-    // Emit Socket.IO event
     socket.emit("stream-update", {
-      socketId: remoteSocketId, // Assuming you have mySocketId
+      socketId: remoteSocketId,
       type: "audio",
       enabled: audioTrack.enabled,
     });
@@ -263,8 +278,6 @@ const RoomPage = () => {
     const videoTrack = remoteStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     setVideoRemoteEnabled(videoTrack.enabled);
-    console.log(remoteSocketId, 'remote socket id')
-    // Emit Socket.IO event
     socket.emit("stream-update", {
       socketId: remoteSocketId,
       type: "video",
@@ -275,7 +288,6 @@ const RoomPage = () => {
   const handleDisconnect = () => {
     const confirmDisconnect = window.confirm("Are you sure you want to quit?");
     if (confirmDisconnect) {
-      // Logic to disconnect the call
       if (peer) {
         peer.close();
       }
@@ -285,14 +297,14 @@ const RoomPage = () => {
 
   return (
     <div className="meeting-container">
-      {!remoteSocketId && userType === "patient" && (
+      {userType === "patient" && !doctorConnected && (
         <div className="message-container">
-          <h2>Please wait for the doctor and feel free to contact us.</h2>
+          <h2>Please wait for the doctor to join.</h2>
         </div>
       )}
-      {!remoteSocketId && userType === "doctor" && (
+      {userType === "doctor" && !patientConnected && (
         <div className="message-container">
-          <h2>Waiting for the patient to join.</h2>
+          <h2>Please wait for the patient to join.</h2>
         </div>
       )}
       <div className="video-container">
@@ -306,19 +318,19 @@ const RoomPage = () => {
               muted
               playsInline
             />
-           {userType !== userTypeConstant.doctor && (
-            <div className="controls">
-              <button onClick={toggleLocalAudio}>
-                {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleLocalVideo}>
-                {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+            {userType !== userTypeConstant.doctor && (
+              <div className="controls">
+                <button onClick={toggleLocalAudio}>
+                  {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+                </button>
+                <button onClick={toggleLocalVideo}>
+                  {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
         {remoteStream && (
@@ -331,18 +343,22 @@ const RoomPage = () => {
               playsInline
             />
             {userType !== userTypeConstant.patient && (
-            <div className="controls">
-              <button onClick={toggleRemoteAudio}>
-                {audioRemoteEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              </button>
-              <button onClick={toggleRemoteVideo}>
-                {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
-              </button>
-              <button onClick={handleDisconnect}>
-                <FaPhoneSlash />
-              </button>
-            </div>
-          )}
+              <div className="controls">
+                <button onClick={toggleRemoteAudio}>
+                  {audioRemoteEnabled ? (
+                    <FaMicrophone />
+                  ) : (
+                    <FaMicrophoneSlash />
+                  )}
+                </button>
+                <button onClick={toggleRemoteVideo}>
+                  {videoRemoteEnabled ? <FaVideo /> : <FaVideoSlash />}
+                </button>
+                <button onClick={handleDisconnect}>
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -390,6 +406,10 @@ const RoomPage = () => {
           border: none;
           cursor: pointer;
           font-size: 24px;
+        }
+        .message-container {
+          margin-bottom: 20px;
+          text-align: center;
         }
       `}</style>
     </div>

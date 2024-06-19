@@ -6,14 +6,14 @@ const SocketHandler = (req, res) => {
   } else {
     console.log("Socket is initializing");
     const io = new Server(res.socket.server, {
-      cors: {
+      cors: { 
         origin: "*",
       },
     });
     res.socket.server.io = io;
-
-    const emailToSocketIdMap = new Map();
-    const socketidToEmailMap = new Map();
+    
+    // const emailToSocketIdMap = new Map();
+    // const socketidToEmailMap = new Map();
 
     io.on("connection", (socket) => {
       console.log(`Socket Connected: ${socket.id}`);
@@ -63,11 +63,11 @@ const SocketHandler = (req, res) => {
 
       socket.on("disconnect", () => {
         console.log(`User disconnected: ${socket.id}`);
-        const email = socketidToEmailMap.get(socket.id);
-        if (email) {
-          emailToSocketIdMap.delete(email);
-          socketidToEmailMap.delete(socket.id);
-        }
+        // const email = socketidToEmailMap.get(socket.id);
+        // if (email) {
+        //   emailToSocketIdMap.delete(email);
+        //   socketidToEmailMap.delete(socket.id);
+        // }
       });
     });
   }
