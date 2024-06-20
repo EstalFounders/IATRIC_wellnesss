@@ -21,7 +21,7 @@ const RoomPage = () => {
   const [videoRemoteEnabled, setVideoRemoteEnabled] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [doctorConnected, setDoctorConnected] = useState(false);
-  const [patientConnected, setPatientConnected] = useState(true);
+  const [patientConnected, setPatientConnected] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -68,13 +68,8 @@ const RoomPage = () => {
     ({ id }) => {
       console.log(`User with id ${id} joined room`);
       setRemoteSocketId(id);
-      if (userType === userTypeConstant.doctor) {
-        setPatientConnected(true);
-      } else {
-        setDoctorConnected(true);
-      }
     },
-    [userType]
+    []
   );
 
   const handleIncomingCall = useCallback(
@@ -172,8 +167,30 @@ const RoomPage = () => {
           const socketInstance = await initializeSocket();
           setSocket(socketInstance);
 
-          socketInstance.emit("room:join", { roomId: meetingId });
-          console.log("Socket instance:", socketInstance);
+          socketInstance.emit("room:join", { meetingId, userType });
+
+        console.log("Socket instance:", socketInstance);
+
+        socketInstance.on("connect", () => {
+          console.log("connected");
+
+          // Set initial state based on userType
+          if (userType === userTypeConstant.doctor) {
+            setDoctorConnected(true);
+          } else {
+            setPatientConnected(true);
+          }
+        });
+
+        socketInstance.on("room:currentState", (roomState) => {
+          console.log(roomState , 'room state in socket instance')
+          if (roomState.doctors.length > 0) {
+            setDoctorConnected(true);
+          }
+          if (roomState.patients.length > 0) {
+            setPatientConnected(true);
+          }
+        });
 
           socketInstance.on("connect", () => {
             console.log("connected");
@@ -204,14 +221,14 @@ const RoomPage = () => {
       }
     };
   }, [
-    meetingId,
-    socket,
-    handleUserJoined,
-    handleIncomingCall,
-    handleCallAccepted,
-    handleNegoNeedIncoming,
-    handleNegoNeedFinal,
-    handleStreamUpdate,
+    // meetingId,
+    // socket,
+    // handleUserJoined,
+    // handleIncomingCall,
+    // handleCallAccepted,
+    // handleNegoNeedIncoming,
+    // handleNegoNeedFinal,
+    // handleStreamUpdate,
   ]);
 
   useEffect(() => {
