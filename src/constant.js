@@ -8,7 +8,7 @@ export const contact_no = "+91 96259 42020";
 export const email= 'iatrichealthcare@gmail.com'
 export const twilioPhoneNumber = '+14155238886'
 export const countryCode = "+91" 
-export const production_url = "https://iatrichealthcare.com/"
+export const production_url = "https://bugfix-new.d2yz9ffcmgcaz.amplifyapp.com"
 
 export const api = {
     addDoctor: "/api/addDoctor",
