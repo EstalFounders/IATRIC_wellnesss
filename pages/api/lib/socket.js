@@ -19,28 +19,28 @@ const SocketHandler = (req, res) => {
 
     io.on("connection", (socket) => {
       console.log(`Socket Connected: ${socket.id}`);
-      socket.on("room:join", ({ meetingId, userType }) => {
-        // const { roomId } = data;
-        console.log(`Joining room: ${meetingId}`);
-        if (!rooms[meetingId]) {
-          rooms[meetingId] = { patients: [], doctors: [] };
+      socket.on("room:join", (data) => {
+        const { roomId } = data;
+        console.log(`Joining room: ${roomId}`);
+        if (!rooms[roomId]) {
+          rooms[roomId] = { patients: [], doctors: [] };
         }
 
-        if (userType === "doctor") {
-          rooms[meetingId].doctors.push(socket.id);
-        } else {
-          rooms[meetingId].patients.push(socket.id);
-        }
-        socket.join(meetingId);
+        // if (userType === "doctor") {
+        //   rooms[roomId].doctors.push(socket.id);
+        // } else {
+        //   rooms[roomId].patients.push(socket.id);
+        // }
+        socket.join(roomId);
 
         const otherUsers = Array.from(
-          io.sockets.adapter.rooms.get(meetingId) || []
+          io.sockets.adapter.rooms.get(roomId) || []
         ).filter((id) => id !== socket.id);
         if (otherUsers.length > 0) {
         io.to(socket.id).emit("user:joined", { id: otherUsers[0] });
         }
 
-        socket.emit("room:currentState", rooms[meetingId]);
+        socket.emit("room:currentState", rooms[roomId]);
       });
 
       socket.on("user:call", ({ to, offer }) => {
@@ -76,16 +76,16 @@ const SocketHandler = (req, res) => {
 
       socket.on("disconnect", () => {
         console.log(`User disconnected: ${socket.id}`);
-        for (const meetingId in rooms) {
-          const room = rooms[meetingId];
+        for (const roomId in rooms) {
+          const room = rooms[roomId];
           room.patients = room.patients.filter((id) => id !== socket.id);
           room.doctors = room.doctors.filter((id) => id !== socket.id);
 
           // Notify other users in the room about the user leaving
-          socket.to(meetingId).emit("user:left", { id: socket.id });
+          socket.to(roomId).emit("user:left", { id: socket.id });
 
           if (room.patients.length === 0 && room.doctors.length === 0) {
-            delete rooms[meetingId];
+            delete rooms[roomId];
           }
         }
       });
