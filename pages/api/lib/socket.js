@@ -9,7 +9,7 @@ const SocketHandler = (req, res) => {
     console.log("Socket is initializing");
     const io = new Server(res.socket.server, {
       cors: {
-        origin: "https://bugfix-new.d2yz9ffcmgcaz.amplifyapp.com",
+        origin: "*",
       },
     });
     res.socket.server.io = io;
