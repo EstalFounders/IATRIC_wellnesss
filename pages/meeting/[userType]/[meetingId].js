@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { production_url, userTypeConstant } from "../../../src/constant";
 
-const socket = io(production_url);
+const socket = io(production_url, {debug: true});
 
 const RoomPage = () => {
   // const [doctorConnected, setDoctorConnected] = useState(false);
@@ -123,12 +123,12 @@ const RoomPage = () => {
     socket.emit("peer:nego:needed", { offer, to: remoteSocketId });
   }, [remoteSocketId, getOffer, peer]);
 
-  useEffect(() => {
-    addEventListener("negotiationneeded", handleNegoNeeded);
-    return () => {
-      removeEventListener("negotiationneeded", handleNegoNeeded);
-    };
-  }, [handleNegoNeeded, addEventListener, removeEventListener]);
+  // useEffect(() => {
+  //   addEventListener("negotiationneeded", handleNegoNeeded);
+  //   return () => {
+  //     removeEventListener("negotiationneeded", handleNegoNeeded);
+  //   };
+  // }, [handleNegoNeeded, addEventListener, removeEventListener]);
 
   const handleNegoNeedIncoming = useCallback(
     async ({ from, offer }) => {
@@ -160,12 +160,12 @@ const RoomPage = () => {
     console.log(`${socketId} of ${type} is ${enabled} now`);
   }, []);
 
-  useEffect(() => {
-    addEventListener("track", async (event) => {
-      const [remoteStream] = event.streams;
-      setRemoteStream(remoteStream);
-    });
-  }, [addEventListener]);
+  // useEffect(() => {
+  //   addEventListener("track", async (event) => {
+  //     const [remoteStream] = event.streams;
+  //     setRemoteStream(remoteStream);
+  //   });
+  // }, [addEventListener]);
 
   const socketInitializer = async () => {
     await fetch("/api/lib/socket");
@@ -203,23 +203,23 @@ const RoomPage = () => {
     handleStreamUpdate,
   ]);
 
-  useEffect(() => {
-    if (myStream && localVideoRef.current) {
-      localVideoRef.current.srcObject = myStream;
-    }
-  }, [myStream]);
+  // useEffect(() => {
+  //   if (myStream && localVideoRef.current) {
+  //     localVideoRef.current.srcObject = myStream;
+  //   }
+  // }, [myStream]);
 
-  useEffect(() => {
-    if (remoteStream && remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [remoteStream]);
+  // useEffect(() => {
+  //   if (remoteStream && remoteVideoRef.current) {
+  //     remoteVideoRef.current.srcObject = remoteStream;
+  //   }
+  // }, [remoteStream]);
 
-  useEffect(() => {
-    if (remoteSocketId) {
-      handleCallUser();
-    }
-  }, [handleCallUser, remoteSocketId]);
+  // useEffect(() => {
+  //   if (remoteSocketId) {
+  //     handleCallUser();
+  //   }
+  // }, [handleCallUser, remoteSocketId]);
 
   const toggleLocalAudio = () => {
     const audioTrack = myStream.getAudioTracks()[0];

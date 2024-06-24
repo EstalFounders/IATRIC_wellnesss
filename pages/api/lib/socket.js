@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { production_url } from "../../../src/constant";
 
 const rooms = {};
 
@@ -9,7 +10,7 @@ const SocketHandler = (req, res) => {
     console.log("Socket is initializing");
     const io = new Server(res.socket.server, {
       cors: {
-        origin: "https://bugfix-new.d2yz9ffcmgcaz.amplifyapp.com",
+        origin: production_url,
       },
     });
     res.socket.server.io = io;

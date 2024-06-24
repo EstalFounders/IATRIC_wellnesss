@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { production_url } from '../constant';
 
 const initializeSocket = async () => {
   try {
@@ -6,7 +7,7 @@ const initializeSocket = async () => {
     await fetch('/api/lib/socket');
 
     // Initialize the socket connection
-    const socket = io('http://localhost:3000'); // Your Next.js server address
+    const socket = io(production_url); // Your Next.js server address
 
     // Return a promise that resolves when the socket is connected
     return new Promise((resolve, reject) => {
