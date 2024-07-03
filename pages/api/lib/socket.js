@@ -11,6 +11,7 @@ const SocketHandler = (req, res) => {
     const io = new Server(res.socket.server, {
       cors: {
         origin: production_url,
+        methods: ["GET","POST"]
       },
     });
     res.socket.server.io = io;
