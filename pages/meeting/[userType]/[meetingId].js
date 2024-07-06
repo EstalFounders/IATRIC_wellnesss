@@ -31,7 +31,7 @@ export default function App() {
   };
 
   const apiKey = "tg4yurp3jnkh";
-  const callId = "iatric-" + Math.random().toString(16).substring(2);
+  const callId = meetingId;
   const user = {
     id: user_id,
     name: userType === "patient" ? "Patient" : "Doctor",
@@ -52,7 +52,7 @@ export default function App() {
 
       setClient(streamClient);
 
-      const streamCall = streamClient.call(callType, meetingId);
+      const streamCall = streamClient.call(callType, callId);
 
       streamCall.on("participant_joined", (event) => {
         console.log("A participant joined:", event.participant);
@@ -99,7 +99,7 @@ export const MyUILayout = () => {
   const callingState = useCallCallingState();
   const localParticipant = useLocalParticipant();
   const remoteParticipants = useRemoteParticipants();
-  console.log(remoteParticipants, "remote participant");
+  const firstRemoteParticipant = remoteParticipants[0]; // Get the first remote participant
 
   if (callingState !== CallingState.JOINED) {
     return <div>Loading...</div>;
@@ -107,10 +107,12 @@ export const MyUILayout = () => {
 
   return (
     <StreamTheme>
-      <ParticipantView participant={localParticipant} />
-      {remoteParticipants.map((participant) => (
-        <ParticipantView key={participant.id} participant={participant} />
-      ))}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+          <ParticipantView participant={localParticipant} className="m-3" />
+        {firstRemoteParticipant && (
+            <ParticipantView participant={firstRemoteParticipant} className="m-3" />
+        )}
+      </div>
       <CallControls />
     </StreamTheme>
   );
