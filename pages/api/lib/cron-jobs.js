@@ -54,7 +54,9 @@ const shouldExecuteTask = () => {
   return diffDays >= 24;
 };
 
-const startCronJob = () => {
+const startCronJob = async () => {
+  await performScheduledTasks();
+  lastExecutionDate = new Date();
   cron.schedule(
     "0 0 * * *", // Every day at midnight
     async () => {

@@ -2,6 +2,7 @@
 import { consultationTypeMapping, twilioPhoneNumber } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import twilioClient from "../../src/lib/twilioClient";
+import Appointment from "../../src/models/appointmentSchema";
 import { checkSlotAvailability, findAvailableDoctor } from "./helper";
 import { makeTwilioCall, sendWhatsAppMessage } from "./lib/twilio";
 import createZoomMeetingUrl from "./lib/zoomVideo";
@@ -83,45 +84,97 @@ export default async function handler(req, res) {
       doctorMobileNo: "8920897437",
     };
     
+    const bookConsultation = async ({
+      doctorId,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType,
+      appointmentTime,
+      status,
+      patientMeetingUrl,
+      doctorMeetingUrl,
+      prescriptionUrl
+    }) => {
+      // const appointment = AppointSche
+      const appointment = Appointment.create({
+        meetingId,
+        doctorId,
+        symptoms,
+        name,
+        email,
+        patientMobNo,
+        consultationType,
+        appointmentTime,
+        status,
+        patientMeetingUrl,
+        doctorMeetingUrl,
+        prescriptionUrl
+      });
+    
+      return appointment;
+    };
 
+    
+
+    console.log(meetingId, 'meeting id')
+     
     // Handle consultation types
     switch (consultationType) {
       case "Call":
       case "Video":
+        const patientMeetingUrl = `/meeting/patient/${meetingId}`;
+        const doctorMeetingUrl = `/meeting/doctor/${meetingId}`;
+    
         if (appointmentTime === "Now") {
           // Immediate handling
-          const meetingDetails =
-            consultationType === "Call"
-              ? await makeTwilioCall("8920897437", pateintNo)
-              :  res.status(200).json({
-                meetingUrl: `/meeting/${meetingId}`,
-                // details: meetingDetails || {},
-              });
-          // Optionally save the meeting details or send a confirmation message
-          // sendConfirmationWhatsApp(name, email, meetingDetails, consultationType);
+          // res.status(200).json({
+          //   patientMeetingUrl: patientMeetingUrl,
+          //   doctorMeetingUrl: doctorMeetingUrl,
+          // });
         } else {
           // Scheduled handling
-          const meetingDetails =
-            consultationType === "Call"
-              ? await scheduleTwilioCall(doctorId, name, mobNo, selectedDate)
-              : await createZoomMeetingUrl(doctorId, name, selectedDate);
-          // Send a preliminary confirmation now and set up a reminder for the meeting time
-          // scheduleReminderWhatsApp(name, email, meetingDetails, consultationType, selectedDate);
+          // res.status(200).json({
+          //   patientMeetingUrl: patientMeetingUrl,
+          //   doctorMeetingUrl: doctorMeetingUrl,
+          // });
         }
-        // Booking logic here, possibly save meeting details
+        // Store appointment details
+    await bookConsultation({
+      meetingId,
+      doctorId,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType,
+      appointmentTime: isNow ? new Date() : selectedDate,
+      status: "open",
+      patientMeetingUrl,
+      doctorMeetingUrl,
+      prescriptionUrl: ''
+    });
+
         break;
+    
       case "Home visit":
       case "Clinic":
         // Simply book the consultation
-        await bookConsultation(
-          doctorId,
-          symptoms,
-          name,
-          email,
-          mobNo,
-          consultationType,
-          isNow ? now : selectedDate
-        );
+       // Store appointment details
+    await bookConsultation({
+      doctorId,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType,
+      appointmentTime: isNow ? new Date() : selectedDate,
+      status: "open",
+      patientMeetingUrl,
+      doctorMeetingUrl,
+      prescriptionUrl: ''
+    });
         break;
     }
 

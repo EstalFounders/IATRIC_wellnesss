@@ -10,6 +10,7 @@ import {
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+import CustomDialog from "../CustomPopup";
 
 const AppointmentPage = () => {
   const [doctorChoice, setDoctorChoice] = useState("any");
@@ -30,6 +31,8 @@ const AppointmentPage = () => {
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
   const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [message, setMessage] = useState('');
 
   const consultationData = {
     selectedDoctorId,
@@ -169,7 +172,18 @@ const AppointmentPage = () => {
     setOpenSnackBar(false);
   };
 
+  const handleShowDialog = (msg) => {
+    setMessage(msg);
+    setShowDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+    setMessage('');
+  };
+
   const bookConsultation = async () => {
+    setIsLoading(true);
     if (
       !name.trim() ||
       !email.trim() ||
@@ -190,7 +204,6 @@ const AppointmentPage = () => {
     if (doctorChoice === "choose" && appointmentTime === "Now") {
       checkAvailableSlot(); // Only check for immediate availability in this specific scenario
     }
-    setIsLoading(true);
     try {
       const response = await fetch(api.bookConsultation, {
         method: "POST",
@@ -202,7 +215,8 @@ const AppointmentPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Booking successful:", data);
+        console.log("Booking successful:", data.message);
+        handleShowDialog(data.message)
         // Handle successful booking, e.g., show a success message
       } else {
         console.error("Failed to book consultation");
@@ -530,7 +544,7 @@ const AppointmentPage = () => {
                       className="btn btn-blue blue-hover"
                       onClick={bookConsultation}
                     >
-                      Consult
+                      {isLoading ? '......' :'Consult'}
                     </button>
                   </div>
                   <Snackbar
@@ -641,6 +655,7 @@ const AppointmentPage = () => {
             {/* END SIDEBAR TABLE */}
           </aside>
           {/* END SIDEBAR */}
+          <CustomDialog show={showDialog} handleClose={handleCloseDialog} message={message} />
         </div>
         {/* End row */}
       </div>
