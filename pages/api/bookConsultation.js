@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         throw new Error("No available doctors at the selected time");
       }
     }
-
+    console.log(doctorId, selectedDate, selectedSlot, 'all required details',appointmentTime !== "Now")
     // Check slot availability
     if (appointmentTime !== "Now") {
       slotDetails = await checkSlotAvailability(
