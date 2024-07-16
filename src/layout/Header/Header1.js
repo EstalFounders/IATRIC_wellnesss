@@ -206,7 +206,10 @@ const Header1 = ({ toggleMenu, toggle }) => {
         <div className="wsmainwp clearfix">
           {/* LOGO IMAGE */}
           {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-          <div className="desktoplogo">
+          
+          {/* MAIN MENU */}
+          <nav className="wsmenu clearfix">
+          <div className="desktoplogo" style={{ position: 'absolute', left: 0 }}>
             <a href="#">
               <img
                 src="images/logo.png"
@@ -216,8 +219,6 @@ const Header1 = ({ toggleMenu, toggle }) => {
               />
             </a>
           </div>
-          {/* MAIN MENU */}
-          <nav className="wsmenu clearfix">
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
@@ -536,7 +537,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
                       handleConsultationTypeOpenDialog();
                     }}
                   >
-                    Make an Appointment
+                    Book an Appointment
                   </a>
                 </Link>
               </li>
