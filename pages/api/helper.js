@@ -1,9 +1,6 @@
 // pages/api/sendWhatsAppMessage.js
-import twilioClient from "../../src/lib/twilioClient";
 import Slot from "../../src/models/slots";
-import cron from "node-cron";
 import Doctor from "../../src/models/doctorModel";
-import { consultationTypeMapping } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 
 

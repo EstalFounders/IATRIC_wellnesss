@@ -1,12 +1,11 @@
 // import { immediateCall, scheduleCall, generateMeetingUrl, sendWhatsAppMessage } from '../../lib/twilio';
-import { consultationTypeMapping, twilioPhoneNumber } from "../../src/constant";
-import { dbConnect } from "../../src/lib/db";
-import twilioClient from "../../src/lib/twilioClient";
+import {
+  consultationTypeMapping,
+  development_production_url,
+} from "../../src/constant";
 import Appointment from "../../src/models/appointmentSchema";
 import { checkSlotAvailability, findAvailableDoctor } from "./helper";
-import { makeTwilioCall, sendWhatsAppMessage } from "./lib/twilio";
-import createZoomMeetingUrl from "./lib/zoomVideo";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -14,7 +13,7 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
     return;
   }
-
+  console.log('21', req.body)
   const {
     selectedDoctorId,
     appointmentTime,
@@ -28,6 +27,18 @@ export default async function handler(req, res) {
   } = req.body;
 
   try {
+    console.log(
+      selectedDoctorId,
+      appointmentTime,
+      selectedDate,
+      selectedSlot,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType,
+    );
+
     let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
     let slotDetails;
     let doctor;
@@ -45,7 +56,6 @@ export default async function handler(req, res) {
         throw new Error("No available doctors at the selected time");
       }
     }
-    console.log(doctorId, selectedDate, selectedSlot, 'all required details',appointmentTime !== "Now")
     // Check slot availability
     if (appointmentTime !== "Now") {
       slotDetails = await checkSlotAvailability(
@@ -83,7 +93,7 @@ export default async function handler(req, res) {
       email: doctor.email,
       doctorMobileNo: "8920897437",
     };
-    
+
     const bookConsultation = async ({
       doctorId,
       symptoms,
@@ -95,7 +105,7 @@ export default async function handler(req, res) {
       status,
       patientMeetingUrl,
       doctorMeetingUrl,
-      prescriptionUrl
+      prescriptionUrl,
     }) => {
       // const appointment = AppointSche
       const appointment = Appointment.create({
@@ -110,23 +120,21 @@ export default async function handler(req, res) {
         status,
         patientMeetingUrl,
         doctorMeetingUrl,
-        prescriptionUrl
+        prescriptionUrl,
       });
-    
+
       return appointment;
     };
 
-    
+    console.log(meetingId, "meeting id");
 
-    console.log(meetingId, 'meeting id')
-     
     // Handle consultation types
     switch (consultationType) {
       case "Call":
       case "Video":
-        const patientMeetingUrl = `/meeting/patient/${meetingId}`;
-        const doctorMeetingUrl = `/meeting/doctor/${meetingId}`;
-    
+        const patientMeetingUrl = `${development_production_url}/meeting/patient/${meetingId}`;
+        const doctorMeetingUrl = `${development_production_url}/meeting/doctor/${meetingId}`;
+
         if (appointmentTime === "Now") {
           // Immediate handling
           // res.status(200).json({
@@ -141,40 +149,40 @@ export default async function handler(req, res) {
           // });
         }
         // Store appointment details
-    await bookConsultation({
-      meetingId,
-      doctorId,
-      symptoms,
-      name,
-      email,
-      patientMobNo,
-      consultationType,
-      appointmentTime: isNow ? new Date() : selectedDate,
-      status: "open",
-      patientMeetingUrl,
-      doctorMeetingUrl,
-      prescriptionUrl: ''
-    });
+        await bookConsultation({
+          meetingId,
+          doctorId,
+          symptoms,
+          name,
+          email,
+          patientMobNo,
+          consultationType,
+          appointmentTime: isNow ? new Date() : selectedDate,
+          status: "open",
+          patientMeetingUrl,
+          doctorMeetingUrl,
+          prescriptionUrl: "",
+        });
 
         break;
-    
+
       case "Home visit":
       case "Clinic":
         // Simply book the consultation
-       // Store appointment details
-    await bookConsultation({
-      doctorId,
-      symptoms,
-      name,
-      email,
-      patientMobNo,
-      consultationType,
-      appointmentTime: isNow ? new Date() : selectedDate,
-      status: "open",
-      patientMeetingUrl,
-      doctorMeetingUrl,
-      prescriptionUrl: ''
-    });
+        // Store appointment details
+        await bookConsultation({
+          doctorId,
+          symptoms,
+          name,
+          email,
+          patientMobNo,
+          consultationType,
+          appointmentTime: isNow ? new Date() : selectedDate,
+          status: "open",
+          patientMeetingUrl,
+          doctorMeetingUrl,
+          prescriptionUrl: "",
+        });
         break;
     }
 

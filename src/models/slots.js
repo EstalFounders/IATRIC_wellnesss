@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const slotSchema = new Schema({
   doctorId: {
     type: Schema.Types.ObjectId,
-    ref: 'Doctor',  // Assuming you have a Doctor model you want to link to
+    ref: 'Doctor',
     required: true
   },
   startTime: {
@@ -25,7 +25,15 @@ const slotSchema = new Schema({
   }
 });
 
-const Slot = mongoose.models.slotSchema || mongoose.model('Slot', slotSchema);
+// Use a unique model identifier
+const modelName = 'Slot';
+
+// Check if the model already exists
+if (mongoose.models[modelName]) {
+  mongoose.deleteModel(modelName);
+}
+
+// Compile the model if it doesn't exist
+const Slot = mongoose.model(modelName, slotSchema);
 
 export default Slot;
-
