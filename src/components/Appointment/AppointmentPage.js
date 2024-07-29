@@ -157,6 +157,19 @@ const AppointmentPage = () => {
     }
   }, [doctors]);
 
+  useEffect(() => {
+    if (doctorChoice === "choose" && appointmentTime === "Now") {
+      try {
+        if (!selectedSlot) {
+          checkAvailableSlot(); // Wait for the available slot to be set
+        }
+      } catch (error) {
+        console.error("Slot check failed:", error);
+        return; // Stop execution if no slot is available
+      }
+    }
+  }, [availableSlots]);
+
   const handleOpenSnackBar = () => {
     setOpenSnackBar(true);
   };
@@ -192,19 +205,8 @@ const AppointmentPage = () => {
       handleOpenSnackBar();
       return;
     }
-
-    if (doctorChoice === "choose" && appointmentTime === "Now") {
-      try {
-        if(!selectedSlot) {
-        await checkAvailableSlot(); // Wait for the available slot to be set
-        }
-      } catch (error) {
-        console.error("Slot check failed:", error);
-        return; // Stop execution if no slot is available
-      }
-    }
-    console.log(selectedSlot, 'selected slot')
-   try {
+    console.log(selectedSlot, "selected slot");
+    try {
       setIsLoading(true);
       const consultationData = {
         selectedDoctorId,
@@ -249,14 +251,15 @@ const AppointmentPage = () => {
       now.setMinutes(0);
       now.setSeconds(0);
       now.setMilliseconds(0);
-  
+
       const availableSlot = availableSlots.find((slot) => {
         const startTime = new Date(slot.startTime);
         const endTime = new Date(slot.endTime);
         return now >= startTime && now < endTime && !slot.isBooked;
       });
-  
+
       if (availableSlot) {
+        console.log(availableSlot._id, "when now selected slot id");
         setSelectedSlot(availableSlot);
         resolve(availableSlot); // Resolve the promise with the available slot
       } else {
@@ -265,12 +268,9 @@ const AppointmentPage = () => {
           "Currently, no slots are available. Please choose another time or try again later."
         );
         handleOpenSnackBar();
-        reject(new Error("No available slots")); // Reject the promise
       }
     });
   };
-  
-  
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
@@ -357,7 +357,7 @@ const AppointmentPage = () => {
                       name="mobNo"
                       className="form-control"
                       placeholder="Mobile Number*"
-                      max={10}
+                      maxLength={10}
                       value={mobNo}
                       onChange={(e) => setMobNo(e.target.value)}
                       required
@@ -491,6 +491,7 @@ const AppointmentPage = () => {
                         selected={selectedDate}
                         onChange={(date) => setSelectedDate(date)}
                         inline
+                        minDate={new Date()}
                         highlightDates={availableSlots.map((slot) => ({
                           "react-datepicker__day--highlighted": new Date(
                             slot.startTime
@@ -506,14 +507,20 @@ const AppointmentPage = () => {
                           }}
                         >
                           {availableSlots
-                            .filter((slot) => !slot.isBooked)
+                            .filter((slot) => {
+                              const slotDate = new Date(slot.startTime);
+                              return (
+                                !slot.isBooked &&
+                                slotDate.getTime() > new Date().getTime()
+                              );
+                            })
                             .map((slot) => (
                               <li
                                 key={slot._id}
                                 style={{
                                   color: "black",
                                   backgroundColor:
-                                    selectedSlot?._id === slot._id
+                                    selectedSlot._id === slot._id
                                       ? "#9f9856"
                                       : "white",
                                   border: "1px solid black",

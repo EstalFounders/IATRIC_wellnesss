@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
     return;
   }
-  console.log('21', req.body)
   const {
     selectedDoctorId,
     appointmentTime,
@@ -56,46 +55,34 @@ export default async function handler(req, res) {
         throw new Error("No available doctors at the selected time");
       }
     }
-    // Check slot availability
-    if (appointmentTime !== "Now") {
-      slotDetails = await checkSlotAvailability(
-        doctorId,
-        selectedDate,
-        selectedSlot
-      );
-      console.log(slotDetails, "slot detauls");
-      if (slotDetails.isBooked) {
-        res.status(409).json({ message: "Selected slot is not available." });
-        return;
-      }
-    }
-    console.log(patientMobNo, "pateitn mob no");
-    const patientDetails = {
-      name: name,
-      selectedDoctorId: doctorId,
-      appointmentTime: appointmentTime,
-      selectedDate: selectedDate,
-      selectedSlot: selectedSlot,
-      symptoms: symptoms,
-      consultationType: consultationType,
-      email: email,
-      patientMobileNo: patientMobNo,
-    };
+    
+    // const patientDetails = {
+    //   PatientName: "Shubham",
+    //   selectedDoctorId: doctorId,
+    //   appointmentTime: appointmentTime,
+    //   selectedDate: selectedDate,
+    //   selectedSlot: selectedSlot,
+    //   symptoms: symptoms,
+    //   consultationType: consultationType,
+    //   email: email,
+    //   patientMobileNo: patientMobNo,
+    // };
 
-    const doctorDetails = {
-      name: doctor.name,
-      selectedDoctorId: selectedDoctorId,
-      appointmentTime: appointmentTime,
-      selectedDate: selectedDate,
-      selectedSlot: selectedSlot,
-      symptoms: symptoms,
-      consultationType: consultationType,
-      email: doctor.email,
-      doctorMobileNo: "8920897437",
-    };
+    // const doctorDetails = {
+    //   doctorName: "Ashima",
+    //   selectedDoctorId: selectedDoctorId,
+    //   appointmentTime: appointmentTime,
+    //   selectedDate: selectedDate,
+    //   selectedSlot: selectedSlot,
+    //   symptoms: symptoms,
+    //   consultationType: consultationType,
+    //   email: doctor.email,
+    //   doctorMobileNo: "8920897437",
+    // };
 
     const bookConsultation = async ({
       doctorId,
+      selectedSlot,
       symptoms,
       name,
       email,
@@ -111,6 +98,7 @@ export default async function handler(req, res) {
       const appointment = Appointment.create({
         meetingId,
         doctorId,
+        slotId: selectedSlot._id,
         symptoms,
         name,
         email,
@@ -152,6 +140,7 @@ export default async function handler(req, res) {
         await bookConsultation({
           meetingId,
           doctorId,
+          selectedSlot,
           symptoms,
           name,
           email,
@@ -171,7 +160,9 @@ export default async function handler(req, res) {
         // Simply book the consultation
         // Store appointment details
         await bookConsultation({
+          meetingId,
           doctorId,
+          selectedSlot,
           symptoms,
           name,
           email,
