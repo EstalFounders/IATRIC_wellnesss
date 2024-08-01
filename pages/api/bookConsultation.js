@@ -3,8 +3,14 @@ import {
   consultationTypeMapping,
   development_production_url,
 } from "../../src/constant";
+import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
-import { checkSlotAvailability, findAvailableDoctor } from "./helper";
+import Slot from "../../src/models/slots";
+import {
+  findAvailableDoctor,
+  findAvailableDoctorForNow,
+  findAvailableDoctorForSpecificTimeSlot,
+} from "./helper";
 import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
@@ -35,27 +41,48 @@ export default async function handler(req, res) {
       name,
       email,
       patientMobNo,
-      consultationType,
+      consultationType
     );
 
     let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
-    let slotDetails;
+    let slot = selectedSlot === "" ? null : selectedSlot;
     let doctor;
+
     // Determine current or specific time
     const now = new Date();
     const isNow = appointmentTime === "Now";
     const genericConsultationType = consultationTypeMapping[consultationType];
     const meetingId = uuidv4();
-    // Find available doctor if needed
-    if (doctorId === null) {
-      doctor = await findAvailableDoctor(selectedDate, genericConsultationType);
-      doctorId = doctor._id;
-      console.log(doctor, "doctorid");
+
+    // Find available doctor if needed right now
+    if (doctorId == null && appointmentTime == "Now") {
+      const result = await findAvailableDoctorForNow(
+        selectedDate,
+        genericConsultationType
+      );
+      doctorId = result.doctor.doctorId;
+      slot = result.slot;
+      console.log(doctor, "doctorid for right now");
       if (!doctor) {
         throw new Error("No available doctors at the selected time");
       }
     }
-    
+
+    // Find available doctor if needed at specific time
+    if (doctorId == null && appointmentTime == "chooseTime") {
+      const result = await findAvailableDoctorForSpecificTimeSlot(
+        selectedDate,
+        genericConsultationType,
+        selectedSlot
+      );
+      doctorId = result.doctor;
+      slot = result.slotId;
+      console.log(doctorId, "doctorid for specific time", slot, "slot");
+      if (!doctorId && !slot) {
+        throw new Error("No available doctors at the selected time");
+      }
+    }
+
     // const patientDetails = {
     //   PatientName: "Shubham",
     //   selectedDoctorId: doctorId,
@@ -81,8 +108,9 @@ export default async function handler(req, res) {
     // };
 
     const bookConsultation = async ({
+      meetingId,
       doctorId,
-      selectedSlot,
+      slot,
       symptoms,
       name,
       email,
@@ -94,11 +122,25 @@ export default async function handler(req, res) {
       doctorMeetingUrl,
       prescriptionUrl,
     }) => {
-      // const appointment = AppointSche
-      const appointment = Appointment.create({
+      await dbConnect();
+
+      const updatedSlot = await Slot.findOneAndUpdate(
+        { _id: slot._id, doctorId, isBooked: false },
+        { isBooked: true },
+        { new: true }
+      );
+
+      console.log(updatedSlot, "updated slot");
+      // Check if the slot was successfully booked
+      if (!updatedSlot) {
+        throw new Error("Slot is already booked or does not exist.");
+      }
+
+      // Step 2: Create the appointment
+      const appointment = await Appointment.create({
         meetingId,
         doctorId,
-        slotId: selectedSlot._id,
+        slotId: updatedSlot._id,
         symptoms,
         name,
         email,
@@ -140,7 +182,7 @@ export default async function handler(req, res) {
         await bookConsultation({
           meetingId,
           doctorId,
-          selectedSlot,
+          slot,
           symptoms,
           name,
           email,
@@ -162,7 +204,7 @@ export default async function handler(req, res) {
         await bookConsultation({
           meetingId,
           doctorId,
-          selectedSlot,
+          slot,
           symptoms,
           name,
           email,

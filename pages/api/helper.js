@@ -31,18 +31,21 @@ export async function generateSlotsForMonth(doctorId, year, month) {
   await Slot.insertMany(slots);
 }
 
-export async function findAvailableDoctor(selectedDate, genericConsultationType) {
-  await dbConnect()
+export async function findAvailableDoctorForNow(selectedDate, genericConsultationType) {
+  await dbConnect();
+
+  console.log(genericConsultationType, 'generic consultation type', selectedDate, 'selected date')
+
   const startOfDay = new Date(selectedDate);
   startOfDay.setHours(0, 0, 0, 0);
 
   const endOfDay = new Date(selectedDate);
   endOfDay.setHours(23, 59, 59, 999);
-
   // Find doctors who can provide the requested consultation type
   const doctors = await Doctor.find({
     consultationType: genericConsultationType,
   });
+  console.log("49", doctors._id)
   for (const doctor of doctors) {
     // Check for available slots for this doctor on the given date
     const availableSlot = await Slot.findOne({
@@ -51,12 +54,53 @@ export async function findAvailableDoctor(selectedDate, genericConsultationType)
       isBooked: false,
     });
     if (availableSlot) {
-      return doctor; // Return the first available doctor's ID with an available slot
+      return {
+        doctor,
+        slot: availableSlot, // Include the slot ID in the returned result
+      };
     }
   }
 
-  return ""; // Return empty if no available doctors are found
+  return ""; // Return null if no available doctors are found
 }
+
+
+export async function findAvailableDoctorForSpecificTimeSlot(selectedDate, genericConsultationType, slot) {
+  await dbConnect();
+
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(selectedDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Use the startTime and endTime from the slot object
+  const { startTime, endTime } = slot;
+
+  // Find doctors who can provide the requested consultation type
+  
+  const doctors = await Doctor.find({
+    consultationType: genericConsultationType,
+  });
+  console.log(doctors[0]._id, 'doctors id in helper 85')
+  for (const doctor of doctors) {
+    // Check for available slots for this doctor within the specific time range
+    const availableSlot = await Slot.findOne({
+      doctorId: doctor._id,
+      startTime: { $gte: new Date(startTime), $lte: new Date(endTime) },
+      isBooked: false,
+    });
+    console.log(availableSlot, 'available slot')
+    if (availableSlot) {
+      return {doctor,
+        slotId: availableSlot
+      }; // Return the first available doctor's ID with an available slot in the specific time range
+    }
+  }
+
+  return ""; // Return empty if no available doctors are found within the specific time range
+}
+
 
 export async function checkSlotAvailability(doctorId, startDate, endDate) {
    try {
