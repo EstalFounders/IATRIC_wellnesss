@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import Navbar from "../../components/superAdminComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/superAdminComponent/NavBarComponent/RightSideMenu";
 
-const DocLoginHeader = ({ session }) => {
+const SuperAdminLoginHeader = ({ session }) => {
   const router = useRouter();
 
   return (
@@ -33,4 +33,4 @@ const DocLoginHeader = ({ session }) => {
   );
 };
 
-export default DocLoginHeader;
+export default SuperAdminLoginHeader;

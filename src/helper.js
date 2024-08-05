@@ -3,7 +3,7 @@ import { api, contact_no } from "./constant";
 
 export const loginUser = async ({ email, password }) => {
   console.log("login user console");
-  const res = await signIn("credentials", {
+  const res = await signIn("superAdmin-credentials", {
     redirect: false,
     email,
     password,
@@ -14,23 +14,14 @@ export const loginUser = async ({ email, password }) => {
 
 
 export async function loginDoctor({ email, password }) {
-  const credentials = {
-    email: email,
-    password: password,
-  };
-  try {
-    // Make a POST request to your backend login route
-    const response = await fetch(api.doctorLogin, {
-      method: "POST",
-      body: JSON.stringify(credentials),
-    });
-    return response;
-  } catch (error) {
-    return {
-      success: false,
-      message: error.response.data.message || "An error occurred.",
-    };
-  }
+  console.log(email, 'email',password,"password");
+  const res = await signIn("doctor-credentials", {
+    redirect: false,
+    email,
+    password,
+  });
+
+  return res;
 }
 
 export const dial = () => {

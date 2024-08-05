@@ -10,12 +10,18 @@ import {
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
+import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
+import { useRouter } from "next/router";
+
+
 
 const AppointmentPage = () => {
+  const router = useRouter();
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("Now");
+  const [appointmentTime, setAppointmentTime] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [doctors, setDoctors] = useState([]); // Initially all doctors are shown
@@ -32,18 +38,7 @@ const AppointmentPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [message, setMessage] = useState("");
-
-  // const consultationData = {
-  //   selectedDoctorId,
-  //   appointmentTime,
-  //   selectedDate: selectedDate.toISOString(), // Format the date to ensure compatibility
-  //   selectedSlot,
-  //   symptoms,
-  //   name,
-  //   email,
-  //   patientMobNo: mobNo,
-  //   consultationType,
-  // };
+  const withinBusinessHours = isWithinBusinessHours();
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -116,7 +111,7 @@ const AppointmentPage = () => {
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;
     setAppointmentTime(timeChoice);
-    if (timeChoice === "Now") {
+    if (timeChoice == "chooseTime") {
     }
     setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
   };
@@ -156,6 +151,13 @@ const AppointmentPage = () => {
       filterDoctors(consultationType);
     }
   }, [doctors]);
+
+  useEffect(() => {
+    if (appointmentTime === "chooseTime") {
+      const slots = generateSlotsForChooseTime(selectedDate, 9, 21, 15); // Generate slots from 9 AM to 9 PM with 15-minute intervals
+      setLocallyCreatedSlots(slots);
+    }
+  }, [selectedDate, appointmentTime]);
 
   useEffect(() => {
     if (doctorChoice === "choose" && appointmentTime === "Now") {
@@ -230,6 +232,7 @@ const AppointmentPage = () => {
         const data = await response.json();
         console.log("Booking successful:", data.message);
         handleShowDialog(data.message);
+        router.reload();
       } else {
         const errorData = await response.json();
         console.error("Failed to book consultation:", errorData.message);
@@ -457,17 +460,19 @@ const AppointmentPage = () => {
                     className="col-lg-12"
                     style={{ textAlign: "center", marginBottom: "20px" }}
                   >
-                    <label style={{ marginRight: "30px" }} className="ml-2">
-                      <input
-                        type="radio"
-                        name="appointmentTime"
-                        value="Now"
-                        checked={appointmentTime === "Now"}
-                        onChange={handleTimeSelection}
-                        style={{ marginRight: "10px" }}
-                      />
-                      Now
-                    </label>
+                    {withinBusinessHours && (
+                      <label style={{ marginRight: "30px" }} className="ml-2">
+                        <input
+                          type="radio"
+                          name="appointmentTime"
+                          value="Now"
+                          checked={appointmentTime === "Now"}
+                          onChange={handleTimeSelection}
+                          style={{ marginRight: "10px" }}
+                        />
+                        Now
+                      </label>
+                    )}
                     <label style={{ marginRight: "30px" }} className="ml-3">
                       <input
                         type="radio"
@@ -547,20 +552,64 @@ const AppointmentPage = () => {
                   ) : appointmentTime === "chooseTime" &&
                     doctorChoice === "any" ? (
                     <div className="col-lg-12">
-                      <input
-                        type="datetime-local"
-                        name="dateTimePicker"
-                        className="form-control"
-                        value={
-                          selectedDate instanceof Date
-                            ? selectedDate.toISOString().substring(0, 16)
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setSelectedDate(new Date(e.target.value))
-                        }
-                        required
+                      <DatePicker
+                        selected={selectedDate}
+                        onChange={(date) => setSelectedDate(date)}
+                        inline
+                        minDate={new Date()}
+                        highlightDates={locallyCreatedSlots.map((slot) => ({
+                          "react-datepicker__day--highlighted": new Date(
+                            slot.startTime
+                          ),
+                        }))}
                       />
+                      <ul>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "space-around",
+                          }}
+                        >
+                          {locallyCreatedSlots
+                            .filter((slot) => {
+                              const currentDate = new Date();
+                              return (
+                                selectedDate.toDateString() ===
+                                  slot.startTime.toDateString() &&
+                                slot.startTime > currentDate
+                              );
+                            })
+                            .map((slot) => (
+                              <li
+                                key={slot._id}
+                                style={{
+                                  color: "black",
+                                  backgroundColor:
+                                    selectedSlot &&
+                                    selectedSlot._id === slot._id
+                                      ? "#9f9856"
+                                      : "white",
+                                  border: "1px solid black",
+                                  padding: "5px",
+                                  margin: "5px",
+                                  borderRadius: "5px",
+                                  width: "30%",
+                                  maxWidth: "160px",
+                                  textAlign: "center",
+                                  cursor: "pointer",
+                                  transition: "background-color 0.3s",
+                                  fontSize: "0.9rem",
+                                  lineHeight: "1.4",
+                                }}
+                                onClick={() => handleSlotSelection(slot)}
+                              >
+                                {formatTime(slot.startTime)} -{" "}
+                                {formatTime(slot.endTime)}
+                              </li>
+                            ))}
+                        </div>
+                      </ul>
                     </div>
                   ) : null}
 

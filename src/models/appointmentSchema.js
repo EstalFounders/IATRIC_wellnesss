@@ -57,6 +57,17 @@ const appointmentSchema = new mongoose.Schema({
   },
 });
 
+// Use a unique model identifier
+const modelName = 'Appointment';
+
+// Check if the model already exists
+if (mongoose.models[modelName]) {
+  mongoose.deleteModel(modelName);
+}
+
+// Compile the model if it doesn't exist
+const Slot = mongoose.model(modelName, appointmentSchema);
+
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
 export default Appointment;
