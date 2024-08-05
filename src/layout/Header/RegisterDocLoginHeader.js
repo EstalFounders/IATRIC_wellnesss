@@ -12,7 +12,7 @@ const RegisterDocLoginHeader = ({ session }) => {
 
   const handleLogout = async () => {
     await signOut();
-    // router.push("/registerDoc/login")
+    router.push("/registerDoc/login")
   };
 
   return (
