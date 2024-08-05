@@ -1,5 +1,5 @@
 import { Button, Col, Row } from "react-bootstrap";
-import DocLoginHeader from "../../layout/Header/DocLoginHeader";
+import DocLoginHeader from "../../layout/Header/SuperAdminLoginHeader";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import { useState } from "react";

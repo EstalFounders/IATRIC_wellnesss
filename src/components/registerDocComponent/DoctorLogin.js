@@ -1,107 +1,128 @@
-// pages/login.js
-
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { loginDoctor } from "../../helper";
 import Preloader from "../Preloader";
-
-// Define CSS styles
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    // justifyContent: "center",
-    height: "100vh",
-    backgroundColor: "#f3f9dc", // Light green
-  },
-  form: {
-    width: "300px",
-    backgroundColor: "#fff", // White
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#8e8333", // Yellow
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
-  },
-  errorMessage: {
-    color: "red",
-    marginTop: "10px",
-  },
-};
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import Image from "next/image";
+import Logo from "../../../public/images/logo.png";
+// import GoogleSvg from "../assets/icons8-google.svg";
+import ImageSrc from "../../../public/images/Doctor/doctor-removebg-preview.png"; // Adjust the path as necessary
+import styles from "./css/DoctorLogin.module.css"; // Import the CSS file
+import CustomDialog from "../CustomPopup";
 
 export default function DoctorLogin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setloading] = useState("")
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [message, setMessage] = useState(
+    ""
+  );
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+    setMessage("");
+  };
+
+  const handleShowDialog = (msg) => {
+    setMessage(msg);
+    setShowDialog(true);
+  };
 
   const handleSubmit = async (e) => {
-    setloading(true)
+    setLoading(true);
     e.preventDefault();
     setError("");
 
     try {
-      // Call the function to handle login logic
       const res = await loginDoctor({ email, password });
       if (res.ok) {
-        
-        // Redirect to homepage if login is successful
         router.push("/registerDoc/homepage");
-        
       } else {
-        setError(res.message);
+        // console.log(res.status, 'error message')
+        setError(res.error);
+        handleShowDialog("Wrong Input, Please try again with the correct credentials");
+        setEmail("")
+        setPassword("")
+        setLoading(false);
       }
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again later.");
     }
-    setloading(false)
   };
 
   return (
-    <div style={styles.container} className="p-4">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={{ marginBottom: "20px" }}>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-          />
+    <div className={`${styles.container} p-4`}>
+      <div className={styles["login-main"]}>
+        <div className={styles["login-left"]}>
+          <Image src={ImageSrc} alt="Login Image" />
         </div>
-        <div style={{ marginBottom: "20px" }}>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-          />
+        <div className={styles["login-right"]}>
+          <div className={styles["form-container"]}>
+            <div className={styles["login-logo"]}>
+              <Image src={Logo} alt="Logo" />
+            </div>
+            <div className={styles["login-center"]}>
+              <h2>Welcome back!</h2>
+              <h6>Please enter your details</h6>
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.input}
+                />
+                <div className={styles["pass-input-div"]}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={styles.input}
+                  />
+                  {showPassword ? (
+                    <FaEyeSlash
+                      onClick={() => setShowPassword(!showPassword)}
+                      className={styles["pass-input-icon"]}
+                    />
+                  ) : (
+                    <FaEye
+                      onClick={() => setShowPassword(!showPassword)}
+                      className={styles["pass-input-icon"]}
+                    />
+                  )}
+                </div>
+                <div className={styles["login-center-options"]}>
+                  {/* <div className={styles["remember-div"]}>
+                    <input type="checkbox" id="remember-checkbox" />
+                    <label htmlFor="remember-checkbox">
+                      Remember for 30 days
+                    </label>
+                  </div> */}
+                  <a href="#" className={styles["forgot-pass-link"]}>
+                    Forgot password?
+                  </a>
+                </div>
+                <button type="submit" className={styles.button}>
+                  Log In
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-          <button type="submit" style={styles.button}>
-            Login
-          </button>
-      </form>
-      {loading ? <Preloader />: null}
-      {error && <p style={styles.errorMessage}>{error}</p>}
+      </div>
+      {loading && <Preloader />}
+      <CustomDialog
+        show={showDialog}
+        handleClose={handleCloseDialog}
+        message={message}
+      />
+      {/* {error && <p className={styles["error-message"]}>{error}</p>} */}
     </div>
   );
 }

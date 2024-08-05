@@ -50,7 +50,7 @@ export async function findAvailableDoctorForNow(selectedDate, genericConsultatio
     // Check for available slots for this doctor on the given date
     const availableSlot = await Slot.findOne({
       doctorId: doctor._id,
-      date: { $gte: startOfDay, $lte: endOfDay },
+      startTime: { $gte: new Date(startTime), $lte: new Date(endTime) },
       isBooked: false,
     });
     if (availableSlot) {
