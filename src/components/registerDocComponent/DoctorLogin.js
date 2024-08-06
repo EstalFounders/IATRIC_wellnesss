@@ -98,12 +98,6 @@ export default function DoctorLogin() {
                   )}
                 </div>
                 <div className={styles["login-center-options"]}>
-                  {/* <div className={styles["remember-div"]}>
-                    <input type="checkbox" id="remember-checkbox" />
-                    <label htmlFor="remember-checkbox">
-                      Remember for 30 days
-                    </label>
-                  </div> */}
                   <a href="#" className={styles["forgot-pass-link"]}>
                     Forgot password?
                   </a>
