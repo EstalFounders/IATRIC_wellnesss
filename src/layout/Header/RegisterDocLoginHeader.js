@@ -11,8 +11,8 @@ const RegisterDocLoginHeader = ({ session }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut();
-    router.push("/registerDoc/login")
+    const callbackUrl = process.env.NODE_ENV === 'production' ? 'https://development.d2xrlfkxmadgut.amplifyapp.com/' : 'http://localhost:3000';
+    await signOut({ callbackUrl: `${callbackUrl}/registerDoc/login` });
   };
 
   return (
