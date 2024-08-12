@@ -32,7 +32,7 @@ const Dropdown = () => {
   return (
     <div className={styles.dropdown}>
       <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
-        <strong>{super_admin_info.user.fname}</strong>
+        <strong>{super_admin_info ? super_admin_info.user.fname: null}</strong>
       <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
       </div>
 
