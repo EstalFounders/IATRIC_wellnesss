@@ -14,11 +14,52 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
+  if (req.method === "GET") {
+    const { doctorId } = req.query; // Get the doctorId from the query parameters
+
+    try {
+      await dbConnect();
+
+      let appointments;
+      if (doctorId) {
+        appointments = await Appointment.find({ doctorId: doctorId });
+      } else {
+        appointments = await Appointment.find({});
+      }
+
+      res.status(200).json({ appointments });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Unable to fetch appointments" });
+    }
+  } 
+
+  if (req.method === 'PUT') {
+    const { appointmentId, selectedStatus } = req.body; // Extract the id and status from the request body
+
+    if (!appointmentId || !selectedStatus) {
+      return res.status(400).json({ message: 'Missing id or status' });
+    }
+    console.log(appointmentId, 'appointment id', selectedStatus, 'selected status')
+    try {
+      const appointment = await Appointment.findByIdAndUpdate(
+        {_id: appointmentId},
+        {status: selectedStatus},
+        { new: true } // Return the updated document
+      );
+
+      res.status(200).json({ message: 'Status updated successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred', error });
+    }
+  } else {
+    res.setHeader('Allow', ['PUT']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
-    return;
   }
+
+
+
+  if (req.method === "POST") {
   const {
     selectedDoctorId,
     appointmentTime,
@@ -240,4 +281,6 @@ export default async function handler(req, res) {
       .status(500)
       .json({ message: error.message || "Failed to book the consultation" });
   }
+
+}
 }

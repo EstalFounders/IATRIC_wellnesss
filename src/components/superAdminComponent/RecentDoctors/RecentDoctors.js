@@ -32,7 +32,7 @@ const RecentDoctors = ({ doctors, refreshDoctorList }) => {
         </Row>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {doctors.map((item) => (
-            <ItemCard key={item.id} doctor={item} refreshDoctorList={refreshDoctorList} />
+            <ItemCard key={item._id} doctor={item} refreshDoctorList={refreshDoctorList} />
           ))}
         </div>
         <Row className="mt-4">

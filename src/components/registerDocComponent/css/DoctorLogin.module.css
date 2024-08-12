@@ -107,7 +107,7 @@ body {
 }
 
 .form button[type='submit'] {
-  width: 50%;
+  width: 80%;
   padding: 16px;
   border: none;
   border-radius: 4px;
@@ -202,7 +202,7 @@ body {
 @media(max-width: 1366px) {
   .login-left {
     display: none;
-  }   
+  }
 }
 
 @media(max-width: 370px) {

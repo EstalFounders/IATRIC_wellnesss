@@ -4,9 +4,14 @@ import React, { useState } from 'react';
 import { FiCircle } from 'react-icons/fi';
 import styles from './RightSideMenu.module.css';
 import { FaAngleDown } from 'react-icons/fa';
+import { super_admin_info_local_sotrage } from "../../../constant";
 
 const Dropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const super_admin_info = JSON.parse(
+    localStorage.getItem(super_admin_info_local_sotrage)
+  );
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -27,7 +32,7 @@ const Dropdown = () => {
   return (
     <div className={styles.dropdown}>
       <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
-        <strong>Dr Satvik</strong>
+        <strong>{super_admin_info.user.fname}</strong>
       <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
       </div>
 

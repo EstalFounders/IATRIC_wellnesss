@@ -69,7 +69,20 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Doctor signature is required"],
   },
-  slots: [{ type: Schema.Types.ObjectId, ref: 'Slot' }],
+  doctorType: {
+    type: String,
+    required: [true, "Doctor type is required"],
+  },
+  price: {
+    type: Number,
+    required: [true, "Doctor type is required"],
+  },
+  slotStartTime: {
+    type: Date,
+  },
+  slotEndTime: {
+    type: Date,
+  },
   joiningDate: {
     type: Date,
     default: Date.now,

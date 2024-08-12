@@ -61,6 +61,10 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
     formData.append("consultationType", updatedDoctor.consultationType);
     formData.append("location", updatedDoctor.location);
     formData.append("profilePicture", updatedDoctor.profilePictureUrl);
+    formData.append("doctorType", updatedDoctor.doctorType);
+    formData.append("price", updatedDoctor.price);
+    formData.append("slotStartTime", updatedDoctor.slotStartTime);
+    formData.append("slotEndTime", updatedDoctor.slotEndTime);
     updatedDoctor.diplomasCertificatesUrls.forEach((certificate, index) => {
       formData.append(`diplomasCertificatesUrls[${index}]`, certificate);
     });

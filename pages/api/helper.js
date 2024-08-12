@@ -145,4 +145,6 @@ export async function checkSlotAvailability(doctorId, startDate, endDate) {
        `Best regards,\n` +
        `Iatric Healthcare`;
 }
+
+
  

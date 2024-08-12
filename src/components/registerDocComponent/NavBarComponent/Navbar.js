@@ -19,7 +19,7 @@ function Navbar() {
         <div className={styles.navbar}>
           <div className={styles["menu-bars"]}>
             <FaIcons.FaBars
-              color="#000000"
+              color="#3b5f1d"
               size={30}
               onClick={showSidebar}
               className="ml-2"
@@ -41,9 +41,9 @@ function Navbar() {
             </li>
             {SidebarData.map((item, index) => {
               return (
-                <li key={index} className={item.cName}>
+                <li key={index} className={`${item.cName}`}>
                   <Link href={item.path}>
-                    <div className="mt-5 m-4">
+                    <div className={`mt-5 m-4 border-bottom`}>
                       {item.icon}
                       <span className={styles.span}>{item.title}</span>
                     </div>

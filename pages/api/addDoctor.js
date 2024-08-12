@@ -18,8 +18,8 @@ import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
-import { generateSlotsForMonth } from "./helper";
-import Slot from '../../src/models/slots'
+import { convertTimeIntoDate, generateSlotsForMonth } from "./helper";
+import Slot from "../../src/models/slots";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -145,26 +145,20 @@ export default async function handler(req, res) {
               value.toString(),
             ])
           );
-
+          console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
             password: hashedPassword,
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
-            doctorStampUrl, 
+            doctorStampUrl,
             doctorSignatureUrl,
           });
 
           console.log(addedDoctor._id, "Doctor Added");
 
-          await generateSlotsForMonth(
-            addedDoctor._id,
-            new Date().getFullYear(),
-            new Date().getMonth()
-          );
-
           res.status(200).json({
-            success: true,
+            message: "Doctor Added successfully",
           });
 
           // Assuming the rest of your code to handle the response and database operations
@@ -199,6 +193,7 @@ export default async function handler(req, res) {
       // Fetch the doctor by ID
       const existingDoctor = await Doctor.findById(id);
       console.log(existingDoctor, "existing doctor");
+
       if (!existingDoctor) {
         return res.status(404).json({ message: "Doctor not found" });
       }
@@ -302,17 +297,25 @@ export default async function handler(req, res) {
         const stringFields = Object.fromEntries(
           Object.entries(fields).map(([key, value]) => [key, value.toString()])
         );
+        console.log(fields.slotStartTime, 'slort start time on server')
+        // Convert slotStartTime and slotEndTime before storing in MongoDB
+        // const slotStartTime = convertTimeIntoDate(fields.slotStartTime);
+        // const slotEndTime = convertTimeIntoDate(fields.slotEndTime);
+
+        
 
         // Update doctor data in MongoDB
         const updateData = {
           ...stringFields,
+          // slotStartTime,
+          // slotEndTime,
           profilePictureUrl,
           diplomasCertificatesUrls,
         };
-        const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
-          new: true,
-        });
-        console.log(updatedDoctor, "updated doctor");
+        // const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
+        //   new: true,
+        // });
+        console.log(updateData, "updated data");
 
         res.status(200).json({ success: true });
       });
@@ -352,9 +355,9 @@ export default async function handler(req, res) {
       // Iterate over the URLs of the diplomas and certificates and delete each image from Google Storage
       doctor.diplomasCertificatesUrls.forEach(async (url) => {
         const oldCertificateRef = ref(storage, url);
-        console.log(doctor.diplomasCertificatesUrls, 'doctor diplomaster url')
-        console.log(doctor.diplomasCertificatesUrls, 'doctor diplomaster url')
-        console.log(oldCertificateRef, 'oldcertificate', url, 'url')
+        console.log(doctor.diplomasCertificatesUrls, "doctor diplomaster url");
+        console.log(doctor.diplomasCertificatesUrls, "doctor diplomaster url");
+        console.log(oldCertificateRef, "oldcertificate", url, "url");
         await deleteObject(oldCertificateRef);
       });
 

@@ -1,7 +1,7 @@
 import { getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { doctor_info_local_storage } from '../../../src/constant';
+import { doctor_info_local_storage, super_admin_info_local_sotrage } from '../../../src/constant';
 
 const DoctorAuthenticatedComponent = ({ children }) => {
   const router = useRouter();
