@@ -12,9 +12,8 @@ export const loginUser = async ({ email, password }) => {
   return res;
 };
 
-
 export async function loginDoctor({ email, password }) {
-  console.log(email, 'email',password,"password");
+  console.log(email, "email", password, "password");
   const res = await signIn("doctor-credentials", {
     redirect: false,
     email,
@@ -35,8 +34,25 @@ export const openSupportWhatsAppWeb = () => {
   window.open(whatsappWebUrl, "_blank");
 };
 
-  
+export const convertDateIntoTime = (dateString) => {
+  // Create a Date object from the string
+  const date = new Date(dateString);
 
+  // Extract the hours and minutes
+  const hours = date.getHours().toString().padStart(2, "0"); // Ensure two digits
+  const minutes = date.getMinutes().toString().padStart(2, "0"); // Ensure two digits
 
+  // Format the time as HH:MM
+  const time = `${hours}:${minutes}`;
 
+  return time;
+};
 
+export const convertTimeIntoDate = (dateString) => {
+  const [hours, minutes] = dateString.split(":");
+  const updatedDate = new Date(); // You can set a specific date here if needed
+  updatedDate.setHours(hours, minutes, 0, 0);
+  // const formattedDate = updatedDate.toISOString().replace('Z', '+00:00');
+  console.log(updatedDate, 'updated date in helper')
+  return updatedDate;
+};

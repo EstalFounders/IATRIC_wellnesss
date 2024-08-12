@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
+import { convertDateIntoTime, convertTimeIntoDate } from "../../helper";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
   
@@ -10,11 +11,19 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
     doctor.profilePictureUrl
   );
 
+  const [slotStartTime, setSlotStartTime] = useState(convertDateIntoTime(editedDoctor.slotStartTime))
+  const [slotEndTime, setSlotEndTime] = useState(convertDateIntoTime(editedDoctor.slotEndTime))
+
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "slotStartTime" || name === "slotEndTime") {
+      {name === "slotStartTime" ? setSlotStartTime(value): setSlotEndTime(value)}
+    }
+    
     setEditedDoctor({ ...editedDoctor, [name]: value });
   };
 
@@ -187,6 +196,70 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
                   name="educationTraining"
                   value={editedDoctor.educationTraining}
                   onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              {/* Add Form.Group for profile picture */}
+              <Form.Group controlId="doctor-type," className="mb-3">
+                <Form.Label>
+                  <b>Doctor Type</b>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="doctorType"
+                  value={editedDoctor.doctorType}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="price" className="mb-3">
+                <Form.Label>
+                  <b>Price</b>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="price"
+                  value={editedDoctor.price}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              {/* Add Form.Group for profile picture */}
+              <Form.Group controlId="slotStartTime," className="mb-3">
+                <Form.Label className="mr-4">
+                  <b>Start time</b>
+                </Form.Label>
+                <input
+                  type="time"
+                  id="slotStartTime"
+                  name="slotStartTime"
+                  value={slotStartTime}
+                  onChange={handleChange}
+                  min="09:00"
+                  max="21:00"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="slotEndTime" className="mb-3">
+                <Form.Label className="mr-4">
+                  <b>EndTime</b>
+                </Form.Label>
+                <input
+                  type="time"
+                  id="slotEndTime"
+                  name="slotEndTime"
+                  value={slotEndTime}
+                  onChange={handleChange}
+                  min="09:00"
+                  max="21:00"
                 />
               </Form.Group>
             </Col>
