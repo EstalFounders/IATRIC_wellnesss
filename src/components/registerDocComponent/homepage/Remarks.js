@@ -1,18 +1,19 @@
-import React from 'react';
+import React from "react";
 
 const Remarks = () => {
   return (
     <div
       style={{
-        backgroundColor: '#f9f9f9',
-        padding: '20px',
-        borderRadius: '10px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        height: '100%',
-        boxSizing: 'border-box',
+        backgroundColor: "#f9f9f9",
+        padding: "20px",
+        borderRadius: "10px",
+        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+        height: "100%",
+        boxSizing: "border-box",
       }}
     >
-      <h3>Doctor's Remarks</h3>
+      <h3>Doctor&apos;s Remarks</h3>
+
       {/* <textarea
         style={{
           width: '100%',
