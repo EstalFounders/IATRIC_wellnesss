@@ -297,25 +297,17 @@ export default async function handler(req, res) {
         const stringFields = Object.fromEntries(
           Object.entries(fields).map(([key, value]) => [key, value.toString()])
         );
-        console.log(fields.slotStartTime, 'slort start time on server')
-        // Convert slotStartTime and slotEndTime before storing in MongoDB
-        // const slotStartTime = convertTimeIntoDate(fields.slotStartTime);
-        // const slotEndTime = convertTimeIntoDate(fields.slotEndTime);
-
-        
 
         // Update doctor data in MongoDB
         const updateData = {
           ...stringFields,
-          // slotStartTime,
-          // slotEndTime,
           profilePictureUrl,
           diplomasCertificatesUrls,
         };
-        // const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
-        //   new: true,
-        // });
-        console.log(updateData, "updated data");
+        const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
+          new: true,
+        });
+        console.log(updatedDoctor, "updated doctor");
 
         res.status(200).json({ success: true });
       });
