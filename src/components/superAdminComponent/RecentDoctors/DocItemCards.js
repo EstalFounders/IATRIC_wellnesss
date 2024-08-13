@@ -45,7 +45,7 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
   };
 
   const handleSaveDoctor = async (updatedDoctor) => {
-    setLoader(true);
+    // setLoader(true);
     console.log("Updated Doctor:", updatedDoctor);
     const id = updatedDoctor._id;
     const formData = new FormData();

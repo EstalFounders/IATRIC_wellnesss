@@ -12,27 +12,23 @@ export default function HomepageComp() {
 
   const doctorId = doctorInfo.user._id;
 
-  useEffect(() => {
-    // Define async function within useEffect
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch(`${api.bookConsultation}?doctorId=${doctorId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch appointments');
-        }
-        const data = await response.json();
-        setAppointments(data.appointments);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  async function fetchAppointments(){
+    try {
+      const response = await fetch(`${api.bookConsultation}?doctorId=${doctorId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch appointments');
       }
-    };
+      const data = await response.json();
+      setAppointments(data.appointments);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
 
-    // Call the async function
-    fetchAppointments();
-  }, [doctorId]); // Dependency array
-
+    useEffect(() => {
+      fetchAppointments(); // Call the fetchAppointments function when the component mounts
+    }, []);
 
   // Early returns for loading and error states
   if (loading) return <div>Loading...</div>;
@@ -68,4 +64,5 @@ export default function HomepageComp() {
       </div>
     </>
   );
+}
 }

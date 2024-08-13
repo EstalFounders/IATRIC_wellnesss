@@ -17,15 +17,29 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "slotStartTime" || name === "slotEndTime") {
-      {name === "slotStartTime" ? setSlotStartTime(value): setSlotEndTime(value)}
-    }
+    const handleChange = (e) => {
+      const { name, value } = e.target;
     
-    setEditedDoctor({ ...editedDoctor, [name]: value });
-  };
+      if (name === "slotStartTime" || name === "slotEndTime") {
+        const updatedTime = convertTimeIntoDate(value);
+        if (name === "slotStartTime") {
+          setSlotStartTime(value);
+          setEditedDoctor({
+            ...editedDoctor,
+            slotStartTime: updatedTime,
+          });
+        } else {
+          setSlotEndTime(value);
+          setEditedDoctor({
+            ...editedDoctor,
+            slotEndTime: updatedTime,
+          });
+        }
+      } else {
+        setEditedDoctor({ ...editedDoctor, [name]: value });
+      }
+    };
+    
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -60,6 +74,7 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
   };
 
   const handleSave = () => {
+    console.log(editedDoctor, 'edited doctor')
     onSave(editedDoctor);
     handleClose();
   };
