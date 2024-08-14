@@ -23,12 +23,6 @@ const RegisterDocLoginHeader = ({ session }) => {
   };
 
   const handleLogout = async () => {
-    const callbackUrl =
-      process.env.NODE_ENV === "production"
-        ? "https://development.d2xrlfkxmadgut.amplifyapp.com"
-        : "http://localhost:3000";
-    console.log(process.env.NODE_ENV, "node env", callbackUrl, "callback url");
-    // await signOut({ callbackUrl: `${callbackUrl}/registerDoc/login` });
     await signOut();
   };
 
