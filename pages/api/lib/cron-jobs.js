@@ -13,14 +13,16 @@ const generateSlotsForDoctor = async (doctorId, start, numDays) => {
   for (let i = 0; i < numDays; i++) {
     let date = new Date(start);
     date.setDate(start.getDate() + i);
-    for (let hour = 9; hour < 21; hour += 0.5) {  // Assuming half-hour slots from 9 AM to 9 PM
-      slots.push(new Slot({
-        doctorId: doctorId,
-        startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour),
-        endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour + 0.5),
-        date: date,
-        isBooked: false
-      }));
+    for (let hour = 9; hour < 21; hour++) {  // Assuming 15-minute slots from 9 AM to 9 PM
+      for (let minute = 0; minute < 60; minute += 15) {
+        slots.push(new Slot({
+          doctorId: doctorId,
+          startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute),
+          endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute + 15),
+          date: date,
+          isBooked: false
+        }));
+      }
     }
   }
   await Slot.insertMany(slots);
@@ -52,7 +54,9 @@ const shouldExecuteTask = () => {
   return diffDays >= 24;
 };
 
-const startCronJob = () => {
+const startCronJob = async () => {
+  await performScheduledTasks();
+  lastExecutionDate = new Date();
   cron.schedule(
     "0 0 * * *", // Every day at midnight
     async () => {

@@ -1,0 +1,65 @@
+import React from 'react';
+import { formatData } from '../utils/helper';
+
+const AppointmentsTable = ({ appointments }) => {
+  return (
+    <div
+      style={{
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '10px',
+        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+        height: '100%',
+        boxSizing: 'border-box',
+        overflowX: 'auto', // Ensure horizontal scrolling on small screens
+      }}
+    >
+      <h3 style={{ fontSize: '1.5em', textAlign: 'center' }}>Appointments</h3>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              backgroundColor: '#f4f4f4',
+              borderBottom: '2px solid #ddd',
+            }}
+          >
+            <th style={{ padding: '10px', textAlign: 'left' }}>Name</th>
+            <th style={{ padding: '10px', textAlign: 'left' }}>Appointment Time</th>
+            <th style={{ padding: '10px', textAlign: 'left' }}>Status</th>
+            <th style={{ padding: '10px', textAlign: 'left' }}>Consultation Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {appointments.map((appointment, index) => (
+            <tr key={index}>
+              <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{appointment.name}</td>
+              <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatData(appointment.appointmentTime)}</td>
+              <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{appointment.status}</td>
+              <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{appointment.consultationType}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          table {
+            width: 100%;
+            display: block;
+            overflow-x: auto;
+          }
+          th, td {
+            white-space: nowrap;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default AppointmentsTable;

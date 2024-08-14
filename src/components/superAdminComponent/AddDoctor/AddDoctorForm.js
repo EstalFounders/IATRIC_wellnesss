@@ -5,8 +5,10 @@ import { Col, Row } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
-import Popup from "../../Popup.js";
 import { api } from "../../../constant.js";
+import TimePicker from "react-time-picker";
+import CustomDialog from "../../CustomPopup.js";
+import { convertTimeIntoDate } from "../../../helper.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -15,6 +17,10 @@ const AddDoctorForm = () => {
   const [doctorSignature, setDoctorSignature] = useState("");
   const [loader, setLoader] = useState(false);
   const [cpassword, setCPassword] = useState();
+  const [slotStartTime, setSlotStartTime] = useState("09:00");
+  const [slotEndTime, setSlotEndTime] = useState("21:00");
+  const [message, setMessage] = useState("");
+  const [showDialog, setShowDialog] = useState(false);
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
@@ -29,6 +35,10 @@ const AddDoctorForm = () => {
     educationTraining: "",
     consultationType: "",
     password: "",
+    doctorType: "individual",
+    price: "",
+    slotStartTime: "",
+    slotEndTime: "",
   });
 
   const handleConsultationTypeChange = (e) => {
@@ -40,9 +50,36 @@ const AddDoctorForm = () => {
     setDoctorDetails({ ...doctorDetails, location: e.target.value });
   };
 
+  const handleShowDialog = (msg) => {
+    setMessage(msg);
+    setShowDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+    setMessage("");
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDoctorDetails({ ...doctorDetails, [name]: value });
+    console.log(name, 'name', value, 'value') 
+    // Parse the selected time
+    if (name === "slotStartTime" || name === "slotEndTime") {
+      {name === "slotStartTime" ? setSlotStartTime(value) : setSlotEndTime(value)}  
+      // const [hours, minutes] = value.split(":");
+      // const updatedDate = new Date(); // You can set a specific date here if needed
+      // updatedDate.setHours(hours, minutes, 0, 0);
+      
+      setDoctorDetails({
+        ...doctorDetails,
+        [name]: convertTimeIntoDate(value),
+      });
+    } else {
+      setDoctorDetails({
+        ...doctorDetails,
+        [name]: value,
+      });
+    }
   };
 
   const handleImagesChange = (id, newImages) => {
@@ -57,12 +94,15 @@ const AddDoctorForm = () => {
     }
   };
 
+  
+
   const handleSubmit = async (e) => {
+    console.log(doctorDetails, "doctor details");
     setLoader(true);
     e.preventDefault();
 
     if (doctorDetails.password != cpassword) {
-      return window.alert("password is not matching");
+      return handleShowDialog("Password is not matching");
     }
 
     const formData = new FormData();
@@ -80,6 +120,10 @@ const AddDoctorForm = () => {
     formData.append("digitalSignature", doctorSignature);
     formData.append("location", doctorDetails.location);
     formData.append("profilePicture", profilePicture);
+    formData.append("doctorType", doctorDetails.doctorType);
+    formData.append("price", doctorDetails.price);
+    formData.append("slotStartTime", doctorDetails.slotStartTime);
+    formData.append("slotEndTime", doctorDetails.slotEndTime);
     formData.append("doctorStamp", doctorStamp);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
@@ -90,13 +134,13 @@ const AddDoctorForm = () => {
         method: "POST",
         body: formData,
       });
-
+      
       if (response.ok) {
-        window.alert("Doctor added successfully.");
-        window.location.reload();
+        handleShowDialog(response.message)
         // Reset form fields or navigate to another page
       } else {
         console.error("Error adding doctor:", response.statusText);
+        handleShowDialog("Something went wrong, please try again")
       }
     } catch (error) {
       console.error("Error adding doctor:", error.message);
@@ -251,6 +295,68 @@ const AddDoctorForm = () => {
           <Row>
             <Col>
               <label className={styles.label}>
+                <b>Price</b>
+                <input
+                  type="number"
+                  name="price"
+                  value={doctorDetails.price}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </label>
+            </Col>
+
+            <Col className="ml-5">
+              <label className={styles.label}>
+                <b>Doctor Type</b>
+                <select
+                  name="doctorType"
+                  value={doctorDetails.doctorType}
+                  onChange={handleChange}
+                  className={styles.select}
+                >
+                  <option value="individual">Individual</option>
+                  <option value="company">Company</option>
+                </select>
+              </label>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <label className={styles.label}>
+                <b>Start time:</b>
+                <input
+                  type="time"
+                  id="slotStartTime"
+                  name="slotStartTime"
+                  value={slotStartTime}
+                  onChange={handleChange}
+                  min="09:00"
+                  max="21:00"
+                  className={styles.input}
+                />
+              </label>
+            </Col>
+
+            <Col className="ml-5">
+              <label className={styles.label}>
+                <b>End time:</b>
+                <input
+                  type="time"
+                  id="slotEndTime"
+                  name="slotEndTime"
+                  value={slotEndTime}
+                  onChange={handleChange}
+                  min="09:00"
+                  max="21:00"
+                  className={styles.input}
+                />
+              </label>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <label className={styles.label}>
                 <b>Password:</b>
                 <input
                   className={styles.input}
@@ -334,6 +440,11 @@ const AddDoctorForm = () => {
             </button>
           </Col>
         </Row>
+        <CustomDialog
+            show={showDialog}
+            handleClose={handleCloseDialog}
+            message={message}
+          />
       </form>
       {loader && <Preloader />}
     </div>

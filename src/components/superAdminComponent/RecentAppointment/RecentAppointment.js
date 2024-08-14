@@ -3,20 +3,11 @@ import React from "react";
 import ItemCard from "./AppointmentItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 
-const RecentAppointment = ({ data }) => {
+const RecentAppointment = ({ data, onUpdateStatus }) => {
+  
   return (
     <Row>
       <Col>
-        <Row>
-          <Col>
-            <h4>
-              <b>Recent Appointment</b>
-            </h4>
-          </Col>
-          <Col className="text-right">
-            <Button className="bg-danger">Add Appointment</Button>
-          </Col>
-        </Row>
         <Row
           style={{
             display: "flex",
@@ -28,13 +19,16 @@ const RecentAppointment = ({ data }) => {
             <b>Name</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
-            <b>Gender</b>
+            <b>Consultation Type</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
-            <b>Date</b>
+            <b>Appointment Time</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
-            <b>Disease</b>
+            <b>Symptoms</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
+            <b>Mobile Number</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
             <b>Status</b>
@@ -43,12 +37,15 @@ const RecentAppointment = ({ data }) => {
         <div style={{ display: "flex", flexDirection: "column" }}>
           {data.map((item) => (
             <ItemCard
-              key={item.id} // Ensure each item has a unique key
+              key={item._id} // Ensure each item has a unique key
+              itemId={item._id}
               name={item.name}
-              gender={item.gender}
-              date={item.date}
-              disease={item.disease}
+              consultationType={item.consultationType}
+              date={item.appointmentTime}
+              symptoms={item.symptoms}
               status={item.status}
+              patientMobNo={item.patientMobNo}
+              onUpdateStatus = {onUpdateStatus}
             />
           ))}
         </div>

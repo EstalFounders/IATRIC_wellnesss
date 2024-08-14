@@ -1,8 +1,22 @@
-// components/ItemCard.js
-import React from "react";
-import { Col, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper imports
+import { formatData } from "../../registerDocComponent/utils/helper";
 
-const ItemCards = ({ name, gender, date, disease, status }) => {
+const ItemCards = ({ itemId,name, consultationType, date, symtoms, status, patientMobNo, onUpdateStatus }) => {
+  const [selectedStatus, setSelectedStatus] = useState(status);
+  const [appointmentId, setAppointmentId] = useState(status);
+
+  const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value);
+    setAppointmentId(itemId)
+  };
+
+  const handleUpdateClick = () => {
+    if (onUpdateStatus) {
+      onUpdateStatus({selectedStatus, appointmentId});
+    }
+  };
+
   return (
     <Row
       style={{
@@ -11,13 +25,25 @@ const ItemCards = ({ name, gender, date, disease, status }) => {
         display: "flex",
         flexDirection: "row",
       }}
-    className="mt-4"
+      className="mt-4"
     >
       <Col>{name}</Col>
-      <Col>{gender}</Col>
-      <Col>{date}</Col>
-      <Col>{disease}</Col>
-      <Col>{status}</Col>
+      <Col>{consultationType}</Col>
+      <Col>{formatData(date)}</Col>
+      <Col>{symtoms}</Col>
+      <Col>{patientMobNo}</Col>
+      <Col>
+        <Form.Group controlId="statusSelect">
+          <Form.Control as="select" value={selectedStatus} onChange={handleStatusChange}>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+            <option value="reschedule">Reschedule</option>
+          </Form.Control>
+        </Form.Group>
+        <Button onClick={handleUpdateClick} className="mt-2">
+          Update
+        </Button>
+      </Col>
     </Row>
   );
 };

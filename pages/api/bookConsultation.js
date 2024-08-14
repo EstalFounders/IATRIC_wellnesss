@@ -1,19 +1,65 @@
 // import { immediateCall, scheduleCall, generateMeetingUrl, sendWhatsAppMessage } from '../../lib/twilio';
-import { consultationTypeMapping, twilioPhoneNumber } from "../../src/constant";
+import {
+  consultationTypeMapping,
+  development_production_url,
+} from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
-import twilioClient from "../../src/lib/twilioClient";
-import { checkSlotAvailability, findAvailableDoctor } from "./helper";
-import { makeTwilioCall, sendWhatsAppMessage } from "./lib/twilio";
-import createZoomMeetingUrl from "./lib/zoomVideo";
-import { v4 as uuidv4 } from 'uuid';
+import Appointment from "../../src/models/appointmentSchema";
+import Slot from "../../src/models/slots";
+import {
+  findAvailableDoctor,
+  findAvailableDoctorForNow,
+  findAvailableDoctorForSpecificTimeSlot,
+} from "./helper";
+import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
+  if (req.method === "GET") {
+    const { doctorId } = req.query; // Get the doctorId from the query parameters
+
+    try {
+      await dbConnect();
+
+      let appointments;
+      if (doctorId) {
+        appointments = await Appointment.find({ doctorId: doctorId });
+      } else {
+        appointments = await Appointment.find({});
+      }
+
+      res.status(200).json({ appointments });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Unable to fetch appointments" });
+    }
+  } 
+
+  if (req.method === 'PUT') {
+    const { appointmentId, selectedStatus } = req.body; // Extract the id and status from the request body
+
+    if (!appointmentId || !selectedStatus) {
+      return res.status(400).json({ message: 'Missing id or status' });
+    }
+    console.log(appointmentId, 'appointment id', selectedStatus, 'selected status')
+    try {
+      const appointment = await Appointment.findByIdAndUpdate(
+        {_id: appointmentId},
+        {status: selectedStatus},
+        { new: true } // Return the updated document
+      );
+
+      res.status(200).json({ message: 'Status updated successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred', error });
+    }
+  } else {
+    res.setHeader('Allow', ['PUT']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
-    return;
   }
 
+
+
+  if (req.method === "POST") {
   const {
     selectedDoctorId,
     appointmentTime,
@@ -27,101 +73,190 @@ export default async function handler(req, res) {
   } = req.body;
 
   try {
+    console.log(
+      selectedDoctorId,
+      appointmentTime,
+      selectedDate,
+      selectedSlot,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType
+    );
+
     let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
-    let slotDetails;
+    let slot = selectedSlot === "" ? null : selectedSlot;
     let doctor;
+
     // Determine current or specific time
     const now = new Date();
     const isNow = appointmentTime === "Now";
     const genericConsultationType = consultationTypeMapping[consultationType];
     const meetingId = uuidv4();
-    // Find available doctor if needed
-    if (doctorId === null) {
-      doctor = await findAvailableDoctor(selectedDate, genericConsultationType);
-      doctorId = doctor._id;
-      console.log(doctor, "doctorid");
+
+    // Find available doctor if needed right now
+    if (doctorId == null && appointmentTime == "Now") {
+      const result = await findAvailableDoctorForNow(
+        selectedDate,
+        genericConsultationType
+      );
+      doctorId = result.doctor.doctorId;
+      slot = result.slot;
+      console.log(doctor, "doctorid for right now");
       if (!doctor) {
         throw new Error("No available doctors at the selected time");
       }
     }
 
-    // Check slot availability
-    if (appointmentTime !== "Now") {
-      slotDetails = await checkSlotAvailability(
-        doctorId,
+    // Find available doctor if needed at specific time
+    if (doctorId == null && appointmentTime == "chooseTime") {
+      const result = await findAvailableDoctorForSpecificTimeSlot(
         selectedDate,
+        genericConsultationType,
         selectedSlot
       );
-      console.log(slotDetails, "slot detauls");
-      if (slotDetails.isBooked) {
-        res.status(409).json({ message: "Selected slot is not available." });
-        return;
+      doctorId = result.doctor;
+      slot = result.slotId;
+      console.log(doctorId, "doctorid for specific time", slot, "slot");
+      if (!doctorId && !slot) {
+        throw new Error("No available doctors at the selected time");
       }
     }
-    console.log(patientMobNo, "pateitn mob no");
-    const patientDetails = {
-      name: name,
-      selectedDoctorId: doctorId,
-      appointmentTime: appointmentTime,
-      selectedDate: selectedDate,
-      selectedSlot: selectedSlot,
-      symptoms: symptoms,
-      consultationType: consultationType,
-      email: email,
-      patientMobileNo: patientMobNo,
+
+    // const patientDetails = {
+    //   PatientName: "Shubham",
+    //   selectedDoctorId: doctorId,
+    //   appointmentTime: appointmentTime,
+    //   selectedDate: selectedDate,
+    //   selectedSlot: selectedSlot,
+    //   symptoms: symptoms,
+    //   consultationType: consultationType,
+    //   email: email,
+    //   patientMobileNo: patientMobNo,
+    // };
+
+    // const doctorDetails = {
+    //   doctorName: "Ashima",
+    //   selectedDoctorId: selectedDoctorId,
+    //   appointmentTime: appointmentTime,
+    //   selectedDate: selectedDate,
+    //   selectedSlot: selectedSlot,
+    //   symptoms: symptoms,
+    //   consultationType: consultationType,
+    //   email: doctor.email,
+    //   doctorMobileNo: "8920897437",
+    // };
+
+    const bookConsultation = async ({
+      meetingId,
+      doctorId,
+      slot,
+      symptoms,
+      name,
+      email,
+      patientMobNo,
+      consultationType,
+      appointmentTime,
+      status,
+      patientMeetingUrl,
+      doctorMeetingUrl,
+      prescriptionUrl,
+    }) => {
+      await dbConnect();
+
+      const updatedSlot = await Slot.findOneAndUpdate(
+        { _id: slot._id, doctorId, isBooked: false },
+        { isBooked: true },
+        { new: true }
+      );
+
+      console.log(updatedSlot, "updated slot");
+      // Check if the slot was successfully booked
+      if (!updatedSlot) {
+        throw new Error("Slot is already booked or does not exist.");
+      }
+
+      // Step 2: Create the appointment
+      const appointment = await Appointment.create({
+        meetingId,
+        doctorId,
+        slotId: updatedSlot._id,
+        symptoms,
+        name,
+        email,
+        patientMobNo,
+        consultationType,
+        appointmentTime,
+        status,
+        patientMeetingUrl,
+        doctorMeetingUrl,
+        prescriptionUrl,
+      });
+
+      return appointment;
     };
 
-    const doctorDetails = {
-      name: doctor.name,
-      selectedDoctorId: selectedDoctorId,
-      appointmentTime: appointmentTime,
-      selectedDate: selectedDate,
-      selectedSlot: selectedSlot,
-      symptoms: symptoms,
-      consultationType: consultationType,
-      email: doctor.email,
-      doctorMobileNo: "8920897437",
-    };
-    
+    console.log(meetingId, "meeting id");
 
     // Handle consultation types
     switch (consultationType) {
       case "Call":
       case "Video":
+        const patientMeetingUrl = `${development_production_url}/meeting/patient/${meetingId}`;
+        const doctorMeetingUrl = `${development_production_url}/meeting/doctor/${meetingId}`;
+
         if (appointmentTime === "Now") {
           // Immediate handling
-          const meetingDetails =
-            consultationType === "Call"
-              ? await makeTwilioCall("8920897437", pateintNo)
-              :  res.status(200).json({
-                meetingUrl: `/meeting/${meetingId}`,
-                // details: meetingDetails || {},
-              });
-          // Optionally save the meeting details or send a confirmation message
-          // sendConfirmationWhatsApp(name, email, meetingDetails, consultationType);
+          // res.status(200).json({
+          //   patientMeetingUrl: patientMeetingUrl,
+          //   doctorMeetingUrl: doctorMeetingUrl,
+          // });
         } else {
           // Scheduled handling
-          const meetingDetails =
-            consultationType === "Call"
-              ? await scheduleTwilioCall(doctorId, name, mobNo, selectedDate)
-              : await createZoomMeetingUrl(doctorId, name, selectedDate);
-          // Send a preliminary confirmation now and set up a reminder for the meeting time
-          // scheduleReminderWhatsApp(name, email, meetingDetails, consultationType, selectedDate);
+          // res.status(200).json({
+          //   patientMeetingUrl: patientMeetingUrl,
+          //   doctorMeetingUrl: doctorMeetingUrl,
+          // });
         }
-        // Booking logic here, possibly save meeting details
-        break;
-      case "Home visit":
-      case "Clinic":
-        // Simply book the consultation
-        await bookConsultation(
+        // Store appointment details
+        await bookConsultation({
+          meetingId,
           doctorId,
+          slot,
           symptoms,
           name,
           email,
-          mobNo,
+          patientMobNo,
           consultationType,
-          isNow ? now : selectedDate
-        );
+          appointmentTime: isNow ? new Date() : selectedDate,
+          status: "open",
+          patientMeetingUrl,
+          doctorMeetingUrl,
+          prescriptionUrl: "",
+        });
+
+        break;
+
+      case "Home visit":
+      case "Clinic":
+        // Simply book the consultation
+        // Store appointment details
+        await bookConsultation({
+          meetingId,
+          doctorId,
+          slot,
+          symptoms,
+          name,
+          email,
+          patientMobNo,
+          consultationType,
+          appointmentTime: isNow ? new Date() : selectedDate,
+          status: "open",
+          patientMeetingUrl,
+          doctorMeetingUrl,
+          prescriptionUrl: "",
+        });
         break;
     }
 
@@ -146,4 +281,6 @@ export default async function handler(req, res) {
       .status(500)
       .json({ message: error.message || "Failed to book the consultation" });
   }
+
+}
 }
