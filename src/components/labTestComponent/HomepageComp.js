@@ -8,7 +8,7 @@ import {
 import { useRouter } from "next/router";
 import FirstSection from "./firstSection/FirstSection";
 import FeaturedHealthCheckUp from "./featuredHealthCheckUp/FeaturedHealthCheckUp";
-import FindTestByHealthConcern from "./FindTest/FindTestByHealthConcern";
+import FindTestByHealthConcern from "../labTestComponent/findTest/FindTestByHealthConcern";
 
 export default function HomepageComp() {
   const router = useRouter();
