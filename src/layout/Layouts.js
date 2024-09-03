@@ -13,7 +13,7 @@ import Header6 from "./Header/Header6";
 import DocLoginHeader from "./Header/SuperAdminLoginHeader";
 import SuperAdminLoginHeader from "./Header/SuperAdminLoginHeader";
 import RegisterDocLoginHeader from "./Header/RegisterDocLoginHeader";
-import LabTestHeader from "./Header/labtestHeader";
+import LabTestHeader from "./Header/LabTestHeader";
 
 const Layouts = ({ children, header, footer }) => {
   const [toggle, setToggle] = useState(false);
