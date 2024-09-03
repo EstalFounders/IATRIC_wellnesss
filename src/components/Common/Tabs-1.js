@@ -13,13 +13,13 @@ const Tabs1 = () => {
     {
       id: 1,
       name: "Pediatrics",
-      image: "images/hematology_700x700.jpg",
+      image: "images/hematology_700x700.jpeg",
       description: "Description of Pediatrics service...",
     },
     {
       id: 2,
       name: "Cardiology",
-      image: "images/hematology_700x700.jpg",
+      image: "images/Cardiology_700x700.jpeg",
       description: "Description of Cardiology service...",
     },
     {
@@ -49,7 +49,7 @@ const Tabs1 = () => {
     {
       id: 7,
       name: "Pulmonology",
-      image: "images/hematology_700x700.jpg",
+      image: "images/Pulmonology_700x700.jpeg",
       description: "Description of Pulmonology...",
     },
     {
