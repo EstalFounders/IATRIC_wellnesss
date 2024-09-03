@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { FaArrowLeft } from "react-icons/fa"; // Importing a back icon
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
-import { signOut } from "next-auth/react";
 
 const LabTestHeader = ({ session }) => {
   const router = useRouter();
