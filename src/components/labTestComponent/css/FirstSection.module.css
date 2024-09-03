@@ -1,0 +1,93 @@
+/* styles/YourComponent.module.scss */
+
+.optionButton {
+    width: 100%;
+    padding: 40px;
+    margin-bottom: 2%;
+    background-color: #8e8333;
+    border-radius: 40px;
+    border: 8px solid #ddd;
+    text-align: left;
+  }
+
+  .optionButton:hover {
+    border-color: #3b5f1d; /* Replace with your desired hover color */
+}
+
+  .optionText {
+    font-size: 2rem;
+    white-space: normal;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+  }
+  
+  .optionSubtext {
+    font-size: 1rem;
+    color: black;
+    margin-left: 1%;
+    font-weight: 400;
+  }
+  
+  .optionImage {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+  }
+  
+  .text-left {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+
+  .rightArrowIcon {
+    margin-left: 1%;
+  }
+  
+  @media (max-width: 1280px) {
+    .optionText {
+      font-size: 0.8rem;
+    }
+  
+    .optionSubtext {
+      font-size: 0.6rem;
+    }
+  
+    .optionImage {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .optionText {
+      font-size: 0.8rem;
+    }
+  
+    .optionSubtext {
+      font-size: 0.5rem;
+    }
+  
+    .optionImage {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+
+  @media (max-width: 1048px) {
+    .optionText {
+      font-size: 0.6rem;
+    }
+  
+    .optionSubtext {
+      font-size: 0.5rem;
+    }
+  
+    .optionImage {
+      width: 30px;
+      height: 30px;
+    }
+  }
+  

@@ -1,0 +1,22 @@
+.carousel {
+    margin: 20px 0;
+  }
+  
+  .carouselImage {
+    object-fit: cover;
+    max-height: 400px;
+  }
+
+  
+  @media (max-width: 768px) {
+    .carouselImage {
+      max-height: 300px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .carouselImage {
+      max-height: 200px;
+    }
+  }
+  

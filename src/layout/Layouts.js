@@ -13,6 +13,7 @@ import Header6 from "./Header/Header6";
 import DocLoginHeader from "./Header/SuperAdminLoginHeader";
 import SuperAdminLoginHeader from "./Header/SuperAdminLoginHeader";
 import RegisterDocLoginHeader from "./Header/RegisterDocLoginHeader";
+import LabTestHeader from "./Header/labtestHeader";
 
 const Layouts = ({ children, header, footer }) => {
   const [toggle, setToggle] = useState(false);
@@ -39,7 +40,7 @@ const Layouts = ({ children, header, footer }) => {
       case 5:
         return <Header5 toggleMenu={() => openClick()} toggle={toggle} />;
       case 6:
-        return <SuperAdminLoginHeader session={false} />;
+        return <LabTestHeader />;
       case 7:
         return <SuperAdminLoginHeader session={true} />;
       case 8:
