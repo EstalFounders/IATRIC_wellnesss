@@ -5,20 +5,20 @@ import * as IoIcons from "react-icons/io";
 
 export const SidebarData = [
   {
-    title: "Home",
+    title: "HOME",
     path: "/superAdmin/homepage",
     icon: <AiIcons.AiFillHome />,
     cName: "nav-text",
   },
   {
-    title: "Add Doctors",
+    title: "ADD DOCTOR",
     path: "/superAdmin/addDoctor",
     icon: <IoIcons.IoIosPaper />,
     cName: "nav-text",
   },
   {
-    title: "Products",
-    path: "/superAdmin/addDoctor",
+    title: "LAB TEST",
+    path: "/superAdmin/labTest",
     icon: <FaIcons.FaCartPlus />,
     cName: "nav-text",
   },

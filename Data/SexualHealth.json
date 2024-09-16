@@ -1,0 +1,146 @@
+[
+{
+  "title": "STD Test Package - Advanced",
+  "description": "Sexually transmitted diseases (STDs) are infections transmitted through sexual contact, caused by bacteria, viruses, or parasites. They can lead to various health complications if untreated. The advanced STD test package offers a thorough screening for multiple STDs. The STD advanced check-up test can be used for the diagnosis of eight STDs – syphilis, chlamydia, herpes (HSV types I & II), hepatitis B & C, and HIV 1 & 2. The test checks for the presence of antibodies and antigens produced by your blood against the organisms that cause these STDs. Each test is designed to accurately identify the presence of specific pathogens through advanced diagnostic techniques.\n\nThe STD test package ensures complete confidentiality and delivers highly accurate results through state-of-the-art laboratory technologies. The sample will be collected by a trained technician (eMedic) at your chosen location after the booking. For prompt and accurate results, your blood sample will be sent for testing to an ICMR- and NABL/NABH -approved laboratory. The reports will be delivered to you within 5 working days on your email address or WhatsApp number.",
+  "sample_required": [
+    "Blood"
+  ],
+  "preparation_required": [
+    "No Fasting Required"
+  ],
+  "test_included": [
+    {
+      "testName": "HBsAg (ECLIA)",
+      "description": "This test uses Electrochemiluminescence Immunoassay (ECLIA) to detect the Hepatitis B surface antigen (HBsAg). It is a highly sensitive and accurate method used to diagnose active Hepatitis B virus infection.",
+      "parameters": []
+    },
+    {
+      "testName": "VDRL  Qualitative",
+      "description": "The VDRL (Venereal Disease Research Laboratory) test is a blood test for syphilis that was developed by the eponymous lab. The test doesn't look for the bacterium that causes syphilis, but rather for antibodies that are often present in people who have the disease.",
+      "parameters": []
+    },
+    {
+      "testName": "Chlamydia Trachomatis antibody IgG",
+      "description": "This test detects IgG antibodies to Chlamydia trachomatis, suggesting a past infection.",
+      "parameters": []
+    },
+    {
+      "testName": "Hepatitis C Virus antibodies (Anti HCV) - Total",
+      "description": "This test looks for antibodies to the Hepatitis C virus (Anti HCV) in the blood, indicating a past or present infection. It does not differentiate between an active or previous infection.",
+      "parameters": []
+    },
+    {
+      "testName": "Herpes Simplex Virus (HSV) Type I & II antibodies IgG",
+      "description": "This test detects IgG antibodies to HSV type 1 and 2, suggesting a past infection or immunity",
+      "parameters": []
+    },
+    {
+      "testName": "Herpes Simplex Virus (HSV) Type I & II antibodies IgM",
+      "description": "This test detects IgM antibodies to HSV type 1 and 2, suggesting a recent or current infection.",
+      "parameters": []
+    },
+    {
+      "testName": "Treponema Pallidum Haemagglutination Assay (TPHA)",
+      "description": "TPHA is a test used to confirm the presence of antibodies for the bacteria Treponema pallidum, the cause of syphilis.",
+      "parameters": []
+    },
+    {
+      "testName": "HIV 1&2 (ECLIA)",
+      "description": "This test uses Electrochemiluminescence Immunoassay (ECLIA) to detect antibodies and antigens associated with HIV-1 and HIV-2. It is a highly sensitive and specific method used to diagnose HIV infection.",
+      "parameters": []
+    },
+    {
+      "testName": "Anti Treponema Pallidum (TPAB) antibody",
+      "description": "This test looks for antibodies to the bacterium Treponema pallidum, the causative agent of syphilis. A positive result indicates a past or current syphilis infection.",
+      "parameters": []
+    }
+  ]
+},
+{
+"title": "Essential STD Checkup",
+"description": "The STD test package includes crucial screenings for sexually transmitted infections and blood-borne diseases. It covers tests like HBAg (ECLIA) for active hepatitis B, (VDRL) RPR QUALITATIVE for syphilis antibodies, Hepatitis C Virus antibodies (Anti-HCV) - Total for hepatitis C, and HIV 182 (ECLIA) for HIV. These tests are vital for early diagnosis and timely intervention, reducing the risk of severe health issues like liver disease, syphilis complications, and HIV/AIDS",
+"sample_required": [
+"Blood"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "VDRL",
+"parameters": ["VDRL"]
+},
+{
+"testName": "HIV 1 & 2 Antibody (Qualitative)",
+"parameters": ["HIV 1 & 2 Antibody (Qualitative)"]
+},
+{
+"testName": "Hepatitis B Surface antigen (HBsAg)-Qualitative",
+"parameters": ["Hepatitis B Surface antigen (HBsAg)-Qualitative"]
+},
+{
+"testName": "Anti HCV-Total (Antibodies to Hepatitis C Virus)",
+"parameters": ["Anti HCV-Total (Antibodies to Hepatitis C Virus)"]
+}
+]
+},
+{
+"title": "STD Package Comprehensive",
+"description": "The comprehensive STD test package includes vital screenings for hepatitis B and C (HBsAg and Anti-HCV), Chlamydia, herpes (HSV Type I & II), HIV 1 and 2, gonorrhea, and syphilis. HBsAg and Anti-HCV tests diagnose hepatitis B and C, while the Chlamydia test identifies Chlamydia trachomatis infections. Herpes is screened via HSV Type I & II antibody tests, and HIV is assessed using HIV 1 and 2 tests. Additionally, the package includes PCR (Qualitative) testing for gonorrhea alongside syphilis.",
+"sample_required": [
+"Blood"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "VDRL",
+"parameters": ["VDRL"]
+},
+{
+"testName": "HIV 1 & 2 Antibody (Qualitative)",
+"parameters": ["HIV 1 & 2 Antibody (Qualitative)"]
+},
+{
+"testName": "Chlamydia Trachomatis Antibody, IgG",
+"parameters": ["Chlamydia Trachomatis Antibody, IgG"]
+},
+{
+"testName": "Anti Treponema Pallidum (TPAB) antibody",
+"parameters": ["Anti Treponema Pallidum (TPAB) antibody"]
+},
+{
+"testName": "Hepatitis B Surface antigen (HBsAg)-Qualitative",
+"parameters": ["Hepatitis B Surface antigen (HBsAg)-Qualitative"]
+},
+{
+"testName": "Chlamydia Trachomatis, Antibody, IgM, Serum",
+"parameters": ["Chlamydia Trachomatis, Antibody, IgM, Serum"]
+},
+{
+"testName": "Anti HCV-Total (Antibodies to Hepatitis C Virus)",
+"parameters": ["Anti HCV-Total (Antibodies to Hepatitis C Virus)"]
+},
+{
+"testName": "Treponema pallidum haemagglutination (TPHA), Serum",
+"parameters": ["Treponema pallidum haemagglutination (TPHA), Serum"]
+},
+{
+"testName": "Herpes simplex virus (HSV) type I & II antibody, IgG",
+"parameters": ["Herpes simplex virus (HSV) type I & II antibody, IgG"]
+},
+{
+"testName": "Herpes simplex virus (HSV) type I & II antibody, IgM",
+"parameters": ["Herpes simplex virus (HSV) type I & II antibody, IgM"]
+},
+{
+"testName": "Gonorrhoea PCR (Qualitative)",
+"parameters": ["Gonorrhoea PCR (Qualitative)"]
+}
+]
+}
+]
+
+
+

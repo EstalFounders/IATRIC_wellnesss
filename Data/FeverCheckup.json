@@ -1,0 +1,453 @@
+[
+{
+  "title": "Fever Profile - Advanced",
+  "description": "Fever is a common symptom in developing countries, particularly during the rainy season. Outbreaks of acute fever diseases, including dengue, malaria, and typhoid, have been a significant concern in India. Fever is an important part of the body's defence against infection, indicating that the body is fighting an underlying issue. Our Advanced Fever Profile Checkup includes blood and urine analysis to diagnose persistent fever and associated symptoms such as headaches and dizziness. This profile also screens for malaria, typhoid, and dengue.\n\nWith this comprehensive fever package, we aim to identify the cause of the fever and assist in early diagnosis and treatment. If you live in Bangalore and have a fever, get a Fever Profile test in Bangalore today to find the cause.",
+  "sample_required": [
+    "Blood",
+    "Urine"
+  ],
+  "preparation_required": [
+    "No Fasting Required"
+  ],
+  "test_included": [
+    {
+      "testName": "Liver Function Test (LFT)",
+      "description": "The Liver Function Test (LFT) is a group of tests used to evaluate the health of your liver. It measures the levels of proteins, liver enzymes, and bilirubin in your blood. An LFT can help diagnose liver diseases such as hepatitis, cirrhosis, or liver cancer.",
+      "parameters": []
+    },
+    {
+      "testName": "Smear for Malarial Parasite (MP)",
+      "description": "This test checks for the presence of malaria parasites in a blood smear under a microscope. It's used to diagnose a current malaria infection.",
+      "parameters": []
+    },
+    {
+      "testName": "Typhidot",
+      "description": "Typhidot is a medical test consisting of a dot ELISA kit that detects IgM and IgG antibodies against the outer membrane protein (OMP) of the Salmonella typhi, the bacteria causing typhoid fever. It's a useful rapid diagnostic test for typhoid fever.",
+      "parameters": []
+    },
+    {
+      "testName": "Urine Complete Analysis",
+      "description": "A Urine Complete Analysis, also known as Urinalysis, is a test that evaluates a sample of a person's urine. It can detect and measure a range of substances, including cells, cell fragments, and substances such as crystals or casts in the urine. This test is used to detect urinary tract infections, kidney diseases, and diabetes, among other health conditions.",
+      "parameters": []
+    },
+    {
+      "testName": "Complete Blood Count (CBC) with ESR",
+      "description": "This is a combination of the Complete Blood Count (CBC), which measures various components of the blood, along with the Erythrocyte Sedimentation Rate (ESR). The ESR is a type of blood test that measures how quickly erythrocytes (red blood cells) settle at the bottom of a test tube containing a blood sample. A faster than normal rate may indicate a systemic disease, such as inflammation, infection, or cancer.",
+      "parameters": []
+    },
+    {
+      "testName": "Dengue profile (ELISA)",
+      "description": "A Dengue Profile ELISA is a blood test that detects antibodies specific to the dengue virus. It's used to diagnose dengue infection, a mosquito-borne viral illness with flu-like symptoms. This ELISA test helps confirm the presence of dengue antibodies in the blood, aiding in accurate diagnosis and guiding appropriate medical care, especially in regions where dengue is prevalent.",
+      "parameters": []
+    }
+  ]
+},
+
+{
+"title": "Fever Profile Essential",
+"description": "The monsoon season increases the danger of sickness making us susceptible to infections such as malaria, dengue fever, and typhoid. Fever profile tests, which involve blood and urine analysis, are used to diagnose persistent fever and associated symptoms. Symptoms such as headache, dizziness, chills, sore eyes, and fever suggest that you should be screened. Test results direct proper therapy, medication, and illness prevention measures. This fever profile screens for malaria and typhoid.",
+"sample_required": [
+"Blood",
+"Urine"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "Complete Blood Count (CBC)",
+"description": "Complete Blood Count (CBC) is a common blood test used to evaluate overall health and detect a wide range of disorders, including anemia, infection, and leukemia.",
+"parameters": [
+"Hemoglobin",
+"Total Leucocyte Count",
+"RBC Count",
+"Packed Cell Volume",
+"Mean Corpuscular Volume (MCV)",
+"MCH",
+"MCHC",
+"RDW-CV",
+"RDW-SD",
+"Platelet Count",
+"MPV",
+"PCT",
+"Mentzer Index",
+"Sehgal index",
+"Neutrophil",
+"Monocyte",
+"Basophil",
+"Lymphocytes",
+"Absolute Neutrophils",
+"Absolute Lymphocytes",
+"Absolute Monocytes",
+"Absolute Eosinophils",
+"Absolute Basophils",
+"NLR (Neutrophil Lymphocyte ratio)"
+]
+},
+{
+"testName": "Liver Function Test (LFT)",
+"description": "The Liver Function Test (LFT) is a group of tests used to evaluate the health of your liver. It measures the levels of proteins, liver enzymes, and bilirubin in your blood. An LFT can help diagnose liver diseases such as hepatitis, cirrhosis, or liver cancer.",
+"parameters": [
+"Total Bilirubin",
+"Direct Bilirubin",
+"Indirect Bilirubin",
+"SGOT",
+"SGPT",
+"Alkaline Phosphatase",
+"GGT",
+"Total Protein",
+"Albumin",
+"Globulin",
+"A/G Ratio",
+"SGOT/SGPT Ratio"
+]
+},
+{
+"testName": "Peripheral Smear for Malarial Parasite (MP)",
+"description": "The Peripheral Smear for Malarial Parasite (MP) is used to detect the presence of malaria parasites in the blood. It helps diagnose malaria by identifying the parasites in the red blood cells.",
+"parameters": [
+"Peripheral Smear for Malarial Parasite (MP)"
+]
+},
+{
+"testName": "Typhidot",
+"description": "Typhidot is a medical test consisting of a dot ELISA kit that detects IgM and IgG antibodies against the outer membrane protein (OMP) of the Salmonella typhi, the bacteria causing typhoid fever. It's a useful rapid diagnostic test for typhoid fever.",
+"parameters": [
+"Typhidot"
+]
+},
+{
+"testName": "Urine Complete Analysis",
+"description": "Urine Complete Analysis is a diagnostic test that evaluates various properties of urine to help diagnose a range of conditions, including urinary tract infections, kidney disease, and diabetes.",
+"parameters": [
+"Colour",
+"Appearance",
+"PH",
+"Specific gravity",
+"Glucose",
+"Ketones",
+"Proteins",
+"Nitrites",
+"Urobilinogen",
+"Bilirubin",
+"Blood",
+"Leucocyte esterase",
+"RBC",
+"Pus cells",
+"Epithelial Cells",
+"Mucus",
+"Uric acid Crystals",
+"Phosphate Crystals",
+"Calcium Oxalate Crystals",
+"Amorphous urates",
+"Granular Casts",
+"Hyaline Casts",
+"Yeast",
+"Bacteria",
+"Parasites",
+"Amorphous phosphates",
+"Volume"
+]
+}
+]
+},
+{
+"title": "Fever Profile Comprehensive",
+"description": "Fever is a common symptom in developing countries, particularly during the rainy season. Outbreaks of acute fever diseases, including dengue, malaria, and typhoid, have been a significant concern in India. Fever is an important part of the body's defence against infection, indicating that the body is fighting an underlying issue. Our Advanced Fever Profile Checkup includes blood and urine analysis to diagnose persistent fever and associated symptoms such as headaches and dizziness. This profile also screens for malaria, typhoid, and dengue.\n\nWith this comprehensive fever package, we aim to identify the cause of the fever and assist in early diagnosis and treatment. If you live in Bangalore and have a fever, get a Fever Profile test in Bangalore today to find the cause.",
+"sample_required": [
+"Blood",
+"Urine"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "Complete Blood Count (CBC) with ESR",
+"description": "Complete Blood Count (CBC) with ESR is a comprehensive blood test used to evaluate overall health and detect a variety of disorders, including anemia, infection, and leukemia. The addition of ESR (Erythrocyte Sedimentation Rate) helps to detect inflammation or infection.",
+"parameters": [
+"Hemoglobin",
+"Total Leucocyte Count",
+"RBC Count",
+"Packed Cell Volume",
+"Mean Corpuscular Volume (MCV)",
+"MCH",
+"MCHC",
+"RDW-CV",
+"RDW-SD",
+"Platelet Count",
+"MPV",
+"PCT",
+"Mentzer Index",
+"Sehgal index",
+"Neutrophil",
+"Monocyte",
+"Basophil",
+"Lymphocytes",
+"Absolute Neutrophils",
+"Absolute Lymphocytes",
+"Absolute Monocytes",
+"Absolute Eosinophils",
+"Absolute Basophils",
+"NLR (Neutrophil Lymphocyte ratio)",
+"ESR"
+]
+},
+{
+"testName": "Liver Function Test (LFT)",
+"description": "The Liver Function Test (LFT) is a group of tests used to evaluate the health of your liver. It measures the levels of proteins, liver enzymes, and bilirubin in your blood. An LFT can help diagnose liver diseases such as hepatitis, cirrhosis, or liver cancer.",
+"parameters": [
+"Total Bilirubin",
+"Direct Bilirubin",
+"Indirect Bilirubin",
+"SGOT",
+"SGPT",
+"Alkaline Phosphatase",
+"GGT",
+"Total Protein",
+"Albumin",
+"Globulin",
+"A/G Ratio",
+"SGOT/SGPT Ratio"
+]
+},
+{
+"testName": "Peripheral Smear for Malarial Parasite (MP)",
+"description": "The Peripheral Smear for Malarial Parasite (MP) is used to detect the presence of malaria parasites in the blood. It helps diagnose malaria by identifying the parasites in the red blood cells.",
+"parameters": [
+"Peripheral Smear for Malarial Parasite (MP)"
+]
+},
+{
+"testName": "Typhidot",
+"description": "Typhidot is a medical test consisting of a dot ELISA kit that detects IgM and IgG antibodies against the outer membrane protein (OMP) of the Salmonella typhi, the bacteria causing typhoid fever. It's a useful rapid diagnostic test for typhoid fever.",
+"parameters": [
+"Typhidot"
+]
+},
+{
+"testName": "Urine Complete Analysis",
+"description": "Urine Complete Analysis is a diagnostic test that evaluates various properties of urine to help diagnose a range of conditions, including urinary tract infections, kidney disease, and diabetes.",
+"parameters": [
+"Colour",
+"Appearance",
+"PH",
+"Specific gravity",
+"Glucose",
+"Ketones",
+"Proteins",
+"Nitrites",
+"Urobilinogen",
+"Bilirubin",
+"Blood",
+"Leucocyte esterase",
+"RBC",
+"Pus cells",
+"Epithelial Cells",
+"Mucus",
+"Uric acid Crystals",
+"Phosphate Crystals",
+"Calcium Oxalate Crystals",
+"Amorphous urates",
+"Granular Casts",
+"Hyaline Casts",
+"Yeast",
+"Bacteria",
+"Parasites",
+"Amorphous phosphates",
+"Volume"
+]
+},
+{
+"testName": "Dengue profile (ELISA)",
+"description": "Dengue profile (ELISA) is a diagnostic test used to detect the presence of Dengue virus antigens and antibodies. It helps in diagnosing dengue fever and distinguishing it from other febrile illnesses.",
+"parameters": [
+"Dengue NS1 Antigen",
+"Dengue IgM antibody",
+"Dengue IgG antibody(ELISA)"
+]
+},
+{
+"testName": "Chikungunya IgM",
+"description": "Chikungunya IgM is a blood test that detects IgM antibodies to the Chikungunya virus, indicating a recent infection with the virus.",
+"parameters": [
+"Chikungunya IgM"
+]
+}
+]
+},
+
+{
+"title": "Malaria Fever Profile",
+"description": "Fever is a common symptom in developing countries, particularly during the rainy season. Outbreaks of acute fever diseases, including dengue, malaria, and typhoid, have been a significant concern in India. Fever is an important part of the body's defence against infection, indicating that the body is fighting an underlying issue. Our Advanced Fever Profile Checkup includes blood and urine analysis to diagnose persistent fever and associated symptoms such as headaches and dizziness. This profile also screens for malaria, typhoid, and dengue.\n\nWith this comprehensive fever package, we aim to identify the cause of the fever and assist in early diagnosis and treatment. If you live in Bangalore and have a fever, get a Fever Profile test in Bangalore today to find the cause.",
+"sample_required": [
+"Blood",
+"Urine"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "Complete Blood Count (CBC)",
+"description": "The Complete Blood Count (CBC) is a comprehensive blood test used to evaluate overall health and detect a variety of disorders, including anemia, infection, and leukemia. It includes various parameters to measure the components of blood.",
+"parameters": [
+"Hemoglobin",
+"Total Leucocyte Count",
+"RBC Count",
+"Packed Cell Volume",
+"Mean Corpuscular Volume (MCV)",
+"MCH",
+"MCHC",
+"RDW-CV",
+"RDW-SD",
+"Platelet Count",
+"MPV",
+"PCT",
+"Mentzer Index",
+"Sehgal index",
+"Neutrophil",
+"Monocyte",
+"Basophil",
+"Lymphocytes",
+"Absolute Neutrophils",
+"Absolute Lymphocytes",
+"Absolute Monocytes",
+"Absolute Eosinophils",
+"Absolute Basophils",
+"NLR (Neutrophil Lymphocyte ratio)"
+]
+},
+{
+"testName": "Peripheral Smear for Malarial Parasite (MP)",
+"description": "The Peripheral Smear for Malarial Parasite (MP) is used to detect the presence of malaria parasites in the blood. It helps diagnose malaria by identifying the parasites in the red blood cells.",
+"parameters": [
+"Peripheral Smear for Malarial Parasite (MP)"
+]
+},
+{
+"testName": "Widal Test (Slide Method)",
+"description": "The Widal Test (Slide Method) is used to diagnose typhoid fever by detecting the presence of specific antibodies in the blood. It helps to identify the presence of Salmonella bacteria causing typhoid.",
+"parameters": [
+"Widal Test (Slide Method)"
+]
+}
+]
+},
+{
+"title": "Dengue Screening",
+"description": "A Dengue Profile ELISA is a blood test that detects antibodies specific to the dengue virus. It's used to diagnose dengue infection, a mosquito-borne viral illness with flu-like symptoms. This ELISA test helps confirm the presence of dengue antibodies in the blood, aiding in accurate diagnosis and guiding appropriate medical care, especially in regions where dengue is prevalent.",
+"sample_required": [
+"Blood",
+"Urine"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "Complete Blood Count (CBC)",
+"description": "The Complete Blood Count (CBC) is a broad screening test used to assess overall health and detect a wide range of disorders, including anemia, infection, and many other diseases. It measures various components of the blood.",
+"parameters": [
+"Hemoglobin",
+"Total Leucocyte Count",
+"RBC Count",
+"Packed Cell Volume",
+"Mean Corpuscular Volume (MCV)",
+"MCH",
+"MCHC",
+"RDW-CV",
+"RDW-SD",
+"Platelet Count",
+"MPV",
+"PCT",
+"Mentzer Index",
+"Sehgal index",
+"Neutrophil",
+"Monocyte",
+"Basophil",
+"Lymphocytes",
+"Absolute Neutrophils",
+"Absolute Lymphocytes",
+"Absolute Monocytes",
+"Absolute Eosinophils",
+"Absolute Basophils",
+"NLR (Neutrophil Lymphocyte ratio)"
+]
+},
+{
+"testName": "Liver Function Test (LFT)",
+"description": "The Liver Function Test (LFT) is a series of blood tests used to assess the health of the liver by measuring levels of liver enzymes, proteins, and bilirubin in the blood. It helps in diagnosing liver conditions such as hepatitis, cirrhosis, and liver damage.",
+"parameters": [
+"Total Bilirubin",
+"Direct Bilirubin",
+"Indirect Bilirubin",
+"SGOT",
+"SGPT",
+"Alkaline Phosphatase",
+"GGT",
+"Total Protein",
+"Albumin",
+"Globulin",
+"A/G Ratio",
+"SGOT/SGPT Ratio"
+]
+},
+{
+"testName": "Dengue profile (ELISA)",
+"description": "The Dengue profile (ELISA) is a diagnostic test used to detect antibodies and antigens related to the dengue virus. It is a highly specific and sensitive test that helps diagnose dengue fever.",
+"parameters": [
+"Dengue profile (ELISA)"
+]
+}
+]
+},
+{
+"title": "Comprehensive Influenza Profile(H3N2, H1N1, Inf A&B, COVID) Package",
+"description": "Seasonal flu like H3N2 is hard to control and increasing. Take Comprehensive Influenza Profile checkup to avoid H3N2, H1N1, influenza, or COVID-19. Diagnosis is crucial, especially for high-risk groups like pregnant women, elderly, children, and those with heart or lung disease",
+"sample_required": [
+"Blood",
+"Urine"
+],
+"preparation_required": [
+"No Fasting Required"
+],
+"test_included": [
+{
+"testName": "H3N2",
+"description": "H3N2 is a subtype of the Influenza A virus that causes seasonal flu. Testing for H3N2 is important for diagnosing and managing flu outbreaks.",
+"parameters": [
+"H3N2"
+]
+},
+{
+"testName": "COVID-19",
+"description": "The COVID-19 test is used to detect the presence of the SARS-CoV-2 virus, the cause of COVID-19, either through viral RNA detection (PCR) or antigen testing.",
+"parameters": [
+"COVID-19"
+]
+},
+{
+"testName": "Influenza A",
+"description": "The Influenza A test detects the presence of the Influenza A virus, a common cause of the seasonal flu. It helps in determining the specific strain causing the infection.",
+"parameters": [
+"Influenza A"
+]
+},
+{
+"testName": "Influenza B",
+"description": "The Influenza B test is used to detect the Influenza B virus, which is another common cause of the seasonal flu, often causing milder illness compared to Influenza A.",
+"parameters": [
+"Influenza B"
+]
+},
+{
+"testName": "H1N1 (Swine Flu)",
+"description": "The H1N1 test detects the H1N1 virus, commonly known as Swine Flu. It is essential for diagnosing this strain of influenza, which can lead to severe respiratory illness.",
+"parameters": [
+"H1N1 (Swine Flu)"
+]
+}
+]
+}
+]
