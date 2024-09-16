@@ -1,0 +1,1206 @@
+[
+{
+    "title": "Comprehensive Allergy Analysis Package",
+    "description": "Are you constantly suffering from sneezing, skin rashes, runny nose, watery/red eyes, or even an abnormal reaction to an insect bite? You could be suffering from an allergy that you are unaware of! Get tested for allergies from 236 allergens (including food and environmental allergens)",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+        {
+            "testName": "MEAT",
+            "description": "A variety of meats commonly consumed in diets, which can be tested for allergies or sensitivities.",
+            "parameters": [
+                "PORK",
+                "BEEF",
+                "MUTTON",
+                "DUCK MEAT",
+                "CHICKEN MEAT",
+                "TURKEY"
+            ]
+        },
+        {
+            "testName": "WEED",
+            "description": "Tests for allergies to various types of weeds, which are common allergens found in the environment.",
+            "parameters": [
+                "CHENOPODIUM ALBUM (GOOSEFOOT)",
+                "BRASSICA NAPUS (RAPE)",
+                "AMARANTHUS RETROFLEXUS (COMMON PIGWEED)",
+                "XANTHIUM COMMUNE (COCKLEBUR)"
+            ]
+        },
+        {
+            "testName": "DAIRY",
+            "description": "Tests for allergies or sensitivities to dairy products, including milk and milk derivatives.",
+            "parameters": [
+                "COW MILK",
+                "CHEESE CHEDDAR TYPE",
+                "CURD",
+                "YOGURT"
+            ]
+        },
+        {
+            "testName": "DRUGS",
+            "description": "Tests for allergies or sensitivities to various commonly used drugs and medications.",
+            "parameters": [
+                "LIDOCAINE, HAS",
+                "BENZOCAINE, HAS",
+                "PRILOCAINE",
+                "PARACETAMOL",
+                "ASPIRIN, HAS",
+                "PIROXYCAM",
+                "NAPROXEN",
+                "KETOPROFEN, HAS",
+                "DICLOFENAC",
+                "IBUPROFEN",
+                "PENICILLOYL G",
+                "PENICILLOYL V",
+                "CO-TRIMOXAZOLE",
+                "DOXYCYCLINE",
+                "PHOSPHOMYCIN",
+                "CLOXACILLIN",
+                "NEOMYCIN",
+                "CIPROFLOXACIN, HAS",
+                "OXACILLIN",
+                "OFLOXACIN",
+                "CHLORAMPHENICOL",
+                "METRONIDAZOLE",
+                "CLARITHROMYCIN",
+                "NORFLOXACIN, HAS",
+                "AZITHROMYCIN",
+                "AMPICILLIN, HAS",
+                "AMOXICILLIN, HAS",
+                "TETRACYCLINE, HAS",
+                "CEPHALOSPORIN, HAS",
+                "GENTAMYCIN, HAS",
+                "ERYTHROMYCIN, HAS",
+                "STREPTOMYCIN, HAS",
+                "RIFAMPICIN, HAS",
+                "GELATIN",
+                "THEOPHYLLINE",
+                "AMBROXOL",
+                "BROMHEXINE",
+                "PYRIDOXINE",
+                "THIAMINE (VITAMIN B1)",
+                "COBALAMIN (VITAMIN B12)",
+                "ASCORBIC ACID (VITAMIN C)",
+                "ACETYLCYSTEINE"
+            ]
+        },
+        {
+            "testName": "DUSTS",
+            "description": "Tests for allergies to various dust particles found in the environment.",
+            "parameters": [
+                "TOBACCO DUST",
+                "BOOKS DUST",
+                "HOUSE DUST, IFCI 1",
+                "HAY DUST"
+            ]
+        },
+        {
+            "testName": "TREES",
+            "description": "Tests for allergies to pollen from various types of trees.",
+            "parameters": [
+                "EUCALYPTUS SPP (GUM-TREE)",
+                "MORUS ALBA (RED MULBERRY)",
+                "PROSOPIS JULIFLORA (MESQUITE)",
+                "ACACIA SPP (ACACIA)",
+                "OAK WOOD",
+                "SALIX CAPREA (WILLOW)"
+            ]
+        }
+    ]
+},
+
+{
+    "title": "Food Allergy Test (Non-Veg and Veg Foods) ",
+    "description": "A food allergy blood test, also known as a food-specific IgE blood test is a diagnostic procedure used to detect specific food allergies in an individual. Severe cases of food allergies have the potential to trigger a life-threatening allergic reaction known as anaphylaxis. Food allergies commonly manifest through various symptoms, including skin reactions such as hives, eczema, and swelling of the lips. Respiratory issues like shortness of breath and asthma can also occur as a result of food allergies.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+"test_included": [
+{
+"testName": "MEAT",
+"description": "A variety of meats commonly consumed in diets, which can be tested for allergies or sensitivities.",
+"parameters": [
+"PORK",
+"BEEF",
+"MUTTON",
+"DUCK MEAT",
+"CHICKEN MEAT",
+"TURKEY"
+]
+},
+{
+"testName": "WEED",
+"description": "Tests for allergies to various types of weeds, which are common allergens found in the environment.",
+"parameters": [
+"CHENOPODIUM ALBUM (GOOSEFOOT)",
+"BRASSICA NAPUS (RAPE)",
+"AMARANTHUS RETROFLEXUS (COMMON PIGWEED)",
+"XANTHIUM COMMUNE (COCKLEBUR)"
+]
+},
+{
+"testName": "DAIRY",
+"description": "Tests for allergies or sensitivities to dairy products, including milk and milk derivatives.",
+"parameters": [
+"COW MILK",
+"CHEESE CHEDDAR TYPE",
+"CURD",
+"YOGURT"
+]
+},
+{
+"testName": "DRUGS",
+"description": "Tests for allergies or sensitivities to various commonly used drugs and medications.",
+"parameters": [
+"LIDOCAINE, HAS",
+"BENZOCAINE, HAS",
+"PRILOCAINE",
+"PARACETAMOL",
+"ASPIRIN, HAS",
+"PIROXYCAM",
+"NAPROXEN",
+"KETOPROFEN, HAS",
+"DICLOFENAC",
+"IBUPROFEN",
+"PENICILLOYL G",
+"PENICILLOYL V",
+"CO-TRIMOXAZOLE",
+"DOXYCYCLINE",
+"PHOSPHOMYCIN",
+"CLOXACILLIN",
+"NEOMYCIN",
+"CIPROFLOXACIN, HAS",
+"OXACILLIN",
+"OFLOXACIN",
+"CHLORAMPHENICOL",
+"METRONIDAZOLE",
+"CLARITHROMYCIN",
+"NORFLOXACIN, HAS",
+"AZITHROMYCIN",
+"AMPICILLIN, HAS",
+"AMOXICILLIN, HAS",
+"TETRACYCLINE, HAS",
+"CEPHALOSPORIN, HAS",
+"GENTAMYCIN, HAS",
+"ERYTHROMYCIN, HAS",
+"STREPTOMYCIN, HAS",
+"RIFAMPICIN, HAS",
+"GELATIN",
+"THEOPHYLLINE",
+"AMBROXOL",
+"BROMHEXINE",
+"PYRIDOXINE",
+"THIAMINE (VITAMIN B1)",
+"COBALAMIN (VITAMIN B12)",
+"ASCORBIC ACID (VITAMIN C)",
+"ACETYLCYSTEINE"
+]
+},
+{
+"testName": "DUSTS",
+"description": "Tests for allergies to various dust particles found in the environment.",
+"parameters": [
+"TOBACCO DUST",
+"BOOKS DUST",
+"HOUSE DUST, IFCI 1",
+"HAY DUST"
+]
+},
+{
+"testName": "TREES",
+"description": "Tests for allergies to pollen from various types of trees.",
+"parameters": [
+"EUCALYPTUS SPP (GUM-TREE)",
+"MORUS ALBA (RED MULBERRY)",
+"PROSOPIS JULIFLORA (MESQUITE)",
+"ACACIA SPP (ACACIA)",
+"OAK WOOD",
+"SALIX CAPREA (WILLOW)"
+]
+}
+]
+},
+
+{
+    "title": "Asthma and Respiratory Allergy Package",
+    "description": "Are you a person living with asthma? Certain food chemicals are known to trigger allergic reactions for asthmatic patients.  Symptoms include skin rashes, hives, nausea, vomiting, nasal congestion, sneezing. If you have any of these symptoms and you\u2019re an asthma patient, you could be suffering from an allergy that you are unaware of! Get tested for allergies from 70 allergens.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "WEED",
+"description": "Tests for allergies to various types of weeds, which are common allergens found in the environment.",
+"parameters": [
+"CHENOPODIUM ALBUM (GOOSEFOOT)",
+"BRASSICA NAPUS (RAPE)",
+"AMARANTHUS RETROFLEXUS (COMMON PIGWEED)",
+"XANTHIUM COMMUNE (COCKLEBUR)"
+]
+},
+{
+"testName": "DUSTS",
+"description": "Tests for allergies to various dust particles found in the environment.",
+"parameters": [
+"TOBACCO DUST",
+"BOOKS DUST",
+"HOUSE DUST, IFCI 1",
+"HAY DUST"
+]
+},
+{
+"testName": "TREES",
+"description": "Tests for allergies to pollen from various types of trees.",
+"parameters": [
+"EUCALYPTUS SPP (GUM-TREE)",
+"MORUS ALBA (RED MULBERRY)",
+"PROSOPIS JULIFLORA (MESQUITE)",
+"ACACIA SPP (ACACIA)",
+"OAK WOOD",
+"SALIX CAPREA (WILLOW)"
+]
+},
+{
+"testName": "ANIMALS",
+"description": "Tests for allergies to animal epithelium, dander, feathers, and droppings from various species.",
+"parameters": [
+"CAT EPITHELIUM",
+"DOG EPITHELIUM",
+"COW DANDER",
+"DOG DANDER",
+"PIGEON DROPPINGS",
+"GOOSE FEATHERS",
+"BUDGERIGAR DROPPING",
+"BUDGERIGAR FEATHERS",
+"BUDGERIGAR SERUM PROTEINS",
+"SHEEP EPITHELIUM",
+"PIG EPITHELIUM",
+"RABBIT EPITHELIUM",
+"CHICKEN FEATHERS",
+"DUCK FEATHERS",
+"MOUSE (EPITHELIUM, SERUM, URINE, PROTEIN)",
+"TURKEY FEATHERS",
+"CAT DANDER",
+"CANARIAN FEATHERS",
+"PIGEON FEATHERS",
+"CHICKEN DROPPINGS"
+]
+},
+{
+"testName": "GRASSES",
+"description": "Tests for allergies to various types of grasses.",
+"parameters": [
+"FESTUCA ELATIOR (MEADOW FESCUE)",
+"PHRAGMITES COMMUNIS (COMMON REED)",
+"DACTYLIS GLOMERATA (COCKSFOOT)",
+"PHLEUM PRATENSE (TIMOTHY)",
+"CYNODON DACTYLON (BERMUDA GRASS)",
+"LOLIUM PERENNE (RYE-GRASS)",
+"AGROSTIS STOLONIFERA (BENTGRASS)",
+"SORGHUM HALEPENSE (JOHNSON GRASS)",
+"ANTHOXANTHUM ODORATUM (SWEET VERNAL GRASS)"
+]
+},
+{
+"testName": "INSECTS",
+"description": "Tests for allergies to various insect allergens, including bites, stings, and body parts.",
+"parameters": [
+"APIS MELLIFERA (HONEY BEE)",
+"VESPULA GERMANICA (COMMON WASP - YELLOW JACKET)",
+"BLATELLA GERMANICA (COCKROACH)",
+"HETEROCERA MIX (MOTH)",
+"HOUSEFLY MUSCA DOMESTICA",
+"AEDES COMUNIS (COMMON MOSQUITO)"
+]
+},
+{
+"testName": "MOULDS & YEAST",
+"description": "Tests for allergies to various moulds and yeast, which can be environmental or found in food.",
+"parameters": [
+"PENICILLIUM NOTATUM",
+"CLADOSPORIUM HERBARUM",
+"ASPERGILLUS FUMIGATUS",
+"MUCOR RACEMOSUS",
+"CANDIDA ALBICANS",
+"ALTERNARIA ALTERNATA",
+"PHOMA BETAE",
+"TRICHODERMA VIRIDE",
+"RHIZOPUS NIGRICANS",
+"HELMINTHOSPORIUM HALODES"
+]
+}
+]
+},
+
+{
+    "title": "Drugs and Inhalants Allergy Package in Bangalore",
+    "description": "Are you constantly suffering from a headache, anxiety, gastrointestinal problems or just feeling unwell or lethargic? You could be intolerant to certain drugs and inhalants. Get tested for intolerance to 112 drugs and inhalants allergens.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "PETS",
+"description": "Tests for allergies to pet dander, feathers, and droppings from various species.",
+"parameters": [
+"CAT EPITHELIUM",
+"DOG EPITHELIUM",
+"COW DANDER",
+"DOG DANDER",
+"PIGEON DROPPINGS",
+"GOOSE FEATHERS",
+"BUDGERIGAR DROPPING",
+"BUDGERIGAR FEATHERS",
+"BUDGERIGAR SERUM PROTEINS",
+"SHEEP EPITHELIUM",
+"PIG EPITHELIUM",
+"RABBIT EPITHELIUM",
+"CHICKEN FEATHERS",
+"DUCK FEATHERS",
+"EPITH.+SERUM-URINE PROT. MOUSE",
+"TURKEY FEATHERS",
+"CAT DANDER",
+"CANARIAN FEATHERS",
+"PIGEON FEATHERS",
+"CHICKEN DROPPINGS"
+]
+},
+{
+"testName": "WEED",
+"description": "Tests for allergies to various types of weeds found in the environment.",
+"parameters": [
+"CHENOPODIUM ALBUM (GOOSEFOOT)",
+"BRASSICA NAPUS (RAPE)",
+"AMARANTHUS RETROFLEXUS (COMMON PIGWEED)",
+"XANTHIUM COMMUNE (COCKLEBUR)"
+]
+},
+{
+"testName": "DRUGS",
+"description": "Tests for allergies to various types of drugs, including common painkillers and antibiotics.",
+"parameters": [
+"LIDOCAINE , HAS",
+"BENZOCAINE , HAS",
+"PRILOCAINE",
+"PARACETAMOL",
+"ASPIRIN, HAS",
+"PIROXYCAM",
+"NAPROXEN",
+"KETOPROFEN , HAS",
+"DICLOFENAC",
+"IBUPROFEN",
+"PENICILLOYL G",
+"PENICILLOYL V",
+"CO-TRIMOXAZOLE",
+"DOXYCYCLINE",
+"PHOSPHOMYCIN",
+"CLOXACILLIN",
+"NEOMYCIN",
+"CIPROFLOXACIN , HAS",
+"OXACILLIN",
+"OFLOXACIN",
+"CHLORAMPHENICOL",
+"METRONIDAZOLE",
+"VANCOMYCIN",
+"CLARITHROMYCIN",
+"NORFLOXACIN , HAS",
+"AZITHROMYCIN",
+"AMPICILLIN, HAS",
+"AMOXICILLIN, HAS",
+"TETRACYCLINE, HAS",
+"CEPHALOSPORIN, HAS",
+"GENTAMYCIN, HAS",
+"ERYTHROMYCIN, HAS",
+"STREPTOMYCIN, HAS",
+"RIFAMPICIN, HAS",
+"DIATRIZOATE",
+"AMIDOTRIZOATE MEGLUMINE",
+"GELATIN",
+"THEOPHYLLINE",
+"AMBROXOL",
+"BROMHEXINE",
+"PYRIDOXINE",
+"THIAMINE (VITAMIN B1)",
+"COBALAMIN (VITAMIN B12)",
+"ASCORBIC ACID (VITAMIN C)",
+"ACETYLCYSTEINE"
+]
+},
+{
+"testName": "TREES",
+"description": "Tests for allergies to pollen from various types of trees.",
+"parameters": [
+"EUCALYPTUS SPP (GUM-TREE)",
+"MORUS ALBA (RED MULBERRY)",
+"PROSOPIS JULIFLORA (MESQUITE)",
+"ACACIA SPP (ACACIA)",
+"OAK WOOD",
+"SALIX CAPREA (WILLOW)"
+]
+},
+{
+"testName": "MOULDS & YEAST",
+"description": "Tests for allergies to moulds and yeast, which can be environmental or food-related.",
+"parameters": [
+"PENICILLIUM NOTATUM",
+"CLADOSPORIUM HERBARUM",
+"ASPERGILLUS FUMIGATUS",
+"MUCOR RACEMOSUS",
+"CANDIDA ALBICANS",
+"ALTERNARIA ALTERNATA",
+"PHOMA BETAE",
+"TRICHODERMA VIRIDE",
+"RHIZOPUS NIGRICANS",
+"HELMINTHOSPORIUM HALODES"
+]
+},
+{
+"testName": "GRASS",
+"description": "Tests for allergies to various types of grass pollen.",
+"parameters": [
+"FESTUCA ELATIOR (MEADOW FESCUE)",
+"PHRAGMITES COMMUNIS (COMMON REED)",
+"DACTYLIS GLOMERATA (COCKSFOOT)",
+"PHLEUM PRATENSE (TIMOTHY)",
+"CYNODON DACTYLON (BERMUDA GRASS)",
+"LOLIUM PERENNE (RYE-GRASS)",
+"AGROSTIS STOLONIFERA (BENTGRASS)",
+"SORGHUM HALEPENSE (JOHNSON GRASS)",
+"ANTHOXANTHUM ODORATUM (SWEET VERNAL GRASS)"
+]
+},
+{
+"testName": "INSECTS",
+"description": "Tests for allergies to various insect allergens, including stings and body parts.",
+"parameters": [
+"APIS MELLIFERA (HONEY BEE)",
+"VESPULA GERMANICA (COMMON WASP - YELLOW JACKET)",
+"BLATELLA GERMANICA (COCKROACH)",
+"HETEROCERA MIX (MOTH)",
+"HOUSEFLY MUSCA DOMESTICA",
+"AEDES COMUNIS (COMMON MOSQUITO)"
+]
+}
+]
+},
+{
+    "title": "Vegetarian Food Allergy Package in Bangalore",
+    "description": "Do end up with rashes, hives or a tingling sensation in your mouth post a meal? You could be allergic to certain vegetarian foods. Get yourself tested for 98 food allergens.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "DAIRY",
+"description": "Tests for allergies to dairy products.",
+"parameters": [
+"COW MILK",
+"CHEESE CHEDDAR TYPE",
+"CURD",
+"YOGURT"
+]
+},
+{
+"testName": "FRUITS",
+"description": "Tests for allergies to various types of fruits.",
+"parameters": [
+"ORANGE",
+"STRAWBERRY",
+"APPLE",
+"KIWI",
+"MELON",
+"MANGO",
+"BANANA",
+"PEAR",
+"PEACH",
+"LEMON",
+"PINEAPPLE",
+"APRICOT",
+"CHERRY",
+"PLUM",
+"GRAPE",
+"GUAVA",
+"PAPAYA",
+"WATERMELON",
+"CRANBERRY",
+"LYCHEE",
+"COCONUT"
+]
+},
+{
+"testName": "OTHERS",
+"description": "Tests for allergies to miscellaneous allergens.",
+"parameters": [
+"YEAST",
+"CHOCOLATE"
+]
+},
+{
+"testName": "SPICES",
+"description": "Tests for allergies to various spices and seasonings.",
+"parameters": [
+"GARLIC",
+"FENNEL",
+"OLIVE",
+"CELERY",
+"POPPY (SEED)",
+"PARSLEY",
+"MINT",
+"CIANNAMON",
+"VANILLA",
+"CARDAMON",
+"CLOVES",
+"BASIL",
+"GINGER",
+"ANISE",
+"THYME",
+"BLACK PEPPER",
+"CURRY",
+"NUTMEG",
+"CORIANDER",
+"SAFFRON",
+"OREGANO",
+"ROSEMARY"
+]
+},
+{
+"testName": "CEREALS",
+"description": "Tests for allergies to common cereals and grains.",
+"parameters": [
+"WHEAT FLOUR",
+"BARLEY",
+"OATS",
+"MAIZE",
+"RICE",
+"MILLET",
+"SEMOLINA"
+]
+},
+{
+"testName": "BEVERAGES",
+"description": "Tests for allergies to various beverages.",
+"parameters": [
+"COFFEE",
+"TEA",
+"COCONUT MILK"
+]
+},
+{
+"testName": "OIL SEEDS",
+"description": "Tests for allergies to various oil seeds.",
+"parameters": [
+"SESAME SEED",
+"MUSTARD",
+"SUNFLOWER SEED"
+]
+},
+{
+"testName": "DRY FRUITS",
+"description": "Tests for allergies to dry fruits and nuts.",
+"parameters": [
+"RAISIN",
+"DATE",
+"FIG",
+"PEANUT",
+"HAZELNUT",
+"ALMOND",
+"FLAXSEED",
+"PUMPKIN SEED",
+"CASHEW NUT",
+"PISTACHIO NUT",
+"WALNUT"
+]
+},
+{
+"testName": "VEGETABLES",
+"description": "Tests for allergies to various types of vegetables.",
+"parameters": [
+"TOMATO",
+"CARROT",
+"POTATO",
+"ONION",
+"SWEET POTATO",
+"SPINACH",
+"LETTUCE",
+"CABBAGE",
+"SWEET PEPPER",
+"PUMPKIN",
+"TURNIP",
+"BROCCOLI",
+"EGG PLANT / AUBERGINE",
+"CAULIFLOWER",
+"BEET",
+"PEA",
+"SOYA BEAN",
+"FRENCH BEAN",
+"TOFU(BEAN CURD)",
+"CUCUMBER",
+"RADISH"
+]
+},
+{
+"testName": "DAL / PULSES",
+"description": "Tests for allergies to various types of pulses.",
+"parameters": [
+"CHICK PEA"
+]
+}
+]
+},
+{
+    "title": "Drug Allergy Package in Bangalore",
+    "description": "A person may develop an allergy to certain medications. These could be prescribed or OTC medicines. The allergic reaction to any medication is not the same as side effects of taking the medication. Symptoms of a reaction can vary from mild rashes to hives and swelling. Get tested for allergies from 42 drug allergens.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "DRUGS",
+"description": "Tests for allergies to various drugs and medications.",
+"parameters": [
+"LIDOCAINE , HAS",
+"BENZOCAINE , HAS",
+"PRILOCAINE",
+"PARACETAMOL",
+"ASPIRIN, HAS",
+"PIROXYCAM",
+"NAPROXEN",
+"KETOPROFEN , HAS",
+"DICLOFENAC",
+"IBUPROFEN",
+"PENICILLOYL G",
+"PENICILLOYL V",
+"CO-TRIMOXAZOLE",
+"DOXYCYCLINE",
+"PHOSPHOMYCIN",
+"CLOXACILLIN",
+"NEOMYCIN",
+"CIPROFLOXACIN , HAS",
+"OXACILLIN",
+"OFLOXACIN",
+"CHLORAMPHENICOL",
+"METRONIDAZOLE",
+"CLARITHROMYCIN",
+"NORFLOXACIN , HAS",
+"AZITHROMYCIN",
+"AMPICILLIN, HAS",
+"AMOXICILLIN, HAS",
+"TETRACYCLINE, HAS",
+"CEPHALOSPORIN, HAS",
+"GENTAMYCIN, HAS",
+"ERYTHROMYCIN, HAS",
+"STREPTOMYCIN, HAS",
+"RIFAMPICIN, HAS",
+"GELATIN",
+"THEOPHYLLINE",
+"AMBROXOL",
+"BROMHEXINE",
+"PYRIDOXINE",
+"THIAMINE (VITAMIN B1)",
+"COBALAMIN (VITAMIN B12)",
+"ASCORBIC ACID (VITAMIN C)",
+"ACETYLCYSTEINE"
+]
+}
+]
+},
+{
+    "title": "Comprehensive Food Intolerance Package in Bangalore",
+    "description": "Food intolerance refers to difficulty in digesting or processing certain foods. It occurs when the body lacks certain enzymes or chemicals needed for proper digestion. The most common example is lactose intolerance, where the body lacks the enzyme lactase needed to break down lactose in dairy products.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "VEGETABLE PANEL EXTENDED",
+"description": "Tests for allergies to a wide range of vegetables.",
+"parameters": [
+"WHITE BEAN",
+"HORSERADISH",
+"ZUCCHINI",
+"RED CABBAGE",
+"ARTICHOKE",
+"SEAWEED",
+"OYSTER MUSHROOM",
+"NAPA CABBAGE",
+"GUAR GUM",
+"ICEBERG LETTUCE",
+"ASPARGUS",
+"BAMBOO SHOOT",
+"CILANTRO",
+"CELERY",
+"LETTUCE",
+"TOMATO",
+"PEA",
+"CUCUMBER",
+"RED RADISH",
+"CABBAGE",
+"PUMPKIN",
+"EGG PLANT/AUBERGINE",
+"CAULIFLOWER",
+"FRENCH BEAN",
+"POTATO",
+"MUSHROOMS",
+"CARROT",
+"GARLIC",
+"ONION",
+"SWEET POTATO",
+"LEMON",
+"TURNIP",
+"BROCCOLI",
+"BEET",
+"PARSLEY",
+"TOFU (BEAN CURD)",
+"MINT",
+"BASIL",
+"GINGER",
+"RED BEAN",
+"ROSE HIPS",
+"LENTIL",
+"SOYA BEAN",
+"CHICK PEA",
+"SPINACH",
+"SWEET PEPPER"
+]
+},
+{
+"testName": "MEAT",
+"description": "Tests for allergies to various types of meat.",
+"parameters": [
+"BEEF LIVER",
+"MUTTON",
+"CHICKEN MEAT",
+"TURKEY",
+"BEEF",
+"PORK",
+"DUCK MEAT"
+]
+},
+{
+"testName": "SEAFOOD",
+"description": "Tests for allergies to various types of seafood.",
+"parameters": [
+"HADDOCK (fish)",
+"OCTOPUS",
+"CLAM",
+"SQUID",
+"HALIBUT (fish)",
+"HAKE (fish)",
+"CRAB",
+"SHRIMP",
+"TUNA",
+"CARP FISH",
+"SALMON",
+"SARDINE",
+"LOBSTER",
+"MACKEREL"
+]
+},
+{
+"testName": "DAIRY",
+"description": "Tests for allergies to various dairy products.",
+"parameters": [
+"SWISS CHEESE",
+"ALPHA-LACTALBUMIN (BOVINE)",
+"BETA-LACTOGLOBULIN (BOVINE)",
+"CASEIN (BOVINE)",
+"CHEESE MOULD TYPE",
+"MILK POWDER",
+"CHEESE, GOUDA TYPE",
+"COOKED MILK",
+"CHEESE PARMESAN TYPE",
+"MOZZARELLA CHEESE",
+"GOAT MILK",
+"GOAT CHEESE",
+"CHEESE CHEDDAR TYPE",
+"COW MILK",
+"CURD",
+"YOGURT"
+]
+},
+{
+"testName": "GLUTEN INTOLERANCE",
+"description": "Tests for gluten intolerance.",
+"parameters": [
+"Gluten"
+]
+},
+{
+"testName": "SPICES",
+"description": "Tests for allergies to various spices.",
+"parameters": [
+"RYE",
+"GREEN PEPPER",
+"CARAWAY",
+"DILL",
+"BAY LEAF",
+"CHILI PEPPER",
+"SAGE",
+"POPPY (SEED)",
+"CLOVES",
+"BLACK PEPPER",
+"FENNEL",
+"OLIVE",
+"CINNAMON",
+"VANILLA",
+"CARDAMOM",
+"ANISE",
+"THYME",
+"CURRY",
+"NUTMEG",
+"CORIANDER",
+"SAFFRON",
+"OREGANO",
+"ROSEMARY",
+"MUSTARD"
+]
+},
+{
+"testName": "FRUITS",
+"description": "Tests for allergies to various fruits.",
+"parameters": [
+"TANGERINE",
+"AVOCADO",
+"RASPBERRY",
+"GRAPEFRUIT",
+"BLACKBERRY",
+"BLUEBERRY",
+"PASSIONFRUIT",
+"PITAHAYA (PITAYA)",
+"PERSIMMON (KAKI) fruit",
+"POMELO fruit",
+"LIME",
+"BLACKCURRANT",
+"ORANGE",
+"STRAWBERRY",
+"APPLE",
+"PEAR",
+"PEACH",
+"PINEAPPLE",
+"APRICOT",
+"CHERRY",
+"PLUM",
+"GRAPE",
+"DATE",
+"GUAVA",
+"PAPAYA",
+"WATERMELON",
+"CRANBERRY",
+"LYCHEE",
+"KIWI",
+"COCONUT",
+"MELON",
+"MANGO",
+"BANANA"
+]
+},
+{
+"testName": "CEREALS",
+"description": "Tests for allergies to various cereals.",
+"parameters": [
+"BUCK WHEAT",
+"BRAN (WHEAT)",
+"GLIADIN",
+"WHEAT FLOUR",
+"BARLEY",
+"OATS",
+"MAIZE",
+"RICE",
+"MILLET",
+"SEMOLINA"
+]
+},
+{
+"testName": "NUTS",
+"description": "Tests for allergies to various nuts.",
+"parameters": [
+"BRAZIL NUT",
+"PECAN NUT",
+"CHESTNUT",
+"MACADAMIA NUT",
+"HAZELNUT",
+"ALMOND",
+"RAISIN",
+"FIG",
+"PEANUT",
+"CASHEW NUT",
+"PISTACHIO NUT",
+"WALNUT"
+]
+},
+{
+"testName": "OTHERS",
+"description": "Tests for allergies to other substances.",
+"parameters": [
+"MALT",
+"COCOA",
+"LECITHIN",
+"HIBISCUS",
+"CHICORY",
+"HONEY",
+"GREEN TEA",
+"SORREL (plant)",
+"CHAMOMILE TEA",
+"YEAST",
+"TEA",
+"COCONUT MILK",
+"CHOCOLATE",
+"COFFEE"
+]
+}
+]
+
+},
+{
+    "title": "Non-Veg Food Intolerance (Essential) Checkup in Bangalore",
+    "description": "Food intolerance refers to difficulty in digesting or processing certain foods. It occurs when the body lacks certain enzymes or chemicals needed for proper digestion. The most common example is lactose intolerance, where the body lacks the enzyme lactase needed to break down lactose in dairy products.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "SEAFOOD",
+"description": "Tests for allergies to various types of seafood.",
+"parameters": [
+"HADDOCK (FISH)",
+"OCTOPUS",
+"CLAM",
+"SQUID",
+"HALIBUT (FISH)",
+"HAKE (FISH)",
+"CRAB",
+"SHRIMP",
+"TUNA",
+"CARP FISH",
+"SALMON",
+"SARDINE",
+"LOBSTER",
+"MACKEREL"
+]
+},
+{
+"testName": "NON-VEG EXTENDED",
+"description": "Tests for allergies to a variety of non-vegetarian items.",
+"parameters": [
+"EGG WHITE",
+"EGG YOLK",
+"BEEF LIVER",
+"MUTTON",
+"CHICKEN MEAT",
+"TURKEY",
+"BEEF",
+"PORK",
+"WHOLE EGG (HEN)",
+"DUCK MEAT"
+]
+}
+]
+
+},
+{
+    "title": "Dairy Gluten Intolerance Package in Bangalore",
+    "description": "Food intolerance refers to difficulty in digesting or processing certain foods. It occurs when the body lacks certain enzymes or chemicals needed for proper digestion. The most common example is lactose intolerance, where the body lacks the enzyme lactase needed to break down lactose in dairy products.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "DAIRY",
+"description": "Tests for allergies to various dairy products.",
+"parameters": [
+"SWISS CHEESE",
+"ALPHA-LACTALBUMIN (BOVINE)",
+"BETA-LACTOGLOBULIN (BOVINE)",
+"CASEIN (BOVINE)",
+"CHEESE MOULD TYPE",
+"MILK POWDER",
+"CHEESE, GOUDA TYPE",
+"COOKED MILK",
+"CHEESE PARMESAN TYPE",
+"MOZZARELLA CHEESE",
+"GOAT MILK",
+"GOAT CHEESE",
+"CHEESE CHEDDAR TYPE",
+"COW MILK",
+"CURD",
+"YOGURT"
+]
+},
+{
+"testName": "GLUTEN INTOLERANCE (IGG)",
+"description": "Test for gluten intolerance using IgG.",
+"parameters": [
+"Gluten"
+]
+}
+]
+
+},
+{
+    "title": "Veg Food Intolerance (Advanced) Checkup in Bangalore",
+    "description": "Food intolerance refers to difficulty in digesting or processing certain foods. It occurs when the body lacks certain enzymes or chemicals needed for proper digestion. The most common example is lactose intolerance, where the body lacks the enzyme lactase needed to break down lactose in dairy products.",
+    "sample_required": [
+        "Blood"
+    ],
+    "preparation_required": [
+        "Blood",
+        "No Fasting Required"
+    ],
+    "test_included": [
+{
+"testName": "FRUITS",
+"description": "Tests for allergies to various fruits.",
+"parameters": [
+"TANGERINE",
+"AVOCADO",
+"RASPBERRY",
+"GRAPEFRUIT",
+"BLACKBERRY",
+"BLUEBERRY",
+"PASSIONFRUIT",
+"PITAHAYA (PITAYA)",
+"PERSIMMON (KAKI) FRUIT",
+"POMELO FRUIT",
+"LIME",
+"BLACKCURRANT",
+"ORANGE",
+"STRAWBERRY",
+"APPLE",
+"PEAR",
+"PEACH",
+"PINEAPPLE",
+"APRICOT",
+"CHERRY",
+"PLUM",
+"GRAPE",
+"DATE",
+"GUAVA",
+"PAPAYA",
+"WATERMELON",
+"CRANBERRY",
+"LYCHEE",
+"KIWI",
+"COCONUT",
+"MELON",
+"MANGO",
+"BANANA"
+]
+},
+{
+"testName": "DAIRY",
+"description": "Tests for allergies to various dairy products.",
+"parameters": [
+"SWISS CHEESE",
+"ALPHA-LACTALBUMIN (BOVINE)",
+"BETA-LACTOGLOBULIN (BOVINE)",
+"CASEIN (BOVINE)",
+"CHEESE MOULD TYPE",
+"MILK POWDER",
+"CHEESE, GOUDA TYPE",
+"COOKED MILK",
+"CHEESE PARMESAN TYPE",
+"MOZZARELLA CHEESE",
+"GOAT MILK",
+"GOAT CHEESE",
+"CHEESE CHEDDAR TYPE",
+"COW MILK",
+"CURD",
+"YOGURT"
+]
+},
+{
+"testName": "NUTS",
+"description": "Tests for allergies to various nuts.",
+"parameters": [
+"BRAZIL NUT",
+"PECAN NUT",
+"CHESTNUT",
+"MACADAMIA NUT",
+"HAZELNUT",
+"ALMOND",
+"RAISIN",
+"FIG",
+"PEANUT",
+"CASHEW NUT",
+"PISTACHIO NUT",
+"WALNUT"
+]
+},
+{
+"testName": "VEGETABLE PANEL 1",
+"description": "Tests for allergies to various vegetables.",
+"parameters": [
+"LETTUCE",
+"TOMATO",
+"PEA",
+"CUCUMBER",
+"RED RADISH",
+"CABBAGE",
+"PUMPKIN",
+"EGG PLANT/AUBERGINE",
+"CAULIFLOWER",
+"FRENCH BEAN",
+"POTATO",
+"MUSHROOMS",
+"CARROT",
+"GARLIC",
+"ONION",
+"SWEET POTATO",
+"LEMON",
+"TURNIP",
+"BROCCOLI",
+"BEET",
+"PARSLEY",
+"TOFU (BEAN CURD)",
+"MINT",
+"BASIL",
+"GINGER",
+"RED BEAN",
+"LENTIL",
+"SOYA BEAN",
+"CHICK PEA",
+"SPINACH",
+"SWEET PEPPER"
+]
+}
+]
+}
+]

@@ -10,7 +10,7 @@ const TestDetailsCard = ({ test }) => {
       <Card.Body>
         <Row className="d-flex">
           <Col sm={10} md={8} lg={9}>
-            <Image src={test.icon} alt={test.name} width={40} height={40} />
+            <Image src={test.icon} alt={test.Title} width={40} height={40} />
           </Col>
           <Col sm={10} md={8} lg={3}>
             {test.discount && (
@@ -20,13 +20,13 @@ const TestDetailsCard = ({ test }) => {
             )}
           </Col>
         </Row>
-        <Card.Title className={styles.testName}>{test.name}</Card.Title>
+        <Card.Title className={styles.testName}>{test.title}</Card.Title>
         <div className={styles.testIncluded}>
-          Included {test.testCount} test
+          Included {test.test_included.length} test
         </div>
         <Row className="mt-5">
           <Col sm={10} md={8} lg={3} className={styles.discountPrice}>
-            {`₹${test.discountPrice}`}
+            {`₹${test.discount}`}
           </Col>
 
           <Col sm={10} md={8} lg={5} className={`mt-1 ${styles.price}`}>
@@ -34,7 +34,7 @@ const TestDetailsCard = ({ test }) => {
           </Col>
 
           <Col sm={10} md={8} lg={3} className={`border text-center pt-1 text-white  ${styles.addButton}`}>
-            Add
+            View
           </Col>
         </Row>
       </Card.Body>
