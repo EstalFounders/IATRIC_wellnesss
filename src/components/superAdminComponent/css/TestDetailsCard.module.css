@@ -1,0 +1,48 @@
+/* css/TestCard.module.css */
+.testCard {
+    border-radius: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f2;
+  }
+  
+  .discountBadge {
+    background-color: #e8eb63;
+    font-size: 0.8rem;
+    color: black;
+    padding: 8px;
+  }
+
+  .testIncluded {
+    font-size: 14px;
+    color: gray;
+    font-weight: 800;
+  }
+
+  .testName {
+    font-weight: 900;
+    font-size: 28px;
+    margin-top: 15%;
+    font-weight: 800;
+    white-space: nowrap;  
+    overflow: hidden;       
+    text-overflow: ellipsis;
+  }
+
+  .discountPrice {
+     font-size: 22px;
+     font-weight: 800;
+  }
+
+  .price {
+    font-size: 18px;
+    text-decoration: line-through;
+    font-weight: 800;
+  }
+
+  .addButton {
+    border-radius: 10px;
+    font-weight: 500;
+    background-color: #3b5f1e;
+    cursor: pointer;
+  }
+  
