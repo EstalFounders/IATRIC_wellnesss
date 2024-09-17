@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Table, Button, Form, Modal } from "react-bootstrap";
 import { BiEdit } from "react-icons/bi";
-import TestDetailsCard from "../../labTestComponent/FeaturedHealthCheckUp/TestDetailsCard";
+import TestDetailsCard from "./TestDetailsCard";
 
 const LabTestComponent = () => {
   // State to store fetched data
