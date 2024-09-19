@@ -43,7 +43,7 @@ function Navbar() {
               return (
                 <li key={index} className={item.cName}>
                   <Link href={item.path}>
-                    <div className="mt-3 m-3">
+                    <div className="m-1">
                       {item.icon}
                       <span className={styles.span}>{item.title}</span>
                     </div>
