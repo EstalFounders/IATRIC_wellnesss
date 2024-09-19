@@ -102,7 +102,7 @@ const LabTestComponent = () => {
     setLoadingTest(true); // Start loading state
 
     try {
-      const response = await fetch(`/api/labtestdetails/?id=${id}`); // Replace with your API endpoint
+      const response = await fetch(`/api/labcategorydetails/?id=${id}`); // Replace with your API endpoint
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -122,7 +122,7 @@ const LabTestComponent = () => {
   const handleClose = () => setShow(false);
 
   return (
-    <div className="mx-5">
+    <div style={{marginLeft: '100px',marginRight: '100px'}}>
       <h2 className="mt-4">Lab Tests</h2>
       <Row className="mb-3">
         <Col xs={12} md={6}>

@@ -72,7 +72,7 @@ const options = {
   ],
   pages: {
     signIn: {
-      superAdmin: "/superAdmin/login",
+      superAdmin: "/superAdmin/onload",
       doctor: "/doctor/login",
     },
   },
