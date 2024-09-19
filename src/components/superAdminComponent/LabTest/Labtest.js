@@ -102,7 +102,7 @@ const LabTestComponent = () => {
     setLoadingTest(true); // Start loading state
 
     try {
-      const response = await fetch(`/api/labtestdetails/?id=${id}`); // Replace with your API endpoint
+      const response = await fetch(`/api/labcategorydetails/?id=${id}`); // Replace with your API endpoint
 
       if (!response.ok) {
         throw new Error("Network response was not ok");

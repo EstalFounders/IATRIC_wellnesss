@@ -1,41 +1,34 @@
+// pages/api/update-test-details.js
+
 import { dbConnect } from "../../src/lib/db";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 
+
 export default async function handler(req, res) {
-  await dbConnect();
+  const { method } = req;
+  const { id } = req.query;
 
-  if (req.method === "GET") {
-    const { id } = req.query
-    console.log(id, 'id on srver')
-    try {
-      const labTestsDetails = await LabTestDetails.find({ ['category_id']: id });
-      res.status(200).json(labTestsDetails);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching lab tests" });
-    }
-  }
-  if (req.method === "PUT") {
-    console.log(req.query, 'req query')
-    const { id } = req.query;
+  await dbConnect(); // Connect to MongoDB
 
+  if (method === 'POST') {
     try {
-      // Find the lab test by ID and update with the request body
-      const updatedLabTest = await LabTest.findByIdAndUpdate(id, req.body, {
+      const data = req.body;
+
+      // Update the test details in the database
+      const updatedTestDetails = await LabTestDetails.findByIdAndUpdate(id, data, {
         new: true, // Return the updated document
-        runValidators: true, // Enforce schema validation
+        runValidators: true, // Ensure validation rules are applied
       });
 
-      if (!updatedLabTest) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Lab test not found" });
+      if (!updatedTestDetails) {
+        return res.status(404).json({ success: false, message: 'Test details not found' });
       }
 
-      res.status(200).json({ success: true, data: updatedLabTest });
+      return res.status(200).json({ success: true, data: updatedTestDetails });
     } catch (error) {
-      res.status(400).json({ success: false, error: error.message });
+      return res.status(400).json({ success: false, message: 'Error updating test details', error });
     }
   } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }

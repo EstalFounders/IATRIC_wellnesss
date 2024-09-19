@@ -23,7 +23,7 @@ const Dropdown = () => {
     try {
         await signOut();
         // Additional logic after successful sign-out
-        router.push("/registerDoc/onload"); // Redirect to the login screen
+        router.push("/superAdmin/onload"); // Redirect to the login screen
       } catch (error) {
         console.error("Error during sign-out:", error);
       }
