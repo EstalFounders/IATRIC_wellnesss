@@ -1,0 +1,123 @@
+.card {
+    width: 350px;
+    height: 300px;
+    border: 1px solid #EDEDED;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #F8FAF6;
+    margin-bottom: 10px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .icon {
+    font-size: 24px;
+  }
+  
+  .discount {
+    color: #BA1A1A;
+    font-weight: bold;
+    font-size: 20px;
+    font-family: Montserrat;
+font-weight: 700;
+line-height: 31.69px;
+text-align: left;
+
+  }
+  
+  .price {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: Montserrat;
+font-weight: 500;
+line-height: 31.69px;
+text-align: left;
+color: #000000;
+top: 15px;
+
+  }
+  
+  .mrp {
+    text-decoration: line-through;
+    color: #A0A0A0;
+    font-size: 14px;
+    margin-left: 5px;
+    font-family: Montserrat;
+font-weight: 400;
+line-height: 17.07px;
+text-align: left;
+color: #767676;
+
+  }
+  
+  .title {
+    margin-left: 3%;
+    font-family: Poppins;
+font-size: 24px;
+font-weight: 400;
+line-height: 28.8px;
+text-align: left;
+color: #011632;
+
+}
+  
+  .details {
+    font-size: 14px;
+    margin-top: 5%;
+  }
+  
+  .addToCartbutton {
+    width: 117px;
+height: 33px;
+padding: 8px 16px 8px 16px;
+gap: 4px;
+border-radius: 8px;
+opacity: 0px;
+background-color: #C1E16C;
+border-color: #C1E16C;
+font-family: Montserrat;
+font-size: 14px;
+font-weight: 700;
+line-height: 17.07px;
+text-align: left;
+color: #2B3133;
+}
+
+  .viewDetailsButton {
+    width: 124px;
+    height: 33px;
+    padding: 8px 16px 8px 16px;
+    gap: 4px;
+    border-radius: 8px;
+    border: 2px 0px 0px 0px;
+    opacity: 0px;
+    font-family: Montserrat;
+font-size: 14px;
+font-weight: 700;
+line-height: 17.07px;
+text-align: left;
+color: #2B3133;
+margin-left: 5%;
+    border: 2px solid #E9F2D1
+    
+  }
+  
+  .buttons {
+    margin-top: 5%;
+  }
+
+  .upperSection {
+    background-color: #C1E16C;
+    height: 130px;
+    border-radius: 10px;
+  }
+  .icon {
+    width: 40px;
+    background-color: #DDE6C6;
+    border-radius: 50px;
+  }
+  

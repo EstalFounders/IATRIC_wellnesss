@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Badge, Row, Col, Button } from "react-bootstrap";
 import Image from "next/image";
+import { FaTrash } from "react-icons/fa"; // Import trash icon
 import styles from "../css/TestDetailsCard.module.css";
 import EditableTestDetails from "./EditableTestDetails";
 
@@ -18,9 +19,27 @@ const TestDetailsCard = ({ test }) => {
     setSelectedTestDetails(null); // Clear selected test details
   };
 
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this test package?")) {
+      try {
+        const response = await fetch(`/api/labtestcategorydetails/?id=${test._id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete the test package");
+        }
+
+        alert("Test package deleted successfully!");
+        // Optionally refresh the data or handle UI updates after deletion
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  };
+
   return (
     <>
-      {/* Card displaying test details */}
       <Card className={styles.testCard}>
         <Card.Body>
           <Row className="d-flex">
@@ -57,11 +76,20 @@ const TestDetailsCard = ({ test }) => {
             >
               Edit
             </Col>
+            {/* Delete Button with Icon */}
+            <Col
+              sm={10}
+              md={8}
+              lg={3}
+              className={`mt-2 text-center ${styles.deleteButton}`}
+              onClick={handleDelete}
+            >
+              <FaTrash />
+            </Col>
           </Row>
         </Card.Body>
       </Card>
 
-      {/* Modal Component outside of the card */}
       {showEditableComponent && selectedTestDetails && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -72,14 +100,12 @@ const TestDetailsCard = ({ test }) => {
               </Button>
             </div>
             <div className="modal-body">
-              {/* Passing selectedTestDetails as prop to the component */}
               <EditableTestDetails data={selectedTestDetails} />
             </div>
           </div>
         </div>
       )}
 
-      {/* Styles for Modal Overlay */}
       <style jsx>{`
         .modal-overlay {
           position: fixed;
@@ -101,6 +127,11 @@ const TestDetailsCard = ({ test }) => {
           max-width: 90vw;
           max-height: 90vh;
           overflow-y: auto;
+        }
+
+        .deleteButton {
+          background-color: red;
+          cursor: pointer;
         }
       `}</style>
     </>

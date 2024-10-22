@@ -1,0 +1,33 @@
+.section {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .boldLabel {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .selectCategory {
+    margin-bottom: 15px;
+  }
+  
+  .testContainer {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+  }
+  
+  .submitButton {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    font-weight: bold;
+    border-radius:
+  }  

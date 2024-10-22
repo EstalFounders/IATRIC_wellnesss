@@ -37,7 +37,7 @@ const Footer4 = () => {
               {/* Footer Logo */}
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
               <img
-                src="images/logo-grey.png"
+                src="/images/logo-grey.png"
                 width={180}
                 height={40}
                 alt="footer-logo"

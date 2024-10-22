@@ -36,4 +36,25 @@ export default async function handler(req, res) {
   } else {
     res.status(405).json({ message: "Method Not Allowed" });
   }
+
+  if (req.method === 'POST') {
+    try {
+      const { category_name, category_description } = req.body;
+
+      if (!category_name || !category_description) {
+        return res.status(400).json({ message: "Category name and description are required" });
+      }
+
+      const newCategory = new LabTest({
+        category_name,
+        category_description,
+      });
+
+      const savedCategory = await newCategory.save();
+
+      res.status(201).json(savedCategory);
+    } catch (error) {
+      res.status(500).json({ message: "Error creating category", error: error.message });
+    }
+  } 
 }

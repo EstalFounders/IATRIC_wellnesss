@@ -43,7 +43,7 @@ const EditableTestDetails = ({ data }) => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`/api/labtestdetails/?id=${formData._id}`, {
+      const response = await fetch(`/api/updatelabtestdetails/?id=${formData._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

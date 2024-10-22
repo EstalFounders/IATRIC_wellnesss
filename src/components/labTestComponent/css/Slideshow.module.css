@@ -1,10 +1,14 @@
 .carousel {
-    margin: 20px 0;
+    margin: 20px 0 10px 0;
+        
   }
   
   .carouselImage {
     object-fit: cover;
-    max-height: 400px;
+    max-height: 550px;
+    border-radius: 10px;
+    border-color: black;
+    border-width: 10;
   }
 
   
