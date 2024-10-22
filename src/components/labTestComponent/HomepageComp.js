@@ -11,7 +11,7 @@ import MostPopularCheckup from "./mostPopularCheckup/MostPopularCheckup";
 import VitalOrganCheckup from "./vitalOrganCheckUp/VitalOrganCheckup";
 import HealthyBodyCheckup from "./healthyBodyCheckup/HealthyBodyCheckup";
 import Footer4 from "../../layout/Footer/Footer4";
-import FAQ from "./FAQ/FAQ";
+import FAQ from "./faqs/FAQ";
 
 export default function HomepageComp() {
   const router = useRouter();
