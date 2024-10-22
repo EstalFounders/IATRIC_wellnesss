@@ -1,0 +1,49 @@
+.vitalBodyCheckupText {
+  font-family: Poppins;
+font-size: 32px;
+font-weight: 600;
+line-height: 48px;
+letter-spacing: 0.03em;
+text-align: center;
+color: #1E1E1E;
+}
+
+.vitalBodyCheckupSubText {
+font-family: Poppins;
+font-size: 21px;
+font-weight: 400;
+line-height: 31.5px;
+letter-spacing: 0.03em;
+text-align: center;
+}
+
+.filterButton {
+  width: 100px;
+padding: 8px;
+gap: 4px;
+border-radius: 8px;
+border: 1px 0px 0px 0px;
+opacity: 0px;
+text-align: center;
+font-family: Montserrat;
+font-size: 14px;
+font-weight: 700;
+line-height: 17.07px;
+border: 1px solid #4F6628
+
+}
+
+
+.filterButton:hover {
+  background-color: #d1eca0;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filterButton.active {
+  background-color: #4F6628;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+

@@ -7,8 +7,11 @@ import {
 } from "react-icons/fa";
 import { useRouter } from "next/router";
 import FirstSection from "./firstSection/FirstSection";
-import FeaturedHealthCheckUp from "./featuredHealthCheckUp/FeaturedHealthCheckUp";
-import FindTestByHealthConcern from "../labTestComponent/findTest/FindTestByHealthConcern";
+import MostPopularCheckup from "./mostPopularCheckup/MostPopularCheckup";
+import VitalOrganCheckup from "./vitalOrganCheckUp/VitalOrganCheckup";
+import HealthyBodyCheckup from "./healthyBodyCheckup/HealthyBodyCheckup";
+import Footer4 from "../../layout/Footer/Footer4";
+import FAQ from "./FAQ/FAQ";
 
 export default function HomepageComp() {
   const router = useRouter();
@@ -25,14 +28,29 @@ export default function HomepageComp() {
             <FirstSection />
           </Col>
         </Row>
-        <Row>
+        <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
           <Col>
-            <FeaturedHealthCheckUp />
+            <MostPopularCheckup />
           </Col>
         </Row>
         <Row>
           <Col>
-            <FindTestByHealthConcern />
+            <VitalOrganCheckup />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <HealthyBodyCheckup />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <FAQ />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Footer4 />
           </Col>
         </Row>
       </div>

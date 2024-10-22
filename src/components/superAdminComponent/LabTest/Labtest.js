@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Table, Button, Form, Modal } from "react-bootstrap";
 import { BiEdit } from "react-icons/bi";
 import TestDetailsCard from "./TestDetailsCard";
+import { useRouter } from "next/router";
+import NewTest from "./NewTest";
 
 const LabTestComponent = () => {
   // State to store fetched data
@@ -11,6 +13,8 @@ const LabTestComponent = () => {
   const [error, setError] = useState(null);
   const [show, setShow] = useState(false);
   const [testDetails, setTestDetails] = useState([]);
+  const router = useRouter();
+  const [newTest, setNewTest] = useState(false)
 
   // State for modal and editing
   const [showModal, setShowModal] = useState(false);
@@ -102,7 +106,7 @@ const LabTestComponent = () => {
     setLoadingTest(true); // Start loading state
 
     try {
-      const response = await fetch(`/api/labcategorydetails/?id=${id}`); // Replace with your API endpoint
+      const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -122,7 +126,7 @@ const LabTestComponent = () => {
   const handleClose = () => setShow(false);
 
   return (
-    <div style={{marginLeft: '100px',marginRight: '100px'}}>
+    <div style={{ marginLeft: "100px", marginRight: "100px" }}>
       <h2 className="mt-4">Lab Tests</h2>
       <Row className="mb-3">
         <Col xs={12} md={6}>
@@ -139,7 +143,11 @@ const LabTestComponent = () => {
           </Button>
         </Col>
         <Col xs={12} md={4} className="text-end mt-2 mt-md-0">
-          <Button variant="success" className="w-100">
+          <Button
+            variant="success"
+            className="w-100"
+            onClick={() => setNewTest(true)}
+          >
             New Test
           </Button>
         </Col>
@@ -256,7 +264,7 @@ const LabTestComponent = () => {
         </Modal>
       )}
       {show && (
-        <div className="modal-overlay" style={{marginTop: '-500px'}}>
+        <div className="modal-overlay" style={{ marginTop: "-500px" }}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Packages</h5>
@@ -278,6 +286,25 @@ const LabTestComponent = () => {
                     <TestDetailsCard test={test} />
                   </Col>
                 ))}
+              </Row>
+            </div>
+          </div>
+        </div>
+      )}
+      {newTest && (
+        <div className="modal-overlay" style={{ marginTop: "-500px" }}>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Create New Test</h5>
+              <Button variant="secondary" onClick={() => setNewTest(false)}>
+                Close
+              </Button>
+            </div>
+            <div className="modal-body">
+              <Row className="d-flex flex-wrap">
+                  <Col>
+                    <NewTest labtest={labTests}/>
+                  </Col>
               </Row>
             </div>
           </div>
