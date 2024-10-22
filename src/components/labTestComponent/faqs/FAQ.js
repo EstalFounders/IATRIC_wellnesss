@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { HiOutlinePlus, HiOutlineMinus } from "react-icons/hi";
-import styles from "../CSS/FAQ.module.css"; // Importing the CSS module
+import styles from "../css/FAQ.module.css"; // Importing the CSS module
 
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
