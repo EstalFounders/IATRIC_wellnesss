@@ -1,0 +1,42 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width for the overlay */
+    height: 100%; /* Full height for the overlay */
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+  }
+  
+  .modalcontent {
+    background-color: #fff;
+    max-width: 1200px; /* Set a max-width for the modal */
+    width: 90%;
+    max-height: 80vh; /* Restrict the height to 80% of the viewport */
+    overflow-y: auto; /* Enable vertical scrolling for overflow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .scrollableContent {
+    max-height: 60vh; /* Limit the scrollable area height */
+    overflow-y: auto; /* Enable scrolling for the content */
+  }
+  
+  .allTestText {
+    font-family: Poppins, sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 48px;
+  }
+
+  .closeButton {
+    display: flex;
+    justify-content: center;
+  }
+   
+  

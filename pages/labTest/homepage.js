@@ -3,6 +3,6 @@ import HomepageComp from "../../src/components/labTestComponent/HomepageComp";
 
 export default function Homepage() {
   return (
-        <HomepageComp />
+      <HomepageComp />
   );
 }

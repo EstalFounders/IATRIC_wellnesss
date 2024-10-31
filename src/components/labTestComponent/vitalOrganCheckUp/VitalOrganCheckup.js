@@ -124,7 +124,7 @@ const VitalOrganCheckup = () => {
           </div>
 
           {/* Filter Buttons */}
-          <div className="row justify-content-center mb-3 ml-auto mr-auto mt-5">
+          <div className="row mr-auto ml-auto mt-5">
             {filters.map((filter) => (
               <Col xs="auto" key={filter.category}>
                 <div
