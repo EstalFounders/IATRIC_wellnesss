@@ -266,8 +266,8 @@ const MostPopularCheckup = () => {
       <div className="row mt-5">
         <div className="row ml-auto mr-auto mt-5">
           <div className="col" style={{ marginTop: "5%" }}>
-            <div className={styles.mostpopulartext}>Most Popular checkups</div>
-            <div className={styles.mostpopulartextsubtext}>
+            <div className={styles.mostPopularText}>Most Popular checkups</div>
+            <div className={styles.mostPopularTextSubtext}>
               Lorem ipsum dolor sit amet consectetur.
             </div>
           </div>
