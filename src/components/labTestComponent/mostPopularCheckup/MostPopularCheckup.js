@@ -263,9 +263,9 @@ const MostPopularCheckup = () => {
   return (
     <>
     <Container>
-      <div className="row mt-5">
-        <div className="row ml-auto mr-auto mt-5">
-          <div className="col" style={{ marginTop: "5%" }}>
+      <div className="row">
+        <div className="row">
+          <div className="col text-center" style={{ marginTop: "15%" }}>
             <div className={styles.mostPopularText}>Most Popular checkups</div>
             <div className={styles.mostPopularTextSubtext}>
               Lorem ipsum dolor sit amet consectetur.
