@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react";
-import styles from "../css/HealthCheckUpCard.module.css";
 import { TbKeyframes, TbReportSearch } from "react-icons/tb";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { calculateParameters, storeHealthCheckupData, useAddToCart } from "./CommonMethod";
 import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
+import styles from '../css/HealthCheckUpCard.module.css'
 
 
 const HealthCheckupCard = ({healthCheckupData}) => {
