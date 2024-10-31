@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import styles from "../css/HealthCheckupCard.module.css";
+import styles from "../css/HealthCheckUpCard.module.css";
 import { TbKeyframes, TbReportSearch } from "react-icons/tb";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { calculateParameters, storeHealthCheckupData, useAddToCart } from "./CommonMethod";
@@ -58,15 +58,15 @@ const HealthCheckupCard = ({healthCheckupData}) => {
 
       {/* Buttons Section */}
       <div className={`d-flex justify-content-center mt-3 ${styles.buttons}`}>
-        <button
+        <div
           className={`${styles.addToCartbutton} ${isClicked ? styles.clicked : ""}`}
           onClick={() =>
             handleAddToCart({healthCheckupData})
           }
         >
           Add to Cart
-        </button>
-        <button className={styles.viewDetailsButton} onClick={() => handleViewDetails(healthCheckupData)}>View Details</button>
+        </div>
+        <div className={styles.viewDetailsButton} onClick={() => handleViewDetails(healthCheckupData)}>View Details</div>
       </div>
       {snackbarOpen && (
         <Snackbar

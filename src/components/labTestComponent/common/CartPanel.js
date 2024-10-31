@@ -50,9 +50,9 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   return (
     <div className={`${styles.cartPanel} ${isOpen ? styles.open : ""}`}>
       <div className={styles.cartPanelHeader}>
-        <button onClick={togglePanel} className={styles.closeButton}>
+        <div onClick={togglePanel} className={styles.closeButton}>
           X
-        </button>
+        </div>
       </div>
       <div className={styles.cartItems}>
         {cartItems.length > 0 ? (
@@ -71,25 +71,25 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
               {/* Delete Button */}
               <div className="col d-flex align-items-center">
-                <button
+                <div
                   className={`${styles.deleteButton}`}
                   onClick={() => handleDeleteItem(index)}
                 >
                   <AiFillDelete size={24} />
-                </button>
+                </div>
               </div>
             </div>
           ))
         ) : (
-          <div className={`${styles.emptyCartMessage}`}>Your cart is empty</div>
+          <div className={styles.emptyCartMessage}>Your cart is empty</div>
         )}
       </div>
       <div className={styles.bottomSection}>
-        <div className={`row ${styles.discount}`}>
+        <div className={`row d-flex flex-row ${styles.discount}`}>
           <div className="col col-1">
             <CiDiscount1 size={20} />
           </div>
-          <div className={`col ${styles.discountText}`}>
+          <div className={styles.discountText}>
             Get 5% OFF on Online Payment
           </div>
         </div>
@@ -131,7 +131,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
               <div className="text-muted ml-1">{cartItems.length} tests</div>
             </div>
           </div>
-          <div className={`button ${styles.proceedBtn}`}>Proceed</div>
+          <div className={styles.proceedBtn}>Proceed</div>
         </div>
       </div>
     </div>

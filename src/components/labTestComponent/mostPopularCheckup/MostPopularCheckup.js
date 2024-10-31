@@ -263,17 +263,15 @@ const MostPopularCheckup = () => {
   return (
     <>
     <Container>
-      <div className="row">
+      <div className="row d-flex justify-content-center align-items-center">
         <div className="row">
-          <div className="col text-center" style={{ marginTop: "15%" }}>
+          <div className="col" style={{ marginTop: "15%" }}>
             <div className={styles.mostPopularText}>Most Popular checkups</div>
             <div className={styles.mostPopularTextSubtext}>
               Lorem ipsum dolor sit amet consectetur.
             </div>
           </div>
         </div>
-      </div>
-      <div>
           <Row>
             {healthCheckupData.map((checkup) => (
               <Col

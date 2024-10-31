@@ -41,16 +41,16 @@ export const RequestOtp = ({ onClose, handleOtpRequest }) => {
         <div className={`mt-3 ${styles.requestOtptext}`}>Login</div>
         <div className={`mt-2 ${styles.getaccesstext}`}>Get access to your reports</div>
 
-        <div className="w-100">
+        <div>
           <input
             type="text"
             placeholder="Enter your Mobile No"
-            className={`mt-4 form-control ${styles.mobilenumberinput}`}
+            className={`mt-4 ${styles.mobilenumberinput}`}
             onChange={handleOnChange}
           />
         </div>
 
-        <div className={`mt-3 w-100 ${styles.requestOtpBtn}`} onClick={handlOTPrequest}>
+        <div className={`mt-3 clickable-div ${styles.requestOtpBtn}`} onClick={handlOTPrequest}>
           Request OTP
         </div>
         <div className="text-danger mt-2">
