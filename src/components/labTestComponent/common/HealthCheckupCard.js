@@ -1,19 +1,23 @@
 import React, { useContext, useState } from "react";
-import styles from "../css/HealthCheckupCard.module.css";
 import { TbKeyframes, TbReportSearch } from "react-icons/tb";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
-import { calculateParameters, storeHealthCheckupData, useAddToCart } from "./CommonMethod";
+import styles from "../css/HealthCheckUpCard.module.css";
+import {
+  calculateParameters,
+  storeHealthCheckupData,
+  useAddToCart,
+} from "./CommonMethod";
 import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 
-
-const HealthCheckupCard = ({healthCheckupData}) => {
-    const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } = useAddToCart();
-    const router = useRouter()
-    const handleViewDetails = (healthCheckupData) => {
-        storeHealthCheckupData(healthCheckupData)
-      router.push({pathname:'/labTest/viewDetails'})
-    }
+const HealthCheckupCard = ({ healthCheckupData }) => {
+  const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
+    useAddToCart();
+  const router = useRouter();
+  const handleViewDetails = (healthCheckupData) => {
+    storeHealthCheckupData(healthCheckupData);
+    router.push({ pathname: "/labTest/viewDetails" });
+  };
   return (
     <div className={styles.card}>
       {/* Header section with discount, price and MRP */}
@@ -25,10 +29,13 @@ const HealthCheckupCard = ({healthCheckupData}) => {
               🩺
             </span>
           </div>
-          <div className={`col col-md-2 ${styles.discount}`}>{healthCheckupData.discount}</div>
+          <div className={`col col-md-2 ${styles.discount}`}>
+            {healthCheckupData.discount}
+          </div>
           <div className={`col ${styles.price}`}>
-            ₹{healthCheckupData.price} <span className={styles.mrp}>₹{healthCheckupData.mrp}</span>
-          </div>    
+            ₹{healthCheckupData.price}{" "}
+            <span className={styles.mrp}>₹{healthCheckupData.mrp}</span>
+          </div>
         </div>
 
         {/* Title Section */}
@@ -44,7 +51,9 @@ const HealthCheckupCard = ({healthCheckupData}) => {
           <div className={`text-center ${styles.icon}`}>
             <TbKeyframes />
           </div>
-          <strong className="font-weight-bold">{calculateParameters(healthCheckupData.test_included)} parameters</strong>{" "}
+          <strong className="font-weight-bold">
+            {calculateParameters(healthCheckupData.test_included)} parameters
+          </strong>{" "}
           included
         </div>
         <div className="col">
@@ -58,15 +67,20 @@ const HealthCheckupCard = ({healthCheckupData}) => {
 
       {/* Buttons Section */}
       <div className={`d-flex justify-content-center mt-3 ${styles.buttons}`}>
-        <button
-          className={`${styles.addToCartbutton} ${isClicked ? styles.clicked : ""}`}
-          onClick={() =>
-            handleAddToCart({healthCheckupData})
-          }
+        <div
+          className={`${styles.addToCartbutton} ${
+            isClicked ? styles.clicked : ""
+          }`}
+          onClick={() => handleAddToCart({ healthCheckupData })}
         >
           Add to Cart
-        </button>
-        <button className={styles.viewDetailsButton} onClick={() => handleViewDetails(healthCheckupData)}>View Details</button>
+        </div>
+        <div
+          className={styles.viewDetailsButton}
+          onClick={() => handleViewDetails(healthCheckupData)}
+        >
+          View Details
+        </div>
       </div>
       {snackbarOpen && (
         <Snackbar

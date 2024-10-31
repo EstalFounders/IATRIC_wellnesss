@@ -82,7 +82,12 @@ color: #011632;
     line-height: 17.07px;
     text-align: center;
     color: #2B3133;
+    display: flex;
+justify-content: center;
+align-items: center;
+    
     background-color: #C1E16C;
+
     transition: background-color 0.3s ease; /* Smooth transition */
   }
   
@@ -104,14 +109,14 @@ font-weight: 700;
 line-height: 17.07px;
 text-align: center;
 color: #2B3133;
+border: 2px solid #E9F2D1;
 background-color: white;
 margin-left: 2%;
+display: flex;
+justify-content: center;
+align-items: center;
 }
   
-  .buttons {
-    
-  }
-
   .upperSection {
     background-color: #C1E16C;
     height: 170px;

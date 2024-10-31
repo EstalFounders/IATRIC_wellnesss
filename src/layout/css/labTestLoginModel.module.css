@@ -32,6 +32,7 @@ border: 1px solid #E6E6E6
 }
 
 .requestOtpBtn {
+width: 100%;
 padding: 21px 16px 20px 16px;
 gap: 4px;
 border-radius: 8px;

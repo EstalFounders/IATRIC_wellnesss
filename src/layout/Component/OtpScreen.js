@@ -65,7 +65,7 @@ export const OtpScreen = ({ onClose, handleSubmitOtp }) => {
         </div>
 
         <div
-          className={`mt-3 w-100 clickable-div ${styles.requestOtpBtn}`}
+          className={`mt-3 clickable-div ${styles.requestOtpBtn}`}
           onClick={handleSubmitOTP}
         >
           Submit

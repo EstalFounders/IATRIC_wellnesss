@@ -263,17 +263,15 @@ const MostPopularCheckup = () => {
   return (
     <>
     <Container>
-      <div className="row mt-5">
-        <div className="row ml-auto mr-auto mt-5">
-          <div className="col" style={{ marginTop: "5%" }}>
-            <div className={styles.mostpopulartext}>Most Popular checkups</div>
-            <div className={styles.mostpopulartextsubtext}>
+      <div className="row d-flex justify-content-center align-items-center">
+        <div className="row">
+          <div className="col" style={{ marginTop: "15%" }}>
+            <div className={styles.mostPopularText}>Most Popular checkups</div>
+            <div className={styles.mostPopularTextSubtext}>
               Lorem ipsum dolor sit amet consectetur.
             </div>
           </div>
         </div>
-      </div>
-      <div>
           <Row>
             {healthCheckupData.map((checkup) => (
               <Col

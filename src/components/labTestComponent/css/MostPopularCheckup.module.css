@@ -5,25 +5,23 @@ opacity: 0px;
 
 }
 
-.mostpopulartext {
-gap: 0px;
-opacity: 0px;
+.mostPopularText {
   font-family: Poppins;
-  font-size: 42px;
-  font-weight: 600;
-  line-height: 48px;
+font-size: 32px;
+font-weight: 600;
+line-height: 48px;
+letter-spacing: 0.03em;
+text-align: center;
+color: #1E1E1E;
 }
 
-.mostpopulartextsubtext {
-gap: 0px;
-opacity: 0px;
-font-family: Poppins;
-font-size: 18px;
-font-weight: 400;
-line-height: 27.9px;
-letter-spacing: 0.015em;
-text-align: center;
-color: #888888;
+.mostPopularTextSubtext {
+  font-family: Poppins;
+  font-size: 21px;  
+  font-weight: 400;
+  line-height: 31.5px;
+  letter-spacing: 0.03em;
+  text-align: center;
 }
 
 .listContainer {
