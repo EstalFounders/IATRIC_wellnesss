@@ -70,14 +70,15 @@
   padding: 16px;
   font-size: 14px;
   font-weight: 700;
+  border-radius: 8px;
 }
 
 .callingButton {
   width: 58px;
 height: 58px;
-padding: 8px 0px 0px 0px;
+padding: 8px;
 gap: 10px;
-border-radius: 10px 0px 0px 0px;
+border-radius: 8px;
 border: 10px 0px 0px 0px;
 opacity: 0px;
 background-color: #DDE6C6;

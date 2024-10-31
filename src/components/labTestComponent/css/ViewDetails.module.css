@@ -1,0 +1,227 @@
+.viewDetailsFirstSec {
+  background-image: url('/images/labtest/labTestFirstSectionBg.png');
+  background-size: cover;
+  background-position: center;
+  height: 15vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewDetailsSecondSec {
+  padding: 20px;
+  background-color: #ECF0E5;
+  border-radius: 8px;
+  padding-left: 10%;
+}
+
+.productCard {
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.productTitle {
+  font-family: Poppins;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 48px;
+  text-align: center;
+}
+
+.priceDetails {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  margin-left: 13%;
+}
+
+.discount {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 500;
+  color: #BA1A1A;
+}
+
+.currentPrice {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 700;
+  color: black;
+}
+
+.originalPrice {
+  font-family: Montserrat;
+  font-size: 14px;
+  font-weight: 400;
+  color: #949494;
+  text-decoration: line-through;
+}
+
+.divider {
+  width: 2px;
+  height: 30px;
+  background-color: #87B45A;
+}
+
+.bookingInfo {
+  font-family: Poppins;
+  font-size: 18px;
+  font-weight: 400;
+  color: black;
+  display: flex;
+  align-items: center;
+}
+
+.addToCartBtn {
+  width: auto;
+  height: 40px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: #C1E16C;
+  font-family: Montserrat;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2B3133;
+  margin-left: 22%;   
+}
+
+.foregroundImage {
+  border-radius: 8px;
+  top: 45px;
+  left: 175px;
+}
+
+.testDetails {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-left: 12%;
+}
+
+.testDetails .accordion-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .testDetails .accordion-body {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-top: none;
+  }
+  
+.detailsSmallText {
+    font-family: Poppins;
+font-size: 14px;
+font-weight: 400;
+line-height: 21px;
+color: #AAAAAA;
+}
+
+.detailsSmallTextValue {
+    font-family: Poppins;
+font-size: 18px;
+font-weight: 600;
+line-height: 27px;
+color: black;
+}
+.prequisiteContainer {
+padding: 10px;
+gap: 10px;
+border-radius: 8px;
+border: 1px 0px 0px 0px;
+opacity: 0px;
+background-color: #F9F9F9;
+border: 1px solid #E8E8E8
+}
+
+.testIncludedContainer {
+    padding: 16px 24px 16px 24px;
+    gap: 0px;
+    border: 10px;
+    opacity: 0px;
+    background-color:#F3F3F3;
+    border: 1px solid #CCCCCC
+}
+
+.testIncludedName {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 28.8px;
+    color: #878787;
+}
+
+.testIncludedDesc {
+    font-family: Poppins;
+font-size: 16px;
+font-weight: 400;
+line-height: 30.24px;
+letter-spacing: 0.015em;
+color: #3C4959;
+}
+
+.relatedTestText {
+    font-family: Poppins;
+font-size: 32px;
+font-weight: 600;
+line-height: 48px;
+color: black;
+margin-top: 8%;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .productTitle {
+    font-size: 24px;
+    line-height: 36px;
+  }
+
+  .priceDetails {
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 0;
+  }
+
+  .discount, .currentPrice, .originalPrice, .bookingInfo {
+    font-size: 18px;
+  }
+
+  .addToCartBtn {
+    width: 100%;
+    text-align: center;
+    margin-left: 0;
+  }
+
+     
+}
+
+@media (max-width: 576px) {
+    .divider {
+        display: none;
+    }
+  .viewDetailsFirstSec {
+    height: auto;
+    padding: 1rem;
+  }
+
+  .productTitle {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .discount, .currentPrice, .originalPrice, .bookingInfo {
+    font-size: 16px;
+  }
+
+  .priceDetails {
+    gap: 8px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+}

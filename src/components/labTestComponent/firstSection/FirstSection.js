@@ -53,7 +53,7 @@ export default function FirstSection() {
         {/* Header Section */}
         <div className="row justify-content-center">
           <div className="col">
-            <LabTesLandingPageHeader />
+            <LabTesLandingPageHeader  />
           </div>
         </div>
 
