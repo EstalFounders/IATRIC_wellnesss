@@ -53,7 +53,6 @@
     top: 129px;
     left: 26px;
     gap: 24px;
-    opacity: 0px;
   overflow-y: scroll;
   padding-right: 10px; 
   }
@@ -73,7 +72,6 @@ height: 148px;
 padding: 16px 0px 0px 0px;
 gap: 32px;
 border-radius: 8px;
-opacity: 0px;
 margin-left: 2%;
 margin-top: 2%;
 border: 1px solid #DADADA
@@ -84,8 +82,6 @@ border: 1px solid #DADADA
     width: 389px;
     height: 116px;
     gap: 6px;
-    opacity: 0px;
-    
   }
   
   .icon {
@@ -110,10 +106,6 @@ border: 1px solid #DADADA
     margin-top: 5px;
   }
   
-  .deleteButton {
-    
-  }
-  
   .emptyCartMessage {
     text-align: center;
     font-size: 16px;
@@ -130,7 +122,6 @@ border: 1px solid #DADADA
     top: 2000px;
     padding: 5px 27px 5px 27px;
     gap: 10px;
-    opacity: 0px;
     margin-left: 0.1%;
     background-color: #01B37A;   
     color: white;
@@ -151,7 +142,6 @@ line-height: 27.9px;
 padding: 8px 16px 8px 16px;
 gap: 4px;
 border-radius: 8px;
-opacity: 0px;
 background-color: #D1ECA0;
 margin-right: 10px;
   }

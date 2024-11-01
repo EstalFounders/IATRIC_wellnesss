@@ -29,7 +29,6 @@ padding: 10px 16px 10px 16px;
 gap: 8px;
 border-radius: 8px;
 border: 1px;
-opacity: 0px;
 border: 1px solid #808080
   }
 
@@ -37,7 +36,6 @@ border: 1px solid #808080
 padding: 12px;
 gap: 8px;
 border-radius: 8px;
-opacity: 0px;
 border: 1px solid #CDCDCD
 }
 
@@ -45,7 +43,6 @@ border: 1px solid #CDCDCD
 padding: 12px 32px 12px 32px;
 gap: 8px;
 border-radius: 0px 8px 8px 0px;
-opacity: 0px;
 background-color: #DDE6C6;
 font-family: Poppins;
 font-size: 16px;
