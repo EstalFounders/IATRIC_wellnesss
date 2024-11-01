@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import styles from "../css/MostPopularCheckup.module.css"; // Import the CSS module
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { HiArrowCircleRight } from "react-icons/hi";
-import { MoreButton } from "../common/CommonMethod";
+import { getLabCategoryId, getLabTestCategory, MoreButton } from "../common/CommonMethod";
 
 const healthCheckupData = [
   {
@@ -260,6 +260,28 @@ const healthCheckupData = [
 ];
 
 const MostPopularCheckup = () => {
+  const [healthCheckupData, setHealthCheckUpData] = useState()
+  const [loading, setLoading] = useState(true)
+  const labTestCat = getLabTestCategory()
+  const id = getLabCategoryId('FullBodyCheckup',labTestCat)
+
+  useEffect(() => {
+    console.log(id, 'get category id')
+    const fetchLabTestsDetails = async () => {
+      try {
+        const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
+        const data = await response.json();
+        setHealthCheckUpData(data);
+        setLoading(false);
+      } catch (err) {
+        setError("Error fetching data");
+        setLoading(false);
+      }
+    };
+
+    fetchLabTestsDetails();
+  }, []);
+
   return (
     <>
     <Container>
@@ -273,7 +295,7 @@ const MostPopularCheckup = () => {
           </div>
         </div>
           <Row>
-            {healthCheckupData.map((checkup) => (
+            {loading ? 'Please wait': healthCheckupData.map((checkup) => (
               <Col
                 key={checkup.id}
                 xs={12}

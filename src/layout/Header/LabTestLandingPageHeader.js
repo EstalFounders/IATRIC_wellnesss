@@ -76,7 +76,7 @@ function LabTesLandingPageHeader() {
         </Col>
 
         <Col md={6} className="d-none d-md-flex justify-content-center">
-          <div className="mx-4" onClick={() => router.push('/labTest/homepage')}>Home</div>
+          <div className="mx-4 clickable-div" onClick={() => router.push('/labTest/homepage')}>Home</div>
           <div className="mx-4">Services</div>
           <div className="mx-4">Blog</div>
           <div className="mx-4">About</div>

@@ -56,6 +56,7 @@ export const useAddToCart = () => {
 };
 
 export const calculateParameters = (testIncluded) => {
+  console.log(testIncluded, 'testincluded')
   let parameter_count = 0;
   // Loop through each item in the testIncluded array
   for (let i = 0; i < testIncluded.length; i++) {
@@ -78,6 +79,31 @@ export const getHealthCheckupData = () => {
   return data;
 }
 
+export const storeLabTestCategory = (data) => {
+  // Clear existing healthCheckupData from localStorage
+  localStorage.removeItem('labCategory');
+  // Store new data
+  localStorage.setItem('labCategory', JSON.stringify([data]));
+}
+
+
+export const getLabTestCategory = () => {
+  const data = JSON.parse(localStorage.getItem('labCategory')) || [];
+return data;
+}
+
 export const formatPreparationRequired = (preparationArray) => {
     return preparationArray ? preparationArray.join(' , '):""
   };
+
+  export const getLabCategoryId = (keyword, labTestCat) => {
+    let id;
+    let category = labTestCat[0];
+    for(let i =0; i < category.length; i++) {
+      console.log(labTestCat.category_name, 'category name')
+      if(category[i].category_name === keyword) 
+        id = category[i]._id
+    }     
+    return id;
+  };
+  

@@ -37,7 +37,7 @@ const ViewDetails = () => {
   useEffect(() => {
     const storedData = getHealthCheckupData();
     setHealthCheckupData(storedData[0]);
-    setStoredData(storedData)
+    setStoredData(storedData);
   }, []);
 
   return (
@@ -161,7 +161,7 @@ const ViewDetails = () => {
                 Sample Required
               </div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {healthCheckupData.sample_required}
+                {formatPreparationRequired(healthCheckupData.sample_required)}
               </div>
             </div>
           </div>
@@ -248,12 +248,14 @@ const ViewDetails = () => {
           : "No test found"}
         <div className={`ml-2 ${styles.relatedTestText}`}>Related Tests</div>
         <div className="d-flex flex-wrap mb-5">
-            {console.log(storedData, 'ehatl fadlaj')}
-          {storedData ? storedData.map((checkup) => (
+          {console.log(storedData, "ehatl fadlaj")}
+          {storedData
+            ? storedData.map((checkup) => (
                 <div key={checkup._id} className="col-12 col-sm-6 col-md-4 p-2">
                   <HealthCheckupCard healthCheckupData={checkup} />
                 </div>
-              )): ""}
+              ))
+            : ""}
         </div>
       </div>
       <div className="d-flex justify-content-center">
