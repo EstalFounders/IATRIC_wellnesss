@@ -102,27 +102,12 @@ export const formatPreparationRequired = (preparationArray) => {
 };
 
 export const getLabCategoryId = (keyword, labTestCat) => {
-  console.log(labTestCat, "labtest");
-
-  // Check if labTestCat exists and has at least one element that is an array
-  if (
-    !labTestCat ||
-    !Array.isArray(labTestCat) ||
-    !Array.isArray(labTestCat[0])
-  ) {
-    return "";
-  }
+  console.log(labTestCat, 'labtest')
 
   let id;
   let category = labTestCat[0];
-
-  // Loop over the category array to find the matching keyword
   for (let i = 0; i < category.length; i++) {
-    if (category[i].category_name === keyword) {
-      id = category[i]._id;
-      break; // Stop looping once a match is found
-    }
+    if (category[i].category_name === keyword) id = category[i]._id;
   }
-
   return id;
 };
