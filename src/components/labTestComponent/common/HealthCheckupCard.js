@@ -11,7 +11,6 @@ import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
-  console.log(healthCheckupData, 'health checkup data')
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
   const router = useRouter();

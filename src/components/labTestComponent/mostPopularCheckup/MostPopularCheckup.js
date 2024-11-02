@@ -16,11 +16,6 @@ const MostPopularCheckup = () => {
 
   useEffect(() => {
     let id;
-    
-    if(labTestCat) {
-      id = getLabCategoryId("FullBodyCheckup", labTestCat);
-    }
-    
     const fetchLabTestsDetails = async () => {
       try {
         const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
@@ -33,7 +28,10 @@ const MostPopularCheckup = () => {
       }
     };
 
-    fetchLabTestsDetails();
+    if (labTestCat) {
+      id = getLabCategoryId("FullBodyCheckup", labTestCat);
+      fetchLabTestsDetails();
+    }
   }, []);
 
   return (
