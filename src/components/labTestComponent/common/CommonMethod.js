@@ -102,10 +102,11 @@ export const formatPreparationRequired = (preparationArray) => {
 };
 
 export const getLabCategoryId = (keyword, labTestCat) => {
+  console.log(labTestCat.length, 'lab test')
   let id;
-  let category = labTestCat[0];
-  for (let i = 0; i < category.length; i++) {
-    if (category[i].category_name === keyword) id = category[i]._id;
+  for (let i = 0; i < labTestCat.length; i++) {
+    if (labTestCat[i].category_name === keyword) id = labTestCat[i]._id;
   }
+  console.log(id, 'id')
   return id;
 };

@@ -12,27 +12,37 @@ import {
 const MostPopularCheckup = () => {
   const [healthCheckupData, setHealthCheckUpData] = useState();
   const [loading, setLoading] = useState(true);
-  const labTestCat = getLabTestCategory();
+  const [error, setError] = useState();
+  let id;
 
   useEffect(() => {
-    let id;
-    const fetchLabTestsDetails = async () => {
+    const fetchLabCateogory = async () => {
       try {
-        const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
+        const response = await fetch("/api/labtest"); // Replace with your API endpoint
         const data = await response.json();
-        setHealthCheckUpData(data);
-        setLoading(false);
+        id = getLabCategoryId("FullBodyCheckup", data);
+        await fetchLabTestsDetails(id);
+        storeLabTestCategory(data);
       } catch (err) {
         setError("Error fetching data");
         setLoading(false);
       }
     };
 
-    if (labTestCat) {
-      id = getLabCategoryId("FullBodyCheckup", labTestCat);
-      fetchLabTestsDetails();
-    }
+    fetchLabCateogory();
   }, []);
+
+  const fetchLabTestsDetails = async (id) => {
+    try {
+      const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
+      const data = await response.json();
+      setHealthCheckUpData(data);
+      setLoading(false);
+    } catch (err) {
+      setError("Error fetching data");
+      setLoading(false);
+    }
+  };
 
   return (
     <>
