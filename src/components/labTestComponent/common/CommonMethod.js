@@ -3,8 +3,8 @@ import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useState } from "react";
 import MoreModalComp from "../modal/MoreButtonModel";
 
-export const MoreButton = ({healthCheckupData}) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+export const MoreButton = ({ healthCheckupData }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -16,20 +16,28 @@ export const MoreButton = ({healthCheckupData}) => {
 
   return (
     <div>
-    <div style={{ color: "#4B82CB" }} className="btn ml-5 mb-5 font-weight-bold" onClick={handleOpenModal}>
-      More <HiArrowCircleRight color="#4B82CB" />
-    </div>
-    {isModalOpen && <MoreModalComp onClose={handleCloseModal} healthCheckupData={healthCheckupData} />}
+      <div
+        style={{ color: "#4B82CB" }}
+        className="btn ml-5 mb-5 font-weight-bold"
+        onClick={handleOpenModal}
+      >
+        More <HiArrowCircleRight color="#4B82CB" />
+      </div>
+      {isModalOpen && (
+        <MoreModalComp
+          onClose={handleCloseModal}
+          healthCheckupData={healthCheckupData}
+        />
+      )}
     </div>
   );
 };
 
 export const calculateTotalPrice = (cartItems) => {
-    return cartItems.reduce((total, item) => {
-      return total + parseFloat(item.healthCheckupData.price);
-    }, 0);
-  };
-  
+  return cartItems.reduce((total, item) => {
+    return total + parseFloat(item.healthCheckupData.price);
+  }, 0);
+};
 
 export const useAddToCart = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -56,7 +64,6 @@ export const useAddToCart = () => {
 };
 
 export const calculateParameters = (testIncluded) => {
-  console.log(testIncluded, 'testincluded')
   let parameter_count = 0;
   // Loop through each item in the testIncluded array
   for (let i = 0; i < testIncluded.length; i++) {
@@ -67,43 +74,43 @@ export const calculateParameters = (testIncluded) => {
 };
 
 export const storeHealthCheckupData = (data) => {
-    // Clear existing healthCheckupData from localStorage
-    localStorage.removeItem('healthCheckupData');
-    // Store new data
-    localStorage.setItem('healthCheckupData', JSON.stringify([data]));
-  }
-  
+  // Clear existing healthCheckupData from localStorage
+  localStorage.removeItem("healthCheckupData");
+  // Store new data
+  localStorage.setItem("healthCheckupData", JSON.stringify([data]));
+};
 
 export const getHealthCheckupData = () => {
-    const data = JSON.parse(localStorage.getItem('healthCheckupData')) || [];
+  const data = JSON.parse(localStorage.getItem("healthCheckupData")) || [];
   return data;
-}
+};
 
 export const storeLabTestCategory = (data) => {
   // Clear existing healthCheckupData from localStorage
-  localStorage.removeItem('labCategory');
+  localStorage.removeItem("labCategory");
   // Store new data
-  localStorage.setItem('labCategory', JSON.stringify([data]));
-}
-
+  localStorage.setItem("labCategory", JSON.stringify([data]));
+};
 
 export const getLabTestCategory = () => {
-  const data = JSON.parse(localStorage.getItem('labCategory')) || [];
-return data;
-}
+  const data = JSON.parse(localStorage.getItem("labCategory")) || [];
+  return data;
+};
 
 export const formatPreparationRequired = (preparationArray) => {
-    return preparationArray ? preparationArray.join(' , '):""
-  };
+  return preparationArray ? preparationArray.join(" , ") : "";
+};
 
-  export const getLabCategoryId = (keyword, labTestCat) => {
-    let id;
-    let category = labTestCat[0];
-    for(let i =0; i < category.length; i++) {
-      console.log(labTestCat.category_name, 'category name')
-      if(category[i].category_name === keyword) 
-        id = category[i]._id
-    }     
-    return id;
-  };
-  
+export const getLabCategoryId = (keyword, labTestCat) => {
+  console.log(labTestCat, 'labtest')
+  if (!labTestCat) {
+    return "";
+  }
+
+  let id;
+  let category = labTestCat[0];
+  for (let i = 0; i < category.length; i++) {
+    if (category[i].category_name === keyword) id = category[i]._id;
+  }
+  return id;
+};
