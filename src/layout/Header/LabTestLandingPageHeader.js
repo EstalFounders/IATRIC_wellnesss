@@ -6,7 +6,6 @@ import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { FaBars } from "react-icons/fa";
 import Image from "next/image";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
-import LabTestLogin from "../../components/labTestComponent/modal/LabTestLogin";
 import { RequestOtp } from "../Component/RequestOtp";
 import { OtpScreen } from "../Component/OtpScreen";
 import styles from "../css/LabTestHeader.module.css"; // Import CSS module
@@ -15,6 +14,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
+import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
 
 function LabTesLandingPageHeader() {
   const router = useRouter()
@@ -175,7 +175,7 @@ function LabTesLandingPageHeader() {
         </div>
       )}
 
-      <LabTestLogin isOpen={isLoginModalOpen}>
+      <LabTestModel isOpen={isLoginModalOpen}>
         {otpRequested ? (
           <OtpScreen onClose={handleClose} handleSubmitOtp={handleSubmitOtp} />
         ) : (
@@ -184,7 +184,7 @@ function LabTesLandingPageHeader() {
             handleOtpRequest={handleOtpRequest}
           />
         )}
-      </LabTestLogin>
+      </LabTestModel>
     </Container>
   );
 }

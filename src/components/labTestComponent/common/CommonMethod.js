@@ -102,7 +102,6 @@ export const formatPreparationRequired = (preparationArray) => {
 };
 
 export const getLabCategoryId = (keyword, labTestCat) => {
-  console.log(labTestCat.length, 'lab test')
   let id;
   for (let i = 0; i < labTestCat.length; i++) {
     if (labTestCat[i].category_name === keyword) id = labTestCat[i]._id;
@@ -110,3 +109,13 @@ export const getLabCategoryId = (keyword, labTestCat) => {
   console.log(id, 'id')
   return id;
 };
+
+export const isMobileValid = (mobNo) => {
+  const isValidMobile = /^[0-9]{10}$/.test(mobNo); // Checks if mobNo is exactly 10 digits
+
+  if(isValidMobile) {
+      return true
+  } else {
+    return false
+  }
+}

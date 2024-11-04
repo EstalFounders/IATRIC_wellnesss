@@ -68,7 +68,7 @@ const MostPopularCheckup = () => {
                     sm={6}
                     md={4}
                     lg={3}
-                    className="m-4 ml-5"
+                    className="m-5"
                   >
                     {" "}
                     {/* Key should be here */}

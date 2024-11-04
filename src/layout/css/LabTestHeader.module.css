@@ -42,11 +42,11 @@
   }
   
   .mobileNav {
-    display: none;
     background-color: #ffffff;
     position: absolute;
     top: 100%;
     width: 100%;
+    right: 2px;
     text-align: center;
     z-index: 1050;
     border: 1px solid #EDEDED;
