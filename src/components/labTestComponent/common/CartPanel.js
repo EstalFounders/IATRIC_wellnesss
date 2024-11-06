@@ -21,6 +21,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
   const [responseSuccess, setReponseSuccess] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   // Handler to update state
   const handlePaymentChange = (event) => {
@@ -43,6 +44,8 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       cartEventEmitter.removeAllListeners("cartUpdate");
     };
   }, [cartItems, onUpdateCartItemCount]);
+
+  
 
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {
@@ -115,6 +118,20 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (responseSuccess) {
+      // Start the fade-out effect
+      setFadeOut(true);
+
+      // Close the modal after 2 seconds
+      setTimeout(() => {
+        setFadeOut(false); // reset fadeOut state for the next time
+        handleClose(); // Call parent function to fully close the modal
+        setReponseSuccess(false)
+      }, 2000);
+    }
+  }, [responseSuccess, handleClose]);
 
   return (
     <Container>
@@ -210,25 +227,14 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
             </div>
           </div>
         </div>
-        <LabTestModel isOpen={isProceed}>
+        <LabTestModel
+          isOpen={isProceed}>
           {responseSuccess ? (
             <div class={styles.successMessage}>
-              <Image
-              src={"/images/success.png"}
-              width={100}
-              height={100}
-              />
-              <div className={`${styles.successText} mt-3`}>
-                Thank you!
-              </div>
+              <Image src={"/images/success.png"} width={100} height={100} />
+              <div className={`${styles.successText} mt-3`}>Thank you!</div>
               <div className={`${styles.successText}`}>
                 Your Lab Test has been Booked.
-              </div>
-              <div
-                className="text-center text-secondary clickable-div mt-4"
-                onClick={handleClose}
-              >
-                X
               </div>
             </div>
           ) : (

@@ -4,6 +4,7 @@ import styles from "../css/MostPopularCheckup.module.css"; // Import the CSS mod
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { HiArrowCircleRight } from "react-icons/hi";
 import {
+  filterActiveHealthTest,
   getLabCategoryId,
   getLabTestCategory,
   MoreButton,
@@ -36,7 +37,8 @@ const MostPopularCheckup = () => {
     try {
       const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
       const data = await response.json();
-      setHealthCheckUpData(data);
+      const activeData = filterActiveHealthTest(data)
+      setHealthCheckUpData(activeData);
       setLoading(false);
     } catch (err) {
       setError("Error fetching data");

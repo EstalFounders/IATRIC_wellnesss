@@ -9,7 +9,7 @@ const testIncludedSchema = new Schema({
 
 const labTestDetailsSchema = new Schema({
   title: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String, required: false },
   sample_required: [String],
   preparation_required: [String],
   test_included: [testIncludedSchema],
@@ -28,6 +28,11 @@ const labTestDetailsSchema = new Schema({
   },
   report_within: {
     type: String,
+    required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
     required: true
   }
 });

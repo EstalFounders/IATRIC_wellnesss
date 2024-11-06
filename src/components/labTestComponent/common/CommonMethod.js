@@ -119,3 +119,7 @@ export const isMobileValid = (mobNo) => {
     return false
   }
 }
+
+export const filterActiveHealthTest = (data) => {
+  return data.filter((item) => item.isActive === true);
+};

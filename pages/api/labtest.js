@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     }
   }
   if (req.method === "PUT") {
-    console.log(req.query, 'req query')
+    console.log(req.query, "req query");
     const { id } = req.query;
 
     try {
@@ -33,16 +33,16 @@ export default async function handler(req, res) {
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }
-  } else {
-    res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       const { category_name, category_description } = req.body;
 
       if (!category_name || !category_description) {
-        return res.status(400).json({ message: "Category name and description are required" });
+        return res
+          .status(400)
+          .json({ message: "Category name and description are required" });
       }
 
       const newCategory = new LabTest({
@@ -54,7 +54,30 @@ export default async function handler(req, res) {
 
       res.status(201).json(savedCategory);
     } catch (error) {
-      res.status(500).json({ message: "Error creating category", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error creating category", error: error.message });
     }
-  } 
+  }
+
+  if (req.method === "DELETE") {
+    const { id } = req.query;
+    console.log(id, "id on server");
+    try {
+      const deletedItem = await LabTest.deleteOne({ _id: id });
+
+      if (!deletedItem) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Item successfully deleted", deletedItem });
+    } catch (error) {
+      console.error("Delete error:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  } else {
+    return res.status(405).json({ message: "Method Not Allowed" });
+  }
 }

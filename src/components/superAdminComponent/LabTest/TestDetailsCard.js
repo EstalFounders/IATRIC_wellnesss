@@ -22,9 +22,12 @@ const TestDetailsCard = ({ test }) => {
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this test package?")) {
       try {
-        const response = await fetch(`/api/labtestcategorydetails/?id=${test._id}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `/api/labtestcategorydetails/?id=${test._id}`,
+          {
+            method: "DELETE",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to delete the test package");
@@ -37,6 +40,8 @@ const TestDetailsCard = ({ test }) => {
       }
     }
   };
+
+  
 
   return (
     <>
@@ -95,6 +100,9 @@ const TestDetailsCard = ({ test }) => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Edit Test Details</h5>
+
+             
+
               <Button variant="secondary" onClick={handleCloseEditable}>
                 Close
               </Button>

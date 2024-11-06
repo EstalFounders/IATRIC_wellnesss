@@ -4,6 +4,8 @@ import { BiEdit } from "react-icons/bi";
 import TestDetailsCard from "./TestDetailsCard";
 import { useRouter } from "next/router";
 import NewTest from "./NewTest";
+import { MdDelete } from "react-icons/md";
+import ConfirmModal from "../model/ConfirmModel";
 
 const LabTestComponent = () => {
   // State to store fetched data
@@ -14,7 +16,9 @@ const LabTestComponent = () => {
   const [show, setShow] = useState(false);
   const [testDetails, setTestDetails] = useState([]);
   const router = useRouter();
-  const [newTest, setNewTest] = useState(false)
+  const [newTest, setNewTest] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [labTestId, setLabTestId] = useState();
 
   // State for modal and editing
   const [showModal, setShowModal] = useState(false);
@@ -125,6 +129,32 @@ const LabTestComponent = () => {
 
   const handleClose = () => setShow(false);
 
+  const handleDeleteRequest = (id) => {
+    setLabTestId(id);
+    setShowConfirmModal(true);
+  };
+
+  // Function to handle confirmation and make the delete API call
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch(`/api/labtest?id=${labTestId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log("Item deleted successfully");
+      } else {
+        console.error("Failed to delete item");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      // Close the modal after the API call completes
+      setShowConfirmModal(false);
+      setLabTests((prevTests) => prevTests.filter((test) => test._id !== labTestId));
+    }
+  };
+
   return (
     <div style={{ marginLeft: "100px", marginRight: "100px" }}>
       <h2 className="mt-4">Lab Tests</h2>
@@ -186,6 +216,14 @@ const LabTestComponent = () => {
                 >
                   Details
                 </Button>{" "}
+                <div onClick={() => handleDeleteRequest(labTest._id)}>
+                  <MdDelete />
+                </div>
+                <ConfirmModal
+                  show={showConfirmModal}
+                  onClose={() => setShowConfirmModal(false)}
+                  onConfirm={handleConfirmDelete}
+                />
                 {/* Details button */}
               </td>
             </tr>
@@ -264,10 +302,10 @@ const LabTestComponent = () => {
         </Modal>
       )}
       {show && (
-        <div className="modal-overlay" style={{ marginTop: "-500px" }}>
+        <div className="modal-overlay" style={{ marginTop: "-300px" }}>
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Packages</h5>
+              <h5 className="modal-title">All Packages</h5>
               <Button variant="secondary" onClick={handleClose}>
                 Close
               </Button>
@@ -302,9 +340,9 @@ const LabTestComponent = () => {
             </div>
             <div className="modal-body">
               <Row className="d-flex flex-wrap">
-                  <Col>
-                    <NewTest labtest={labTests}/>
-                  </Col>
+                <Col>
+                  <NewTest labtest={labTests} />
+                </Col>
               </Row>
             </div>
           </div>
