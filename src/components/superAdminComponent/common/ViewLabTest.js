@@ -20,7 +20,7 @@ const ViewLabTestDetailsComp = () => {
       try {
         const localDeductions = localStorage.getItem("lab_deductions");
         // console.log(localDeductions, "local deduction");
-        if (!localDeductions) {
+        if (localDeductions) {
           setDeductions(JSON.parse(localDeductions));
         } else {
           const response = await fetch("/api/helper/deductions");
