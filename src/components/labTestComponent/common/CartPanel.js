@@ -12,8 +12,12 @@ import LabTestModel from "../modal/LabTestModel";
 import BookingDetailsInput from "./BookingDetailsInput";
 import Preloader from "../../Preloader";
 import Image from "next/image";
+import { RequestOtp } from "../../../layout/Component/RequestOtp";
+import { OtpScreen } from "../../../layout/Component/OtpScreen";
 
 const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
+  const [name, setName] = useState()
+  const [mobileNumber, setMobileNumber] = useState()
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("onlinePay"); // Initialize state
   const [cartItemsIds, setCartItemsIds] = useState([]);
@@ -21,7 +25,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
   const [responseSuccess, setReponseSuccess] = useState(false);
-  const [fadeOut, setFadeOut] = useState(false);
+  const [otpRequested, setOtpRequested] = useState(false);
 
   // Handler to update state
   const handlePaymentChange = (event) => {
@@ -45,8 +49,6 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
     };
   }, [cartItems, onUpdateCartItemCount]);
 
-  
-
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {
     const updatedCartItems = cartItems.filter(
@@ -68,13 +70,32 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
   const handleClose = () => {
     setIsProceed(false);
+    setError()
   };
 
   const hanleProceed = () => {
     setIsProceed(true);
+    setOtpRequested(true)
   };
 
-  const handleBookTest = async ({ name, mobileNumber }) => {
+  const handleOtpRequest = ({ name, mobileNumber }) => {
+    console.log('testing', name, mobileNumber)
+    if (cartItemsIds.length === 0) {
+      setError("Please select a test package to book");
+      return;
+    }
+    
+    if (!name) {
+      setError("Please fill all the fields");
+      return;
+    }
+
+    setName(name)
+    setMobileNumber(mobileNumber)
+    setOtpRequested(false)
+  }
+
+  const handleBookTest = async () => {
     const body = {
       name,
       mobileNumber,
@@ -82,20 +103,6 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       cartItemsIds,
       totalPrice,
     };
-
-    if (cartItemsIds.length === 0) {
-      setError("Please select a test package to book");
-      return;
-    }
-
-    if (!isMobileValid(mobileNumber)) {
-      setError("Please enter a 10-digit number");
-      return;
-    }
-    if (!name) {
-      setError("Please fill all the fields");
-      return;
-    }
 
     try {
       setLoading(true);
@@ -121,14 +128,12 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
   useEffect(() => {
     if (responseSuccess) {
-      // Start the fade-out effect
-      setFadeOut(true);
 
       // Close the modal after 2 seconds
       setTimeout(() => {
         setFadeOut(false); // reset fadeOut state for the next time
         handleClose(); // Call parent function to fully close the modal
-        setReponseSuccess(false)
+        setReponseSuccess(false);
       }, 2000);
     }
   }, [responseSuccess, handleClose]);
@@ -227,21 +232,21 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
             </div>
           </div>
         </div>
-        <LabTestModel
-          isOpen={isProceed}>
+        <LabTestModel isOpen={isProceed}>
           {responseSuccess ? (
-            <div class={styles.successMessage}>
+            <div className={styles.successMessage}>
               <Image src={"/images/success.png"} width={100} height={100} />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
-              <div className={`${styles.successText}`}>
+              <div className={styles.successText}>
                 Your Lab Test has been Booked.
               </div>
             </div>
+          ) : otpRequested ? (
+            // Display component when otpRequested is true and responseSuccess is false
+            <RequestOtp onClose={handleClose} handleOtpRequest={handleOtpRequest} />
           ) : (
-            <BookingDetailsInput
-              onClose={handleClose}
-              bookTest={handleBookTest}
-            />
+            // Display component when both otpRequested and responseSuccess are false
+            <OtpScreen onClose={handleClose} handleSubmitOtp={handleBookTest} />
           )}
           <div className="text-danger text-center mb-2">{error}</div>
         </LabTestModel>

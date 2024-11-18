@@ -9,25 +9,30 @@ import {
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { FaCalendar, FaMoneyBill, FaUsb, FaUser } from "react-icons/fa";
-import RecentAppointment from "./RecentAppointment/RecentAppointment";
+import { FaMoneyBill, FaUser } from "react-icons/fa";
+import { GrTest } from "react-icons/gr";
+import RecentAppointment from "./RecentAppointment/Appointments";
 import RecentDoctors from "./RecentDoctors/RecentDoctors";
 import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
+import AppointTable from "./common/AppointmentTable";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
   const [isAppointmentLoading, setIsAppointmentLoading] = useState(true);
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [income, setIncome] = useState(0);
   const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [snackBarMessage, setSnackBarMessage] = useState('staus has been changed');
+  const [snackBarMessage, setSnackBarMessage] = useState(
+    "staus has been changed"
+  );
   const [severity, setSeverity] = useState("success");
+  const router = useRouter();
 
   async function fetchDoctors() {
     try {
@@ -90,33 +95,38 @@ export default function HomepageComp() {
     await fetchDoctors();
   };
 
-  const handleUpdateStatus = async ({selectedStatus, appointmentId}) => {
-    console.log("Status updated to:", selectedStatus, 'appointment id',appointmentId);
+  const handleUpdateStatus = async ({ selectedStatus, appointmentId }) => {
+    console.log(
+      "Status updated to:",
+      selectedStatus,
+      "appointment id",
+      appointmentId
+    );
     try {
       const response = await fetch(`${api.bookConsultation}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ appointmentId,selectedStatus }),
+        body: JSON.stringify({ appointmentId, selectedStatus }),
       });
-  
+
       if (response.ok) {
-        handleOpenSnackBar()
+        handleOpenSnackBar();
         const data = await response.json();
-        console.log('Status updated:', data);
+        console.log("Status updated:", data);
         // Handle success, maybe show a notification or refresh the data
       } else {
         const errorData = await response.json();
-        console.error('Error updating status:', errorData.message);
+        console.error("Error updating status:", errorData.message);
       }
     } catch (error) {
-      console.error('An error occurred while updating status:', error);
+      console.error("An error occurred while updating status:", error);
     }
   };
 
   const handleOpenSnackBar = () => {
-    console.log('handle open snack bar')
+    console.log("handle open snack bar");
     setOpenSnackBar(true);
   };
 
@@ -132,37 +142,40 @@ export default function HomepageComp() {
     <>
       <Row className="m-4">
         <Col style={{ marginTop: 60 }}>
-          <CardDeck className="w-50 ml-auto mr-auto mt-4">
-            <Card className="rounded-circle">
+          <CardDeck
+            className="w-50 ml-auto mr-auto mt-4"
+            
+          >
+            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/consultationBooked")}>
               <div className="text-center mt-4">
                 <FaUser color="#0009C7" size={50} />
               </div>
               <Card.Body>
-                <Card.Title className="text-center">Total Patients</Card.Title>
+                <Card.Title className="text-center">
+                  Consultation Booked
+                </Card.Title>
                 <Card.Text className="text-center">
                   <b>{totalPatients}</b>
                 </Card.Text>
               </Card.Body>
             </Card>
-
-            <Card className="rounded-circle">
+            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/labTestBooked")}>
               <div className="text-center mt-4">
-                <FaCalendar color="#C70018" size={50} />
+                <GrTest color="#C70018" size={50} />
               </div>
               <Card.Body>
-                <Card.Title className="text-center">Appointments</Card.Title>
+                <Card.Title className="text-center">LabTest Booked</Card.Title>
                 <Card.Text className="text-center">
                   <b>{totalAppointments}</b>
                 </Card.Text>
               </Card.Body>
             </Card>
-
-            <Card className="rounded-circle">
+            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/consultationBooked")}>
               <div className="text-center mt-4">
                 <FaMoneyBill color="#18C700" size={50} />
               </div>
               <Card.Body>
-                <Card.Title className="text-center">Income</Card.Title>
+                <Card.Title className="text-center">Total Earning</Card.Title>
                 <Card.Text className="text-center">
                   <b>{income} rs</b>
                 </Card.Text>
@@ -171,39 +184,14 @@ export default function HomepageComp() {
           </CardDeck>
         </Col>
       </Row>
-      <Row
-        className="w-75 ml-auto mr-auto border p-4 mb-4"
-        style={{ marginTop: 100, borderRadius: 20 }}
-      >
-        <Row className="w-100 mx-2 border-bottom pb-1">
-          {/* Added w-100 to make the child Row full width */}
-          <Col className="mt-3">
-            <h4>
-              <b>Appointment</b>
-            </h4>
-          </Col>
-          <Col className="text-right mt-2">
-            <Button className="bg-secondary" href="/superAdmin/addDoctor">
-              Book Appointment
-            </Button>
-          </Col>
-        </Row>
-        <Row className="ml-4 w-100 mt-3">
-          {isAppointmentLoading ? (
-            <p>Loading...</p>
-          ) : doctors.length === 0 ? (
-            <p>No Appointment found.</p>
-          ) : (
-            <Col>
-              <RecentAppointment
-                data={appointments}
-                onUpdateStatus={handleUpdateStatus}
-                className="text-center"
-              />
-            </Col>
-          )}
-        </Row>
-      </Row>
+      <div>
+        <AppointTable
+          heading={"Appointments"}
+          isLoading={isAppointmentLoading}
+          appointments={appointments}
+          onUpdateStatus={handleUpdateStatus}
+        />
+      </div>
       <Row
         className="w-75 ml-auto mr-auto border p-4 mb-4"
         style={{ marginTop: 100, borderRadius: 20 }}
@@ -235,18 +223,18 @@ export default function HomepageComp() {
             </Col>
           )}
           <Snackbar
-                    open={openSnackBar}
-                    autoHideDuration={3000}
-                    onClose={handleCloseSnackBar}
-                  >
-                    <Alert
-                      onClose={handleCloseSnackBar}
-                      severity={severity}
-                      sx={{ width: "100%" }}
-                    >
-                      {snackBarMessage}
-                    </Alert>
-                  </Snackbar>
+            open={openSnackBar}
+            autoHideDuration={3000}
+            onClose={handleCloseSnackBar}
+          >
+            <Alert
+              onClose={handleCloseSnackBar}
+              severity={severity}
+              sx={{ width: "100%" }}
+            >
+              {snackBarMessage}
+            </Alert>
+          </Snackbar>
         </Row>
       </Row>
     </>

@@ -1,0 +1,114 @@
+.bookingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .circleContainer {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    width: 30%;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+  }
+
+  .circleText {
+    font-size: 40px;
+  }
+  
+  .circle:hover {
+    transform: scale(1.1);
+  }
+  
+  .bookingList {
+    width: 80%;
+    max-width: 600px;
+    text-align: left;
+  }
+  
+  .bookingList h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .bookingList ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .bookingList li {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .bookingTable {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+  }
+  
+  .bookingTable h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .bookingTable table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .bookingTable th, .bookingTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+  }
+  
+  .bookingTable th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  .bookingTable tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .statusDropdown {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+  }
+
+  .statusContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .updateButton {
+    margin-left: 8px;
+    padding: 5px 10px;
+    text-decoration: underline;
+    font-weight: bolder;
+    color: black;
+    cursor: pointer;
+  }
+  
+  

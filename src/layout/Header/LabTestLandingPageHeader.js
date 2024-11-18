@@ -15,6 +15,7 @@ import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
 import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
+import { existingUser } from "../../constant";
 
 function LabTesLandingPageHeader() {
   const router = useRouter()
@@ -182,6 +183,7 @@ function LabTesLandingPageHeader() {
           <RequestOtp
             onClose={handleClose}
             handleOtpRequest={handleOtpRequest}
+            source={existingUser}
           />
         )}
       </LabTestModel>
