@@ -11,8 +11,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FaMoneyBill, FaUser } from "react-icons/fa";
 import { GrTest } from "react-icons/gr";
-import RecentAppointment from "./RecentAppointment/Appointments";
-import RecentDoctors from "./RecentDoctors/RecentDoctors";
+import RecentDoctors from "./recentDoctors/RecentDoctors";
 import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
@@ -75,7 +74,6 @@ export default function HomepageComp() {
 
   const calculateStatistics = (appointments) => {
     const uniquePatients = new Set();
-    let totalIncome = 0;
 
     appointments.forEach((appointment) => {
       if (appointment.patientMobNo) {
@@ -87,8 +85,6 @@ export default function HomepageComp() {
     });
 
     setTotalPatients(uniquePatients.size);
-    setTotalAppointments(appointments.length);
-    setIncome(totalIncome);
   };
 
   const refreshDoctorList = async () => {
@@ -138,15 +134,34 @@ export default function HomepageComp() {
     setOpenSnackBar(false);
   };
 
+  const createDoctorSlots = async () => {
+    console.log("create doctor slot");
+    try {
+      const response = await fetch("/api/lib/runCronJob", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        window.alert("Slots Created");
+        // Reset form fields or navigate to another page
+      } else {
+        console.error("Error adding doctor:", response.statusText);
+        handleShowDialog("Something went wrong, please try again");
+      }
+    } catch (error) {
+      console.error("Error adding doctor:", error.message);
+    }
+  };
+
   return (
     <>
       <Row className="m-4">
         <Col style={{ marginTop: 60 }}>
-          <CardDeck
-            className="w-50 ml-auto mr-auto mt-4"
-            
-          >
-            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/consultationBooked")}>
+          <CardDeck className="w-50 ml-auto mr-auto mt-4">
+            <Card
+              className="rounded-circle"
+              onClick={() => router.push("/superAdmin/consultationBooked")}
+            >
               <div className="text-center mt-4">
                 <FaUser color="#0009C7" size={50} />
               </div>
@@ -155,11 +170,14 @@ export default function HomepageComp() {
                   Consultation Booked
                 </Card.Title>
                 <Card.Text className="text-center">
-                  <b>{totalPatients}</b>
+                  <b>{appointments.length}</b>
                 </Card.Text>
               </Card.Body>
             </Card>
-            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/labTestBooked")}>
+            <Card
+              className="rounded-circle"
+              onClick={() => router.push("/superAdmin/labTestBooked")}
+            >
               <div className="text-center mt-4">
                 <GrTest color="#C70018" size={50} />
               </div>
@@ -170,7 +188,10 @@ export default function HomepageComp() {
                 </Card.Text>
               </Card.Body>
             </Card>
-            <Card className="rounded-circle" onClick={() => router.push("/superAdmin/consultationBooked")}>
+            <Card
+              className="rounded-circle"
+              onClick={() => router.push("/superAdmin/earnings")}
+            >
               <div className="text-center mt-4">
                 <FaMoneyBill color="#18C700" size={50} />
               </div>
@@ -192,10 +213,17 @@ export default function HomepageComp() {
           onUpdateStatus={handleUpdateStatus}
         />
       </div>
+
       <Row
         className="w-75 ml-auto mr-auto border p-4 mb-4"
         style={{ marginTop: 100, borderRadius: 20 }}
       >
+        <div
+          className="mx-1 font-weight-bold text-primary text-center float-right clickable-div"
+          onClick={createDoctorSlots}
+        >
+          <u>Create Doctor Slots</u>
+        </div>
         <Row className="w-100 mx-2 border-bottom pb-1">
           {/* Added w-100 to make the child Row full width */}
           <Col className="mt-3">
@@ -204,7 +232,7 @@ export default function HomepageComp() {
             </h4>
           </Col>
           <Col className="text-right mt-2">
-            <Button className="bg-primary" href="/superAdmin/addDoctor">
+            <Button className="bg-secondary" href="/superAdmin/addDoctor">
               Add Doctor
             </Button>
           </Col>

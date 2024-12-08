@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row, Form, InputGroup } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
-import Appointments from "../RecentAppointment/Appointments";
-import DoctorList from "../ConsultationBooked/DoctorList/DoctorsList";
 import LabList from "../LabTesBooked/LabList/LabList";
 
 const LabListTable = ({

@@ -28,7 +28,7 @@ const AppointTable = ({
   return (
     <Row
       className="w-75 ml-auto mr-auto border p-4 mb-4"
-      style={{borderRadius: 20 }}
+      style={{ borderRadius: 20 }}
     >
       <Row className="w-100 mx-2 border-bottom pb-1">
         <Col className="mt-3 text-left">

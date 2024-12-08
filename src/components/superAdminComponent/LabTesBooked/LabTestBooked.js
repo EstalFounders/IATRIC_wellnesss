@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import styles from "../css/ConsultationBooked.module.css";
 import AppointTable from "../common/AppointmentTable";
 import { labTest_status } from "../../../constant";
-import LabTestList from "../LabTest/LabTestsList";
 import LabBookedListTable from "../common/LabBookedListTable";
 import LabListTable from "../common/LabListTable";
 
 const LabTestBookedComp = () => {
-  const [selectedBookingType, setSelectedBookingType] = useState(labTest_status.total);
+  const [selectedBookingType, setSelectedBookingType] = useState(
+    labTest_status.total
+  );
 
   // Complete array of all bookings
   const bookings = [
@@ -92,9 +93,9 @@ const LabTestBookedComp = () => {
       name: "simple life",
       location: "Gurgoan",
       colabDate: "12/09/2024",
-      contacntNo: "9933443388"
-    }
-]
+      contacntNo: "9933443388",
+    },
+  ];
 
   // Filtered bookings based on status
   const totalBookings = bookings;
@@ -149,7 +150,7 @@ const LabTestBookedComp = () => {
           </span>
         </div>
       </div>
-      <div className="mt-5 h1 font-weight-bold">LabTest booked</div> 
+      <div className="mt-5 h1 font-weight-bold">LabTest booked</div>
       {/* List of Bookings in Table Format */}
       <LabBookedListTable
         heading={selectedBookingType}
@@ -159,9 +160,9 @@ const LabTestBookedComp = () => {
 
       <div className="mt-5 h1 font-weight-bold">LabTest booked</div>
       <LabListTable
-      //  doctors={doctors}
-       appointments={listOflab}
-      //  onUpdateStatus={handleUpdateStatus}
+        //  doctors={doctors}
+        appointments={listOflab}
+        //  onUpdateStatus={handleUpdateStatus}
       />
     </div>
   );

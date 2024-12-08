@@ -3,7 +3,6 @@ import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper impor
 import { formatData } from "../../registerDocComponent/utils/helper";
 import { appointment_status } from "../../../constant";
 import { useRouter } from "next/router";
-import { storeAppointmentData } from "../common/CommonMethod";
 
 const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);

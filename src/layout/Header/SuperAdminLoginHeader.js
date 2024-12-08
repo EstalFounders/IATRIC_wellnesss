@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Navbar from "../../components/superAdminComponent/NavBarComponent/Navbar";
-import RightSideMenu from "../../components/superAdminComponent/NavBarComponent/RightSideMenu";
+import Navbar from "../../components/superAdminComponent/navBarComponent/Navbar";
+import RightSideMenu from "../../components/superAdminComponent/navBarComponent/RightSideMenu";
 
 const SuperAdminLoginHeader = ({ session }) => {
   const router = useRouter();
