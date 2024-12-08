@@ -11,11 +11,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FaMoneyBill, FaUser } from "react-icons/fa";
 import { GrTest } from "react-icons/gr";
-import RecentDoctors from "./recentDoctors/RecentDoctors";
 import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
+import RecentDoctors from "./recentDoctors/RecentDoctors"
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);

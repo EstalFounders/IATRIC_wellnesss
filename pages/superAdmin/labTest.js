@@ -1,4 +1,3 @@
-import AddDoctorForm from "../../src/components/superAdminComponent/addDoctor/AddDoctorForm";
 import LabTestComponent from "../../src/components/superAdminComponent/LabTest/Labtest";
 import Layouts from "../../src/layout/Layouts";
 import AuthenticatedComponent from "../api/auth/authenticatedcomponent";
