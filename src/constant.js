@@ -62,3 +62,27 @@ export const userTypeConstant = {
     doctor: 'doctor'
 }
 
+export const existingUser = "existing"
+export const newUser = "new"
+
+export const appointment_status = {
+    total: "TOTAL",
+    completed: "COMPLETED",
+    pending: "PENDING",
+    confirmed: "CONFIRMED",
+    cancelled: "CANCELLED",
+    rescheduled: "RESCHEDULED"
+}
+
+export const labTest_status = {
+    total: "TOTAL",
+    completed: "COMPLETED",
+    pending: "PENDING",
+    unpaid: "UNPAID",
+    cancelled: "CANCELLED",
+    paid: "PAID"
+}
+
+export const consultation = "Consultation"
+
+

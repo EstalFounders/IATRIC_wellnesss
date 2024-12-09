@@ -6,7 +6,6 @@ import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { FaBars } from "react-icons/fa";
 import Image from "next/image";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
-import LabTestLogin from "../../components/labTestComponent/modal/LabTestLogin";
 import { RequestOtp } from "../Component/RequestOtp";
 import { OtpScreen } from "../Component/OtpScreen";
 import styles from "../css/LabTestHeader.module.css"; // Import CSS module
@@ -15,6 +14,8 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
+import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
+import { existingUser } from "../../constant";
 
 function LabTesLandingPageHeader() {
   const router = useRouter()
@@ -76,7 +77,7 @@ function LabTesLandingPageHeader() {
         </Col>
 
         <Col md={6} className="d-none d-md-flex justify-content-center">
-          <div className="mx-4" onClick={() => router.push('/labTest/homepage')}>Home</div>
+          <div className="mx-4 clickable-div" onClick={() => router.push('/labTest/homepage')}>Home</div>
           <div className="mx-4">Services</div>
           <div className="mx-4">Blog</div>
           <div className="mx-4">About</div>
@@ -175,16 +176,17 @@ function LabTesLandingPageHeader() {
         </div>
       )}
 
-      <LabTestLogin isOpen={isLoginModalOpen}>
+      <LabTestModel isOpen={isLoginModalOpen}>
         {otpRequested ? (
           <OtpScreen onClose={handleClose} handleSubmitOtp={handleSubmitOtp} />
         ) : (
           <RequestOtp
             onClose={handleClose}
             handleOtpRequest={handleOtpRequest}
+            source={existingUser}
           />
         )}
-      </LabTestLogin>
+      </LabTestModel>
     </Container>
   );
 }

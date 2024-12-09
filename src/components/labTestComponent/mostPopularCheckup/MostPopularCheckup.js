@@ -1,297 +1,85 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import styles from "../css/MostPopularCheckup.module.css"; // Import the CSS module
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { HiArrowCircleRight } from "react-icons/hi";
-import { MoreButton } from "../common/CommonMethod";
-
-const healthCheckupData = [
-  {
-    _id: "66e57653b378ff8dfa602131",
-    title: "Comprehensive Allergy Analysis Package",
-    description:
-      "Are you constantly suffering from sneezing, skin rashes, runny nose, ...",
-    sample_required: ["Blood"],
-    preparation_required: ["Fasting", "Avoid medication"],
-    test_included: [
-      {
-        _id: "66e57653b378ff8dfa602130",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602131",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602132",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602133",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602134",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12","Vitamin B12"],
-      },
-     
-      // Add more test objects here
-    ],
-    price: "320",
-    discount: "30",
-    report_within: "6 hours",
-  },
-  {
-    _id: "66e57653b378ff8dfa602132",
-    title: "Comprehensive Allergy Analysis Package",
-    description:
-      "Are you constantly suffering from sneezing, skin rashes, runny nose, ...",
-    sample_required: ["Blood"],
-    preparation_required: ["Fasting", "Avoid medication"],
-    test_included: [
-      {
-        _id: "66e57653b378ff8dfa602130",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602131",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602132",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602133",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602134",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-     
-      // Add more test objects here
-    ],
-    price: "320",
-    discount: "30",
-    report_within: "6 hours",
-  },
-  {
-    _id: "66e57653b378ff8dfa602133",
-    title: "Comprehensive Allergy Analysis Package",
-    description:
-      "Are you constantly suffering from sneezing, skin rashes, runny nose, ...",
-    sample_required: ["Blood"],
-    preparation_required: ["Fasting", "Avoid medication"],
-    test_included: [
-      {
-        _id: "66e57653b378ff8dfa602130",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602131",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602132",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602133",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602134",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-     
-      // Add more test objects here
-    ],
-    price: "320",
-    discount: "30",
-    report_within: "6 hours",
-  },
-  {
-    _id: "66e57653b378ff8dfa602134",
-    title: "Comprehensive Allergy Analysis Package",
-    description:
-      "Are you constantly suffering from sneezing, skin rashes, runny nose, ...",
-    sample_required: ["Blood"],
-    preparation_required: ["Fasting", "Avoid medication"],
-    test_included: [
-      {
-        _id: "66e57653b378ff8dfa602130",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602131",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602132",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602133",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602134",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-     
-      // Add more test objects here
-    ],
-    price: "320",
-    discount: "30",
-    report_within: "6 hours",
-  },
-  {
-    _id: "66e57653b378ff8dfa602135",
-    title: "Comprehensive Allergy Analysis Package",
-    description:
-      "Are you constantly suffering from sneezing, skin rashes, runny nose, ...",
-    sample_required: ["Blood"],
-    preparation_required: ["Fasting", "Avoid medication"],
-    test_included: [
-      {
-        _id: "66e57653b378ff8dfa602130",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602131",
-        testName: "MT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602132",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602133",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-      {
-        _id: "66e57653b378ff8dfa602134",
-        testName: "MEAT",
-        description:
-          "A variety of meats commonly consumed in diets, which can be tested for...",
-        parameters: ["Protein", "Iron", "Vitamin B12"],
-      },
-     
-      // Add more test objects here
-    ],
-    price: "320",
-    discount: "30",
-    report_within: "6 hours",
-  },
-  // ... other items
-];
+import {
+  filterActiveHealthTest,
+  getLabCategoryId,
+  getLabTestCategory,
+  MoreButton,
+} from "../common/CommonMethod";
 
 const MostPopularCheckup = () => {
+  const [healthCheckupData, setHealthCheckUpData] = useState();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState();
+  let id;
+
+  useEffect(() => {
+    const fetchLabCateogory = async () => {
+      try {
+        const response = await fetch("/api/labtest"); // Replace with your API endpoint
+        const data = await response.json();
+        id = getLabCategoryId("FullBodyCheckup", data);
+        await fetchLabTestsDetails(id);
+        storeLabTestCategory(data);
+      } catch (err) {
+        setError("Error fetching data");
+        setLoading(false);
+      }
+    };
+
+    fetchLabCateogory();
+  }, []);
+
+  const fetchLabTestsDetails = async (id) => {
+    try {
+      const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
+      const data = await response.json();
+      const activeData = filterActiveHealthTest(data)
+      setHealthCheckUpData(activeData);
+      setLoading(false);
+    } catch (err) {
+      setError("Error fetching data");
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-    <Container>
-      <div className="row d-flex justify-content-center align-items-center">
-        <div className="row">
-          <div className="col" style={{ marginTop: "15%" }}>
-            <div className={styles.mostPopularText}>Most Popular checkups</div>
-            <div className={styles.mostPopularTextSubtext}>
-              Lorem ipsum dolor sit amet consectetur.
+      <Container>
+        <div className="row d-flex justify-content-center align-items-center">
+          <div className="row">
+            <div className="col" style={{ marginTop: "15%" }}>
+              <div className={styles.mostPopularText}>
+                Most Popular checkups
+              </div>
+              <div className={styles.mostPopularTextSubtext}>
+                Lorem ipsum dolor sit amet consectetur.
+              </div>
             </div>
           </div>
-        </div>
           <Row>
-            {healthCheckupData.map((checkup) => (
-              <Col
-                key={checkup.id}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                className="m-4 ml-5"
-              >
-                {" "}
-                {/* Key should be here */}
-                <HealthCheckupCard
-                  healthCheckupData = {checkup}
-                />
-              </Col>
-            ))}
+            {loading
+              ? "Please wait"
+              : healthCheckupData.map((checkup) => (
+                  <Col
+                    key={checkup._id}
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                    className="m-5"
+                  >
+                    {" "}
+                    {/* Key should be here */}
+                    <HealthCheckupCard healthCheckupData={checkup} />
+                  </Col>
+                ))}
           </Row>
           <MoreButton healthCheckupData={healthCheckupData} />
-      </div>
+        </div>
       </Container>
     </>
   );

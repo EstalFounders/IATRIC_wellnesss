@@ -50,6 +50,7 @@ const healthCheckupData = [
 const HealthyBodyCheckup = () => {
   return (
     <>
+    <Container>
       <div className={`row align-items-center mb-5 p-2 ${styles.container}`}>
         <div className="col text-center" style={{ marginTop: "5%" }}>
           <div className={styles.healthyBodyCheckuptext}>
@@ -62,7 +63,6 @@ const HealthyBodyCheckup = () => {
         </div>
       </div>
       <div>
-        <Container>
           <Row>
             {healthCheckupData.map((checkup, index) => (
               <Col
@@ -71,7 +71,7 @@ const HealthyBodyCheckup = () => {
                 sm={6}
                 md={4}
                 lg={3}
-                className="m-4 ml-5"
+                className="mb-3"
               >
                 <HealthyBodyCard
                   title={checkup.title}
@@ -82,9 +82,9 @@ const HealthyBodyCheckup = () => {
             ))}
           </Row>
           <MoreButton />
-        </Container>
         <LabTestimonial />
       </div>
+      </Container>
     </>
   );
 };

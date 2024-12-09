@@ -3,8 +3,8 @@ import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useState } from "react";
 import MoreModalComp from "../modal/MoreButtonModel";
 
-export const MoreButton = ({healthCheckupData}) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+export const MoreButton = ({ healthCheckupData }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -16,20 +16,28 @@ export const MoreButton = ({healthCheckupData}) => {
 
   return (
     <div>
-    <div style={{ color: "#4B82CB" }} className="btn ml-5 mb-5 font-weight-bold" onClick={handleOpenModal}>
-      More <HiArrowCircleRight color="#4B82CB" />
-    </div>
-    {isModalOpen && <MoreModalComp onClose={handleCloseModal} healthCheckupData={healthCheckupData} />}
+      <div
+        style={{ color: "#4B82CB" }}
+        className="btn ml-5 mb-5 font-weight-bold"
+        onClick={handleOpenModal}
+      >
+        More <HiArrowCircleRight color="#4B82CB" />
+      </div>
+      {isModalOpen && (
+        <MoreModalComp
+          onClose={handleCloseModal}
+          healthCheckupData={healthCheckupData}
+        />
+      )}
     </div>
   );
 };
 
 export const calculateTotalPrice = (cartItems) => {
-    return cartItems.reduce((total, item) => {
-      return total + parseFloat(item.healthCheckupData.price);
-    }, 0);
-  };
-  
+  return cartItems.reduce((total, item) => {
+    return total + parseFloat(item.healthCheckupData.price);
+  }, 0);
+};
 
 export const useAddToCart = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -66,18 +74,52 @@ export const calculateParameters = (testIncluded) => {
 };
 
 export const storeHealthCheckupData = (data) => {
-    // Clear existing healthCheckupData from localStorage
-    localStorage.removeItem('healthCheckupData');
-    // Store new data
-    localStorage.setItem('healthCheckupData', JSON.stringify([data]));
-  }
-  
+  // Clear existing healthCheckupData from localStorage
+  localStorage.removeItem("healthCheckupData");
+  // Store new data
+  localStorage.setItem("healthCheckupData", JSON.stringify([data]));
+};
 
 export const getHealthCheckupData = () => {
-    const data = JSON.parse(localStorage.getItem('healthCheckupData')) || [];
+  const data = JSON.parse(localStorage.getItem("healthCheckupData")) || [];
   return data;
-}
+};
+
+export const storeLabTestCategory = (data) => {
+  // Clear existing healthCheckupData from localStorage
+  localStorage.removeItem("labCategory");
+  // Store new data
+  localStorage.setItem("labCategory", JSON.stringify([data]));
+};
+
+export const getLabTestCategory = () => {
+  const data = JSON.parse(localStorage.getItem("labCategory")) || [];
+  return data;
+};
 
 export const formatPreparationRequired = (preparationArray) => {
-    return preparationArray ? preparationArray.join(' , '):""
-  };
+  return preparationArray ? preparationArray.join(" , ") : "";
+};
+
+export const getLabCategoryId = (keyword, labTestCat) => {
+  let id;
+  for (let i = 0; i < labTestCat.length; i++) {
+    if (labTestCat[i].category_name === keyword) id = labTestCat[i]._id;
+  }
+  console.log(id, 'id')
+  return id;
+};
+
+export const isMobileValid = (mobNo) => {
+  const isValidMobile = /^[0-9]{10}$/.test(mobNo); // Checks if mobNo is exactly 10 digits
+
+  if(isValidMobile) {
+      return true
+  } else {
+    return false
+  }
+}
+
+export const filterActiveHealthTest = (data) => {
+  return data.filter((item) => item.isActive === true);
+};

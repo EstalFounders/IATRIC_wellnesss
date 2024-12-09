@@ -68,7 +68,7 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
       {/* Buttons Section */}
       <div className={`d-flex justify-content-center mt-3 ${styles.buttons}`}>
         <div
-          className={`${styles.addToCartbutton} ${
+          className={`clickable-div ${styles.addToCartbutton} ${
             isClicked ? styles.clicked : ""
           }`}
           onClick={() => handleAddToCart({ healthCheckupData })}
@@ -76,7 +76,7 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
           Add to Cart
         </div>
         <div
-          className={styles.viewDetailsButton}
+          className={`clickable-div ${styles.viewDetailsButton}`}
           onClick={() => handleViewDetails(healthCheckupData)}
         >
           View Details

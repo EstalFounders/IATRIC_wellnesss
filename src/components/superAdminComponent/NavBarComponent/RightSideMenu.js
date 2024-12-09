@@ -6,7 +6,7 @@ import styles from './RightSideMenu.module.css';
 import { FaAngleDown } from 'react-icons/fa';
 import { super_admin_info_local_sotrage } from "../../../constant";
 
-const Dropdown = () => {
+const RightSideMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const super_admin_info = JSON.parse(
@@ -56,4 +56,4 @@ const Dropdown = () => {
   );
 };
 
-export default Dropdown;
+export default RightSideMenu;

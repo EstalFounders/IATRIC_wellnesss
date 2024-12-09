@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Row, Col, Form, Card } from "react-bootstrap";
+import { Button, Form, Card } from "react-bootstrap";
 
 const EditableTestDetails = ({ data }) => {
   const [formData, setFormData] = useState(data);
@@ -43,13 +43,16 @@ const EditableTestDetails = ({ data }) => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`/api/updatelabtestdetails/?id=${formData._id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `/api/updatelabtestdetails/?id=${formData._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       if (response.ok) {
         alert("Updated successfully");
         setIsModified(false);
@@ -61,9 +64,55 @@ const EditableTestDetails = ({ data }) => {
     }
   };
 
+  const handleToggle = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      isActive: !prevData.isActive,
+    }));
+    setIsModified(true);
+  };
+
   return (
     <div>
-      <h3>Edit Test Details</h3>
+      <div className="d-flex flex-row justify-content-between align-items-center p-2">
+        <h3>Edit Test Details</h3>
+
+        {/* Toggle Switch with Status Text */}
+        <div className="d-flex flex-column align-items-center">
+          <div
+            className="toggle-switch"
+            onClick={handleToggle}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              cursor: "pointer",
+              width: "40px",
+              height: "20px",
+              borderRadius: "15px",
+              backgroundColor: formData.isActive ? "green" : "gray",
+              position: "relative",
+            }}
+          >
+            <div
+              className="toggle-knob"
+              style={{
+                position: "absolute",
+                top: "2px",
+                left: formData.isActive ? "20px" : "2px",
+                width: "16px",
+                height: "16px",
+                borderRadius: "50%",
+                backgroundColor: "white",
+                transition: "left 0.2s ease",
+              }}
+            ></div>
+          </div>
+          <small className="mt-1" style={{ color: "black" }}>
+            {formData.isActive ? "Active" : "Not Active"}
+          </small>
+        </div>
+      </div>
+
       <Form>
         <Form.Group>
           <Form.Label>Title</Form.Label>

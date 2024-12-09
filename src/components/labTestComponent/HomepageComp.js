@@ -12,6 +12,8 @@ import VitalOrganCheckup from "./vitalOrganCheckUp/VitalOrganCheckup";
 import HealthyBodyCheckup from "./healthyBodyCheckup/HealthyBodyCheckup";
 import Footer4 from "../../layout/Footer/Footer4";
 import FAQ from "./faqs/FAQ";
+import { storeLabTestCategory } from "./common/CommonMethod";
+import { useEffect } from "react";
 
 export default function HomepageComp() {
   const router = useRouter();
@@ -19,6 +21,8 @@ export default function HomepageComp() {
   const handleLocationClick = () => {
     // Your location click handler logic
   };
+
+
 
   return (
     <>

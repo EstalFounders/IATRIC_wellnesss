@@ -12,8 +12,11 @@ import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
 import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
 import { useRouter } from "next/router";
-
-
+import styles from "./appointmentPage.module.css";
+import { style } from "@mui/system";
+import Preloader from "../Preloader";
+import AppointmentBookingModal from "./modal/AppointmentBookingModal";
+import Image from "next/image";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -35,10 +38,17 @@ const AppointmentPage = () => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [message, setMessage] = useState("");
+  const [bookingResponse, setBookingResponse] = useState();
   const withinBusinessHours = isWithinBusinessHours();
+  const consultationTypeConstant = {
+    call: "Call",
+    video: "Video",
+    clinic: "Clinic",
+    home_visit: "Home Visit",
+  };
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -186,7 +196,7 @@ const AppointmentPage = () => {
 
   const handleShowDialog = (msg) => {
     setMessage(msg);
-    setShowDialog(true);
+    setBookingResponse(true);
   };
 
   const handleCloseDialog = () => {
@@ -232,7 +242,6 @@ const AppointmentPage = () => {
         const data = await response.json();
         console.log("Booking successful:", data.message);
         handleShowDialog(data.message);
-        router.reload();
       } else {
         const errorData = await response.json();
         console.error("Failed to book consultation:", errorData.message);
@@ -295,16 +304,14 @@ const AppointmentPage = () => {
           <div className="col-lg-8">
             <div className="txt-block pr-30">
               {/* Title */}
-              <h3 className="h3-md steelblue-color">Make Appointment</h3>
+              <h3 className={`${styles.makeAppointmentText}`}>
+                Make Appointment
+              </h3>
               {/* Text */}
-              <p>
+              <p className={styles.makeAppointmentSubText}>
                 Porta semper lacus cursus, feugiat primis ultrice in ligula
                 risus auctor tempus feugiat dolor lacinia cubilia curae integer
                 congue leo metus, primis in orci integer metus mollis faucibus
-                enim. Nemo ipsam egestas volute turpis dolores ut aliquam
-                quaerat sodales sapien undo pretium purus feugiat dolor impedit
-                magna purus pretium gravida donec ligula massa gravida donec
-                pretium
               </p>
               {/* APPOINTMENT FORM */}
               <div className="text-center">
@@ -313,63 +320,47 @@ const AppointmentPage = () => {
                   className="appointment-form"
                 >
                   {/* Symptoms Input */}
-                  <div className="col-lg-12">
-                    <textarea
-                      name="symptoms"
-                      className="form-control"
-                      placeholder="Describe your symptoms..."
-                      required
-                      rows="4"
-                      cols="50"
-                      style={{ resize: "vertical" }}
-                      value={symptoms}
-                      onChange={(e) => setSymptoms(e.target.value)} // To update the state as the user types
-                    />
-                  </div>
-
-                  {/* patient name Input */}
-                  <div className="col-lg-12">
-                    <input
-                      type="tel"
-                      name="name"
-                      className="form-control"
-                      placeholder="Name*"
-                      onChange={(e) => setName(e.target.value)}
-                      value={name}
-                      required
-                    />
-                  </div>
-
-                  {/* email Input */}
-                  <div className="col-lg-12">
-                    <input
-                      type="tel"
-                      name="email"
-                      className="form-control"
-                      placeholder="Email*"
-                      onChange={(e) => setEmail(e.target.value)}
-                      value={email}
-                      required
-                    />
-                  </div>
-
-                  {/* Mobile Number Input */}
-                  <div className="col-lg-12">
-                    <input
-                      type="tel"
-                      name="mobNo"
-                      className="form-control"
-                      placeholder="Mobile Number*"
-                      maxLength={10}
-                      value={mobNo}
-                      onChange={(e) => setMobNo(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <textarea
+                    name="symptoms"
+                    className={styles.textarea}
+                    placeholder="Describe your symptoms..."
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="name"
+                    className={styles.input}
+                    placeholder="Name*"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    className={styles.input}
+                    placeholder="Email*"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="tel"
+                    name="mobile"
+                    className={styles.input}
+                    placeholder="Mobile Number*"
+                    min={10}
+                    max={10}
+                    value={mobNo}
+                    onChange={(e) => setMobNo(e.target.value)}
+                    required
+                  />
 
                   {/* consultation type */}
                   <div
-                    className="col-lg-12"
+                    className="col-lg-12 mt-3"
                     style={{
                       display: "flex",
                       justifyContent: "center",
@@ -394,14 +385,14 @@ const AppointmentPage = () => {
                           onChange={(e) => handleConsultationChange(e)}
                           style={{ marginRight: "10px" }}
                         />
-                        <strong>{option}</strong>
+                        <strong className={styles.radioText}>{option}</strong>
                       </label>
                     ))}
                   </div>
 
                   {/* Doctor Choice */}
                   <div
-                    className="col-lg-12"
+                    className={`col-lg-12 ${styles.radioText}`}
                     style={{ textAlign: "center", marginBottom: "20px" }}
                   >
                     <label style={{ marginRight: "20px" }}>
@@ -432,7 +423,7 @@ const AppointmentPage = () => {
 
                   {/* Conditional Doctor Selection Dropdown */}
                   {doctorChoice === "choose" && (
-                    <div className="col-lg-12">
+                    <div className={`col-lg-12 ${styles.radioText}`}>
                       <select
                         name="doctor"
                         className="custom-select"
@@ -457,7 +448,7 @@ const AppointmentPage = () => {
 
                   {/* Time Selection */}
                   <div
-                    className="col-lg-12"
+                    className={`col-lg-12 ${styles.radioText}`}
                     style={{ textAlign: "center", marginBottom: "20px" }}
                   >
                     {withinBusinessHours && (
@@ -731,14 +722,24 @@ const AppointmentPage = () => {
             {/* END SIDEBAR TABLE */}
           </aside>
           {/* END SIDEBAR */}
-          <CustomDialog
+          {/* <CustomDialog
             show={showDialog}
             handleClose={handleCloseDialog}
             message={message}
-          />
+          /> */}
+          <AppointmentBookingModal isOpen={bookingResponse} onClose={() => setBookingResponse(false)}>
+            <div className={styles.successMessage}>
+              <Image src={"/images/success.png"} width={100} height={100} />
+              <div className={`${styles.successText} mt-3`}>Thank you!</div>
+              <div className={styles.successText}>
+                {message}
+              </div>
+            </div>
+          </AppointmentBookingModal>
         </div>
         {/* End row */}
       </div>
+      {isLoading ? <Preloader /> : ""}
       {/* End container */}
     </div>
   );

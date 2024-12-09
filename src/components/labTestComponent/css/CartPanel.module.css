@@ -53,7 +53,6 @@
     top: 129px;
     left: 26px;
     gap: 24px;
-    opacity: 0px;
   overflow-y: scroll;
   padding-right: 10px; 
   }
@@ -68,24 +67,32 @@
   }
   
   .cartItem {
+    max-height: 50vh; /* Restrict height to half the viewport */
+  overflow-y: auto; /* Scrollable if content exceeds the height */
+  padding: 0 10px;
     width: 380.67px;
 height: 148px;
 padding: 16px 0px 0px 0px;
 gap: 32px;
 border-radius: 8px;
-opacity: 0px;
 margin-left: 2%;
 margin-top: 2%;
 border: 1px solid #DADADA
+}
 
+  .cartItems::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .cartItems::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
   }
   
   .cartItemDetails {
     width: 389px;
     height: 116px;
     gap: 6px;
-    opacity: 0px;
-    
   }
   
   .icon {
@@ -110,10 +117,6 @@ border: 1px solid #DADADA
     margin-top: 5px;
   }
   
-  .deleteButton {
-    
-  }
-  
   .emptyCartMessage {
     text-align: center;
     font-size: 16px;
@@ -123,14 +126,18 @@ border: 1px solid #DADADA
   }
 
   .bottomSection {
-    margin-top: 25%;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    position: sticky;
+    bottom: 0; /* Keeps it fixed at the bottom */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+
   }
 
   .discount {
     top: 2000px;
     padding: 5px 27px 5px 27px;
     gap: 10px;
-    opacity: 0px;
     margin-left: 0.1%;
     background-color: #01B37A;   
     color: white;
@@ -151,9 +158,54 @@ line-height: 27.9px;
 padding: 8px 16px 8px 16px;
 gap: 4px;
 border-radius: 8px;
-opacity: 0px;
 background-color: #D1ECA0;
 margin-right: 10px;
+  }
+
+  .successMessage {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .successIcon {
+    font-size: 50px;
+    color: #2ecc71; /* Green color */
+    margin-bottom: 20px;
+  }
+
+  .iconWrapper {
+    width: 100px;
+    padding: 10px;
+    border: 2px solid #01B37A;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50px;
+  }
+  
+  .successText {
+    font-size: 18px;
+    color: #333;
+  }
+  
+
+  @media only screen and (max-width: 600px) {
+    .cartPanel {
+      width: 100%; /* Full width on small screens */
+    }
+  
+    .cartItems {
+      max-height: 50vh; /* Adjust for smaller screens */
+    }
+  
+    .proceedBtn {
+      padding: 10px 16px; /* Adjust button padding */
+    }
+  }
+
+  @media only screen and (max-width: 1024px) {
+    .bottomSection {
+      margin-top: 40%;
+    }
   }
 
   

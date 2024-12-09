@@ -66,8 +66,6 @@ if (mongoose.models[modelName]) {
 }
 
 // Compile the model if it doesn't exist
-const Slot = mongoose.model(modelName, appointmentSchema);
-
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
 export default Appointment;
