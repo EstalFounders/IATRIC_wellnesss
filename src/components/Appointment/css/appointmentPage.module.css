@@ -92,4 +92,20 @@ color: #949494;
     color: #333;
   }
 
+  .priceText {
+    width: 170px;
+height: 50px;
+padding: 10px 23px 10px 23px;
+gap: 10px;
+border-radius: 4px;
+opacity: 0px;
+margin-top: 2%;
+background-color: #F8F8F8;
+font-family: Poppins;
+font-size: 20px;
+font-weight: 600;
+line-height: 30px;
+text-align: left;
+
+  }
   

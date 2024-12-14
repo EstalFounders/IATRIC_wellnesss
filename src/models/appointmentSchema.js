@@ -36,6 +36,10 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
     enum: ["Call", "Video", "Home visit", "Clinic"],
   },
+  consultationprice: {
+   type: Number,
+   required: true,
+  },
   appointmentTime: {
     type: Date,
     required: true,

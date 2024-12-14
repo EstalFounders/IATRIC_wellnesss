@@ -110,15 +110,6 @@ export const getLabCategoryId = (keyword, labTestCat) => {
   return id;
 };
 
-export const isMobileValid = (mobNo) => {
-  const isValidMobile = /^[0-9]{10}$/.test(mobNo); // Checks if mobNo is exactly 10 digits
-
-  if(isValidMobile) {
-      return true
-  } else {
-    return false
-  }
-}
 
 export const filterActiveHealthTest = (data) => {
   return data.filter((item) => item.isActive === true);

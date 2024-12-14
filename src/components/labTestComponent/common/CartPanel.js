@@ -6,7 +6,7 @@ import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { CiDiscount1 } from "react-icons/ci";
 import { MdShoppingCart } from "react-icons/md";
 import { HiOutlineShoppingCart } from "react-icons/hi";
-import { calculateTotalPrice, isMobileValid } from "./CommonMethod";
+import { calculateTotalPrice} from "./CommonMethod";
 import { Container } from "react-bootstrap";
 import LabTestModel from "../modal/LabTestModel";
 import BookingDetailsInput from "./BookingDetailsInput";

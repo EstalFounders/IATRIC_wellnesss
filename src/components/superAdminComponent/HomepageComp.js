@@ -15,7 +15,7 @@ import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
-import RecentDoctors from "./recentDoctors/RecentDoctors"
+import RecentDoctors from "./recentDoctors/RecentDoctors";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
@@ -52,7 +52,7 @@ export default function HomepageComp() {
     fetchDoctors(); // Call the fetchDoctors function when the component mounts
   }, []);
 
-  async function fetchAppointments() {
+  const fetchAppointments=async () => {
     try {
       const response = await fetch(api.bookConsultation); // Fetch data from the API
       if (!response.ok) {

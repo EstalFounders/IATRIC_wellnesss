@@ -1,8 +1,8 @@
 import Image from "next/image";
 import styles from "../css/labTestLoginModel.module.css";
 import { useState } from "react";
-import { isMobileValid } from "../../components/labTestComponent/common/CommonMethod";
 import { existingUser } from "../../constant";
+import { isMobileValid } from "../../helper";
 
 export const RequestOtp = ({ onClose, handleOtpRequest, source }) => {
   const [mobileNumber, setMobileNumber] = useState();

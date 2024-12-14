@@ -6,4 +6,4 @@ const DeductionSchema = new mongoose.Schema({
   paymentProcessingFee: { type: Number, required: true },
 });
 
-export default mongoose.models.Deduction || mongoose.model("Deduction", DeductionSchema);
+export default mongoose.models.Deduction || mongoose.model("Deductions", DeductionSchema);

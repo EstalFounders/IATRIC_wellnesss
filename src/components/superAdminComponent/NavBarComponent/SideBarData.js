@@ -23,9 +23,9 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
-    title: "Team",
-    path: "/superAdmin/addDoctor",
-    icon: <IoIcons.IoMdPeople />,
+    title: "CONSULTATION FEE",
+    path: "/superAdmin/consultationFee",
+    icon: <IoIcons.IoIosPricetags />,
     cName: "nav-text",
   },
   {

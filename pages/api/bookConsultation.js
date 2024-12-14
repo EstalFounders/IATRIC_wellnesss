@@ -70,6 +70,7 @@ export default async function handler(req, res) {
       email,
       patientMobNo,
       consultationType,
+      consultationprice
     } = req.body;
 
     try {
@@ -92,9 +93,8 @@ export default async function handler(req, res) {
           genericConsultationType
         );
         console.log(result, "result 97");
-        doctorId = result.doctor._id.toString();
-        slot = result.slots;
-        console.log(result.doctor._id.toString(), "doctorid for right now");
+        doctorId = result ? result.doctor._id.toString():"";
+        slot = result ? result.slots: "";
         if (!doctorId) {
           throw new Error("No available doctors at the selected time");
         }
@@ -148,6 +148,7 @@ export default async function handler(req, res) {
         email,
         patientMobNo,
         consultationType,
+        consultationprice,
         appointmentTime,
         status,
         patientMeetingUrl,
@@ -178,6 +179,7 @@ export default async function handler(req, res) {
           email,
           patientMobNo,
           consultationType,
+          consultationprice,
           appointmentTime,
           status,
           patientMeetingUrl,
@@ -220,6 +222,7 @@ export default async function handler(req, res) {
             email,
             patientMobNo,
             consultationType,
+            consultationprice,
             appointmentTime: isNow ? new Date() : selectedDate,
             status: "open",
             patientMeetingUrl,
@@ -242,6 +245,7 @@ export default async function handler(req, res) {
             email,
             patientMobNo,
             consultationType,
+            consultationprice,
             appointmentTime: isNow ? new Date() : selectedDate,
             status: "open",
             patientMeetingUrl,

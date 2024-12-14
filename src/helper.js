@@ -78,3 +78,13 @@ export const CustomPagination = ({ currentPage, totalItems, itemsPerPage, onPage
   );
 };
 
+export const isMobileValid = (mobNo) => {
+  const isValidMobile = /^[0-9]{10}$/.test(mobNo); // Checks if mobNo is exactly 10 digits
+
+  if(isValidMobile) {
+      return true
+  } else {
+    return false
+  }
+}
+

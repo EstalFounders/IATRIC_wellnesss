@@ -2,21 +2,18 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {
-  api,
-  consultationTypeConstant,
-  consultationTypeMapping,
-} from "../../constant";
+import { api, consultationTypeMapping } from "../../constant";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
 import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
 import { useRouter } from "next/router";
-import styles from "./appointmentPage.module.css";
+import styles from "./css/appointmentPage.module.css";
 import { style } from "@mui/system";
 import Preloader from "../Preloader";
 import AppointmentBookingModal from "./modal/AppointmentBookingModal";
 import Image from "next/image";
+import { isMobileValid } from "../../helper";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -35,20 +32,16 @@ const AppointmentPage = () => {
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
   const [consultationType, setConsultationType] = useState("Call");
+  const [consultationTypes, setConsultationTypes] = useState([]);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
   const [isLoading, setIsLoading] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [message, setMessage] = useState("");
+  const [consultationprice, setConsultationPrice] = useState("");
   const [bookingResponse, setBookingResponse] = useState();
   const withinBusinessHours = isWithinBusinessHours();
-  const consultationTypeConstant = {
-    call: "Call",
-    video: "Video",
-    clinic: "Clinic",
-    home_visit: "Home Visit",
-  };
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -68,11 +61,44 @@ const AppointmentPage = () => {
   };
 
   useEffect(() => {
-    // Retrieve the label from session storage
-    const savedLabel = sessionStorage.getItem("selectedLabel");
-    if (savedLabel) {
-      setConsultationType(savedLabel);
-    }
+    const fetchConsultationFees = async () => {
+      try {
+        // Step 1: Fetch consultation fee details from the API
+        const response = await fetch("/api/superAdmin/consultationFee");
+        const consultationFees = await response.json(); // Assuming the API returns the array directly
+        setConsultationTypes(consultationFees);
+        console.log("Fetched Consultation Fees:", consultationTypes);
+
+        // Step 2: Retrieve the saved label from session storage
+        const savedLabel = sessionStorage.getItem("selectedLabel");
+        console.log("Saved Label from sessionStorage:", savedLabel);
+
+        if (savedLabel && consultationFees.length > 0) {
+          // Step 3: Find the matching consultation type
+          const matchingConsultation = consultationFees.find(
+            (consultation) => consultation.name === savedLabel
+          );
+
+          if (matchingConsultation) {
+            // Step 4: Set the consultation type and price
+            setConsultationType(matchingConsultation.name);
+            setConsultationPrice(matchingConsultation.fee);
+            console.log(
+              "Matched Consultation Type:",
+              matchingConsultation.name,
+              "Price:",
+              matchingConsultation.fee
+            );
+          } else {
+            console.log("No matching consultation type found.");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching consultation fees:", error);
+      }
+    };
+
+    fetchConsultationFees();
   }, []);
 
   useEffect(() => {
@@ -135,7 +161,14 @@ const AppointmentPage = () => {
   const handleConsultationChange = (event) => {
     console.log(event.target.value, "event");
     const selectedType = event.target.value;
-    setConsultationType(selectedType);
+    const matchingConsultation = consultationTypes.find(
+      (consultation) => consultation.name === selectedType
+    );
+    if(matchingConsultation) {
+      setConsultationType(matchingConsultation.name);
+      setConsultationPrice(matchingConsultation.fee)
+    }
+
     filterDoctors(selectedType);
   };
 
@@ -217,7 +250,11 @@ const AppointmentPage = () => {
       handleOpenSnackBar();
       return;
     }
-    console.log(selectedSlot, "selected slot");
+    if (!isMobileValid(mobNo)) {
+      setSnackBarMessage("Please enter 10 digit in mobile number");
+      handleOpenSnackBar();
+      return;
+    }
     try {
       setIsLoading(true);
       const consultationData = {
@@ -229,6 +266,7 @@ const AppointmentPage = () => {
         name,
         email,
         patientMobNo: mobNo,
+        consultationprice,
         consultationType,
       };
       const response = await fetch(api.bookConsultation, {
@@ -326,7 +364,6 @@ const AppointmentPage = () => {
                     placeholder="Describe your symptoms..."
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
-                    required
                   />
                   <input
                     type="text"
@@ -335,7 +372,6 @@ const AppointmentPage = () => {
                     placeholder="Name*"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    required
                   />
                   <input
                     type="email"
@@ -344,7 +380,6 @@ const AppointmentPage = () => {
                     placeholder="Email*"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
                   <input
                     type="tel"
@@ -355,8 +390,11 @@ const AppointmentPage = () => {
                     max={10}
                     value={mobNo}
                     onChange={(e) => setMobNo(e.target.value)}
-                    required
                   />
+
+                  <div className={styles.priceText}>
+                    Price: {consultationprice} /-
+                  </div>
 
                   {/* consultation type */}
                   <div
@@ -367,27 +405,32 @@ const AppointmentPage = () => {
                       marginBottom: "20px",
                     }}
                   >
-                    {[
-                      consultationTypeConstant.call,
-                      consultationTypeConstant.video,
-                      consultationTypeConstant.clinic,
-                      consultationTypeConstant.home_visit,
-                    ].map((option, index) => (
-                      <label
-                        key={index}
-                        style={{ marginRight: index === 3 ? "0" : "20px" }}
-                      >
-                        <input
-                          type="radio"
-                          name="consultationType"
-                          value={option}
-                          checked={consultationType === option}
-                          onChange={(e) => handleConsultationChange(e)}
-                          style={{ marginRight: "10px" }}
-                        />
-                        <strong className={styles.radioText}>{option}</strong>
-                      </label>
-                    ))}
+                    {consultationTypes
+                      .filter((item) => item.isActive) // Only include items with isActive: true
+                      .map((option, index) => (
+                        <label
+                          key={option._id}
+                          style={{
+                            marginRight:
+                              index === consultationTypes.length - 1
+                                ? "0"
+                                : "20px",
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            name="consultationType"
+                            value={option.name}
+                            checked={consultationType === option.name} // Compare with option.name
+                            onChange={(e) => handleConsultationChange(e)}
+                            style={{ marginRight: "10px" }}
+                          />
+                          <strong className={styles.radioText}>
+                            {option.name}
+                          </strong>{" "}
+                          {/* Show name */}
+                        </label>
+                      ))}
                   </div>
 
                   {/* Doctor Choice */}
@@ -727,13 +770,14 @@ const AppointmentPage = () => {
             handleClose={handleCloseDialog}
             message={message}
           /> */}
-          <AppointmentBookingModal isOpen={bookingResponse} onClose={() => setBookingResponse(false)}>
+          <AppointmentBookingModal
+            isOpen={bookingResponse}
+            onClose={() => setBookingResponse(false)}
+          >
             <div className={styles.successMessage}>
               <Image src={"/images/success.png"} width={100} height={100} />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
-              <div className={styles.successText}>
-                {message}
-              </div>
+              <div className={styles.successText}>{message}</div>
             </div>
           </AppointmentBookingModal>
         </div>
