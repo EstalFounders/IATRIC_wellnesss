@@ -19,7 +19,8 @@ export const api = {
     prescriptionCall: "/api/prescription",
     sendWhatsAppCall: "/api/whatsApp",
     recommendedServies: "/api/lib/recommendedServices",
-    bookConsultation: "/api/bookConsultation/"
+    bookConsultation: "/api/bookConsultation/",
+    consiltationFee: "/api/superAdmin/consultationFee"
 }
 
 export const services = [

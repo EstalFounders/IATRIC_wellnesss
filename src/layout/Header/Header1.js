@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
@@ -11,11 +11,7 @@ import {
   FaMapMarkedAlt,
   FaPhone,
 } from "react-icons/fa";
-import {
-  consultationType,
-  consultationTypeConstant,
-  contact_no,
-} from "../../constant";
+import { api, contact_no } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
@@ -25,6 +21,8 @@ const Header1 = ({ toggleMenu, toggle }) => {
   const router = useRouter();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
+  const [consultationTypes, setConsultationTypes] = useState();
+  const hiddenRoutes = ["/appointment", "/some-other-route"];
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -43,37 +41,66 @@ const Header1 = ({ toggleMenu, toggle }) => {
   };
 
   const handleNavigate = (label) => {
+    console.log(label, "label");
     sessionStorage.setItem("selectedLabel", label);
     router.push("/appointment");
   };
-
-  const consultationOptions = [
-    {
-      label: consultationTypeConstant.call,
-      action: () => handleNavigate(consultationTypeConstant.call),
-      icon: 2,
-    },
-    {
-      label: consultationTypeConstant.video,
-      action: () => handleNavigate(consultationTypeConstant.video),
-      icon: 3,
-    },
-    {
-      label: consultationTypeConstant.clinic,
-      action: () => handleNavigate(consultationTypeConstant.clinic),
-      icon: 4,
-    },
-    {
-      label: consultationTypeConstant.home_visit,
-      action: () => handleNavigate(consultationTypeConstant.home_visit),
-      icon: 5,
-    },
-  ];
 
   const dialOptions = [
     { label: "Dial", action: dial, icon: 0 },
     { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
   ];
+
+  useEffect(() => {
+    const storedConsultations = localStorage.getItem("ConsultationFee");
+
+    if (storedConsultations) {
+      setConsultationTypes(JSON.parse(storedConsultations));
+    } else {
+      fetch(api.consiltationFee)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch consultations");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Filter active items and transform into consultationOptions format
+          const activeConsultations = data
+            .filter((item) => item.isActive)
+            .map((item) => ({
+              label: item.name, // Assuming `item.name` corresponds to consultationTypeConstant names
+              action: () => handleNavigate(item.name),
+              icon: getIconByName(item.name),
+            }));
+
+          // Set options and store in localStorage
+          setConsultationTypes(activeConsultations);
+          localStorage.setItem(
+            "consultations",
+            JSON.stringify(activeConsultations)
+          );
+        })
+        .catch((error) =>
+          console.error("Error fetching consultations:", error)
+        );
+    }
+  }, []);
+
+  // Helper function to map names to icon numbers
+  const getIconByName = (name) => {
+    const iconMapping = {
+      call: 2,
+      video: 3,
+      clinic: 4,
+      home_visit: 5,
+    };
+
+    // Normalize the name to lowercase for case-insensitive matching
+    const normalizedName = name.toLowerCase();
+
+    return iconMapping[normalizedName] || 0; // Default to 0 if name doesn't match
+  };
 
   return (
     <header id="header" className="header">
@@ -206,19 +233,22 @@ const Header1 = ({ toggleMenu, toggle }) => {
         <div className="wsmainwp clearfix">
           {/* LOGO IMAGE */}
           {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-          
+
           {/* MAIN MENU */}
           <nav className="wsmenu clearfix">
-          <div className="desktoplogo" style={{ position: 'absolute', left: 0 }}>
-            <a href="#">
-              <img
-                src="images/logo.png"
-                width={180}
-                height={65}
-                alt="header-logo"
-              />
-            </a>
-          </div>
+            <div
+              className="desktoplogo"
+              style={{ position: "absolute", left: 0 }}
+            >
+              <a href="#">
+                <img
+                  src="images/logo.png"
+                  width={180}
+                  height={65}
+                  alt="header-logo"
+                />
+              </a>
+            </div>
             <ul className="wsmenu-list">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
@@ -529,18 +559,20 @@ const Header1 = ({ toggleMenu, toggle }) => {
                 <a href="#">Simple Link</a>
               </li>
               {/* NAVIGATION MENU BUTTON */}
-              <li className="nl-simple header-btn" aria-haspopup="true">
-                <Link legacyBehavior href="/">
-                  <a
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleConsultationTypeOpenDialog();
-                    }}
-                  >
-                    Book an Appointment
-                  </a>
-                </Link>
-              </li>
+              {!hiddenRoutes.includes(router.pathname) && (
+                <li className="nl-simple header-btn" aria-haspopup="true">
+                  <Link legacyBehavior href="/">
+                    <a
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleConsultationTypeOpenDialog();
+                      }}
+                    >
+                      Book an Appointment
+                    </a>
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
 
@@ -550,7 +582,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
           <PopupDialog
             isOpen={isConsultationTypeOpen}
             onClose={handleConsultationTypeCloseDialog}
-            options={consultationOptions}
+            options={consultationTypes}
           />
         </div>
       </div>

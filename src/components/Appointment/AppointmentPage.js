@@ -62,39 +62,67 @@ const AppointmentPage = () => {
 
   useEffect(() => {
     const fetchConsultationFees = async () => {
-      try {
-        // Step 1: Fetch consultation fee details from the API
-        const response = await fetch("/api/superAdmin/consultationFee");
-        const consultationFees = await response.json(); // Assuming the API returns the array directly
-        setConsultationTypes(consultationFees);
-        console.log("Fetched Consultation Fees:", consultationTypes);
+      const storedConsultations = localStorage.getItem("ConsultationsFee");
+      console.log(storedConsultations, "stored consultation");
 
-        // Step 2: Retrieve the saved label from session storage
-        const savedLabel = sessionStorage.getItem("selectedLabel");
-        console.log("Saved Label from sessionStorage:", savedLabel);
+      let consultationFees;
 
-        if (savedLabel && consultationFees.length > 0) {
-          // Step 3: Find the matching consultation type
-          const matchingConsultation = consultationFees.find(
-            (consultation) => consultation.name === savedLabel
-          );
+      // Only fetch from API if localStorage is invalid or empty
+      if (storedConsultations && storedConsultations !== "null") {
+        consultationFees = JSON.parse(storedConsultations);
 
-          if (matchingConsultation) {
-            // Step 4: Set the consultation type and price
-            setConsultationType(matchingConsultation.name);
-            setConsultationPrice(matchingConsultation.fee);
-            console.log(
-              "Matched Consultation Type:",
-              matchingConsultation.name,
-              "Price:",
-              matchingConsultation.fee
-            );
-          } else {
-            console.log("No matching consultation type found.");
-          }
+        if (Array.isArray(consultationFees) && consultationFees.length > 0) {
+          console.log("Using stored consultations from localStorage.");
+          setConsultationTypes(consultationFees);
+        } else {
+          consultationFees = null;
         }
-      } catch (error) {
-        console.error("Error fetching consultation fees:", error);
+      }
+
+      if (!consultationFees) {
+        console.log("Fetching consultation fees from API...");
+        const response = await fetch(api.consiltationFee, {
+          method: "GET",
+          cache: "no-cache", // Avoids browser caching for debugging
+        });
+        consultationFees = await response.json();
+        setConsultationTypes(consultationFees);
+        localStorage.setItem(
+          "ConsultationsFee",
+          JSON.stringify(consultationFees)
+        );
+      }
+
+      // Process the saved label in both cases
+      processSavedLabel(consultationFees);
+    };
+
+    const processSavedLabel = (consultationFees) => {
+      const savedLabel = sessionStorage.getItem("selectedLabel");
+      console.log("Saved Label from sessionStorage:", savedLabel);
+
+      if (
+        savedLabel &&
+        Array.isArray(consultationFees) &&
+        consultationFees.length > 0
+      ) {
+        const matchingConsultation = consultationFees.find(
+          (consultation) =>
+            consultation.name.toLowerCase() === savedLabel.toLowerCase() // Case insensitive
+        );
+
+        if (matchingConsultation) {
+          setConsultationType(matchingConsultation.name);
+          setConsultationPrice(matchingConsultation.fee);
+          console.log(
+            "Matched Consultation Type:",
+            matchingConsultation.name,
+            "Price:",
+            matchingConsultation.fee
+          );
+        } else {
+          console.log("No matching consultation type found.");
+        }
       }
     };
 
@@ -164,9 +192,9 @@ const AppointmentPage = () => {
     const matchingConsultation = consultationTypes.find(
       (consultation) => consultation.name === selectedType
     );
-    if(matchingConsultation) {
+    if (matchingConsultation) {
       setConsultationType(matchingConsultation.name);
-      setConsultationPrice(matchingConsultation.fee)
+      setConsultationPrice(matchingConsultation.fee);
     }
 
     filterDoctors(selectedType);

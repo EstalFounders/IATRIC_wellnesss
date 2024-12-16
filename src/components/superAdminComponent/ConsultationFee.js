@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./css/ConsultationFee.module.css";
 import { MdDelete } from "react-icons/md";
+import { api } from "../../constant";
 
 const ConsultationFeeComponent = () => {
   const [consultations, setConsultations] = useState([]);
@@ -14,12 +15,29 @@ const ConsultationFeeComponent = () => {
   });
 
   useEffect(() => {
-    axios
-      .get("/api/superAdmin/consultationFee")
-      .then((response) => {
-        setConsultations(response.data);
-      })
-      .catch((error) => console.error("Error fetching consultations:", error));
+    const storedConsultations = localStorage.getItem("ConsultationsFee");
+
+    if (storedConsultations) {
+      // If data exists in local storage, parse and set it
+      setConsultations(JSON.parse(storedConsultations));
+    } else {
+      // If no data in local storage, fetch from API
+      fetch(api.consiltationFee)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch consultations");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setConsultations(data);
+          // Save fetched data to local storage for future use
+          localStorage.setItem("ConsultationsFee", JSON.stringify(data));
+        })
+        .catch((error) =>
+          console.error("Error fetching consultations:", error)
+        );
+    }
   }, []);
 
   const handleEdit = (id) => {
@@ -36,7 +54,7 @@ const ConsultationFeeComponent = () => {
   };
 
   const handleUpdate = (id) => {
-    fetch(`/api/superAdmin/consultationFee?id=${id}`, {
+    fetch(`${api.consiltationFee}?id=${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +79,7 @@ const ConsultationFeeComponent = () => {
   };
 
   const handleAdd = () => {
-    fetch("/api/superAdmin/consultationFee", {
+    fetch(api.consiltationFee, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +100,7 @@ const ConsultationFeeComponent = () => {
   };
 
   const handleDelete = (id) => {
-    fetch(`/api/superAdmin/consultationFee?id=${id}`, {
+    fetch(`${api.consiltationFee}?id=${id}`, {
       method: "DELETE",
     })
       .then((response) => {
