@@ -15,7 +15,7 @@ import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
-import RecentDoctors from "./recentDoctors/RecentDoctors";
+import RecentDoctors from "./RecentDoctors/RecentDoctors";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
