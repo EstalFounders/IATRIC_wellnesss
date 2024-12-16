@@ -11,5 +11,7 @@ if (mongoose.models[modelName]) {
   mongoose.deleteModel(modelName);
 }
 
-export default mongoose.models.Consultation ||
-  mongoose.model(modelName, ConsultationFeeSchema);
+// Compile the model if it doesn't exist
+const ConsultationFee = mongoose.model(modelName, ConsultationFeeSchema)
+
+export default ConsultationFee;

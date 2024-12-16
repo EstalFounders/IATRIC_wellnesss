@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styles from "../css/CartPanel.module.css"; // CSS for the side panel
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { AiFillDelete } from "react-icons/ai"; // For the delete icon
@@ -68,10 +68,10 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       ? calculateTotalPrice(cartItems) * 0.95 // Apply 5% discount
       : calculateTotalPrice(cartItems);
 
-  const handleClose = () => {
-    setIsProceed(false);
-    setError()
-  };
+      const handleClose = useCallback(() => {
+        setIsProceed(false);
+        setError();
+      }, [setIsProceed, setError]);
 
   const hanleProceed = () => {
     setIsProceed(true);
@@ -235,7 +235,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
         <LabTestModel isOpen={isProceed}>
           {responseSuccess ? (
             <div className={styles.successMessage}>
-              <Image src={"/images/success.png"} width={100} height={100} />
+              <Image src={"/images/success.png"} alt="Thank you" width={100} height={100} />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
               <div className={styles.successText}>
                 Your Lab Test has been Booked.

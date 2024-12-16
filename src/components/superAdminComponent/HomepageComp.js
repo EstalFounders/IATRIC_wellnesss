@@ -7,7 +7,7 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FaMoneyBill, FaUser } from "react-icons/fa";
 import { GrTest } from "react-icons/gr";
@@ -52,7 +52,7 @@ export default function HomepageComp() {
     fetchDoctors(); // Call the fetchDoctors function when the component mounts
   }, []);
 
-  const fetchAppointments=async () => {
+  const fetchAppointments = useCallback(async () => {
     try {
       const response = await fetch(api.bookConsultation); // Fetch data from the API
       if (!response.ok) {
@@ -66,11 +66,11 @@ export default function HomepageComp() {
     } finally {
       setIsAppointmentLoading(false);
     }
-  }
+  },[])
 
   useEffect(() => {
     fetchAppointments(); // Call the fetchAppointments function when the component mounts
-  }, []);
+  }, [fetchAppointments]);
 
   const calculateStatistics = (appointments) => {
     const uniquePatients = new Set();

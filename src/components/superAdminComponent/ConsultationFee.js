@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "./css/ConsultationFee.module.css";
 import { MdDelete } from "react-icons/md";
 
-const ConsultationComponent = () => {
+const ConsultationFeeComponent = () => {
   const [consultations, setConsultations] = useState([]);
   const [editing, setEditing] = useState(null);
   const [editedConsultation, setEditedConsultation] = useState(null);
@@ -29,7 +29,6 @@ const ConsultationComponent = () => {
       setEditedConsultation({ ...consultationToEdit });
     }
   };
-  
 
   const handleDiscard = () => {
     setEditing(null);
@@ -37,12 +36,23 @@ const ConsultationComponent = () => {
   };
 
   const handleUpdate = (id) => {
-    axios
-      .put(`/api/superAdmin/consultationFee?id=${id}`, editedConsultation)
+    fetch(`/api/superAdmin/consultationFee?id=${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editedConsultation),
+    })
       .then((response) => {
-        console.log(response, 'response 43')
+        if (!response.ok) {
+          throw new Error("Failed to update consultation");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data, "response 43");
         setConsultations((prev) =>
-          prev.map((item) => (item._id === id ? response.data : item))
+          prev.map((item) => (item._id === id ? data : item))
         );
         setEditing(null);
         setEditedConsultation(null);
@@ -51,90 +61,111 @@ const ConsultationComponent = () => {
   };
 
   const handleAdd = () => {
-    axios
-      .post("/api/superAdmin/consultationFee", newConsultation)
+    fetch("/api/superAdmin/consultationFee", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newConsultation),
+    })
       .then((response) => {
-        setConsultations((prev) => [...prev, response.data]);
+        if (!response.ok) {
+          throw new Error("Failed to add consultation");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setConsultations((prev) => [...prev, data]);
         setNewConsultation({ name: "", fee: "", isActive: true });
       })
       .catch((error) => console.error("Error adding consultation:", error));
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`/api/superAdmin/consultationFee?id=${id}`)
+    fetch(`/api/superAdmin/consultationFee?id=${id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete consultation");
+        }
+        return response.text(); // You can use `.json()` if your backend returns a JSON response.
+      })
       .then(() => {
         setConsultations((prev) => prev.filter((item) => item._id !== id));
       })
       .catch((error) => console.error("Error deleting consultation:", error));
   };
 
-
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Consultation Types</h1>
       <div className={styles.cardContainer}>
         {consultations.map((consultation) => (
-          
           <div key={consultation._id} className={styles.card}>
             {editing === consultation._id && editedConsultation ? (
               <>
-              <input
-                className={styles.input}
-                type="text"
-                value={editedConsultation.name}
-                onChange={(e) =>
-                  setEditedConsultation({
-                    ...editedConsultation,
-                    name: e.target.value,
-                  })
-                }
-              />
-              <input
-                className={styles.input}
-                type="text"
-                value={editedConsultation.fee}
-                onChange={(e) =>
-                  setEditedConsultation({
-                    ...editedConsultation,
-                    fee: e.target.value,
-                  })
-                }
-              />
-              <div
-                className={styles.toggleSwitch}
-                onClick={() =>
-                  setEditedConsultation({
-                    ...editedConsultation,
-                    isActive: !editedConsultation.isActive,
-                  })
-                }
-                style={{
-                  backgroundColor: editedConsultation.isActive ? "green" : "gray",
-                }}
-              >
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={editedConsultation.name}
+                  onChange={(e) =>
+                    setEditedConsultation({
+                      ...editedConsultation,
+                      name: e.target.value,
+                    })
+                  }
+                />
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={editedConsultation.fee}
+                  onChange={(e) =>
+                    setEditedConsultation({
+                      ...editedConsultation,
+                      fee: e.target.value,
+                    })
+                  }
+                />
                 <div
-                  className={styles.toggleKnob}
+                  className={styles.toggleSwitch}
+                  onClick={() =>
+                    setEditedConsultation({
+                      ...editedConsultation,
+                      isActive: !editedConsultation.isActive,
+                    })
+                  }
                   style={{
-                    left: editedConsultation.isActive ? "20px" : "2px",
+                    backgroundColor: editedConsultation.isActive
+                      ? "green"
+                      : "gray",
                   }}
-                ></div>
-              </div>
-              <small className={styles.statusText}>
-                {editedConsultation.isActive ? "Active" : "Not Active"}
-              </small>
-              <div className={styles.buttonGroup}>
-                <button
-                  className={styles.updateButton}
-                  onClick={() => handleUpdate(consultation._id)}
                 >
-                  Update
-                </button>
-                <button className={styles.discardButton} onClick={handleDiscard}>
-                  Discard
-                </button>
-              </div>
-            </>
+                  <div
+                    className={styles.toggleKnob}
+                    style={{
+                      left: editedConsultation.isActive ? "20px" : "2px",
+                    }}
+                  ></div>
+                </div>
+                <small className={styles.statusText}>
+                  {editedConsultation.isActive ? "Active" : "Not Active"}
+                </small>
+                <div className={styles.buttonGroup}>
+                  <button
+                    className={styles.updateButton}
+                    onClick={() => handleUpdate(consultation._id)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className={styles.discardButton}
+                    onClick={handleDiscard}
+                  >
+                    Discard
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <div className="font-weight-bold">{consultation.name}</div>
@@ -203,4 +234,4 @@ const ConsultationComponent = () => {
   );
 };
 
-export default ConsultationComponent;
+export default ConsultationFeeComponent;

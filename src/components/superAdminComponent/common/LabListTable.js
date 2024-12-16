@@ -17,14 +17,11 @@ const LabListTable = ({
   useEffect(() => {
     // Filter appointments based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = appointments.filter(
-      (appointment) =>
-        appointment.name.toLowerCase().includes(lowerCaseSearchTerm)
-      // ||
-      // appointment.status.toLowerCase().includes(lowerCaseSearchTerm)
+    const results = appointments.filter((appointment) =>
+      appointment.name.toLowerCase().includes(lowerCaseSearchTerm)
     );
     setfilteredDoctors(results);
-  }, [searchTerm, doctors]);
+  }, [searchTerm, appointments]); // Include appointments in dependency array
 
   return (
     <Row
@@ -37,11 +34,6 @@ const LabListTable = ({
             <b>Total</b>
           </h4>
         </Col>
-        {/* <Col className="text-right mt-2">
-          <Button className="bg-secondary" href="/superAdmin/addDoctor">
-            Book Appointment
-          </Button>
-        </Col> */}
       </Row>
 
       {/* Search bar */}

@@ -71,7 +71,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []); // Em
+  }, [data]); // Em
 
   // Define the column widths for TH elements
   const columnWidths = {

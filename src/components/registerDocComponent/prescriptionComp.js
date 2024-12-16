@@ -97,7 +97,7 @@ const PrescriptionComp = () => {
       ...updatedFormDetails,
       medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
     });
-  }, []);
+  }, [medicineForms,updatedFormDetails]);
 
   useEffect(() => {
     const fetchDoctors = async () => {

@@ -14,14 +14,14 @@ const MostPopularCheckup = () => {
   const [healthCheckupData, setHealthCheckUpData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
-  let id;
+  const idRef = useRef(null); 
 
   useEffect(() => {
     const fetchLabCateogory = async () => {
       try {
         const response = await fetch("/api/labtest"); // Replace with your API endpoint
         const data = await response.json();
-        id = getLabCategoryId("FullBodyCheckup", data);
+        idRef.current = getLabCategoryId("FullBodyCheckup", data);
         await fetchLabTestsDetails(id);
         storeLabTestCategory(data);
       } catch (err) {
