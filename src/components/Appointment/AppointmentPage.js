@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { api, consultationTypeMapping } from "../../constant";
+import { api, consultationTypeMapping, sessionStorageName } from "../../constant";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
@@ -62,7 +62,7 @@ const AppointmentPage = () => {
 
   useEffect(() => {
     const fetchConsultationFees = async () => {
-      const storedConsultations = localStorage.getItem("ConsultationsFee");
+      const storedConsultations = sessionStorage.getItem(sessionStorageName.ConsultationFee);
       console.log(storedConsultations, "stored consultation");
 
       let consultationFees;
@@ -87,8 +87,8 @@ const AppointmentPage = () => {
         });
         consultationFees = await response.json();
         setConsultationTypes(consultationFees);
-        localStorage.setItem(
-          "ConsultationsFee",
+        sessionStorage.setItem(
+          sessionStorageName.ConsultationFee,
           JSON.stringify(consultationFees)
         );
       }
@@ -108,7 +108,7 @@ const AppointmentPage = () => {
       ) {
         const matchingConsultation = consultationFees.find(
           (consultation) =>
-            consultation.name.toLowerCase() === savedLabel.toLowerCase() // Case insensitive
+            consultation.name === savedLabel // Case insensitive
         );
 
         if (matchingConsultation) {

@@ -86,4 +86,9 @@ export const labTest_status = {
 
 export const consultation = "Consultation"
 
+export const sessionStorageName = {
+    ConsultationFee: "ConsultationFee",
+    SelectedLabel: "selectedLabel"
+}
+
 

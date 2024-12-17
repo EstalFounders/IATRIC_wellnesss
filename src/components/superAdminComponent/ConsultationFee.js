@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./css/ConsultationFee.module.css";
 import { MdDelete } from "react-icons/md";
-import { api } from "../../constant";
+import { api, sessionStorageName } from "../../constant";
 
 const ConsultationFeeComponent = () => {
   const [consultations, setConsultations] = useState([]);
@@ -15,7 +15,7 @@ const ConsultationFeeComponent = () => {
   });
 
   useEffect(() => {
-    const storedConsultations = localStorage.getItem("ConsultationsFee");
+    const storedConsultations = sessionStorage.getItem(sessionStorageName.ConsultationFee);
 
     if (storedConsultations) {
       // If data exists in local storage, parse and set it

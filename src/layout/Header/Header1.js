@@ -11,7 +11,7 @@ import {
   FaMapMarkedAlt,
   FaPhone,
 } from "react-icons/fa";
-import { api, contact_no } from "../../constant";
+import { api, contact_no, sessionStorageName } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
@@ -41,7 +41,6 @@ const Header1 = ({ toggleMenu, toggle }) => {
   };
 
   const handleNavigate = (label) => {
-    console.log(label, "label");
     sessionStorage.setItem("selectedLabel", label);
     router.push("/appointment");
   };
@@ -52,10 +51,38 @@ const Header1 = ({ toggleMenu, toggle }) => {
   ];
 
   useEffect(() => {
-    const storedConsultations = localStorage.getItem("ConsultationFee");
+    const processConsultations = (data) => {
+      // Filter active items and transform into consultationOptions format
+      console.log(data, '56 processed consultation')
+      const activeConsultations = data
+        .filter((item) => item.isActive)
+        .map((item) => ({
+          label: item.name,
+          action: () => handleNavigate(item.name),
+          icon: getIconByName(item.name),
+        }));
 
-    if (storedConsultations) {
-      setConsultationTypes(JSON.parse(storedConsultations));
+      console.log(activeConsultations, "active consultation");
+
+      // Set options and store in sessionStorage
+      setConsultationTypes(activeConsultations);
+      sessionStorage.setItem(
+        sessionStorageName.ConsultationFee,
+        JSON.stringify(data)
+      );
+    };
+
+    const storedConsultations = sessionStorage.getItem(
+      sessionStorageName.ConsultationFee
+    );
+    
+    const parsedConsultations = JSON.parse(storedConsultations);
+
+    console.log(parsedConsultations, "stored consultation in header");
+
+    if (parsedConsultations && parsedConsultations.length > 0) {
+      console.log(parsedConsultations, "paresed consultation 83");
+      processConsultations(parsedConsultations);
     } else {
       fetch(api.consiltationFee)
         .then((response) => {
@@ -65,21 +92,7 @@ const Header1 = ({ toggleMenu, toggle }) => {
           return response.json();
         })
         .then((data) => {
-          // Filter active items and transform into consultationOptions format
-          const activeConsultations = data
-            .filter((item) => item.isActive)
-            .map((item) => ({
-              label: item.name, // Assuming `item.name` corresponds to consultationTypeConstant names
-              action: () => handleNavigate(item.name),
-              icon: getIconByName(item.name),
-            }));
-
-          // Set options and store in localStorage
-          setConsultationTypes(activeConsultations);
-          localStorage.setItem(
-            "consultations",
-            JSON.stringify(activeConsultations)
-          );
+          processConsultations(data);
         })
         .catch((error) =>
           console.error("Error fetching consultations:", error)
@@ -98,7 +111,6 @@ const Header1 = ({ toggleMenu, toggle }) => {
 
     // Normalize the name to lowercase for case-insensitive matching
     const normalizedName = name.toLowerCase();
-
     return iconMapping[normalizedName] || 0; // Default to 0 if name doesn't match
   };
 

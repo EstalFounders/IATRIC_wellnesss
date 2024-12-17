@@ -24,7 +24,6 @@ const StyledListItem = styled(ListItem)`
 `;
 
 const PopupDialog = ({ isOpen, onClose, options }) => {
-  console.log(options, 'options in popup dialog')
   const theme = useTheme();
   const numberToIcon = {
     0: FiPhoneCall,
@@ -44,7 +43,6 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
         </DialogTitle>
         <List>
           {options ? options.map((option, index) => {
-            console.log(option, "option");
             const IconComponent = numberToIcon[option.icon]; // Use the icon from the option directly
             return (
               <StyledListItem
