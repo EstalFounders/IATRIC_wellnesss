@@ -87,6 +87,7 @@ const AppointmentPage = () => {
         });
         consultationFees = await response.json();
         setConsultationTypes(consultationFees);
+        setConsultationPrice(consultationFees[0].fee)
         sessionStorage.setItem(
           sessionStorageName.ConsultationFee,
           JSON.stringify(consultationFees)
