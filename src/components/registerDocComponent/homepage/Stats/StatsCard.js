@@ -5,7 +5,7 @@ const StatsCard = ({ todayBooking, totalEarning }) => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h3 className={styles.title}>Today's Booking</h3>
+        <h3 className={styles.title}>Today&apos;s Booking</h3>
         <p className={styles.value}>{todayBooking}</p>
       </div>
       <div className={styles.card}>
