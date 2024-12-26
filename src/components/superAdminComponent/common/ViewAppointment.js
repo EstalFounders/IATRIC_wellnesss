@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, ProgressBar } from "react-bootstrap";
 import { getAppointmentData } from "./CommonMethod";
 import { useRouter } from "next/router";
+import { price_symbol } from "../../../constant";
 
 const ViewAppointmentDetailsComp = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const ViewAppointmentDetailsComp = () => {
   useEffect(() => {
     const fetchDeductions = async () => {
       try {
-        const localDeductions = localStorage.getItem("consultation_deductions");
+        const localDeductions = sessionStorage.getItem("consultation_deductions");
         console.log(localDeductions, "local deduction");
         if (localDeductions) {
           setDeductions(JSON.parse(localDeductions));
@@ -46,7 +47,7 @@ const ViewAppointmentDetailsComp = () => {
           } else {
             console.error("LabTest deductions not found.");
           }
-          localStorage.setItem("consultation_deductions", JSON.stringify(deductionsData));
+          sessionStorage.setItem("consultation_deductions", JSON.stringify(deductionsData));
           setDeductions(deductionsData);
         }
       } catch (error) {
@@ -130,7 +131,7 @@ const ViewAppointmentDetailsComp = () => {
           <Row className="mb-4">
             <Col className="text-center">
               <h5>Total Price</h5>
-              <h4 className="text-primary">₹{totalPrice}</h4>
+              <h4 className="text-primary">{price_symbol}{totalPrice}</h4>
             </Col>
           </Row>
           <Row>
@@ -143,7 +144,7 @@ const ViewAppointmentDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.doctorShare / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.doctorShare / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>
@@ -157,7 +158,7 @@ const ViewAppointmentDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.platformFee / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.platformFee / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>
@@ -171,7 +172,7 @@ const ViewAppointmentDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹
+                {price_symbol}
                 {((deductions.paymentProcessingFee / 100) * totalPrice).toFixed(
                   2
                 )}
@@ -188,7 +189,7 @@ const ViewAppointmentDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.GST / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.GST / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>

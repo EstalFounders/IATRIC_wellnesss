@@ -12,7 +12,7 @@ const DoctorAuthenticatedComponent = ({ children }) => {
       const session = await getSession();
       console.log(session, 'session in DoctorAuthenticatedComponent');
       if (session) {
-        localStorage.setItem(doctor_info_local_storage, JSON.stringify(session));
+        sessionStorage.setItem(doctor_info_local_storage, JSON.stringify(session));
         setLoading(false); // Stop loading once the session is set
       } else {
         // Redirect to the doctor login page if not authenticated

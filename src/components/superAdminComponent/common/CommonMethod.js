@@ -1,12 +1,12 @@
 export const storeAppointmentData = (data) => {
     // Clear existing healthCheckupData from localStorage
-    localStorage.removeItem("appointmentData");
+    sessionStorage.removeItem("appointmentData");
     // Store new data
-    localStorage.setItem("appointmentData", JSON.stringify([data]));
+    sessionStorage.setItem("appointmentData", JSON.stringify([data]));
   };
 
   export const getAppointmentData = () => {
-    const data = JSON.parse(localStorage.getItem("appointmentData")) || [];
+    const data = JSON.parse(sessionStorage.getItem("appointmentData")) || [];
     return data;
   };
 

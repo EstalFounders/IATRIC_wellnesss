@@ -44,8 +44,8 @@ const Layouts = ({ children, header, footer }) => {
         return <LabTesLandingPageHeader />;
       case 7:
         return <SuperAdminLoginHeader session={true} />;
-      case 8:
-        return <RegisterDocLoginHeader session={false} />;
+      // case 8:
+      //   return <RegisterDocLoginHeader session={false} />;
       case 9:
         return <RegisterDocLoginHeader session={true} />;
       default:

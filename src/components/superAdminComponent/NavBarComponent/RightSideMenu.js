@@ -10,7 +10,7 @@ const RightSideMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const super_admin_info = JSON.parse(
-    localStorage.getItem(super_admin_info_local_sotrage)
+    sessionStorage.getItem(super_admin_info_local_sotrage)
   );
 
   const toggleDropdown = () => {

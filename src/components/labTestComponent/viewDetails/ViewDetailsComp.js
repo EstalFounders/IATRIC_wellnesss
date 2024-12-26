@@ -21,6 +21,7 @@ import {
 } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
 import HealthCheckupCard from "../common/HealthCheckupCard";
+import { price_symbol } from "../../../constant";
 
 const ViewDetails = () => {
   const [healthCheckupData, setHealthCheckupData] = useState([]);
@@ -78,7 +79,7 @@ const ViewDetails = () => {
 
             {/* Original Price */}
             <span className={`${styles.originalPrice} me-2`}>
-              M.R.P: ₹{healthCheckupData.price}
+              M.R.P: {price_symbol}{healthCheckupData.price}
             </span>
 
             {/* Divider */}

@@ -16,5 +16,17 @@ export const SidebarData = [
     icon: <IoIcons.IoIosPaper />,
     cName: "nav-text",
   },
+  {
+    title: "Payment",
+    path: "/registerDoc/prescription",
+    icon: <IoIcons.IoIosWallet />,
+    cName: "nav-text",
+  },
+  {
+    title: "Contract",
+    path: "/registerDoc/prescription",
+    icon: <IoIcons.IoMdClipboard />,
+    cName: "nav-text",
+  },
   
 ];

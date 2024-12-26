@@ -17,7 +17,7 @@ import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
 import { FaWhatsapp } from "react-icons/fa";
 
-const Header1 = ({ toggleMenu, toggle }) => {
+const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
@@ -291,6 +291,11 @@ const Header1 = ({ toggleMenu, toggle }) => {
                           </Link>
                         </li>
                         <li>
+                          <Link legacyBehavior href="/about-us">
+                            <a>Mission / Plans</a>
+                          </Link>
+                        </li>
+                        <li>
                           <Link legacyBehavior href="/who-we-are">
                             <a>Who We Are</a>
                           </Link>
@@ -302,7 +307,12 @@ const Header1 = ({ toggleMenu, toggle }) => {
                         </li>
                         <li>
                           <Link legacyBehavior href="/service-1">
-                            <a>Get In Touch</a>
+                            <a>Contact Us</a>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link legacyBehavior href="/service-1">
+                            <a>Join Us</a>
                           </Link>
                         </li>
                       </ul>

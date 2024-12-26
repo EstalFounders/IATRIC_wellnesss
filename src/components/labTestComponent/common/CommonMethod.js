@@ -77,23 +77,23 @@ export const storeHealthCheckupData = (data) => {
   // Clear existing healthCheckupData from localStorage
   localStorage.removeItem("healthCheckupData");
   // Store new data
-  localStorage.setItem("healthCheckupData", JSON.stringify([data]));
+  sessionStorage.setItem("healthCheckupData", JSON.stringify([data]));
 };
 
 export const getHealthCheckupData = () => {
-  const data = JSON.parse(localStorage.getItem("healthCheckupData")) || [];
+  const data = JSON.parse(sessionStorage.getItem("healthCheckupData")) || [];
   return data;
 };
 
 export const storeLabTestCategory = (data) => {
   // Clear existing healthCheckupData from localStorage
-  localStorage.removeItem("labCategory");
+  sessionStorage.removeItem("labCategory");
   // Store new data
-  localStorage.setItem("labCategory", JSON.stringify([data]));
+  sessionStorage.setItem("labCategory", JSON.stringify([data]));
 };
 
 export const getLabTestCategory = () => {
-  const data = JSON.parse(localStorage.getItem("labCategory")) || [];
+  const data = JSON.parse(sessionStorage.getItem("labCategory")) || [];
   return data;
 };
 

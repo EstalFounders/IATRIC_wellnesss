@@ -5,33 +5,23 @@ import { useRouter } from "next/router";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
 import { signOut } from "next-auth/react";
+import { doctor_info_local_storage } from "../../constant";
 
 const styles = {};
 const RegisterDocLoginHeader = ({ session }) => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
 
-
-  const buttonStyle = {
-    color: isHovered ? "#fff" : "#8E8333",
-    backgroundColor: isHovered ? "#3b5f1d" : "#fff",
-    border: "none",
-    padding: "10px 20px",
-    cursor: "pointer",
-    borderRadius: '5px',
-    transition: "background-color 0.3s ease, color 0.3s ease",
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-  };
+  const userInfo = JSON.parse(
+      sessionStorage.getItem(doctor_info_local_storage)
+    );
 
   return (
     <Row className="bg-white border-bottom align-items-center">
-      <Col xs={12} md={4} className="mt-4">
+      <Col xs={12} md={5} className="mt-4">
         {session && <Navbar />}
       </Col>
-      <Col xs={12} md={4} className="text-center py-3">
+      <Col xs={12} md={6} className="py-3">
         <Image
           src="/images/logo.png" // Make sure the path is correct starting from the 'public' directory
           width={180}
@@ -40,16 +30,18 @@ const RegisterDocLoginHeader = ({ session }) => {
           className="pt-2"
         />
       </Col>
-      <Col xs={12} md={4} className="mt-4 text-md-right text-center">
-        {session && (
-          <div className="mr-2" onClick={handleLogout}>
-            <button
+      <Col className="mb-3">
+      
+        {userInfo && (
+          <div>
+            {/* <button
               style={buttonStyle}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               Logout
-            </button>
+            </button> */}
+            <RightSideMenu user={userInfo} />
           </div>
         )}
       </Col>

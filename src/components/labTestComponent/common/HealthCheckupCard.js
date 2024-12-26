@@ -9,6 +9,7 @@ import {
 } from "./CommonMethod";
 import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
+import { price_symbol } from "../../../constant";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
@@ -33,8 +34,8 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
             {healthCheckupData.discount}
           </div>
           <div className={`col ${styles.price}`}>
-            ₹{healthCheckupData.price}{" "}
-            <span className={styles.mrp}>₹{healthCheckupData.mrp}</span>
+            {price_symbol}{healthCheckupData.price}{" "}
+            <span className={styles.mrp}>{price_symbol}{healthCheckupData.mrp}</span>
           </div>
         </div>
 

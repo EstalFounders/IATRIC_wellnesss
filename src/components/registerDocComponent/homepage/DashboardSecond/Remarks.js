@@ -13,7 +13,7 @@ const Remarks = () => {
       }}
     >
       <h3>Doctor&apos;s Remarks</h3>
-
+      <div>No Remarks Found</div>
       {/* <textarea
         style={{
           width: '100%',

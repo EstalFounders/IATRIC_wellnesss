@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, ProgressBar } from "react-bootstrap";
 import { getAppointmentData } from "./CommonMethod";
 import { useRouter } from "next/router";
+import { price_symbol } from "../../../constant";
 
 const ViewLabTestDetailsComp = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const ViewLabTestDetailsComp = () => {
   useEffect(() => {
     const fetchDeductions = async () => {
       try {
-        const localDeductions = localStorage.getItem("lab_deductions");
+        const localDeductions = sessionStorage.getItem("lab_deductions");
         // console.log(localDeductions, "local deduction");
         if (localDeductions) {
           setDeductions(JSON.parse(localDeductions));
@@ -47,7 +48,7 @@ const ViewLabTestDetailsComp = () => {
             console.error("LabTest deductions not found.");
           }
 
-          localStorage.setItem(
+          sessionStorage.setItem(
             "lab_deductions",
             JSON.stringify(deductionsData)
           );
@@ -128,7 +129,7 @@ const ViewLabTestDetailsComp = () => {
           <Row className="mb-4">
             <Col className="text-center">
               <h5>Total Price</h5>
-              <h4 className="text-primary">₹{totalPrice}</h4>
+              <h4 className="text-primary">{price_symbol}{totalPrice}</h4>
             </Col>
           </Row>
           <Row>
@@ -141,7 +142,7 @@ const ViewLabTestDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.labShare / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.labShare / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>
@@ -155,7 +156,7 @@ const ViewLabTestDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.platformFee / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.platformFee / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>
@@ -169,7 +170,7 @@ const ViewLabTestDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹
+                {price_symbol}
                 {((deductions.paymentProcessingFee / 100) * totalPrice).toFixed(
                   2
                 )}
@@ -186,7 +187,7 @@ const ViewLabTestDetailsComp = () => {
                 style={{ height: "20px" }}
               />
               <p className="mt-2 font-weight-bold">
-                ₹{((deductions.GST / 100) * totalPrice).toFixed(2)}
+                {price_symbol}{((deductions.GST / 100) * totalPrice).toFixed(2)}
               </p>
             </Col>
           </Row>

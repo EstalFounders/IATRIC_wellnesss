@@ -14,6 +14,7 @@ import Preloader from "../../Preloader";
 import Image from "next/image";
 import { RequestOtp } from "../../../layout/Component/RequestOtp";
 import { OtpScreen } from "../../../layout/Component/OtpScreen";
+import { price_symbol } from "../../../constant";
 
 const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   const [name, setName] = useState()
@@ -158,7 +159,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
                     {item.healthCheckupData.title}
                   </div>
                   <div className={`row ${styles.itemPrice}`}>
-                    ₹{item.healthCheckupData.price}
+                    {price_symbol}{item.healthCheckupData.price}
                   </div>
                 </div>
 
@@ -219,7 +220,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
               </div>
               <div className="ms-3">
                 <div className="fw-bold text-success">
-                  ₹ {totalPrice.toFixed(2)}
+                  {price_symbol} {totalPrice.toFixed(2)}
                 </div>
                 <div className="text-muted ml-1">{cartItems.length} tests</div>
               </div>

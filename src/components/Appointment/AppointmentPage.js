@@ -74,6 +74,7 @@ const AppointmentPage = () => {
         if (Array.isArray(consultationFees) && consultationFees.length > 0) {
           console.log("Using stored consultations from localStorage.");
           setConsultationTypes(consultationFees);
+          setConsultationPrice(consultationFees[0].fee)
         } else {
           consultationFees = null;
         }

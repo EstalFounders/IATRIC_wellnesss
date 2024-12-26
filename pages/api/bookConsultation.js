@@ -110,7 +110,7 @@ export default async function handler(req, res) {
         doctorId = result.doctor;
         slot = result.slotId;
         console.log(doctorId, "doctorid for specific time", slot, "slot");
-        if (!doctorId && !slot) {
+        if (!doctorId && !slot) { 
           throw new Error("No available doctors at the selected time");
         }
       }

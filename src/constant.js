@@ -91,4 +91,5 @@ export const sessionStorageName = {
     SelectedLabel: "selectedLabel"
 }
 
+export const price_symbol = "₹"
 

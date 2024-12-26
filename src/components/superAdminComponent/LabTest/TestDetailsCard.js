@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FaTrash } from "react-icons/fa"; // Import trash icon
 import styles from "../css/TestDetailsCard.module.css";
 import EditableTestDetails from "./EditableTestDetails";
+import { price_symbol } from "../../../constant";
 
 const TestDetailsCard = ({ test }) => {
   const [showEditableComponent, setShowEditableComponent] = useState(false);
@@ -65,11 +66,11 @@ const TestDetailsCard = ({ test }) => {
           </div>
           <Row className="mt-5">
             <Col sm={10} md={8} lg={3} className={styles.discountPrice}>
-              {`₹${test.discount}`}
+              {`${price_symbol}${test.discount}`}
             </Col>
 
             <Col sm={10} md={8} lg={5} className={`mt-1 ${styles.price}`}>
-              {`₹${test.price}`}
+              {`${price_symbol}${test.price}`}
             </Col>
 
             <Col

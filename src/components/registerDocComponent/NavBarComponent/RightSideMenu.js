@@ -5,7 +5,8 @@ import { FiCircle } from 'react-icons/fi';
 import styles from './RightSideMenu.module.css';
 import { FaAngleDown } from 'react-icons/fa';
 
-const Dropdown = () => {
+const Dropdown = ({user}) => {
+  console.log(user, 'doctor name on right side menu')
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -27,7 +28,7 @@ const Dropdown = () => {
   return (
     <div className={styles.dropdown}>
       <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
-        <strong>Dr Satvik</strong>
+      <strong>{user.user.name.split(' ')[0]}</strong>
       <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
       </div>
 

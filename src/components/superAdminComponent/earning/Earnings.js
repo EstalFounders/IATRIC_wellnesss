@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "../css/ConsultationBooked.module.css";
-import { labTest_status } from "../../../constant";
+import { labTest_status, price_symbol } from "../../../constant";
 import ConsultationEarningTable from "../common/ConsultationEarningTable";
 import LabTestEarningTable from "../common/LabTestEarningTable";
 import {
@@ -228,7 +228,7 @@ const EarningsComp = () => {
         >
           <span>Consultation Earning</span>
           <span className={`text-secondary ${styles.circleText}`}>
-            {`₹${ConsultationEarning}`}
+            {`${price_symbol}${ConsultationEarning}`}
           </span>
         </div>
 
@@ -238,7 +238,7 @@ const EarningsComp = () => {
         >
           <span>Lab Test Earning</span>
           <span className={`text-secondary ${styles.circleText}`}>
-            {`₹${LabTestEarning}`}
+            {`${price_symbol}${LabTestEarning}`}
           </span>
         </div>
       </div>

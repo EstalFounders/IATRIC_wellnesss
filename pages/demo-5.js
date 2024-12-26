@@ -1,4 +1,3 @@
-import { use } from "react";
 import About5 from "../src/components/Common/About-5";
 import Banner5 from "../src/components/Common/Banner-5";
 import Statistic1 from "../src/components/Common/Statistic-1";

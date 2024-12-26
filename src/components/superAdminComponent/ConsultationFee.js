@@ -32,7 +32,7 @@ const ConsultationFeeComponent = () => {
         .then((data) => {
           setConsultations(data);
           // Save fetched data to local storage for future use
-          localStorage.setItem("ConsultationsFee", JSON.stringify(data));
+          sessionStorage.setItem("ConsultationsFee", JSON.stringify(data));
         })
         .catch((error) =>
           console.error("Error fetching consultations:", error)
