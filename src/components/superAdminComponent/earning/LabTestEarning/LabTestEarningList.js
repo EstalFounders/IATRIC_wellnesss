@@ -5,6 +5,7 @@ import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../../helper";
 
 const LabTestEarningList = ({ source, data, appointments }) => {
+  console.log(data, "lab test data on earning list");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -34,18 +35,21 @@ const LabTestEarningList = ({ source, data, appointments }) => {
           <Col md={2} style={{ color: "#8e8333" }}>
             <b>Name</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
-            <b>Package Name</b>
+          <Col md={3} style={{ color: "#8e8333" }}>
+            <b>Test Booked</b>
           </Col>
           <Col md={2} style={{ color: "#8e8333" }}>
-            <b>Booking Time</b>
+            <b>Booked</b>
+          </Col>
+          <Col md={2} className="ml-4" style={{ color: "#8e8333" }}>
+            <b>Price</b>
           </Col>
           <Col md={2} style={{ color: "#8e8333" }}>
-            <b>Total Price</b>
+            <b>Mobile Number</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
-            <b>Payment Status</b>
-          </Col>
+          {/* <Col md={2} style={{ color: "#8e8333" }}>
+            <b>Status</b>
+          </Col> */}
         </Row>
         <div
           style={{

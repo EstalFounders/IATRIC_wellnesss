@@ -1,8 +1,11 @@
 import React from "react";
 import { formatData } from "../../utils/helper";
 import { appointment_status } from "../../../../constant";
+import { Button } from "react-bootstrap";
+import { useRouter } from "next/router";
 
-const AppointmentsTable = ({ appointments }) => {
+const AppointmentsTable = ({ appointments, filterText }) => {
+  const router = useRouter()
   return (
     <div
       style={{
@@ -15,7 +18,9 @@ const AppointmentsTable = ({ appointments }) => {
         overflowX: "auto", // Ensure horizontal scrolling on small screens
       }}
     >
-      <h3 style={{ fontSize: "1.5em", textAlign: "center" }}>Appointments</h3>
+      <h3 style={{ fontSize: "1.5em", textAlign: "center" }}>
+        {filterText} Appointments
+      </h3>
       <table
         style={{
           width: "100%",
@@ -38,43 +43,71 @@ const AppointmentsTable = ({ appointments }) => {
             <th style={{ padding: "10px", textAlign: "left" }}>
               Consultation Type
             </th>
+            <th style={{ padding: "10px", textAlign: "left" }}>Price</th>
           </tr>
         </thead>
         <tbody>
-          {appointments.map((appointment, index) => (
-            <tr key={index}>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {appointment.name}
-              </td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {`appointment.gender`}
-              </td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {formatData(appointment.appointmentTime)}
-              </td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {appointment.status}
-              </td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {appointment.consultationType}
-              </td>
-              {appointment.status == `${appointment_status.completed}` ? (
-                <td
-                  style={{
-                    padding: "10px",
-                    borderBottom: "1px solid #ddd",
-                    textDecoration: "underline",
-                  }}
-                >
-                  View Description
-                </td>
-              ) : (
-                ""
-              )}
-            </tr>
-          ))}
+          {appointments.length > 0
+            ? appointments.map((appointment, index) => (
+                <tr key={index}>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {appointment.name}
+                  </td>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {/* {`appointment.gender`} */}
+                  </td>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {formatData(appointment.appointmentTime)}
+                  </td>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {appointment.status}
+                  </td>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {appointment.consultationType}
+                  </td>
+                  <td
+                    style={{ padding: "10px", borderBottom: "1px solid #ddd" }}
+                  >
+                    {appointment.consultationprice}
+                  </td>
+                  {appointment.status == `${appointment_status.completed}` ? (
+                    <td
+                      style={{
+                        padding: "10px",
+                        borderBottom: "1px solid #ddd",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      View Description
+                    </td>
+                  ) : (
+                    <td></td>
+                  )}
+                </tr>
+              ))
+            : "No appointment available"}
         </tbody>
       </table>
+      <div className="text-center mt-4">
+        <Button onClick={() => router.push({
+          pathname: '/registerDoc/viewAllAppointment',
+          query: {
+            type: filterText
+          }
+        })}>
+        View All Appointment
+        </Button>
+      </div>
 
       <style jsx>{`
         @media (max-width: 768px) {

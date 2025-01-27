@@ -8,24 +8,24 @@ import LabTestEarningList from "../earning/LabTestEarning/LabTestEarningList";
 const LabTestEarningTable = ({
   heading,
   isLoading,
-  appointments,
+  labTests,
   onStatusChanged,
   onUpdateStatus,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredAppointments, setFilteredAppointments] =
-    useState(appointments);
+  const [filteredLabTests, setFilteredLabTests] =
+    useState(labTests);
 
   useEffect(() => {
     // Filter appointments based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = appointments.filter(
-      (appointment) =>
-        appointment.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        appointment.paymentStatus.toLowerCase().includes(lowerCaseSearchTerm)
+    const results = labTests.filter(
+      (labTest) =>
+        labTest.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      labTest.paymentStatus.toLowerCase().includes(lowerCaseSearchTerm)
     );
-    setFilteredAppointments(results);
-  }, [searchTerm, appointments]);
+    setFilteredLabTests(results);
+  }, [searchTerm, labTests]);
 
   return (
     <Row
@@ -46,7 +46,7 @@ const LabTestEarningTable = ({
       </Row>
 
       {/* Search bar */}
-      {appointments.length === 0 ? (
+      {labTests.length === 0 ? (
         ""
       ) : (
         <Row className="w-100 mt-3">
@@ -68,12 +68,12 @@ const LabTestEarningTable = ({
       <Row className="ml-4 w-100 mt-3">
         {isLoading ? (
           <p>Loading...</p>
-        ) : filteredAppointments.length === 0 ? (
+        ) : filteredLabTests.length === 0 ? (
           <p>No Lab Test found.</p>
         ) : (
           <Col>
             <LabTestEarningList
-              data={filteredAppointments}
+              data={filteredLabTests}
               onStatusChanged={onStatusChanged}
               onUpdateStatus={onUpdateStatus}
               className="text-center"

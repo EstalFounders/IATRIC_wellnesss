@@ -1,5 +1,6 @@
 // models/appointmentModel.js
 import mongoose from "mongoose";
+import { appointment_status } from "../constant";
 
 const appointmentSchema = new mongoose.Schema({
   meetingId: {
@@ -34,7 +35,6 @@ const appointmentSchema = new mongoose.Schema({
   consultationType: {
     type: String,
     required: true,
-    enum: ["Call", "Video", "Home visit", "Clinic"],
   },
   consultationprice: {
    type: Number,
@@ -47,8 +47,7 @@ const appointmentSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    default: "open",
-    enum: ["open", "completed", "cancelled"],
+    default: appointment_status.open,
   },
   patientMeetingUrl: {
     type: String,

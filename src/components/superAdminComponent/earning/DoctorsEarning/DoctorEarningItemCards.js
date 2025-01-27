@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper imports
 import { useRouter } from "next/router";
 import { formatData } from "../../../registerDocComponent/utils/helper";
-import { appointment_status } from "../../../../constant";
+import { appointment_status, payment, showUpdate } from "../../../../constant";
 import { FaEye } from "react-icons/fa";
 import SuperAdminModel from "../../model/SuperAdminModel";
 import AppointTable from "../../common/AppointmentTable";
 
-const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
+const ItemCards = ({ data, appointments, totalPrice, onUpdateStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [appointmentId, setAppointmentId] = useState(data._id);
   const [filteredData, setFiltereData] = useState(data);
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+
+  console.log(data, "data on item care");
 
   const handleStatusChange = (e) => {
     console.log(e.target.value, "event");
@@ -32,31 +34,40 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       query: { data: JSON.stringify(data) }, // Pass the appointment data as a string
     });
   };
-  
 
   return (
-    <><Row
-      style={{
-        borderBottom: "1px solid #ccc",
-        borderBottomWidth: 3,
-        display: "flex",
-        flexDirection: "row",
-      }}
-      className="mt-4"
-    >
-      <Col className="text-primary clickable-div" onClick={handleViewAppointment}>
-        <u>{data.name}</u>
-      </Col>
-      <Col>{data.consultationType}</Col>
-      <Col>{formatData(data.appointmentTime)}</Col>
-      <Col>{data.price}</Col>
-      <Col>{data.patientMobNo}</Col>
-      <Col>
-        <Col className="font-weight-bold text-primary" onClick={() => setShowModal(true)}>
-          <u>10</u>
-          <FaEye className="ml-1" />
+    <>
+      <Row
+        style={{
+          borderBottom: "1px solid #ccc",
+          borderBottomWidth: 3,
+          display: "flex",
+          flexDirection: "row",
+        }}
+        className="mt-4"
+      >
+        <Col
+          className="text-primary clickable-div"
+          onClick={handleViewAppointment}
+        >
+          <u>{data.name}</u>
         </Col>
-        {/* <div
+        <Col>{data.consultationType}</Col>
+        <Col>{formatData(data.joiningDate)}</Col>
+        <Col>{totalPrice}</Col>
+        <Col>{data.mobileNo}</Col>
+        <Col>
+          <Col
+            className="font-weight-bold text-primary"
+            onClick={() => setShowModal(true)}
+          >
+            <u>{appointments.length}</u>
+            <FaEye className="ml-1" />
+          </Col>
+          <div className="text-secondary font-weight-bold">
+            <u>Paid</u>
+          </div>
+          {/* <div
       className={`font-weight-bold mb-2 ${
         data.status === "COMPLETED"
           ? "text-success"
@@ -74,7 +85,7 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       {data.status}
     </div> */}
 
-        {/* <Form.Group controlId="statusSelect">
+          {/* <Form.Group controlId="statusSelect">
       <Form.Control
         as="select"
         value={selectedStatus}
@@ -93,14 +104,18 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
     <Button onClick={handleUpdateClick} className="mt-1 mb-2">
       Update
     </Button> */}
-      </Col>
-    </Row><SuperAdminModel isOpen={showModal} onClose={() => setShowModal(false)}>
+        </Col>
+      </Row>
+      <SuperAdminModel isOpen={showModal} onClose={() => setShowModal(false)}>
         <div className="mt-2">
           <AppointTable
             heading={"TOTAL"}
-            appointments={"appointments"} />
+            appointments={appointments}
+            source={showUpdate}
+          />
         </div>
-      </SuperAdminModel></>
+      </SuperAdminModel>
+    </>
   );
 };
 

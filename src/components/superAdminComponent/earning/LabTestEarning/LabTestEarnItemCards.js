@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper imports
 import { useRouter } from "next/router";
 import { formatData } from "../../../registerDocComponent/utils/helper";
-import { appointment_status } from "../../../../constant";
+import { appointment_status, labTest_status } from "../../../../constant";
 
 const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);
@@ -40,13 +40,17 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       }}
       className="mt-4"
     >
-      <Col className="text-primary clickable-div" onClick={handleViewAppointment}>
-        <u>{data.name}</u>
+      <Col className="text-muted font-weight-bold clickable-div" onClick={handleViewAppointment}>
+        {data.name}
       </Col>
-      <Col>{data.consultationType}</Col>
-      <Col>{formatData(data.appointmentTime)}</Col>
-      <Col>{data.symptoms}</Col>
-      <Col>{data.patientMobNo}</Col>
+      <Col>{data.cartItemsIds.length}</Col>
+      <Col>{formatData(data.createdAt)}</Col>
+      <Col>{data.totalPrice}</Col>
+      <Col>{data.mobileNumber}</Col>
+      {/* <Col className="">{data.paymentStatus}</Col> */}
+      {data.status === labTest_status.completed ? <div className="text-primary font-weight-bold">
+        <u>View Invoice</u>
+      </div>:""}
     </Row>
   );
 };

@@ -2,6 +2,8 @@ import React from "react";
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
+import { MdUpdate } from "react-icons/md";
+import { ImLab } from "react-icons/im";
 
 export const SidebarData = [
   {
@@ -29,15 +31,21 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
-    title: "Messages",
-    path: "/registerDoc/addDoctor",
-    icon: <FaIcons.FaEnvelopeOpenText />,
+    title: "UPDATE REQUEST",
+    path: "/superAdmin/viewAllDoctorUpdateRequest",
+    icon: <MdUpdate />,
     cName: "nav-text",
   },
   {
-    title: "Support",
-    path: "/support",
-    icon: <IoIcons.IoMdHelpCircle />,
+    title: "LEAVE REQUEST",
+    path: "/superAdmin/viewAllDoctorLeaveRequest",
+    icon: <MdUpdate />,
+    cName: "nav-text",
+  },
+  {
+    title: "ADD LAB",
+    path: "/superAdmin/addLab",
+    icon: <ImLab />,
     cName: "nav-text",
   },
 ];

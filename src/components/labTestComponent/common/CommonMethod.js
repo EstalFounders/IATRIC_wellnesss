@@ -34,9 +34,9 @@ export const MoreButton = ({ healthCheckupData }) => {
 };
 
 export const calculateTotalPrice = (cartItems) => {
-  return cartItems.reduce((total, item) => {
-    return total + parseFloat(item.healthCheckupData.price);
-  }, 0);
+  // return cartItems.reduce((total, item) => {
+  //   return total + parseFloat(item.healthCheckupData.price);
+  // }, 0);
 };
 
 export const useAddToCart = () => {

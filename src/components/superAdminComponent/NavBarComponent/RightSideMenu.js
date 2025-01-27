@@ -18,16 +18,17 @@ const RightSideMenu = () => {
   };
 
   const handleItemClick = async (item) => {
-    console.log(`Clicked on ${item}`);
-    if(item == 'logout') 
-    try {
-        await signOut();
-        // Additional logic after successful sign-out
-        router.push("/superAdmin/onload"); // Redirect to the login screen
-      } catch (error) {
-        console.error("Error during sign-out:", error);
-      }
-  };
+      console.log(`Clicked on ${item}`);
+      if(item == 'logout') 
+      try {
+          await signOut();
+          // Additional logic after successful sign-out
+          router.push("/superAdmin/onload"); // Redirect to the login screen
+        } catch (error) {
+          console.error("Error during sign-out:", error);
+        }
+    };
+
 
   return (
     <div className={styles.dropdown}>

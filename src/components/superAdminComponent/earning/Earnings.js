@@ -10,182 +10,33 @@ import {
 } from "../common/CommonMethod";
 import DoctorsEarningTable from "../common/DoctorsEarningTable";
 import LabsEarningTable from "../common/LabsEarningTable";
+import { useSelector } from "react-redux";
 
 const EarningsComp = () => {
   const [selectedBookingType, setSelectedBookingType] =
     useState("consultation");
 
   // Consultation bookings
-  const consultationBookings = [
-    {
-      _id: 1,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    {
-      _id: 2,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 299,
-      status: "COMPLETED",
-    },
-    {
-      _id: 3,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      doctorId: "123",
-      symptoms: "Cough and cold",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    {
-      _id: 4,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 399,
-      status: "PENDING",
-    },
-    {
-      _id: 5,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "PENDING",
-    },
-    {
-      _id: 6,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "PENDING",
-    },
-    {
-      _id: 7,
-      name: "Tom Johnson",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "125",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 179,
-      status: "RESCHEDULED",
-    },
-    {
-      _id: 8,
-      name: "Tom Johnson",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "125",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "RESCHEDULED",
-    },
-    {
-      _id: 9,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 179,
-      status: "COMPLETED",
-    },
-    {
-      _id: 10,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["Noe"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    // Add more consultation bookings as needed
-  ];
+  const consultationBookings = useSelector(
+    (state) => state.superAdminHomePage.allAppointments
+  );
 
-  // Lab test data
-  const labTests = [
-    {
-      _id: 1,
-      name: "Vinay tomar",
-      mobileNumber: "9999999999",
-      totalPrice: "570",
-      paymentStatus: "paid",
-    },
-    {
-      _id: 2,
-      name: "varu dev",
-      mobileNumber: "9999999999",
-      totalPrice: "450",
-      paymentStatus: "paid",
-    },
-    {
-      _id: 3,
-      name: "santosh isngh",
-      mobileNumber: "9999999999",
-      totalPrice: "1570",
-      paymentStatus: "paid",
-    },
-    {
-      _id: 4,
-      name: "shivam singh",
-      mobileNumber: "9999999999",
-      totalPrice: "260",
-      paymentStatus: "paid",
-    },
-  ];
+  // // Lab test data
+  const labTests = useSelector((state) => state.superAdminHomePage.labTest);
+
+  const doctors = useSelector((state) => state.superAdminHomePage.allDoctors);
 
   const ConsultationEarning =
     calculateConsultationEarning(consultationBookings);
 
   const LabTestEarning = calculateLabTestEarning(labTests);
+
+  const labs = [{
+    _id: '123',
+    labName: 'simple life',
+    joiningDate: '',
+    share: '30%'
+  }]
 
   // Render based on selected booking type
   const renderContent = () => {
@@ -202,6 +53,7 @@ const EarningsComp = () => {
           <DoctorsEarningTable
             heading="Doctors Earning"
             appointments={consultationBookings}
+            doctors={doctors}
             onUpdateStatus={() => {}}
           />
         </>
@@ -210,7 +62,7 @@ const EarningsComp = () => {
       return (
         <>
           <div className="mt-5 h1 font-weight-bold">Lab Test Earning</div>
-          <LabTestEarningTable appointments={labTests} />
+          <LabTestEarningTable labTests={labTests} />
           <div className="mt-5 h1 font-weight-bold">Labs Earning</div>
           <LabsEarningTable appointments={labTests} />
         </>

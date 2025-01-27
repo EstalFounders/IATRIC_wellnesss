@@ -16,6 +16,9 @@ import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
 import RecentDoctors from "./RecentDoctors/RecentDoctors"
+import { useDispatch } from "react-redux";
+import { setAllappointments, setAllDoctor, setAllLabTest } from "../../store/slices/superAdmin/homepageSlice";
+import { calculateTotalIncome } from "./utility/helper";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
@@ -23,15 +26,17 @@ export default function HomepageComp() {
   const [loader, setLoader] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [labTests, setLabTests] = useState([]);
+  const [totalIncome, setTotalIncome] = useState(0)
   const [totalPatients, setTotalPatients] = useState(0);
-  const [totalAppointments, setTotalAppointments] = useState(0);
-  const [income, setIncome] = useState(0);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(
     "staus has been changed"
   );
   const [severity, setSeverity] = useState("success");
   const router = useRouter();
+  const dispatch = useDispatch()
+  
 
   async function fetchDoctors() {
     try {
@@ -41,6 +46,7 @@ export default function HomepageComp() {
       }
       const data = await response.json(); // Extract JSON data from the response
       setDoctors(data); // Update state with fetched data
+      dispatch(setAllDoctor(data))
     } catch (error) {
       console.error("Error fetching data client:", error);
     } finally {
@@ -52,74 +58,60 @@ export default function HomepageComp() {
     fetchDoctors(); // Call the fetchDoctors function when the component mounts
   }, []);
 
-  const fetchAppointments = useCallback(async () => {
-    try {
-      const response = await fetch(api.bookConsultation); // Fetch data from the API
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json(); // Extract JSON data from the response
-      setAppointments(data.appointments); // Update state with fetched data
-      calculateStatistics(data.appointments);
-    } catch (error) {
-      console.error("Error fetching data client:", error);
-    } finally {
-      setIsAppointmentLoading(false);
-    }
-  },[])
-
   useEffect(() => {
-    fetchAppointments(); // Call the fetchAppointments function when the component mounts
-  }, [fetchAppointments]);
+    setIsAppointmentLoading(true)
+    const fetchData = async () => {
+      try {
+        const [appointmentsResponse, labTestsResponse] = await Promise.all([
+          fetch(api.bookConsultation), // Replace with actual API endpoint
+          fetch(api.bookLabTest),    // Replace with actual API endpoint
+        ]);
 
-  const calculateStatistics = (appointments) => {
-    const uniquePatients = new Set();
-
-    appointments.forEach((appointment) => {
-      if (appointment.patientMobNo) {
-        uniquePatients.add(appointment.mobileNumber);
+        const [appointmentsData, labTestsData] = await Promise.all([
+          appointmentsResponse.json(),
+          labTestsResponse.json(),
+        ]);
+        const appointments = appointmentsData.appointments
+        const labTest = labTestsData.labTests
+        setAppointments(appointments);
+        setLabTests(labTest);
+        dispatch(setAllappointments(appointments))
+        dispatch(setAllLabTest(labTest))
+        // Calculate totals
+        const calculatedTotals = calculateTotalIncome(appointments, labTest);
+        console.log(calculatedTotals.totatIncome, 'calculated totals')
+        setTotalIncome(calculatedTotals.totatIncome);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsAppointmentLoading(false);
       }
-      if (appointment.price) {
-        totalIncome += Number(appointment.price); // Convert price to a number
-      }
-    });
+    };
 
-    setTotalPatients(uniquePatients.size);
-  };
+    fetchData();
+  }, []);
+
+  
+  // const calculateStatistics = (appointments) => {
+  //   const uniquePatients = new Set();
+
+  //   appointments.forEach((appointment) => {
+  //     if (appointment.patientMobNo) {
+  //       uniquePatients.add(appointment.mobileNumber);
+  //     }
+  //     if (appointment.price) {
+  //       totalIncome += Number(appointment.price); // Convert price to a number
+  //     }
+  //   });
+
+  //   setTotalPatients(uniquePatients.size);
+  // };
 
   const refreshDoctorList = async () => {
     await fetchDoctors();
   };
 
-  const handleUpdateStatus = async ({ selectedStatus, appointmentId }) => {
-    console.log(
-      "Status updated to:",
-      selectedStatus,
-      "appointment id",
-      appointmentId
-    );
-    try {
-      const response = await fetch(`${api.bookConsultation}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ appointmentId, selectedStatus }),
-      });
-
-      if (response.ok) {
-        handleOpenSnackBar();
-        const data = await response.json();
-        console.log("Status updated:", data);
-        // Handle success, maybe show a notification or refresh the data
-      } else {
-        const errorData = await response.json();
-        console.error("Error updating status:", errorData.message);
-      }
-    } catch (error) {
-      console.error("An error occurred while updating status:", error);
-    }
-  };
+  
 
   const handleOpenSnackBar = () => {
     console.log("handle open snack bar");
@@ -184,7 +176,7 @@ export default function HomepageComp() {
               <Card.Body>
                 <Card.Title className="text-center">LabTest Booked</Card.Title>
                 <Card.Text className="text-center">
-                  <b>{totalAppointments}</b>
+                  <b>{labTests.length}</b>
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -198,21 +190,22 @@ export default function HomepageComp() {
               <Card.Body>
                 <Card.Title className="text-center">Total Earning</Card.Title>
                 <Card.Text className="text-center">
-                  <b>{income} rs</b>
+                  <b>{totalIncome} rs</b>
                 </Card.Text>
               </Card.Body>
             </Card>
           </CardDeck>
         </Col>
       </Row>
-      <div>
+
+      {/* <div>
         <AppointTable
           heading={"Appointments"}
           isLoading={isAppointmentLoading}
           appointments={appointments}
           onUpdateStatus={handleUpdateStatus}
         />
-      </div>
+      </div> */}
 
       <Row
         className="w-75 ml-auto mr-auto border p-4 mb-4"

@@ -3,6 +3,7 @@ import styles from "../css/ConsultationBooked.module.css";
 import AppointTable from "../common/AppointmentTable";
 import { appointment_status, consultation } from "../../../constant";
 import DoctorsTable from "../common/DoctorsTable";
+import { useSelector } from "react-redux";
 
 const ConsultationBookedComp = () => {
   const [selectedBookingType, setSelectedBookingType] = useState(
@@ -10,177 +11,11 @@ const ConsultationBookedComp = () => {
   );
 
   // Complete array of all bookings
-  const bookings = [
-    {
-      _id: 1,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    {
-      _id: 2,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 299,
-      status: "COMPLETED",
-    },
-    {
-      _id: 3,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      doctorId: "123",
-      symptoms: "Cough and cold",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    {
-      _id: 4,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 399,
-      status: "PENDING",
-    },
-    {
-      _id: 5,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "PENDING",
-    },
-    {
-      _id: 6,
-      name: "Jane Smith",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "124",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "PENDING",
-    },
-    {
-      _id: 7,
-      name: "Tom Johnson",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "125",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 179,
-      status: "RESCHEDULED",
-    },
-    {
-      _id: 8,
-      name: "Tom Johnson",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "125",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 159,
-      status: "RESCHEDULED",
-    },
-    {
-      _id: 9,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["None"],
-      price: 179,
-      status: "COMPLETED",
-    },
-    {
-      _id: 10,
-      name: "John Doe",
-      consultationType: "Online",
-      appointmentTime: "12:30 am",
-      patientMobNo: "9922443355",
-      symptoms: "Cough and cold",
-      doctorId: "123",
-      userRemarks: ["None"],
-      adminRemarks: ["Noe"],
-      price: 199,
-      status: "COMPLETED",
-    },
-    // Add more booking items as needed
-  ];
+  const bookings = useSelector(
+    (state) => state.superAdminHomePage.allAppointments
+  );
 
-  const doctors = [
-    {
-      _id: 123,
-      name: "Ashima narula",
-      expertise: "surgery",
-      doctorType: "company",
-      price: 500,
-    },
-    {
-      _id: 125,
-      name: "vishal tomar",
-      expertise: "md",
-      doctorType: "company",
-      price: 500,
-    },
-    {
-      _id: 124,
-      name: "neha tomar",
-      expertise: "medicine",
-      doctorType: "company",
-      price: 500,
-    },
-    {
-        _id: 126,
-        name: "neha tomar",
-        expertise: "medicine",
-        doctorType: "company",
-        price: 500,
-      },
-      {
-        _id: 127,
-        name: "neha tomar",
-        expertise: "medicine",
-        doctorType: "company",
-        price: 500,
-      },
-  ];
+  const doctors = useSelector((state) => state.superAdminHomePage.allDoctors);
 
   // Filtered bookings based on status
   const totalBookings = bookings;
@@ -199,7 +34,35 @@ const ConsultationBookedComp = () => {
       ? pendingBookings
       : rescheduledBookings;
 
-  const handleUpdateStatus = () => {};
+  const handleUpdateStatus = async ({ selectedStatus, appointmentId }) => {
+    console.log(
+      "Status updated to:",
+      selectedStatus,
+      "appointment id",
+      appointmentId
+    );
+    try {
+      const response = await fetch(`${api.bookConsultation}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ appointmentId, selectedStatus }),
+      });
+
+      if (response.ok) {
+        handleOpenSnackBar();
+        const data = await response.json();
+        console.log("Status updated:", data);
+        // Handle success, maybe show a notification or refresh the data
+      } else {
+        const errorData = await response.json();
+        console.error("Error updating status:", errorData.message);
+      }
+    } catch (error) {
+      console.error("An error occurred while updating status:", error);
+    }
+  };
 
   return (
     <div className={styles.bookingContainer}>

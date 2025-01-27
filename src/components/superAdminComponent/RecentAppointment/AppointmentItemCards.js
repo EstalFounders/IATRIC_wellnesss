@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper imports
 import { formatData } from "../../registerDocComponent/utils/helper";
-import { appointment_status } from "../../../constant";
+import { appointment_status, payment, showUpdate } from "../../../constant";
 import { useRouter } from "next/router";
 
-const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
+const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [appointmentId, setAppointmentId] = useState(data._id);
   const [filteredData, setFiltereData] = useState(data);
@@ -28,7 +28,6 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       query: { data: JSON.stringify(data) }, // Pass the appointment data as a string
     });
   };
-  
 
   return (
     <Row
@@ -40,7 +39,10 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       }}
       className="mt-4"
     >
-      <Col className="text-primary clickable-div" onClick={handleViewAppointment}>
+      <Col
+        className="text-primary clickable-div"
+        onClick={handleViewAppointment}
+      >
         <u>{data.name}</u>
       </Col>
       <Col>{data.consultationType}</Col>
@@ -66,25 +68,39 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
           {data.status}
         </div>
 
-        <Form.Group controlId="statusSelect">
-          <Form.Control
-            as="select"
-            value={selectedStatus}
-            onChange={handleStatusChange}
-          >
-            <option value="pending" className="text-center">
-              Select to Update
-            </option>
-            <option value="pending">{appointment_status.pending}</option>
-            <option value="confirmed">{appointment_status.confirmed}</option>
-            <option value="reschedule">{appointment_status.rescheduled}</option>
-            <option value="cancelled">{appointment_status.cancelled}</option>
-            <option value="completed">{appointment_status.completed}</option>
-          </Form.Control>
-        </Form.Group>
-        <Button onClick={handleUpdateClick} className="mt-1 mb-2">
-          Update
-        </Button>
+        {source === showUpdate ? (
+          ""
+        ) : (
+          <>
+            <Form.Group controlId="statusSelect">
+              <Form.Control
+                as="select"
+                value={selectedStatus}
+                onChange={handleStatusChange}
+              >
+                <option value="pending" className="text-center">
+                  Select to Update
+                </option>
+                <option value="pending">{appointment_status.pending}</option>
+                <option value="confirmed">
+                  {appointment_status.confirmed}
+                </option>
+                <option value="reschedule">
+                  {appointment_status.rescheduled}
+                </option>
+                <option value="cancelled">
+                  {appointment_status.cancelled}
+                </option>
+                <option value="completed">
+                  {appointment_status.completed}
+                </option>
+              </Form.Control>
+            </Form.Group>
+            <Button onClick={handleUpdateClick} className="mt-1 mb-2">
+              Update
+            </Button>
+          </>
+        )}
       </Col>
     </Row>
   );

@@ -4,15 +4,19 @@ import Preloader from "../src/components/Preloader";
 import { animation } from "../src/utils";
 import "../styles/globals.css";
 import { NoSsr } from "@mui/material";
-import { Chat } from 'stream-chat-react';
-import { ChatProvider, VideoProvider } from '@stream-io/video-react-sdk';
-import 'stream-chat-react/dist/css/index.css';
-import '../pages/meeting/meetingStyles.css'
+import { Chat } from "stream-chat-react";
+import { ChatProvider, VideoProvider } from "@stream-io/video-react-sdk";
+import "stream-chat-react/dist/css/index.css";
+import "../pages/meeting/meetingStyles.css";
+import { wrapper } from "../src/store/store";
+import { persistStore } from "redux-persist";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
-  // const [clientReady, setClientReady] = useState(false);
+  const { store, props } = wrapper.useWrappedStore(rest);
+  const persistor = persistStore(store);
 
   useEffect(() => {
     animation();
@@ -42,10 +46,14 @@ function MyApp({ Component, pageProps }) {
       </Head>
       {loader && <Preloader />}
       <NoSsr>
-        <Component {...pageProps} />
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Component {...pageProps} />
+          </PersistGate>
+        </Provider>
       </NoSsr>
     </Fragment>
   );
 }
 
-export default MyApp;
+export default  MyApp;

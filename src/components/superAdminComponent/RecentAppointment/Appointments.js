@@ -3,7 +3,7 @@ import ItemCard from "./AppointmentItemCards";
 import { Col, Row, Pagination } from "react-bootstrap";
 import { CustomPagination } from "../../../helper";
 
-const Appointments = ({ data, onStatusChanged, onUpdateStatus }) => {
+const Appointments = ({ source,data, onStatusChanged, onUpdateStatus }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -62,6 +62,7 @@ const Appointments = ({ data, onStatusChanged, onUpdateStatus }) => {
         >
           {currentItems.map((item) => (
             <ItemCard
+              source={source}
               key={item._id}
               data={item}
               onStatusChanged={onStatusChanged}

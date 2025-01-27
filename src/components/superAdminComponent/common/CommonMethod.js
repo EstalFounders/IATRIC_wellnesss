@@ -12,7 +12,7 @@ export const storeAppointmentData = (data) => {
 
   export const calculateConsultationEarning = (appointments) => {
     return appointments.reduce((total, appointment) => {
-      return total + appointment.price;
+      return total + appointment.consultationprice;
     }, 0);
   }
 
@@ -21,4 +21,6 @@ export const storeAppointmentData = (data) => {
       return total + (item.paymentStatus.toLowerCase() === "paid" ? parseFloat(item.totalPrice) : 0);
     }, 0);
   };
+
+  
   

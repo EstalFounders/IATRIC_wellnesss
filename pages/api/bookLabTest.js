@@ -32,7 +32,19 @@ export default async function handler(req, res) {
       console.error("Error creating booking:", error);
       res.status(500).json({ error: "Server error. Please try again later." });
     }
-  } else {
+  } else if (req.method === "GET") {
+    let labTests
+    try {
+      await dbConnect();
+      labTests = await BookLabTest.find({})
+      
+      res.status(200).json({ labTests });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Unable to fetch Lab Test" });
+    }
+  } 
+  else {
     res.status(405).json({ error: "Method not allowed" });
   }
 }

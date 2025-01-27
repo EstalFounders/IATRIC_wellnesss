@@ -12,6 +12,11 @@ const doctorSchema = new Schema({
     required: true,
     unique: true,
   },
+  mobileNo: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   expertise: {
     type: String,
     required: [true, "Area of expertise is required"],

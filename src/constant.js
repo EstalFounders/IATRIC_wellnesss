@@ -11,6 +11,7 @@ export const countryCode = "+91"
 export const development_production_url = "https://development.d2xrlfkxmadgut.amplifyapp.com/"
 export const doctor_info_local_storage = 'doctor_info'
 export const super_admin_info_local_sotrage= 'super_admin_info'
+export const single_call = "single_call"
 
 export const api = {
     addDoctor: "/api/addDoctor",
@@ -20,7 +21,17 @@ export const api = {
     sendWhatsAppCall: "/api/whatsApp",
     recommendedServies: "/api/lib/recommendedServices",
     bookConsultation: "/api/bookConsultation/",
-    consiltationFee: "/api/superAdmin/consultationFee"
+    bookLabTest: "/api/bookLabTest/",
+    consiltationFee: "/api/superAdmin/consultationFee",
+    updateDoctorStatus: "/api/registerDoc/updateDoctorStatus",
+    doctorUpdateRequest: "/api/registerDoc/doctorUpdateReq",
+    leaveRequest: "/api/registerDoc/leaveRequest",
+    labTest: "/api/labtest",
+    labTestCategoryDetails:"/api/labtestcategorydetails",
+    labTestDetails: "/api/superAdmin/labTest/labTestDetails",
+    addNewLab: "/api/superAdmin/addNewLab",
+    globalVar: "/api/globalVar"
+
 }
 
 export const services = [
@@ -68,6 +79,7 @@ export const newUser = "new"
 
 export const appointment_status = {
     total: "TOTAL",
+    open: "OPEN",
     completed: "COMPLETED",
     pending: "PENDING",
     confirmed: "CONFIRMED",
@@ -88,8 +100,11 @@ export const consultation = "Consultation"
 
 export const sessionStorageName = {
     ConsultationFee: "ConsultationFee",
-    SelectedLabel: "selectedLabel"
+    SelectedLabel: "selectedLabel",
+    doctorUpdateRequest: "doctorUpdateRequest",
+    leaveUpdateRequest: "leaveUpdateRequest"
 }
 
 export const price_symbol = "₹"
+export const showUpdate="showUpdate"
 

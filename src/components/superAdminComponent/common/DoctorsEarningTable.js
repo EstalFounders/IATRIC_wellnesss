@@ -10,24 +10,26 @@ const DoctorsEarningTable = ({
   heading,
   isLoading,
   appointments,
+  doctors,
   onStatusChanged,
   onUpdateStatus,
 }) => {
   
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredAppointments, setFilteredAppointments] =
-    useState(appointments);
+  const [filteredDoctors, setFilteredDoctors] =
+    useState(doctors);
+
 
   useEffect(() => {
     // Filter appointments based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = appointments.filter(
-      (appointment) =>
-        appointment.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        appointment.paymentStatus.toLowerCase().includes(lowerCaseSearchTerm)
+    const results = doctors.filter(
+      (doctor) =>
+        doctor.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        doctor.status.toLowerCase().includes(lowerCaseSearchTerm)
     );
-    setFilteredAppointments(results);
-  }, [searchTerm, appointments]);
+    setFilteredDoctors(results);
+  }, [searchTerm, doctors]);
 
   return (
     <Row
@@ -48,7 +50,7 @@ const DoctorsEarningTable = ({
       </Row>
 
       {/* Search bar */}
-      {appointments.length === 0 ? (
+      {doctors.length === 0 ? (
         ""
       ) : (
         <Row className="w-100 mt-3">
@@ -70,12 +72,13 @@ const DoctorsEarningTable = ({
       <Row className="ml-4 w-100 mt-3">
         {isLoading ? (
           <p>Loading...</p>
-        ) : filteredAppointments.length === 0 ? (
-          <p>No Lab Test found.</p>
+        ) : filteredDoctors.length === 0 ? (
+          <p>No Doctor found.</p>
         ) : (
           <Col>
             <DoctorEarningList
-              data={filteredAppointments}
+              appointments={appointments}
+              doctors={doctors}
               onStatusChanged={onStatusChanged}
               onUpdateStatus={onUpdateStatus}
               className="text-center"

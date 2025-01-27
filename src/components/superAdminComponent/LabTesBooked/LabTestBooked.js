@@ -4,6 +4,7 @@ import AppointTable from "../common/AppointmentTable";
 import { labTest_status } from "../../../constant";
 import LabBookedListTable from "../common/LabBookedListTable";
 import LabListTable from "../common/LabListTable";
+import { useSelector } from "react-redux";
 
 const LabTestBookedComp = () => {
   const [selectedBookingType, setSelectedBookingType] = useState(
@@ -11,81 +12,7 @@ const LabTestBookedComp = () => {
   );
 
   // Complete array of all bookings
-  const bookings = [
-    {
-      _id: 1,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "COMPLETED",
-    },
-    {
-      _id: 2,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "COMPLETED",
-    },
-    {
-      _id: 3,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "PENDING",
-    },
-    {
-      _id: 4,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "PENDING",
-    },
-    {
-      _id: 5,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "PENDING",
-    },
-    {
-      _id: 6,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "UNPAID",
-    },
-    {
-      _id: 7,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "UNPAID",
-    },
-    {
-      _id: 8,
-      name: "John Doe",
-      paymentMethod: "Online",
-      createdAt: "12:30 am",
-      mobileNumber: "9922443355",
-      totalPrice: "600",
-      paymentStatus: "COMPLETED",
-    },
-    // Add more booking items as needed
-  ];
+  const bookings = useSelector((state) => state.superAdminHomePage.labTest);
 
   const listOflab = [
     {

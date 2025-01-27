@@ -2,7 +2,7 @@ import React from "react";
 import Remarks from "./Remarks";
 import AppointmentsTable from "./AppointmentTable";
 
-const DashboardSecondComp = ({ appointments }) => {
+const DashboardSecondComp = ({ appointments, filterText }) => {
   const containerStyle = {
     display: "flex",
     flexDirection: "column",
@@ -17,12 +17,11 @@ const DashboardSecondComp = ({ appointments }) => {
     flex: "1",
     marginBottom: "20px",
   };
-  console.log(appointments, "appont in second comp");
   return (
     <div style={containerStyle}>
       <div style={sectionStyle}>
         <Remarks />
-        <AppointmentsTable appointments={appointments} />
+        <AppointmentsTable appointments={appointments} filterText={filterText} />
       </div>
     </div>
   );

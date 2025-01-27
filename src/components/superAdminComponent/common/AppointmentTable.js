@@ -5,6 +5,7 @@ import Appointments from "../RecentAppointment/Appointments";
 
 const AppointTable = ({
   heading,
+  source,
   isLoading,
   appointments,
   onStatusChanged,
@@ -71,6 +72,7 @@ const AppointTable = ({
         ) : (
           <Col>
             <Appointments
+              source={source}
               data={filteredAppointments}
               onStatusChanged={onStatusChanged}
               onUpdateStatus={onUpdateStatus}

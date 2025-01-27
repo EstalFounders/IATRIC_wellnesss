@@ -28,7 +28,6 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       query: { data: JSON.stringify(data) }, // Pass the appointment data as a string
     });
   };
-  
 
   return (
     <Row
@@ -40,51 +39,24 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       }}
       className="mt-4"
     >
-      <Col className="text-primary clickable-div" onClick={handleViewAppointment}>
-        <u>{data.name}</u>
+      <Col
+        className="text-muted font-weight-bold clickable-div"
+        onClick={handleViewAppointment}
+      >
+        {data.name}
       </Col>
       <Col>{data.consultationType}</Col>
       <Col>{formatData(data.appointmentTime)}</Col>
-      <Col>{data.price}</Col>
+      <Col>{data.consultationprice}</Col>
       <Col>{data.patientMobNo}</Col>
       <Col>
-        <div
-          className={`font-weight-bold mb-2 ${
-            data.status === "COMPLETED"
-              ? "text-success"
-              : data.status === appointment_status.cancelled
-              ? "text-danger"
-              : data.status === appointment_status.rescheduled
-              ? "text-secondary"
-              : data.status === appointment_status.pending
-              ? "text-primary"
-              : data.status === appointment_status.confirmed
-              ? "text-muted"
-              : ""
-          }`}
-        >
-          {data.status}
-        </div>
-
-        <Form.Group controlId="statusSelect">
-          <Form.Control
-            as="select"
-            value={selectedStatus}
-            onChange={handleStatusChange}
-          >
-            <option value="pending" className="text-center">
-              Select to Update
-            </option>
-            <option value="pending">{appointment_status.pending}</option>
-            <option value="confirmed">{appointment_status.confirmed}</option>
-            <option value="reschedule">{appointment_status.rescheduled}</option>
-            <option value="cancelled">{appointment_status.cancelled}</option>
-            <option value="completed">{appointment_status.completed}</option>
-          </Form.Control>
-        </Form.Group>
-        <Button onClick={handleUpdateClick} className="mt-1 mb-2">
-          Update
-        </Button>
+        {data.status == appointment_status.completed ? (
+          <div className="text-primary font-weight-bold">
+            <u>View Invoice</u>
+          </div>
+        ) : (
+          ""
+        )}
       </Col>
     </Row>
   );
