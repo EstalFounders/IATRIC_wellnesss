@@ -138,7 +138,7 @@ export default function HomepageComp() {
         // Reset form fields or navigate to another page
       } else {
         console.error("Error adding doctor:", response.statusText);
-        handleShowDialog("Something went wrong, please try again");
+        window.alert("Something went wrong, please try again");
       }
     } catch (error) {
       console.error("Error adding doctor:", error.message);
