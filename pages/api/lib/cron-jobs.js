@@ -5,20 +5,26 @@ import Slot from "../../../src/models/slots";
 import mongoose from "mongoose";
 import { dbConnect } from "../../../src/lib/db";
 
-let lastExecutionDate = new Date(); // This should ideally be persisted somewhere
-
-const generateSlotsForDoctor = async (doctorId, start, numDays) => {
+const generateSlotsForDoctor = async (doctor, start, numDays) => {
   let slots = [];
 
+  if (!doctor.slotStartTime || !doctor.slotEndTime) {
+    console.warn(
+      `Doctor ${doctor._id} (${doctor.name}) has no slotStartTime or slotEndTime`
+    );
+    return;
+  }
+
+  const slotStartHour = new Date(doctor.slotStartTime).getHours();
+  const slotEndHour = new Date(doctor.slotEndTime).getHours();
+
   for (let i = 0; i < numDays; i++) {
-    // Create a new date for each day
     let date = new Date(start);
     date.setDate(start.getDate() + i);
 
-    for (let hour = 9; hour < 21; hour++) {
-      // Assuming 15-minute slots from 9 AM to 9 PM
-      for (let minute = 0; minute < 60; minute += 15) {
-        // Create a fresh date object for each slot's start and end time
+    for (let hour = slotStartHour; hour < slotEndHour; hour++) {
+      for (let minute = 0; minute < 60; minute += 20) {
+        // 20-minute slots
         const slotStartTime = new Date(
           date.getFullYear(),
           date.getMonth(),
@@ -31,27 +37,29 @@ const generateSlotsForDoctor = async (doctorId, start, numDays) => {
           date.getMonth(),
           date.getDate(),
           hour,
-          minute + 15
+          minute + 20
         );
 
-        slots.push(
-          new Slot({
-            doctorId: doctorId,
-            startTime: slotStartTime,
-            endTime: slotEndTime,
-            date: new Date(date), // Ensure date remains the same for this day
-            isBooked: false,
-          })
-        );
+        slots.push({
+          doctorId: doctor._id,
+          startTime: slotStartTime,
+          endTime: slotEndTime,
+          date: new Date(date),
+          isBooked: false,
+        });
       }
     }
   }
 
-  await Slot.insertMany(slots);
-  console.log(`${slots.length} slots created for doctor with ID: ${doctorId}`);
+  if (slots.length > 0) {
+    await Slot.insertMany(slots);
+    console.log(
+      `${slots.length} slots created for doctor ${doctor._id} (${doctor.name})`
+    );
+  }
 };
 
-export const performScheduledTasks = async () => {
+const performScheduledTasks = async () => {
   await dbConnect();
 
   console.log("Performing scheduled tasks...");
@@ -62,7 +70,7 @@ export const performScheduledTasks = async () => {
 
   // Generate new slots for each doctor
   for (const doctor of doctors) {
-    await generateSlotsForDoctor(doctor._id, today, 30);
+    await generateSlotsForDoctor(doctor, today, 30);
   }
 
   // After generating new slots, delete old slots
