@@ -70,7 +70,7 @@ const performScheduledTasks = async () => {
 
   // Generate new slots for each doctor
   for (const doctor of doctors) {
-    await generateSlotsForDoctor(doctor, today, 30);
+    await generateSlotsForDoctor(doctor, today, 7);
   }
 
   // After generating new slots, delete old slots
