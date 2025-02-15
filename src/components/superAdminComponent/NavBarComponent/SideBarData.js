@@ -4,6 +4,7 @@ import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
 import { ImLab } from "react-icons/im";
+import { BiSolidOffer } from "react-icons/bi";
 
 export const SidebarData = [
   {
@@ -43,9 +44,15 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
-    title: "ADD LAB",
+    title: "LAB",
     path: "/superAdmin/addLab",
     icon: <ImLab />,
+    cName: "nav-text",
+  },
+  {
+    title: "OFFERS",
+    path: "/superAdmin/offers",
+    icon: <BiSolidOffer />,
     cName: "nav-text",
   },
 ];

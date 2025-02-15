@@ -29,7 +29,9 @@ export const api = {
     labTest: "/api/labtest",
     labTestCategoryDetails:"/api/labtestcategorydetails",
     labTestDetails: "/api/superAdmin/labTest/labTestDetails",
+    doctorEarning: "/api/registerDoc/doctorEarnings",
     addNewLab: "/api/superAdmin/addNewLab",
+    addNewOffer: "/api/superAdmin/addNewOffer",
     globalVar: "/api/globalVar"
 
 }
@@ -107,4 +109,9 @@ export const sessionStorageName = {
 
 export const price_symbol = "₹"
 export const showUpdate="showUpdate"
+export const discount_type = {
+    Percentage: "Percentage",
+    Fixed: "Fixed",
+    Free: "Free"
+}
 

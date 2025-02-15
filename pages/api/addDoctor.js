@@ -137,7 +137,7 @@ export default async function handler(req, res) {
             })
           );
 
-          const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
+          // const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
 
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
@@ -148,7 +148,7 @@ export default async function handler(req, res) {
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
             ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
-            password: hashedPassword,
+            password: fields.password[0],
             profilePictureUrl, // Now profilePictureUrl is accessible here
             diplomasCertificatesUrls,
             doctorStampUrl,

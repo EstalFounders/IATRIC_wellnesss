@@ -31,12 +31,7 @@ const EarningsComp = () => {
 
   const LabTestEarning = calculateLabTestEarning(labTests);
 
-  const labs = [{
-    _id: '123',
-    labName: 'simple life',
-    joiningDate: '',
-    share: '30%'
-  }]
+  const labs = useSelector((state) => state.superAdminHomePage.allLab);
 
   // Render based on selected booking type
   const renderContent = () => {
@@ -64,7 +59,7 @@ const EarningsComp = () => {
           <div className="mt-5 h1 font-weight-bold">Lab Test Earning</div>
           <LabTestEarningTable labTests={labTests} />
           <div className="mt-5 h1 font-weight-bold">Labs Earning</div>
-          <LabsEarningTable appointments={labTests} />
+          <LabsEarningTable appointments={labs} />
         </>
       );
     }

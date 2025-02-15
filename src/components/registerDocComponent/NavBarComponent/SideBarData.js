@@ -18,7 +18,7 @@ export const SidebarData = [
   },
   {
     title: "Payment",
-    path: "/registerDoc/prescription",
+    path: "/registerDoc/doctorEarnings",
     icon: <IoIcons.IoIosWallet />,
     cName: "nav-text",
   },

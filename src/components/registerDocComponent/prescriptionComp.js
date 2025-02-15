@@ -7,17 +7,19 @@ import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import { api } from "../../constant";
+import { api, doctor_info_local_storage } from "../../constant";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
 
 const PrescriptionComp = () => {
-    
   const [previewVisible, setPreviewVisible] = useState(false);
   const [medicineForms, setMedicineForms] = useState([]);
-  const [doctors, setDoctors] = useState([]);
   const [showPasswordPopup, setPasswordPopup] = useState(false);
   const [doctorPassword, setDoctorPassword] = useState("");
+  const doctorInfo = JSON.parse(
+    sessionStorage.getItem(doctor_info_local_storage)
+  );
+  const [doctors, setDoctors] = useState(doctorInfo.user);
 
   const [updatedFormDetails, setUpdatedFormDetails] = useState({
     doctorName: "",
@@ -38,7 +40,7 @@ const PrescriptionComp = () => {
   });
 
   const handleMedicineFormChange = (formValues, index) => {
-    console.log(formValues, 'form value in homepage')
+    console.log(formValues, "form value in homepage");
     const updatedMedicineForms = [...medicineForms];
     updatedMedicineForms[index] = formValues;
     setMedicineForms(updatedMedicineForms);
@@ -91,38 +93,24 @@ const PrescriptionComp = () => {
     console.log(updatedFormDetails, "updated form details before");
   };
 
-  useEffect(() => {
-    // Update medicineInfo whenever medicineForms changes
-    setUpdatedFormDetails({
-      ...updatedFormDetails,
-      medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
-    });
-  }, [medicineForms,updatedFormDetails]);
+  // useEffect(() => {
+  //   // Update medicineInfo whenever medicineForms changes
+  //   setUpdatedFormDetails({
+  //     ...updatedFormDetails,
+  //     medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+  //   });
+  // }, [medicineForms, updatedFormDetails]);
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const response = await fetch(api.addDoctor);
-        const data = await response.json();
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchDoctors();
-  }, []);
-
-  const handleDoctorSelect = (event) => {
-    const selectedDoctor = JSON.parse(event.target.value);
-    setUpdatedFormDetails({
-      ...updatedFormDetails,
-      doctorName: selectedDoctor.name,
-      doctorStampUrl: selectedDoctor.doctorStampUrl,
-      doctorSignatureUrl: selectedDoctor.doctorSignatureUrl,
-    });
-    setDoctorPassword(selectedDoctor.password);
-  };
+  // const handleDoctorSelect = (event) => {
+  //   const selectedDoctor = JSON.parse(event.target.value);
+  //   setUpdatedFormDetails({
+  //     ...updatedFormDetails,
+  //     doctorName: selectedDoctor.name,
+  //     doctorStampUrl: selectedDoctor.doctorStampUrl,
+  //     doctorSignatureUrl: selectedDoctor.doctorSignatureUrl,
+  //   });
+  //   setDoctorPassword(selectedDoctor.password);
+  // };
 
   // CSS for the modal
   const modalStyle = {
@@ -175,22 +163,7 @@ const PrescriptionComp = () => {
           <div style={{ display: "grid", gap: "10px" }}>
             <div className="row">
               <div className="col">
-                <select
-                  onChange={handleDoctorSelect}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    width: "100%",
-                  }}
-                >
-                  <option value="">Select a Doctor</option>
-                  {doctors.map((doctor) => (
-                    <option key={doctor._id} value={JSON.stringify(doctor)}>
-                      {doctor.name}
-                    </option>
-                  ))}
-                </select>
+              <div className="font-weight-bold"> Dr {doctorInfo.user.name}</div>
               </div>
             </div>
             <Row>
