@@ -13,7 +13,7 @@ const LabTestimonial = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className={`h3-md ${styles.labTestHeading}`}>Testimonial</h3>
+            <div className={`h3-md ${styles.labTestHeading}`}>Testimonial</div>
             {/* Text */}
             <div className={styles.labTestHeadingDesc}>
               We use only the best quality materials on the market in order to
