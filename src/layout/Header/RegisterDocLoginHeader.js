@@ -3,7 +3,12 @@ import { Col, Row } from "react-bootstrap";
 import Image from "next/image";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
-import { doctor_info_local_storage, api, single_call, userTypeConstant } from "../../constant";
+import {
+  doctor_info_local_storage,
+  api,
+  single_call,
+  userTypeConstant,
+} from "../../constant";
 import DoctorModalComp from "../../components/superAdminComponent/DoctorModalComp";
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
@@ -11,7 +16,7 @@ import LeaveRequestModel from "../../components/registerDocComponent/model/Leave
 
 const RegisterDocLoginHeader = () => {
   const [show, setShow] = useState(false);
-  const [leaveRequestModelShow,setLeaveRequestModelShow] = useState(false);
+  const [leaveRequestModelShow, setLeaveRequestModelShow] = useState(false);
   const [loader, setLoader] = useState(false);
   const DoctorInfo = JSON.parse(
     sessionStorage.getItem(doctor_info_local_storage)
@@ -26,13 +31,12 @@ const RegisterDocLoginHeader = () => {
     setLoader(true);
 
     let changedFields = {};
+    let hasChanges = false; // Flag to track changes
 
     Object.keys(updatedDoctor).forEach((key) => {
-      // Check if the value has changed
       if (Array.isArray(updatedDoctor[key])) {
-        // Handle arrays (e.g., diplomasCertificatesUrls)
         const updatedArray = updatedDoctor[key];
-        const originalArray = DoctorInfo.user[key];
+        const originalArray = DoctorInfo.user[key] || [];
 
         // Compare arrays (length and content)
         const arraysAreEqual =
@@ -41,29 +45,35 @@ const RegisterDocLoginHeader = () => {
           updatedArray.every((value, index) => value === originalArray[index]);
 
         if (!arraysAreEqual) {
-          // If arrays are different, append each value in the array
+          hasChanges = true; // Mark changes found
           updatedArray.forEach((value, index) => {
             changedFields[`${key}[${index}]`] = value;
           });
         }
       } else {
-        // Handle non-array fields
         if (updatedDoctor[key] !== DoctorInfo.user[key]) {
-          // Add only changed fields to changedFields object
+          hasChanges = true; // Mark changes found
           changedFields[key] = updatedDoctor[key];
         }
       }
     });
 
+    // If no changes were detected, exit early
+    if (!hasChanges) {
+      window.alert("You have changed nothing");
+      setLoader(false);
+      return; // Stops further execution
+    }
+
     try {
       const response = await fetch(
-        `${api.doctorUpdateRequest}/?id=${updatedDoctor._id}&name=${DoctorInfo.user.name}`, // Use '&' to separate query parameters
+        `${api.doctorUpdateRequest}/?id=${updatedDoctor._id}&name=${DoctorInfo.user.name}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({changedFields}),
+          body: JSON.stringify({ changedFields }),
         }
       );
 
@@ -71,9 +81,9 @@ const RegisterDocLoginHeader = () => {
       setLoader(false);
       window.alert(data.message);
       handleCloseModal();
-      
     } catch (error) {
       console.error("Error submitting update request:", error);
+      setLoader(false);
     }
   };
 
@@ -86,11 +96,11 @@ const RegisterDocLoginHeader = () => {
   };
 
   const handleShowLeaveReqestModel = () => {
-    setLeaveRequestModelShow(true)
-  }
+    setLeaveRequestModelShow(true);
+  };
   const handleCloseLeaveReqestModel = () => {
-    setLeaveRequestModelShow(false)
-  }
+    setLeaveRequestModelShow(false);
+  };
 
   // Function to update the doctor's active status on the backend
   const updateDoctorStatus = async (status) => {
@@ -134,31 +144,33 @@ const RegisterDocLoginHeader = () => {
     sessionStorage.removeItem(single_call);
   };
 
-  const handleLeaveRequestSubmit = async(formData)=> {
-    //need to create client api call for leave request 
-       console.log(JSON.stringify(formData), 'formdata on 138 in register Doc login header')
-       setLoader(true)
-       try {
-        const response = await fetch(
-          `${api.leaveRequest}/?id=${DoctorInfo.user._id}&name=${DoctorInfo.user.name}`, // Use '&' to separate query parameters
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({formData}),
-          }
-        );
-  
-        const data = await response.json();
-        setLoader(false);
-        window.alert(data.message);
-        handleCloseModal();
-        
-      } catch (error) {
-        console.error("Error submitting update request:", error);
-      }
-  }
+  const handleLeaveRequestSubmit = async (formData) => {
+    //need to create client api call for leave request
+    console.log(
+      JSON.stringify(formData),
+      "formdata on 138 in register Doc login header"
+    );
+    setLoader(true);
+    try {
+      const response = await fetch(
+        `${api.leaveRequest}/?id=${DoctorInfo.user._id}&name=${DoctorInfo.user.name}`, // Use '&' to separate query parameters
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ formData }),
+        }
+      );
+
+      const data = await response.json();
+      setLoader(false);
+      window.alert(data.message);
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error submitting update request:", error);
+    }
+  };
 
   // Set doctorStatus to true when the component loads (login)
   useEffect(() => {
@@ -233,7 +245,7 @@ const RegisterDocLoginHeader = () => {
         )}
       </Col>
       <div>
-        <DoctorModalComp  
+        <DoctorModalComp
           show={show}
           handleClose={handleCloseModal}
           doctor={DoctorInfo.user}
@@ -243,9 +255,9 @@ const RegisterDocLoginHeader = () => {
       </div>
       <div>
         <LeaveRequestModel
-         show={leaveRequestModelShow}
-        onClose={handleCloseLeaveReqestModel}
-         onConfirm={handleLeaveRequestSubmit}
+          show={leaveRequestModelShow}
+          onClose={handleCloseLeaveReqestModel}
+          onConfirm={handleLeaveRequestSubmit}
         />
       </div>
       <div>{loader ? <Preloader /> : ""}</div>

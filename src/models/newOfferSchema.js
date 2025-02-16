@@ -38,6 +38,10 @@ const newOfferSchema = new Schema({
       message: "Discount value must be [0] when discount type is 'free'",
     },
   },
+  redemption_limit: {
+    type: Number,
+    required: true,
+  },
   target_audience: {
     type: Array,
     required: true,
