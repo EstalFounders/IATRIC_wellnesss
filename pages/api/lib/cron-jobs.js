@@ -2,7 +2,6 @@
 import cron from "node-cron";
 import Doctor from "../../../src/models/doctorModel";
 import Slot from "../../../src/models/slots";
-import mongoose from "mongoose";
 import { dbConnect } from "../../../src/lib/db";
 
 const generateSlotsForDoctor = async (doctor, start, numDays) => {
@@ -15,35 +14,48 @@ const generateSlotsForDoctor = async (doctor, start, numDays) => {
     return;
   }
 
-  const slotStartHour = new Date(doctor.slotStartTime).getHours();
-  const slotEndHour = new Date(doctor.slotEndTime).getHours();
+  // Convert slotStartTime and slotEndTime to UTC to avoid timezone mismatches
+  const slotStartTime = new Date(doctor.slotStartTime);
+  const slotEndTime = new Date(doctor.slotEndTime);
+
+  const slotStartHour = slotStartTime.getUTCHours(); // Get correct start hour in UTC
+  const slotStartMinute = slotStartTime.getUTCMinutes(); // Get correct start minute
+  const slotEndHour = slotEndTime.getUTCHours();
 
   for (let i = 0; i < numDays; i++) {
     let date = new Date(start);
     date.setDate(start.getDate() + i);
 
     for (let hour = slotStartHour; hour < slotEndHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 20) {
-        // 20-minute slots
-        const slotStartTime = new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          hour,
-          minute
+      for (
+        let minute = hour === slotStartHour ? slotStartMinute : 0;
+        minute < 60;
+        minute += 20
+      ) {
+        // Ensure slots start exactly from slotStartTime
+        const slotStart = new Date(
+          Date.UTC(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            hour,
+            minute
+          )
         );
-        const slotEndTime = new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          hour,
-          minute + 20
+        const slotEnd = new Date(
+          Date.UTC(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            hour,
+            minute + 20
+          )
         );
 
         slots.push({
           doctorId: doctor._id,
-          startTime: slotStartTime,
-          endTime: slotEndTime,
+          startTime: slotStart,
+          endTime: slotEnd,
           date: new Date(date),
           isBooked: false,
         });
