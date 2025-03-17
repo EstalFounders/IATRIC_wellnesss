@@ -8,7 +8,7 @@ import Preloader from "../../Preloader.js";
 import { api } from "../../../constant.js";
 import TimePicker from "react-time-picker";
 import CustomDialog from "../../CustomPopup.js";
-import { convertTimeIntoDate } from "../../../helper.js";
+import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -39,6 +39,7 @@ const AddDoctorForm = () => {
     price: "",
     slotStartTime: "",
     slotEndTime: "",
+    mobileNumber: "",
   });
 
   const handleConsultationTypeChange = (e) => {
@@ -62,14 +63,18 @@ const AddDoctorForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, 'name', value, 'value') 
+    console.log(name, "name", value, "value");
     // Parse the selected time
     if (name === "slotStartTime" || name === "slotEndTime") {
-      {name === "slotStartTime" ? setSlotStartTime(value) : setSlotEndTime(value)}  
+      {
+        name === "slotStartTime"
+          ? setSlotStartTime(value)
+          : setSlotEndTime(value);
+      }
       // const [hours, minutes] = value.split(":");
       // const updatedDate = new Date(); // You can set a specific date here if needed
       // updatedDate.setHours(hours, minutes, 0, 0);
-      
+
       setDoctorDetails({
         ...doctorDetails,
         [name]: convertTimeIntoDate(value),
@@ -94,20 +99,26 @@ const AddDoctorForm = () => {
     }
   };
 
-  
-
   const handleSubmit = async (e) => {
     console.log(doctorDetails, "doctor details");
     setLoader(true);
     e.preventDefault();
 
     if (doctorDetails.password != cpassword) {
+      setLoader(false)
       return handleShowDialog("Password is not matching");
+      
+    }
+    if (!isMobileValid(doctorDetails.mobileNumber)) {
+      setLoader(false)
+      return handleShowDialog("Please correct mobile number");
+      
     }
 
     const formData = new FormData();
     formData.append("name", doctorDetails.name);
     formData.append("email", doctorDetails.email);
+    formData.append("mobileNumber", doctorDetails.mobileNumber);
     formData.append("expertise", doctorDetails.expertise);
     formData.append("degree", doctorDetails.degree);
     formData.append("language", doctorDetails.language);
@@ -134,13 +145,13 @@ const AddDoctorForm = () => {
         method: "POST",
         body: formData,
       });
-      
+
       if (response.ok) {
-        handleShowDialog(response.message)
+        handleShowDialog("Doctor registered successfully");
         // Reset form fields or navigate to another page
       } else {
         console.error("Error adding doctor:", response.statusText);
-        handleShowDialog("Something went wrong, please try again")
+        handleShowDialog("Something went wrong, please try again");
       }
     } catch (error) {
       console.error("Error adding doctor:", error.message);
@@ -172,6 +183,18 @@ const AddDoctorForm = () => {
               type="email"
               name="email"
               value={doctorDetails.email}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label className={styles.label}>
+            <b>Mobile Number:</b>
+            <input
+              className={styles.input}
+              type="number"
+              name="mobileNumber"
+              value={doctorDetails.mobileNumber}
               onChange={handleChange}
               required
             />
@@ -441,10 +464,10 @@ const AddDoctorForm = () => {
           </Col>
         </Row>
         <CustomDialog
-            show={showDialog}
-            handleClose={handleCloseDialog}
-            message={message}
-          />
+          show={showDialog}
+          handleClose={handleCloseDialog}
+          message={message}
+        />
       </form>
       {loader && <Preloader />}
     </div>

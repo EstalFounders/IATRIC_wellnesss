@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./css/ConsultationFee.module.css";
 import { MdDelete } from "react-icons/md";
 import { api, sessionStorageName } from "../../constant";
+import { Button } from "react-bootstrap";
 
 const ConsultationFeeComponent = () => {
   const [consultations, setConsultations] = useState([]);
@@ -205,18 +206,13 @@ const ConsultationFeeComponent = () => {
                   {consultation.isActive ? "Active" : "Not Active"}
                 </small>
                 <div className={styles.buttonGroup}>
-                  <button
+                  <Button
                     className={styles.editButton}
                     onClick={() => handleEdit(consultation._id)}
                   >
                     Edit
-                  </button>
-                  <button
-                    className="ml-2"
-                    onClick={() => handleDelete(consultation._id)}
-                  >
-                    <MdDelete />
-                  </button>
+                  </Button>
+                    <MdDelete size={22} className="ml-2" onClick={() => handleDelete(consultation._id)} />
                 </div>
               </>
             )}
@@ -244,9 +240,9 @@ const ConsultationFeeComponent = () => {
             setNewConsultation({ ...newConsultation, fee: e.target.value })
           }
         />
-        <button className={styles.addButton} onClick={handleAdd}>
+        <Button className={styles.addButton} onClick={handleAdd}>
           Add Consultation
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -9,21 +9,24 @@ import {
   getLabTestCategory,
   MoreButton,
 } from "../common/CommonMethod";
+import { useDispatch, useSelector } from "react-redux";
+import { setMostPopularCheckUp } from "../../../store/slices/labTest/labTestCategoryApiData";
 
 const MostPopularCheckup = () => {
-  const [healthCheckupData, setHealthCheckUpData] = useState();
+  const healthCheckupData = useSelector(
+    (state) => state.labtestHomepage.mostPopularCheckup
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
-  const idRef = useRef(null); 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchLabCateogory = async () => {
       try {
         const response = await fetch("/api/labtest"); // Replace with your API endpoint
         const data = await response.json();
-        idRef.current = getLabCategoryId("FullBodyCheckup", data);
+        const id = getLabCategoryId("FullBodyCheckup", data);
         await fetchLabTestsDetails(id);
-        storeLabTestCategory(data);
       } catch (err) {
         setError("Error fetching data");
         setLoading(false);
@@ -37,8 +40,10 @@ const MostPopularCheckup = () => {
     try {
       const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
       const data = await response.json();
-      const activeData = filterActiveHealthTest(data)
-      setHealthCheckUpData(activeData);
+      console.log(data, "40");
+      const activeData = filterActiveHealthTest(data);
+      // setHealthCheckUpData(activeData);
+      dispatch(setMostPopularCheckUp(activeData));
       setLoading(false);
     } catch (err) {
       setError("Error fetching data");
@@ -61,7 +66,7 @@ const MostPopularCheckup = () => {
             </div>
           </div>
           <Row>
-            {loading
+            {loading && healthCheckupData > 0
               ? "Please wait"
               : healthCheckupData.map((checkup) => (
                   <Col

@@ -4,12 +4,10 @@ import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { AiFillDelete } from "react-icons/ai"; // For the delete icon
 import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { CiDiscount1 } from "react-icons/ci";
-import { MdShoppingCart } from "react-icons/md";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { calculateTotalPrice} from "./CommonMethod";
 import { Container } from "react-bootstrap";
 import LabTestModel from "../modal/LabTestModel";
-import BookingDetailsInput from "./BookingDetailsInput";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { RequestOtp } from "../../../layout/Component/RequestOtp";
@@ -220,7 +218,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
               </div>
               <div className="ms-3">
                 <div className="fw-bold text-success">
-                  {price_symbol} {totalPrice.toFixed(2)}
+                  {price_symbol} {totalPrice}
                 </div>
                 <div className="text-muted ml-1">{cartItems.length} tests</div>
               </div>

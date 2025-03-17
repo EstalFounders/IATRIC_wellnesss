@@ -18,7 +18,7 @@ const StatsCard = ({ todayBooking, totalEarning, totalBooking, onCardClick }) =>
         <h3 className={styles.title}>Total Booking</h3>
         <p className={styles.value}>{totalBooking}</p>
       </div>
-      <div className={`${styles.card} clickable-div`}>
+      <div className={`${styles.card} clickable-div`} onClick={() => onCardClick("payment")}>
         <h3 className={styles.title}>Total Earning</h3>
         <p className={styles.value}>
           {price_symbol}

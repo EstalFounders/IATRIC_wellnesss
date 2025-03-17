@@ -3,7 +3,12 @@ import { api, doctor_info_local_storage } from "../../../constant";
 import DashboardSecondComp from "./DashboardSecond/DashboardSecondComp";
 import StatsCard from "./Stats/StatsCard";
 import { useDispatch, useSelector } from "react-redux";
-import { setAppointments, setTodaysAppointments } from "../../../store/slices/appointmentSlice";
+import {
+  setAppointments,
+  setDoctorEarning,
+  setTodaysAppointments,
+} from "../../../store/slices/registerDoc/appointmentSlice";
+import { useRouter } from "next/router";
 
 export default function HomepageComp() {
   // const [appointments, setAppointments] = useState([]);
@@ -11,15 +16,39 @@ export default function HomepageComp() {
   const [filterText, setFilterText] = useState("Todays");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeframe, setTimeframe] = useState("month")
   const appointments = useSelector((state) => state.appointment.appointments);
-  const todayAppointments = useSelector((state) => state.appointment.todaysAppointments);
+  const doctorEarning = useSelector((state) => state.appointment.doctorEarnings);
+  const todayAppointments = useSelector(
+    (state) => state.appointment.todaysAppointments
+  );
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const doctorInfo = JSON.parse(
     sessionStorage.getItem(doctor_info_local_storage)
   );
 
   const doctorId = doctorInfo.user._id;
+
+  useEffect(() => {
+    const fetchDoctorEarnings = async () => {
+      try {
+        const respone = await fetch(`${api.doctorEarning}?doctorId=${doctorId}&timeframe=${timeframe}`);
+        if (!respone.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+        const data = await respone.json();
+        dispatch(setDoctorEarning(data));
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctorEarnings();
+  }, [doctorId, timeframe]);
+
 
   useEffect(() => {
     // Define async function within useEffect
@@ -50,13 +79,15 @@ export default function HomepageComp() {
       const todayAppointments = appointments.filter((appointment) =>
         appointment.appointmentTime.startsWith(today)
       );
-      dispatch(setTodaysAppointments(todayAppointments))
-      setFilteredAppointments(todayAppointments)
+      dispatch(setTodaysAppointments(todayAppointments));
+      setFilteredAppointments(todayAppointments);
       setFilterText("Today");
     } else if (type === "total") {
       dispatch(setAppointments(appointments));
-      setFilteredAppointments(appointments)
+      setFilteredAppointments(appointments);
       setFilterText("Total");
+    } else if (type === "payment") {
+      router.push("/registerDoc/doctorEarnings");
     }
   };
 
@@ -80,7 +111,7 @@ export default function HomepageComp() {
       <div style={containerStyle}>
         <StatsCard
           todayBooking={todayBooking}
-          totalEarning={1250.75}
+          totalEarning={doctorEarning.totalEarningsAllTime}
           totalBooking={appointments.length}
           onCardClick={handleCardClick} // Pass the click handler
         />

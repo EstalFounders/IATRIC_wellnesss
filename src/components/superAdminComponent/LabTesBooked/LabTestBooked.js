@@ -14,15 +14,7 @@ const LabTestBookedComp = () => {
   // Complete array of all bookings
   const bookings = useSelector((state) => state.superAdminHomePage.labTest);
 
-  const listOflab = [
-    {
-      _id: 1,
-      name: "simple life",
-      location: "Gurgoan",
-      colabDate: "12/09/2024",
-      contacntNo: "9933443388",
-    },
-  ];
+  const listOflab = useSelector((state) => state.superAdminHomePage.allLab);;
 
   // Filtered bookings based on status
   const totalBookings = bookings;

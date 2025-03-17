@@ -17,7 +17,7 @@ import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
 import RecentDoctors from "./RecentDoctors/RecentDoctors"
 import { useDispatch } from "react-redux";
-import { setAllappointments, setAllDoctor, setAllLabTest } from "../../store/slices/superAdmin/homepageSlice";
+import { setAllappointments, setAllDoctor, setAllLab, setAllLabTest } from "../../store/slices/superAdmin/homepageSlice";
 import { calculateTotalIncome } from "./utility/helper";
 
 export default function HomepageComp() {
@@ -62,14 +62,16 @@ export default function HomepageComp() {
     setIsAppointmentLoading(true)
     const fetchData = async () => {
       try {
-        const [appointmentsResponse, labTestsResponse] = await Promise.all([
+        const [appointmentsResponse, labTestsResponse, labResponse] = await Promise.all([
           fetch(api.bookConsultation), // Replace with actual API endpoint
           fetch(api.bookLabTest),    // Replace with actual API endpoint
+          fetch(api.addNewLab),
         ]);
 
-        const [appointmentsData, labTestsData] = await Promise.all([
+        const [appointmentsData, labTestsData,labData] = await Promise.all([
           appointmentsResponse.json(),
           labTestsResponse.json(),
+          labResponse.json()
         ]);
         const appointments = appointmentsData.appointments
         const labTest = labTestsData.labTests
@@ -77,6 +79,7 @@ export default function HomepageComp() {
         setLabTests(labTest);
         dispatch(setAllappointments(appointments))
         dispatch(setAllLabTest(labTest))
+        dispatch(setAllLab(labData))
         // Calculate totals
         const calculatedTotals = calculateTotalIncome(appointments, labTest);
         console.log(calculatedTotals.totatIncome, 'calculated totals')
