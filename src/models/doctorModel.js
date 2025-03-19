@@ -12,6 +12,11 @@ const doctorSchema = new Schema({
     required: true,
     unique: true,
   },
+  gender: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   mobileNumber: {
     type: Number,
     required: true,
@@ -43,7 +48,7 @@ const doctorSchema = new Schema({
     required: true,
   },
   consultationType: {
-    type: String,
+    type: Array,
     required: true,
   },
   location: {

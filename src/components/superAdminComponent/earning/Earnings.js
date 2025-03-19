@@ -28,6 +28,7 @@ const EarningsComp = () => {
 
   const ConsultationEarning =
     calculateConsultationEarning(consultationBookings);
+    console.log(ConsultationEarning, "ConsultationEarning");
 
   const LabTestEarning = calculateLabTestEarning(labTests);
 

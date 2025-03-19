@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Table, ProgressBar } from "react-bootstrap";
-import { getAppointmentData } from "./CommonMethod";
 import { useRouter } from "next/router";
 import { price_symbol } from "../../../constant";
 
@@ -20,7 +19,7 @@ const ViewLabTestDetailsComp = () => {
     const fetchDeductions = async () => {
       try {
         const localDeductions = sessionStorage.getItem("lab_deductions");
-        // console.log(localDeductions, "local deduction");
+        console.log(localDeductions, "local deduction");
         if (localDeductions) {
           setDeductions(JSON.parse(localDeductions));
         } else {
@@ -80,7 +79,7 @@ const ViewLabTestDetailsComp = () => {
       {/* Appointment Details */}
       <Card className="mb-4">
         <Card.Header as="h4" className="bg-primary text-white">
-          Appointment Details
+          LabTest Booking Details
         </Card.Header>
         <Card.Body>
           <Table striped bordered hover>

@@ -3,6 +3,7 @@
   max-width: 600px;
   margin: 0 auto;
   margin-top: 20px;
+  margin-bottom: 2%;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -57,4 +58,34 @@
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag {
+  background-color: #000000;
+  color: white;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.removeButton:hover {
+  color: #ffdddd;
 }

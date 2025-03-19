@@ -3,16 +3,22 @@ import FilterBar from "../filterbar/filterbar";
 import React, { useState, useEffect } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 import { api } from "../../constant";
+import { useDispatch, useSelector } from "react-redux";
+import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 
 const AllDoctorsDoctors3 = () => {
   const [doctors, setDoctors] = useState([]);
+  const storedDoctors = useSelector((state) => state.allDoctorS.allDoctors);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
       // Check if data is stored in session storage
-      const storedDoctors = sessionStorage.getItem("doctors");
+      
+      // sessionStorage.getItem("doctors");
+      console.log(storedDoctors, "testing in all doctors2");
       if (storedDoctors) {
-        setDoctors(JSON.parse(storedDoctors)); // Parse and set to state
+        setDoctors(storedDoctors); // Parse and set to state
       } else {
         try {
           const response = await fetch(api.addDoctor);
@@ -20,7 +26,8 @@ const AllDoctorsDoctors3 = () => {
             throw new Error("Failed to fetch");
           }
           const data = await response.json();
-          sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          // sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          dispatch(setAllDoctors(data));
           setDoctors(data);
         } catch (error) {
           console.error("Error fetching data:", error);

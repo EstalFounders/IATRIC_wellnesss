@@ -1,13 +1,26 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { contact_no, email } from "../../constant";
+import { api, contact_no, email } from "../../constant";
 import PopupDialog from "../Common/PopupDialog";
-import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
+import CircleLoader from "../circleLoader";
 
 const Demo5Contacts1 = () => {
   const router = useRouter();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    mobile_number: "",
+    patient: "",
+    visited_before: "",
+    message: "",
+  });
+  const [error, setError] = useState();
+
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
   };
@@ -19,10 +32,52 @@ const Demo5Contacts1 = () => {
     router.push(`mailto:${email}`);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value, "name value");
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const dialOptions = [
     { label: "Dial", action: dial },
     { label: "Whatsapp", action: openSupportWhatsAppWeb },
   ];
+
+  const saveQuery = async (e) => {
+    setLoading(true)
+    if (!isMobileValid(formData.mobile_number)) {
+      setIsSuccess(false);
+      setError("Please enter a valid mobile number");
+      return;
+    }
+
+    console.log(formData, "form data of query");
+    const res = await fetch(api.userQuery, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      setIsSuccess(true);
+      setLoading(false)
+      setError("Query saved successfully");
+      setFormData({
+        name: "",
+        email: "",
+        mobile_number: "",
+        patient: "",
+        visited_before: "",
+        message: "",
+      });
+    } else {
+      alert("Failed to save query");
+    }
+  };
 
   return (
     <section
@@ -136,6 +191,8 @@ const Demo5Contacts1 = () => {
                       className="form-control name"
                       placeholder="Your Name*"
                       required="required"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       data-error="Enter no more than (2) characters."
                     />
                     <div className="help-block with-errors" />
@@ -151,6 +208,8 @@ const Demo5Contacts1 = () => {
                       name="email"
                       placeholder="Your Email"
                       required="required"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       data-error="Email is required"
                     />
                     <div className="help-block with-errors" />
@@ -163,9 +222,11 @@ const Demo5Contacts1 = () => {
                       id="form_phone"
                       className="form-control phone"
                       type="tel"
-                      name="phone"
+                      name="mobile_number"
                       placeholder="Your Phone Number"
                       required="required"
+                      value={formData.mobile_number}
+                      onChange={handleInputChange}
                       data-error="Please enter only digits."
                     />
                     <div className="help-block with-errors" />
@@ -176,8 +237,12 @@ const Demo5Contacts1 = () => {
                   <div className="form-group">
                     <select
                       id="inlineFormCustomSelect1"
-                      name="patient"
+                      name="visited_before"
                       className="custom-select patient"
+                      required="required"
+                      data-error="Select an option."
+                      value={formData.visited_before}
+                      onChange={handleInputChange}
                     >
                       <option>Have You Visited Us Before?*</option>
                       <option>New Patient</option>
@@ -198,7 +263,8 @@ const Demo5Contacts1 = () => {
                       placeholder="Your Message ..."
                       required="required"
                       data-error="Enter no more than (10) characters."
-                      defaultValue=""
+                      value={formData.message}
+                      onChange={handleInputChange}
                     />
                     <div className="help-block with-errors" />
                   </div>
@@ -206,14 +272,20 @@ const Demo5Contacts1 = () => {
                 {/* Contact Form Message */}
                 <div className="messages" />
                 {/* Button */}
-                <div className="col-md-12 mt-15 form-btn">
+                <div className="col-md-12 mt-15 form-btn d-flex d-inline-flex">
                   <button
                     type="submit"
                     className="btn btn-md btn-blue blue-hover submit"
+                    onClick={saveQuery}
                     style={{ backgroundColor: "#3b5f1d" }}
                   >
                     Talk to Us
                   </button>
+                  {loading ? (
+                    <div className="mt-3 ml-5">
+                      <CircleLoader />
+                    </div>
+                  ) : null}
                 </div>
               </form>
             </div>
@@ -227,6 +299,14 @@ const Demo5Contacts1 = () => {
           options={dialOptions}
         />
       </div>
+      <div
+        className={`text-center ${
+          isSuccess ? "text-success" : "text-danger"
+        } font-weight-bold`}
+      >
+        {error}
+      </div>
+
       {/* End container */}
     </section>
   );

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { convertDateIntoTime, convertTimeIntoDate } from "../../helper";
-import { userTypeConstant } from "../../constant";
+import { superAdminConsultationtype, userTypeConstant } from "../../constant";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
-  console.log(doctor, "doctor");
+  console.log(doctor, "doctor in modal");
   const [editedDoctor, setEditedDoctor] = useState({ ...doctor });
   const [profilePicturePreview, setProfilePicturePreview] = useState(
     doctor.profilePictureUrl
@@ -17,6 +17,8 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   const [slotEndTime, setSlotEndTime] = useState(
     convertDateIntoTime(editedDoctor.slotEndTime)
   );
+
+  const [selectedTypes, setSelectedTypes] = useState(editedDoctor.consultationType || []);
 
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
@@ -81,6 +83,20 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     onSave(editedDoctor);
     handleClose();
   };
+
+  const handleCheckboxChange = (type) => {
+    let updatedTypes;
+    if (selectedTypes.includes(type)) {
+      updatedTypes = selectedTypes.filter(item => item !== type); // Remove if already selected
+    } else {
+      updatedTypes = [...selectedTypes, type]; // Add if not selected
+    }
+    
+    setSelectedTypes(updatedTypes);
+    setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+  };
+  
+  console.log(editedDoctor, "edited doctor");
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -180,12 +196,21 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Consultation Type</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="consultationType"
-                  value={editedDoctor.consultationType}
-                  onChange={handleChange}
-                />
+                <div>
+                  {Object.entries(superAdminConsultationtype).map(
+                    ([key, label]) => (
+                      <Form.Check
+                        key={key}
+                        type="checkbox"
+                        label={label}
+                        value={key}
+                        checked={selectedTypes.includes(label)}
+                        onChange={() => handleCheckboxChange(label)}
+                        className="mb-2"
+                      />
+                    )
+                  )}
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -323,11 +348,12 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   <Form.Label>
                     <b>Profile Picture</b>
                   </Form.Label>
-                  <Form.Control
+                  <input
                     type="file"
                     accept="image/*"
                     onChange={handleProfilePictureChange}
                   />
+
                   {profilePicturePreview && (
                     <>
                       <img

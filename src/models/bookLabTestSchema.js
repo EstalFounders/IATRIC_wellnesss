@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { labTest_payment_status, labTest_status } from "../constant";
 
 const { Schema } = mongoose;
 
@@ -30,8 +31,13 @@ const bookingLabTestSchema = new Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["paid", "unpaid"],
+      enum: [labTest_payment_status.PAID, labTest_payment_status.UNPAID],
       // required: true,
+    },
+    bookingStatus: {
+      type: String,
+      default: labTest_status.pending,
+      enum: [labTest_status.pending, labTest_status.completed,labTest_status.cancelled],
     },
   },
   {

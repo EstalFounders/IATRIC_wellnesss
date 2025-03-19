@@ -34,7 +34,7 @@ const LabTestList = ({ data, onStatusChanged, onUpdateStatus }) => {
             <b>Name</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
-            <b>Payment Method</b>
+            <b>Payment Status</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
             <b>Booking Time</b>
@@ -46,7 +46,7 @@ const LabTestList = ({ data, onStatusChanged, onUpdateStatus }) => {
             <b>Mobile Number</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
-            <b>Payment Status</b>
+            <b>Booking Status</b>
           </Col>
         </Row>
         <div

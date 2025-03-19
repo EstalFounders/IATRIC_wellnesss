@@ -42,6 +42,7 @@ const AppointmentPage = () => {
   const [consultationprice, setConsultationPrice] = useState("");
   const [bookingResponse, setBookingResponse] = useState();
   const withinBusinessHours = isWithinBusinessHours();
+  const [slotEmpty, setSlotEmpty] = useState(false);
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -53,7 +54,9 @@ const AppointmentPage = () => {
     );
     const data = await response.json();
     if (data.success) {
+      console.log(data.data, "data in 56");
       setAvailableSlots(data.data);
+      {data.data.length == 0 ? setSlotEmpty(true) : setSlotEmpty(false)}
     } else {
       console.error("Failed to fetch slots:", data.message);
       setAvailableSlots([]);
@@ -575,7 +578,8 @@ const AppointmentPage = () => {
                             justifyContent: "space-around",
                           }}
                         >
-                          {availableSlots
+                          {console.log(availableSlots, "available slots")}
+                          {!slotEmpty ? availableSlots
                             .filter((slot) => {
                               const slotDate = new Date(slot.startTime);
                               return (
@@ -609,7 +613,7 @@ const AppointmentPage = () => {
                                 {formatTime(slot.startTime)} -{" "}
                                 {formatTime(slot.endTime)}
                               </li>
-                            ))}
+                            )): <div className="text-danger font-weight-bold">SLOTS WILL BE GENERATED SOON</div>}
                         </div>
                       </ul>
                     </div>

@@ -56,11 +56,14 @@ const options = {
         if (!user) {
           throw new Error("Invalid credentials");
         }
+        console.log(user, "user in server");
+        const isPasswordCorrect = credentials.password === user.password;
 
-        const isPasswordCorrect = await compare(
-          credentials.password,
-          user.password
-        );
+        if (isPasswordCorrect) {
+          console.log("Password is correct");
+        } else {
+          console.log("Password is incorrect");
+        }
 
         if (!isPasswordCorrect) {
           throw new Error("Invalid credentials");

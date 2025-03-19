@@ -2,10 +2,13 @@ import { getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { doctor_info_local_storage, super_admin_info_local_sotrage } from '../../../src/constant';
+import { useDispatch } from 'react-redux';
+import { setUserDetails } from '../../../src/store/slices/authentication/userDetailsSlice';
 
 const AuthenticatedComponent = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const checkSession = async () => {
@@ -13,6 +16,7 @@ const AuthenticatedComponent = ({ children }) => {
       console.log(session, 'session in AuthenticatedComponent');
       if (session) {
         sessionStorage.setItem(super_admin_info_local_sotrage, JSON.stringify(session));
+        dispatch(setUserDetails(session.user));
         setLoading(false); // Stop loading once the session is set
       } else {
         // Redirect to the doctor login page if not authenticated
