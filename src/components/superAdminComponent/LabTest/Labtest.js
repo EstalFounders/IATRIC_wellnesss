@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Table, Button, Form, Modal } from "react-bootstrap";
+import { Row, Col, Table, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BiEdit } from "react-icons/bi";
 import TestDetailsCard from "./TestDetailsCard";
 import { useRouter } from "next/router";
 import NewTest from "./NewTest";
 import { MdDelete } from "react-icons/md";
 import ConfirmModal from "../model/ConfirmModel";
+import { roles } from "../../../constant";
+import { useSelector } from "react-redux";
 
 const LabTestComponent = () => {
   // State to store fetched data
@@ -19,6 +21,7 @@ const LabTestComponent = () => {
   const [newTest, setNewTest] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [labTestId, setLabTestId] = useState();
+  const userDetails = useSelector((state) => state.userDetails.userDetails);
 
   // State for modal and editing
   const [showModal, setShowModal] = useState(false);
@@ -130,6 +133,7 @@ const LabTestComponent = () => {
   const handleClose = () => setShow(false);
 
   const handleDeleteRequest = (id) => {
+    console.log("testing for 133");
     setLabTestId(id);
     setShowConfirmModal(true);
   };
@@ -151,7 +155,9 @@ const LabTestComponent = () => {
     } finally {
       // Close the modal after the API call completes
       setShowConfirmModal(false);
-      setLabTests((prevTests) => prevTests.filter((test) => test._id !== labTestId));
+      setLabTests((prevTests) =>
+        prevTests.filter((test) => test._id !== labTestId)
+      );
     }
   };
 
@@ -216,8 +222,31 @@ const LabTestComponent = () => {
                 >
                   Details
                 </Button>{" "}
-                <div onClick={() => handleDeleteRequest(labTest._id)}>
-                  <MdDelete />
+                <div>
+                  {userDetails.role.includes(roles.superAdmin) ? (
+                    <MdDelete
+                      style={{ cursor: "pointer" }}
+                      className="ml-2"
+                      onClick={() => handleDeleteRequest(labTest._id)}
+                    />
+                  ) : (
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip>
+                          You are not allowed to perform this action
+                        </Tooltip>
+                      }
+                    >
+                      <span className="d-inline-block">
+                        <MdDelete
+                          style={{ cursor: "not-allowed", opacity: 0.5 }}
+                          tabIndex={0} // Ensures it receives focus for tooltip
+                          
+                        />
+                      </span>
+                    </OverlayTrigger>
+                  )}
                 </div>
                 <ConfirmModal
                   show={showConfirmModal}

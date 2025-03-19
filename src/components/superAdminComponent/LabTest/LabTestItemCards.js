@@ -5,19 +5,19 @@ import { labTest_status } from "../../../constant";
 import { useRouter } from "next/router";
 
 const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
-  const [selectedStatus, setSelectedStatus] = useState(data.paymentStatus);
-  const [appointmentId, setAppointmentId] = useState(data._id);
-  const router = useRouter()
+  const [selectedStatus, setSelectedStatus] = useState(data.bookingStatus);
+  const [labTestId, setLabTestId] = useState(data._id);
+  const router = useRouter();
 
   const handleStatusChange = (e) => {
     console.log(e.target.value, "event");
     setSelectedStatus(e.target.value);
-    setAppointmentId(data._id);
+    setLabTestId(data._id);
   };
 
   const handleUpdateClick = () => {
     if (onUpdateStatus) {
-      onUpdateStatus({ selectedStatus, appointmentId });
+      onUpdateStatus({ selectedStatus, labTestId });
     }
   };
 
@@ -41,7 +41,7 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
       <Col className="text-primary clickable-div" onClick={handleViewLabTest}>
         <u>{data.name}</u>
       </Col>
-      <Col>{data.paymentMethod}</Col>
+      <Col>{`${data.paymentMethod}-${data.paymentStatus}`}</Col>
       <Col>{formatData(data.createdAt)}</Col>
       <Col>{data.totalPrice}</Col>
       <Col>{data.mobileNumber}</Col>
@@ -52,16 +52,16 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
               ? "text-success"
               : data.paymentStatus === labTest_status.cancelled
               ? "text-danger"
-              : data.paymentStatus === labTest_status.unpaid
-              ? "text-secondary"
+              // : data.paymentStatus === labTest_status.unpaid
+              // ? "text-secondary"
               : data.paymentStatus === labTest_status.pending
               ? "text-primary"
-              : data.paymentStatus === labTest_status.paid
-              ? "text-muted"
+              // : data.paymentStatus === labTest_status.paid
+              // ? "text-muted"
               : ""
           }`}
         >
-          {data.paymentStatus}
+          {data.bookingStatus}
         </div>
 
         <Form.Group controlId="statusSelect">
@@ -71,11 +71,11 @@ const ItemCards = ({ data, onStatusChanged, onUpdateStatus }) => {
             onChange={handleStatusChange}
           >
             <option value="pending" className="text-center">
-              Select to Update
+              {selectedStatus ? selectedStatus : "Select to Update"}
             </option>
             <option value="pending">{labTest_status.pending}</option>
-            <option value="confirmed">{labTest_status.paid}</option>
-            <option value="reschedule">{labTest_status.unpaid}</option>
+            {/* <option value="confirmed">{labTest_status.paid}</option> */}
+            {/* <option value="reschedule">{labTest_status.unpaid}</option> */}
             <option value="cancelled">{labTest_status.cancelled}</option>
             <option value="completed">{labTest_status.completed}</option>
           </Form.Control>

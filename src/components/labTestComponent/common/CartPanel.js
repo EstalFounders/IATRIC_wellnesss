@@ -115,6 +115,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       if (result.success) {
         console.log("Booking successful:", result.booking);
         setReponseSuccess(true);
+        setCartItems([])
         setError(""); // Clear any errors if successful
       } else {
         setError(result.error || "Booking failed. Please try again.");
@@ -130,7 +131,6 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
       // Close the modal after 2 seconds
       setTimeout(() => {
-        setFadeOut(false); // reset fadeOut state for the next time
         handleClose(); // Call parent function to fully close the modal
         setReponseSuccess(false);
       }, 2000);

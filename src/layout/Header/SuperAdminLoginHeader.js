@@ -53,7 +53,7 @@ const SuperAdminLoginHeader = ({ session }) => {
   const handleLeaveApproveOrReject = async (id, action) => {
     console.log("Approved request ID:", id, action);
     try {
-       await handleLeaveApproveOrRejectService(id,action)
+      await handleLeaveApproveOrRejectService(id, action);
     } catch (error) {
       console.error("Error while processing the request:", error);
       alert("Something went wrong. Please try again later.");

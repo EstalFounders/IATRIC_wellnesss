@@ -5,7 +5,6 @@ import NotifcationPreviewModel from "../model/NotificationPreviewModel";
 import DoctorUpdateReqCard from "./DoctorUpdateReqCard";
 import PreviewRequest from "./PreviewRequest";
 import LeaveReqCard from "./LeaveReqCard";
-import { name } from "@stream-io/video-react-sdk";
 
 const NotificationSection = ({
   doctorUpdateRequests,
@@ -17,6 +16,7 @@ const NotificationSection = ({
 
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState("Doctor Update"); // State to track active tab
+  const [previewRequest, setPreviewRequest] = useState();
 
   const showModel = () => {
     setShow(true);
@@ -28,6 +28,7 @@ const NotificationSection = ({
 
   const handleReview = (index) => {
     console.log("Reviewed request ID:", index);
+    setPreviewRequest(doctorUpdateRequests[index]);
     showModel();
     // Add API call or navigation logic for review here
   };
@@ -80,10 +81,10 @@ const NotificationSection = ({
               </ListGroup.Item>
               <NotifcationPreviewModel
                 isOpen={show}
-                key={`${request.id || index}-model`}
+                key={`${request._id || index}-model`}
               >
                 <PreviewRequest
-                  request={request}
+                  request={previewRequest}
                   handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
                   onClose={closeModel}
                 />

@@ -1,8 +1,5 @@
-
 // pages/api/startCron.js
-
 import performScheduledTasks from "./cron-jobs";
-
 
 export default async function handler(req, res) {
   if (req.method === "POST") {

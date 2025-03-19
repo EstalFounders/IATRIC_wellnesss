@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "../css/ConsultationBooked.module.css";
 import AppointTable from "../common/AppointmentTable";
-import { labTest_status } from "../../../constant";
+import { api, labTest_status } from "../../../constant";
 import LabBookedListTable from "../common/LabBookedListTable";
 import LabListTable from "../common/LabListTable";
 import { useSelector } from "react-redux";
@@ -33,7 +33,36 @@ const LabTestBookedComp = () => {
       ? pendingBookings
       : unpaidBookings;
 
-  const handleUpdateStatus = () => {};
+  const handleUpdateStatus = async ({ selectedStatus, labTestId }) => {
+     console.log(selectedStatus,labTestId, 'event value')
+     console.log(
+      "Status updated to:",
+      selectedStatus,
+      "appointment id",
+      labTestId
+    );
+    try {
+      const response = await fetch(`${api.bookLabTest}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ labTestId, selectedStatus }),
+      });
+
+      if (response.ok) {
+        // handleOpenSnackBar();
+        const data = await response.json();
+        console.log("Status updated:", data);
+        // Handle success, maybe show a notification or refresh the data
+      } else {
+        const errorData = await response.json();
+        console.error("Error updating status:", errorData.message);
+      }
+    } catch (error) {
+      console.error("An error occurred while updating status:", error);
+    }
+  };
 
   return (
     <div className={styles.bookingContainer}>

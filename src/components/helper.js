@@ -22,7 +22,7 @@ export const generateSlotsForChooseTime = (selectedDate, startHour, endHour, int
 export const isWithinBusinessHours = () => {
   const now = new Date();
   const hours = now.getHours();
-  return hours >= 9 && hours < 21;
+  return hours >= 9 && hours < 23;
 };
 
 

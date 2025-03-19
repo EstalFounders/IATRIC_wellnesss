@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { FaEdit } from "react-icons/fa";
 import DoctorModal from "../DoctorModalComp";
 import DoctorModalComp from "../DoctorModalComp";
-import { api } from "../../../constant";
+import { api, roles } from "../../../constant";
 import Preloader from "../../Preloader";
 import { MdDelete } from "react-icons/md";
+import ConfirmModal from "../model/ConfirmModel";
+import { useSelector } from "react-redux";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -16,6 +18,8 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
   const [showModal, setShowModal] = useState(false);
   const [loader, setLoader] = useState(false);
   const [doctorInCard, setDoctorInCard] = useState(doctor);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const userDetails = useSelector((state) => state.userDetails.userDetails);
 
   const handleEdit = () => {
     setShowModal(true);
@@ -107,11 +111,28 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
         <Col>{formatDate(doctor.joiningDate)}</Col>
         <Col>
           <FaEdit onClick={handleEdit} style={{ cursor: "pointer" }} />
-          <MdDelete
-            onClick={handleDelete}
-            style={{ cursor: "pointer" }}
-            className="ml-2"
-          />
+
+          {userDetails.role.includes(roles.superAdmin) ? (
+            <MdDelete
+              onClick={() => setShowConfirmModal(true)}
+              style={{ cursor: "pointer" }}
+              className="ml-2"
+            />
+          ) : (
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip>You are not allowed to perform this action</Tooltip>
+              }
+            >
+              <span className="d-inline-block">
+                <MdDelete
+                  style={{ cursor: "not-allowed", opacity: 0.5 }}
+                  tabIndex={0} // Ensures it receives focus for tooltip
+                />
+              </span>
+            </OverlayTrigger>
+          )}
         </Col>
       </Row>
       <DoctorModalComp
@@ -120,7 +141,11 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
         doctor={doctor}
         onSave={handleSaveDoctor}
       />
-
+      <ConfirmModal
+        show={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleDelete}
+      />
       {loader && <Preloader />}
     </>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
-import { MdUpdate } from "react-icons/md";
+import { MdOutlineQueryStats, MdUpdate } from "react-icons/md";
 import { ImLab } from "react-icons/im";
 import { BiSolidOffer } from "react-icons/bi";
 
@@ -53,6 +53,12 @@ export const SidebarData = [
     title: "OFFERS",
     path: "/superAdmin/offers",
     icon: <BiSolidOffer />,
+    cName: "nav-text",
+  },
+  {
+    title: "CUSTOMER QUERY",
+    path: "/superAdmin/customerQuery",
+    icon: <MdOutlineQueryStats />,
     cName: "nav-text",
   },
 ];

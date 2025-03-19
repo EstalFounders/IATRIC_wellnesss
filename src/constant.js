@@ -32,7 +32,8 @@ export const api = {
     doctorEarning: "/api/registerDoc/doctorEarnings",
     addNewLab: "/api/superAdmin/addNewLab",
     addNewOffer: "/api/superAdmin/addNewOffer",
-    globalVar: "/api/globalVar"
+    globalVar: "/api/globalVar",
+    userQuery: "/api/userQuery",
 
 }
 
@@ -98,6 +99,11 @@ export const labTest_status = {
     paid: "PAID"
 }
 
+export const labTest_payment_status = {
+    PAID: "paid",
+    UNPAID: "unpaid"
+}
+
 export const consultation = "Consultation"
 
 export const sessionStorageName = {
@@ -114,4 +120,17 @@ export const discount_type = {
     Fixed: "Fixed",
     Free: "Free"
 }
+
+export const roles = {
+    superAdmin: "superAdmin",
+    doctor: "doctor",
+    patient: "patient",
+    employe: "employe"
+}
+
+export const superAdminConsultationtype = [
+    "Online consultations",
+    "Off-line consultations",
+    "Home visit",
+  ];
 

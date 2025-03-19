@@ -147,12 +147,17 @@ export default async function handler(req, res) {
           );
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
-            ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
+            ...stringFields,
             password: fields.password[0],
-            profilePictureUrl, // Now profilePictureUrl is accessible here
+            profilePictureUrl,
             diplomasCertificatesUrls,
             doctorStampUrl,
             doctorSignatureUrl,
+            consultationType: stringFields.consultationType
+              ? stringFields.consultationType
+                  .split(",")
+                  .map((type) => type.trim())
+              : [], // Convert to array & trim spaces
           });
 
           console.log(addedDoctor._id, "Doctor Added");

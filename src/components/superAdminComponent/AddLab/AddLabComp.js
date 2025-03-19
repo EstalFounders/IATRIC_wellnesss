@@ -7,11 +7,15 @@ import {
   Container,
   Row,
   Col,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, roles } from "../../../constant";
 import styles from "../css/AddLabComp.module.css";
 import Preloader from "../../Preloader";
 import ConfirmModal from "../model/ConfirmModel";
+import { MdDelete } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 const AddLabComponent = () => {
   const [availableTests, setAvailableTests] = useState([]); // Stores tests fetched from the API
@@ -32,6 +36,7 @@ const AddLabComponent = () => {
     tests_offered: [],
     isActive: true,
   });
+  const userDetails = useSelector((state) => state.userDetails.userDetails);
 
   // Function to fetch tests from the API
   const fetchAvailableTests = async () => {
@@ -84,7 +89,7 @@ const AddLabComponent = () => {
 
   const handleEditLab = (lab) => {
     console.log(lab, "lab");
-    setLabId(lab._id)
+    setLabId(lab._id);
     setIsEditing(true);
     setCurrentLab(lab);
     setShowModal(true);
@@ -164,26 +169,26 @@ const AddLabComponent = () => {
   };
 
   const handleUpdate = (id) => {
-    setLoading(true)
-      fetch(`${api.addNewLab}?id=${labId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(currentLab),
+    setLoading(true);
+    fetch(`${api.addNewLab}?id=${labId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(currentLab),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update Lab");
+        }
+        setLoading(false);
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to update Lab");
-          }
-          setLoading(false)
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data, "response 43");
-        })
-        .catch((error) => console.error("Error updating Lab:", error));
-    };
+      .then((data) => {
+        console.log(data, "response 43");
+      })
+      .catch((error) => console.error("Error updating Lab:", error));
+  };
 
   const handleDeleteRequest = (id) => {
     setLabId(id);
@@ -204,7 +209,7 @@ const AddLabComponent = () => {
       })
       .then(() => {
         setLabs((prev) => prev.filter((item) => item._id !== id));
-        setShowConfirmModal(false)
+        setShowConfirmModal(false);
       })
       .catch((error) => console.error("Error deleting consultation:", error));
   };
@@ -224,7 +229,7 @@ const AddLabComponent = () => {
             <th>Email</th>
             <th>Tests</th>
             <th>Actions</th>
-            <th>Active</th> 
+            <th>Active</th>
           </tr>
         </thead>
         <tbody>
@@ -271,7 +276,7 @@ const AddLabComponent = () => {
               </td>
               {/* New delete column */}
               <td>
-                <button
+                {/* <button
                   style={{
                     background: "none",
                     border: "none",
@@ -282,7 +287,30 @@ const AddLabComponent = () => {
                   title="Delete Lab"
                 >
                   🗑️
-                </button>
+                </button> */}
+                {userDetails.role.includes(roles.superAdmin) ? (
+                  <MdDelete
+                    style={{ cursor: "pointer" }}
+                    className="ml-2"
+                    onClick={() => handleDeleteRequest(lab._id)}
+                  />
+                ) : (
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip>
+                        You are not allowed to perform this action
+                      </Tooltip>
+                    }
+                  >
+                    <span className="d-inline-block">
+                      <MdDelete
+                        style={{ cursor: "not-allowed", opacity: 0.5 }}
+                        tabIndex={0} // Ensures it receives focus for tooltip
+                      />
+                    </span>
+                  </OverlayTrigger>
+                )}
               </td>
             </tr>
           ))}
@@ -338,7 +366,7 @@ const AddLabComponent = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Location</Form.Label>
+              <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
                 name="location"
