@@ -41,6 +41,9 @@ const Appointments = ({ source,data, onStatusChanged, onUpdateStatus }) => {
             <b>Appointment Time</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>
+            <b>Booking Time</b>
+          </Col>
+          <Col style={{ color: "#8e8333" }}>
             <b>Symptoms</b>
           </Col>
           <Col style={{ color: "#8e8333" }}>

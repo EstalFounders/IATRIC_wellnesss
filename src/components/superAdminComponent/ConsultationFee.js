@@ -4,6 +4,9 @@ import styles from "./css/ConsultationFee.module.css";
 import { MdDelete } from "react-icons/md";
 import { api, sessionStorageName } from "../../constant";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
+import { set } from "mongoose";
 
 const ConsultationFeeComponent = () => {
   const [consultations, setConsultations] = useState([]);
@@ -14,31 +17,13 @@ const ConsultationFeeComponent = () => {
     fee: "",
     isActive: true,
   });
+  const dispatch = useDispatch();
+  const storedConsultations = useSelector(
+    (state) => state.otherDetailsSlice.consultationType
+  );
 
   useEffect(() => {
-    const storedConsultations = sessionStorage.getItem(sessionStorageName.ConsultationFee);
-
-    if (storedConsultations) {
-      // If data exists in local storage, parse and set it
-      setConsultations(JSON.parse(storedConsultations));
-    } else {
-      // If no data in local storage, fetch from API
-      fetch(api.consiltationFee)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch consultations");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setConsultations(data);
-          // Save fetched data to local storage for future use
-          sessionStorage.setItem("ConsultationsFee", JSON.stringify(data));
-        })
-        .catch((error) =>
-          console.error("Error fetching consultations:", error)
-        );
-    }
+    setConsultations(storedConsultations);
   }, []);
 
   const handleEdit = (id) => {

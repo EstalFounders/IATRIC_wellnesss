@@ -3,6 +3,8 @@ import Link from "next/link";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
+  MdOutlineFace3,
+  MdPregnantWoman,
 } from "react-icons/md";
 import {
   FaStethoscope,
@@ -14,9 +16,13 @@ import {
   FaBaby,
   FaEye,
 } from "react-icons/fa";
-import { GiErlenmeyer, GiKneeCap } from "react-icons/gi";
+import { GiErlenmeyer, GiKneeCap, GiMedicinePills, GiMedicines } from "react-icons/gi";
 import { BiInjection } from "react-icons/bi";
 import { services } from "../../constant";
+import { FaHeartPulse } from "react-icons/fa6";
+import { BsLungsFill } from "react-icons/bs";
+import { TbPhysotherapist } from "react-icons/tb";
+import { RiTeamFill } from "react-icons/ri";
 
 const Demo5Services2 = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,14 +80,14 @@ const Demo5Services2 = () => {
           );
         case 2:
           return (
-            <GiKneeCap
+            <FaHeartPulse
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
           );
         case 3:
           return (
-            <FaTooth
+            <MdOutlineFace3
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
@@ -95,7 +101,7 @@ const Demo5Services2 = () => {
           );
         case 5:
           return (
-            <FaFemale
+            <MdPregnantWoman
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
@@ -109,7 +115,7 @@ const Demo5Services2 = () => {
           );
         case 7:
           return (
-            <FaUserNurse
+            <BsLungsFill
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
@@ -128,7 +134,14 @@ const Demo5Services2 = () => {
           );
         case 9:
           return (
-            <FaHeart
+            <FaTooth
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+          case 10:
+          return (
+            <TbPhysotherapist
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
@@ -140,9 +153,37 @@ const Demo5Services2 = () => {
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />
           );
+          case 12:
+          return (
+            <FaUserNurse
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+          case 13:
+          return (
+            <GiMedicines
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
         case 14:
           return (
             <GiErlenmeyer
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+          case 15:
+          return (
+            <FaStethoscope
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+            />
+          );
+          case 16:
+          return (
+            <RiTeamFill
               size={80}
               color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
             />

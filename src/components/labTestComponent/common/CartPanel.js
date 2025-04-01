@@ -5,7 +5,7 @@ import { AiFillDelete } from "react-icons/ai"; // For the delete icon
 import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { CiDiscount1 } from "react-icons/ci";
 import { HiOutlineShoppingCart } from "react-icons/hi";
-import { calculateTotalPrice} from "./CommonMethod";
+import { calculateTotalPrice } from "./CommonMethod";
 import { Container } from "react-bootstrap";
 import LabTestModel from "../modal/LabTestModel";
 import Preloader from "../../Preloader";
@@ -15,8 +15,8 @@ import { OtpScreen } from "../../../layout/Component/OtpScreen";
 import { price_symbol } from "../../../constant";
 
 const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
-  const [name, setName] = useState()
-  const [mobileNumber, setMobileNumber] = useState()
+  const [name, setName] = useState();
+  const [mobileNumber, setMobileNumber] = useState();
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("onlinePay"); // Initialize state
   const [cartItemsIds, setCartItemsIds] = useState([]);
@@ -67,32 +67,32 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       ? calculateTotalPrice(cartItems) * 0.95 // Apply 5% discount
       : calculateTotalPrice(cartItems);
 
-      const handleClose = useCallback(() => {
-        setIsProceed(false);
-        setError();
-      }, [setIsProceed, setError]);
+  const handleClose = useCallback(() => {
+    setIsProceed(false);
+    setError();
+  }, [setIsProceed, setError]);
 
   const hanleProceed = () => {
     setIsProceed(true);
-    setOtpRequested(true)
+    setOtpRequested(true);
   };
 
   const handleOtpRequest = ({ name, mobileNumber }) => {
-    console.log('testing', name, mobileNumber)
+    console.log("testing", name, mobileNumber);
     if (cartItemsIds.length === 0) {
       setError("Please select a test package to book");
       return;
     }
-    
+
     if (!name) {
       setError("Please fill all the fields");
       return;
     }
 
-    setName(name)
-    setMobileNumber(mobileNumber)
-    setOtpRequested(false)
-  }
+    setName(name);
+    setMobileNumber(mobileNumber);
+    setOtpRequested(false);
+  };
 
   const handleBookTest = async () => {
     const body = {
@@ -115,7 +115,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       if (result.success) {
         console.log("Booking successful:", result.booking);
         setReponseSuccess(true);
-        setCartItems([])
+        setCartItems([]);
         setError(""); // Clear any errors if successful
       } else {
         setError(result.error || "Booking failed. Please try again.");
@@ -128,12 +128,11 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
   useEffect(() => {
     if (responseSuccess) {
-
       // Close the modal after 2 seconds
       setTimeout(() => {
         handleClose(); // Call parent function to fully close the modal
         setReponseSuccess(false);
-      }, 2000);
+      }, 8000);
     }
   }, [responseSuccess, handleClose]);
 
@@ -157,7 +156,8 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
                     {item.healthCheckupData.title}
                   </div>
                   <div className={`row ${styles.itemPrice}`}>
-                    {price_symbol}{item.healthCheckupData.price}
+                    {price_symbol}
+                    {item.healthCheckupData.price}
                   </div>
                 </div>
 
@@ -234,7 +234,12 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
         <LabTestModel isOpen={isProceed}>
           {responseSuccess ? (
             <div className={styles.successMessage}>
-              <Image src={"/images/success.png"} alt="Thank you" width={100} height={100} />
+              <Image
+                src={"/images/success.png"}
+                alt="Thank you"
+                width={100}
+                height={100}
+              />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
               <div className={styles.successText}>
                 Your Lab Test has been Booked.
@@ -242,7 +247,10 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
             </div>
           ) : otpRequested ? (
             // Display component when otpRequested is true and responseSuccess is false
-            <RequestOtp onClose={handleClose} handleOtpRequest={handleOtpRequest} />
+            <RequestOtp
+              onClose={handleClose}
+              handleOtpRequest={handleOtpRequest}
+            />
           ) : (
             // Display component when both otpRequested and responseSuccess are false
             <OtpScreen onClose={handleClose} handleSubmitOtp={handleBookTest} />

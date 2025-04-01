@@ -3,10 +3,14 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { convertDateIntoTime, convertTimeIntoDate } from "../../helper";
-import { superAdminConsultationtype, userTypeConstant } from "../../constant";
+import { DoctorType, superAdminConsultationtype, userTypeConstant } from "../../constant";
+import { useSelector } from "react-redux";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
+  const consultationTypeStore = useSelector(
+    (state) => state.otherDetailsSlice.consultationType
+  );
   const [editedDoctor, setEditedDoctor] = useState({ ...doctor });
   const [profilePicturePreview, setProfilePicturePreview] = useState(
     doctor.profilePictureUrl
@@ -18,7 +22,9 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     convertDateIntoTime(editedDoctor.slotEndTime)
   );
 
-  const [selectedTypes, setSelectedTypes] = useState(editedDoctor.consultationType || []);
+  const [selectedTypes, setSelectedTypes] = useState(
+    editedDoctor.consultationType || []
+  );
 
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
@@ -87,15 +93,15 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   const handleCheckboxChange = (type) => {
     let updatedTypes;
     if (selectedTypes.includes(type)) {
-      updatedTypes = selectedTypes.filter(item => item !== type); // Remove if already selected
+      updatedTypes = selectedTypes.filter((item) => item !== type); // Remove if already selected
     } else {
       updatedTypes = [...selectedTypes, type]; // Add if not selected
     }
-    
+
     setSelectedTypes(updatedTypes);
     setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
   };
-  
+
   console.log(editedDoctor, "edited doctor");
 
   return (
@@ -197,19 +203,17 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   <b>Consultation Type</b>
                 </Form.Label>
                 <div>
-                  {Object.entries(superAdminConsultationtype).map(
-                    ([key, label]) => (
-                      <Form.Check
-                        key={key}
-                        type="checkbox"
-                        label={label}
-                        value={key}
-                        checked={selectedTypes.includes(label)}
-                        onChange={() => handleCheckboxChange(label)}
-                        className="mb-2"
-                      />
-                    )
-                  )}
+                  {consultationTypeStore.map((type) => (
+                    <Form.Check
+                      key={type._id} // Assuming each 'type' has a unique '_id' field
+                      type="checkbox"
+                      label={type.name} // Assuming 'name' is a property of each type
+                      value={type.name}
+                      checked={selectedTypes.includes(type.name)}
+                      onChange={() => handleCheckboxChange(type.name)}
+                      className="mb-2"
+                    />
+                  ))}
                 </div>
               </Form.Group>
             </Col>
@@ -250,12 +254,19 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Doctor Type</b>
                 </Form.Label>
-                <Form.Control
+                <select
                   type="text"
                   name="doctorType"
                   value={editedDoctor.doctorType}
                   onChange={handleChange}
-                />
+                  className="w-100 py-2"
+                >
+                  <option value="" disabled>
+                    Select an option
+                  </option>
+                  <option value={DoctorType.Company}>{DoctorType.Company}</option>
+                  <option value={DoctorType.Individual}>{DoctorType.Individual}</option>
+                </select>
               </Form.Group>
             </Col>
             <Col md={6}>

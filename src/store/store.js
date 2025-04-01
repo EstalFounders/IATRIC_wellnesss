@@ -6,6 +6,7 @@ import storage from "redux-persist/lib/storage";
 import appointmentReducer from "./slices/registerDoc/appointmentSlice";
 import notificationDataSlice from "./slices/notificationSectionApiData";
 import homepageSlice from "./slices/superAdmin/homepageSlice";
+import otherDetailsSlice from "./slices/superAdmin/otherDetailsSlice";
 import labTestCateogryDataSlice from "./slices/labTest/labTestCategoryApiData";
 import allDoctorsPageSlice from "./slices/bookingWebsite/allDoctorsPageSlice";
 import userDetailsPageSlice from "./slices/authentication/userDetailsSlice";
@@ -24,6 +25,7 @@ const notificationPersistedReducer = persistReducer(
   notificationDataSlice
 );
 const superAdminHomePageReducer = persistReducer(persistConfig, homepageSlice);
+const superAdminOtherDetailsReducer = persistReducer(persistConfig, otherDetailsSlice);
 const LabTestHomepageReducer = persistReducer(
   persistConfig,
   labTestCateogryDataSlice
@@ -40,6 +42,7 @@ export const makeStore = () =>
       labtestHomepage: LabTestHomepageReducer,
       allDoctorS: allDoctors,
       userDetails: userDetailsSlice,
+      otherDetailsSlice: superAdminOtherDetailsReducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

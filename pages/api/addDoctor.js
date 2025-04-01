@@ -18,7 +18,6 @@ import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
-import { convertTimeIntoDate, generateSlotsForMonth } from "./helper";
 import Slot from "../../src/models/slots";
 
 // Global variable to store the database connection

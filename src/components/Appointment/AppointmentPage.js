@@ -15,6 +15,12 @@ import AppointmentBookingModal from "./modal/AppointmentBookingModal";
 import Image from "next/image";
 import { isMobileValid } from "../../helper";
 
+const slotMessage = (
+  <div className="text-danger font-weight-bold">
+    SLOTS WILL BE GENERATED SOON
+  </div>
+);
+
 const AppointmentPage = () => {
   const router = useRouter();
   const [doctorChoice, setDoctorChoice] = useState("any");
@@ -212,7 +218,10 @@ const AppointmentPage = () => {
 
     const filtered = doctors.filter((doctor) => {
       // If the type is "Online consultations" or "Offline consultations", check if the doctor's type includes it
-      if (type === "Online consultations" || type === "Offline consultations") {
+      if (type === "Call" || type === "Video") {
+        return doctor.consultationType.includes(type);
+      }
+      if (type === "Clinic") {
         return doctor.consultationType.includes(type);
       }
       // Special handling for "Home visit" to match exactly
@@ -230,7 +239,7 @@ const AppointmentPage = () => {
 
   useEffect(() => {
     if (appointmentTime === "chooseTime") {
-      const slots = generateSlotsForChooseTime(selectedDate, 9, 21, 15); // Generate slots from 9 AM to 9 PM with 15-minute intervals
+      const slots = generateSlotsForChooseTime(selectedDate, 8, 23, 20); // Generate slots from 9 AM to 9 PM with 20-minute intervals
       setLocallyCreatedSlots(slots);
     }
   }, [selectedDate, appointmentTime]);
@@ -613,7 +622,7 @@ const AppointmentPage = () => {
                                 {formatTime(slot.startTime)} -{" "}
                                 {formatTime(slot.endTime)}
                               </li>
-                            )): <div className="text-danger font-weight-bold">SLOTS WILL BE GENERATED SOON</div>}
+                            )): slotMessage}
                         </div>
                       </ul>
                     </div>
@@ -639,7 +648,8 @@ const AppointmentPage = () => {
                             justifyContent: "space-around",
                           }}
                         >
-                          {locallyCreatedSlots
+                          {console.log(locallyCreatedSlots, "locally created slots")}
+                          {locallyCreatedSlots.length > 0 ? locallyCreatedSlots
                             .filter((slot) => {
                               const currentDate = new Date();
                               return (
@@ -675,7 +685,7 @@ const AppointmentPage = () => {
                                 {formatTime(slot.startTime)} -{" "}
                                 {formatTime(slot.endTime)}
                               </li>
-                            ))}
+                            )): slotMessage}
                         </div>
                       </ul>
                     </div>

@@ -47,6 +47,7 @@ const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
       </Col>
       <Col>{data.consultationType}</Col>
       <Col>{formatData(data.appointmentTime)}</Col>
+      <Col>{formatData(data.appointmentTime)}</Col>
       <Col>{data.symptoms}</Col>
       <Col>{data.patientMobNo}</Col>
       <Col>

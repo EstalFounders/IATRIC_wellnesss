@@ -43,7 +43,7 @@ export const services = [
     "Cardiology",
     "Dermatologist",
     "Orthopaedics",
-    "Gynaecology",
+    "Gynaecology & Obstetrics",
     "Ophthalmology",
     "Pulmonology",
     "Psychiatrist",
@@ -55,22 +55,21 @@ export const services = [
     "Lab Investigation",
     "Corporate Healthcare",
     "Healthcamp",
-    "Obstetrics",
 ]
 
 export const consultationTypeMapping = {
-    "Call": "Online consultations",
-    "Video": "Online consultations",
-    "Clinic": "Offline consultations",
+    "Call": "Call",
+    "Video": "Video",
+    "Clinic": "Clinic",
     "Home Visit": "Home visit"
   };
 
-export const consultationTypeConstant =  {
-    call: "Call",
-    video: "Video",
-    clinic: "Clinic",
-    home_visit:"Home Visit"
-}
+// export const consultationTypeConstant =  {
+//     call: "Call",
+//     video: "Video",
+//     clinic: "Clinic",
+//     home_visit:"Home Visit"
+// }
 
 export const userTypeConstant = {
     patient: 'patient',
@@ -129,8 +128,14 @@ export const roles = {
 }
 
 export const superAdminConsultationtype = [
-    "Online consultations",
-    "Off-line consultations",
+    "Call",
+    "Video",
     "Home visit",
+    "Clinic"
   ];
+
+export const DoctorType = {
+    Company: "Company",
+    Individual: "Indiividual",
+};
 

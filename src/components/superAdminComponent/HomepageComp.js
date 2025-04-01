@@ -15,10 +15,16 @@ import { api } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
-import RecentDoctors from "./RecentDoctors/RecentDoctors"
+import RecentDoctors from "./RecentDoctors/RecentDoctors";
 import { useDispatch } from "react-redux";
-import { setAllappointments, setAllDoctor, setAllLab, setAllLabTest } from "../../store/slices/superAdmin/homepageSlice";
+import {
+  setAllappointments,
+  setAllDoctor,
+  setAllLab,
+  setAllLabTest,
+} from "../../store/slices/superAdmin/homepageSlice";
 import { calculateTotalIncome } from "./utility/helper";
+import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
@@ -27,7 +33,7 @@ export default function HomepageComp() {
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [labTests, setLabTests] = useState([]);
-  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalIncome, setTotalIncome] = useState(0);
   const [totalPatients, setTotalPatients] = useState(0);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(
@@ -35,8 +41,7 @@ export default function HomepageComp() {
   );
   const [severity, setSeverity] = useState("success");
   const router = useRouter();
-  const dispatch = useDispatch()
-  
+  const dispatch = useDispatch();
 
   async function fetchDoctors() {
     try {
@@ -46,7 +51,7 @@ export default function HomepageComp() {
       }
       const data = await response.json(); // Extract JSON data from the response
       setDoctors(data); // Update state with fetched data
-      dispatch(setAllDoctor(data))
+      dispatch(setAllDoctor(data));
     } catch (error) {
       console.error("Error fetching data client:", error);
     } finally {
@@ -55,34 +60,50 @@ export default function HomepageComp() {
   }
 
   useEffect(() => {
+    // If no data in local storage, fetch from API
+    fetch(api.consiltationFee)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch consultations");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        dispatch(setConsultationType(data));
+      })
+      .catch((error) => console.error("Error fetching consultations:", error));
+  }, []);
+
+  useEffect(() => {
     fetchDoctors(); // Call the fetchDoctors function when the component mounts
   }, []);
 
   useEffect(() => {
-    setIsAppointmentLoading(true)
+    setIsAppointmentLoading(true);
     const fetchData = async () => {
       try {
-        const [appointmentsResponse, labTestsResponse, labResponse] = await Promise.all([
-          fetch(api.bookConsultation), // Replace with actual API endpoint
-          fetch(api.bookLabTest),    // Replace with actual API endpoint
-          fetch(api.addNewLab),
-        ]);
+        const [appointmentsResponse, labTestsResponse, labResponse] =
+          await Promise.all([
+            fetch(api.bookConsultation), // Replace with actual API endpoint
+            fetch(api.bookLabTest), // Replace with actual API endpoint
+            fetch(api.addNewLab),
+          ]);
 
-        const [appointmentsData, labTestsData,labData] = await Promise.all([
+        const [appointmentsData, labTestsData, labData] = await Promise.all([
           appointmentsResponse.json(),
           labTestsResponse.json(),
-          labResponse.json()
+          labResponse.json(),
         ]);
-        const appointments = appointmentsData.appointments
-        const labTest = labTestsData.labTests
+        const appointments = appointmentsData.appointments;
+        const labTest = labTestsData.labTests;
         setAppointments(appointments);
         setLabTests(labTest);
-        dispatch(setAllappointments(appointments))
-        dispatch(setAllLabTest(labTest))
-        dispatch(setAllLab(labData))
+        dispatch(setAllappointments(appointments));
+        dispatch(setAllLabTest(labTest));
+        dispatch(setAllLab(labData));
         // Calculate totals
         const calculatedTotals = calculateTotalIncome(appointments, labTest);
-        console.log(calculatedTotals.totatIncome, 'calculated totals')
+        console.log(calculatedTotals.totatIncome, "calculated totals");
         setTotalIncome(calculatedTotals.totatIncome);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -94,7 +115,6 @@ export default function HomepageComp() {
     fetchData();
   }, []);
 
-  
   // const calculateStatistics = (appointments) => {
   //   const uniquePatients = new Set();
 
@@ -113,8 +133,6 @@ export default function HomepageComp() {
   const refreshDoctorList = async () => {
     await fetchDoctors();
   };
-
-  
 
   const handleOpenSnackBar = () => {
     console.log("handle open snack bar");

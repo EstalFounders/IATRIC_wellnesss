@@ -87,6 +87,7 @@ export default async function handler(req, res) {
       const meetingId = uuidv4();
 
       // Find available doctor if needed right now
+      console.log(genericConsultationType, "generic consultation type");
       if (doctorId == null && appointmentTime == "Now") {
         const result = await findAvailableDoctorForNow(
           selectedDate,
@@ -107,6 +108,7 @@ export default async function handler(req, res) {
           genericConsultationType,
           selectedSlot
         );
+        console.log(result, "result 111");
         doctorId = result.doctor;
         slot = result.slotId;
         console.log(doctorId, "doctorid for specific time", slot, "slot");

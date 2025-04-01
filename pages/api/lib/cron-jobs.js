@@ -14,17 +14,15 @@ const generateSlotsForDoctor = async (doctor, start, numDays) => {
     return;
   }
 
-  // Convert slotStartTime and slotEndTime to UTC to avoid timezone mismatches
   const slotStartTime = new Date(doctor.slotStartTime);
   const slotEndTime = new Date(doctor.slotEndTime);
 
-  const slotStartHour = slotStartTime.getUTCHours(); // Get correct start hour in UTC
-  const slotStartMinute = slotStartTime.getUTCMinutes(); // Get correct start minute
+  const slotStartHour = slotStartTime.getUTCHours();
+  const slotStartMinute = slotStartTime.getUTCMinutes();
   const slotEndHour = slotEndTime.getUTCHours();
 
   for (let i = 0; i < numDays; i++) {
-    let date = new Date(start);
-    date.setDate(start.getDate() + i);
+    let date = new Date(start.getTime() + i * 86400000); // Avoid modifying original start date
 
     for (let hour = slotStartHour; hour < slotEndHour; hour++) {
       for (
@@ -32,24 +30,11 @@ const generateSlotsForDoctor = async (doctor, start, numDays) => {
         minute < 60;
         minute += 20
       ) {
-        // Ensure slots start exactly from slotStartTime
         const slotStart = new Date(
-          Date.UTC(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            hour,
-            minute
-          )
+          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute)
         );
         const slotEnd = new Date(
-          Date.UTC(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            hour,
-            minute + 20
-          )
+          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute + 20)
         );
 
         slots.push({
@@ -63,13 +48,17 @@ const generateSlotsForDoctor = async (doctor, start, numDays) => {
     }
   }
 
-  if (slots.length > 0) {
-    await Slot.insertMany(slots);
-    console.log(
-      `${slots.length} slots created for doctor ${doctor._id} (${doctor.name})`
-    );
+  // Prevent duplicates before inserting into DB
+  for (let slot of slots) {
+    const existingSlot = await Slot.findOne({ doctorId: slot.doctorId, startTime: slot.startTime });
+    if (!existingSlot) {
+      await Slot.create(slot);
+    }
   }
+
+  console.log(`${slots.length} slots created for doctor ${doctor._id} (${doctor.name})`);
 };
+
 
 const performScheduledTasks = async () => {
   await dbConnect();

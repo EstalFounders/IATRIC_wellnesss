@@ -5,10 +5,16 @@ import { Button, Col, Row } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
-import { api, superAdminConsultationtype } from "../../../constant.js";
+import {
+  api,
+  DoctorType,
+  superAdminConsultationtype,
+} from "../../../constant.js";
 import TimePicker from "react-time-picker";
 import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setConsultationType } from "../../../store/slices/superAdmin/otherDetailsSlice.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -22,8 +28,9 @@ const AddDoctorForm = () => {
   const [message, setMessage] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const dispatch = useDispatch();
 
-  const consultationOptions = superAdminConsultationtype;
+  
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
@@ -39,12 +46,16 @@ const AddDoctorForm = () => {
     educationTraining: "",
     consultationType: "",
     password: "",
-    doctorType: "individual",
+    doctorType: DoctorType.INDIVIDUAL,
     price: "",
     slotStartTime: "",
     slotEndTime: "",
     mobileNumber: "",
   });
+
+  const consultationTypeStore = useSelector(
+    (state) => state.otherDetailsSlice.consultationType
+  );
 
   const handleAddType = (e) => {
     const value = e.target.value;
@@ -283,13 +294,13 @@ const AddDoctorForm = () => {
               <option value="" disabled>
                 Select an option
               </option>
-              {consultationOptions.map((option) => (
+              {consultationTypeStore.map((option) => (
                 <option
-                  key={option}
-                  value={option}
-                  disabled={selectedTypes.includes(option)}
+                  key={option._id}
+                  value={option.name}
+                  disabled={selectedTypes.includes(option.name)}
                 >
-                  {option}
+                  {option.isActive ? option.name : null} 
                 </option>
               ))}
             </select>
@@ -383,8 +394,12 @@ const AddDoctorForm = () => {
                   onChange={handleChange}
                   className={styles.select}
                 >
-                  <option value="individual">Individual</option>
-                  <option value="company">Company</option>
+                  <option value={DoctorType.Individual}>
+                    {DoctorType.Individual}
+                  </option>
+                  <option value={DoctorType.Company}>
+                    {DoctorType.Company}
+                  </option>
                 </select>
               </label>
             </Col>
