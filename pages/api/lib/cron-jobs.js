@@ -7,6 +7,7 @@ import { dbConnect } from "../../../src/lib/db";
 const generateSlotsForDoctor = async (doctor, start, numDays) => {
   let slots = [];
 
+  // Validate required fields
   if (!doctor.slotStartTime || !doctor.slotEndTime) {
     console.warn(
       `Doctor ${doctor._id} (${doctor.name}) has no slotStartTime or slotEndTime`
@@ -17,48 +18,71 @@ const generateSlotsForDoctor = async (doctor, start, numDays) => {
   const slotStartTime = new Date(doctor.slotStartTime);
   const slotEndTime = new Date(doctor.slotEndTime);
 
-  const slotStartHour = slotStartTime.getUTCHours();
-  const slotStartMinute = slotStartTime.getUTCMinutes();
-  const slotEndHour = slotEndTime.getUTCHours();
+  // Get start/end times in minutes from midnight
+  const slotStartMinutes =
+    slotStartTime.getUTCHours() * 60 + slotStartTime.getUTCMinutes();
+  const slotEndMinutes =
+    slotEndTime.getUTCHours() * 60 + slotEndTime.getUTCMinutes();
 
+  // Validate time range
+  if (slotStartMinutes >= slotEndMinutes) {
+    console.warn(
+      `Invalid time range for doctor ${doctor._id}: Start (${slotStartTime}) must be before End (${slotEndTime})`
+    );
+    return;
+  }
+
+  // Generate slots for specified number of days
   for (let i = 0; i < numDays; i++) {
-    let date = new Date(start.getTime() + i * 86400000); // Avoid modifying original start date
+    let date = new Date(start.getTime() + i * 86400000);
 
-    for (let hour = slotStartHour; hour < slotEndHour; hour++) {
-      for (
-        let minute = hour === slotStartHour ? slotStartMinute : 0;
-        minute < 60;
-        minute += 20
-      ) {
-        const slotStart = new Date(
-          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute)
-        );
-        const slotEnd = new Date(
-          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute + 20)
-        );
+    // Calculate first available slot minute for today
+    let currentMinute = slotStartMinutes;
 
-        slots.push({
-          doctorId: doctor._id,
-          startTime: slotStart,
-          endTime: slotEnd,
-          date: new Date(date),
-          isBooked: false,
-        });
-      }
+    while (currentMinute < slotEndMinutes) {
+      // Create start time for this slot
+      const slotStart = new Date(
+        Date.UTC(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
+          Math.floor(currentMinute / 60),
+          currentMinute % 60
+        )
+      );
+
+      // Create end time (20 minutes later)
+      const slotEnd = new Date(slotStart.getTime() + 20 * 60000);
+
+      slots.push({
+        doctorId: doctor._id,
+        startTime: slotStart,
+        endTime: slotEnd,
+        date: new Date(date),
+        isBooked: false,
+      });
+
+      // Move to next 20-minute interval
+      currentMinute += 20;
     }
   }
 
   // Prevent duplicates before inserting into DB
   for (let slot of slots) {
-    const existingSlot = await Slot.findOne({ doctorId: slot.doctorId, startTime: slot.startTime });
+    const existingSlot = await Slot.findOne({
+      doctorId: slot.doctorId,
+      startTime: slot.startTime,
+    });
+
     if (!existingSlot) {
       await Slot.create(slot);
     }
   }
 
-  console.log(`${slots.length} slots created for doctor ${doctor._id} (${doctor.name})`);
+  console.log(
+    `${slots.length} slots created for doctor ${doctor._id} (${doctor.name})`
+  );
 };
-
 
 const performScheduledTasks = async () => {
   await dbConnect();
@@ -83,3 +107,4 @@ const performScheduledTasks = async () => {
 };
 
 export default performScheduledTasks;
+

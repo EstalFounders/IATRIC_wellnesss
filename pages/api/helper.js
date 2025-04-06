@@ -37,74 +37,65 @@ export async function findAvailableDoctorForNow(
 ) {
   await dbConnect();
 
-  console.log(
-    genericConsultationType,
-    "generic consultation type",
-    selectedDate,
-    "selected date"
-  );
-
-  // Normalize the selectedDate to the nearest 15-minute interval
   const selectedDateObj = new Date(selectedDate);
   const minutes = selectedDateObj.getMinutes();
   const nextSlotTime = new Date(selectedDateObj);
 
-  // Adjust to the next 20-minute slot (round up)
+  // Round up to the next 20-minute slot
   if (minutes % 20 !== 0) {
     const roundedMinutes = Math.ceil(minutes / 20) * 20;
-    nextSlotTime.setMinutes(roundedMinutes, 0, 0); // Round to next 15-minute interval
+    nextSlotTime.setMinutes(roundedMinutes, 0, 0);
   }
+  nextSlotTime.setMilliseconds(0);
 
-  console.log(nextSlotTime, "nextSlotTime"); // Debug: Next 15-min slot start
+  console.log("Searching slots from:", nextSlotTime);
 
-  // Find doctors who can provide the requested consultation type
-  // First, try to find doctors with the specified doctorType
+  // Step 1: Find active company doctors
   let doctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
     doctorType: DoctorType.Company,
-    isActive: true,
+    // isActive: true,
   });
 
-  // If no doctors are found, try again without the doctorType filter
+  // Step 2: If no company doctors, fallback to any matching doctors
   if (doctors.length === 0) {
     doctors = await Doctor.find({
       consultationType: { $in: [genericConsultationType] },
+      // isActive: true,
     });
   }
 
-  for (const doctor of doctors) {
-    console.log(doctor._id.toString(), "doctor", nextSlotTime, "nextSlotTime");
+  let earliestSlotInfo = null;
 
-    // Find the slot starting from the normalized nextSlotTime
-    const availableSlots = await Slot.find({
+  // Step 3: Find the earliest available slot among all doctors
+  for (const doctor of doctors) {
+    const nextAvailableSlot = await Slot.findOne({
       doctorId: doctor._id.toString(),
       startTime: { $gte: nextSlotTime },
       isBooked: false,
-    }).sort({ startTime: 1 }); // Sort slots by startTime
+    }).sort({ startTime: 1 });
 
-    console.log(availableSlots, "available slots");
-
-    // Check if there are two consecutive slots of 15 minutes
-    for (let i = 0; i < availableSlots.length - 1; i++) {
-      const currentSlot = availableSlots[i];
-      const nextSlot = availableSlots[i + 1];
-
-      const currentSlotEndTime = new Date(currentSlot.startTime);
-      currentSlotEndTime.setMinutes(currentSlotEndTime.getMinutes() + 20);
-
-      // Ensure the next slot starts immediately after the current slot
-      if (
-        currentSlotEndTime.getTime() === new Date(nextSlot.startTime).getTime()
-      ) {
-        return {
-          doctor,
-          slots: [nextSlot], // Return both consecutive slots
-        };
-      }
+    if (
+      nextAvailableSlot &&
+      (!earliestSlotInfo ||
+        new Date(nextAvailableSlot.startTime) <
+          new Date(earliestSlotInfo.slot.startTime))
+    ) {
+      earliestSlotInfo = {
+        doctor,
+        slot: nextAvailableSlot,
+      };
     }
   }
 
-  return ""; // Return an empty result if no suitable doctor/slots are found
+  if (earliestSlotInfo) {
+    return {
+      doctor: earliestSlotInfo.doctor,
+      slot: earliestSlotInfo.slot,
+    };
+  }
+
+  return null; // No slots found
 }
 
 export async function findAvailableDoctorForSpecificTimeSlot(
@@ -136,7 +127,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
       consultationType: { $in: [genericConsultationType] },
     });
   }
-  console.log(doctors[0]._id, "doctors id in helper 85");  
+  console.log(doctors[0]._id, "doctors id in helper 85");
   for (const doctor of doctors) {
     // Check for available slots for this doctor within the specific time range
     const availableSlot = await Slot.findOne({

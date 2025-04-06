@@ -94,8 +94,14 @@ export default async function handler(req, res) {
           genericConsultationType
         );
         console.log(result, "result 97");
+        console.log(
+          result.doctor._id.toString(),
+          "result doctor id",
+          result.slot,
+          "result slots"
+        );
         doctorId = result ? result.doctor._id.toString():"";
-        slot = result ? result.slots: "";
+        slot = result ? result.slot: "";
         if (!doctorId) {
           throw new Error("No available doctors at the selected time");
         }
@@ -158,7 +164,6 @@ export default async function handler(req, res) {
         prescriptionUrl,
       }) => {
         await dbConnect();
-
         const updatedSlot = await Slot.findOneAndUpdate(
           { _id: slot, doctorId, isBooked: false },
           { isBooked: true },
@@ -166,10 +171,6 @@ export default async function handler(req, res) {
         );
 
         console.log(updatedSlot, "updated slot");
-        // Check if the slot was successfully booked
-        if (!updatedSlot) {
-          throw new Error("Slot is already booked or does not exist.");
-        }
 
         // Step 2: Create the appointment
         const appointment = await Appointment.create({
