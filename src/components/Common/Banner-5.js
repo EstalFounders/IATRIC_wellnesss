@@ -13,7 +13,7 @@ const Banner5 = () => {
             </h3>
             {/* Text */}
             <p>
-              Start your journey to optimal health. Iatric Healthcare offers
+              Start your journey to optimal health. Healthpath offers
               exceptional care, personalized to your needs, by highly qualified
               experts. We empower you to reach your wellness goals.
             </p>

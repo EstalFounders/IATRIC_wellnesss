@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { contact_no } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../Common/PopupDialog";
+import { FaPhoneAlt } from "react-icons/fa";
 
 const Demo5About2 = () => {
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
@@ -90,7 +91,7 @@ const Demo5About2 = () => {
                 <h5 className="h5-md steelblue-color">Get in Touch</h5>
                 {/* Text */}
                 <h4 className="h4-sm emergency-call blue-color">
-                  <i className="fas fa-phone" />
+                  <FaPhoneAlt />
                   <a
                     onClick={(e) => {
                       e.preventDefault();
@@ -107,7 +108,7 @@ const Demo5About2 = () => {
                   </a>
                 </h4>
                 <p className="mt-20">
-                  Your health is our priority at Iatric Healthcare. Whether you
+                  Your health is our priority at Healthpath. Whether you
                   have questions, concerns, or need to schedule an appointment,
                   we&apos;re here to assist you every step of the way. Committed
                   to your satisfaction, we eagerly anticipate partnering with

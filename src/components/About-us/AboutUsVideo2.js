@@ -54,7 +54,7 @@ const AboutUsVideo2 = () => {
                   <i className="fas fa-genderless" />
                 </div>
                 <p>
-                  Supporting Your Community Iatric Healthcare believes in
+                  Supporting Your Community Healthpath believes in
                   promoting a culture of wellness. We partner with companies to
                   establish and manage occupational health centers, keeping
                   employees healthy and productive. We also organize health

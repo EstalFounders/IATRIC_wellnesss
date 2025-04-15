@@ -14,7 +14,7 @@ const DoctorsSection = () => {
             throw new Error("Failed to fetch");
           }
           const data = await response.json();
-          sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
+          sessionStorage.setItem("doctors" ,JSON.stringify(data)); // Store fetched data in session storage
           setDoctors(data);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -27,14 +27,14 @@ const DoctorsSection = () => {
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
       <div className="container">
-        {/* SECTION TITLE */}
+        {/* SECTION TITLE */} 
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title */}
             <h3 className="h3-md steelblue-color">Our Medical Specialists</h3>
             {/* Text */}
             <p>
-              At Iatric Healthcare, we understand the importance of having
+              At Healthpath, we understand the importance of having
               access to reliable healthcare guidance, even beyond traditional
               office hours. That&apos;s why we offer a range of options to
               connect with a qualified healthcare professional, whenever you

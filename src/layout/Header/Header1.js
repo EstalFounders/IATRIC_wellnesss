@@ -176,7 +176,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                     e.preventDefault();
                     handleDialDialogOpen();
                   }}
-                  href="tel:9625942020"
+                  href={`tel:${contact_no}`}
                   className="callusbtn"
                   onMouseOver={(e) => {
                     e.target.style.color = "#8e8333";

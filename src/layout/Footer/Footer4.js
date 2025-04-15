@@ -1,7 +1,7 @@
 import Link from "next/dist/client/link";
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
 import { contact_no, email } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -174,7 +174,7 @@ const Footer4 = () => {
                       e.target.style.color = "#8e8333";
                     }}
                   >
-                    <i className="fas fa-phone" /> {contact_no}
+                    <FaPhoneAlt /> {contact_no}
                   </a>
                 </Link>
               </h5>
@@ -190,9 +190,9 @@ const Footer4 = () => {
         {/* FOOTER COPYRIGHT */}
         <div className="bottom-footer">
           <div className="row">
-            <div className="col-md-12">
+            <div className="col-md-12 text-right">
               <p className="footer-copyright">
-                © {new Date().getFullYear()} <span>Iatric Healthcare</span>. All
+              {new Date().getFullYear()} ©  <span>TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All
                 Rights Reserved
               </p>
             </div>

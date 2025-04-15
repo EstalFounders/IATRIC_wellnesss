@@ -24,7 +24,7 @@ const AboutUsInfo4 = () => {
               <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
-                  Welcome to Iatric healthcare
+                  Welcome to Healthpath
                 </span>
                 {/* Title */}
                 <h3 className="h3-md steelblue-color">
@@ -32,7 +32,7 @@ const AboutUsInfo4 = () => {
                 </h3>
                 {/* Text */}
                 <p>
-                  Iatric Healthcare offers a revolutionary approach to medical
+                  Healthpath offers a revolutionary approach to medical
                   care, placing your convenience and well-being at the
                   forefront. We understand the challenges of busy schedules and
                   long wait times, which is why we&apos;ve designed a system
@@ -63,7 +63,7 @@ const AboutUsInfo4 = () => {
                 <p className="mb-30">
                   Imagine getting expert medical attention, from online
                   consultations to personalized home visits, all without leaving
-                  your comfort zone. Iatric Healthcare provides a comprehensive
+                  your comfort zone. Healthpath provides a comprehensive
                   suite of services, including:
                 </p>
                 {/* Options List */}

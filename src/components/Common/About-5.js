@@ -20,7 +20,7 @@ const About5 = () => {
             <div className="txt-block pc-30" data-wow-delay="0.4s">
               {/* Section ID */}
               <span className="section-id blue-color">
-                <h5>Welcome to Iatric Healthcare</h5>
+                <h5>Welcome to Healthpath</h5>
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">

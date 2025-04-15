@@ -36,13 +36,13 @@ function MyApp({ Component, pageProps, ...rest }) {
           href="https://fonts.googleapis.com/css?family=Lato:400,700,900,900&display=swap"
           rel="stylesheet"
         />
-        <title>Iatric Healthcare</title>
+        <title>Health Path</title>
         <link
           rel="shortcut icon"
-          href="images/favicon.ico"
+          href="images/logo.png"
           type="image/x-icon"
         />
-        <link rel="icon" href="images/favicon.ico" type="image/x-icon"></link>
+        <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
       {loader && <Preloader />}
       <NoSsr>

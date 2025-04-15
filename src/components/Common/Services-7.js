@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import PopupDialog from "./PopupDialog";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import { Button } from "react-bootstrap";
+import { contact_no } from "../../constant";
 
 const Services7 = () => {
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
@@ -215,7 +216,7 @@ const Services7 = () => {
               {/* <h5 className="h5-sm">Need a personal health plan?</h5> */}
               {/* Text */}
               <p className="p-sm">
-                Contact Iatric Healthcare today and experience a clinic with a
+                Contact Healthpath today and experience a clinic with a
                 truly innovative approach to treatment.
                 <br />
                 <Button
@@ -239,14 +240,14 @@ const Services7 = () => {
                 >
                   Call/WhatsApp -{" "}
                   <a
-                    href="tel:+919625942020"
+                    href={`tel:${contact_no}`}
                     style={{
                       fontFamily: "bold",
                       textDecoration: "none",
                       color: "#000000",
                     }}
                   >
-                    +91 9625942020
+                    {contact_no}
                   </a>
                 </Button>
               </p>

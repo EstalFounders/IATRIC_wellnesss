@@ -20,7 +20,8 @@ export default function HomePage() {
   return (
     <div>
       <h1>Store Lab Test Data</h1>
-      <button onClick={handleFetch}>Store Data</button>
+      {/* <button onClick={handleFetch}>Store Data</button> */}
+      <button onClick={handleFetch}>Send WhatsApp</button>
       {message && <p>{message}</p>}
     </div>
   );

@@ -244,18 +244,18 @@ const AppointmentPage = () => {
     }
   }, [selectedDate, appointmentTime]);
 
-  useEffect(() => {
-    if (doctorChoice === "choose" && appointmentTime === "Now") {
-      try {
-        if (!selectedSlot) {
-          checkAvailableSlot(); // Wait for the available slot to be set
-        }
-      } catch (error) {
-        console.error("Slot check failed:", error);
-        return; // Stop execution if no slot is available
-      }
-    }
-  }, [availableSlots]);
+  // useEffect(() => {
+  //   if (doctorChoice === "choose" && appointmentTime === "Now") {
+  //     try {
+  //       if (!selectedSlot) {
+  //         checkAvailableSlot(); // Wait for the available slot to be set
+  //       }
+  //     } catch (error) {
+  //       console.error("Slot check failed:", error);
+  //       return; // Stop execution if no slot is available
+  //     }
+  //   }
+  // }, [availableSlots]);
 
   const handleOpenSnackBar = () => {
     setOpenSnackBar(true);
@@ -337,32 +337,32 @@ const AppointmentPage = () => {
     }
   };
 
-  const checkAvailableSlot = () => {
-    return new Promise((resolve, reject) => {
-      const now = new Date();
-      now.setMinutes(0);
-      now.setSeconds(0);
-      now.setMilliseconds(0);
+  // const checkAvailableSlot = () => {
+  //   return new Promise((resolve, reject) => {
+  //     const now = new Date();
+  //     now.setMinutes(0);
+  //     now.setSeconds(0);
+  //     now.setMilliseconds(0);
 
-      const availableSlot = availableSlots.find((slot) => {
-        const startTime = new Date(slot.startTime);
-        const endTime = new Date(slot.endTime);
-        return now >= startTime && now < endTime && !slot.isBooked;
-      });
+  //     const availableSlot = availableSlots.find((slot) => {
+  //       const startTime = new Date(slot.startTime);
+  //       const endTime = new Date(slot.endTime);
+  //       return now >= startTime && now < endTime && !slot.isBooked;
+  //     });
 
-      if (availableSlot) {
-        console.log(availableSlot._id, "when now selected slot id");
-        setSelectedSlot(availableSlot);
-        resolve(availableSlot); // Resolve the promise with the available slot
-      } else {
-        setSeverity("warning");
-        setSnackBarMessage(
-          "Currently, no slots are available. Please choose another time or try again later."
-        );
-        handleOpenSnackBar();
-      }
-    });
-  };
+  //     if (availableSlot) {
+  //       console.log(availableSlot._id, "when now selected slot id");
+  //       setSelectedSlot(availableSlot);
+  //       resolve(availableSlot); // Resolve the promise with the available slot
+  //     } else {
+  //       setSeverity("warning");
+  //       setSnackBarMessage(
+  //         "Currently, no slots are available. Please choose another time or try again later."
+  //       );
+  //       handleOpenSnackBar();
+  //     }
+  //   });
+  // };
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);

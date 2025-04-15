@@ -94,7 +94,7 @@ const Demo5Contacts1 = () => {
             </h3>
             {/* Text */}
             <p>
-              Feeling unsure or in need of guidance? At Iatric Healthcare,
+              Feeling unsure or in need of guidance? At Healthpath,
               we&apos;re here to listen. Don&apos;t hesitate to reach out with
               any questions, concerns, or simply to discuss your healthcare
               goals. We&apos;re dedicated to providing personalized support and

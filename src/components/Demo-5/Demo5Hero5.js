@@ -12,7 +12,7 @@ const Demo5Hero5 = () => {
               className="hero-5-strip bg-blue white-color"
               style={{ backgroundColor: "#3b5f1d" }}
             >
-              <h5>Iatric Healthcare Provides</h5>
+              <h5>HEALTHPATH Provides</h5>
             </div>
             <div className="hero-txt">
               {/* Title */}

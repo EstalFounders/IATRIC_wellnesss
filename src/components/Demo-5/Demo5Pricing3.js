@@ -9,14 +9,14 @@ const Demo5Pricing3 = () => {
           <div className="col-lg-6">
             <div className="txt-block pc-30 mb-40" data-wow-delay="0.4s">
               {/* Section ID */}
-              <span className="section-id blue-color">Iatric Pricing</span>
+              <span className="section-id blue-color">Healthpath Pricing</span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
                 Invest in Your Health, Affordably
               </h3>
               {/* Text */}
               <p>
-                Iatric Healthcare prioritizes affordable &amp; accessible
+                Healthpath prioritizes affordable &amp; accessible
                 healthcare. We offer budget-friendly options for checkups,
                 chronic care, &amp; specialized services, allowing you to invest
                 in your health without breaking the bank.
