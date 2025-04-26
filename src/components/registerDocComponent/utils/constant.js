@@ -1,0 +1,8 @@
+export const KNOWN_CASES_TXT = "Known Case Of"
+export const UNDER_TREATMENT_TXT = "Under Treatment Since"
+export const CHIEF_COMPLAINTS_TXT = "Chief Complaints"
+export const HISTORY_KNOWN_ALLERGY_TXT = "Any history of known allergy"
+export const LAST_HEALTH_TEXT_DONE_TXT = "Last Health Test Done"
+export const ADVICES = "Advices"
+export const NOTES = "Notes"
+export const TEST_ADVICES = "TEST ADVICES"

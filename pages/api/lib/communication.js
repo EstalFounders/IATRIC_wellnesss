@@ -39,7 +39,7 @@ export async function sendWhatsAppMessage(number, body) {
       const message = await twilioClient.messages.create({
         body: `${body}`,
         from: `whatsapp:${twilioPhoneNumber}`,
-        to: `whatsapp:+91${number}`
+        to: `whatsapp:${number}`
       });
       console.log("Message sent successfully:", message);
     } catch (error) {

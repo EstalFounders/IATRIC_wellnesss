@@ -1,4 +1,3 @@
-// pages/api/sendWhatsAppMessage.js
 import Slot from "../../src/models/slots";
 import Doctor from "../../src/models/doctorModel";
 import { dbConnect } from "../../src/lib/db";

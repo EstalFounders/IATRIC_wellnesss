@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import LabTest from "../../src/models/lab-test"; // Assuming you've defined a model schema
 import LabTestDetails from "../../src/models/lab-test-detailsSchema"; // For storing test details
 import { dbConnect } from "../../src/lib/db";
-import { sendWhatsAppMessage } from "./lib/twilio";
+import { sendWhatsAppMessage } from "./lib/communication";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -14,17 +14,17 @@ export default async function handler(req, res) {
   }
 
   try {
-     await sendWhatsAppMessage(
-        "7455992234",
-        `Your Audio consultation is booked successfully.`
-      );
-  } catch (error) { 
+    await sendWhatsAppMessage(
+      "7455992234",
+      `Your Audio consultation is booked successfully.`
+    );
+  } catch (error) {
     console.error("Error connecting to database:", error);
-    return res.status(500).json({ message: "Internal server error" });  
-  } 
-  
-  //code for update new column in db 
-  
+    return res.status(500).json({ message: "Internal server error" });
+  }
+
+  //code for update new column in db
+
   // try {
   //   // Update all documents to ensure the 'newField' exists with a default value if not present
   //   const result = await LabTestDetails.updateMany(
@@ -38,9 +38,9 @@ export default async function handler(req, res) {
   //   res.status(500).json({ success: false, message: 'Failed to update documents', error });
   // }
 
-  //  code for storing lab data 
+  //  code for storing lab data
 
-  // try {     
+  // try {
   //   // Directory path where the JSON files are stored
   //   const directoryPath = path.join(process.cwd(), "Data"); // Assuming your JSON files are in a 'data' folder
   //   console.log(directoryPath, "directory path");
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
   //     // console.log(jsonData, 'json data line 29')
   //     // Create a dummy category description
   //     const categoryDescription = `Auto generated description`;
-       
+
   //     // Insert the category into the Lab-Test collection
   //     const newCategory = new LabTest({
   //       category_name: path.parse(file).name, // Using file name as category name
@@ -86,7 +86,4 @@ export default async function handler(req, res) {
   //   console.error("Error processing data:", error);
   //   return res.status(500).json({ message: "Internal server error" });
   // }
-
-
 }
-

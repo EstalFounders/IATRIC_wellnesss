@@ -4,8 +4,8 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../src/lib/firebase";
-import { api, prescription_img_path } from "../../src/constant";
-import { sendWhatsAppMessage } from "./lib/twilio";
+import { api, prescription_img_path, twilioPhoneNumber } from "../../src/constant";
+import { sendWhatsAppMessage } from "./lib/communication";
 
 export const config = {
   api: {
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const form = new multiparty.Form();
 
   form.parse(req, async (err, fields, files) => {
-    console.log(files, "files");
+    console.log(files, "files", fields, "fields");
     if (err) {
       console.error("Error parsing form data:", err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     try {
       // Read the file into a Buffer
       const fileBuffer = fs.readFileSync(files.prescriptionpdfFile[0].path);
-       
+
       // Upload PDF to Google Cloud Storage
       const storageRef = ref(
         storage,
@@ -48,9 +48,9 @@ export default async function handler(req, res) {
       const number = 7455992234;
       const sendPdfUrl = sendWhatsAppMessage(number, prescriptionUrl);
 
-      if(!sendPdfUrl) {
-        throw new Error("Failed to send whastapp")
-     } 
+      if (!sendPdfUrl) {
+        throw new Error("Failed to send whastapp");
+      }
 
       res.status(200).json({ status: "send successfully", prescriptionUrl });
     } catch (error) {

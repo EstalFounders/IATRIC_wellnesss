@@ -1,3 +1,4 @@
+export const company_registrated_name = "Ttanshe health path pvt.ltd";
 export const certificate_img_path = "images/doctorCertificate/";
 export const profilePicture_img_path = "images/doctorPicture/";
 export const doctorStamp_img_path = "images/doctorStamp/";
@@ -12,6 +13,8 @@ export const development_production_url = "https://development.d2xrlfkxmadgut.am
 export const doctor_info_local_storage = 'doctor_info'
 export const super_admin_info_local_sotrage= 'super_admin_info'
 export const single_call = "single_call"
+export const invoice_bill_yellow_color = "#d1bd9a"
+export const company_font_family = "TT Ramillas"
 
 export const api = {
     addDoctor: "/api/addDoctor",
@@ -34,6 +37,7 @@ export const api = {
     addNewOffer: "/api/superAdmin/addNewOffer",
     globalVar: "/api/globalVar",
     userQuery: "/api/userQuery",
+    getImageFomrFirebase: "/api/helper/getImageFromFirebase",
 
 }
 

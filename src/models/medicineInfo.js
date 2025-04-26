@@ -9,6 +9,14 @@ const medicineSchema = new mongoose.Schema({
  salt: String
 });
 
-const Medicine = mongoose.model('Medicine', medicineSchema);
+// Use a unique model identifier
+const modelName = 'Medicine';
+
+// Check if the model already exists
+if (mongoose.models[modelName]) {
+  mongoose.deleteModel(modelName);
+}
+
+const Medicine = mongoose.model(modelName, medicineSchema);
 
 export default Medicine;
