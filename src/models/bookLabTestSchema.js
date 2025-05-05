@@ -39,6 +39,14 @@ const bookingLabTestSchema = new Schema(
       default: labTest_status.pending,
       enum: [labTest_status.pending, labTest_status.completed,labTest_status.cancelled],
     },
+    serviceOffered: {
+      type: String,
+      required: true,
+    },
+    serviceType: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true, // To automatically manage createdAt and updatedAt fields

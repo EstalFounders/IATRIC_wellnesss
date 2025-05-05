@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import styles from "./css/OffersComponent.module.css";
-import { api, discount_type } from "../../constant";
+import { api, discount_type, serviceOffered } from "../../constant";
 import { Button } from "react-bootstrap";
 import Preloader from "../Preloader";
+import { MdClose } from "react-icons/md";
 
 const OffersComponent = () => {
+  const [selectedServices, setSelectedServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [offers, setOffers] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -17,9 +19,22 @@ const OffersComponent = () => {
     discount_type: discount_type.Percentage,
     discount_value: "",
     redemption_limit: "",
+    service_type: selectedServices,
     target_audience: "",
     isActive: true,
   });
+
+  const handleCheckboxChange = (service) => {
+    setSelectedServices((prevSelected) =>
+      prevSelected.includes(service)
+        ? prevSelected.filter((s) => s !== service)
+        : [...prevSelected, service]
+    );
+  };
+
+  const removeService = (service) => {
+    setSelectedServices((prev) => prev.filter((s) => s !== service));
+  };
 
   useEffect(() => {
     fetch(api.addNewOffer)
@@ -189,6 +204,18 @@ const OffersComponent = () => {
                     <input
                       className={styles.input}
                       type="text"
+                      value={editedOffer.discount_value}
+                      onChange={(e) =>
+                        setEditedOffer({
+                          ...editedOffer,
+                          discount_value: e.target.value,
+                        })
+                      }
+                      placeholder="Discount Value"
+                    />
+                    <input
+                      className={styles.input}
+                      type="text"
                       value={editedOffer.redemption_limit}
                       onChange={(e) =>
                         setEditedOffer({
@@ -239,6 +266,9 @@ const OffersComponent = () => {
                       <div className={styles.offerDiscount}>
                         <b>DISCOUNT TYPE</b> - {offer.discount_type}
                       </div>
+                      <div className={styles.offerDiscount}>
+                        <b>DISCOUNT VALUE</b> - {offer.discount_value}
+                      </div>
                       <div className={styles.offerLimit}>
                         <b>REDEMPTION LIMIT</b> - {offer.redemption_limit}
                       </div>
@@ -249,9 +279,7 @@ const OffersComponent = () => {
                     <div
                       className={styles.toggleSwitch}
                       style={{
-                        backgroundColor: offer.isActive
-                          ? "green"
-                          : "gray",
+                        backgroundColor: offer.isActive ? "green" : "gray",
                       }}
                     >
                       <div
@@ -323,10 +351,45 @@ const OffersComponent = () => {
             setNewOffer({ ...newOffer, discount_type: e.target.value })
           }
         >
-          <option value={discount_type.Percentage}>Percentage</option>
-          <option value={discount_type.Fixed}>Fixed</option>
-          <option value={discount_type.Free}>Free</option>
+          <option value={discount_type.Percentage}>
+            {discount_type.Percentage}
+          </option>
+          <option value={discount_type.Fixed}>{discount_type.Fixed}</option>
+          <option value={discount_type.Free}>{discount_type.Free}</option>
         </select>
+        <select
+          className={styles.dropdown}
+          value={newOffer.service_type || ""}
+          onChange={(e) => handleCheckboxChange(e.target.value)}
+          // onChange={(e) =>
+          //   setNewOffer({ ...newOffer, service_type: e.target.value })
+          // }
+        >
+          <option value="">Select Service</option>
+          <option value={serviceOffered.consultation}>
+            {serviceOffered.consultation}
+          </option>
+          <option value={serviceOffered.labTest}>
+            {serviceOffered.labTest}
+          </option>
+        </select>
+
+        {/* Display selected options */}
+        <div className={styles.tagsContainer}>
+          {selectedServices.map((service) => (
+            <div key={service} className={styles.tag}>
+              {service}
+              <button
+                type="button"
+                className={styles.removeButton}
+                onClick={() => removeService(service)}
+              >
+                ✖
+              </button>
+            </div>
+          ))}
+        </div>
+
         <input
           className={styles.input}
           type="text"
@@ -354,6 +417,7 @@ const OffersComponent = () => {
             setNewOffer({ ...newOffer, target_audience: e.target.value })
           }
         />
+
         <div>
           <Button className={`${styles.buttonAdd}`} onClick={handleAdd}>
             Add Offer

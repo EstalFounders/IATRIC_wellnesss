@@ -4,6 +4,7 @@ export const profilePicture_img_path = "images/doctorPicture/";
 export const doctorStamp_img_path = "images/doctorStamp/";
 export const doctorSignature_img_path = "images/doctorSignature/";
 export const prescription_img_path = "images/prescription/";
+export const invoice_img_path = "images/invoice/";
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
 export const contact_no = "+91 8448559925";
 export const email= 'customercare@healthpath.co.in'
@@ -38,7 +39,8 @@ export const api = {
     globalVar: "/api/globalVar",
     userQuery: "/api/userQuery",
     getImageFomrFirebase: "/api/helper/getImageFromFirebase",
-
+    getInvoice: "/api/helper/generateInvoice",
+    uploadInvoice: "/api/helper/uploadInvoice",
 }
 
 export const services = [
@@ -142,4 +144,10 @@ export const DoctorType = {
     Company: "Company",
     Individual: "Indiividual",
 };
+
+export const serviceOffered = {
+    consultation: "Consultation",
+    labTest: "LabTest",
+}
+
 

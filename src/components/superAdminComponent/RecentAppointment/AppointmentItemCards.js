@@ -79,20 +79,22 @@ const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
                 value={selectedStatus}
                 onChange={handleStatusChange}
               >
-                <option value="pending" className="text-center">
+                <option value="selecttoupdate" className="text-center">
                   Select to Update
                 </option>
-                <option value="pending">{appointment_status.pending}</option>
-                <option value="confirmed">
+                <option value={appointment_status.pending}>
+                  {appointment_status.pending}
+                </option>
+                <option value={appointment_status.confirmed}>
                   {appointment_status.confirmed}
                 </option>
-                <option value="reschedule">
+                <option value={appointment_status.rescheduled}>
                   {appointment_status.rescheduled}
                 </option>
-                <option value="cancelled">
+                <option value={appointment_status.cancelled}>
                   {appointment_status.cancelled}
                 </option>
-                <option value="completed">
+                <option value={appointment_status.completed}>
                   {appointment_status.completed}
                 </option>
               </Form.Control>

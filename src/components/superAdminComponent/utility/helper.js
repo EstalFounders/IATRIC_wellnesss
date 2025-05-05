@@ -37,3 +37,5 @@ export const calculateDiscountedPrice = (price, discountPercentage) => {
   
     return parseFloat(discountedPrice.toFixed(2));
   };
+
+  

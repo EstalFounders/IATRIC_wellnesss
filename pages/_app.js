@@ -7,7 +7,6 @@ import { NoSsr } from "@mui/material";
 import { Chat } from "stream-chat-react";
 import { ChatProvider, VideoProvider } from "@stream-io/video-react-sdk";
 import "stream-chat-react/dist/css/index.css";
-import "../pages/meeting/meetingStyles.css";
 import { wrapper } from "../src/store/store";
 import { persistStore } from "redux-persist";
 import { Provider } from "react-redux";

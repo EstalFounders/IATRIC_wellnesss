@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 import styles from "../css/ConsultationBooked.module.css";
 import AppointTable from "../common/AppointmentTable";
-import { appointment_status, consultation } from "../../../constant";
+import { api, appointment_status, consultation } from "../../../constant";
 import DoctorsTable from "../common/DoctorsTable";
 import { useSelector } from "react-redux";
+import { Alert, Snackbar } from "@mui/material";
 
 const ConsultationBookedComp = () => {
   const [selectedBookingType, setSelectedBookingType] = useState(
     appointment_status.total
   );
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState(false);
+  const [severity, setSeverity] = useState("success");
+  const handleOpenSnackBar = () => {
+    setOpenSnackBar(true);
+  };
 
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackBar(false);
+  };
   // Complete array of all bookings
   const bookings = useSelector(
     (state) => state.superAdminHomePage.allAppointments
@@ -53,7 +67,8 @@ const ConsultationBookedComp = () => {
       if (response.ok) {
         handleOpenSnackBar();
         const data = await response.json();
-        console.log("Status updated:", data);
+        setSnackBarMessage(`Status updated: ${selectedStatus}`);
+        console.log("Status updated:", selectedStatus);
         // Handle success, maybe show a notification or refresh the data
       } else {
         const errorData = await response.json();
@@ -112,6 +127,19 @@ const ConsultationBookedComp = () => {
         appointments={bookings}
         onUpdateStatus={handleUpdateStatus}
       />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackBar}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity={severity}
+          sx={{ width: "100%" }}
+        >
+          {snackBarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

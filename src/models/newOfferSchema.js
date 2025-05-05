@@ -46,6 +46,10 @@ const newOfferSchema = new Schema({
     type: Array,
     required: true,
   },
+  service_type: {
+    type: Array,
+    required: true,
+  },
   isActive: { type: Boolean, default: true },
 });
 

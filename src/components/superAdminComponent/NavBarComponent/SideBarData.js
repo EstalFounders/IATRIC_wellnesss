@@ -5,6 +5,7 @@ import * as IoIcons from "react-icons/io";
 import { MdOutlineQueryStats, MdUpdate } from "react-icons/md";
 import { ImLab } from "react-icons/im";
 import { BiSolidOffer } from "react-icons/bi";
+import { TbFileInvoice } from "react-icons/tb";
 
 export const SidebarData = [
   {
@@ -59,6 +60,12 @@ export const SidebarData = [
     title: "CUSTOMER QUERY",
     path: "/superAdmin/customerQuery",
     icon: <MdOutlineQueryStats />,
+    cName: "nav-text",
+  },
+  {
+    title: "INVOICE",
+    path: "/superAdmin/invoice",
+    icon: <TbFileInvoice />,
     cName: "nav-text",
   },
 ];

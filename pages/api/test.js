@@ -2,9 +2,11 @@ import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
 import LabTest from "../../src/models/lab-test"; // Assuming you've defined a model schema
-import LabTestDetails from "../../src/models/lab-test-detailsSchema"; // For storing test details
 import { dbConnect } from "../../src/lib/db";
 import { sendWhatsAppMessage } from "./lib/communication";
+import Appointment from "../../src/models/appointmentSchema";
+import { serviceOffered } from "../../src/constant";
+import BookLabTest from "../../src/models/bookLabTestSchema";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -13,30 +15,49 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  try {
-    await sendWhatsAppMessage(
-      "7455992234",
-      `Your Audio consultation is booked successfully.`
-    );
-  } catch (error) {
-    console.error("Error connecting to database:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  // try {
+  //   await sendWhatsAppMessage(
+  //     "7455992234",
+  //     `Your Audio consultation is booked successfully.`
+  //   );
+  // } catch (error) {
+  //   console.error("Error connecting to database:", error);
+  //   return res.status(500).json({ message: "Internal server error" });
+  // }
 
   //code for update new column in db
 
-  // try {
-  //   // Update all documents to ensure the 'newField' exists with a default value if not present
-  //   const result = await LabTestDetails.updateMany(
-  //     { newField: { $exists: false } },    // Filter documents without the new field
-  //     { $set: { isActive: true } } // Add the new field with a default value
-  //   );
+  try {
+    // Update all documents to ensure the 'newField' exists with a default value if not present
+    console.log("service offered", serviceOffered); 
+    // const consultationResult = await Appointment.updateMany(
+    //   { serviceType: { $exists: false } },
+    //   { $set: { serviceType: serviceOffered.consultation } },
+    //   { upsert: true } // Add the upsert option here
+    // );
 
-  //   res.status(200).json({ success: true, message: 'All documents updated', result });
-  // } catch (error) {
-  //   console.error("Error updating documents:", error);
-  //   res.status(500).json({ success: false, message: 'Failed to update documents', error });
-  // }
+    // const labTestResult = await BookLabTest.updateMany(
+    //   { serviceType: { $exists: true } }, // Filter documents without the new field
+    //   { $set: { serviceType: serviceOffered.labTest } }, // Add the new field with a default value
+    //   { upsert: true }
+    // );
+
+    // 5. Send a response
+    res.status(200).json({
+      message: 'Collections updated successfully',
+      // updatedAppointmentCount: consultationResult.modifiedCount,
+      // upsertedAppointmentCount: consultationResult.upsertedCount,
+      // updatedLabTestCount: labTestResult.modifiedCount,
+      // upsertedLabTestCount: labTestResult.upsertedCount,
+      // consultationResult: consultationResult,
+      // labTestResult: labTestResult
+    });
+  } catch (error) {
+    console.error("Error updating documents:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update documents", error });
+  }
 
   //  code for storing lab data
 

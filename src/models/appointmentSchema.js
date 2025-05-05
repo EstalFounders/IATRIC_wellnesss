@@ -58,6 +58,10 @@ const appointmentSchema = new mongoose.Schema({
   prescriptionUrl: {
     type: String,
   },
+  serviceType: {
+    type: String,
+    required: true,
+  },
 });
 
 // Use a unique model identifier

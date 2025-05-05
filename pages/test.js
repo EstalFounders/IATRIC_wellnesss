@@ -5,15 +5,21 @@ import {
   invoice_bill_yellow_color,
 } from "../src/constant";
 import style from "./api/css/generateInvoiceImagecss.module.css";
+import { formatData } from "../src/components/registerDocComponent/utils/helper";
 
 export default function HomePage() {
   const [message, setMessage] = useState("");
+  const date = new Date().toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
   const invoiceData = {
     patientName: "ABCD",
     address: "Darcy, 123 Anywhere St., Any City",
     phone: "00000000",
     invoiceNo: "A09785",
-    date: "15/05/2023",
+    date: date,
     items: [
       {
         description: "Doctors consultation",
@@ -81,10 +87,12 @@ export default function HomePage() {
     // <div>
     //   <h1>Store Lab Test Data</h1>
     //   {/* <button onClick={handleFetch}>Store Data</button> */}
-    //   <button onClick={handleFetch}>Send WhatsApp</button>
+    //   <button onClick={handleFetch}>create column</button>
     //   {message && <p>{message}</p>}
     // </div>
-    <div className="container w-50 border rounded shadow-sm bg-white">
+    <div className="container w-50 border rounded shadow-sm bg-white"
+    // style={{fontFamily: 'TT Ramillas'}}
+    >
       {/* Header */}
       <div className="row">
         <div className="col-md-8 mt-5">

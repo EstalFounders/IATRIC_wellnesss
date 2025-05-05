@@ -16,7 +16,9 @@
 @import "../public/css/style.css";
 @import "../public/css/responsive.css";
 
-
+body {
+  font-family: 'TT Ramillas' !important;
+}
 
 .owl-carousel {
   display: block !important;
