@@ -3,8 +3,14 @@ import React, { useState } from "react";
 import { FiCircle } from "react-icons/fi";
 import styles from "./RightSideMenu.module.css";
 import { FaAngleDown } from "react-icons/fa";
+import { signOut } from "next-auth/react";
 
-const Dropdown = ({ user, onLogout, handleShowModel,handleShowLeaveReqestModel }) => {
+const Dropdown = ({
+  user,
+  onLogout,
+  handleShowModel,
+  handleShowLeaveReqestModel,
+}) => {
   console.log(user, "doctor name on right side menu");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,7 +24,10 @@ const Dropdown = ({ user, onLogout, handleShowModel,handleShowLeaveReqestModel }
     if (item == "Leave Request") handleShowLeaveReqestModel();
     if (item == "Logout")
       try {
-        await onLogout();
+        await signOut({
+          callbackUrl: "/registerDoc/login",
+          redirect: true,
+        });
         // Additional logic after successful sign-out
       } catch (error) {
         console.error("Error during sign-out:", error);

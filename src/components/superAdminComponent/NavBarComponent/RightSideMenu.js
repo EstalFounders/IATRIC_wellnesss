@@ -21,9 +21,14 @@ const RightSideMenu = () => {
       console.log(`Clicked on ${item}`);
       if(item == 'logout') 
       try {
-          await signOut();
+          await signOut(
+            {
+              callbackUrl: "/superAdmin/onload",
+              redirect: true,
+            }
+          );
           // Additional logic after successful sign-out
-          router.push("/superAdmin/onload"); // Redirect to the login screen
+          // router.push("/superAdmin/onload"); // Redirect to the login screen
         } catch (error) {
           console.error("Error during sign-out:", error);
         }
