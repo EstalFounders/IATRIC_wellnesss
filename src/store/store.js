@@ -25,7 +25,10 @@ const notificationPersistedReducer = persistReducer(
   notificationDataSlice
 );
 const superAdminHomePageReducer = persistReducer(persistConfig, homepageSlice);
-const superAdminOtherDetailsReducer = persistReducer(persistConfig, otherDetailsSlice);
+const superAdminOtherDetailsReducer = persistReducer(
+  persistConfig,
+  otherDetailsSlice
+);
 const LabTestHomepageReducer = persistReducer(
   persistConfig,
   labTestCateogryDataSlice

@@ -5,7 +5,8 @@ const initialState = {
   allAppointments: [],
   labTest: [],
   allDoctors: [],
-  allLab:[]
+  allLab:[],
+  serviceOffered: [],
 };
 
 const homepageSlice = createSlice({
@@ -24,11 +25,14 @@ const homepageSlice = createSlice({
     setAllLab: (state, action) => {
       state.allLab = action.payload;
     },
+    setServiceOffered: (state, action) => {
+      state.serviceOffered = action.payload;
+    },
   },
 });
 
 // Export actions
-export const { setAllappointments,setAllLabTest, setAllDoctor, setAllLab } = homepageSlice.actions;
+export const { setAllappointments,setAllLabTest, setAllDoctor, setAllLab,setServiceOffered } = homepageSlice.actions;
 
 // Export reducer
 export default homepageSlice.reducer;

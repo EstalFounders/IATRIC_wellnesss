@@ -35,6 +35,11 @@ const serviceOfferedSchema = new Schema({
     type: Number,
     required: true,
   },
+  isActive: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
 });
 
 // Use a unique model identifier

@@ -2,7 +2,7 @@ import React from "react";
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
-import { MdOutlineQueryStats, MdUpdate } from "react-icons/md";
+import { MdMedicalServices, MdOutlineQueryStats, MdUpdate } from "react-icons/md";
 import { ImLab } from "react-icons/im";
 import { BiSolidOffer } from "react-icons/bi";
 import { TbFileInvoice } from "react-icons/tb";
@@ -30,6 +30,12 @@ export const SidebarData = [
     title: "CONSULTATION",
     path: "/superAdmin/consultationFee",
     icon: <IoIcons.IoIosPricetags />,
+    cName: "nav-text",
+  },
+  {
+    title: "SERVICE OFFERED",
+    path: "/superAdmin/serviceOffered",
+    icon: <MdMedicalServices />,
     cName: "nav-text",
   },
   {

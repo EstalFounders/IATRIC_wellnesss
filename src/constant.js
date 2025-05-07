@@ -41,6 +41,7 @@ export const api = {
     getImageFomrFirebase: "/api/helper/getImageFromFirebase",
     getInvoice: "/api/helper/generateInvoice",
     uploadInvoice: "/api/helper/uploadInvoice",
+    serviceOffered: "/api/superAdmin/serviceOffered",
 }
 
 export const services = [

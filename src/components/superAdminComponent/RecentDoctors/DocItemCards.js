@@ -112,7 +112,8 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
         <Col>
           <FaEdit onClick={handleEdit} style={{ cursor: "pointer" }} />
 
-          {userDetails.role.includes(roles.superAdmin) ? (
+          {Array.isArray(userDetails?.role) &&
+          userDetails.role.includes(roles.superAdmin) ? (
             <MdDelete
               onClick={() => setShowConfirmModal(true)}
               style={{ cursor: "pointer" }}
@@ -128,7 +129,7 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
               <span className="d-inline-block">
                 <MdDelete
                   style={{ cursor: "not-allowed", opacity: 0.5 }}
-                  tabIndex={0} // Ensures it receives focus for tooltip
+                  tabIndex={0}
                 />
               </span>
             </OverlayTrigger>

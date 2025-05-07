@@ -22,6 +22,7 @@ import {
   setAllDoctor,
   setAllLab,
   setAllLabTest,
+  setServiceOffered,
 } from "../../store/slices/superAdmin/homepageSlice";
 import { calculateTotalIncome } from "./utility/helper";
 import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
@@ -82,17 +83,19 @@ export default function HomepageComp() {
     setIsAppointmentLoading(true);
     const fetchData = async () => {
       try {
-        const [appointmentsResponse, labTestsResponse, labResponse] =
+        const [appointmentsResponse, labTestsResponse, labResponse, serviceOfferedResponse] =
           await Promise.all([
             fetch(api.bookConsultation), // Replace with actual API endpoint
             fetch(api.bookLabTest), // Replace with actual API endpoint
             fetch(api.addNewLab),
+            fetch(api.serviceOffered)
           ]);
 
-        const [appointmentsData, labTestsData, labData] = await Promise.all([
+        const [appointmentsData, labTestsData, labData, serviceOfferedData] = await Promise.all([
           appointmentsResponse.json(),
           labTestsResponse.json(),
           labResponse.json(),
+          serviceOfferedResponse.json()
         ]);
         const appointments = appointmentsData.appointments;
         const labTest = labTestsData.labTests;
@@ -101,6 +104,7 @@ export default function HomepageComp() {
         dispatch(setAllappointments(appointments));
         dispatch(setAllLabTest(labTest));
         dispatch(setAllLab(labData));
+        dispatch(setServiceOffered(serviceOfferedData))
         // Calculate totals
         const calculatedTotals = calculateTotalIncome(appointments, labTest);
         console.log(calculatedTotals.totatIncome, "calculated totals");

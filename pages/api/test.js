@@ -7,6 +7,7 @@ import { sendWhatsAppMessage } from "./lib/communication";
 import Appointment from "../../src/models/appointmentSchema";
 import { serviceOffered } from "../../src/constant";
 import BookLabTest from "../../src/models/bookLabTestSchema";
+import ServiceOffered from "../../src/models/serviceOffered";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -30,6 +31,12 @@ export default async function handler(req, res) {
   try {
     // Update all documents to ensure the 'newField' exists with a default value if not present
     console.log("service offered", serviceOffered); 
+    // const consultationResult = await ServiceOffered.updateMany(
+    //   { isActive: { $exists: false } },
+    //   { $set: { isActive: true } },
+    //   { upsert: true } // Add the upsert option here
+    // );
+
     // const consultationResult = await Appointment.updateMany(
     //   { serviceType: { $exists: false } },
     //   { $set: { serviceType: serviceOffered.consultation } },
