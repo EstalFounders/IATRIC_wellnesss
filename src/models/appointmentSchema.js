@@ -64,7 +64,6 @@ const appointmentSchema = new mongoose.Schema({
   },
   serviceType: {
     type: String,
-    required: true,
   },
 });
 
