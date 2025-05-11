@@ -58,6 +58,10 @@ const appointmentSchema = new mongoose.Schema({
   prescriptionUrl: {
     type: String,
   },
+  invoiceId: {
+    type: String,
+    default: "",
+  },
   serviceType: {
     type: String,
     required: true,

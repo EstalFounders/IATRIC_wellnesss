@@ -1,7 +1,21 @@
+import { serviceOffered } from "../../../src/constant";
+
 export const createServicesToBill = (appointments, labTests, serviceOffer) => {
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
 
-  console.log(serviceOffer, "service offer");
+  const appointmentTaxes = serviceOffer.filter((item) => {
+    const itemName = item.name.toLowerCase();
+    const consultationName = serviceOffered.consultation.toLowerCase();
+    return itemName === consultationName;
+  });
+
+  const labtestTaxes = serviceOffer.filter((item) => {
+    const itemName = item.name.toLowerCase();
+    const labTestName = serviceOffered.labTest.toLowerCase();
+    return itemName === labTestName;
+  });
+
+  console.log(appointmentTaxes, "labtestTaxes", labtestTaxes, "labtestTaxes");
 
   const servicesToBill = [];
   const usedMobileNumbers = new Set();
@@ -14,10 +28,13 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
 
   // Process appointments
   appointments.forEach((appointment) => {
+    console.log(appointment, "appointment in 26 server");
     const mobNo = appointment.patientMobNo;
     const matchingLabTest = labTestsByMobile[mobNo];
     const invoiceNumber = `INV-${randomNumber}`;
-    const totalPrice = appointment.consultationprice + (matchingLabTest ? matchingLabTest.totalPrice : 0);
+    const totalPrice =
+      appointment.consultationprice +
+      (matchingLabTest ? matchingLabTest.totalPrice : 0);
     if (matchingLabTest) {
       // If there's a matching lab test for the same number
       const combinedService = {
@@ -26,7 +43,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice + matchingLabTest.totalPrice,
-        gst: serviceOffer[0].gst + serviceOffer[1].gst,
+        gst: appointmentTaxes[0].gst + labtestTaxes[0].gst,
         discount: 0,
         freight: 0,
         tax: 0,
@@ -35,7 +52,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
           {
             name: appointment.consultationType,
             price: appointment.consultationprice,
-            hsn: serviceOffer[0].hsn_percentage,
+            hsn: appointmentTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
             totalPrice: appointment.consultationprice,
@@ -43,7 +60,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
           {
             name: matchingLabTest.name,
             price: matchingLabTest.totalPrice,
-            hsn: serviceOffer[1].hsn_percentage,
+            hsn: labtestTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
             totalPrice: matchingLabTest.totalPrice,
@@ -54,6 +71,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       usedMobileNumbers.add(mobNo);
     } else {
       // No matching lab test
+      console.log("No matching lab test for mobile number:", appointmentTaxes[0].freight,appointmentTaxes[0].isActive,appointmentTaxes[0].processingfee,appointmentTaxes[0].share);
       const appointmentService = {
         id: appointment._id,
         name: appointment.name,
@@ -61,20 +79,21 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice,
         totalPrice: totalPrice,
-        gst: serviceOffer[0].gst,
+        gst: appointmentTaxes[0].gst,
         freight: 0,
         tax: 0,
         item: [
           {
             name: appointment.consultationType,
             price: appointment.consultationprice,
-            hsn: serviceOffer[0].hsn_percentage,
+            hsn: appointmentTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
             totalPrice: appointment.consultationprice,
           },
         ],
       };
+      console.log(appointmentService, "appointment service in serveer");
       servicesToBill.push(appointmentService);
     }
   });
@@ -90,15 +109,15 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: labTest.totalPrice,
-        gst: serviceOffer[1].gst,
-        
-        freight: serviceOffer[1].freight,
+        gst: labtestTaxes[0].gst,
+
+        freight: 0,
         totalPrice: labTest.totalPrice,
         item: [
           {
             name: labTest.name,
             price: labTest.totalPrice,
-            hsn: serviceOffer[1].hsn_percentage,
+            hsn: labtestTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
             totalPrice: labTest.totalPrice,

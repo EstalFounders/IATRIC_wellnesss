@@ -3,7 +3,7 @@ import { formatData } from "../../registerDocComponent/utils/helper";
 import { useState } from "react";
 import { Alert, Snackbar } from "@mui/material";
 
-const InvoiceCard = ({ request, openPreview,handleGenerate }) => {
+const InvoiceCard = ({ request,   openPreview,handleGenerate }) => {
   const id = request._id;
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
@@ -63,7 +63,7 @@ const InvoiceCard = ({ request, openPreview,handleGenerate }) => {
           variant="outline-success"
           size="sm"
           className="me-2"
-          onClick={() => openPreview()}
+          onClick={() => openPreview(request.id)}
         >
           VIEW INVOICE
         </Button>

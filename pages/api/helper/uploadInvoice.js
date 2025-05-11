@@ -26,20 +26,20 @@ export default async function handler(req, res) {
 
     try {
       // Read the file into a Buffer
-      const fileBuffer = fs.readFileSync(files.invoice[0].path);
-      const { invoiceNo } = req.query;
-      // Upload PDF to Google Cloud Storage
-      const storageRef = ref(
-        storage,
-        `${invoice_img_path}/${invoiceNo}`
-      );
-      const metadata = {
-        contentType: "application/pdf",
-      };
-      await uploadBytes(storageRef, fileBuffer, metadata);
+      // const fileBuffer = fs.readFileSync(files.invoice[0].path);
+      // const { invoiceNo } = req.query;
+      // // Upload PDF to Google Cloud Storage
+      // const storageRef = ref(
+      //   storage,
+      //   `${invoice_img_path}/${invoiceNo}`
+      // );
+      // const metadata = {
+      //   contentType: "application/pdf",
+      // };
+      // await uploadBytes(storageRef, fileBuffer, metadata);
 
-      // Return the URL of the uploaded PDF file
-      const prescriptionUrl = await getDownloadURL(storageRef);
+      // // Return the URL of the uploaded PDF file
+      // const prescriptionUrl = await getDownloadURL(storageRef);
 
       // send pdf url to patient whatsapp
 
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       //   throw new Error("Failed to send whastapp");
       // }
 
-      res.status(200).json({ status: "send successfully", prescriptionUrl });
+      res.status(200).json({ status: "send successfully" });
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json({ error: "Internal Server Error" });

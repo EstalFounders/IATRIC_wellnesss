@@ -15,6 +15,7 @@ const InvoiceComp = () => {
   const { type } = router.query;
   const [invoice, setInvoice] = useState([]);
   const [filteredReq, setFilteredRq] = useState(invoice);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [show, setShow] = useState(false)
   const invoiceRef = React.useRef();
 
@@ -37,7 +38,9 @@ const InvoiceComp = () => {
     }
   }, []);
 
-  const openPreview = () => {
+  const openPreview = (id) => {
+    console.log("id", id);
+    setSelectedInvoice(invoice.filter((req) => req.id === id));
     setShow(true)
   }
 
@@ -95,7 +98,7 @@ const InvoiceComp = () => {
                   key={`${req.id || index}-model`}
                 >
                   <GenerateInvoiceImage
-                    request={req}
+                    request={selectedInvoice}
                     onClose={closePreview}
                   />
                 </NotifcationPreviewModel>

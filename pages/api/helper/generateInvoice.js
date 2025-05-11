@@ -75,10 +75,12 @@ export default async function handler(req, res) {
   } else if (req.method == "GET") {
     const appointments = await Appointment.find({
       status: appointment_status.completed,
+      invoiceId: "",
     }).lean();
 
     const labTests = await BookLabTest.find({
       status: appointment_status.completed,
+      invoiceId: "",
     }).lean();
 
     // const deductions = await Deductions.find({});

@@ -1,22 +1,17 @@
-import Image from "next/image";
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { useSearchParams } from "next/navigation";
-
-import { useEffect, useImperativeHandle, useState } from "react";
+import { useState } from "react";
 import {
   api,
   company_registrated_name,
   invoice_bill_yellow_color,
 } from "../../../constant";
 import Preloader from "../../Preloader";
-import { styles } from "../css/GenerateInvoiceImage.module.css";
 
 const GenerateInvoiceImage = ({ request, onClose, ref }) => {
-  const searchParams = useSearchParams();
-  const rawData = searchParams.get("data");
-  const data = request;
+  console.log("request", request);
+  const data = request[0];
   const [loader, setLoader] = useState(false);
 
 
@@ -33,27 +28,13 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
     subTotal,
     totalPrice,
     gst,
-    discount,
     freight,
     tax,
     item,
   } = data;
   // const {}
 
-  const invoiceData = {
-    name: name,
-    mobNo: mobNo,
-    invoiceNo: invoiceNumber,
-    date: date,
-    items: item,
-    subtotal: subTotal,
-    gst: gst,
-    discount: discount,
-    freight: freight,
-    tax: tax,
-    total: totalPrice,
-  };
-
+  
   const generatePDF = async () => {
     setLoader(true);
 
@@ -117,7 +98,7 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
 
       const formData = new FormData();
       formData.append("invoice", blob, "invoice.pdf");
-      const response = await fetch(`${api.uploadInvoice}?invoiceNo=${invoiceData.invoiceNumber}`, {
+      const response = await fetch(`${api.uploadInvoice}?invoiceNo=${invoiceNumber}`, {
         method: "POST",
         body: formData,
       });
@@ -146,11 +127,11 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
     <div>
       <div
         id="invoiceContainer"
-        className="border rounded shadow-sm bg-white"
+        className="border rounded bg-white"
         style={{
           width: "100%",
           height: "800px", // Changed from fixed height
-          // minHeight: "900px", // Added minimum height
+          minHeight: "900px", // Added minimum height
           overflow: "auto",
           display: "flex",
           flexDirection: "column",
@@ -179,23 +160,23 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
         <div className="row mb-4">
           <div className="col-md-4">
             <h4>BILL TO:</h4>
-            <p className="h6">
+            <div className="h6">
               <b>Name:</b> {name}
-            </p>
-            <p className="h6">
+            </div>
+            <div className="h6">
               <b>Address:</b>
               {/* {address} */}
-            </p>
-            <p className="h6">
+            </div>
+            <div className="h6">
               <b>Contact:</b> {mobNo}
-            </p>
+            </div>
           </div>
           <div className="col-md-4">
             <h4>FROM:</h4>
-            <p style={{ fontFamily: "sans-serif" }}>
+            <div>
               HEALTHPATH F-33 RIGROSS COMPLEX C,BLOCK SECTOR 57 GURGAON ,HARYANA
               CONTACT : +91 84485 59925 GSTIN : XXXXXXXXXXXXXX
-            </p>
+            </div>
           </div>
           <div className="col-md-4 text-md-end">
             <div>
@@ -225,10 +206,10 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
               </tr>
             </thead>
             <tbody>
-              {invoiceData.items.map((item, idx) => (
+              {item.map((item, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{item.name}</td>
+                  <td>{item.name}</td>  
                   <td>{item.hsn}</td>
                   <td>{item.qty}</td>
                   <td>{item.discount}</td>
@@ -244,42 +225,42 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
         <div className="row mb-4">
           <div className="col-md-6 text-end"></div>
           <div className="col-md-6 text-right">
-            <p className="row">
+            <div className="row">
               <b className="col">Subtotal:</b>
               <div className="col">₹ {subTotal}</div>
-            </p>
-            <p className="row">
+            </div>
+            <div className="row">
               <b className="col">GST:</b>
               <div className="col">₹ {gst}</div>
-            </p>
-            <p className="row">
+            </div>
+            <div className="row">
               <b className="col">Discount:</b>
-              <div className="col">₹ {discount}</div>
-            </p>
-            <p className="row">
+              <div className="col">₹ {0}</div>
+            </div>
+            <div className="row">
               <b className="col">Freight:</b>
               <div className="col">₹ {freight}</div>
-            </p>
-            <p className="row">
+            </div>
+            <div className="row">
               <b className="col">Tax:</b>
               <div className="col">₹ {tax}</div>
-            </p>
+            </div>
             <hr style={{ borderWidth: "2.2px", backgroundColor: "#000000" }} />
-            <p className="row h5">
+            <div className="row h5">
               <b className="col">TOTAL:</b>
               <div className="col">₹ {totalPrice}</div>
-            </p>
+            </div>
           </div>
         </div>
 
         {/* Terms and Conditions */}
         <div className="mb-4 d-flex flex-row">
-          <p className="font-weight-bold">TOTAL IN WORDS:</p>
-          <p className="ml-3 text-uppercase">One Hundred Only</p>
+          <div className="font-weight-bold">TOTAL IN WORDS:</div>
+          <div className="ml-3 text-uppercase">One Hundred Only</div>
         </div>
         <div>
           <hr />
-          <p className="font-weight-bold small">TERMS & CONDITIONS:</p>
+          <div className="font-weight-bold small">TERMS & CONDITIONS:</div>
           <ol style={{ listStyleType: "disc" }} className="small">
             <li>
               INTEREST 18% P.A. WILL BE CHARGED IF PAYMENT IS NOT MADE WITHIN
@@ -299,13 +280,13 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
           style={{ backgroundColor: `${invoice_bill_yellow_color}` }}
         >
           <div className="col-md-6 text-left">
-            <p className="mb-1 text-center h2 font-weight-bold">Thank you!</p>
-            <p className="mb-0 text-center">TTANSHE HEALTH PATH PVT. LTD</p>
+            <div className="mb-1 text-center h2 font-weight-bold">Thank you!</div>
+            <div className="mb-0 text-center">TTANSHE HEALTH PATH PVT. LTD</div>
           </div>
           <div className="col-md-6 text-right text-black font-weight-bold">
-            <p className="mb-0">Contact: +91 84485 59925</p>
-            <p className="mb-0">www.healthpath.co.in</p>
-            <p>customercare@healthpath.co.in</p>
+            <div className="mb-0">Contact: +91 84485 59925</div>
+            <div className="mb-0">www.healthpath.co.in</div>
+            <div>customercare@healthpath.co.in</div>
           </div>
         </div>
       </div>

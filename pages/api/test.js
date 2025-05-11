@@ -30,7 +30,22 @@ export default async function handler(req, res) {
 
   try {
     // Update all documents to ensure the 'newField' exists with a default value if not present
-    console.log("service offered", serviceOffered); 
+    // const consultationResult = await Appointment.updateMany(
+    //   { invoiceNumber: { $exists: true } },
+    //   { $rename: { "invoiceNumber": "invoiceId" } }
+    // );
+    
+    const consultationResult = await BookLabTest.updateMany(
+      { invoiceId: { $exists: false } },
+      { $set: { invoiceId: "" } },
+      { upsert: true } // Add the upsert option here
+    );
+
+    // const consultationResult = await Appointment.updateMany(
+    //   { invoiceNumber: { $exists: false } },
+    //   { $set: { invoiceNumber: "" } },
+    //   { upsert: true } // Add the upsert option here
+    // );
     // const consultationResult = await ServiceOffered.updateMany(
     //   { isActive: { $exists: false } },
     //   { $set: { isActive: true } },
@@ -52,6 +67,7 @@ export default async function handler(req, res) {
     // 5. Send a response
     res.status(200).json({
       message: 'Collections updated successfully',
+      consultationResult,
       // updatedAppointmentCount: consultationResult.modifiedCount,
       // upsertedAppointmentCount: consultationResult.upsertedCount,
       // updatedLabTestCount: labTestResult.modifiedCount,

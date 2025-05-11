@@ -47,6 +47,10 @@ const bookingLabTestSchema = new Schema(
       type: String,
       required: true,
     },
+    invoiceId: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true, // To automatically manage createdAt and updatedAt fields

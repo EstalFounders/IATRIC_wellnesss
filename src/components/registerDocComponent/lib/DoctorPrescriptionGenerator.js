@@ -100,6 +100,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     formData.append("doctorName", data.doctorName);
     formData.append("doctorSignatureUrl", data.doctorSignatureUrl);
     formData.append("doctorStampUrl", data.doctorStampUrl);
+    formData.append("appointmentId", data.appointmentId);
 
     // Send FormData to server using AJAX (for example, using Axios)
     try {

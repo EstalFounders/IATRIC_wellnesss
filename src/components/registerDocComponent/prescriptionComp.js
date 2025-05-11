@@ -7,7 +7,7 @@ import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import { api, doctor_info_local_storage } from "../../constant";
+import { api, appointment_status, doctor_info_local_storage } from "../../constant";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
 import { useSelector } from "react-redux";
@@ -48,7 +48,7 @@ const PrescriptionComp = () => {
   const [updatedFormDetails, setUpdatedFormDetails] = useState({
     doctorName: "",
     doctorDegree: doctorInfo.user.degree,
-    doctorMobNo:doctorInfo.user.mobileNumber,
+    doctorMobNo: doctorInfo.user.mobileNumber,
     patientName: "",
     age: "",
     gender: "Male",
@@ -66,6 +66,7 @@ const PrescriptionComp = () => {
     testAdvices: [],
     doctorStampUrl: "",
     doctorSignatureUrl: "",
+    appointmentId: "",
     // Add more fields as needed
   });
 
@@ -77,11 +78,20 @@ const PrescriptionComp = () => {
   };
 
   const handleOtherFormDetailsChange = (formValues, index) => {
-    const { name, value } = formValues.target;
-    setUpdatedFormDetails((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (formValues.target) {
+      // Handling a single input change (like before)
+      const { name, value } = formValues.target;
+      setUpdatedFormDetails((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    } else {
+      // Handling multiple field updates
+      setUpdatedFormDetails((prevState) => ({
+        ...prevState,
+        ...formValues, // Spread the formValues object to update multiple keys
+      }));
+    }
   };
 
   const handleDeleteMedicineForm = (index) => {
@@ -163,7 +173,7 @@ const PrescriptionComp = () => {
 
     // Call the original change handler if you need to track the raw input
     if (isEditing) {
-      handleOtherFormDetailsChange({ target: { name: "patientName", value } });
+      handleOtherFormDetailsChange({ patientName: value });
     }
   };
 
@@ -183,14 +193,17 @@ const PrescriptionComp = () => {
     setShowDropdown(false);
     setIsEditing(false); // Go to view mode after selection
     handleOtherFormDetailsChange({
-      target: { name: "patientName", value: appointment.name },
+      patientName: appointment.name,
+      patientId: appointment._id,
+      patientNo: appointment.patientMobNo,
+      appointmentId: appointment._id,
     });
-    handleOtherFormDetailsChange({
-      target: { name: "patientId", value: appointment._id },
-    });
-    handleOtherFormDetailsChange({
-      target: { name: "patientNo", value: appointment.patientMobNo },
-    });
+    // handleOtherFormDetailsChange({
+    //   target: { name: "patientId", value: appointment._id },
+    // });
+    // handleOtherFormDetailsChange({
+    //   target: { name: "patientNo", value: appointment.patientMobNo },
+    // });
   };
 
   const handleBlur = () => {
@@ -409,15 +422,19 @@ const PrescriptionComp = () => {
                           overflowY: "auto",
                         }}
                       >
-                        {suggestions.map((appointment) => (
-                          <div
-                            key={appointment.id || appointment.name}
-                            style={{ padding: "8px", cursor: "pointer" }}
-                            onClick={() => handleSuggestionClick(appointment)}
-                          >
-                            {appointment.name}
-                          </div>
-                        ))}
+                        {suggestions
+                          .filter(
+                            (appointment) => appointment.status !== appointment_status.completed
+                          )
+                          .map((appointment) => (
+                            <div
+                              key={appointment.id || appointment.name}
+                              style={{ padding: "8px", cursor: "pointer" }}
+                              onClick={() => handleSuggestionClick(appointment)}
+                            >
+                              {appointment.name}
+                            </div>
+                          ))}
                       </div>
                     )}
                     {showDropdown && suggestions.length === 0 && searchTerm && (

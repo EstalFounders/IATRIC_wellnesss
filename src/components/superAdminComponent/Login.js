@@ -22,6 +22,7 @@ export default function Login() {
         console.log(loginRes.ok, 'login resp')
 
         if (loginRes && !loginRes.ok) {
+            setLoader(false)
             setLoginErr('Please check your password & email')
         } else {
             setLoader(false)
