@@ -17,6 +17,7 @@ import mongoose from "mongoose";
 export const config = {
   api: {
     bodyParser: false, // Disable bodyParser as we'll handle the request body manually
+    sizeLimit: "20mb", // Set the size limit for the incoming file
   },
 };
 
