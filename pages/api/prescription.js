@@ -17,7 +17,6 @@ import mongoose from "mongoose";
 export const config = {
   api: {
     bodyParser: false, // Disable bodyParser as we'll handle the request body manually
-    sizeLimit: "20mb", // Set the size limit for the incoming file
   },
 };
 
@@ -26,7 +25,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const form = new multiparty.Form();
+  const form = new multiparty.Form({
+    maxFilesSize: 25 * 1024 * 1024, // 25MB limit
+  });
+  
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
