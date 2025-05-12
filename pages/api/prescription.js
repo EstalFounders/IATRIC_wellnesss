@@ -14,67 +14,58 @@ import { sendWhatsAppMessage } from "./lib/communication";
 import Appointment from "../../src/models/appointmentSchema";
 import mongoose from "mongoose";
 
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
-  // console.log(files, 'files', fields, 'fields'); // Keep this for debugging
-  let session; // Declare session variable
-  try {
-    // Start a Mongoose session for the transaction
-    session = await mongoose.startSession();
-    session.startTransaction();
-    const { prescriptionUrl, appointmentId } = req.body;
+    // console.log(files, 'files', fields, 'fields'); // Keep this for debugging
+    let session; // Declare session variable
+    try {
+      // Start a Mongoose session for the transaction
+      session = await mongoose.startSession();
+      session.startTransaction();
+      const {prescriptionUrl, appointmentId} = req.body;
 
-    console.log(
-      "prescriptionUrl",
-      prescriptionUrl,
-      "appointmentId",
-      appointmentId
-    );
+      console.log("prescriptionUrl", prescriptionUrl, "appointmentId", appointmentId);
 
-    // Update the Appointment document *within the transaction*
-    const updateStatus = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      async (appointment) => {
-        // Pass a function to findByIdAndUpdate
-        if (appointment.status === appointment_status.completed) {
-          throw new Error("Prescription is already completed");
-        }
-        //  If not completed, update the fields
-        appointment.prescriptionUrl = prescriptionUrl;
-        appointment.status = appointment_status.completed;
-        return appointment; // Return the modified appointment object
-      },
-      { new: true, session }
-    );
+      // Update the Appointment document *within the transaction*
+      const updateStatus = await Appointment.findByIdAndUpdate(
+        appointmentId,
+        {
+          prescriptionUrl: prescriptionUrl,
+          status: appointment_status.completed, //  Use the string directly, or define it elsewhere.
+        },
+        { new: true, session } // Pass the session here!
+      );
 
-    if (!updateStatus) {
-      throw new Error("Failed to update appointment status"); //  Throw an error to rollback
-    }
+      if (!updateStatus) {
+        throw new Error("Failed to update appointment status"); //  Throw an error to rollback
+      }
 
-    // send pdf url to patient whatsapp
-    // const number = 7455992234;
-    // const sendPdfUrl = await sendWhatsAppMessage(number, prescriptionUrl); // Await here
+      // send pdf url to patient whatsapp
+      // const number = 7455992234;
+      // const sendPdfUrl = await sendWhatsAppMessage(number, prescriptionUrl); // Await here
 
-    // if (!sendPdfUrl) {
-    //   throw new Error("Failed to send whastapp");
-    // }
+      // if (!sendPdfUrl) {
+      //   throw new Error("Failed to send whastapp");
+      // }
 
-    // If all operations were successful, commit the transaction
-    await session.commitTransaction();
-    session.endSession();
-
-    res.status(200).json({ status: "send successfully" });
-  } catch (error) {
-    // If any error occurred, roll back the transaction
-    if (session) {
-      await session.abortTransaction();
+      // If all operations were successful, commit the transaction
+      await session.commitTransaction();
       session.endSession();
+
+      res.status(200).json({ status: "send successfully" });
+    } catch (error) {
+      // If any error occurred, roll back the transaction
+      if (session) {
+        await session.abortTransaction();
+        session.endSession();
+      }
+      console.error("Error:", error);
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", message: error.message }); // Include the error message
     }
-    console.error("Error:", error);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message }); // Include the error message
-  }
-}
+  };
+
