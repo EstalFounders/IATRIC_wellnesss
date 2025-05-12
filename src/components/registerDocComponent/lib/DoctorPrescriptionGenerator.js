@@ -15,6 +15,7 @@ import {
 } from "../utils/constant";
 import { sign } from "crypto";
 import CircleLoader from "../../circleLoader";
+import { sendFileToFirebase, sendPrescriptionToFirebase } from "../../../utils";
 
 const DocPrescriptionGeneratePdf = ({ data }) => {
   const [loading, setLoading] = useState(false);
@@ -83,42 +84,49 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
 
   const handleCreatePDF = async () => {
     setLoading(true);
-    const doc = new jsPDF();
-    const canvas = await html2canvas(document.getElementById("pdfContainer"));
-
-    const imgData = canvas.toDataURL("image/png");
-    const imgProps = doc.getImageProperties(imgData);
-    const pdfWidth = doc.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-    // Save the PDF to a blob
-    const blob = doc.output("blob");
-    const formData = new FormData();
-    formData.append("prescriptionpdfFile", blob, "document.pdf");
-    formData.append("patientName", data.pateintName);
-    formData.append("doctorName", data.doctorName);
-    formData.append("doctorSignatureUrl", data.doctorSignatureUrl);
-    formData.append("doctorStampUrl", data.doctorStampUrl);
-    formData.append("appointmentId", data.appointmentId);
-
-    // Send FormData to server using AJAX (for example, using Axios)
     try {
+      const doc = new jsPDF();
+      const canvas = await html2canvas(document.getElementById("pdfContainer"));
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgProps = doc.getImageProperties(imgData);
+      const pdfWidth = doc.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      const blob = doc.output("blob");
+      const details = {
+        patientName: data.patientName,
+        doctorName: data.doctorName,
+      };
+
+      const prescriptionUrl = await sendPrescriptionToFirebase(blob, details);
+
+      if (!prescriptionUrl) {
+        throw new Error("Failed to upload PDF to Firebase.");
+      }
+
+      // Now send just appointmentId and prescriptionUrl to your API
       const response = await fetch(api.prescriptionCall, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appointmentId: data.appointmentId,
+          prescriptionUrl: prescriptionUrl,
+        }),
       });
 
       if (response.ok) {
-        setLoading(false);
-        window.alert("Pdf sent.");
-        // Reset form fields or navigate to another page
+        window.alert("PDF sent successfully.");
       } else {
-        console.error("Error uploading pdf:", response.statusText);
-        window.alert("something went wrong, Please try again");
+        console.error("Error saving prescription URL:", response.statusText);
+        window.alert("Something went wrong. Please try again.");
       }
     } catch (error) {
-      console.error("Error uploading pdf:", error.message);
+      console.error("PDF generation/upload error:", error.message);
+      window.alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -299,7 +307,6 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                   height={70}
                 />
               )}
-              
             </div>
             <div className="mt-2">
               {signatureUrl && (
@@ -313,7 +320,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
             </div>
             <div className="float-right mt-5 mr-4">
               {signNstampLoader && <CircleLoader />}
-              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -336,7 +343,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           >
             <strong>Sign PDF</strong>
           </div>
-        </div>
+        </div>  
       </div>
       {loading ? <Preloader /> : null}
     </div>

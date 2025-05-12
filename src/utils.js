@@ -1,3 +1,8 @@
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { prescription_img_path } from "./constant";
+import { storage } from "./lib/firebase";
+import { v4 as uuidv4 } from "uuid";
+
 export const animation = () => {
   if (typeof window !== "undefined") {
     window.WOW = require("wowjs");
@@ -61,4 +66,20 @@ export const getPagination = (totalNumber, sort) => {
     .fill()
     .map((_, idx) => idx + 1);
   return arr;
+};
+
+export const sendPrescriptionToFirebase = async (file, details) => {
+  console.log(details.patientName, "details");
+  const storageRef = ref(
+    storage,
+    `${prescription_img_path}/patient=${details.patientName},doctor=${
+      details.doctorName
+    }_${uuidv4()}`
+  );
+  const metadata = {
+    contentType: file.type,
+  };
+  await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(storageRef);
+  return url;
 };
