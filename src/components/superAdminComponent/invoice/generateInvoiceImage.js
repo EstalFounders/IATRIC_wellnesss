@@ -125,7 +125,7 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
 
   return (
     <div>
-      <div
+      <div  
         id="invoiceContainer"
         className="border rounded bg-white"
         style={{

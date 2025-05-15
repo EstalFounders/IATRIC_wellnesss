@@ -4,7 +4,6 @@ import { FaSearch } from "react-icons/fa";
 import LabTestList from "../LabTest/LabTestsList";
 import LabTestEarningList from "../earning/LabTestEarning/LabTestEarningList";
 
-
 const LabTestEarningTable = ({
   heading,
   isLoading,
@@ -13,17 +12,21 @@ const LabTestEarningTable = ({
   onUpdateStatus,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredLabTests, setFilteredLabTests] =
-    useState(labTests);
+  const [filteredLabTests, setFilteredLabTests] = useState(labTests);
 
   useEffect(() => {
-    // Filter appointments based on search term
+    // Filter labTests based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = labTests.filter(
-      (labTest) =>
-        labTest.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-      labTest.paymentStatus.toLowerCase().includes(lowerCaseSearchTerm)
-    );
+    const results = labTests.filter((labTest) => {
+      // Check if labTest, labTest.name, or labTest.paymentStatus are undefined
+      const name = labTest?.name?.toLowerCase() || "";
+      const paymentStatus = labTest?.paymentStatus?.toLowerCase() || "";
+
+      return (
+        name.includes(lowerCaseSearchTerm) ||
+        paymentStatus.includes(lowerCaseSearchTerm)
+      );
+    });
     setFilteredLabTests(results);
   }, [searchTerm, labTests]);
 

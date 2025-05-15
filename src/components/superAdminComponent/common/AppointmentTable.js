@@ -16,13 +16,15 @@ const AppointTable = ({
     useState(appointments);
 
   useEffect(() => {
-    // Filter appointments based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = appointments.filter(
-      (appointment) =>
-        appointment.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        appointment.status.toLowerCase().includes(lowerCaseSearchTerm)
-    );
+    const results = appointments.filter((appointment) => {
+      const name = appointment.name || ""; //  Treat undefined as empty string
+      const status = appointment.status || ""; // Treat undefined as empty string
+      return (
+        name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        status.toLowerCase().includes(lowerCaseSearchTerm)
+      );
+    });
     setFilteredAppointments(results);
   }, [searchTerm, appointments]);
 

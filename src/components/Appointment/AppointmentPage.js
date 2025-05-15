@@ -819,7 +819,7 @@ const AppointmentPage = () => {
             onClose={() => setBookingResponse(false)}
           >
             <div className={styles.successMessage}>
-              <Image src={"/images/success.png"} width={100} height={100} />
+              <Image alt="success_response" src={"/images/success.png"} width={100} height={100} />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
               <div className={styles.successText}>{message}</div>
             </div>

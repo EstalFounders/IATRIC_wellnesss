@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     } catch (error) {
       res.status(500).json({ message: "An error occurred", error });
     }
-  } 
+  }
 
   if (req.method === "POST") {
     const {
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       email,
       patientMobNo,
       consultationType,
-      consultationprice
+      consultationprice,
     } = req.body;
 
     try {
@@ -100,8 +100,8 @@ export default async function handler(req, res) {
           result.slot,
           "result slots"
         );
-        doctorId = result ? result.doctor._id.toString():"";
-        slot = result ? result.slot: "";
+        doctorId = result ? result.doctor._id.toString() : "";
+        slot = result ? result.slot : "";
         if (!doctorId) {
           throw new Error("No available doctors at the selected time");
         }
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         doctorId = result.doctor;
         slot = result.slotId;
         console.log(doctorId, "doctorid for specific time", slot, "slot");
-        if (!doctorId && !slot) { 
+        if (!doctorId && !slot) {
           throw new Error("No available doctors at the selected time");
         }
       }
@@ -163,20 +163,64 @@ export default async function handler(req, res) {
         doctorMeetingUrl,
         prescriptionUrl,
       }) => {
-        await dbConnect();
-        const updatedSlot = await Slot.findOneAndUpdate(
-          { _id: slot, doctorId, isBooked: false },
-          { isBooked: true },
-          { new: true }
-        );
+        console.log(slot, "slot",doctorId, "doctor id");
+        if (slot === null) {
+          const now = new Date();
 
-        console.log(updatedSlot, "updated slot");
+          // Find the slot where current time is between start and end, and not booked
+          const currentSlot = await Slot.findOne({
+            doctorId,
+            isBooked: false,
+            startTime: { $lte: now },
+            endTime: { $gte: now },
+          }).sort({ startTime: 1 });
+
+          console.log(currentSlot, "current slot");
+
+          if (!currentSlot) {
+            throw new Error("No current slot found for this time.");
+          }
+
+          // Step 2: Find the next available slot after the current slot’s end time
+          const nextSlot = await Slot.findOneAndUpdate(
+            {
+              doctorId,
+              isBooked: false,
+              startTime: { $gt: currentSlot.endTime },
+            },
+            { isBooked: true },
+            { new: true }
+          );
+
+          console.log(nextSlot, "next slot");
+
+          if (!nextSlot) {
+            throw new Error("No next available slot found.");
+          }
+
+          slot = nextSlot._id;
+        } else {
+          // Book the selected slot if it's not already booked
+          const updatedSlot = await Slot.findOneAndUpdate(
+            { _id: slot, doctorId, isBooked: false },
+            { isBooked: true },
+            { new: true }
+          );
+
+          if (!updatedSlot) {
+            throw new Error("Selected slot is already booked or not found.");
+          }
+
+          slot = updatedSlot._id;
+        }
+
+        console.log(slot, "updated slot");
 
         // Step 2: Create the appointment
         const appointment = await Appointment.create({
           meetingId,
           doctorId,
-          slotId: updatedSlot._id,
+          slotId: slot._id,
           symptoms,
           name,
           email,
@@ -272,7 +316,7 @@ export default async function handler(req, res) {
       //   doctorId,
       //   `New ${consultationType} consultation booked with ${name}.`
       // );
-      res.status(200).json({message: "Consultation booked successfully"})
+      res.status(200).json({ message: "Consultation booked successfully" });
     } catch (error) {
       console.error("Booking error:", error);
       res

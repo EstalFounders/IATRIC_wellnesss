@@ -8,10 +8,12 @@ export const calculateConsultationEarning = (appointments) => {
 
 export const calculateLabTestEarning = (items) => {
   return items.reduce((total, item) => {
+    const paymentStatus = item.paymentStatus || ""; // Treat undefined as empty string
+    const bookingStatus = item.bookingStatus || ""; // Treat undefined as empty string
     return (
       total +
-      (item.paymentStatus.toLowerCase() === labTest_payment_status.PAID ||
-      item.bookingStatus.toLowerCase() === labTest_status.completed
+      (paymentStatus.toLowerCase() === labTest_payment_status.PAID ||
+      bookingStatus.toLowerCase() === labTest_status.completed
         ? parseFloat(item.totalPrice)
         : 0)
     );
