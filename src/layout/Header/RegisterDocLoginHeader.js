@@ -174,13 +174,13 @@ const RegisterDocLoginHeader = () => {
 
   // Set doctorStatus to true when the component loads (login)
   useEffect(() => {
-    console.log(doctorStatus, "doctor status");
-    if (DoctorInfo?.user?.isActive === false && doctorStatus === null) {
+    console.log(doctorStatus, "doctor status",DoctorInfo, "doctor info");
+    // if (DoctorInfo?.user?.isActive === false && doctorStatus === null) {
       setDoctorStatus(true); // Set to true locally
       updateDoctorStatus(true); // Update backend
       sessionStorage.setItem(single_call, true);
-    }
-  }, []);
+    // }
+  }, [doctorStatus]);
 
   return (
     <Row className="bg-white border-bottom align-items-center">

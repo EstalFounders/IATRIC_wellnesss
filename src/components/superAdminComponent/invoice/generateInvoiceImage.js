@@ -1,4 +1,3 @@
-
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useState } from "react";
@@ -8,12 +7,12 @@ import {
   invoice_bill_yellow_color,
 } from "../../../constant";
 import Preloader from "../../Preloader";
+import { sendInvoiceToFirebase } from "../../../utils";
 
-const GenerateInvoiceImage = ({ request, onClose, ref }) => {
+const GenerateInvoiceImage = ({ request, onClose }) => {
   console.log("request", request);
   const data = request[0];
   const [loader, setLoader] = useState(false);
-
 
   const date = new Date().toLocaleDateString("en-IN", {
     year: "numeric",
@@ -33,8 +32,8 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
     item,
   } = data;
   // const {}
+  console.log(data, "data");
 
-  
   const generatePDF = async () => {
     setLoader(true);
 
@@ -94,18 +93,29 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
 
       // Save the PDF
       const blob = doc.output("blob");
+
+      const invoiceUrl = await sendInvoiceToFirebase(blob, invoiceNumber);
       // doc.save(`${invoiceNumber}.pdf`);
 
-      const formData = new FormData();
-      formData.append("invoice", blob, "invoice.pdf");
-      const response = await fetch(`${api.uploadInvoice}?invoiceNo=${invoiceNumber}`, {
+      // const formData = new FormData();
+      // formData.append("invoice", blob, "invoice.pdf");
+      const payload = {
+        data: {
+          ...data,
+          invoiceUrl: invoiceUrl,
+        },
+      };
+      const response = await fetch(api.uploadInvoice, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         setLoader(false);
-        window.alert("Pdf sent.");
+        window.alert("Invoice sent.");
         // Reset form fields or navigate to another page
       } else {
         console.error("Error uploading pdf:", response.statusText);
@@ -125,7 +135,7 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
 
   return (
     <div>
-      <div  
+      <div
         id="invoiceContainer"
         className="border rounded bg-white"
         style={{
@@ -209,7 +219,7 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
               {item.map((item, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{item.name}</td>  
+                  <td>{item.name}</td>
                   <td>{item.hsn}</td>
                   <td>{item.qty}</td>
                   <td>{item.discount}</td>
@@ -280,7 +290,9 @@ const GenerateInvoiceImage = ({ request, onClose, ref }) => {
           style={{ backgroundColor: `${invoice_bill_yellow_color}` }}
         >
           <div className="col-md-6 text-left">
-            <div className="mb-1 text-center h2 font-weight-bold">Thank you!</div>
+            <div className="mb-1 text-center h2 font-weight-bold">
+              Thank you!
+            </div>
             <div className="mb-0 text-center">TTANSHE HEALTH PATH PVT. LTD</div>
           </div>
           <div className="col-md-6 text-right text-black font-weight-bold">

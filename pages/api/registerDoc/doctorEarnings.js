@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   switch (timeframe) {
     case "today":
-      startDate.setHours(0, 0, 0, 0);
+      startDate.setDate(new Date().getDate());
       break;
     case "week":
       startDate.setDate(startDate.getDate() - 7);
@@ -35,10 +35,16 @@ export default async function handler(req, res) {
     const allAppointments = await Appointment.find({ doctorId: doctorId });
 
     // Fetch appointments within the selected timeframe
-    const timeframeAppointments = await Appointment.find({
-      doctorId: doctorId,
-      appointmentTime: { $gte: startDate }, // Filter by timeframe
-    });
+    const timeframeAppointments =
+      timeframe == "today"
+        ? await Appointment.find({
+            doctorId: doctorId,
+            appointmentTime: startDate, // Filter by timeframe
+          })
+        : await Appointment.find({
+            doctorId: doctorId,
+            appointmentTime: { $gte: startDate }, // Filter by timeframe
+          });
 
     console.log(timeframeAppointments, "appointment", doctorId, startDate);
 

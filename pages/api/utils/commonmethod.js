@@ -1,4 +1,6 @@
 import { serviceOffered } from "../../../src/constant";
+import Appointment from "../../../src/models/appointmentSchema";
+import BookLabTest from "../../../src/models/bookLabTestSchema";
 
 export const createServicesToBill = (appointments, labTests, serviceOffer) => {
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
@@ -38,7 +40,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
     if (matchingLabTest) {
       // If there's a matching lab test for the same number
       const combinedService = {
-        id: `${appointment._id},${matchingLabTest._id}`,
+        // serviceIds: `${appointment._id},${matchingLabTest._id}`,
         name: appointment.name + " + " + matchingLabTest.name,
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
@@ -50,20 +52,24 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         totalPrice: totalPrice,
         item: [
           {
+            id: appointment._id,
             name: appointment.consultationType,
             price: appointment.consultationprice,
             hsn: appointmentTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
-            totalPrice: appointment.consultationprice,
+            price: appointment.consultationprice,
+            serviceType: appointment.serviceType,
           },
           {
+            id: matchingLabTest._id,
             name: matchingLabTest.name,
             price: matchingLabTest.totalPrice,
             hsn: labtestTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
-            totalPrice: matchingLabTest.totalPrice,
+            price: matchingLabTest.totalPrice,
+            serviceType: matchingLabTest.serviceType,
           },
         ],
       };
@@ -73,7 +79,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       // No matching lab test
       console.log("No matching lab test for mobile number:", appointmentTaxes[0].freight,appointmentTaxes[0].isActive,appointmentTaxes[0].processingfee,appointmentTaxes[0].share);
       const appointmentService = {
-        id: appointment._id,
+        // serviceIds: appointment._id,
         name: appointment.name,
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
@@ -84,12 +90,14 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         tax: 0,
         item: [
           {
+            id: appointment._id,
             name: appointment.consultationType,
             price: appointment.consultationprice,
             hsn: appointmentTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
-            totalPrice: appointment.consultationprice,
+            price: appointment.consultationprice,
+            serviceType: appointment.serviceType,
           },
         ],
       };
@@ -104,7 +112,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
     const invoiceNumber = `INV-${randomNumber}`;
     if (!usedMobileNumbers.has(mobNo)) {
       const labService = {
-        id: labTest._id,
+        // serviceIds: labTest._id,
         name: labTest.name,
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
@@ -115,12 +123,14 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         totalPrice: labTest.totalPrice,
         item: [
           {
+            id: labTest._id,
             name: labTest.name,
             price: labTest.totalPrice,
             hsn: labtestTaxes[0].hsn_percentage,
             discount: 0,
             quantity: 1,
-            totalPrice: labTest.totalPrice,
+            price: labTest.totalPrice,
+            serviceType: labTest.serviceType,
           },
         ],
       };
@@ -130,3 +140,51 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
 
   return servicesToBill;
 };
+
+export async function updateInvoiceNumberInDatabase(item, invoiceId) {
+  try {
+    if (!item) {
+      console.error('Item is undefined or null');
+      return; // Exit if item is invalid
+    }
+
+    let model;
+    switch (item.serviceType) {
+      case 'Consultation':
+        model = Appointment; // Assuming Appointment is your Consultation model
+        break;
+      case 'LabTest':
+        model = BookLabTest; // Assuming BookLabTest is your LabTest model
+        break;
+      default:
+        console.warn(`Unknown service type: ${item.serviceType}.  Skipping update for item ID: ${item.id}`);
+        return; // Skip if service type is unknown
+    }
+
+    //check if model is defined
+    if(!model){
+        return;
+    }
+    const result = await model.findByIdAndUpdate(
+      item.id, // Use item.id to find the correct record
+      { invoiceId: invoiceId }, // Set the invoiceNumber
+      { new: true } // Return the updated document
+    );
+
+    if (result) {
+      console.log(
+        `Invoice number updated for ${item.serviceType} with ID ${item.id}`
+      );
+    } else {
+      console.warn(
+        `${item.serviceType} with ID ${item.id} not found.  Invoice number not updated.`
+      );
+    }
+  } catch (error) {
+    console.error(
+      `Error updating invoice number for ${item.serviceType} with ID ${item.id}:`,
+      error
+    );
+    throw error; // Re-throw the error to be caught by the caller
+  }
+}

@@ -1,5 +1,5 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { prescription_img_path } from "./constant";
+import { invoice_img_path, prescription_img_path } from "./constant";
 import { storage } from "./lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -75,6 +75,20 @@ export const sendPrescriptionToFirebase = async (file, details) => {
     `${prescription_img_path}/patient=${details.patientName},doctor=${
       details.doctorName
     }_${uuidv4()}`
+  );
+  const metadata = {
+    contentType: file.type,
+  };
+  await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(storageRef);
+  return url;
+};
+
+export const sendInvoiceToFirebase = async (file, invoiceNumber) => {
+  console.log(invoiceNumber, "invoice no", file, "file");
+  const storageRef = ref(
+    storage,
+    `${invoice_img_path}/invoiceNo=${invoiceNumber}_${uuidv4()}`
   );
   const metadata = {
     contentType: file.type,

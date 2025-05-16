@@ -1,11 +1,6 @@
 import { dbConnect } from "../../src/lib/db";
 import GlobalVar from "../../src/models/globalVarSchema";
 
-export const config = {
-    api: {
-      bodyParser: false,
-    },
-};
 
 export default async function handler(req, res) {
     await dbConnect();

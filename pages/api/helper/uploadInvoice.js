@@ -5,55 +5,58 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../../src/lib/firebase";
-
-export const config = {
-  api: {
-    bodyParser: false, // Disable bodyParser as we'll handle the request body manually
-  },
-};
+import mongoose from "mongoose";
+import { updateInvoiceNumberInDatabase } from "../utils/commonmethod";
+import Invoice from "../../../src/models/invoice";
 
 export default async function handler(req, res) {
   await dbConnect();
-  const form = new multiparty.Form();
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+  // console.log(files, 'files', fields, 'fields'); // Keep this for debugging
+  let session; // Declare session variable
+  try {
+    // Start a Mongoose session for the transaction
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const body = req.body;
+    const invoiceNumber = body.data.invoiceNumber;
+    const items = body.data.item;
+    const payload = body.data
 
-  form.parse(req, async (err, fields, files) => {
-    console.log(files, "files", fields, "fields");
-    if (err) {
-      console.error("Error parsing form data:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
+    console.log(payload, "body");
+    console.log(items, "items");
+
+    const invoice = await Invoice.create(payload);
+    const invoiceId = invoice._id; // Get the ID of the newly created invoice
+
+    for (const item of items) {
+      await updateInvoiceNumberInDatabase(item, invoiceId);
     }
 
-    try {
-      // Read the file into a Buffer
-      // const fileBuffer = fs.readFileSync(files.invoice[0].path);
-      // const { invoiceNo } = req.query;
-      // // Upload PDF to Google Cloud Storage
-      // const storageRef = ref(
-      //   storage,
-      //   `${invoice_img_path}/${invoiceNo}`
-      // );
-      // const metadata = {
-      //   contentType: "application/pdf",
-      // };
-      // await uploadBytes(storageRef, fileBuffer, metadata);
+    // send pdf url to patient whatsapp
+    // const number = 7455992234;
+    // const sendPdfUrl = await sendWhatsAppMessage(number, prescriptionUrl); // Await here
 
-      // // Return the URL of the uploaded PDF file
-      // const prescriptionUrl = await getDownloadURL(storageRef);
+    // if (!sendPdfUrl) {
+    //   throw new Error("Failed to send whastapp");
+    // }
 
-      // send pdf url to patient whatsapp
+    // If all operations were successful, commit the transaction
+    await session.commitTransaction();
+    session.endSession();
 
-      // const number = 7455992234;
-      // const sendPdfUrl = sendWhatsAppMessage(number, prescriptionUrl);
-
-      // if (!sendPdfUrl) {
-      //   throw new Error("Failed to send whastapp");
-      // }
-
-      res.status(200).json({ status: "send successfully" });
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+    res.status(200).json({ status: "send successfully", invoice });
+  } catch (error) {
+    // If any error occurred, roll back the transaction
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
     }
-  });
+    console.error("Error:", error);
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message }); // Include the error message
+  }
 }

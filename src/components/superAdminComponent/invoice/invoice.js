@@ -48,6 +48,12 @@ const InvoiceComp = () => {
     setShow(false)
   }
 
+  // const removeInvoice = (invoiceNumber) => {
+  //   const updatedInvoice = invoice.filter((req) => req.invoiceNumber !== invoiceNumber);
+  //   setInvoice(updatedInvoice);
+  //   setFilteredRq(updatedInvoice);
+  // };
+
   
 
   // Handle search input
