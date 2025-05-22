@@ -55,7 +55,6 @@
     "stream-chat": "^8.37.0",
     "stream-chat-react": "^11.22.0",
     "swiper": "^7.2.0",
-    "twilio": "^5.0.3",
     "uuid": "^9.0.1",
     "wowjs": "^1.1.3"
   },

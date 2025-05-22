@@ -2,8 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
-import { convertDateIntoTime, convertTimeIntoDate } from "../../helper";
-import { DoctorType, superAdminConsultationtype, userTypeConstant } from "../../constant";
+import {
+  convertDateIntoTime,
+  convertTimeIntoDate,
+  isMobileValid,
+} from "../../helper";
+import {
+  DoctorType,
+  superAdminConsultationtype,
+  userTypeConstant,
+} from "../../constant";
 import { useSelector } from "react-redux";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
@@ -23,8 +31,10 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   );
 
   const [selectedTypes, setSelectedTypes] = useState(
-    editedDoctor.consultationType || []
+    editedDoctor.consultationType || ""
   );
+
+  console.log(selectedTypes, "selectedTypes");
 
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
@@ -86,6 +96,10 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
 
   const handleSave = () => {
     console.log(editedDoctor, "edited doctor");
+    if (!isMobileValid(editedDoctor.mobileNumber)) {
+      alert("Please enter a valid mobile number");
+      return;
+    }
     onSave(editedDoctor);
     handleClose();
   };
@@ -121,6 +135,17 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   type="text"
                   name="name"
                   value={editedDoctor.name}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group controlId="mobileNumber" className="mb-3">
+                <Form.Label>
+                  <b>Mobile Number</b>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="mobileNumber"
+                  value={editedDoctor.mobileNumber}
                   onChange={handleChange}
                 />
               </Form.Group>
@@ -264,8 +289,12 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   <option value="" disabled>
                     Select an option
                   </option>
-                  <option value={DoctorType.Company}>{DoctorType.Company}</option>
-                  <option value={DoctorType.Individual}>{DoctorType.Individual}</option>
+                  <option value={DoctorType.Company}>
+                    {DoctorType.Company}
+                  </option>
+                  <option value={DoctorType.Individual}>
+                    {DoctorType.Individual}
+                  </option>
                 </select>
               </Form.Group>
             </Col>

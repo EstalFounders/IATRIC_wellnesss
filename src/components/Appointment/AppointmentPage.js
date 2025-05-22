@@ -2,7 +2,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { api, consultationTypeMapping, sessionStorageName } from "../../constant";
+import {
+  api,
+  consultationTypeMapping,
+  sessionStorageName,
+} from "../../constant";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
@@ -25,6 +29,8 @@ const AppointmentPage = () => {
   const router = useRouter();
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [doctorName, setDoctorName] = useState("");
+  const [doctorMobileNumber, setDoctorMobileNumber] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
@@ -62,7 +68,9 @@ const AppointmentPage = () => {
     if (data.success) {
       console.log(data.data, "data in 56");
       setAvailableSlots(data.data);
-      {data.data.length == 0 ? setSlotEmpty(true) : setSlotEmpty(false)}
+      {
+        data.data.length == 0 ? setSlotEmpty(true) : setSlotEmpty(false);
+      }
     } else {
       console.error("Failed to fetch slots:", data.message);
       setAvailableSlots([]);
@@ -71,7 +79,9 @@ const AppointmentPage = () => {
 
   useEffect(() => {
     const fetchConsultationFees = async () => {
-      const storedConsultations = sessionStorage.getItem(sessionStorageName.ConsultationFee);
+      const storedConsultations = sessionStorage.getItem(
+        sessionStorageName.ConsultationFee
+      );
       console.log(storedConsultations, "stored consultation");
 
       let consultationFees;
@@ -83,7 +93,7 @@ const AppointmentPage = () => {
         if (Array.isArray(consultationFees) && consultationFees.length > 0) {
           console.log("Using stored consultations from localStorage.");
           setConsultationTypes(consultationFees);
-          setConsultationPrice(consultationFees[0].fee)
+          setConsultationPrice(consultationFees[0].fee);
         } else {
           consultationFees = null;
         }
@@ -97,7 +107,7 @@ const AppointmentPage = () => {
         });
         consultationFees = await response.json();
         setConsultationTypes(consultationFees);
-        setConsultationPrice(consultationFees[0].fee)
+        setConsultationPrice(consultationFees[0].fee);
         sessionStorage.setItem(
           sessionStorageName.ConsultationFee,
           JSON.stringify(consultationFees)
@@ -118,8 +128,7 @@ const AppointmentPage = () => {
         consultationFees.length > 0
       ) {
         const matchingConsultation = consultationFees.find(
-          (consultation) =>
-            consultation.name === savedLabel // Case insensitive
+          (consultation) => consultation.name === savedLabel // Case insensitive
         );
 
         if (matchingConsultation) {
@@ -180,7 +189,17 @@ const AppointmentPage = () => {
   };
 
   const handleDoctorSelection = (event) => {
-    setSelectedDoctorId(event.target.value);
+    // Get the selected option element
+    const selectedId = event.target.value;
+    setSelectedDoctorId(selectedId);
+    const selectedDoctor = filteredDoctors.find(
+      (doctor) => doctor._id === selectedId
+    );
+    console.log(selectedDoctor, "selected doctor");
+    const doctorName = selectedDoctor.name;
+    const doctorMobileNumber = selectedDoctor.mobileNumber;
+    setDoctorName(doctorName);
+    setDoctorMobileNumber(doctorMobileNumber);
   };
 
   const handleTimeSelection = (event) => {
@@ -306,6 +325,8 @@ const AppointmentPage = () => {
         selectedSlot,
         symptoms,
         name,
+        doctorName,
+        doctorMobileNumber,
         email,
         patientMobNo: mobNo,
         consultationprice,
@@ -588,41 +609,43 @@ const AppointmentPage = () => {
                           }}
                         >
                           {console.log(availableSlots, "available slots")}
-                          {!slotEmpty ? availableSlots
-                            .filter((slot) => {
-                              const slotDate = new Date(slot.startTime);
-                              return (
-                                !slot.isBooked &&
-                                slotDate.getTime() > new Date().getTime()
-                              );
-                            })
-                            .map((slot) => (
-                              <li
-                                key={slot._id}
-                                style={{
-                                  color: "black",
-                                  backgroundColor:
-                                    selectedSlot._id === slot._id
-                                      ? "#9f9856"
-                                      : "white",
-                                  border: "1px solid black",
-                                  padding: "5px", // Reduced padding
-                                  margin: "5px",
-                                  borderRadius: "5px", // Reduced border-radius for a less rounded look
-                                  width: "30%", // Adjust width to make boxes smaller
-                                  maxWidth: "160px", // Maximum width to ensure they don't grow too large
-                                  textAlign: "center",
-                                  cursor: "pointer",
-                                  transition: "background-color 0.3s",
-                                  fontSize: "0.9rem", // Smaller font size for better readability in small boxes
-                                  lineHeight: "1.4", // Adjust line height for better text spacing
-                                }}
-                                onClick={() => handleSlotSelection(slot)}
-                              >
-                                {formatTime(slot.startTime)} -{" "}
-                                {formatTime(slot.endTime)}
-                              </li>
-                            )): slotMessage}
+                          {!slotEmpty
+                            ? availableSlots
+                                .filter((slot) => {
+                                  const slotDate = new Date(slot.startTime);
+                                  return (
+                                    !slot.isBooked &&
+                                    slotDate.getTime() > new Date().getTime()
+                                  );
+                                })
+                                .map((slot) => (
+                                  <li
+                                    key={slot._id}
+                                    style={{
+                                      color: "black",
+                                      backgroundColor:
+                                        selectedSlot._id === slot._id
+                                          ? "#9f9856"
+                                          : "white",
+                                      border: "1px solid black",
+                                      padding: "5px", // Reduced padding
+                                      margin: "5px",
+                                      borderRadius: "5px", // Reduced border-radius for a less rounded look
+                                      width: "30%", // Adjust width to make boxes smaller
+                                      maxWidth: "160px", // Maximum width to ensure they don't grow too large
+                                      textAlign: "center",
+                                      cursor: "pointer",
+                                      transition: "background-color 0.3s",
+                                      fontSize: "0.9rem", // Smaller font size for better readability in small boxes
+                                      lineHeight: "1.4", // Adjust line height for better text spacing
+                                    }}
+                                    onClick={() => handleSlotSelection(slot)}
+                                  >
+                                    {formatTime(slot.startTime)} -{" "}
+                                    {formatTime(slot.endTime)}
+                                  </li>
+                                ))
+                            : slotMessage}
                         </div>
                       </ul>
                     </div>
@@ -648,44 +671,49 @@ const AppointmentPage = () => {
                             justifyContent: "space-around",
                           }}
                         >
-                          {console.log(locallyCreatedSlots, "locally created slots")}
-                          {locallyCreatedSlots.length > 0 ? locallyCreatedSlots
-                            .filter((slot) => {
-                              const currentDate = new Date();
-                              return (
-                                selectedDate.toDateString() ===
-                                  slot.startTime.toDateString() &&
-                                slot.startTime > currentDate
-                              );
-                            })
-                            .map((slot) => (
-                              <li
-                                key={slot._id}
-                                style={{
-                                  color: "black",
-                                  backgroundColor:
-                                    selectedSlot &&
-                                    selectedSlot._id === slot._id
-                                      ? "#9f9856"
-                                      : "white",
-                                  border: "1px solid black",
-                                  padding: "5px",
-                                  margin: "5px",
-                                  borderRadius: "5px",
-                                  width: "30%",
-                                  maxWidth: "160px",
-                                  textAlign: "center",
-                                  cursor: "pointer",
-                                  transition: "background-color 0.3s",
-                                  fontSize: "0.9rem",
-                                  lineHeight: "1.4",
-                                }}
-                                onClick={() => handleSlotSelection(slot)}
-                              >
-                                {formatTime(slot.startTime)} -{" "}
-                                {formatTime(slot.endTime)}
-                              </li>
-                            )): slotMessage}
+                          {console.log(
+                            locallyCreatedSlots,
+                            "locally created slots"
+                          )}
+                          {locallyCreatedSlots.length > 0
+                            ? locallyCreatedSlots
+                                .filter((slot) => {
+                                  const currentDate = new Date();
+                                  return (
+                                    selectedDate.toDateString() ===
+                                      slot.startTime.toDateString() &&
+                                    slot.startTime > currentDate
+                                  );
+                                })
+                                .map((slot) => (
+                                  <li
+                                    key={slot._id}
+                                    style={{
+                                      color: "black",
+                                      backgroundColor:
+                                        selectedSlot &&
+                                        selectedSlot._id === slot._id
+                                          ? "#9f9856"
+                                          : "white",
+                                      border: "1px solid black",
+                                      padding: "5px",
+                                      margin: "5px",
+                                      borderRadius: "5px",
+                                      width: "30%",
+                                      maxWidth: "160px",
+                                      textAlign: "center",
+                                      cursor: "pointer",
+                                      transition: "background-color 0.3s",
+                                      fontSize: "0.9rem",
+                                      lineHeight: "1.4",
+                                    }}
+                                    onClick={() => handleSlotSelection(slot)}
+                                  >
+                                    {formatTime(slot.startTime)} -{" "}
+                                    {formatTime(slot.endTime)}
+                                  </li>
+                                ))
+                            : slotMessage}
                         </div>
                       </ul>
                     </div>
@@ -819,7 +847,12 @@ const AppointmentPage = () => {
             onClose={() => setBookingResponse(false)}
           >
             <div className={styles.successMessage}>
-              <Image alt="success_response" src={"/images/success.png"} width={100} height={100} />
+              <Image
+                alt="success_response"
+                src={"/images/success.png"}
+                width={100}
+                height={100}
+              />
               <div className={`${styles.successText} mt-3`}>Thank you!</div>
               <div className={styles.successText}>{message}</div>
             </div>

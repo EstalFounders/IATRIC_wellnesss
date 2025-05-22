@@ -307,6 +307,11 @@ export default async function handler(req, res) {
           ...stringFields,
           profilePictureUrl,
           diplomasCertificatesUrls,
+          consultationType: stringFields.consultationType
+            ? stringFields.consultationType
+                .split(",")
+                .map((type) => type.trim())
+            : [], // Convert to array & trim spaces
         };
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,

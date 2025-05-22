@@ -3,11 +3,11 @@ import path from "path";
 import mongoose from "mongoose";
 import LabTest from "../../src/models/lab-test"; // Assuming you've defined a model schema
 import { dbConnect } from "../../src/lib/db";
-import { sendWhatsAppMessage } from "./lib/communication";
 import Appointment from "../../src/models/appointmentSchema";
-import { serviceOffered } from "../../src/constant";
+import { serviceOffered, twilioPhoneNumber } from "../../src/constant";
 import BookLabTest from "../../src/models/bookLabTestSchema";
 import ServiceOffered from "../../src/models/serviceOffered";
+import { sendWhatsAppConfirmation } from "./lib/communication";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -16,15 +16,23 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  // try {
-  //   await sendWhatsAppMessage(
-  //     "7455992234",
-  //     `Your Audio consultation is booked successfully.`
-  //   );
-  // } catch (error) {
-  //   console.error("Error connecting to database:", error);
-  //   return res.status(500).json({ message: "Internal server error" });
-  // }
+  try {
+    const body = {
+      appointment_date: "1/1/1",
+      appointment_time: "14:35",
+      doctor_name: "Dr. John Doe",
+      patient_name: "Jane Doe",
+      consultation_type: "Call",
+      contact_us: twilioPhoneNumber
+    }
+    await sendWhatsAppConfirmation(
+      "917455992234",
+      body
+    );
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 
   //code for update new column in db
 
@@ -35,11 +43,11 @@ export default async function handler(req, res) {
     //   { $rename: { "invoiceNumber": "invoiceId" } }
     // );
     
-    const consultationResult = await BookLabTest.updateMany(
-      { invoiceId: { $exists: false } },
-      { $set: { invoiceId: "" } },
-      { upsert: true } // Add the upsert option here
-    );
+    // const consultationResult = await BookLabTest.updateMany(
+    //   { invoiceId: { $exists: false } },
+    //   { $set: { invoiceId: "" } },
+    //   { upsert: true } // Add the upsert option here
+    // );
 
     // const consultationResult = await Appointment.updateMany(
     //   { invoiceNumber: { $exists: false } },
@@ -66,8 +74,8 @@ export default async function handler(req, res) {
 
     // 5. Send a response
     res.status(200).json({
-      message: 'Collections updated successfully',
-      consultationResult,
+      message: 'message send successfully',
+      
       // updatedAppointmentCount: consultationResult.modifiedCount,
       // upsertedAppointmentCount: consultationResult.upsertedCount,
       // updatedLabTestCount: labTestResult.modifiedCount,

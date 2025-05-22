@@ -188,3 +188,30 @@ export async function updateInvoiceNumberInDatabase(item, invoiceId) {
     throw error; // Re-throw the error to be caught by the caller
   }
 }
+
+export const gallaboxReqHeaders = {
+  'apiSecret': process.env.GALLABOX_API_SECRET,
+  'apiKey': process.env.GALLABOX_API_KEY,
+  'Content-Type': "application/json",
+}
+
+export const formatPhoneNumber = (phoneNumberString) => {
+  if (typeof phoneNumberString !== 'string') return null;
+  console.log(phoneNumberString, "last 10 digits 200");
+
+  // Remove all non-digit characters
+  let digits = phoneNumberString.replace(/\D/g, '');
+  console.log(digits, "last 10 digits 203");
+  // Keep only the last 10 digits (assumed to be the actual mobile number)
+  const last10Digits = digits.slice(-10);
+
+  console.log(last10Digits, "last 10 digits 207");
+  // Ensure it's 10 digits
+  if (last10Digits.length !== 10) return null;
+
+  console.log(last10Digits, "last 10 digits 211");
+
+  // Prefix with country code
+  return `91${last10Digits}`;
+};
+

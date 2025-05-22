@@ -1,7 +1,9 @@
 // import { immediateCall, scheduleCall, generateMeetingUrl, sendWhatsAppMessage } from '../../lib/twilio';
+import mongoose from "mongoose";
 import {
   consultationTypeMapping,
   development_production_url,
+  twilioPhoneNumber,
 } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
@@ -12,6 +14,14 @@ import {
   findAvailableDoctorForSpecificTimeSlot,
 } from "./helper";
 import { v4 as uuidv4 } from "uuid";
+import {
+  extractTime,
+  formatData,
+} from "../../src/components/registerDocComponent/utils/helper";
+import { sendWhatsAppConfirmation } from "./lib/communication";
+import { formatPhoneNumber } from "./utils/commonmethod";
+import { format } from "path";
+import { WHATSAPP_CONFIRMATION_TEMPLATE } from "./utils/constants";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -60,6 +70,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    let session;
     const {
       selectedDoctorId,
       appointmentTime,
@@ -67,6 +78,8 @@ export default async function handler(req, res) {
       selectedSlot,
       symptoms,
       name,
+      doctorName,
+      doctorMobileNumber,
       email,
       patientMobNo,
       consultationType,
@@ -75,7 +88,10 @@ export default async function handler(req, res) {
 
     try {
       console.log(req.body);
-
+      session = await mongoose.startSession();
+      session.startTransaction();
+      let docName = doctorName == "" ? null : doctorName;
+      let doctorMobileNo = doctorMobileNumber == "" ? null : doctorMobileNumber;
       let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
       let slot = selectedSlot === "" ? null : selectedSlot;
       let doctor;
@@ -101,6 +117,8 @@ export default async function handler(req, res) {
           "result slots"
         );
         doctorId = result ? result.doctor._id.toString() : "";
+        docName = result ? result.doctor.name : "";
+        doctorMobileNo = result ? result.doctor.mobileNumber : "";
         slot = result ? result.slot : "";
         if (!doctorId) {
           throw new Error("No available doctors at the selected time");
@@ -115,6 +133,8 @@ export default async function handler(req, res) {
           selectedSlot
         );
         console.log(result, "result 111");
+        docName = result.doctor.name;
+        doctorMobileNo = result.doctor.mobileNumber;
         doctorId = result.doctor;
         slot = result.slotId;
         console.log(doctorId, "doctorid for specific time", slot, "slot");
@@ -123,17 +143,14 @@ export default async function handler(req, res) {
         }
       }
 
-      // const patientDetails = {
-      //   PatientName: "Shubham",
-      //   selectedDoctorId: doctorId,
-      //   appointmentTime: appointmentTime,
-      //   selectedDate: selectedDate,
-      //   selectedSlot: selectedSlot,
-      //   symptoms: symptoms,
-      //   consultationType: consultationType,
-      //   email: email,
-      //   patientMobileNo: patientMobNo,
-      // };
+      const confirmMessageBody = {
+        appointment_date: formatData(selectedDate),
+        appointment_time: extractTime(selectedDate),
+        doctor_name: docName,
+        patient_name: name,
+        consultation_type: consultationType,
+        contact_us: twilioPhoneNumber,
+      };
 
       // const doctorDetails = {
       //   doctorName: "Ashima",
@@ -163,7 +180,7 @@ export default async function handler(req, res) {
         doctorMeetingUrl,
         prescriptionUrl,
       }) => {
-        console.log(slot, "slot",doctorId, "doctor id");
+        console.log(slot, "slot", doctorId, "doctor id");
         if (slot === null) {
           const now = new Date();
 
@@ -233,7 +250,17 @@ export default async function handler(req, res) {
           doctorMeetingUrl,
           prescriptionUrl,
         });
-        console.log("line no 190");
+        console.log(formatPhoneNumber(doctorMobileNo.toString()),doctorMobileNo,"line no 190");
+        await sendWhatsAppConfirmation(
+          formatPhoneNumber(patientMobNo.toString()),
+          confirmMessageBody,
+          WHATSAPP_CONFIRMATION_TEMPLATE
+        );
+        await sendWhatsAppConfirmation(
+          formatPhoneNumber(doctorMobileNo.toString()),
+          confirmMessageBody,
+          WHATSAPP_CONFIRMATION_TEMPLATE
+        );
         // return appointment;
       };
 
@@ -316,8 +343,14 @@ export default async function handler(req, res) {
       //   doctorId,
       //   `New ${consultationType} consultation booked with ${name}.`
       // );
+      await session.commitTransaction();
+      session.endSession();
       res.status(200).json({ message: "Consultation booked successfully" });
     } catch (error) {
+      if (session) {
+        await session.abortTransaction();
+        session.endSession();
+      }
       console.error("Booking error:", error);
       res
         .status(500)
