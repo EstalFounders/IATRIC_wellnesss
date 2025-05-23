@@ -5,8 +5,13 @@ import Slot from "../../../src/models/slots";
 import { appointment_status } from "../../../src/constant";
 import Doctor from "../../../src/models/doctorModel";
 import { sendWhatsAppConfirmation } from "./communication";
-import { WHATSAPP_CONFIRMATION_TEMPLATE, WHATSAPP_REMINDER_TEMPLATE_DOCTOR, WHATSAPP_REMINDER_TEMPLATE_PATIENT } from "../utils/constants";
+import {
+  WHATSAPP_CONFIRMATION_TEMPLATE,
+  WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
+  WHATSAPP_REMINDER_TEMPLATE_PATIENT,
+} from "../utils/constants";
 import { formatPhoneNumber } from "../utils/commonmethod";
+import { formatData } from "../../../src/components/registerDocComponent/utils/helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -17,7 +22,7 @@ export default async function handler(req, res) {
 
     // 1. Get upcoming appointments within 10 minutes
     const upcomingAppointments = await Appointment.find({
-        appointmentTime: { $gte: now, $lte: twentyMinutesFromNow },
+      appointmentTime: { $gte: now, $lte: twentyMinutesFromNow },
       status: new RegExp(appointment_status.open, "i"), // 'i' flag for case-insensitive
     });
 
@@ -31,10 +36,9 @@ export default async function handler(req, res) {
 
       if (!slot || !doctor) continue;
 
-      const appointmentTime = new Date(slot.startTime).toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      });
+      const appointmentTime = formatData(slot.startTime);
+
+      console.log("Appointment Time:", appointmentTime);
 
       // Prepare messages
       const reminderMessageBodyPateint = {
@@ -65,13 +69,15 @@ export default async function handler(req, res) {
 
       // Send messages (your `sendMessage` handles actual sending logic)
       console.log(
-        'patientMobNo',formatPhoneNumber(patientMobNo.toString()),
-        'doctorMobNo',formatPhoneNumber(doctorMobNo.toString())
+        "patientMobNo",
+        formatPhoneNumber(patientMobNo.toString()),
+        "doctorMobNo",
+        formatPhoneNumber(doctorMobNo.toString())
       );
       await sendWhatsAppConfirmation(
         formatPhoneNumber(patientMobNo.toString()),
         reminderMessageBodyPateint,
-        WHATSAPP_REMINDER_TEMPLATE_PATIENT        
+        WHATSAPP_REMINDER_TEMPLATE_PATIENT
       );
       await sendWhatsAppConfirmation(
         formatPhoneNumber(doctorMobNo.toString()),
