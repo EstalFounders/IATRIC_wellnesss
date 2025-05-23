@@ -1,6 +1,7 @@
 // import { immediateCall, scheduleCall, generateMeetingUrl, sendWhatsAppMessage } from '../../lib/twilio';
 import mongoose from "mongoose";
 import {
+  appointment_status,
   consultationTypeMapping,
   development_production_url,
   twilioPhoneNumber,
@@ -143,14 +144,7 @@ export default async function handler(req, res) {
         }
       }
 
-      const confirmMessageBody = {
-        appointment_date: formatData(selectedDate),
-        appointment_time: extractTime(selectedDate),
-        doctor_name: docName,
-        patient_name: name,
-        consultation_type: consultationType,
-        contact_us: twilioPhoneNumber,
-      };
+      
 
       // const doctorDetails = {
       //   doctorName: "Ashima",
@@ -215,7 +209,8 @@ export default async function handler(req, res) {
             throw new Error("No next available slot found.");
           }
 
-          slot = nextSlot._id;
+          slot = nextSlot
+          // ._id;
         } else {
           // Book the selected slot if it's not already booked
           const updatedSlot = await Slot.findOneAndUpdate(
@@ -228,7 +223,8 @@ export default async function handler(req, res) {
             throw new Error("Selected slot is already booked or not found.");
           }
 
-          slot = updatedSlot._id;
+          slot = updatedSlot
+          // ._id;
         }
 
         console.log(slot, "updated slot");
@@ -250,6 +246,18 @@ export default async function handler(req, res) {
           doctorMeetingUrl,
           prescriptionUrl,
         });
+        
+        console.log("start time 249",slot, "slot 249");
+
+        const confirmMessageBody = {
+          appointment_date: formatData(slot.startTime),
+          appointment_time: extractTime(slot.startTime), 
+          doctor_name: docName,
+          patient_name: name,
+          consultation_type: consultationType,
+          contact_us: twilioPhoneNumber,
+        };
+
         console.log(formatPhoneNumber(doctorMobileNo.toString()),doctorMobileNo,"line no 190");
         await sendWhatsAppConfirmation(
           formatPhoneNumber(patientMobNo.toString()),
@@ -287,6 +295,7 @@ export default async function handler(req, res) {
             // });
           }
           // Store appointment details
+          console.log(slot.startTime, "slot start time", slot, "slot");
           await bookConsultation({
             meetingId,
             doctorId,
@@ -297,8 +306,8 @@ export default async function handler(req, res) {
             patientMobNo,
             consultationType,
             consultationprice,
-            appointmentTime: isNow ? new Date() : selectedDate,
-            status: "open",
+            appointmentTime: isNow ? new Date() : slot.startTime,
+            status: appointment_status.open,
             patientMeetingUrl,
             doctorMeetingUrl,
             prescriptionUrl: "",

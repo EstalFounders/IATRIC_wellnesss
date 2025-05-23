@@ -8,6 +8,7 @@ import { serviceOffered, twilioPhoneNumber } from "../../src/constant";
 import BookLabTest from "../../src/models/bookLabTestSchema";
 import ServiceOffered from "../../src/models/serviceOffered";
 import { sendWhatsAppConfirmation } from "./lib/communication";
+import Slot from "../../src/models/slots";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -37,6 +38,44 @@ export default async function handler(req, res) {
   //code for update new column in db
 
   try {
+    const allAppointments = await Appointment.find({});
+
+    const updatedAppointments = [];
+    const errors = [];
+
+    console.log(`Processing ${allAppointments.length} appointments...`);
+
+    // Iterate through each appointment
+    for (const appointment of allAppointments) {
+      if (!appointment.slotId) {
+        console.warn(`Appointment ${appointment._id} has no slotId. Skipping.`);
+        errors.push({ id: appointment._id, message: 'No slotId found for appointment' });
+        continue;
+      }
+
+      try {
+        // 2. Fetch the corresponding slot using slotId
+        const slot = await Slot.findById(appointment.slotId);
+
+        if (slot && slot.startTime) {
+          // 3. Update the appointmentTime of the appointment schema with slot.startTime
+          const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointment._id,
+            { appointmentTime: slot.startTime },
+            { new: true } // Return the updated document
+          );
+          updatedAppointments.push(updatedAppointment);
+          console.log(`Updated appointment ${appointment._id} with time ${slot.startTime}`);
+        } else {
+          console.warn(`Slot ${appointment.slotId} not found or has no startTime for appointment ${appointment._id}. Skipping.`);
+          errors.push({ id: appointment._id, message: 'Slot not found or startTime missing' });
+        }
+      } catch (innerError) {
+        console.error(`Error processing appointment ${appointment._id}:`, innerError);
+        errors.push({ id: appointment._id, message: `Error updating: ${innerError.message}` });
+      }
+    }
+
     // Update all documents to ensure the 'newField' exists with a default value if not present
     // const consultationResult = await Appointment.updateMany(
     //   { invoiceNumber: { $exists: true } },
@@ -74,8 +113,8 @@ export default async function handler(req, res) {
 
     // 5. Send a response
     res.status(200).json({
-      message: 'message send successfully',
-      
+      message: 'Column updated successfully',
+      updatedAppointments: updatedAppointments,
       // updatedAppointmentCount: consultationResult.modifiedCount,
       // upsertedAppointmentCount: consultationResult.upsertedCount,
       // updatedLabTestCount: labTestResult.modifiedCount,
