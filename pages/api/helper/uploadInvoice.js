@@ -6,8 +6,13 @@ import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../../src/lib/firebase";
 import mongoose from "mongoose";
-import { updateInvoiceNumberInDatabase } from "../utils/commonmethod";
+import {
+  formatPhoneNumber,
+  updateInvoiceNumberInDatabase,
+} from "../utils/commonmethod";
 import Invoice from "../../../src/models/invoice";
+import { sendWhatsAppConfirmation } from "../lib/communication";
+import { WHATSAPP_INVOICE_TEMPLATE } from "../utils/constants";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -23,7 +28,7 @@ export default async function handler(req, res) {
     const body = req.body;
     const invoiceNumber = body.data.invoiceNumber;
     const items = body.data.item;
-    const payload = body.data
+    const payload = body.data;
 
     console.log(payload, "body");
     console.log(items, "items");
@@ -34,6 +39,17 @@ export default async function handler(req, res) {
     for (const item of items) {
       await updateInvoiceNumberInDatabase(item, invoiceId);
     }
+    const invoiceMessage = {
+      patient_name: payload.name,
+      invoice_number: invoiceNumber,
+      total_amount: payload.totalPrice,
+      invoice_url: payload.invoiceUrl,
+    };
+    await sendWhatsAppConfirmation(
+      formatPhoneNumber(payload.mobNo.toString()),
+      invoiceMessage,
+      WHATSAPP_INVOICE_TEMPLATE
+    );
 
     // send pdf url to patient whatsapp
     // const number = 7455992234;

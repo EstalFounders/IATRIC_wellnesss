@@ -1,6 +1,8 @@
 export const WHATSAPP_REMINDER_TEMPLATE_PATIENT = "consultation_reminder_patient";
 export const WHATSAPP_REMINDER_TEMPLATE_DOCTOR = "consultation_reminder_doctor";
 export const WHATSAPP_CONFIRMATION_TEMPLATE = "booking_confirmation";
+export const WHATSAPP_PRESCRIPTION_TEMPLATE = "patient_prescription";
+export const WHATSAPP_INVOICE_TEMPLATE = "consultation_invoice";
 export const CHANNEL_TYPE = "whatsapp";
 export const WHATSAPP_TYPE = "template";
 export const GALLABOX_API = {

@@ -4,7 +4,7 @@ import {
   appointment_status,
   consultationTypeMapping,
   development_production_url,
-  twilioPhoneNumber,
+  contact_no
 } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
@@ -255,7 +255,7 @@ export default async function handler(req, res) {
           doctor_name: docName,
           patient_name: name,
           consultation_type: consultationType,
-          contact_us: twilioPhoneNumber,
+          contact_us: contact_no,
         };
 
         console.log(formatPhoneNumber(doctorMobileNo.toString()),doctorMobileNo,"line no 190");

@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import LabTest from "../../src/models/lab-test"; // Assuming you've defined a model schema
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
-import { serviceOffered, twilioPhoneNumber } from "../../src/constant";
+import { contact_no, serviceOffered } from "../../src/constant";
 import BookLabTest from "../../src/models/bookLabTestSchema";
 import ServiceOffered from "../../src/models/serviceOffered";
 import { sendWhatsAppConfirmation } from "./lib/communication";
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       doctor_name: "Dr. John Doe",
       patient_name: "Jane Doe",
       consultation_type: "Call",
-      contact_us: twilioPhoneNumber
+      contact_us: contact_no
     }
     await sendWhatsAppConfirmation(
       "917455992234",
