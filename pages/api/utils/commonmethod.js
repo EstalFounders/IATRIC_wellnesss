@@ -59,7 +59,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
             discount: 0,
             quantity: 1,
             price: appointment.consultationprice,
-            serviceType: appointment.serviceType,
+            serviceType: appointmentTaxes[0].name,
           },
           {
             id: matchingLabTest._id,
@@ -69,7 +69,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
             discount: 0,
             quantity: 1,
             price: matchingLabTest.totalPrice,
-            serviceType: matchingLabTest.serviceType,
+            serviceType: labtestTaxes[0].name,
           },
         ],
       };
@@ -97,7 +97,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
             discount: 0,
             quantity: 1,
             price: appointment.consultationprice,
-            serviceType: appointment.serviceType,
+            serviceType: appointmentTaxes[0].name,
           },
         ],
       };
@@ -130,7 +130,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
             discount: 0,
             quantity: 1,
             price: labTest.totalPrice,
-            serviceType: labTest.serviceType,
+            serviceType: labtestTaxes[0].name,
           },
         ],
       };
