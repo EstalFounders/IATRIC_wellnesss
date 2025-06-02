@@ -5,12 +5,19 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   api,
   consultationTypeMapping,
+  IN_TWENTY_MINUTES_NOW,
+  isNow,
+  SERVER_AVAILABLE_SLOTS_CODE,
   sessionStorageName,
 } from "../../constant";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CustomDialog from "../CustomPopup";
-import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
+import {
+  formatTime,
+  generateSlotsForChooseTime,
+  isWithinBusinessHours,
+} from "../helper";
 import { useRouter } from "next/router";
 import styles from "./css/appointmentPage.module.css";
 import { style } from "@mui/system";
@@ -18,6 +25,10 @@ import Preloader from "../Preloader";
 import AppointmentBookingModal from "./modal/AppointmentBookingModal";
 import Image from "next/image";
 import { isMobileValid } from "../../helper";
+import AvailableSlotsModel from "./modal/AvailableSlotsModel";
+import AvailableSlots from "./AvailableSlots";
+import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
+import OtpConfirmationPopup from "./OtpConfirmationPopup";
 
 const slotMessage = (
   <div className="text-danger font-weight-bold">
@@ -33,6 +44,9 @@ const AppointmentPage = () => {
   const [doctorMobileNumber, setDoctorMobileNumber] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [availableSlotsFromServer, setAvailableSlotsFromServer] = useState([]);
+  const [openAvailableSlotsFromServer, setOpenAvailableSlotsFromServer] =
+    useState(false);
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -55,6 +69,8 @@ const AppointmentPage = () => {
   const [bookingResponse, setBookingResponse] = useState();
   const withinBusinessHours = isWithinBusinessHours();
   const [slotEmpty, setSlotEmpty] = useState(false);
+  const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
+  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -204,15 +220,15 @@ const AppointmentPage = () => {
 
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;
+    console.log(timeChoice, "time choice in handle time selection");
     setAppointmentTime(timeChoice);
-    if (timeChoice == "chooseTime") {
-    }
     setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
   };
 
   const handleSlotSelection = (slot) => {
     console.log("Slot selected:", slot);
     setSelectedSlot(slot);
+    checkDuration();
     // Handle slot booking logic here
   };
 
@@ -298,7 +314,30 @@ const AppointmentPage = () => {
     setMessage("");
   };
 
-  const bookConsultation = async () => {
+  let In_Now_Duration;
+
+  const checkDuration = () => {
+    console.log(selectedSlot, "check duration called");
+    if (selectedSlot) {
+      console.log(selectedSlot, "selected slot in check duration");
+      const currentTime = new Date();
+      const slotStartTime = new Date(selectedSlot.startTime);
+      const timeDifference =
+        Math.abs(slotStartTime - currentTime) / (2000 * 60); // Difference in minutes
+
+      console.log(timeDifference, "time difference in minutes");
+      In_Now_Duration = timeDifference <= 20;
+      if (In_Now_Duration) {
+        console.log(
+          "Appointment time is within 20 minutes of the selected slot."
+        );
+      }
+    }
+    console.log(appointmentTime, "appointment time in check duration");
+  };
+
+  const sendWhatsAppConfirmation = () => {
+    console.log("send whats app confirmation called");
     if (
       !name.trim() ||
       !email.trim() ||
@@ -316,11 +355,33 @@ const AppointmentPage = () => {
       handleOpenSnackBar();
       return;
     }
+    setOtpConfirmationPopup(true);
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !mobNo.trim() ||
+      !symptoms.trim() ||
+      !consultationType.trim() ||
+      appointmentTime === ""
+    ) {
+      setSnackBarMessage("All fields are required.");
+      handleOpenSnackBar();
+      return;
+    }
+    if (!isMobileValid(mobNo)) {
+      setSnackBarMessage("Please enter 10 digit in mobile number");
+      handleOpenSnackBar();
+      return;
+    }
+    setAvailableSlotsFromServer(true);
+  };
+
+  const bookConsultation = async () => {
     try {
       setIsLoading(true);
       const consultationData = {
         selectedDoctorId,
-        appointmentTime,
+        appointmentTime: In_Now_Duration ? IN_TWENTY_MINUTES_NOW : isNow,
         selectedDate,
         selectedSlot,
         symptoms,
@@ -339,8 +400,16 @@ const AppointmentPage = () => {
         },
         body: JSON.stringify(consultationData),
       });
+
+      const data = await response.json();
+      console.log("Response from booking API:", data.status);
+      if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
+        setOpenAvailableSlotsFromServer(true);
+        setAvailableSlotsFromServer(data.nextSlots);
+        setNoSLotAvailableMessage(data.message);
+        return; // Exit the function to prevent further execution
+      }
       if (response.ok) {
-        const data = await response.json();
         console.log("Booking successful:", data.message);
         handleShowDialog(data.message);
       } else {
@@ -357,42 +426,14 @@ const AppointmentPage = () => {
       setIsLoading(false);
     }
   };
-
-  // const checkAvailableSlot = () => {
-  //   return new Promise((resolve, reject) => {
-  //     const now = new Date();
-  //     now.setMinutes(0);
-  //     now.setSeconds(0);
-  //     now.setMilliseconds(0);
-
-  //     const availableSlot = availableSlots.find((slot) => {
-  //       const startTime = new Date(slot.startTime);
-  //       const endTime = new Date(slot.endTime);
-  //       return now >= startTime && now < endTime && !slot.isBooked;
-  //     });
-
-  //     if (availableSlot) {
-  //       console.log(availableSlot._id, "when now selected slot id");
-  //       setSelectedSlot(availableSlot);
-  //       resolve(availableSlot); // Resolve the promise with the available slot
-  //     } else {
-  //       setSeverity("warning");
-  //       setSnackBarMessage(
-  //         "Currently, no slots are available. Please choose another time or try again later."
-  //       );
-  //       handleOpenSnackBar();
-  //     }
-  //   });
-  // };
-
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+  const onBookNextAvailableSlot = async (slot) => {
+    console.log("Booking next available slot:", slot);
   };
+
+  const whatsappConfrimation = () => {
+    setOtpConfirmationPopup(false);
+    bookConsultation();
+  }
 
   return (
     <div
@@ -562,12 +603,12 @@ const AppointmentPage = () => {
                         <input
                           type="radio"
                           name="appointmentTime"
-                          value="Now"
-                          checked={appointmentTime === "Now"}
+                          value={isNow}
+                          checked={appointmentTime === isNow}
                           onChange={handleTimeSelection}
                           style={{ marginRight: "10px" }}
                         />
-                        Now
+                        {isNow} {/* Display "Now" if within business hours */}
                       </label>
                     )}
                     <label style={{ marginRight: "30px" }} className="ml-3">
@@ -724,7 +765,7 @@ const AppointmentPage = () => {
                     <button
                       type="submit"
                       className="btn btn-blue blue-hover"
-                      onClick={bookConsultation}
+                      onClick={sendWhatsAppConfirmation}
                     >
                       {isLoading ? "......" : "Consult"}
                     </button>
@@ -857,6 +898,22 @@ const AppointmentPage = () => {
               <div className={styles.successText}>{message}</div>
             </div>
           </AppointmentBookingModal>
+          <AvailableSlotsModel
+            isOpen={openAvailableSlotsFromServer}
+            onClose={() => setOpenAvailableSlotsFromServer(false)}
+          >
+            <AvailableSlots
+              slots={availableSlotsFromServer}
+              onBookSlot={onBookNextAvailableSlot}
+              message={noSLotAvailableMessage}
+            />
+          </AvailableSlotsModel>
+          <WhatsappConfirmationModel
+            isOpen={otpConfirmationPopup}
+            onClose={() => setOtpConfirmationPopup(false)}
+          >
+            <OtpConfirmationPopup mobile={mobNo} onConfirm={whatsappConfrimation} />
+          </WhatsappConfirmationModel>
         </div>
         {/* End row */}
       </div>

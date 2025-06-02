@@ -4,12 +4,15 @@ import {
   appointment_status,
   consultationTypeMapping,
   development_production_url,
-  contact_no
+  contact_no,
+  IN_TWENTY_MINUTES_NOW,
 } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
 import Slot from "../../src/models/slots";
 import {
+  bookConsultation,
+  checkNbookSelectedDoctorForNow,
   findAvailableDoctor,
   findAvailableDoctorForNow,
   findAvailableDoctorForSpecificTimeSlot,
@@ -22,7 +25,17 @@ import {
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { format } from "path";
-import { WHATSAPP_CONFIRMATION_TEMPLATE } from "./utils/constants";
+import {
+  IS_NOW,
+  WHATSAPP_CONFIRMATION_TEMPLATE,
+  WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
+  WHATSAPP_REMINDER_TEMPLATE_PATIENT,
+} from "./utils/constants";
+import {
+  getConfirmMessageBody,
+  getReminderMessageBodyDoctor,
+  getReminderMessageBodyPatient,
+} from "./utils/whatsappMessageBodies";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -87,6 +100,8 @@ export default async function handler(req, res) {
       consultationprice,
     } = req.body;
 
+    const clientSideAppointmentTime = appointmentTime;
+
     try {
       console.log(req.body);
       session = await mongoose.startSession();
@@ -94,21 +109,45 @@ export default async function handler(req, res) {
       let docName = doctorName == "" ? null : doctorName;
       let doctorMobileNo = doctorMobileNumber == "" ? null : doctorMobileNumber;
       let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
+      console.log("111");
       let slot = selectedSlot === "" ? null : selectedSlot;
       let doctor;
 
       // Determine current or specific time
       const now = new Date();
-      const isNow = appointmentTime === "Now";
       const genericConsultationType = consultationTypeMapping[consultationType];
       const meetingId = uuidv4();
+      console.log("119");
 
       // Find available doctor if needed right now
-      console.log(genericConsultationType, "generic consultation type");
-      if (doctorId == null && appointmentTime == "Now") {
+      console.log(
+        genericConsultationType,
+        "generic consultation type",
+        doctorId,
+        "doctor id",
+        clientSideAppointmentTime,
+        "appointment time",
+        IN_TWENTY_MINUTES_NOW,
+        "in twenty minutes now",
+        clientSideAppointmentTime == IS_NOW,
+        clientSideAppointmentTime === IN_TWENTY_MINUTES_NOW
+      );
+      if(doctorId && clientSideAppointmentTime == IS_NOW) {
+        const result = await checkNbookSelectedDoctorForNow(
+          selectedDate,
+          doctorId,
+        );
+        slot = result.slot;
+      }
+      if (
+        doctorId == null &&
+        (clientSideAppointmentTime == IS_NOW ||
+          clientSideAppointmentTime == IN_TWENTY_MINUTES_NOW)
+      ) {
         const result = await findAvailableDoctorForNow(
           selectedDate,
-          genericConsultationType
+          genericConsultationType,
+          res
         );
         console.log(result, "result 97");
         console.log(
@@ -144,21 +183,11 @@ export default async function handler(req, res) {
         }
       }
 
-      
+      let patientMeetingUrl, doctorMeetingUrl;
+      patientMeetingUrl = `${development_production_url}/meeting/patient/${meetingId}`;
+      doctorMeetingUrl = `${development_production_url}/meeting/doctor/${meetingId}`;
 
-      // const doctorDetails = {
-      //   doctorName: "Ashima",
-      //   selectedDoctorId: selectedDoctorId,
-      //   appointmentTime: appointmentTime,
-      //   selectedDate: selectedDate,
-      //   selectedSlot: selectedSlot,
-      //   symptoms: symptoms,
-      //   consultationType: consultationType,
-      //   email: doctor.email,
-      //   doctorMobileNo: "8920897437",
-      // };
-
-      const bookConsultation = async ({
+      const bookConsultationParams = {
         meetingId,
         doctorId,
         slot,
@@ -168,108 +197,15 @@ export default async function handler(req, res) {
         patientMobNo,
         consultationType,
         consultationprice,
-        appointmentTime,
-        status,
-        patientMeetingUrl,
-        doctorMeetingUrl,
-        prescriptionUrl,
-      }) => {
-        console.log(slot, "slot", doctorId, "doctor id");
-        if (slot === null) {
-          const now = new Date();
-
-          // Find the slot where current time is between start and end, and not booked
-          const currentSlot = await Slot.findOne({
-            doctorId,
-            isBooked: false,
-            startTime: { $lte: now },
-            endTime: { $gte: now },
-          }).sort({ startTime: 1 });
-
-          console.log(currentSlot, "current slot");
-
-          if (!currentSlot) {
-            throw new Error("No current slot found for this time.");
-          }
-
-          // Step 2: Find the next available slot after the current slot’s end time
-          const nextSlot = await Slot.findOneAndUpdate(
-            {
-              doctorId,
-              isBooked: false,
-              startTime: { $gt: currentSlot.endTime },
-            },
-            { isBooked: true },
-            { new: true }
-          );
-
-          console.log(nextSlot, "next slot");
-
-          if (!nextSlot) {
-            throw new Error("No next available slot found.");
-          }
-
-          slot = nextSlot
-          // ._id;
-        } else {
-          // Book the selected slot if it's not already booked
-          const updatedSlot = await Slot.findOneAndUpdate(
-            { _id: slot, doctorId, isBooked: false },
-            { isBooked: true },
-            { new: true }
-          );
-
-          if (!updatedSlot) {
-            throw new Error("Selected slot is already booked or not found.");
-          }
-
-          slot = updatedSlot
-          // ._id;
-        }
-
-        console.log(slot, "updated slot");
-
-        // Step 2: Create the appointment
-        const appointment = await Appointment.create({
-          meetingId,
-          doctorId,
-          slotId: slot._id,
-          symptoms,
-          name,
-          email,
-          patientMobNo,
-          consultationType,
-          consultationprice,
-          appointmentTime,
-          status,
-          patientMeetingUrl,
-          doctorMeetingUrl,
-          prescriptionUrl,
-        });
-        
-        console.log("start time 249",slot, "slot 249");
-
-        const confirmMessageBody = {
-          appointment_date: formatData(slot.startTime),
-          appointment_time: extractTime(slot.startTime), 
-          doctor_name: docName,
-          patient_name: name,
-          consultation_type: consultationType,
-          contact_us: contact_no,
-        };
-
-        console.log(formatPhoneNumber(doctorMobileNo.toString()),doctorMobileNo,"line no 190");
-        await sendWhatsAppConfirmation(
-          formatPhoneNumber(patientMobNo.toString()),
-          confirmMessageBody,
-          WHATSAPP_CONFIRMATION_TEMPLATE
-        );
-        await sendWhatsAppConfirmation(
-          formatPhoneNumber(doctorMobileNo.toString()),
-          confirmMessageBody,
-          WHATSAPP_CONFIRMATION_TEMPLATE
-        );
-        // return appointment;
+        appointmentTime: slot.startTime,
+        status: appointment_status.open,
+        patientMeetingUrl: patientMeetingUrl,
+        doctorMeetingUrl: doctorMeetingUrl,
+        prescriptionUrl: "",
+        docName: docName,
+        doctorMobileNo: doctorMobileNo,
+        doctorId: doctorId,
+        clientSideAppointmentTime: clientSideAppointmentTime,
       };
 
       console.log(meetingId, "meeting id");
@@ -278,40 +214,8 @@ export default async function handler(req, res) {
       switch (consultationType) {
         case "Call":
         case "Video":
-          const patientMeetingUrl = `${development_production_url}/meeting/patient/${meetingId}`;
-          const doctorMeetingUrl = `${development_production_url}/meeting/doctor/${meetingId}`;
-
-          if (appointmentTime === "Now") {
-            // Immediate handling
-            // res.status(200).json({
-            //   patientMeetingUrl: patientMeetingUrl,
-            //   doctorMeetingUrl: doctorMeetingUrl,
-            // });
-          } else {
-            // Scheduled handling
-            // res.status(200).json({
-            //   patientMeetingUrl: patientMeetingUrl,
-            //   doctorMeetingUrl: doctorMeetingUrl,
-            // });
-          }
           // Store appointment details
-          console.log(slot.startTime, "slot start time", slot, "slot");
-          await bookConsultation({
-            meetingId,
-            doctorId,
-            slot,
-            symptoms,
-            name,
-            email,
-            patientMobNo,
-            consultationType,
-            consultationprice,
-            appointmentTime: isNow ? new Date() : slot.startTime,
-            status: appointment_status.open,
-            patientMeetingUrl,
-            doctorMeetingUrl,
-            prescriptionUrl: "",
-          });
+          await bookConsultation({ bookConsultationParams });
 
           break;
 
@@ -319,22 +223,7 @@ export default async function handler(req, res) {
         case "Clinic":
           // Simply book the consultation
           // Store appointment details
-          await bookConsultation({
-            meetingId,
-            doctorId,
-            slot,
-            symptoms,
-            name,
-            email,
-            patientMobNo,
-            consultationType,
-            consultationprice,
-            appointmentTime: isNow ? new Date() : selectedDate,
-            status: "open",
-            patientMeetingUrl,
-            doctorMeetingUrl,
-            prescriptionUrl: "",
-          });
+          await bookConsultation({ bookConsultationParams });
           break;
 
         default:
@@ -342,16 +231,6 @@ export default async function handler(req, res) {
             message: "Invalid consultation type.",
           });
       }
-      // // Send WhatsApp messages for confirmation
-      // await sendWhatsAppMessage(
-      //   name,
-      //   mobNo,
-      //   `Your ${consultationType} consultation is booked successfully.`
-      // );
-      // await sendWhatsAppMessage(
-      //   doctorId,
-      //   `New ${consultationType} consultation booked with ${name}.`
-      // );
       await session.commitTransaction();
       session.endSession();
       res.status(200).json({ message: "Consultation booked successfully" });
@@ -361,9 +240,9 @@ export default async function handler(req, res) {
         session.endSession();
       }
       console.error("Booking error:", error);
-      res
-        .status(500)
-        .json({ message: error.message || "Failed to book the consultation" });
+      res.status(200).json({
+        message: "All doctor are busy right now, No slot is available",
+      });
     }
   }
 }

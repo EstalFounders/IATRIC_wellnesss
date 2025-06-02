@@ -1,8 +1,12 @@
-
-export const generateSlotsForChooseTime = (selectedDate, startHour, endHour, intervalMinutes) => {
+export const generateSlotsForChooseTime = (
+  selectedDate,
+  startHour,
+  endHour,
+  intervalMinutes
+) => {
   const slots = [];
 
-  const today = new Date(); 
+  const today = new Date();
   const maxDate = new Date();
   maxDate.setDate(today.getDate() + 5); // Allow slots only for up to 6 days from today
 
@@ -30,18 +34,34 @@ export const generateSlotsForChooseTime = (selectedDate, startHour, endHour, int
   return slots;
 };
 
-
 export const isWithinBusinessHours = () => {
   const now = new Date();
   const hours = now.getHours();
   return hours >= 9 && hours < 23;
 };
 
+export const formatTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
+};
 
 
 
-  
+export const extractDate = (timestamp) => {
+  const date = new Date(timestamp);
 
+  // Using toLocaleDateString() with specific options for day, month, and year
+  const options = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Asia/Kolkata", // Ensure IST time zone
+  };
 
-
-
+  return date.toLocaleDateString("en-IN", options);
+};
