@@ -9,7 +9,7 @@ const AppointmentBookingModal = ({ isOpen, onClose, children }) => {
       className={`d-flex align-items-center justify-content-center ${styles.modalBackdrop}`}
     >
       <div className={`${styles.modalContent}`}>
-        <div className="float-right mr-2 mt-1 clicklable-div" onClick={onClose}>
+        <div className="float-right mr-2 mt-1 clickable-div" onClick={onClose}>
           X
         </div>
         <div>{children}</div>

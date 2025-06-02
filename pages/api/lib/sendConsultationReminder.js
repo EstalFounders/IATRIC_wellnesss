@@ -55,8 +55,8 @@ export default async function handler(req, res) {
         meeting_url: appointment.doctorMeetingUrl,
       };
 
-      const patientMobNo = appointment.patientMobNo;
-      const doctorMobNo = doctor.mobileNumber;
+      const patientMobNo = appointment.patientMobNo.toString();
+      const doctorMobNo = doctor.mobileNumber.toString();
 
       console.log(
         "Reminder Message Body for Patient:",
@@ -70,9 +70,9 @@ export default async function handler(req, res) {
       // Send messages (your `sendMessage` handles actual sending logic)
       console.log(
         "patientMobNo",
-        formatPhoneNumber(patientMobNo.toString()),
+        formatPhoneNumber(patientMobNo),
         "doctorMobNo",
-        formatPhoneNumber(doctorMobNo.toString())
+        formatPhoneNumber(doctorMobNo)
       );
       await sendWhatsAppConfirmation(
         formatPhoneNumber(patientMobNo.toString()),

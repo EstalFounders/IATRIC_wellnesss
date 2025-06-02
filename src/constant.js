@@ -15,6 +15,8 @@ export const super_admin_info_local_sotrage= 'super_admin_info'
 export const single_call = "single_call"
 export const invoice_bill_yellow_color = "#d1bd9a"
 export const company_font_family = "TT Ramillas"
+export const isNow = "Now"
+export const SERVER_AVAILABLE_SLOTS_CODE = "304"
 
 export const api = {
     addDoctor: "/api/addDoctor",
@@ -84,6 +86,7 @@ export const userTypeConstant = {
 
 export const existingUser = "existing"
 export const newUser = "new"
+export const IN_TWENTY_MINUTES_NOW = "in_twenty_minutes_now"
 
 export const appointment_status = {
     total: "TOTAL",
