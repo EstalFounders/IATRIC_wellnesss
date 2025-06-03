@@ -212,14 +212,14 @@ export async function findAvailableDoctorForSpecificTimeSlot(
 
 export const checkNbookSelectedDoctorForNow = async (
   selectedDate,
-  doctorId
+  doctorId,
+  res
 ) => {
   await dbConnect();
 
- 
   const selectedDateObj = new Date(selectedDate.toString());
   const minutes = selectedDateObj.getMinutes();
-  const nextSlotTime = new Date(selectedDateObj);
+  const nextSlotTime = new Date(selectedDateObj); 
 
   // Round up to the next 20-minute slot
   if (minutes % 20 !== 0) {
@@ -248,16 +248,47 @@ export const checkNbookSelectedDoctorForNow = async (
 
   console.log(`Available slots for doctor ${doctor._id}:`, availableSlots);
 
+  // Check if all 3 available slots are for the next day
+  if (
+    availableSlots.length === 3 &&
+    availableSlots.every(
+      (slot) =>
+        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString()
+    )
+  ) {
+    res.status(200).json({
+      message:
+        "No slots available for today. Here are the next available slots.",
+      nextSlots: availableSlots.map((slot) => ({
+        doctorId: doctor._id,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      })),
+      status: SERVER_AVAILABLE_SLOTS_CODE,
+    });
+    return; // Exit early to prevent further processing
+  }
+
   if (availableSlots.length > 0) {
     const firstSlot = availableSlots[0];
     return {
       doctor,
       slot: firstSlot,
-      additionalSlots: availableSlots.slice(1), // Return the rest of the available slots
     };
   }
 
-  return ""; // Return empty if no available slots are found
+  res.status(404).json({ message: "No slots found." });
+
+  // if (availableSlots.length > 0) {
+  //   const firstSlot = availableSlots[0];
+  //   return {
+  //     doctor,
+  //     slot: firstSlot,
+  //     additionalSlots: availableSlots.slice(1), // Return the rest of the available slots
+  //   };
+  // }
+
+  // return ""; // Return empty if no available slots are found
 };
 
 export const bookConsultation = async ({ bookConsultationParams }) => {

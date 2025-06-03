@@ -153,4 +153,6 @@ export const serviceOffered = {
     labTest: "Labtest",
 }
 
+export const CHOOSE_TIME = "ChooseTime";
+
 

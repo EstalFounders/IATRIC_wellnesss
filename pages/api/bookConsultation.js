@@ -6,6 +6,7 @@ import {
   development_production_url,
   contact_no,
   IN_TWENTY_MINUTES_NOW,
+  CHOOSE_TIME,
 } from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
@@ -132,12 +133,13 @@ export default async function handler(req, res) {
         clientSideAppointmentTime == IS_NOW,
         clientSideAppointmentTime === IN_TWENTY_MINUTES_NOW
       );
-      if(doctorId && clientSideAppointmentTime == IS_NOW) {
+      if (doctorId && clientSideAppointmentTime == IS_NOW) {
         const result = await checkNbookSelectedDoctorForNow(
           selectedDate,
           doctorId,
+          res
         );
-        slot = result.slot;
+        slot = result ? result.slot : "";
       }
       if (
         doctorId == null &&
@@ -166,7 +168,7 @@ export default async function handler(req, res) {
       }
 
       // Find available doctor if needed at specific time
-      if (doctorId == null && appointmentTime == "chooseTime") {
+      if (doctorId == null && appointmentTime == CHOOSE_TIME) {
         const result = await findAvailableDoctorForSpecificTimeSlot(
           selectedDate,
           genericConsultationType,
