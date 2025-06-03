@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   api,
+  CHOOSE_TIME,
   consultationTypeMapping,
   IN_TWENTY_MINUTES_NOW,
   isNow,
@@ -29,6 +30,7 @@ import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
+import { IS_NOW } from "../../../pages/api/utils/constants";
 
 const slotMessage = (
   <div className="text-danger font-weight-bold">
@@ -42,7 +44,7 @@ const AppointmentPage = () => {
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [doctorName, setDoctorName] = useState("");
   const [doctorMobileNumber, setDoctorMobileNumber] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState(IS_NOW);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [availableSlotsFromServer, setAvailableSlotsFromServer] = useState([]);
   const [openAvailableSlotsFromServer, setOpenAvailableSlotsFromServer] =
@@ -71,6 +73,7 @@ const AppointmentPage = () => {
   const [slotEmpty, setSlotEmpty] = useState(false);
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
+  const [timeSelection, setTimeSelection] = useState(IS_NOW);
 
   const fetchSlots = async () => {
     const formattedDate = selectedDate
@@ -197,11 +200,12 @@ const AppointmentPage = () => {
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
+
     setDoctorChoice(choice);
     if (choice === "any") {
       setSelectedDoctorId("");
     }
-    setShowDatePicker(appointmentTime === "chooseTime" && choice === "any"); // Update to show/hide date picker based on choice
+    setShowDatePicker(timeSelection === CHOOSE_TIME && choice === "any"); // Update to show/hide date picker based on choice
   };
 
   const handleDoctorSelection = (event) => {
@@ -222,12 +226,14 @@ const AppointmentPage = () => {
     const timeChoice = event.target.value;
     console.log(timeChoice, "time choice in handle time selection");
     setAppointmentTime(timeChoice);
-    setShowDatePicker(timeChoice === "chooseTime" && doctorChoice === "any");
+    setTimeSelection(timeChoice);
+    setShowDatePicker(timeChoice === CHOOSE_TIME && doctorChoice === "any");
   };
 
   const handleSlotSelection = (slot) => {
     console.log("Slot selected:", slot);
     setSelectedSlot(slot);
+    console.log(appointmentTime, "appointment time in handle slot selection");
     checkDuration();
     // Handle slot booking logic here
   };
@@ -273,11 +279,11 @@ const AppointmentPage = () => {
   }, [doctors]);
 
   useEffect(() => {
-    if (appointmentTime === "chooseTime") {
+    if (timeSelection === CHOOSE_TIME && doctorChoice === "any") {
       const slots = generateSlotsForChooseTime(selectedDate, 8, 23, 20); // Generate slots from 9 AM to 9 PM with 20-minute intervals
       setLocallyCreatedSlots(slots);
     }
-  }, [selectedDate, appointmentTime]);
+  }, [selectedDate, timeSelection]);
 
   // useEffect(() => {
   //   if (doctorChoice === "choose" && appointmentTime === "Now") {
@@ -314,8 +320,6 @@ const AppointmentPage = () => {
     setMessage("");
   };
 
-  let In_Now_Duration;
-
   const checkDuration = () => {
     console.log(selectedSlot, "check duration called");
     if (selectedSlot) {
@@ -323,21 +327,54 @@ const AppointmentPage = () => {
       const currentTime = new Date();
       const slotStartTime = new Date(selectedSlot.startTime);
       const timeDifference =
-        Math.abs(slotStartTime - currentTime) / (2000 * 60); // Difference in minutes
+        Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
 
       console.log(timeDifference, "time difference in minutes");
-      In_Now_Duration = timeDifference <= 20;
-      if (In_Now_Duration) {
+      const durationIn20Min = timeDifference <= 20;
+      // Update the state
+      console.log("Is appointment within 20 minutes?", durationIn20Min);
+
+      // Use durationIn20Min directly instead of relying on In_Now_Duration
+      if (durationIn20Min) {
+        setAppointmentTime(IN_TWENTY_MINUTES_NOW);
         console.log(
           "Appointment time is within 20 minutes of the selected slot."
         );
+      } else {
+        setAppointmentTime(CHOOSE_TIME);
+        console.log(
+          "Appointment time is not within 20 minutes of the selected slot."
+        );
       }
     }
-    console.log(appointmentTime, "appointment time in check duration");
   };
+
+  // const checkDuration = () => {
+  //   console.log(selectedSlot, "check duration called");
+  //   if (selectedSlot) {
+  //     console.log(selectedSlot, "selected slot in check duration");
+  //     const currentTime = new Date();
+  //     const slotStartTime = new Date(selectedSlot.startTime);
+  //     const timeDifference =
+  //       Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
+
+  //     console.log(timeDifference, "time difference in minutes");
+  //     const durationIn20Min = timeDifference <= 20;
+  //     setInNowDuration(durationIn20Min);
+  //     console.log("Is appointment within 20 minutes?", durationIn20Min);
+  //     console.log(In_Now_Duration, "In Now Duration");
+  //     if (In_Now_Duration) {
+  //       console.log(
+  //         "Appointment time is within 20 minutes of the selected slot."
+  //       );
+  //     }
+  //   }
+  //   console.log(In_Now_Duration, "appointment time in check duration");
+  // };
 
   const sendWhatsAppConfirmation = () => {
     console.log("send whats app confirmation called");
+    console.log(appointmentTime, "appointment time in whats app confirmation");
     if (
       !name.trim() ||
       !email.trim() ||
@@ -377,11 +414,12 @@ const AppointmentPage = () => {
   };
 
   const bookConsultation = async () => {
+    console.log("Book consultation called");
     try {
       setIsLoading(true);
       const consultationData = {
         selectedDoctorId,
-        appointmentTime: In_Now_Duration ? IN_TWENTY_MINUTES_NOW : isNow,
+        appointmentTime,
         selectedDate,
         selectedSlot,
         symptoms,
@@ -393,6 +431,7 @@ const AppointmentPage = () => {
         consultationprice,
         consultationType,
       };
+
       const response = await fetch(api.bookConsultation, {
         method: "POST",
         headers: {
@@ -433,7 +472,7 @@ const AppointmentPage = () => {
   const whatsappConfrimation = () => {
     setOtpConfirmationPopup(false);
     bookConsultation();
-  }
+  };
 
   return (
     <div
@@ -604,7 +643,7 @@ const AppointmentPage = () => {
                           type="radio"
                           name="appointmentTime"
                           value={isNow}
-                          checked={appointmentTime === isNow}
+                          checked={timeSelection === isNow}
                           onChange={handleTimeSelection}
                           style={{ marginRight: "10px" }}
                         />
@@ -615,8 +654,8 @@ const AppointmentPage = () => {
                       <input
                         type="radio"
                         name="appointmentTime"
-                        value="chooseTime"
-                        checked={appointmentTime === "chooseTime"}
+                        value={CHOOSE_TIME}
+                        checked={timeSelection === CHOOSE_TIME}
                         onChange={handleTimeSelection}
                         style={{ marginRight: "10px" }}
                       />
@@ -625,7 +664,7 @@ const AppointmentPage = () => {
                   </div>
 
                   {/* Conditional Time Picker or Slots Display */}
-                  {appointmentTime === "chooseTime" &&
+                  {timeSelection === CHOOSE_TIME &&
                   doctorChoice === "choose" &&
                   selectedDoctorId ? (
                     <div>
@@ -690,7 +729,7 @@ const AppointmentPage = () => {
                         </div>
                       </ul>
                     </div>
-                  ) : appointmentTime === "chooseTime" &&
+                  ) : timeSelection === CHOOSE_TIME &&
                     doctorChoice === "any" ? (
                     <div className="col-lg-12">
                       <DatePicker
@@ -912,7 +951,10 @@ const AppointmentPage = () => {
             isOpen={otpConfirmationPopup}
             onClose={() => setOtpConfirmationPopup(false)}
           >
-            <OtpConfirmationPopup mobile={mobNo} onConfirm={whatsappConfrimation} />
+            <OtpConfirmationPopup
+              mobile={mobNo}
+              onConfirm={whatsappConfrimation}
+            />
           </WhatsappConfirmationModel>
         </div>
         {/* End row */}
