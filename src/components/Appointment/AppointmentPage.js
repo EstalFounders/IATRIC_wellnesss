@@ -234,7 +234,6 @@ const AppointmentPage = () => {
     console.log("Slot selected:", slot);
     setSelectedSlot(slot);
     console.log(appointmentTime, "appointment time in handle slot selection");
-    checkDuration();
     // Handle slot booking logic here
   };
 
@@ -320,57 +319,32 @@ const AppointmentPage = () => {
     setMessage("");
   };
 
-  const checkDuration = () => {
-    console.log(selectedSlot, "check duration called");
-    if (selectedSlot) {
-      console.log(selectedSlot, "selected slot in check duration");
-      const currentTime = new Date();
-      const slotStartTime = new Date(selectedSlot.startTime);
-      const timeDifference =
-        Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
-
-      console.log(timeDifference, "time difference in minutes");
-      const durationIn20Min = timeDifference <= 20;
-      // Update the state
-      console.log("Is appointment within 20 minutes?", durationIn20Min);
-
-      // Use durationIn20Min directly instead of relying on In_Now_Duration
-      if (durationIn20Min) {
-        setAppointmentTime(IN_TWENTY_MINUTES_NOW);
-        console.log(
-          "Appointment time is within 20 minutes of the selected slot."
-        );
-      } else {
-        setAppointmentTime(CHOOSE_TIME);
-        console.log(
-          "Appointment time is not within 20 minutes of the selected slot."
-        );
-      }
-    }
-  };
-
   // const checkDuration = () => {
-  //   console.log(selectedSlot, "check duration called");
-  //   if (selectedSlot) {
-  //     console.log(selectedSlot, "selected slot in check duration");
-  //     const currentTime = new Date();
-  //     const slotStartTime = new Date(selectedSlot.startTime);
-  //     const timeDifference =
-  //       Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
+    useEffect(() => {
+      if (selectedSlot) {
+        console.log(selectedSlot, "selected slot in check duration");
+        const currentTime = new Date();
+        const slotStartTime = new Date(selectedSlot.startTime);
+        const timeDifference =
+          Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
 
-  //     console.log(timeDifference, "time difference in minutes");
-  //     const durationIn20Min = timeDifference <= 20;
-  //     setInNowDuration(durationIn20Min);
-  //     console.log("Is appointment within 20 minutes?", durationIn20Min);
-  //     console.log(In_Now_Duration, "In Now Duration");
-  //     if (In_Now_Duration) {
-  //       console.log(
-  //         "Appointment time is within 20 minutes of the selected slot."
-  //       );
-  //     }
-  //   }
-  //   console.log(In_Now_Duration, "appointment time in check duration");
-  // };
+        console.log(timeDifference, "time difference in minutes");
+        const durationIn20Min = timeDifference <= 20;
+        console.log("Is appointment within 20 minutes?", durationIn20Min);
+
+        if (durationIn20Min) {
+          setAppointmentTime(IN_TWENTY_MINUTES_NOW);
+          console.log(
+            "Appointment time is within 20 minutes of the selected slot."
+          );
+        } else {
+          setAppointmentTime(CHOOSE_TIME);
+          console.log(
+            "Appointment time is not within 20 minutes of the selected slot."
+          );
+        }
+      }
+    }, [selectedSlot]);
 
   const sendWhatsAppConfirmation = () => {
     console.log("send whats app confirmation called");

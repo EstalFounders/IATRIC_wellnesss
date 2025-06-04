@@ -177,37 +177,86 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   const endOfDay = new Date(selectedDate);
   endOfDay.setHours(23, 59, 59, 999);
 
-  // Use the startTime and endTime from the slot object
   const { startTime, endTime } = slot;
 
-  // Find doctors who can provide the requested consultation type
+  async function findDoctorWithSlot(doctors) {
+    for (const doctor of doctors) {
+      console.log(
+        `Checking available slots for doctor ${doctor._id} (${doctor.name})`
+      );
+      const availableSlot = await Slot.findOne({
+        doctorId: doctor._id,
+        startTime: { $gte: new Date(startTime), $lte: new Date(endTime) },
+        isBooked: false,
+      });
+      console.log(`Available slot for doctor ${doctor._id}:`, availableSlot);
+      if (availableSlot) {
+        return { doctor, slotId: availableSlot };
+      }
+    }
+    return null;
+  }
 
-  let doctors = await Doctor.find({
+  // Step 1: Find company doctors
+  let companyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
     doctorType: DoctorType.Company,
   });
 
-  // If no doctors are found, try again without the doctorType filter
-  if (doctors.length === 0) {
-    doctors = await Doctor.find({
-      consultationType: { $in: [genericConsultationType] },
-    });
-  }
-  console.log(doctors[0]._id, "doctors id in helper 85");
-  for (const doctor of doctors) {
-    // Check for available slots for this doctor within the specific time range
-    const availableSlot = await Slot.findOne({
-      doctorId: doctor._id,
-      startTime: { $gte: new Date(startTime), $lte: new Date(endTime) },
-      isBooked: false,
-    });
-    console.log(availableSlot, "available slot");
-    if (availableSlot) {
-      return { doctor, slotId: availableSlot }; // Return the first available doctor's ID with an available slot in the specific time range
-    }
+  let result = await findDoctorWithSlot(companyDoctors);
+  if (result) {
+    return result;
   }
 
-  return ""; // Return empty if no available doctors are found within the specific time range
+  // Step 2: If no company doctor is available, find non-company doctors
+  let nonCompanyDoctors = await Doctor.find({
+    consultationType: { $in: [genericConsultationType] },
+    doctorType: { $ne: DoctorType.Company },
+  });
+
+  result = await findDoctorWithSlot(nonCompanyDoctors);
+  if (result) {
+    return result;
+  }
+
+  // Step 3: If no doctor is available for the specific slot, find the nearest slot
+  async function findNearestSlot(doctors) {
+    let nearestSlotInfo = null;
+
+    for (const doctor of doctors) {
+      const nearestSlot = await Slot.findOne({
+        doctorId: doctor._id,
+        startTime: { $gte: new Date(startTime) },
+        isBooked: false,
+      }).sort({ startTime: 1 });
+
+      if (
+        nearestSlot &&
+        (!nearestSlotInfo ||
+          new Date(nearestSlot.startTime) <
+            new Date(nearestSlotInfo.slot.startTime))
+      ) {
+        nearestSlotInfo = { doctor, slot: nearestSlot };
+      }
+    }
+
+    return nearestSlotInfo;
+  }
+
+  // Check for nearest slot among company doctors first
+  let nearestSlotInfo = await findNearestSlot(companyDoctors);
+  if (nearestSlotInfo) {
+    return { doctor: nearestSlotInfo.doctor, slotId: nearestSlotInfo.slot };
+  }
+
+  // If no nearest slot is found among company doctors, check non-company doctors
+  nearestSlotInfo = await findNearestSlot(nonCompanyDoctors);
+  if (nearestSlotInfo) {
+    return { doctor: nearestSlotInfo.doctor, slotId: nearestSlotInfo.slot };
+  }
+
+  // Step 4: If no slots are found at all, return an empty result
+  return "";
 }
 
 export const checkNbookSelectedDoctorForNow = async (
@@ -219,7 +268,7 @@ export const checkNbookSelectedDoctorForNow = async (
 
   const selectedDateObj = new Date(selectedDate.toString());
   const minutes = selectedDateObj.getMinutes();
-  const nextSlotTime = new Date(selectedDateObj); 
+  const nextSlotTime = new Date(selectedDateObj);
 
   // Round up to the next 20-minute slot
   if (minutes % 20 !== 0) {
