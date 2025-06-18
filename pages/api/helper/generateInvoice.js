@@ -1,15 +1,9 @@
-import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import { appointment_status } from "../../../src/constant";
 import { dbConnect } from "../../../src/lib/db";
-import Appointment from "../../../src/dbmodels/appointmentSchema";
-import Deductions from "../../../src/dbmodels/deductionSchema";
-import ServiceOffered from "../../../src/dbmodels/serviceOffered";
-import BookLabTest from "../../../src/dbmodels/bookLabTestSchema";
+import Appointment from "../../../src/models/appointmentSchema";
+import BookLabTest from "../../../src/models/bookLabTestSchema";
+import ServiceOffered from "../../../src/models/serviceOffered";
 import { createServicesToBill } from "../utils/commonmethod";
-import puppeteer from "puppeteer";
-import ReactDOMServer from "react-dom/server";
-import { storage } from "../../../src/lib/firebase";
-import { triggerInvoiceCapture } from "../pupeeterScript/generateInvoiceScript";
 
 export default async function handler(req, res) {
   await dbConnect();
