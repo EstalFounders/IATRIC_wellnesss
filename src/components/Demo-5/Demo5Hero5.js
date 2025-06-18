@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { color_schema } from "../../constant";
 
 const Demo5Hero5 = () => {
   return (
@@ -10,13 +11,16 @@ const Demo5Hero5 = () => {
           <div className="col-md-9 col-lg-7 col-xl-6">
             <div
               className="hero-5-strip bg-blue white-color"
-              style={{ backgroundColor: "#3b5f1d" }}
+              style={{ backgroundColor: `${color_schema.green}` }}
             >
-              <h5>HEALTHPATH Provides</h5>
+              <div className="h2 m-0 font-weight-bold">HealthPath Provides</div>
             </div>
             <div className="hero-txt">
               {/* Title */}
-              <h4 className="steelblue-color" style={{ color: "#8e8333" }}>
+              <h4
+                className="steelblue-color"
+                style={{ color: `${color_schema.yellow}` }}
+              >
                 <b>Best Quality</b>
               </h4>
               <h3 className="steelblue-color">
@@ -28,9 +32,9 @@ const Demo5Hero5 = () => {
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
                 <p>
-                  Get optimal health,{" "}
-                  <strong style={{ color: "#8e8333" }}>
-                    <b>ANYTIME, ANYWHERE!</b>
+                  Get optimal health ,{" "}
+                  <strong style={{ color: `${color_schema.green}` }}>
+                    ANYTIME , ANYWHERE !
                   </strong>{" "}
                   One-stop care: Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts
@@ -51,10 +55,10 @@ const Demo5Hero5 = () => {
                 </p>
               </div>
               {/* Button */}
-              <Link legacyBehavior href="/about-us">
+              <Link legacyBehavior href="/discover-more">
                 <a
                   className="btn btn-blue blue-hover"
-                  style={{ backgroundColor: "#8e8333" }}
+                  style={{ backgroundColor: `${color_schema.yellow}` }}
                 >
                   Discover More
                 </a>

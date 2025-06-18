@@ -1,0 +1,197 @@
+/* ViewDoctorListComp.module.css */
+
+.view-doctor-list-container {
+    /* width: 100%; */
+  height: 100%;
+  overflow-y: auto; /* if needed */
+  padding: 16px;
+  box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    padding: 2rem;
+    /* background-color: #f8f9fb; */
+    border-radius: 10px;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    max-height: 100%; /* Optional: Limit the height */
+    scrollbar-width: thin; /* For Firefox */
+    
+  }
+  
+  .new-doctor-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;.modalBackdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+      }
+      
+      .modalContent {
+        width: 80%; 
+        /* max-width: 435px; */
+        background-color:white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+    
+      
+      
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .new-doctor-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  }
+  
+  .doctor-details-section {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .doctor-profile-pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+.doctor-profile-pic {
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #d0eafc;
+    transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+}
+
+.doctor-profile-pic:hover {
+    transform: scale(1.1); /* Slight zoom in effect */
+}
+  
+  .view-profile-link {
+    color: #000000;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-align: center;
+  }
+  
+  .doctor-primary-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .new-doctor-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .doctor-text {
+    color: #555;
+    font-size: 0.95rem;
+  }
+  
+  .location-highlight {
+    font-weight: 600;
+    color: #3b5f1d;
+  }
+  
+  .patient-stories {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .thumbs-up-container {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #28a745;
+    font-weight: 600;
+  }
+  
+  .patient-stories-link {
+    font-size: 0.9rem;
+    color: #3b5f1d;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .doctor-booking-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  
+  .availability-info {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #3c763d;
+  }
+  
+  .new-book-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .new-book-btn.primary {
+    background-color: #3b5f1d;
+    color: white;
+  }
+  
+  .new-book-btn.primary:hover {
+    background-color: #8e8333;
+  }
+  
+  .new-book-btn.secondary {
+    background-color: #eaf4ff;
+    color: #3b5f1d;
+  }
+  
+  .new-book-btn.secondary:hover {
+    background-color: #d0eaff;
+  }
+  
+  .no-doctors-found {
+    text-align: center;
+    font-size: 1rem;
+    color: #999;
+    padding: 2rem 0;
+  }
+  
+  .verified-tick {
+    color: #2ecc71;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .thumbs-up-icon {
+    color: #28a745;
+    width: 16px;
+    height: 16px;
+  }
+  
+  

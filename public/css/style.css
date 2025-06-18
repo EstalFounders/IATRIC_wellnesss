@@ -11,7 +11,14 @@
 /* ==========================================================================
   01. GENERAL & BASIC STYLES
   =========================================================================== */
-
+/*------------------------------------------*/root {
+  --primary-link-color: #3b5f1d;
+  --secondary-link-color: #8e8333;
+  --primary-text-color: #333;
+  --secondary-text-color: #555;
+  --primary-bg-color: #f8f9fb;
+  --secondary-bg-color: #2e2f33;
+}
 html {
   -webkit-font-smoothing: antialiased;
   font-size: 16px;
@@ -1969,7 +1976,7 @@ p.header-widget-phone {
 }
 
 #hero-5 {
-  background-image: url(../images/hero-5.jpeg);
+  background-image: url(../images/hero-5.jpg);
   padding-top: 90px;
   padding-bottom: 210px;
 }

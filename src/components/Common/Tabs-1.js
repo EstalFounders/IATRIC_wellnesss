@@ -1,121 +1,132 @@
 import React, { useState } from "react";
 import { Nav, Tab } from "react-bootstrap";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import ViewDoctorListModel from "../model/ViewDoctorListModel";
+import ViewDoctorListComp from "./ViewDoctorListComp";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import Image from "next/image";
 
 const Tabs1 = () => {
+  const [showDoctor, setShowDoctor] = useState(false);
+  const doctors = useSelector((state) => state.allDoctorS.allDoctors);
+  // Initialize services with a list of services
   const [services] = useState([
     {
       id: 0,
       name: "General Physician",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of General Physician service...",
+      image: "/images/general_physicians.jpg",
+      description:
+        "General Physician: Your Health Partner.Feel better, faster. Our General Physicians provide trusted care for all your health needs. Choose between a convenient online consultation or an in-person visit. We're committed to reaching patients everywhere, making quality healthcare truly accessible. Receive your prescription instantly on your phone after your consultation.",
     },
     {
       id: 1,
       name: "Pediatrics",
-      image: "images/hematology_700x700.jpeg",
+      image: "/images/pediatrics.jpg",
       description: "Description of Pediatrics service...",
     },
     {
       id: 2,
       name: "Cardiology",
-      image: "images/Cardiology_700x700.jpeg",
+      image: "/images/Cardiology_700x700.jpeg",
       description: "Description of Cardiology service...",
     },
     {
       id: 3,
       name: "Dermatologist",
-      image: "images/hematology_700x700.jpg",
+      image: "/images/dermalogist.jpg",
       description: "Description of Dermatologist service...",
     },
     {
       id: 4,
       name: "Orthopaedics",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/orthopedics.jpg",
       description: "Description of Orthopaedics...",
     },
     {
       id: 5,
       name: "Gynaecology",
-      image: "images/hematology_700x700.jpg",
+      image: "/images/gynecologist.jpg",
       description: "Description of Gynaecology...",
     },
     {
       id: 6,
       name: "Ophthalmology",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/ophthalmology.jpg",
       description: "Description of Ophthalmology...",
     },
     {
       id: 7,
       name: "Pulmonology",
-      image: "images/Pulmonology_700x700.jpeg",
+      image: "/images/pulmonology.jpg",
       description: "Description of Pulmonology...",
     },
     {
       id: 8,
       name: "Psychiatrist",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/Psychiatrist.jpg",
       description: "Description of Psychiatrist...",
     },
     {
       id: 9,
       name: "Dentistry",
-      image: "images/hematology_700x700.jpg",
+      image: "/images/dentistry.jpg",
       description: "Description of Dentistry...",
     },
     {
       id: 10,
       name: "Physiotherapy",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/Physiotherapy.jpg",
       description: "Description of Physiotherapy...",
     },
     {
       id: 11,
       name: "Nursing care",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/nursing-care.jpg",
       description: "Description of Nursing care...",
     },
     {
       id: 12,
       name: "Home care",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/home-care.jpg",
       description: "Description of Home care...",
     },
     {
       id: 13,
       name: "Medicine Delivery",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/medicine-delivery.jpg",
       description: "Description of Medicine Delivery...",
     },
     {
       id: 14,
       name: "Lab Investigation",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/lab-investigation.jpg",
       description: "Description of Lab Investigation...",
     },
     {
       id: 15,
       name: "Corporate Healthcare",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/corporate-healthcare.jpg",
       description: "Description of Corporate Healthcare...",
     },
     {
       id: 16,
       name: "Healthcamp",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/healthcamp.jpg",
       description: "Description of Healthcamp...",
     },
     {
       id: 17,
       name: "Obstetrics",
-      image: "images/pediatrics_700x700.jpg",
+      image: "/images/Obstetrics.jpg",
       description: "Description of Obstetrics...",
     },
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
+
+  const router = useRouter();
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -133,6 +144,18 @@ const Tabs1 = () => {
     indexOfFirstService,
     indexOfLastService
   );
+
+  const handleServiceClick = (serviceName) => {
+    console.log(`Service clicked: ${serviceName}`);
+    router.push(
+      `/department-single?serviceName=${serviceName
+        .toLowerCase()
+        .replace(/\s+/g, "-")}`
+    );
+    // setShowDoctor(true);
+    // ${serviceName.toLowerCase().replace(/\s+/g, '-')}
+    // Add your logic here for handling the service click
+  };
 
   return (
     <section id="tabs-1" className="wide-100 tabs-section division">
@@ -181,8 +204,9 @@ const Tabs1 = () => {
                     <div className="row d-flex align-items-center">
                       <div className="col-lg-6">
                         <div className="tab-img">
-                          <img
-                            className="img-fluid"
+                          <Image
+                            width={500} 
+                            height={550}
                             src={service.image}
                             alt="tab-image"
                           />
@@ -190,10 +214,20 @@ const Tabs1 = () => {
                       </div>
                       <div className="col-lg-6">
                         <div className="txt-block pc-30">
-                          <h3 className="h3-md steelblue-color">
+                          <div
+                            className="h1 steelblue-color clickable-div"
+                            style={{ cursor: "pointer" }}
+                            onMouseEnter={(e) =>
+                              (e.target.style.color = "#0056b3")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.target.style.color = "steelblue")
+                            }
+                            onClick={() => handleServiceClick(service.name)}
+                          >
                             {service.name}
-                          </h3>
-                          <p className="mb-30">{service.description}</p>
+                          </div>
+                          <div className="mb-30">{service.description}</div>
                         </div>
                       </div>
                     </div>
@@ -201,27 +235,17 @@ const Tabs1 = () => {
                 ))}
               </Tab.Content>
             </Tab.Container>
-            {/* <div className="navigation-icons text-center mt-1">
-              {currentPage > 1 && (
-                <FaChevronLeft
-                  className="nav-icon"
-                  onClick={handlePrevPage}
-                  color="#8e8333"
-                  size={30}
-                />
-              )}
-              {indexOfLastService < services.length && (
-                <FaChevronRight
-                  className="nav-icon"
-                  onClick={handleNextPage}
-                  color="#8e8333"
-                  size={30}
-                />
-              )}
-            </div> */}
           </div>
         </div>
       </div>
+      <ViewDoctorListModel
+        isOpen={showDoctor}
+        onClose={() => {
+          setShowDoctor(false);
+        }}
+      >
+        <ViewDoctorListComp doctors={doctors} />
+      </ViewDoctorListModel>
     </section>
   );
 };

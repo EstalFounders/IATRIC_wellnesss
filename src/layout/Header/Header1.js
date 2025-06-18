@@ -11,7 +11,14 @@ import {
   FaMapMarkedAlt,
   FaPhone,
 } from "react-icons/fa";
-import { api, contact_no, sessionStorageName } from "../../constant";
+import {
+  address,
+  api,
+  color_schema,
+  contact_no,
+  facebook_page_url,
+  sessionStorageName,
+} from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
@@ -53,7 +60,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   useEffect(() => {
     const processConsultations = (data) => {
       // Filter active items and transform into consultationOptions format
-      console.log(data, '56 processed consultation')
+      console.log(data, "56 processed consultation");
       const activeConsultations = data
         .filter((item) => item.isActive)
         .map((item) => ({
@@ -75,7 +82,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
     const storedConsultations = sessionStorage.getItem(
       sessionStorageName.ConsultationFee
     );
-    
+
     const parsedConsultations = JSON.parse(storedConsultations);
 
     console.log(parsedConsultations, "stored consultation in header");
@@ -165,7 +172,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   <span>
                     <FaMapMarkedAlt className="mx-1" />
                     <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                      Sector 57 , Gurgaon Haryana-122003
+                      {address}
                     </b>
                   </span>
                 </a>
@@ -231,7 +238,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               className="facebookicon"
               title="Facebook"
               target="blank"
-              href="https://www.facebook.com/iatrichealthcare"
+              href={facebook_page_url}
             >
               <FaFacebook size={25} />
               <span className="mobiletext02">Facebook</span>
@@ -582,17 +589,24 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               </li>
               {/* NAVIGATION MENU BUTTON */}
               {!hiddenRoutes.includes(router.pathname) && (
-                <li className="nl-simple header-btn" aria-haspopup="true">
-                  <Link legacyBehavior href="/">
-                    <a
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleConsultationTypeOpenDialog();
-                      }}
-                    >
-                      Book an Appointment
-                    </a>
-                  </Link>
+                <li className="nl-simple" aria-haspopup="true">
+                  <button
+                    className="mt-3 clickable-div"
+                    style={{
+                      backgroundColor: `${color_schema.green}`, // Custom background color
+                      color: "#fff", // Text color
+                      border: "none", // Remove border
+                      padding: "10px 20px", // Padding for button
+                      borderRadius: "5px", // Rounded corners
+                      fontWeight: "bold", // Bold text
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleConsultationTypeOpenDialog();
+                    }}
+                  >
+                    Book an Appointment
+                  </button>
                 </li>
               )}
             </ul>

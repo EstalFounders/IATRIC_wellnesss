@@ -5,6 +5,7 @@ import { DoctorComponent } from "../Common/DoctorComponent";
 import { api } from "../../constant";
 import { useDispatch, useSelector } from "react-redux";
 import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import DoctorCard from "../Common/DoctorCard";
 
 const AllDoctorsDoctors3 = () => {
   const [doctors, setDoctors] = useState([]);
@@ -49,9 +50,11 @@ const AllDoctorsDoctors3 = () => {
     >
       <FilterBar selectFilter={getSelectedFilter} />
       <div className="container">
-        <div className="row mt-4">
+        <div className="row mt-4 d-flex justify-content-center">
           {doctors.map((doctor, index) => (
-            <DoctorComponent key={index} doctor={doctor} />
+            <div className="px-2">
+            <DoctorCard key={index} doctor={doctor} />
+            </div>
           ))}
           {/* END DOCTOR #9 */}
         </div>

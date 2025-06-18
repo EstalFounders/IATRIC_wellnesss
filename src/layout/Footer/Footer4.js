@@ -2,7 +2,7 @@ import Link from "next/dist/client/link";
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { FaFacebook, FaInstagram, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
-import { contact_no, email } from "../../constant";
+import { address, contact_no, email, facebook_page_url } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { useRouter } from "next/router";
@@ -80,7 +80,7 @@ const Footer4 = () => {
                       className="facebookicon"
                       title="Facebook"
                       target="blank"
-                      href="https://www.facebook.com/iatrichealthcare"
+                      href={facebook_page_url}
                     >
                       <FaFacebook size={40} color="#316FF6" />
                       <span className="mobiletext02">Facebook</span>
@@ -96,8 +96,7 @@ const Footer4 = () => {
               {/* Title */}
               <h5 className="h5-xs">Our Location</h5>
               {/* Address */}
-              <p>Sector 57 ,</p>
-              <p>Gurgaon Haryana-122003</p>
+              <p>{address}</p>
               {/* Email */}
               <p className="foo-email mt-20">
                 Email:

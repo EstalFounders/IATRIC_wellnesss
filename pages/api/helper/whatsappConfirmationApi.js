@@ -12,7 +12,10 @@ import {
 } from "../utils/commonmethod";
 import Invoice from "../../../src/models/invoice";
 import { sendWhatsAppConfirmation } from "../lib/communication";
-import { WHATSAPP_INVOICE_TEMPLATE, WHATSAPP_NUMBER_CONFIRMATION } from "../utils/constants";
+import {
+  WHATSAPP_INVOICE_TEMPLATE,
+  WHATSAPP_NUMBER_CONFIRMATION,
+} from "../utils/constants";
 import { getWhatsAppNumberConfirmationMessageBody } from "../utils/whatsappMessageBodies";
 
 export default async function handler(req, res) {
@@ -27,13 +30,12 @@ export default async function handler(req, res) {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const {mobile, otp} = req.body;
+    const { mobile, otp } = req.body;
     console.log(mobile, otp, "mobile and otp");
 
-    const whatsappNumbereConfirmation  = getWhatsAppNumberConfirmationMessageBody(
-      otp
-    );
-    
+    const whatsappNumbereConfirmation =
+      getWhatsAppNumberConfirmationMessageBody(otp);
+
     await sendWhatsAppConfirmation(
       formatPhoneNumber(mobile.toString()),
       whatsappNumbereConfirmation,
@@ -52,7 +54,9 @@ export default async function handler(req, res) {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({ status: "send successfully", invoice });
+    res
+      .status(200)
+      .json({ message: "WhatsApp confirmation sent successfully" });
   } catch (error) {
     // If any error occurred, roll back the transaction
     if (session) {
@@ -60,8 +64,9 @@ export default async function handler(req, res) {
       session.endSession();
     }
     console.error("Error:", error);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message }); // Include the error message
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "check your mobile number and try again",
+    }); // Include the error message
   }
 }

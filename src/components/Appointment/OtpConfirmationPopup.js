@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
+import { api } from "../../constant";
 
 const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   // Refs and state for OTP input
@@ -9,6 +10,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [generatedOtp, setGeneratedOtp] = useState(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [error, setError] = useState("");
 
   // Generate OTP and send on load
   useEffect(() => {
@@ -37,7 +39,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
     console.log("Generated OTP:", newOtp);
 
     try {
-      const res = await fetch("/api/send-otp", {
+      const res = await fetch(api.sendOtp, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, otp: newOtp }),
@@ -45,6 +47,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
       const data = await res.json();
       console.log("OTP sent response:", data);
     } catch (error) {
+      setError(error.message);
       console.error("Failed to send OTP", error);
     }
   };
@@ -95,8 +98,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
       alert("Please enter all 6 digits.");
       return;
     }
-    const temp_code = 123456; // Temporary code for testing
-    if (enteredCode === temp_code.toString()) {
+    if (enteredCode === generatedOtp) {
       console.log("OTP verified successfully:", enteredCode);
       onConfirm(); // Proceed
     } else {
@@ -115,54 +117,86 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
             src="/images/company_logo.png"
             alt="OTP"
             className="mt-5"
-            width={150}
+            width={250}
             height={150}
           />
         </div>
-
-        {/* Heading */}
-        <div className="text-center text-primary mb-2 h1">
-          Verification Code
+        {/* Header */} 
+        <div className="text-center text-primary mb-2 h1 font-bold">
+            <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
+                Verification Code
+            </span>
         </div>
         <div className="text-sm text-center text-gray-600 mb-3">
-          We have sent you code on your whatsApp
+            <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
+                We have sent you a code on your WhatsApp. Please check and enter it below.
+            </span>
         </div>
 
-        {/* OTP Inputs */}
         <div className="flex justify-center gap-3 mb-4 text-center">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              type="text"
-              maxLength="1"
-              inputMode="numeric"
-              value={digit}
-              onChange={(e) => handleChange(e.target.value, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              ref={(el) => (inputRefs.current[index] = el)}
-              className="mx-1"
-              style={{ width: "30px", height: "50px", fontSize: "22px" }}
-            />
-          ))}
+            {otp.map((digit, index) => (
+                <input
+                    key={index}
+                    type="text"
+                    maxLength="1"
+                    inputMode="numeric"
+                    value={digit}
+                    onChange={(e) => handleChange(e.target.value, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
+                    style={{
+                        width: "40px",
+                        height: "50px",
+                        fontSize: "22px",
+                        backgroundColor: "#F9FAFB",
+                    }}
+                />
+            ))}
         </div>
 
         {/* Resend */}
-        <div className="text-center text-sm text-gray-500 mb-4">
-          Didn’t receive code?{" "}
-          <button
-            className={`font-semibold ${
-              resendCooldown > 0
+            <div className="text-center text-sm text-gray-500 mb-4">
+              <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
+                Didn’t receive the code?{" "}
+              </span>
+              <button
+                className={`font-semibold ${
+                  resendCooldown > 0
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-blue-600 hover:underline"
-            }`}
-            onClick={generateAndSendOtp}
-            disabled={resendCooldown > 0}
-          >
-            Resend{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
-          </button>
-        </div>
-
-        {/* Submit */}
+                }`}
+                onClick={generateAndSendOtp}
+                disabled={resendCooldown > 0}
+                style={{
+                  fontSize: "1rem",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
+                  backgroundColor: resendCooldown > 0 ? "#E5E7EB" : "#4A90E2",
+                  color: resendCooldown > 0 ? "#9CA3AF" : "#FFFFFF",
+                  cursor: resendCooldown > 0 ? "not-allowed" : "pointer",
+                  transition: "background-color 0.3s ease",
+                }}
+              >
+                Resend{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
+              </button>
+            </div>
+            {error && (
+              <div
+                className="text-red-500 text-center mb-4"
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  backgroundColor: "#FDEDEC",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #E74C3C",
+                }}
+              >
+                {error}
+              </div>
+            )}
+            {/* Submit */}
         <div className="text-center">
           <button onClick={handleSubmit} className="btn btn-primary mb-4">
             Verify

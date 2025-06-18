@@ -77,7 +77,13 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       usedMobileNumbers.add(mobNo);
     } else {
       // No matching lab test
-      console.log("No matching lab test for mobile number:", appointmentTaxes[0].freight,appointmentTaxes[0].isActive,appointmentTaxes[0].processingfee,appointmentTaxes[0].share);
+      console.log(
+        "No matching lab test for mobile number:",
+        appointmentTaxes[0].freight,
+        appointmentTaxes[0].isActive,
+        appointmentTaxes[0].processingfee,
+        appointmentTaxes[0].share
+      );
       const appointmentService = {
         // serviceIds: appointment._id,
         name: appointment.name,
@@ -144,26 +150,28 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
 export async function updateInvoiceNumberInDatabase(item, invoiceId) {
   try {
     if (!item) {
-      console.error('Item is undefined or null');
+      console.error("Item is undefined or null");
       return; // Exit if item is invalid
     }
 
     let model;
     switch (item.serviceType) {
-      case 'Consultation':
+      case "Consultation":
         model = Appointment; // Assuming Appointment is your Consultation model
         break;
-      case 'LabTest':
+      case "LabTest":
         model = BookLabTest; // Assuming BookLabTest is your LabTest model
         break;
       default:
-        console.warn(`Unknown service type: ${item.serviceType}.  Skipping update for item ID: ${item.id}`);
+        console.warn(
+          `Unknown service type: ${item.serviceType}.  Skipping update for item ID: ${item.id}`
+        );
         return; // Skip if service type is unknown
     }
 
     //check if model is defined
-    if(!model){
-        return;
+    if (!model) {
+      return;
     }
     const result = await model.findByIdAndUpdate(
       item.id, // Use item.id to find the correct record
@@ -190,17 +198,17 @@ export async function updateInvoiceNumberInDatabase(item, invoiceId) {
 }
 
 export const gallaboxReqHeaders = {
-  'apiSecret': process.env.GALLABOX_API_SECRET,
-  'apiKey': process.env.GALLABOX_API_KEY,
-  'Content-Type': "application/json",
-}
+  apiSecret: process.env.GALLABOX_API_SECRET,
+  apiKey: process.env.GALLABOX_API_KEY,
+  "Content-Type": "application/json",
+};
 
 export const formatPhoneNumber = (phoneNumberString) => {
-  if (typeof phoneNumberString !== 'string') return null;
+  if (typeof phoneNumberString !== "string") return null;
   console.log(phoneNumberString, "last 10 digits 200");
 
   // Remove all non-digit characters
-  let digits = phoneNumberString.replace(/\D/g, '');
+  let digits = phoneNumberString.replace(/\D/g, "");
   console.log(digits, "last 10 digits 203");
   // Keep only the last 10 digits (assumed to be the actual mobile number)
   const last10Digits = digits.slice(-10);
@@ -214,4 +222,3 @@ export const formatPhoneNumber = (phoneNumberString) => {
   // Prefix with country code
   return `91${last10Digits}`;
 };
-
