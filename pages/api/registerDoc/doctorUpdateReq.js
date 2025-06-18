@@ -11,7 +11,9 @@ export default async function handler(req, res) {
     // Extract id from query parameters
     console.log(req.body, "body");
     const { id, name } = req.query;
+
     const { changedFields } = req.body;
+    console.log(changedFields, "changesfields");
     if (!id) {
       return res.status(400).json({ error: "ID is required" });
     }
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
       if (action === "approve") {
         console.log(request, "82", request.updatedFields);
         const id = request.doctorId.toString();
-        const fieldsToUpdate = request.updatedFields
+        const fieldsToUpdate = request.updatedFields;
         // Update the doctor's profile
         await Doctor.findByIdAndUpdate(id, fieldsToUpdate, {
           new: true,
@@ -81,7 +83,7 @@ export default async function handler(req, res) {
       } else if (action === "reject") {
         // Mark request as rejected
         request.status = "rejected";
-        request.rejectedAt = new Date()
+        request.rejectedAt = new Date();
         await request.save();
 
         res.status(200).json({ message: "Request rejected." });

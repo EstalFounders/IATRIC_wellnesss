@@ -31,6 +31,7 @@ import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import { IS_NOW } from "../../../pages/api/utils/constants";
+import bookConsultationApiCall from "../ApiService/BookConsultationApiCall";
 
 const slotMessage = (
   <div className="text-danger font-weight-bold">
@@ -320,31 +321,31 @@ const AppointmentPage = () => {
   };
 
   // const checkDuration = () => {
-    useEffect(() => {
-      if (selectedSlot) {
-        console.log(selectedSlot, "selected slot in check duration");
-        const currentTime = new Date();
-        const slotStartTime = new Date(selectedSlot.startTime);
-        const timeDifference =
-          Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
+  useEffect(() => {
+    if (selectedSlot) {
+      console.log(selectedSlot, "selected slot in check duration");
+      const currentTime = new Date();
+      const slotStartTime = new Date(selectedSlot.startTime);
+      const timeDifference =
+        Math.abs(slotStartTime - currentTime) / (1000 * 60); // Difference in minutes
 
-        console.log(timeDifference, "time difference in minutes");
-        const durationIn20Min = timeDifference <= 20;
-        console.log("Is appointment within 20 minutes?", durationIn20Min);
+      console.log(timeDifference, "time difference in minutes");
+      const durationIn20Min = timeDifference <= 20;
+      console.log("Is appointment within 20 minutes?", durationIn20Min);
 
-        if (durationIn20Min) {
-          setAppointmentTime(IN_TWENTY_MINUTES_NOW);
-          console.log(
-            "Appointment time is within 20 minutes of the selected slot."
-          );
-        } else {
-          setAppointmentTime(CHOOSE_TIME);
-          console.log(
-            "Appointment time is not within 20 minutes of the selected slot."
-          );
-        }
+      if (durationIn20Min) {
+        setAppointmentTime(IN_TWENTY_MINUTES_NOW);
+        console.log(
+          "Appointment time is within 20 minutes of the selected slot."
+        );
+      } else {
+        setAppointmentTime(CHOOSE_TIME);
+        console.log(
+          "Appointment time is not within 20 minutes of the selected slot."
+        );
       }
-    }, [selectedSlot]);
+    }
+  }, [selectedSlot]);
 
   const sendWhatsAppConfirmation = () => {
     console.log("send whats app confirmation called");
@@ -387,34 +388,30 @@ const AppointmentPage = () => {
     setAvailableSlotsFromServer(true);
   };
 
+  const consultationData = {
+    selectedDoctorId,
+    appointmentTime,
+    selectedDate,
+    selectedSlot,
+    symptoms,
+    name,
+    doctorName,
+    doctorMobileNumber,
+    email,
+    patientMobNo: mobNo,
+    consultationprice,
+    consultationType,
+  };
+
   const bookConsultation = async () => {
     console.log("Book consultation called");
     try {
-      setIsLoading(true);
-      const consultationData = {
-        selectedDoctorId,
-        appointmentTime,
-        selectedDate,
-        selectedSlot,
-        symptoms,
-        name,
-        doctorName,
-        doctorMobileNumber,
-        email,
-        patientMobNo: mobNo,
-        consultationprice,
-        consultationType,
-      };
+      
+      const response = await bookConsultationApiCall(consultationData, setIsLoading);
+      console.log(response, "response from book consultation api call");
 
-      const response = await fetch(api.bookConsultation, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(consultationData),
-      });
-
-      const data = await response.json();
+      const data = response;
+      const message = data.json()
       console.log("Response from booking API:", data.status);
       if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
         setOpenAvailableSlotsFromServer(true);
@@ -423,8 +420,8 @@ const AppointmentPage = () => {
         return; // Exit the function to prevent further execution
       }
       if (response.ok) {
-        console.log("Booking successful:", data.message);
-        handleShowDialog(data.message);
+        console.log("Booking successful:", message.message);
+        handleShowDialog(message.message);
       } else {
         const errorData = await response.json();
         console.error("Failed to book consultation:", errorData.message);
@@ -439,8 +436,13 @@ const AppointmentPage = () => {
       setIsLoading(false);
     }
   };
-  const onBookNextAvailableSlot = async (slot) => {
-    console.log("Booking next available slot:", slot);
+
+  const selectNextAvailableSlot = async (slot) => {
+    setSelectedSlot(slot);
+  };
+
+  const onBookNextAvailableSlot = async () => {
+    bookConsultation();
   };
 
   const whatsappConfrimation = () => {
@@ -917,6 +919,7 @@ const AppointmentPage = () => {
           >
             <AvailableSlots
               slots={availableSlotsFromServer}
+              selectSlot={selectNextAvailableSlot}
               onBookSlot={onBookNextAvailableSlot}
               message={noSLotAvailableMessage}
             />

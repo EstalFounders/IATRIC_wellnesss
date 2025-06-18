@@ -51,6 +51,10 @@ const doctorSchema = new Schema({
     type: Array,
     required: true,
   },
+  serviceOffered: {
+    type: Array,
+    required: true,
+  },
   location: {
     type: String,
     required: false,

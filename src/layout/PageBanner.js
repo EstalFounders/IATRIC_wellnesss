@@ -19,13 +19,13 @@ const PageBanner = ({ pageTitle, motherTitle, url }) => {
                       <a href={`/${url}`}>{motherTitle}</a>
                     </li>
                   )}
-                  <li className="breadcrumb-item active" aria-current="page">
+                  <li className="breadcrumb-item active text-uppercase" aria-current="page">
                     {pageTitle}
                   </li>
                 </ol>
               </nav>
               {/* Title */}
-              <h4 className="h4-sm steelblue-color">{pageTitle}</h4>
+              <h4 className="h4-sm steelblue-color text-uppercase">{pageTitle}</h4>
             </div>
           </div>
         </div>{" "}

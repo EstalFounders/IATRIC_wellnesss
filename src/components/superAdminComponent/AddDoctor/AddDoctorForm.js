@@ -28,9 +28,8 @@ const AddDoctorForm = () => {
   const [message, setMessage] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedService, setSelectedService] = useState([]);
   const dispatch = useDispatch();
-
-  
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
@@ -45,6 +44,7 @@ const AddDoctorForm = () => {
     workExperience: "",
     educationTraining: "",
     consultationType: "",
+    serviceOffered: "",
     password: "",
     doctorType: DoctorType.INDIVIDUAL,
     price: "",
@@ -52,6 +52,10 @@ const AddDoctorForm = () => {
     slotEndTime: "",
     mobileNumber: "",
   });
+
+  const storedService = useSelector(
+    (state) => state.superAdminHomePage.serviceOffered
+  );
 
   const consultationTypeStore = useSelector(
     (state) => state.otherDetailsSlice.consultationType
@@ -78,6 +82,29 @@ const AddDoctorForm = () => {
   // Remove option from array when "tag" is clicked
   const handleRemoveType = (type) => {
     setSelectedTypes(selectedTypes.filter((item) => item !== type));
+  };
+
+  const handleAddService = (e) => {
+    const value = e.target.value;
+
+    if (value && !selectedService.includes(value)) {
+      setSelectedService((prevTypes) => {
+        const updatedService = [...prevTypes, value];
+
+        // Update doctorDetails with the new consultationType
+        setDoctorDetails((prevDetails) => ({
+          ...prevDetails,
+          serviceOffered: updatedService, // Ensure it updates with latest array
+        }));
+
+        return updatedService;
+      });
+    }
+  };
+
+  // Remove option from array when "tag" is clicked
+  const handleRemoveService = (type) => {
+    setSelectedService(selectedService.filter((item) => item !== type));
   };
 
   const handleLocationTextChange = (e) => {
@@ -283,8 +310,9 @@ const AddDoctorForm = () => {
           {/* <label htmlFor="consultationType" className={styles.label}>
             Consultation Type:
           </label> */}
-          <div>
-            <label htmlFor="consultationType">Select Consultation Type:</label>
+          <div className="font-weight-bold row ml-0">
+            <div className="col-md-6">
+            <label>Select Consultation Type:</label>
             <select
               id="consultationType"
               className={styles.input}
@@ -292,7 +320,7 @@ const AddDoctorForm = () => {
               value=""
             >
               <option value="" disabled>
-                Select an option
+                Select options
               </option>
               {consultationTypeStore.map((option) => (
                 <option
@@ -300,7 +328,7 @@ const AddDoctorForm = () => {
                   value={option.name}
                   disabled={selectedTypes.includes(option.name)}
                 >
-                  {option.isActive ? option.name : null} 
+                  {option.isActive ? option.name : null}
                 </option>
               ))}
             </select>
@@ -336,6 +364,46 @@ const AddDoctorForm = () => {
                 />
               </div>
             )}
+            </div>
+
+            <div className="font-weight-bold col-md-6">
+              <label>Select Services Offered:</label>
+              <select
+                id="ServicesOffered"
+                className={styles.input}
+                onChange={handleAddService}
+                value=""
+              >
+                <option value="" disabled>
+                  Select options
+                </option>
+                {storedService.map((option) => (
+                  <option
+                    key={option._id}
+                    value={option.name}
+                    disabled={selectedService.includes(option.name)}
+                  >
+                    {option.isActive ? option.name : null}
+                  </option>
+                ))}
+              </select>
+
+              {/* Display selected options as "tags" */}
+              <div className={styles.tagsContainer}>
+                {selectedService.map((type) => (
+                  <div key={type} className={styles.tag}>
+                    {type}
+                    <button
+                      type="button"
+                      className={styles.removeButton}
+                      onClick={() => handleRemoveService(type)}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <label className={styles.label}>

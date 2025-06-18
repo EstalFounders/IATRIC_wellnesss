@@ -157,6 +157,11 @@ export default async function handler(req, res) {
                   .split(",")
                   .map((type) => type.trim())
               : [], // Convert to array & trim spaces
+            serviceOffered: stringFields.serviceOffered
+              ? stringFields.serviceOffered
+                  .split(",")
+                  .map((type) => type.trim())
+              : [], // Convert to array & trim spaces
           });
 
           console.log(addedDoctor._id, "Doctor Added");

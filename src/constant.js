@@ -6,7 +6,7 @@ export const doctorSignature_img_path = "images/doctorSignature/";
 export const prescription_img_path = "images/prescription/";
 export const invoice_img_path = "images/invoice/";
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
-export const contact_no = "+91 7895959925";
+export const contact_no = "+91 78959 59925";
 export const email= 'customercare@healthpath.co.in'
 export const countryCode = "+91" 
 export const development_production_url = "https://vtdeveloper.d3pu3hm659dc5p.amplifyapp.com/"
@@ -43,6 +43,7 @@ export const api = {
     getInvoice: "/api/helper/generateInvoice",
     uploadInvoice: "/api/helper/uploadInvoice",
     serviceOffered: "/api/superAdmin/serviceOffered",
+    sendOtp: "api/helper/whatsappConfirmationApi"
 }
 
 export const services = [
@@ -154,5 +155,13 @@ export const serviceOffered = {
 }
 
 export const CHOOSE_TIME = "ChooseTime";
+
+export const address = "Sector 57 , Gurgaon, Haryana-122003";
+export const facebook_page_url = "https://www.facebook.com/share/12GvMifXjiF/?mibextid=wwXIfr"
+
+export const color_schema = {
+    green: "#3b5f1d",
+    yellow: "#8e8333"
+}
 
 

@@ -24,12 +24,9 @@ export default async function handler(req, res) {
       doctor_name: "Dr. John Doe",
       patient_name: "Jane Doe",
       consultation_type: "Call",
-      contact_us: contact_no
-    }
-    await sendWhatsAppConfirmation(
-      "917455992234",
-      body
-    );
+      contact_us: contact_no,
+    };
+    await sendWhatsAppConfirmation("917455992234", body);
   } catch (error) {
     console.error("Error connecting to database:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -49,7 +46,10 @@ export default async function handler(req, res) {
     for (const appointment of allAppointments) {
       if (!appointment.slotId) {
         console.warn(`Appointment ${appointment._id} has no slotId. Skipping.`);
-        errors.push({ id: appointment._id, message: 'No slotId found for appointment' });
+        errors.push({
+          id: appointment._id,
+          message: "No slotId found for appointment",
+        });
         continue;
       }
 
@@ -65,14 +65,27 @@ export default async function handler(req, res) {
             { new: true } // Return the updated document
           );
           updatedAppointments.push(updatedAppointment);
-          console.log(`Updated appointment ${appointment._id} with time ${slot.startTime}`);
+          console.log(
+            `Updated appointment ${appointment._id} with time ${slot.startTime}`
+          );
         } else {
-          console.warn(`Slot ${appointment.slotId} not found or has no startTime for appointment ${appointment._id}. Skipping.`);
-          errors.push({ id: appointment._id, message: 'Slot not found or startTime missing' });
+          console.warn(
+            `Slot ${appointment.slotId} not found or has no startTime for appointment ${appointment._id}. Skipping.`
+          );
+          errors.push({
+            id: appointment._id,
+            message: "Slot not found or startTime missing",
+          });
         }
       } catch (innerError) {
-        console.error(`Error processing appointment ${appointment._id}:`, innerError);
-        errors.push({ id: appointment._id, message: `Error updating: ${innerError.message}` });
+        console.error(
+          `Error processing appointment ${appointment._id}:`,
+          innerError
+        );
+        errors.push({
+          id: appointment._id,
+          message: `Error updating: ${innerError.message}`,
+        });
       }
     }
 
@@ -81,7 +94,7 @@ export default async function handler(req, res) {
     //   { invoiceNumber: { $exists: true } },
     //   { $rename: { "invoiceNumber": "invoiceId" } }
     // );
-    
+
     // const consultationResult = await BookLabTest.updateMany(
     //   { invoiceId: { $exists: false } },
     //   { $set: { invoiceId: "" } },
@@ -113,7 +126,7 @@ export default async function handler(req, res) {
 
     // 5. Send a response
     res.status(200).json({
-      message: 'Column updated successfully',
+      message: "Column updated successfully",
       updatedAppointments: updatedAppointments,
       // updatedAppointmentCount: consultationResult.modifiedCount,
       // upsertedAppointmentCount: consultationResult.upsertedCount,
