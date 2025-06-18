@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import styles from "./css/ServiceOffered.module.css";
 import { MdDelete } from "react-icons/md";
 import { api, sessionStorageName } from "../../constant";
