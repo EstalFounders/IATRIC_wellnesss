@@ -48,7 +48,7 @@ const DoctorsSection = () => {
         <div className="row d-flex justify-content-center">
           {/* Map over the array of doctors to render each doctor component */}
           {doctors.slice(0, 3).map((doctor, index) => (
-            <div className="px-2">
+            <div className="px-2" key={index}>
             <DoctorCard key={index} doctor={doctor} />
             </div>
           ))}

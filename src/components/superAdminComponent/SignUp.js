@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
-import axios from 'axios';
 import Preloader from "../Preloader";
 import { loginUser } from "../../helper";
 import { useRouter } from "next/router";
