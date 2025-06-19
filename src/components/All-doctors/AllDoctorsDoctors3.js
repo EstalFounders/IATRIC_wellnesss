@@ -52,9 +52,7 @@ const AllDoctorsDoctors3 = () => {
       <div className="container">
         <div className="row mt-4 d-flex justify-content-center">
           {doctors.map((doctor, index) => (
-            <div className="px-2">
             <DoctorCard key={index} doctor={doctor} />
-            </div>
           ))}
           {/* END DOCTOR #9 */}
         </div>

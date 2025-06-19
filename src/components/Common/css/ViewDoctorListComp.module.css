@@ -20,6 +20,7 @@
   
   .new-doctor-card {
     display: flex;
+    margin: 0px 10px 0 10px;
     justify-content: space-between;
     align-items: flex-start;.modalBackdrop {
         position: fixed;
