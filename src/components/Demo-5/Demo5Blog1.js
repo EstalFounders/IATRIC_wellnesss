@@ -12,11 +12,12 @@ const Demo5Blog1 = () => {
             <h3 className="h3-md steelblue-color">
               Our Stories, Tips &amp; Latest News
             </h3>
+            <span className="section-id blue-color">
+              <h4>Your Hub for Health & Wellness Insights</h4>
+            </span>
             {/* Text */}
             <p>
-              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
-              primis libero at tempus, blandit posuere ligula varius congue
-              cursus porta feugiat
+              Welcome to Healthpath's dynamic content hub! This is where we share <strong>compelling patient success stories</strong>, provide <strong>actionable health tips</strong>, and keep you informed with the <strong>latest healthcare news and updates</strong>. We're dedicated to empowering you with valuable information to support your well-being journey.
             </p>
           </div>
         </div>

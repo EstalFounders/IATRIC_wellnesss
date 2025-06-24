@@ -4390,6 +4390,10 @@ td.text-right {
 }
 
 .review-2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px; /* Adjust as needed */
   position: relative;
   background-color: #fff;
   border: 1px solid #ddd;

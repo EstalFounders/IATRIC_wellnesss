@@ -9,17 +9,17 @@ const Demo5Pricing3 = () => {
           <div className="col-lg-6">
             <div className="txt-block pc-30 mb-40" data-wow-delay="0.4s">
               {/* Section ID */}
-              <span className="section-id blue-color">Healthpath Pricing</span>
+              <h4 className="section-id blue-color">Healthpath Pricing</h4>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
                 Invest in Your Health, Affordably
               </h3>
               {/* Text */}
               <p>
-                Healthpath prioritizes affordable &amp; accessible
-                healthcare. We offer budget-friendly options for checkups,
-                chronic care, &amp; specialized services, allowing you to invest
-                in your health without breaking the bank.
+                At Healthpath, we believe <strong>high-quality healthcare</strong> should be accessible and <strong>affordable</strong> for everyone. Discover how Healthpath makes <strong>affordable healthcare accessible</strong> by all in reality. We're committed to providing <strong>value-driven medical care</strong> that empowers you to take control of your health journey, affordably.
+              </p>
+              <p>
+                Explore our plans and find the perfect fit for your needs today.
               </p>
               <div className="pricing-table mb-40">
                 <table className="table table-hover">

@@ -9,13 +9,14 @@ const Banner5 = () => {
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
             <h3 className="h3-md steelblue-color">
-              Exceptional Care, Delivered by Expert
+              Exceptional Care, Delivered by Experts
             </h3>
             {/* Text */}
             <p>
-              Start your journey to optimal health. Healthpath offers
-              exceptional care, personalized to your needs, by highly qualified
-              experts. We empower you to reach your wellness goals.
+              Start your journey to optimal health with Healthpath. We offer <strong>exceptional medical care</strong>, meticulously <strong>personalized to your unique needs</strong>, and delivered by our team of <strong>highly qualified and compassionate experts</strong>.
+            </p>
+            <p>
+              At Healthpath, we empower you to confidently <strong>reach your wellness goals</strong> through a combination of cutting-edge <strong>telemedicine services</strong> and a steadfast commitment to your well-being. Experience the difference of <strong>expert healthcare</strong> that truly understands and supports you every step of the way.
             </p>
           </div>
         </div>
