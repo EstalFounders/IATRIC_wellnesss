@@ -1,8 +1,19 @@
 import React from "react";
 import styles from "./css/ViewDoctorListComp.module.css";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 
 const DoctorCard = ({ doctor, index }) => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const handleViewProfile = (doctor) => {
+    console.log("Doctor ID in handleview profile:", doctor);
+    const { doctorSignatureUrl, doctorStampUrl, ...filteredDoctor } = doctor;
+    dispatch(setDoctorInfo(filteredDoctor));
+    router.push(`/doctor-info`);
+  };
   return (
     <div key={index} className={styles["new-doctor-card"]}>
       {/* Left Section */}
@@ -22,7 +33,17 @@ const DoctorCard = ({ doctor, index }) => {
               className={styles["doctor-profile-pic"]}
             />
           </div>
-          <div className={`mt-2 ${styles["view-profile-link"]}`}>View Profile</div>
+          <div
+            className={`mt-2 ${styles["view-profile-link"]}`}
+            onClick={() => handleViewProfile(doctor)}
+            style={{
+              cursor: "pointer",
+              color: "blue",
+              textDecoration: "underline",
+            }}
+          >
+            View Profile
+          </div>
         </div>
 
         <div className={`mt-4 ${styles["doctor-primary-info col"]}`}>

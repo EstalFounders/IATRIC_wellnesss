@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const About5 = () => {
@@ -8,30 +9,35 @@ const About5 = () => {
           {/* IMAGE BLOCK */}
           <div className="col-lg-6">
             <div className="about-img text-center" data-wow-delay="0.6s">
-              <img
+              <Image
+                width={500}
+                height={700}
                 className="img-fluid"
-                src="images/image-03.png"
+                src="/images/image-03.png"
                 alt="about-image"
               />
             </div>
           </div>
           {/* TEXT BLOCK */}
           <div className="col-lg-6">
-            <div className="txt-block pc-30" data-wow-delay="0.4s">
+            <div className="pc-30" data-wow-delay="0.4s">
               {/* Section ID */}
               <span className="section-id blue-color">
                 <h5>Welcome to Healthpath</h5>
               </span>
               {/* Title */}
-              <h3 className="h3-md steelblue-color">
-                Keep Doctors & Loved One in the Loop
+              <h3 className="h3-md">
+                Your Health is Our Priority at Healthpath
               </h3>
               {/* Text */}
-              <p>
-                Securely share your comprehensive medical history with doctor
-                with loved ones, for better communication and care{" "}
-              </p>
-              {/* Singnature */}
+                      <div className="h5 box-list grey-color">
+                      At Healthpath, we're dedicated to your well-being. Whether you
+                      have questions, concerns, or need to schedule an appointment,
+                      our team is here to assist you every step of the way. We're
+                      committed to your satisfaction and eagerly anticipate partnering
+                      with you on your healthcare journey
+                      </div>
+                      {/* Singnature */}
               <div className="singnature mt-35">
                 {/* Text */}
                 {/* <p className="p-small mb-15">Randon Pexon, Head of Clinic</p> */}

@@ -47,7 +47,7 @@ const Demo5Contacts1 = () => {
   ];
 
   const saveQuery = async (e) => {
-    setLoading(true)
+    setLoading(true);
     if (!isMobileValid(formData.mobile_number)) {
       setIsSuccess(false);
       setError("Please enter a valid mobile number");
@@ -64,7 +64,7 @@ const Demo5Contacts1 = () => {
     });
     if (res.ok) {
       setIsSuccess(true);
-      setLoading(false)
+      setLoading(false);
       setError("Query saved successfully");
       setFormData({
         name: "",
@@ -75,7 +75,7 @@ const Demo5Contacts1 = () => {
         message: "",
       });
     } else {
-      alert("Failed to save query");
+      setError("Failed to save query. Please try again later.");
     }
   };
 
@@ -94,11 +94,11 @@ const Demo5Contacts1 = () => {
             </h3>
             {/* Text */}
             <p>
-              Feeling unsure or in need of guidance? At Healthpath,
-              we&apos;re here to listen. Don&apos;t hesitate to reach out with
-              any questions, concerns, or simply to discuss your healthcare
-              goals. We&apos;re dedicated to providing personalized support and
-              helping you navigate your wellness journey.
+              Feeling unsure or in need of guidance? At Healthpath, we&apos;re
+              here to listen. Don&apos;t hesitate to reach out with any
+              questions, concerns, or simply to discuss your healthcare goals.
+              We&apos;re dedicated to providing personalized support and helping
+              you navigate your wellness journey.
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">General Information</h5>
+              <h5 className="h5-sm steelblue-color">Contact Us</h5>
               <p>Sector 57 ,</p>
               <p>Gurgaon Haryana-122003</p>
               <p>
@@ -199,7 +199,7 @@ const Demo5Contacts1 = () => {
                   </div>
                 </div>
                 {/* Email */}
-                <div className="col-md-12 col-lg-6">
+                {/* <div className="col-md-12 col-lg-6">
                   <div className="form-group">
                     <input
                       id="form_email"
@@ -214,7 +214,7 @@ const Demo5Contacts1 = () => {
                     />
                     <div className="help-block with-errors" />
                   </div>
-                </div>
+                </div> */}
                 {/* Phone */}
                 <div className="col-md-12 col-lg-6">
                   <div className="form-group">
@@ -233,7 +233,7 @@ const Demo5Contacts1 = () => {
                   </div>
                 </div>
                 {/* Select Input */}
-                <div className="col-md-12 col-lg-6">
+                {/* <div className="col-md-12 col-lg-6">
                   <div className="form-group">
                     <select
                       id="inlineFormCustomSelect1"
@@ -250,7 +250,7 @@ const Demo5Contacts1 = () => {
                       <option>Other</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Message */}
                 <div className="col-md-12 input-message">

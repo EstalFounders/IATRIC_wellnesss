@@ -12,7 +12,6 @@
   }
   
   .cardTitle {
-    font-family: Poppins;
 font-size: 18px;
 font-weight: 700;
 line-height: 18.9px;
@@ -22,7 +21,6 @@ color: #011632;
   }
 
   .cardDescription {
-    font-family: Poppins;
 font-size: 18px;
 font-weight: 400;
 line-height: 27.9px;
@@ -33,7 +31,6 @@ color: #3C4959;
   }
 
   .moreButton {
-    font-family: Montserrat;
 font-size: 16px;
 font-weight: 400;
 line-height: 24.8px;

@@ -1,5 +1,4 @@
 .testimonialDesc {
-    font-family: Poppins;
 font-size: 18px;
 font-weight: 400;
 line-height: 30px;
@@ -8,7 +7,6 @@ color: black;
 }
 
 .reviewerName {
-    font-family: Poppins;
 font-size: 14px;
 font-weight: 600;
 line-height: 21px;
@@ -18,7 +16,6 @@ margin-top: 10px;
 }
 
 .reviewerProfession {
-    font-family: Poppins;
 font-size: 10px;
 font-weight: 400;
 line-height: 15px;

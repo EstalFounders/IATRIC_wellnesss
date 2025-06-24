@@ -22,8 +22,19 @@ const Demo5About2 = () => {
   return (
     <section id="about-2" className="about-section division">
       <div className="container">
+        {/* Content Boxes */}
         <div className="abox-2-holder">
-          <div className="row">
+          <div className="text-center mb-4 mt-4">
+            {/* Heading */}
+            <h2 className="steelblue-color">Welcome to Healthpath</h2>
+            <p className="mt-3">
+              At Healthpath, we are dedicated to providing exceptional
+              healthcare services. Explore our working hours, doctors'
+              timetable, and ways to get in touch with us.
+            </p>
+          </div>
+          <hr className="w-75" />
+          <div className="row mx-4">
             {/* ABOUT BOX #1 */}
             <div className="col-md-12 col-lg-4">
               <div className="abox-2">
@@ -37,27 +48,6 @@ const Demo5About2 = () => {
                       <td> - </td>
                       <td className="text-right">9:00 AM - 8:00 PM</td>
                     </tr>
-                    {/* <tr>
-                                            <td>Thursday</td>
-                                            <td> - </td>
-                                            <td className="text-right">
-                                                9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Friday</td>
-                                            <td> - </td>
-                                            <td className="text-right">
-                                                9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr>
-                                        <tr className="last-tr">
-                                            <td>Sun - Sun</td>
-                                            <td>-</td>
-                                            <td className="text-right">
-                                            9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr> */}
                   </tbody>
                 </table>
               </div>
@@ -67,12 +57,7 @@ const Demo5About2 = () => {
               <div className="abox-2">
                 <h5 className="h5-md steelblue-color">Doctors Timetable</h5>
                 {/* Text */}
-                <p>
-                  {/* An magnis nulla dolor at sapien augue iaculis purus tempor
-                  magna ipsum vitae and purus primis ipsum magna ipsum at tempus
-                  feugiat dolor impedit felis magna ipsum primis cubilia laoreet
-                  augue suscipit lectus mauris */}
-                </p>
+
                 {/* Button */}
                 <Link legacyBehavior href="/timetable">
                   <a
@@ -85,7 +70,7 @@ const Demo5About2 = () => {
               </div>
             </div>
             {/* ABOUT BOX #3 */}
-            <div className="col-md-6 col-lg-4">
+            <div className="col-md-4 col-lg-4">
               <div className="abox-2">
                 {/* Title */}
                 <h5 className="h5-md steelblue-color">Get in Touch</h5>
@@ -107,13 +92,6 @@ const Demo5About2 = () => {
                     {contact_no}
                   </a>
                 </h4>
-                <p className="mt-20">
-                  Your health is our priority at Healthpath. Whether you
-                  have questions, concerns, or need to schedule an appointment,
-                  we&apos;re here to assist you every step of the way. Committed
-                  to your satisfaction, we eagerly anticipate partnering with
-                  you on your healthcare journey.
-                </p>
               </div>
             </div>
           </div>

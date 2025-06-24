@@ -42,24 +42,24 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
           <b>Choose an option</b>
         </DialogTitle>
         <List>
-          {options ? options.map((option, index) => {
-            const IconComponent = numberToIcon[option.icon]; // Use the icon from the option directly
-            return (
-              <StyledListItem
-                button
-                key={index}
-                onClick={() => option.action()}
-                className="border mt-1"
-              >
-                <Row>
-                  <Col>
-                    {IconComponent ? <IconComponent />: ''}
-                  </Col>
-                  <Col style={{ whiteSpace: "nowrap" }}>{option.label}</Col>
-                </Row>
-              </StyledListItem>
-            );
-          }):""}
+          {options
+            ? options.map((option, index) => {
+                const IconComponent = numberToIcon[option.icon]; // Use the icon from the option directly
+                return (
+                  <StyledListItem
+                    button
+                    key={index}
+                    onClick={() => option.action()}
+                    className="border mt-1"
+                  >
+                    <Row>
+                      <Col>{IconComponent ? <IconComponent /> : ""}</Col>
+                      <Col style={{ whiteSpace: "nowrap" }}>{option.label}</Col>
+                    </Row>
+                  </StyledListItem>
+                );
+              })
+            : ""}
         </List>
       </StyledDialog>
     </ThemeProvider>
