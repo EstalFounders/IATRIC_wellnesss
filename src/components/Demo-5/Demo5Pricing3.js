@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const Demo5Pricing3 = () => {
@@ -66,17 +67,20 @@ const Demo5Pricing3 = () => {
           </div>
           {/* END PRICING TABLE */}
           {/* PRICING IMAGE */}
-          <div className="col-lg-6">
-            <div className="pricing-img">
-              <img
-                className="img-fluid"
-                src="images/image-04.png"
-                alt="pricing-image"
-              />
-            </div>
-          </div>
-        </div>
-        {/* End row */}
+                <div className="col-lg-6">
+                <div className="pricing-img">
+                  <Image
+                  width={600} 
+                  height={550}
+                  className="img-fluid"
+                  src="/images/image-04.png"
+                  alt="pricing-image"
+                  style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </div>
+                </div>
+              </div>
+              {/* End row */}
       </div>
       {/* End container */}
     </section>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Popup from "../Popup";
+import Image from "next/image";
 
 const Demo2Gallery1 = () => {
   const [image, setImage] = useState(false);
@@ -33,9 +34,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image  
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-1.jpg"
+              src="/images/gallery/image-1.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -55,9 +58,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-2.jpg"
+              src="/images/gallery/image-2.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -77,9 +82,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-3.jpg"
+              src="/images/gallery/image-3.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -99,9 +106,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-4.jpg"
+              src="/images/gallery/image-4.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -121,9 +130,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-5.jpg"
+              src="/images/gallery/image-5.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -143,9 +154,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-6.jpg"
+              src="/images/gallery/image-6.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -165,9 +178,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-7.jpg"
+              src="/images/gallery/image-7.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -187,9 +202,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-8.jpg"
+              src="/images/gallery/image-8.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />

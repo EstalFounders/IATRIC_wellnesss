@@ -21,7 +21,7 @@ const Demo5Hero5 = () => {
                 className="steelblue-color"
                 style={{ color: `${color_schema.yellow}` }}
               >
-                <b>Best Quality</b>
+                <div style={{fontWeight: '800'}}>Best Quality</div>
               </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
@@ -31,7 +31,7 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
-                <p>
+                <div className="h5">
                   Get optimal health ,{" "}
                   <strong style={{ color: `${color_schema.green}` }}>
                     ANYTIME , ANYWHERE !
@@ -39,7 +39,7 @@ const Demo5Hero5 = () => {
                   One-stop care: Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts
                   support your journey to a healthier you.
-                </p>
+                </div>
               </div>
               {/* CONTENT BOX #3 */}
               <div className="box-list grey-color mb-15">

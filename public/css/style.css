@@ -748,7 +748,6 @@ h4,
 h5,
 h6 {
   color: #222;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
   letter-spacing: -0.25px;
 }
@@ -1376,7 +1375,6 @@ ul.content-list li:last-child {
 
 span.section-id {
   font-size: 0.825rem;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   display: block;
@@ -1898,7 +1896,6 @@ span.id-color {
 
 p.header-widget-phone {
   font-size: 17px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
   margin-top: 3px;
   margin-bottom: 0;
@@ -2561,7 +2558,6 @@ p.header-widget-phone {
 .hero-form .loading {
   color: #f0f0f0;
   font-size: 17px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
 }
 
@@ -3186,7 +3182,6 @@ td.text-right {
   color: #fff;
   font-size: 16px;
   padding: 18px 0;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   border-top: none;
@@ -3361,7 +3356,6 @@ td.text-right {
 #info-8 .table th {
   font-size: 16px;
   padding: 18px 0;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   border-top: none;
@@ -3394,7 +3388,6 @@ td.text-right {
   color: #fff;
   font-size: 16px;
   padding: 18px 0;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   border-top: none;
@@ -3609,7 +3602,6 @@ td.text-right {
   background-color: transparent;
   color: #888;
   font-size: 1rem;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
   letter-spacing: -0;
   margin: 0 30px;
@@ -3815,7 +3807,10 @@ td.text-right {
     =========================================================================== */
 
 #statistic-1 {
-  background-image: url(../images/statistic.jpg);
+  background-image: url(../images/statistic1.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   padding-top: 80px;
   padding-bottom: 40px;
 }
@@ -3891,7 +3886,6 @@ td.text-right {
 
 .statistic-block p {
   font-size: 1.05rem;
-  font-family: "Lato", sans-serif;
   margin-bottom: 0;
 }
 
@@ -4271,7 +4265,6 @@ td.text-right {
 
 .pricing-table span.price {
   font-size: 70px;
-  font-family: "Lato", sans-serif;
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -4279,7 +4272,6 @@ td.text-right {
 
 .pricing-table sup {
   font-size: 45px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
   top: -7px;
   right: 2px;
@@ -4460,7 +4452,6 @@ td.text-right {
 .review-2 p {
   color: #444;
   font-size: 1.35rem;
-  font-family: "Lato", sans-serif;
   line-height: 1.35;
   font-weight: 400;
 }
@@ -4682,7 +4673,6 @@ td.text-right {
 #banner-1 .banner-details span {
   color: #444;
   font-size: 1.1rem;
-  font-family: "Lato", sans-serif;
   line-height: 2.15rem !important;
   font-weight: 400;
   position: relative;
@@ -5149,7 +5139,6 @@ a.share-ico.ico-pinterest {
 .comment-form .loading {
   color: #666;
   font-size: 17px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
 }
 
@@ -5340,7 +5329,6 @@ p.contact-notice {
 .contact-form .loading {
   color: #666;
   font-size: 17px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
 }
 
@@ -5362,7 +5350,7 @@ p.contact-notice {
 }
 
 .footer.bg-image {
-  background-image: url(../images/footer-bg.jpg);
+  background-image: url(../images/footer-bg.png);
   width: 100%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -6185,7 +6173,6 @@ ul.blog-category-list li:hover {
 .appointment-form .loading {
   color: #666;
   font-size: 17px;
-  font-family: "Lato", sans-serif;
   font-weight: 700;
 }
 
@@ -6207,7 +6194,6 @@ ul.blog-category-list li:hover {
 }
 
 .cd-schedule .timeline span {
-  font-family: "Lato", sans-serif;
   font-weight: 700;
 }
 
@@ -6313,7 +6299,6 @@ ul.blog-category-list li:hover {
 
 #terms-page p.p-notice {
   font-size: 0.915rem;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   letter-spacing: 0.5px;
 }
@@ -6399,7 +6384,6 @@ nav a#pull {
   position: fixed;
   z-index: 9999;
   font-size: 13px;
-  font-family: "Lato", sans-serif;
   overflow: hidden;
   right: -230px;
   top: 125px;
@@ -6472,7 +6456,6 @@ nav a#pull {
 #stlChanger p {
   color: #444;
   font-size: 15px;
-  font-family: "Lato", sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.5px;

@@ -7,7 +7,11 @@ import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import { api, appointment_status, doctor_info_local_storage } from "../../constant";
+import {
+  api,
+  appointment_status,
+  doctor_info_local_storage,
+} from "../../constant";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
 import { useSelector } from "react-redux";
@@ -424,7 +428,9 @@ const PrescriptionComp = () => {
                       >
                         {suggestions
                           .filter(
-                            (appointment) => appointment.status !== appointment_status.completed
+                            (appointment) =>
+                              appointment.status !==
+                              appointment_status.completed
                           )
                           .map((appointment) => (
                             <div

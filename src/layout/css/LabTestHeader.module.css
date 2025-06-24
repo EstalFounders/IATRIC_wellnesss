@@ -1,5 +1,4 @@
 .container {
-    font-family: "Montserrat";
     font-weight: 700;
     margin-top: 1rem;
   }
@@ -80,7 +79,6 @@
   }
 
   .username {
-    font-family: Montserrat;
 font-size: 14px;
 font-weight: 700;
 line-height: 17.07px;
@@ -88,7 +86,6 @@ color: #737373;
   }
 
   .usernamedropdown {
-    font-family: Montserrat;
 font-size: 16px;
 font-weight: 700;
 line-height: 19.5px;
@@ -96,7 +93,6 @@ color: black;
   }
 
   .emaildropdown {
-    font-family: Montserrat;
 font-size: 16px;
 font-weight: 500;
 line-height: 19.5px;
@@ -105,7 +101,6 @@ color: #999999;
   }
 
 .dropdownItem {
-    font-family: Montserrat;
 font-size: 14px;
 font-weight: 500;
 line-height: 17.07px;
