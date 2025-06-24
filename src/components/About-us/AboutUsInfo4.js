@@ -32,11 +32,11 @@ const AboutUsInfo4 = () => {
                 </h3>
                 {/* Text */}
                 <p>
-                  Healthpath offers a revolutionary approach to medical
-                  care, placing your convenience and well-being at the
-                  forefront. We understand the challenges of busy schedules and
-                  long wait times, which is why we&apos;ve designed a system
-                  that delivers expert medical care directly to you.
+                  Healthpath offers a revolutionary approach to medical care,
+                  placing your convenience and well-being at the forefront. We
+                  understand the challenges of busy schedules and long wait
+                  times, which is why we&apos;ve designed a system that delivers
+                  expert medical care directly to you.
                 </p>
               </div>
             </div>
@@ -63,8 +63,8 @@ const AboutUsInfo4 = () => {
                 <p className="mb-30">
                   Imagine getting expert medical attention, from online
                   consultations to personalized home visits, all without leaving
-                  your comfort zone. Healthpath provides a comprehensive
-                  suite of services, including:
+                  your comfort zone. Healthpath provides a comprehensive suite
+                  of services, including:
                 </p>
                 {/* Options List */}
                 <div className="row">

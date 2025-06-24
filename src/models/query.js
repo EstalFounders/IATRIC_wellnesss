@@ -9,7 +9,7 @@ const querySchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
+      // required: true,
     },
     mobile_number: {
       type: Number,

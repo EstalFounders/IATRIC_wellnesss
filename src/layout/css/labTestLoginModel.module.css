@@ -1,5 +1,4 @@
 .requestOtptext {
-    font-family: Montserrat;
 font-size: 32px;
 font-weight: 600;
 line-height: 39.01px;
@@ -7,7 +6,6 @@ color: black;
 }
 
 .getaccesstext {
-    font-family: Montserrat;
 font-size: 14px;
 font-weight: 400;
 line-height: 17.07px;
@@ -23,7 +21,6 @@ border: 1px solid #E6E6E6
 }
 
 .mobilenumberinput::placeholder {
-    font-family: Montserrat;
     font-size: 14px;
     font-weight: 700;
     line-height: 17.07px;
@@ -39,7 +36,6 @@ background-color: #D1ECA0;
 display: flex;
 justify-content: center;
 align-items: center;
-font-family: Montserrat;
 font-size: 14px;
 font-weight: 700;
 line-height: 17.07px;

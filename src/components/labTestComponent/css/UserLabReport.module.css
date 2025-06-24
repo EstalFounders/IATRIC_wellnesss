@@ -9,7 +9,6 @@
   }
 
   .reportsText {
-    font-family: Poppins;
 font-size: 32px;
 font-weight: 600;
 line-height: 48px;
@@ -17,7 +16,6 @@ line-height: 48px;
   }
 
   .sortByText {
-    font-family: Manrope;
 font-size: 20px;
 font-weight: 500;
 line-height: 27.32px;
@@ -44,7 +42,6 @@ padding: 12px 32px 12px 32px;
 gap: 8px;
 border-radius: 0px 8px 8px 0px;
 background-color: #DDE6C6;
-font-family: Poppins;
 font-size: 16px;
 font-weight: 400;
 line-height: 30px;
@@ -62,7 +59,6 @@ border: 1px solid #CDCDCD
   }
 
   .column {
-    font-family: Poppins;
 font-size: 18px;
 font-weight: 500;
 line-height: 27px;
@@ -70,7 +66,6 @@ color: black;
   }
 
   .columnData {
-    font-family: Poppins;
 font-size: 16px;
 font-weight: 400;
 line-height: 24px;

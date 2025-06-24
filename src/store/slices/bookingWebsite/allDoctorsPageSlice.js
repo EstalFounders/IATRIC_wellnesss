@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   allDoctors: [],
+  doctorInfo: null,
 };
 
 const allDoctorsPageSlice = createSlice({
@@ -12,11 +13,14 @@ const allDoctorsPageSlice = createSlice({
     setAllDoctors: (state, action) => {
       state.allDoctors = action.payload;
     },
+    setDoctorInfo: (state, action) => {
+      state.doctorInfo = action.payload;
+    },
   },
 });
 
 // Export actions
-export const { setAllDoctors } = allDoctorsPageSlice.actions;
+export const { setAllDoctors, setDoctorInfo } = allDoctorsPageSlice.actions;
 
 // Export reducer
 export default allDoctorsPageSlice.reducer;

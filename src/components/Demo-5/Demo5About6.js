@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -18,13 +19,13 @@ const Demo5About6 = () => {
                 Clinic with Innovative Approach to Treatment
               </h3>
               {/* CONTENT BOX #1 */}
-              <p>
+              <div className="h5 box-list grey-color">
                 Skip the long wait times and crowded waiting rooms. Access
                 professional healthcare consultations from the comfort of your
                 home, office, or anywhere with an internet connection. Our
                 flexible scheduling options allow you to fit healthcare into
                 your busy life, at your own pace.
-              </p>
+              </div>
               {/* Button */}
               <Link legacyBehavior href="/all-doctors">
                 <a
@@ -40,9 +41,11 @@ const Demo5About6 = () => {
           {/* IMAGE BLOCK */}
           <div className="col-lg-6">
             <div className="about-img text-center" data-wow-delay="0.6s">
-              <img
+              <Image  
+                width={500}
+                height={550}
                 className="img-fluid"
-                src="images/image-02.png"
+                src="/images/image-02.png"
                 alt="about-image"
               />
             </div>

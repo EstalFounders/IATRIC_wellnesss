@@ -10,6 +10,7 @@ import Image from "next/image";
 const Tabs1 = () => {
   const [showDoctor, setShowDoctor] = useState(false);
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
+  let filteredDoctors = null;
   // Initialize services with a list of services
   const [services] = useState([
     {
@@ -82,13 +83,13 @@ const Tabs1 = () => {
     {
       id: 11,
       name: "Nursing care",
-      image: "/images/nursing-care.jpg",
+      image: "/images/nursing-care.png",
       description: "Description of Nursing care...",
     },
     {
       id: 12,
       name: "Home care",
-      image: "/images/home-care.jpg",
+      image: "/images/home-care.jpeg",
       description: "Description of Home care...",
     },
     {
@@ -106,13 +107,13 @@ const Tabs1 = () => {
     {
       id: 15,
       name: "Corporate Healthcare",
-      image: "/images/corporate-healthcare.jpg",
+      image: "/images/corporate-healthcamp.jpg",
       description: "Description of Corporate Healthcare...",
     },
     {
       id: 16,
       name: "Healthcamp",
-      image: "/images/healthcamp.jpg",
+      image: "/images/heatlhcamp.jpg",
       description: "Description of Healthcamp...",
     },
     {
@@ -146,7 +147,15 @@ const Tabs1 = () => {
   );
 
   const handleServiceClick = (serviceName) => {
-    console.log(`Service clicked: ${serviceName}`);
+    filteredDoctors = doctors.filter((doctor) =>
+      doctor.serviceOffered.some(
+      (service) => service.toLowerCase() === serviceName.toLowerCase()
+      )
+    );
+    console.log(
+      `Filtered doctors for service ${serviceName}:`,
+      filteredDoctors
+    );
     router.push(
       `/department-single?serviceName=${serviceName
         .toLowerCase()
@@ -205,7 +214,7 @@ const Tabs1 = () => {
                       <div className="col-lg-6">
                         <div className="tab-img">
                           <Image
-                            width={500} 
+                            width={500}
                             height={550}
                             src={service.image}
                             alt="tab-image"
@@ -244,7 +253,7 @@ const Tabs1 = () => {
           setShowDoctor(false);
         }}
       >
-        <ViewDoctorListComp doctors={doctors} />
+        <ViewDoctorListComp doctors={filteredDoctors} />
       </ViewDoctorListModel>
     </section>
   );

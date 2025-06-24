@@ -22,7 +22,6 @@
     color: #BA1A1A;
     font-weight: bold;
     font-size: 20px;
-    font-family: Montserrat;
 font-weight: 700;
 line-height: 31.69px;
 
@@ -31,7 +30,6 @@ line-height: 31.69px;
   .price {
     font-size: 16px;
     font-weight: bold;
-    font-family: Montserrat;
 font-weight: 500;
 line-height: 31.69px;
 text-align: left;
@@ -45,7 +43,6 @@ top: 15px;
     color: #A0A0A0;
     font-size: 14px;
     margin-left: 5px;
-    font-family: Montserrat;
 font-weight: 400;
 line-height: 17.07px;
 text-align: left;
@@ -54,7 +51,6 @@ text-align: left;
   
   .title {
     margin-left: 5%;
-    font-family: Poppins;
 font-size: 24px;
 font-weight: 500;
 line-height: 28.8px;
@@ -75,7 +71,6 @@ color: #011632;
     height: 33px;
     gap: 4px;
     border-radius: 8px;
-    font-family: Montserrat;
     font-size: 14px;
     font-weight: 700;
     line-height: 17.07px;
@@ -101,7 +96,6 @@ align-items: center;
     height: 33px;
     gap: 4px;
     border-radius: 8px;
-    font-family: Montserrat;
 font-size: 14px;
 font-weight: 700;
 line-height: 17.07px;
