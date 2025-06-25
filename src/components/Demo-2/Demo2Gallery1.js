@@ -20,7 +20,7 @@ const Demo2Gallery1 = () => {
             <h3 className="h3-md steelblue-color">Your Partner in Health</h3>
             {/* Text */}
             <p>
-              At Healthpath, we're more than just a <strong>healthcare provider</strong>; we're truly <strong>your partner in health</strong>. We walk alongside you on your entire <strong>wellness journey</strong>, committed to helping you achieve your personal health goals.
+              At Healthpath, we&apos;re more than just a <strong>healthcare provider</strong>; we&apos;re truly <strong>your partner in health</strong>. We walk alongside you on your entire <strong>wellness journey</strong>, committed to helping you achieve your personal health goals.
             </p><br></br>
             <p>
               We offer <strong>personalized care</strong>, dedicated support, and essential resources every step of the way. With Healthpath, you gain a trusted ally focused on your <strong>long-term well-being</strong>, ensuring you receive the <strong>comprehensive care</strong> and guidance you need to thrive. Choose Healthpath for a collaborative approach to your health, where your success is our shared mission.
