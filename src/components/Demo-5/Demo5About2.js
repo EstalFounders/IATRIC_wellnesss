@@ -27,10 +27,10 @@ const Demo5About2 = () => {
           <div className="text-center mb-4 mt-4">
             {/* Heading */}
             <h2 className="steelblue-color">Welcome to Healthpath</h2>
-            <p className="mt-3">
+            <p className="h5 box-list grey-color mx-5">
               At Healthpath, we are dedicated to providing exceptional
-              healthcare services. Explore our working hours, doctors'
-              timetable, and ways to get in touch with us.
+              healthcare services. Explore our working hours, doctor&apos;s
+              timetable and ways to get in touch with us.
             </p>
           </div>
           <hr className="w-75" />

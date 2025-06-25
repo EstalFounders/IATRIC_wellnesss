@@ -28,7 +28,7 @@ const Footer4 = () => {
 
   return (
     <footer className="bg-image wide-40 footer division">
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         {/* FOOTER CONTENT */}
         <div className="row">
           {/* FOOTER INFO */}

@@ -17,7 +17,7 @@ const Demo5Blog1 = () => {
             </span>
             {/* Text */}
             <p>
-              Welcome to Healthpath's dynamic content hub! This is where we share <strong>compelling patient success stories</strong>, provide <strong>actionable health tips</strong>, and keep you informed with the <strong>latest healthcare news and updates</strong>. We're dedicated to empowering you with valuable information to support your well-being journey.
+              Welcome to Healthpath&apos;s dynamic content hub! This is where we share <strong>compelling patient success stories</strong>, provide <strong>actionable health tips</strong>, and keep you informed with the <strong>latest healthcare news and updates</strong>. We&apos;re dedicated to empowering you with valuable information to support your well-being journey.
             </p>
           </div>
         </div>

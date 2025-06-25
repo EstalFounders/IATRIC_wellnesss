@@ -223,20 +223,20 @@ const Tabs1 = () => {
                       </div>
                       <div className="col-lg-6">
                         <div className="txt-block pc-30">
-                          <div
-                            className="h1 steelblue-color clickable-div"
+                          <h3
+                            className="h3-md text- clickable-div"
                             style={{ cursor: "pointer" }}
                             onMouseEnter={(e) =>
                               (e.target.style.color = "#0056b3")
                             }
                             onMouseLeave={(e) =>
-                              (e.target.style.color = "steelblue")
+                              (e.target.style.color = "black")
                             }
                             onClick={() => handleServiceClick(service.name)}
                           >
                             {service.name}
-                          </div>
-                          <div className="mb-30">{service.description}</div>
+                          </h3>
+                          <div className="h5 box-list grey-color">{service.description}</div>
                         </div>
                       </div>
                     </div>

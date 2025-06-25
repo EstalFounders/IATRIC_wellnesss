@@ -16,13 +16,13 @@ const Demo5Pricing3 = () => {
                 Invest in Your Health, Affordably
               </h3>
               {/* Text */}
-              <p>
-                At Healthpath, we believe <strong>high-quality healthcare</strong> should be accessible and <strong>affordable</strong> for everyone. Discover how Healthpath makes <strong>affordable healthcare accessible</strong> by all in reality. We're committed to providing <strong>value-driven medical care</strong> that empowers you to take control of your health journey, affordably.
+              <p class="h5 box-list grey-color">
+                At Healthpath, we believe <strong>high-quality healthcare</strong> should be accessible and <strong>affordable</strong> for everyone. Discover how Healthpath makes <strong>affordable healthcare accessible</strong> by all in reality. We&apos;re committed to providing <strong>value-driven medical care</strong> that empowers you to take control of your health journey, affordably.
               </p>
-              <p>
+              <p class="h5 box-list grey-color">
                 Explore our plans and find the perfect fit for your needs today.
               </p>
-              <div className="pricing-table mb-40">
+              <div className="pricing-table mb-40 h5 box-list grey-color">
                 <table className="table table-hover">
                   <thead>
                     <tr>
@@ -67,20 +67,20 @@ const Demo5Pricing3 = () => {
           </div>
           {/* END PRICING TABLE */}
           {/* PRICING IMAGE */}
-                <div className="col-lg-6">
-                <div className="pricing-img">
-                  <Image
-                  width={600} 
-                  height={550}
-                  className="img-fluid"
-                  src="/images/image-04.png"
-                  alt="pricing-image"
-                  style={{ borderRadius: "50%", objectFit: "cover" }}
-                  />
-                </div>
-                </div>
-              </div>
-              {/* End row */}
+          <div className="col-lg-6">
+            <div className="pricing-img">
+              <Image
+                width={600}
+                height={550}
+                className="img-fluid"
+                src="/images/image-04.png"
+                alt="pricing-image"
+                style={{ borderRadius: "50%", objectFit: "cover" }}
+              />
+            </div>
+          </div>
+        </div>
+        {/* End row */}
       </div>
       {/* End container */}
     </section>
