@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const Banner5 = () => {
@@ -24,9 +25,11 @@ const Banner5 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1">
             <div className="banner-5-img" data-wow-delay="0.4s">
-              <img
+              <Image
+                width={800}
+                height={600}
                 className="img-fluid"
-                src="images/image-07.png"
+                src="/images/image-07.png"
                 alt="banner-image"
               />
             </div>
