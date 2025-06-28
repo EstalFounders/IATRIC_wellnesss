@@ -40,10 +40,10 @@ const DoctorsSection = () => {
             <h3 className="h3-md steelblue-color">Our Medical Specialists</h3>
             {/* Text */}
             <p>
-              At Healthpath, we believe <strong>expert healthcare guidance</strong> should always be within reach. That's why our team of <strong>highly qualified medical specialists</strong> is available to provide you with reliable advice and support, <strong>even beyond traditional office hours</strong>.
+              At Healthpath, we believe <strong>expert healthcare guidance</strong> should always be within reach. That&apos;s why our team of <strong>highly qualified medical specialists</strong> is available to provide you with reliable advice and support, <strong>even beyond traditional office hours</strong>.
             </p>
             <p> <br></br>
-              We understand life doesn't follow a 9-to-5 schedule. That's why we offer a range of convenient options to <strong>connect with a certified healthcare professional</strong> precisely when you need it most. Whether you're seeking a <strong>virtual consultation</strong>, need urgent advice, or simply have a health question, our <strong>online doctors</strong> are here to ensure you receive timely, expert care from the comfort of your home. Get peace of mind with Healthpath's accessible and <strong>reliable telemedicine services</strong>.
+              We understand life doesn&apos;t follow a 9-to-5 schedule. That&apos;s why we offer a range of convenient options to <strong>connect with a certified healthcare professional</strong> precisely when you need it most. Whether you&apos;re seeking a <strong>virtual consultation</strong>, need urgent advice, or simply have a health question, our <strong>online doctors</strong> are here to ensure you receive timely, expert care from the comfort of your home. Get peace of mind with Healthpath&apos;s accessible and <strong>reliable telemedicine services</strong>.
             </p>
           </div>
         </div>

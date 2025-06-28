@@ -31,9 +31,9 @@ const About5 = () => {
               </h3>
               {/* Text */}
                       <div className="h5 box-list grey-color">
-                      At Healthpath, we're dedicated to your well-being. Whether you
+                      At Healthpath, we&apos;re dedicated to your well-being. Whether you
                       have questions, concerns, or need to schedule an appointment,
-                      our team is here to assist you every step of the way. We're
+                      our team is here to assist you every step of the way. We&apos;re
                       committed to your satisfaction and eagerly anticipate partnering
                       with you on your healthcare journey
                       </div>
