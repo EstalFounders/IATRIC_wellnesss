@@ -112,7 +112,6 @@ export default async function handler(req, res) {
       let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
       console.log("111");
       let slot = selectedSlot === "" ? null : selectedSlot;
-      let doctor;
 
       // Determine current or specific time
       const now = new Date();
