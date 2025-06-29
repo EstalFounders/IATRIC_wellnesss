@@ -6,6 +6,7 @@ import { MdMedicalServices, MdOutlineQueryStats, MdUpdate } from "react-icons/md
 import { ImLab } from "react-icons/im";
 import { BiSolidOffer } from "react-icons/bi";
 import { TbFileInvoice } from "react-icons/tb";
+import { FaBookMedical } from "react-icons/fa";
 
 export const SidebarData = [
   {
@@ -18,6 +19,12 @@ export const SidebarData = [
     title: "ADD DOCTOR",
     path: "/superAdmin/addDoctor",
     icon: <IoIcons.IoIosPaper />,
+    cName: "nav-text",
+  },
+  {
+    title: "BOOK CONSULTATION",
+    path: "/superAdmin/bookConsultationFromAdmin",
+    icon: <FaBookMedical />,
     cName: "nav-text",
   },
   {

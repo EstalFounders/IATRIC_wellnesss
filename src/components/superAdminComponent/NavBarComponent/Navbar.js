@@ -40,16 +40,18 @@ function Navbar() {
               </div>
             </li>
             {SidebarData.map((item, index) => {
-              return (
+                return (
                 <li key={index} className={item.cName}>
                   <Link href={item.path}>
-                    <div>
-                      {item.icon}
-                      <span className={styles.span}>{item.title}</span>
-                    </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    {item.icon}
+                    <span className={styles.span} style={{ marginLeft: "8px", whiteSpace: "nowrap" }}>
+                    {item.title}
+                    </span>
+                  </div>
                   </Link>
                 </li>
-              );
+                );
             })}
           </ul>
         </nav>
