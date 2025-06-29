@@ -8,7 +8,7 @@ const Demo5Pricing3 = () => {
         <div className="row d-flex align-items-center">
           {/* PRICING TABLE */}
           <div className="col-lg-6">
-            <div className="txt-block pc-30 mb-40" data-wow-delay="0.4s">
+            <div className="txt-block pc-30 mb-40 data-wow-delay" data-wow-delay="0.4s">
               {/* Section ID */}
               <h4 className="section-id blue-color">Healthpath Pricing</h4>
               {/* Title */}
