@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from "uuid";
 
 export const animation = () => {
   if (typeof window !== "undefined") {
-    window.WOW = require("wowjs");
+     window.WOW = require("wowjs");
   }
-  new WOW.WOW().init();
+  new WOW.WOW({ live: false, mobile: true }).init();
 };
 export const stickyNav = () => {
   let offset = window.scrollY;

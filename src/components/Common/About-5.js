@@ -8,7 +8,7 @@ const About5 = () => {
         <div className="row d-flex align-items-center">
           {/* IMAGE BLOCK */}
           <div className="col-lg-6">
-            <div className="about-img text-center" data-wow-delay="0.6s">
+            <div className="about-img text-center wow fadeInUp" data-wow-delay="0.6s">
               <Image
                 width={500}
                 height={700}
@@ -20,7 +20,7 @@ const About5 = () => {
           </div>
           {/* TEXT BLOCK */}
           <div className="col-lg-6">
-            <div className="pc-30" data-wow-delay="0.4s">
+            <div className="pc-30 wow fadeInUp" data-wow-delay="0.4s">
               {/* Section ID */}
               <span className="section-id blue-color">
                 <h5>Welcome to Healthpath</h5>
