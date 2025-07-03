@@ -268,7 +268,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 />
               </a>
             </div>
-            <ul className="wsmenu-list">
+            <ul className="wsmenu-list h6 font-weight-bold">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
                 <Link legacyBehavior href="/">
@@ -291,7 +291,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                     <div className="row">
                       {/* MEGAMENU LINKS */}
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Standard Pages:</li>
+                        {/* <li className="title">Standard Pages:</li> */}
                         <li>
                           <Link legacyBehavior href="/about-us">
                             <a>About Us</a>
@@ -325,7 +325,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                       </ul>
                       {/* MEGAMENU LINKS */}
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Medical Pages:</li>
+                        {/* <li className="title">Medical Pages:</li> */}
                         <li>
                           <Link legacyBehavior href="/all-departments">
                             <a>Our Departments</a>
@@ -344,7 +344,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                       </ul>
                       {/* MEGAMENU LINKS */}
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Special Pages:</li>
+                        {/* <li className="title">Special Pages:</li> */}
                         <li>
                           <Link legacyBehavior href="/pricing-1">
                             <a>Pricing Packages #1</a>
@@ -373,7 +373,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                       </ul>
                       {/* MEGAMENU LINKS */}
                       <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Auxiliary Pages:</li>
+                        {/* <li className="title">Auxiliary Pages:</li> */}
                         <li>
                           <Link legacyBehavior href="/gallery">
                             <a>Our Gallery</a>

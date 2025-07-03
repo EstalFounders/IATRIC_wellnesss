@@ -14,7 +14,7 @@ const Demo2Reviews2 = () => {
             {/* Title 	*/}
             <h3 className="h3-md steelblue-color">What Our Patients Say</h3>
             {/* Text */}
-            <p>
+            <p className="h5 box-list grey-color">
               At Healthpath, the heart of our success lies in the positive experiences of our patients. We&apos;re incredibly proud of the trust placed in us and the real difference we make in people&apos;s lives. Here&apos;s what some of our patients have to say about their Healthpath experience:
             </p>
           </div>

@@ -26,77 +26,34 @@ const WhoWeAreInfo1 = () => {
             >
               {/* Section ID */}
               <span className="section-id blue-color">
-                Welcome to MedService
+                <h5>Welcome to HealthPath</h5>
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
-                Clinic with Innovative Approach to Treatment
+                Who We Are: Your Pan-India Healthcare Partner
               </h3>
               {/* Text */}
-              <p className="mb-30">
-                An enim nullam tempor sapien gravida donec enim ipsum blandit
-                porta justo integer odio velna vitae auctor integer congue magna
-                at pretium purus pretium ligula rutrum itae laoreet augue
-                posuere and curae integer congue leo metus mollis primis and
-                mauris
+              <p className="h5 box-list grey-color">
+                At Health Path, we understand that managing your family&apos;s health
+                can be a challenge in today&apos;s fast-paced world. That&apos;s why we&apos;ve
+                built a comprehensive healthcare network designed to be your
+                trusted partner across <b>all of India.</b> Our dedicated team
+                of
+                <b>qualified doctors</b> and healthcare professionals is
+                committed to making health a priority for you and your loved
+                ones, no matter where you are or how busy your schedule.
               </p>
-              {/* Options List */}
-              <div className="row">
-                <div className="col-xl-6">
-                  {/* Option #1 */}
-                  <div className="box-list m-top-15">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">
-                      Nemo ipsam egestas volute and turpis dolores quaerat
-                    </p>
-                  </div>
-                  {/* Option #2 */}
-                  <div className="box-list">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">Magna luctus tempor</p>
-                  </div>
-                  {/* Option #3 */}
-                  <div className="box-list">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">
-                      An enim nullam tempor at pretium purus blandit
-                    </p>
-                  </div>
-                </div>
-                <div className="col-xl-6">
-                  {/* Option #4 */}
-                  <div className="box-list">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">
-                      Magna luctus tempor blandit a vitae suscipit mollis
-                    </p>
-                  </div>
-                  {/* Option #5 */}
-                  <div className="box-list m-top-15">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">
-                      Nemo ipsam egestas volute turpis dolores quaerat
-                    </p>
-                  </div>
-                  {/* Option #6 */}
-                  <div className="box-list">
-                    <div className="box-list-icon blue-color">
-                      <i className="fas fa-angle-double-right" />
-                    </div>
-                    <p className="p-sm">An enim nullam tempor</p>
-                  </div>
-                </div>
-              </div>
+              <h4 className="h3-md steelblue-color">
+                Healthcare, Anywhere, Anytime
+              </h4>
+              <p className="h5 box-list grey-color">
+                Gone are the days of hassle and long waits. With Health Path,
+                expert <b>medical consultation</b> is just a <b>call away</b>. We provide
+                <b>all-India healthcare consultations,</b> bringing quality medical
+                advice directly to you, whenever you need it. Our goal is to
+                simplify your healthcare journey, ensuring you get the care you
+                need without disrupting your hectic life.
+              </p>
               {/* End Options List */}
             </div>
           </div>
