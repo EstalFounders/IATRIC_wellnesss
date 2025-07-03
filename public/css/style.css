@@ -1679,6 +1679,7 @@ span.id-color {
   display: block;
   padding: 5px 15px 5px 15px;
   margin-left: 0;
+  
 }
 
 #header-2 .wsmainfull.cloned .header-button {
@@ -2948,6 +2949,7 @@ td.text-right {
 }
 
 .sbox-7 {
+  
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 6px;
@@ -3463,7 +3465,7 @@ td.text-right {
 .info-9-img {
   background-image: url(../images/info-9.jpg);
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center;
   background-size: cover;
   position: absolute;
   top: 0;
@@ -5949,7 +5951,7 @@ ul.blog-category-list li:hover {
 
 #breadcrumb {
   background-image: url(../images/breadcrumb.jpg);
-  background-position: center center;
+  background-size: cover;
 }
 
 .breadcrumb-holder {
