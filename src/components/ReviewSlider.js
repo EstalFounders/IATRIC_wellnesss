@@ -4,8 +4,8 @@ import Image from "next/image";
 
 const ReviewSlider = () => {
   return (
-    <div className="row">
-      <div className="col-md-12">
+        <div className="row">
+          <div className="col-md-12">
         <Swiper
           {...testimonial2Props}
           className="owl-carousel owl-theme reviews-holder"
@@ -274,7 +274,7 @@ const ReviewSlider = () => {
                 <Image
                   width={100}
                   height={100}
-                  src="/images/review-author-10.jpg"
+                  src="/images/review-author-8.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
@@ -293,7 +293,7 @@ const ReviewSlider = () => {
           <div className="owl-dots"></div>
         </Swiper>
       </div>
-    </div>
+        </div>
   );
 };
 
