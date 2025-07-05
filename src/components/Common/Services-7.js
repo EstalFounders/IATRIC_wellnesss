@@ -30,24 +30,26 @@ const Services7 = () => {
         <div className="row">
           {/* SERVICE BOXES */}
           <div className="col-lg-8">
-            <div className="row">
+            <div className="row align-items-stretch">
               {/* SERVICE BOX #1 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="0.4s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="0.4s">
                   <Link legacyBehavior href="/service-1">
                     <a>
-                      {/* Icon */}
                       <span className="flaticon-137-doctor blue-color" />
-                      {/* Text */}
                       <div className="sbox-7-txt">
-                        {/* Title */}
                         <h5 className="h5-sm steelblue-color">
                           Top Level Doctors
                         </h5>
-                        {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          Access <b>India&apos;s leading medical experts</b> from
+                          anywhere. Our highly qualified and experienced doctors
+                          provide
+                          <b> exceptional, personalized care.</b> Trust
+                          Healthpath for
+                          <b> top-tier medical consultations</b> and your best
+                          health outcomes. Experience healthcare delivered by
+                          the best.
                         </p>
                       </div>
                     </a>
@@ -56,8 +58,8 @@ const Services7 = () => {
               </div>
               {/* END SERVICE BOX #1 */}
               {/* SERVICE BOX #2 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="0.6s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="0.6s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -70,8 +72,12 @@ const Services7 = () => {
                         </h5>
                         {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          At Healthpath, your health is supported by the{" "}
+                          <b>latest medical technology.</b> We utilize{" "}
+                          <b>state-of-the-art equipment</b> for precise
+                          diagnostics and effective treatments. This commitment
+                          ensures <b>accurate results and superior care,</b>{" "}
+                          empowering your journey to wellness.
                         </p>
                       </div>
                     </a>
@@ -80,8 +86,8 @@ const Services7 = () => {
               </div>
               {/* END SERVICE BOX #2 */}
               {/* SERVICE BOX #3 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="0.8s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="0.8s">
                   <Link legacyBehavior href="/service-1">
                     <a>
                       {/* Icon */}
@@ -94,8 +100,14 @@ const Services7 = () => {
                         </h5>
                         {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          Healthpath connects you with{" "}
+                          <b>top-tier medical facilities</b> across India. We
+                          ensure access to{" "}
+                          <b>modern infrastructure and advanced technology.</b>{" "}
+                          Experience
+                          <b>safe, comfortable environments</b> for all your
+                          treatment needs. Trust Healthpath for{" "}
+                          <b>high-quality, accessible care.</b>
                         </p>
                       </div>
                     </a>
@@ -104,8 +116,8 @@ const Services7 = () => {
               </div>
               {/* END SERVICE BOX #3*/}
               {/* SERVICE BOX #4 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="1s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="1s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -118,8 +130,12 @@ const Services7 = () => {
                         </h5>
                         {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          Experience expert medical care tailored to your needs.
+                          <b>Our highly qualified doctors and nurses</b> provide
+                          comprehensive support,{" "}
+                          <b>ensuring your well-being.</b> Trust Healthpath for
+                          reliable, high-quality healthcare
+                          <b>services across India.</b>
                         </p>
                       </div>
                     </a>
@@ -128,8 +144,8 @@ const Services7 = () => {
               </div>
               {/* END SERVICE BOX #4 */}
               {/* SERVICE BOX #5 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="1.2s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="1.2s">
                   <Link legacyBehavior href="/service-1">
                     <a>
                       {/* Icon */}
@@ -142,8 +158,14 @@ const Services7 = () => {
                         </h5>
                         {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          <b>
+                            Immediate medical assistance is just a call away.
+                          </b>
+                          Healthpath provides rapid, reliable emergency support
+                          for urgent medical needs. Our expert team ensures
+                          prompt attention and care, wherever you are. Trust
+                          Healthpath for swift and efficient emergency
+                          healthcare when it matters most.
                         </p>
                       </div>
                     </a>
@@ -152,8 +174,8 @@ const Services7 = () => {
               </div>
               {/* END SERVICE BOX #5 */}
               {/* SERVICE BOX #6 */}
-              <div className="col-md-6">
-                <div className="sbox-7 icon-xs" data-wow-delay="1.4s">
+              <div className="col-md-6 mb-4">
+                <div className="sbox-7 icon-xs h-100" data-wow-delay="1.4s">
                   <Link legacyBehavior href="/service-2">
                     <a>
                       {/* Icon */}
@@ -166,8 +188,14 @@ const Services7 = () => {
                         </h5>
                         {/* Text */}
                         <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
+                          <b>
+                            Immediate medical assistance is just a call away.
+                          </b>
+                          Healthpath provides rapid, reliable emergency support
+                          for urgent medical needs. Our expert team ensures
+                          prompt attention and care, wherever you are. Trust
+                          Healthpath for swift and efficient emergency
+                          healthcare when it matters most.
                         </p>
                       </div>
                     </a>
@@ -185,12 +213,19 @@ const Services7 = () => {
               data-wow-delay="0.6s"
             >
               {/* Title */}
-              <h4 className="h4-xs">Opening Hours:</h4>
+              <h4 className="h4-xs">
+                Healthpath: Your Convenient Path to healthier life , Open Daily
+              </h4>
               {/* Text */}
-              <p className="p-sm">
-                Start Your Journey to a Healthier You Don&apos;t let a busy
-                schedule or long distances prevent you from receiving the
-                medical attention you deserve.
+              <p className="p-md">
+                Don&apos;t let a busy schedule or long distances prevent you from
+                receiving the medical attention you deserve. At Healthpath, we
+                make prioritizing your health simple and accessible. Our doors
+                are open seven days a week, from 8:00 AM to 8:00 PM (Monday –
+                Sunday), ensuring you can access expert medical care when it&apos;s
+                most convenient for you. Contact Healthpath today and experience
+                a clinic with a truly innovative approach to treatment, designed
+                around your life. Start your journey to a healthier you with us!
               </p>
               {/* Table */}
               <table className="table">
@@ -203,21 +238,21 @@ const Services7 = () => {
                   <tr>
                     <td>Saturday</td>
                     <td>-</td>
-                    <td className="text-right">10:00 AM - 6:00 PM</td>
+                    <td className="text-right">8:00 AM - 8:00 PM</td>
                   </tr>
                   <tr>
                     <td>Sunday</td>
                     <td>-</td>
-                    <td className="text-right">10:00 AM - 4:00 PM</td>
+                    <td className="text-right">8:00 AM - 8:00 PM</td>
                   </tr>
                 </tbody>
               </table>
               {/* Title */}
               {/* <h5 className="h5-sm">Need a personal health plan?</h5> */}
               {/* Text */}
-              <p className="p-sm">
-                Contact Healthpath today and experience a clinic with a
-                truly innovative approach to treatment.
+              <p className="h5 box-list">
+                Contact Healthpath today and experience a clinic with a truly
+                innovative approach to treatment.
                 <br />
                 <Button
                   onClick={(e) => {

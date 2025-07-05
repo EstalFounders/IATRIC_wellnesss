@@ -16,43 +16,38 @@ const AboutUsVideo2 = () => {
               className="video-preview mb-40 text-center"
               data-wow-delay="0.6s"
             >
+      {/* {video && <Popup close={setVideo} />} */}
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-10 offset-lg-1 section-title">
+            <div data-wow-delay="0.6s">
+              <button
+                className="video-btn ico-90"
+                onClick={() => setVideo(true)}
+              >
+                <span className="ico-90">
+                  <FaPlay />
+                </span>
+              </button>
+              <video width="100%" height="900px" controls>
+                <source src="/about_us_Vedio_540.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
               {/* Change the link HERE!!! */}
-              <Link legacyBehavior href="#">
-                <a
-                  className="video-popup1"
-                  href="#"
-                  onClick={() => setVideo(true)}
-                >
-                  {/* Play Icon */}
-                  <div className="video-btn play-icon-blue">
-                    <div className="video-block-wrapper">
-                      {/* <i className="fas fa-play" /> */}
-                      <FaPlay size={50} />
-                    </div>
-                  </div>
-                  {/* Preview */}
-                  <img
-                    className="img-fluid"
-                    src="images/video-1.png"
-                    alt="video-photo"
-                  />
-                </a>
-              </Link>
             </div>
           </div>
-          {/* END VIDEO LINK */}
-          {/* VIDEO TEXT */}
-          <div className="col-lg-6">
-            <div className="txt-block pc-30 mb-40" data-wow-delay="0.4s">
+          <div className="col-md-12 text-center">
+          <div className="txt-block pc-30 mb-40" data-wow-delay="0.4s">
               {/* Section ID */}
               <span className="section-id blue-color">
                 <h4>Community care</h4>
+                <h5>Community care</h5>
               </span>
               {/* Title */}
               <h3 className="h3-md text-dark">Beyond Individual Care:</h3>
               {/* CONTENT BOX #1 */}
               <div className="box-list m-top-15">
-                <div className="box-list-icon">
+                {/* <div className="box-list-icon">
                   <i className="fas fa-genderless" />
                 </div>
                 <div>
@@ -63,11 +58,61 @@ const AboutUsVideo2 = () => {
                   workplaces and schools, making preventive healthcare
                   accessible to everyone.
                 </div>
+                </div> */}
+                <p className="h5 box-list grey-color">
+                  At Healthpath, we extend our commitment beyond individual care
+                  to foster the health and well-being of the entire community.
+                  We believe in promoting a proactive culture of wellness and
+                  making preventive healthcare accessible to everyone.
+                </p>
+                <h3 className="h3-md steelblue-color">
+                  Corporate & Occupational Health
+                </h3>
+                <p className="h5 box-list grey-color">
+                  We partner with companies across India to establish and manage
+                  <b>occupational health centers</b>, ensuring your employees
+                  remain
+                  <b>healthy, productive, and safe.</b> Our solutions help
+                  businesses reduce absenteeism and improve morale.
+                </p>
+                <h3 className="h3-md steelblue-color">
+                  Community Health Initiatives
+                </h3>
+                <p className="h5 box-list grey-color">
+                  Healthpath brings healthcare closer to you through:
+                  <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+                    <li>
+                      <p className="p-sm">
+                        <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
+                          Workplace Health Camps:
+                        </b>{" "}
+                        Offering <b>preventive screenings</b> and wellness
+                        programs directly at workplaces , contributing to a
+                        healthier workforce.
+                      </p>
+                    </li>
+                    <li>
+                      <p className="p-sm">
+                        <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
+                          School Health Programs:
+                        </b>{" "}
+                        Conducting <b>health camps and educational workshops</b>{" "}
+                        in schools to promote hygiene and well-being among
+                        students.
+                      </p>
+                    </li>
+                  </ul>
+                </p>
+                <p className="h5 box-list grey-color">
+                  By bringing these vital services to your doorstep, Healthpath
+                  makes preventive healthcare convenient and achievable for more
+                  individuals in our community. Join us in building a healthier
+                  community.
+                </p>
               </div>
             </div>
-          </div>
+            </div>
         </div>
-        {/* End row */}
       </div>
       {/* End container */}
     </section>

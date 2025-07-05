@@ -19,12 +19,41 @@ const Banner5 = () => {
             <div className="mt-3">
               At Healthpath, we empower you to confidently <strong>reach your wellness goals</strong> through a combination of cutting-edge <strong>telemedicine services</strong> and a steadfast commitment to your well-being. Experience the difference of <strong>expert healthcare</strong> that truly understands and supports you every step of the way.
             </div>
+            <h3 className="h3-md steelblue-color">
+              Exceptional Healthcare Across India: Expert Care, Tailored to You
+            </h3>
+            {/* Text */}
+            <p className="h5 box-list grey-color">
+              Start your journey to optimal health with <b>Healthpath,</b> your
+              trusted partner for <b>exceptional medical care.</b> We believe
+              healthcare should be as unique as you are, which is why we offer
+              meticulously <b>personalized treatment plans</b> designed to meet
+              your specific needs. Every service is delivered by our team of{" "}
+              <b>highly qualified and and compassionate healthcare experts.</b>
+            </p>
+            <p className="h5 box-list grey-color">
+              At Healthpath, we empower you to confidently{" "}
+              <b>reach your wellness goals.</b> We achieve this through a
+              powerful combination of <b>cutting-edge telemedicine services</b>{" "}
+              and an unwavering commitment to your overall well-being. Whether
+              you&apos;re seeking online consultations or comprehensive home care,
+              our experts are dedicated to providing the highest standard of
+              medical support.
+            </p>
+            <p className="h5 box-list grey-color">
+              Experience the Healthpath difference:{" "}
+              <b>
+                expert healthcare that truly understands and supports you every
+                step of the way
+              </b>{" "}
+              on your path to optimal health, wherever you are in India.
+            </p>
           </div>
         </div>
         {/* BANNER IMAGE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1">
-            <div className="banner-5-img" data-wow-delay="0.4s">
+            <div className="banner-5-img wow fadeInUp" data-wow-delay="0.4s">
               <Image
                 width={800}
                 height={600}
