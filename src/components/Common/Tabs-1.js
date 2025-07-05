@@ -17,6 +17,7 @@ const Tabs1 = () => {
       id: 0,
       name: "General Physician",
       image: "/images/general_physicians.jpg",
+      subheading: "Primary Care, Always Accessible",
       description:
         "General Physician: Your Health Partner.Feel better, faster. Our General Physicians provide trusted care for all your health needs. Choose between a convenient online consultation or an in-person visit. We're committed to reaching patients everywhere, making quality healthcare truly accessible. Receive your prescription instantly on your phone after your consultation.",
     },
@@ -24,102 +25,119 @@ const Tabs1 = () => {
       id: 1,
       name: "Pediatrics",
       image: "/images/pediatrics.jpg",
+      subheading: "Child Health, Expertly Delivered",
       description: "Description of Pediatrics service...",
     },
     {
       id: 2,
       name: "Cardiology",
       image: "/images/Cardiology_700x700.jpeg",
+      subheading: "Heart Wellness, Trusted Monitoring",
       description: "Description of Cardiology service...",
     },
     {
       id: 3,
       name: "Dermatologist",
       image: "/images/dermalogist.jpg",
+      subheading: "Skin Solutions, Clinically Proven",
       description: "Description of Dermatologist service...",
     },
     {
       id: 4,
       name: "Orthopaedics",
       image: "/images/orthopedics.jpg",
+      subheading: "Mobility Support, Expert Care",
       description: "Description of Orthopaedics...",
     },
     {
       id: 5,
       name: "Gynaecology",
       image: "/images/gynecologist.jpg",
+      subheading: "Women's Health, Expert Guidance",
       description: "Description of Gynaecology...",
     },
     {
       id: 6,
       name: "Ophthalmology",
       image: "/images/ophthalmology.jpg",
+      subheading: "Vision Care You Can Trust",
       description: "Description of Ophthalmology...",
     },
     {
       id: 7,
       name: "Pulmonology",
       image: "/images/pulmonology.jpg",
+      subheading: "Respiratory Relief, Specialist Care",
       description: "Description of Pulmonology...",
     },
     {
       id: 8,
       name: "Psychiatrist",
       image: "/images/Psychiatrist.jpg",
+      subheading: "Mind Wellness, Confidential Support",
       description: "Description of Psychiatrist...",
     },
     {
       id: 9,
       name: "Dentistry",
       image: "/images/dentistry.jpg",
+      subheading: "Dental Care, Patient-Focused",
       description: "Description of Dentistry...",
     },
     {
       id: 10,
       name: "Physiotherapy",
       image: "/images/Physiotherapy.jpg",
+      subheading: "Rehab Services, Movement Recovery",
       description: "Description of Physiotherapy...",
     },
     {
       id: 11,
       name: "Nursing care",
       image: "/images/nursing-care.png",
+      subheading: "Skilled Support, Compassionate Touch",
       description: "Description of Nursing care...",
     },
     {
       id: 12,
       name: "Home care",
       image: "/images/home-care.jpeg",
+      subheading: "In-Home Medical Assistance",
       description: "Description of Home care...",
     },
     {
       id: 13,
       name: "Medicine Delivery",
       image: "/images/medicine-delivery.jpg",
+      subheading: "Quick Access to Medications",
       description: "Description of Medicine Delivery...",
     },
     {
       id: 14,
       name: "Lab Investigation",
       image: "/images/lab-investigation.jpg",
+      subheading: "Accurate Results, On Your Schedule",
       description: "Description of Lab Investigation...",
     },
     {
       id: 15,
       name: "Corporate Healthcare",
       image: "/images/corporate-healthcamp.jpg",
+      subheading: "Workplace Wellness Simplified",
       description: "Description of Corporate Healthcare...",
     },
     {
       id: 16,
       name: "Healthcamp",
       image: "/images/heatlhcamp.jpg",
+      subheading: "Community Checkups & Screenings",
       description: "Description of Healthcamp...",
     },
     {
       id: 17,
       name: "Obstetrics",
       image: "/images/Obstetrics.jpg",
+      subheading: "Safe Delivery, Expert Care",
       description: "Description of Obstetrics...",
     },
   ]);
@@ -149,7 +167,7 @@ const Tabs1 = () => {
   const handleServiceClick = (serviceName) => {
     filteredDoctors = doctors.filter((doctor) =>
       doctor.serviceOffered.some(
-      (service) => service.toLowerCase() === serviceName.toLowerCase()
+        (service) => service.toLowerCase() === serviceName.toLowerCase()
       )
     );
     console.log(
@@ -223,8 +241,11 @@ const Tabs1 = () => {
                       </div>
                       <div className="col-lg-6">
                         <div className="txt-block pc-30">
+                          <span className="section-id blue-color">
+                            <h4>{service.subheading}</h4>
+                          </span>
                           <h3
-                            className="h3-md text- clickable-div"
+                            className="h3-md text- clickable-div mb-0"
                             style={{ cursor: "pointer" }}
                             onMouseEnter={(e) =>
                               (e.target.style.color = "#0056b3")
@@ -236,7 +257,9 @@ const Tabs1 = () => {
                           >
                             {service.name}
                           </h3>
-                          <div className="h5 box-list grey-color">{service.description}</div>
+                          <div className="h5 box-list grey-color">
+                            {service.description}
+                          </div>
                         </div>
                       </div>
                     </div>

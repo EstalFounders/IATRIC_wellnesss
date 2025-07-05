@@ -148,7 +148,7 @@ const Footer4 = () => {
               <h5 className="h5-xs">Working Time</h5>
               {/* Working Hours */}
               <p className="p-sm">
-                Mon - Sun - <span>9:00 AM - 8:00 PM</span>
+                Mon - Sun - <span>8:00 AM - 8:00 PM</span>
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@ const Footer4 = () => {
               <h5 className="h5-xl blue-color">
                 <Link legacyBehavior href="#">
                   <a
-                    style={{ color: "#8e8333" }}
+                    style={{ color: "#FFFFFF" }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleDialDialogOpen();
@@ -170,7 +170,7 @@ const Footer4 = () => {
                       e.target.style.color = "#000000";
                     }} // Change color on hover
                     onMouseOut={(e) => {
-                      e.target.style.color = "#8e8333";
+                      e.target.style.color = "#FFFFFF";
                     }}
                   >
                     <FaPhoneAlt /> {contact_no}

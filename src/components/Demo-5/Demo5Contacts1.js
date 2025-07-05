@@ -89,19 +89,19 @@ const Demo5Contacts1 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">
+            <h3 className="h3-md text-dark">
               Need Help? We&apos;re Here to Talk
               
             </h3>
-            <h3 className="h3-md steelblue-color">
+            <h3 className="h3-md text-dark">
               Contact Healthpath Today
             </h3>
             {/* Text */}
-            <p>
+            <div>
 
               Feeling unsure about your health or in need of expert guidance? At Healthpath, we&apos;re always here to listen and provide the support you need. Don&apos;t hesitate to <strong>reach out with any questions, concerns, or simply to discuss your healthcare goals</strong>.
-            </p>
-            <p>
+            </div>
+            <div>
               We&apos;re dedicated to offering <strong>personalized support</strong> and helping you confidently navigate your wellness journey. Whether you need an <strong>online consultation</strong>, have a question about our telemedicine services, or want to learn more about <strong>accessing expert medical care</strong> from home, our team is ready to assist. <strong>Contact Healthpath today</strong> and let us be your partner in health.
 
               Feeling unsure or in need of guidance? At Healthpath, we&apos;re
@@ -110,7 +110,7 @@ const Demo5Contacts1 = () => {
               We&apos;re dedicated to providing personalized support and helping
               you navigate your wellness journey.
 
-            </p>
+            </div>
           </div>
         </div>
         <div className="row">
@@ -118,10 +118,9 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">Contact Us</h5>
-              <p>Sector 57 ,</p>
-              <p>Gurgaon Haryana-122003</p>
-              <p>
+              <h2>Contact Us</h2><hr />
+              <h5>Sector 57, Gurgaon Haryana-122003</h5>
+              <h5>
                 Ph:{" "}
                 <Link legacyBehavior href="#">
                   <a
@@ -139,9 +138,9 @@ const Demo5Contacts1 = () => {
                     {contact_no}
                   </a>
                 </Link>
-              </p>
-              <p>
-                Email:{" "}
+              </h5>
+              <h5>
+                Email:
                 <Link legacyBehavior href="#">
                   <a
                     className="ml-2"
@@ -159,26 +158,12 @@ const Demo5Contacts1 = () => {
                     {email}
                   </a>
                 </Link>
-              </p>
+              </h5>
             </div>
-            {/* Patient Experience */}
-            {/* <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">Patient Experience</h5>
-              <p>Hannah Harper - Patient Experience Coordinator</p>
-              <p>Phone: +12 9 8765 4321</p>
-              <p>
-                Email:
-                <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com" className="blue-color">
-                    hello@yourdomain.com
-                  </a>
-                </Link>
-              </p>
-            </div> */}
             {/* Working Hours */}
             <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">Working Hours</h5>
-              <p>Monday – Sunday : 9:00 AM - 8:00 PM</p>
+              <h2>Working Hours</h2><hr />
+              <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
             </div>
           </div>
           {/* END CONTACTS INFO */}
@@ -210,22 +195,6 @@ const Demo5Contacts1 = () => {
                   </div>
                 </div>
                 {/* Email */}
-                {/* <div className="col-md-12 col-lg-6">
-                  <div className="form-group">
-                    <input
-                      id="form_email"
-                      className="form-control email"
-                      type="email"
-                      name="email"
-                      placeholder="Your Email"
-                      required="required"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      data-error="Email is required"
-                    />
-                    <div className="help-block with-errors" />
-                  </div>
-                </div> */}
                 {/* Phone */}
                 <div className="col-md-12 col-lg-6">
                   <div className="form-group">
@@ -270,7 +239,7 @@ const Demo5Contacts1 = () => {
                       id="form-message"
                       className="form-control message"
                       name="message"
-                      rows={6}
+                      rows={8}
                       placeholder="Your Message ..."
                       required="required"
                       data-error="Enter no more than (10) characters."

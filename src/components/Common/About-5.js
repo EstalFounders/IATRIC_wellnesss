@@ -23,7 +23,7 @@ const About5 = () => {
             <div className="pc-30 wow fadeInUp" data-wow-delay="0.4s">
               {/* Section ID */}
               <span className="section-id blue-color">
-                <h5>Welcome to Healthpath</h5>
+                <h4>Welcome to Healthpath</h4>
               </span>
               {/* Title */}
               <h3 className="h3-md">
