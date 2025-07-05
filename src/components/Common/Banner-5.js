@@ -4,34 +4,24 @@ import React from "react";
 const Banner5 = () => {
   return (
     <section id="banner-5" className="pt-100 banner-section division">
-      <div className="container h5 box-list grey-color">
+      <div className="container">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md text-dark">
-              Exceptional Care, Delivered by Experts
-            </h3>
-            {/* Text */}
-            <div>
-              Start your journey to optimal health with Healthpath. We offer <strong>exceptional medical care</strong>, meticulously <strong>personalized to your unique needs</strong>, and delivered by our team of <strong>highly qualified and compassionate experts</strong>.
-            </div>
-            <div className="mt-3">
-              At Healthpath, we empower you to confidently <strong>reach your wellness goals</strong> through a combination of cutting-edge <strong>telemedicine services</strong> and a steadfast commitment to your well-being. Experience the difference of <strong>expert healthcare</strong> that truly understands and supports you every step of the way.
-            </div>
             <h3 className="h3-md steelblue-color">
               Exceptional Healthcare Across India: Expert Care, Tailored to You
             </h3>
             {/* Text */}
-            <p className="h5 box-list grey-color">
+            <div className="h5 box-list grey-color">
               Start your journey to optimal health with <b>Healthpath,</b> your
               trusted partner for <b>exceptional medical care.</b> We believe
               healthcare should be as unique as you are, which is why we offer
               meticulously <b>personalized treatment plans</b> designed to meet
               your specific needs. Every service is delivered by our team of{" "}
               <b>highly qualified and and compassionate healthcare experts.</b>
-            </p>
-            <p className="h5 box-list grey-color">
+            </div>
+            <div className="h5 box-list grey-color">
               At Healthpath, we empower you to confidently{" "}
               <b>reach your wellness goals.</b> We achieve this through a
               powerful combination of <b>cutting-edge telemedicine services</b>{" "}
@@ -39,15 +29,15 @@ const Banner5 = () => {
               you&apos;re seeking online consultations or comprehensive home care,
               our experts are dedicated to providing the highest standard of
               medical support.
-            </p>
-            <p className="h5 box-list grey-color">
+            </div>
+            <div className="h5 box-list grey-color">
               Experience the Healthpath difference:{" "}
               <b>
                 expert healthcare that truly understands and supports you every
                 step of the way
               </b>{" "}
               on your path to optimal health, wherever you are in India.
-            </p>
+            </div>
           </div>
         </div>
         {/* BANNER IMAGE */}

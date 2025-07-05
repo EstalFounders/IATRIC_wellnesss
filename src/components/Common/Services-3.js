@@ -19,7 +19,7 @@ const Services3 = () => {
             </h3>
             {/* Text */}
             <div>
-            <p className="h5 box-list grey-color">
+            <div className="h5 box-list grey-color">
               Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
               primis libero at tempus, blandit posuere ligula varius congue
               cursus porta feugiat
@@ -294,6 +294,7 @@ const Services3 = () => {
           </div>
         </div>
         {/* END SERVICES CONTENT */}
+      </div>
       </div>
       {/* End container */}
     </section>

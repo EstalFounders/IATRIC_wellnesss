@@ -29,19 +29,8 @@ const AboutUsInfo4 = () => {
                   </h4>
                 </span>
                 {/* Title */}
-                <h3 className="h3-md text-dark">
-                  Clinic with Innovative Approach to Treatment
-                </h3>
-                {/* Text */}
-                <div>
-                  Healthpath offers a revolutionary approach to medical care,
-                  placing your convenience and well-being at the forefront. We
-                  understand the challenges of busy schedules and long wait
-                  times, which is why we&apos;ve designed a system that delivers
-                  expert medical care directly to you.
-                </div>
-                  <h5>Welcome to Healthpath</h5>
-                </span>
+                
+               
                 {/* Title */}
                 <h3 className="h3-md steelblue-color">
                   Healthpath: Your Convenient Path to Innovative Healthcare
@@ -90,11 +79,7 @@ const AboutUsInfo4 = () => {
                   Highest Quality Care
                   </h4>
                 </span>
-                {/* Title */}
-                <h3 className="h3-md text-dark">
-                  All Your Medical Needs, Under One Roof
-                  <h5>Highest Quality Care</h5>
-                </span>
+
                 {/* Title */}
                 <h3 className="h3-md steelblue-color">
                   Healthpath: Comprehensive Medical Care, Delivered to Your
