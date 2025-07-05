@@ -36,8 +36,8 @@ const Demo5About2 = () => {
           <hr className="w-75" />
           <div className="row mx-4">
             {/* ABOUT BOX #1 */}
-            <div className="col-md-12 col-lg-4">
-              <div className="abox-2">
+            <div className="col-md-4">
+              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
                 {/* Title */}
                 <h5 className="h5-md steelblue-color">Opening Hours</h5>
                 {/* Table */}
@@ -53,15 +53,15 @@ const Demo5About2 = () => {
               </div>
             </div>
             {/* ABOUT BOX #2 */}
-            <div className="col-md-6 col-lg-4">
-              <div className="abox-2">
+            <div className="col-md-4">
+              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
                 <h5 className="h5-md steelblue-color">Doctors Timetable</h5>
                 {/* Text */}
 
                 {/* Button */}
                 <Link legacyBehavior href="/timetable">
                   <a
-                    className="btn btn-sm btn-blue blue-hover mt-25"
+                    className="btn btn-sm btn-blue blue-hover mt-2"
                     style={{ backgroundColor: "#3b5f1d" }}
                   >
                     View Timetable
@@ -70,14 +70,15 @@ const Demo5About2 = () => {
               </div>
             </div>
             {/* ABOUT BOX #3 */}
-            <div className="col-md-4 col-lg-4">
-              <div className="abox-2">
+            <div className="col-md-4">
+              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
                 {/* Title */}
                 <h5 className="h5-md steelblue-color">Get in Touch</h5>
                 {/* Text */}
-                <h4 className="h4-sm emergency-call blue-color">
-                  <FaPhoneAlt />
+                <h4 className="h4-sm emergency-call blue-color d-flex align-items-center">
+                  <FaPhoneAlt className="mr-2" />
                   <a
+                    style={{ color: "#8e8333" }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleDialDialogOpen();

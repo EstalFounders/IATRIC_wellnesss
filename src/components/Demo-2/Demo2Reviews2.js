@@ -1,5 +1,5 @@
 import React from "react";
-import ReviewSlider from "../ReviewSlider";
+import ReviewSlider from "./ReviewSlider";
 
 const Demo2Reviews2 = () => {
   return (
@@ -19,12 +19,14 @@ const Demo2Reviews2 = () => {
               At Healthpath, the heart of our success lies in the positive experiences of our patients. We&apos;re incredibly proud of the trust placed in us and the real difference we make in people&apos;s lives. Here&apos;s what some of our patients have to say about their Healthpath experience:
             </div>
           </div>
+          
         </div>
         {/* END SECTION TITLE */}
         {/* TESTIMONIALS CONTENT */}
-        <ReviewSlider />
+         
         {/* END TESTIMONIALS CONTENT */}
       </div>
+      <ReviewSlider />
       </div>
       {/* End container */}
     </section>
