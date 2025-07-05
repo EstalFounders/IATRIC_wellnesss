@@ -3,7 +3,7 @@ import React from "react";
 const WhoWeAreInfo1 = () => {
     return (
         <section id="info-1" className="wide-60 info-section division">
-            <div className="container">
+            <div className="container h5 box-list grey-color">
                 <div className="row d-flex align-items-center">
                     {/* IMAGE BLOCK */}
                     <div className="col-lg-6">
@@ -26,21 +26,23 @@ const WhoWeAreInfo1 = () => {
                         >
                             {/* Section ID */}
                             <span className="section-id blue-color">
-                                Welcome to MedService
+                                <h4>
+                                    Welcome to MedService
+                                </h4>
                             </span>
                             {/* Title */}
-                            <h3 className="h3-md steelblue-color">
+                            <h3 className="h3-md text-dark">
                                 Clinic with Innovative Approach to Treatment
                             </h3>
                             {/* Text */}
-                            <p className="mb-30">
+                            <div className="mb-30">
                                 An enim nullam tempor sapien gravida donec enim
                                 ipsum blandit porta justo integer odio velna
                                 vitae auctor integer congue magna at pretium
                                 purus pretium ligula rutrum itae laoreet augue
                                 posuere and curae integer congue leo metus
                                 mollis primis and mauris
-                            </p>
+                            </div>
                             {/* Options List */}
                             <div className="row">
                                 <div className="col-xl-6">
@@ -49,29 +51,29 @@ const WhoWeAreInfo1 = () => {
                                         <div className="box-list-icon blue-color">
                                             <i className="fas fa-angle-double-right" />
                                         </div>
-                                        <p className="p-sm">
+                                        <div className="p-sm">
                                             Nemo ipsam egestas volute and turpis
                                             dolores quaerat
-                                        </p>
+                                        </div>
                                     </div>
                                     {/* Option #2 */}
                                     <div className="box-list">
                                         <div className="box-list-icon blue-color">
                                             <i className="fas fa-angle-double-right" />
                                         </div>
-                                        <p className="p-sm">
+                                        <div className="p-sm">
                                             Magna luctus tempor
-                                        </p>
+                                        </div>
                                     </div>
                                     {/* Option #3 */}
                                     <div className="box-list">
                                         <div className="box-list-icon blue-color">
                                             <i className="fas fa-angle-double-right" />
                                         </div>
-                                        <p className="p-sm">
+                                        <div className="p-sm">
                                             An enim nullam tempor at pretium
                                             purus blandit
-                                        </p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="col-xl-6">

@@ -13,18 +13,18 @@ const Demo2Gallery1 = () => {
     <div id="gallery-1" className="gallery-section division">
       {image && <Popup content={{ src, name: "image" }} close={setImage} />}
       {/* SECTION TITLE */}
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">Your Partner in Health</h3>
+            <h3 className="h3-md text-dark">Your Partner in Health</h3>
             {/* Text */}
-            <p>
+            <div>
               At Healthpath, we&apos;re more than just a <strong>healthcare provider</strong>; we&apos;re truly <strong>your partner in health</strong>. We walk alongside you on your entire <strong>wellness journey</strong>, committed to helping you achieve your personal health goals.
-            </p><br></br>
-            <p>
+            </div><br></br>
+            <div>
               We offer <strong>personalized care</strong>, dedicated support, and essential resources every step of the way. With Healthpath, you gain a trusted ally focused on your <strong>long-term well-being</strong>, ensuring you receive the <strong>comprehensive care</strong> and guidance you need to thrive. Choose Healthpath for a collaborative approach to your health, where your success is our shared mission.
-            </p>
+            </div>
           </div>
         </div>
       </div>

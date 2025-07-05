@@ -171,7 +171,9 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li a {
-    color: #666;
+    color: #000;
+    font-size: 17px ;
+    font-weight: 600;
 }
 
 .wsmenu>.wsmenu-list>li:hover>a {

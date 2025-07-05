@@ -4,21 +4,21 @@ import React from "react";
 const Demo5Blog1 = () => {
   return (
     <section id="blog-1" className="wide-60 blog-section division">
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">
-              Our Stories, Tips &amp; Latest News
-            </h3>
             <span className="section-id blue-color">
               <h4>Your Hub for Health & Wellness Insights</h4>
             </span>
+            {/* Title 	*/}
+            <h3 className="h3-md text-dark">
+              Our Stories, Tips &amp; Latest News
+            </h3>
             {/* Text */}
-            <p>
+            <div>
               Welcome to Healthpath&apos;s dynamic content hub! This is where we share <strong>compelling patient success stories</strong>, provide <strong>actionable health tips</strong>, and keep you informed with the <strong>latest healthcare news and updates</strong>. We&apos;re dedicated to empowering you with valuable information to support your well-being journey.
-            </p>
+            </div>
           </div>
         </div>
         {/* BLOG POSTS HOLDER */}

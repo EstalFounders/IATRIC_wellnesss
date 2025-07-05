@@ -5,7 +5,7 @@ import { FaAngleDoubleRight } from "react-icons/fa";
 const AboutUsInfo4 = () => {
   return (
     <section id="info-4" className="wide-100 info-section division">
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         {/* TOP ROW */}
         <div className="top-row mb-80">
           <div className="row d-flex align-items-center">
@@ -24,20 +24,22 @@ const AboutUsInfo4 = () => {
               <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
+                  <h4>
                   Welcome to Healthpath
+                  </h4>
                 </span>
                 {/* Title */}
-                <h3 className="h3-md steelblue-color">
+                <h3 className="h3-md text-dark">
                   Clinic with Innovative Approach to Treatment
                 </h3>
                 {/* Text */}
-                <p>
+                <div>
                   Healthpath offers a revolutionary approach to medical care,
                   placing your convenience and well-being at the forefront. We
                   understand the challenges of busy schedules and long wait
                   times, which is why we&apos;ve designed a system that delivers
                   expert medical care directly to you.
-                </p>
+                </div>
               </div>
             </div>
             {/* END TEXT BLOCK */}
@@ -46,17 +48,19 @@ const AboutUsInfo4 = () => {
         </div>
         {/* END TOP ROW */}
         {/* BOTTOM ROW */}
-        <div className="bottom-row">
+        <div className="bottom-row h5 box-list grey-color">
           <div className="row d-flex align-items-center">
             {/* INFO TEXT */}
             <div className="col-lg-6">
               <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
+                  <h4>
                   Highest Quality Care
+                  </h4>
                 </span>
                 {/* Title */}
-                <h3 className="h3-md steelblue-color">
+                <h3 className="h3-md text-dark">
                   All Your Medical Needs, Under One Roof
                 </h3>
                 {/* Text */}

@@ -23,6 +23,7 @@ import PopupDialog from "../../components/Common/PopupDialog";
 import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
 import { FaWhatsapp } from "react-icons/fa";
+import Image from "next/image";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
@@ -256,14 +257,14 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
           {/* MAIN MENU */}
           <nav className="wsmenu clearfix">
             <div
-              className="desktoplogo"
+            className="desktoplogo"
               style={{ position: "absolute", left: 0 }}
             >
               <a href="#">
-                <img
-                  src="images/logo.png"
+                <Image
+                  src="/images/logo.png"
                   width={180}
-                  height={65}
+                  height={100}
                   alt="header-logo"
                 />
               </a>

@@ -26,8 +26,8 @@ const Demo5About2 = () => {
         <div className="abox-2-holder">
           <div className="text-center mb-4 mt-4">
             {/* Heading */}
-            <h2 className="steelblue-color">Welcome to Healthpath</h2>
-            <p className="h5 box-list grey-color mx-5">
+            <h1 className="steelblue-color">Welcome to Healthpath</h1>
+            <p className="h5 box-list grey-color mx-5 w-50 mr-auto  ml-auto">
               At Healthpath, we are dedicated to providing exceptional
               healthcare services. Explore our working hours, doctor&apos;s
               timetable and ways to get in touch with us.

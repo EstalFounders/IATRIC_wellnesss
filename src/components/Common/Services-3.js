@@ -8,20 +8,20 @@ const Services3 = () => {
       id="services-3"
       className="bg-lightgrey wide-100 services-section division"
     >
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">
+            <h3 className="h3-md text-dark">
               Total Health Care Solutions
             </h3>
             {/* Text */}
-            <p>
+            <div>
               Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
               primis libero at tempus, blandit posuere ligula varius congue
               cursus porta feugiat
-            </p>
+            </div>
           </div>
         </div>
         {/* SERVICES CONTENT */}
