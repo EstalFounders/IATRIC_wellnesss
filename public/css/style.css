@@ -1098,6 +1098,12 @@ ul.content-list li:last-child {
   border-color: #fff;
 }
 
+.green-hover:hover {
+  color: #fff;
+  background-color: #3b5f1d;
+  border-color: #fff;
+}
+
 .black-hover:hover {
   color: #fff !important;
   background-color: #333;

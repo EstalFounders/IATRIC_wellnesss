@@ -21,9 +21,8 @@ const WhoWeAreInfo9 = () => {
   return (
     <section id="info-9" className="bg-blue info-section division">
       {/* TEXT BLOCK */}
-      <div className="container">
         <div className="row">
-          <div className="col-lg-6 mr-auto">
+          <div className="col-lg-6">
             {/* TEXT BLOCK */}
             <div
               className="services-7-table blue-table mb-30"
@@ -112,7 +111,6 @@ const WhoWeAreInfo9 = () => {
           </div>
         </div>
         {/* End row */}
-      </div>
       {/* END TEXT BLOCK */}
       {/* INFO-9 IMAGE */}
       <div className="info-9-img bg-fixed text-center" />

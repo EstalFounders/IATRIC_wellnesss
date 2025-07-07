@@ -299,11 +299,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                           </Link>
                         </li>
                         <li>
-                          <Link legacyBehavior href="/about-us">
-                            <a>Mission / Plans</a>
-                          </Link>
-                        </li>
-                        <li>
                           <Link legacyBehavior href="/who-we-are">
                             <a>Who We Are</a>
                           </Link>
@@ -316,11 +311,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                         <li>
                           <Link legacyBehavior href="/service-1">
                             <a>Contact Us</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/service-1">
-                            <a>Join Us</a>
                           </Link>
                         </li>
                       </ul>

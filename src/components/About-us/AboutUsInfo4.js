@@ -1,20 +1,22 @@
 import { fontWeight } from "@mui/system";
+import Image from "next/image";
 import React from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
 
 const AboutUsInfo4 = () => {
   return (
     <section id="info-4" className="wide-100 info-section division">
-      <div className="container h5 box-list grey-color">
+      <div className="h5 box-list grey-color">
         {/* TOP ROW */}
         <div className="top-row mb-80">
           <div className="row d-flex align-items-center">
             {/* INFO IMAGE */}
             <div className="col-lg-6">
               <div className="info-4-img text-center" data-wow-delay="0.6s">
-                <img
-                  className="img-fluid"
-                  src="images/chief_doctor_700x800.jpg"
+                <Image
+                  src="/images/chief_doctor_700x800.jpg"
+                  width={600}
+                  height={500}
                   alt="info-image"
                 />
               </div>
@@ -105,7 +107,7 @@ const AboutUsInfo4 = () => {
                         className="mt-3"
                       >
                         <li>
-                          <p className="p-sm" style={{ height: "250px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               Online Doctor Consultations:
                             </b>{" "}
@@ -123,7 +125,7 @@ const AboutUsInfo4 = () => {
                           </p>
                         </li>
                         <li>
-                          <p className="p-sm" style={{ height: "180px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               In-Clinic Appointments:
                             </b>{" "}
@@ -136,7 +138,7 @@ const AboutUsInfo4 = () => {
                         </li>
                       </ul>
                     </p>
-                    <p className="h6 h-50" style={{ color: "#3b5f1d" }}>
+                    <p className="h6" style={{ color: "#3b5f1d" }}>
                       <FaAngleDoubleRight />
                       <b> Personalized Home Healthcare Services:</b>
                       <ul
@@ -144,7 +146,7 @@ const AboutUsInfo4 = () => {
                         className="mt-3"
                       >
                         <li>
-                          <p className="p-sm" style={{ height: "250px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               Doctor Home Visits:
                             </b>{" "}
@@ -158,7 +160,7 @@ const AboutUsInfo4 = () => {
                           </p>
                         </li>
                         <li>
-                          <p className="p-sm" style={{ height: "180px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               At-Home Nursing Care:
                             </b>{" "}
@@ -176,13 +178,13 @@ const AboutUsInfo4 = () => {
                   <div className="col-md-6">
                     <p className="h6" style={{ color: "#3b5f1d" }}>
                       <FaAngleDoubleRight />{" "}
-                      <b>Beyond Consultations: Complete Healthcare Support:</b>
+                      <b>Beyond Consultations: Complete Healthcare:</b>
                       <ul
                         style={{ listStyleType: "disc", paddingLeft: "20px" }}
                         className="mt-3"
                       >
                         <li>
-                          <p className="p-sm" style={{ height: "250px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               At-Home Lab Tests & Blood Work:
                             </b>{" "}
@@ -194,7 +196,7 @@ const AboutUsInfo4 = () => {
                           </p>
                         </li>
                         <li>
-                          <p className="p-sm" style={{ height: "180px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               Medication & Medical Equipment Delivery::
                             </b>{" "}
@@ -218,7 +220,7 @@ const AboutUsInfo4 = () => {
                         className="mt-3"
                       >
                         <li>
-                          <p className="p-sm" style={{ height: "250px" }}>
+                          <p className="p-sm" style={{ height: "150px" }}>
                             <b style={{ fontWeight: "bold", color: "#3b5f1d" }}>
                               At-Home Lab Tests & Blood Work:
                             </b>{" "}
@@ -255,9 +257,10 @@ const AboutUsInfo4 = () => {
             {/* INFO IMAGE */}
             <div className="col-lg-6">
               <div className="info-4-img text-center" data-wow-delay="0.6s">
-                <img
-                  className="img-fluid"
-                  src="images/emergency_help_700x800.jpg"
+                <Image
+                  src="/images/emergency_help_700x800.jpg"
+                  width={700}
+                  height={800}
                   alt="info-image"
                 />
               </div>
