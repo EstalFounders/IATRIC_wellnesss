@@ -5,6 +5,7 @@ import PopupDialog from "../Common/PopupDialog";
 import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
 import CircleLoader from "../circleLoader";
+import { ConsultationButton } from "../Common/commonUi";
 
 const Demo5Contacts1 = () => {
   const router = useRouter();
@@ -91,25 +92,33 @@ const Demo5Contacts1 = () => {
             {/* Title 	*/}
             <h3 className="h3-md text-dark">
               Need Help? We&apos;re Here to Talk
-              
             </h3>
-            <h3 className="h3-md text-dark">
-              Contact Healthpath Today
-            </h3>
+            <h3 className="h3-md text-dark">Contact Healthpath Today</h3>
             {/* Text */}
             <div>
-
-              Feeling unsure about your health or in need of expert guidance? At Healthpath, we&apos;re always here to listen and provide the support you need. Don&apos;t hesitate to <strong>reach out with any questions, concerns, or simply to discuss your healthcare goals</strong>.
+              Feeling unsure about your health or in need of expert guidance? At
+              Healthpath, we&apos;re always here to listen and provide the
+              support you need. Don&apos;t hesitate to{" "}
+              <strong>
+                reach out with any questions, concerns, or simply to discuss
+                your healthcare goals
+              </strong>
+              .
             </div>
             <div>
-              We&apos;re dedicated to offering <strong>personalized support</strong> and helping you confidently navigate your wellness journey. Whether you need an <strong>online consultation</strong>, have a question about our telemedicine services, or want to learn more about <strong>accessing expert medical care</strong> from home, our team is ready to assist. <strong>Contact Healthpath today</strong> and let us be your partner in health.
-
-              Feeling unsure or in need of guidance? At Healthpath, we&apos;re
-              here to listen. Don&apos;t hesitate to reach out with any
-              questions, concerns, or simply to discuss your healthcare goals.
-              We&apos;re dedicated to providing personalized support and helping
-              you navigate your wellness journey.
-
+              We&apos;re dedicated to offering{" "}
+              <strong>personalized support</strong> and helping you confidently
+              navigate your wellness journey. Whether you need an{" "}
+              <strong>online consultation</strong>, have a question about our
+              telemedicine services, or want to learn more about{" "}
+              <strong>accessing expert medical care</strong> from home, our team
+              is ready to assist. <strong>Contact Healthpath today</strong> and
+              let us be your partner in health. Feeling unsure or in need of
+              guidance? At Healthpath, we&apos;re here to listen. Don&apos;t
+              hesitate to reach out with any questions, concerns, or simply to
+              discuss your healthcare goals. We&apos;re dedicated to providing
+              personalized support and helping you navigate your wellness
+              journey.
             </div>
           </div>
         </div>
@@ -118,7 +127,8 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h2>Contact Us</h2><hr />
+              <h2>Contact Us</h2>
+              <hr />
               <h5>Sector 57, Gurgaon Haryana-122003</h5>
               <h5>
                 Ph:{" "}
@@ -162,7 +172,8 @@ const Demo5Contacts1 = () => {
             </div>
             {/* Working Hours */}
             <div className="contact-box mb-40">
-              <h2>Working Hours</h2><hr />
+              <h2>Working Hours</h2>
+              <hr />
               <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
             </div>
           </div>
@@ -253,14 +264,9 @@ const Demo5Contacts1 = () => {
                 <div className="messages" />
                 {/* Button */}
                 <div className="col-md-12 mt-15 form-btn d-flex d-inline-flex">
-                  <button
-                    type="submit"
-                    className="btn btn-md btn-blue blue-hover submit"
-                    onClick={saveQuery}
-                    style={{ backgroundColor: "#3b5f1d" }}
-                  >
-                    Talk to Us
-                  </button>
+                  <ConsultationButton onClick={saveQuery}>
+                    TALK TO US
+                  </ConsultationButton>
                   {loading ? (
                     <div className="mt-3 ml-5">
                       <CircleLoader />
@@ -280,8 +286,9 @@ const Demo5Contacts1 = () => {
         />
       </div>
       <div
-        className={`text-center ${isSuccess ? "text-success" : "text-danger"
-          } font-weight-bold`}
+        className={`text-center ${
+          isSuccess ? "text-success" : "text-danger"
+        } font-weight-bold`}
       >
         {error}
       </div>

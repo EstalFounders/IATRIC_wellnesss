@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { useSelector } from "react-redux";
 import DoctorCard from "../Common/DoctorCard";
+import { ConsultationButton } from "../Common/commonUi";
 
 const WhoWeAreDoctors1 = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
@@ -40,10 +41,12 @@ const WhoWeAreDoctors1 = () => {
       {/* ALL DOCTORS BUTTON */}
       <div className="row mt-4">
         <div className="col-md-12 text-center">
-          <div className="all-doctors mb-40">
-            <Link legacyBehavior href="/all-doctors">
-              <a className="btn btn-blue blue-hover">Meet All Doctors</a>
-            </Link>
+          <div className="all-doctors mb-40 w-25 mr-auto ml-auto">
+            <ConsultationButton
+              path={"/all-doctors"}
+            >
+              MEET THE DOCTORS
+            </ConsultationButton>
           </div>
         </div>
       </div>

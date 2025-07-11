@@ -24,6 +24,7 @@ import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
 import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
+import { ConsultationButton } from "../../components/Common/commonUi";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
@@ -257,7 +258,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
           {/* MAIN MENU */}
           <nav className="wsmenu clearfix">
             <div
-            className="desktoplogo"
+              className="desktoplogo"
               style={{ position: "absolute", left: 0 }}
             >
               <a href="#">
@@ -311,6 +312,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                         <li>
                           <Link legacyBehavior href="/service-1">
                             <a>Contact Us</a>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link legacyBehavior href="#">
+                            <a>Join Us</a>
                           </Link>
                         </li>
                       </ul>
@@ -581,23 +587,13 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               {/* NAVIGATION MENU BUTTON */}
               {!hiddenRoutes.includes(router.pathname) && (
                 <li className="nl-simple" aria-haspopup="true">
-                  <button
-                    className="mt-3 clickable-div"
-                    style={{
-                      backgroundColor: `${color_schema.green}`, // Custom background color
-                      color: "#fff", // Text color
-                      border: "none", // Remove border
-                      padding: "10px 20px", // Padding for button
-                      borderRadius: "5px", // Rounded corners
-                      fontWeight: "bold", // Bold text
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleConsultationTypeOpenDialog();
-                    }}
-                  >
-                    Book an Appointment
-                  </button>
+                  <div className="mt-3">
+                    <ConsultationButton
+                      onClick={handleConsultationTypeOpenDialog}
+                    >
+                      Book an Appointment
+                    </ConsultationButton>
+                  </div>
                 </li>
               )}
             </ul>

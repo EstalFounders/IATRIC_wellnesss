@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import { ConsultationButton } from "./commonUi";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
@@ -73,11 +74,9 @@ const DoctorCard = ({ doctor, index }) => {
           </div>
         </div>
         <div className={`${styles["doctor-booking-section"]} text-center`}>
-          <button
-            className={`btn btn-primary ${styles["new-book-btn"]} ${styles["primary"]} mt-3`}
-          >
-            Book Consultation
-          </button>
+          <div className="mr-auto ml-auto mt-3 mb-3">
+            <ConsultationButton>Book Consultation</ConsultationButton>
+          </div>
         </div>
       </div>
     </div>

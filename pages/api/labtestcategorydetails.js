@@ -5,11 +5,13 @@ export default async function handler(req, res) {
   await dbConnect();
   console.log(req.method, 'req') 
   if (req.method === "GET") {
-    const { id } = req.query;
+    const { searchquery } = req.query;
     try {
-      const labTestsDetails = await LabTestDetails.find({
-        ["category_id"]: id,
-      });
+      let filter = {};
+      if (searchquery) {
+        filter.title = { $regex: searchquery, $options: "i" };
+      }
+      const labTestsDetails = await LabTestDetails.find(filter);
       res.status(200).json(labTestsDetails);
     } catch (error) {
       res.status(500).json({ message: "Error fetching lab tests" });

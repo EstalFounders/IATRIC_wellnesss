@@ -52,11 +52,6 @@ export default function HomepageComp() {
           <FAQ />
           </Col>
         </Row>
-        <Row>
-          <Col>
-            <Footer4 />
-          </Col>
-        </Row>
       </div>
     </>
   );

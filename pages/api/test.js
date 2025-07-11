@@ -9,6 +9,7 @@ import BookLabTest from "../../src/models/bookLabTestSchema";
 import ServiceOffered from "../../src/models/serviceOffered";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import Slot from "../../src/models/slots";
+import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -16,78 +17,122 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
-
   try {
-    const body = {
-      appointment_date: "1/1/1",
-      appointment_time: "14:35",
-      doctor_name: "Dr. John Doe",
-      patient_name: "Jane Doe",
-      consultation_type: "Call",
-      contact_us: contact_no,
-    };
-    await sendWhatsAppConfirmation("917455992234", body);
+    // Find all documents and group by title, collecting their _ids
+    const duplicates = await LabTestDetails.aggregate([
+      {
+        $group: {
+          _id: "$title",
+          ids: { $push: "$_id" },
+          count: { $sum: 1 }
+        }
+      },
+      { $match: { count: { $gt: 1 } } }
+    ]);
+
+    let deletedCount = 0;
+
+    // For each group of duplicates, delete all but one
+    for (const dup of duplicates) {
+      // Keep the first _id, delete the rest
+      const idsToDelete = dup.ids.slice(1);
+      const result = await LabTestDetails.deleteMany({ _id: { $in: idsToDelete } });
+      deletedCount += result.deletedCount;
+    }
+
+    return res.status(200).json({
+      message: "Duplicate titles removed",
+      duplicatesFound: duplicates.length,
+      documentsDeleted: deletedCount
+    });
   } catch (error) {
-    console.error("Error connecting to database:", error);
+    console.error("Error removing duplicates:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 
-  //code for update new column in db
+  // const filePath = path.join(process.cwd(), 'data/lab_test_faqs.json');
+  // const fileContents = fs.readFileSync(filePath, 'utf-8');
+  // const jsonData = JSON.parse(fileContents);
 
-  try {
-    const allAppointments = await Appointment.find({});
+  // try {
+  //   const result = await LabTestDetails.insertMany(jsonData);
+  //   res.status(200).json({ message: "Imported successfully", count: result.length });
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ error: "Failed to import" });
+  // }
 
-    const updatedAppointments = [];
-    const errors = [];
+  // try {
+  //   const body = {
+  //     appointment_date: "1/1/1",
+  //     appointment_time: "14:35",
+  //     doctor_name: "Dr. John Doe",
+  //     patient_name: "Jane Doe",
+  //     consultation_type: "Call",
+  //     contact_us: contact_no,
+  //   };
+  //   await sendWhatsAppConfirmation("917455992234", body);
+  // } catch (error) {
+  //   console.error("Error connecting to database:", error);
+  //   return res.status(500).json({ message: "Internal server error" });
+  // }
 
-    console.log(`Processing ${allAppointments.length} appointments...`);
+  // //code for update new column in db
 
-    // Iterate through each appointment
-    for (const appointment of allAppointments) {
-      if (!appointment.slotId) {
-        console.warn(`Appointment ${appointment._id} has no slotId. Skipping.`);
-        errors.push({
-          id: appointment._id,
-          message: "No slotId found for appointment",
-        });
-        continue;
-      }
+  // try {
+  //   const allAppointments = await Appointment.find({});
 
-      try {
-        // 2. Fetch the corresponding slot using slotId
-        const slot = await Slot.findById(appointment.slotId);
+  //   const updatedAppointments = [];
+  //   const errors = [];
 
-        if (slot && slot.startTime) {
-          // 3. Update the appointmentTime of the appointment schema with slot.startTime
-          const updatedAppointment = await Appointment.findByIdAndUpdate(
-            appointment._id,
-            { appointmentTime: slot.startTime },
-            { new: true } // Return the updated document
-          );
-          updatedAppointments.push(updatedAppointment);
-          console.log(
-            `Updated appointment ${appointment._id} with time ${slot.startTime}`
-          );
-        } else {
-          console.warn(
-            `Slot ${appointment.slotId} not found or has no startTime for appointment ${appointment._id}. Skipping.`
-          );
-          errors.push({
-            id: appointment._id,
-            message: "Slot not found or startTime missing",
-          });
-        }
-      } catch (innerError) {
-        console.error(
-          `Error processing appointment ${appointment._id}:`,
-          innerError
-        );
-        errors.push({
-          id: appointment._id,
-          message: `Error updating: ${innerError.message}`,
-        });
-      }
-    }
+  //   console.log(`Processing ${allAppointments.length} appointments...`);
+
+  //   // Iterate through each appointment
+  //   for (const appointment of allAppointments) {
+  //     if (!appointment.slotId) {
+  //       console.warn(`Appointment ${appointment._id} has no slotId. Skipping.`);
+  //       errors.push({
+  //         id: appointment._id,
+  //         message: "No slotId found for appointment",
+  //       });
+  //       continue;
+  //     }
+
+  //     try {
+  //       // 2. Fetch the corresponding slot using slotId
+  //       const slot = await Slot.findById(appointment.slotId);
+
+  //       if (slot && slot.startTime) {
+  //         // 3. Update the appointmentTime of the appointment schema with slot.startTime
+  //         const updatedAppointment = await Appointment.findByIdAndUpdate(
+  //           appointment._id,
+  //           { appointmentTime: slot.startTime },
+  //           { new: true } // Return the updated document
+  //         );
+  //         updatedAppointments.push(updatedAppointment);
+  //         console.log(
+  //           `Updated appointment ${appointment._id} with time ${slot.startTime}`
+  //         );
+  //       } else {
+  //         console.warn(
+  //           `Slot ${appointment.slotId} not found or has no startTime for appointment ${appointment._id}. Skipping.`
+  //         );
+  //         errors.push({
+  //           id: appointment._id,
+  //           message: "Slot not found or startTime missing",
+  //         });
+  //       }
+  //     } catch (innerError) {
+  //       console.error(
+  //         `Error processing appointment ${appointment._id}:`,
+  //         innerError
+  //       );
+  //       errors.push({
+  //         id: appointment._id,
+  //         message: `Error updating: ${innerError.message}`,
+  //       });
+  //     }
+  //   }
 
     // Update all documents to ensure the 'newField' exists with a default value if not present
     // const consultationResult = await Appointment.updateMany(
@@ -125,22 +170,22 @@ export default async function handler(req, res) {
     // );
 
     // 5. Send a response
-    res.status(200).json({
-      message: "Column updated successfully",
-      updatedAppointments: updatedAppointments,
+    // res.status(200).json({
+    //   message: "Column updated successfully",
+    //   updatedAppointments: updatedAppointments,
       // updatedAppointmentCount: consultationResult.modifiedCount,
       // upsertedAppointmentCount: consultationResult.upsertedCount,
       // updatedLabTestCount: labTestResult.modifiedCount,
       // upsertedLabTestCount: labTestResult.upsertedCount,
       // consultationResult: consultationResult,
       // labTestResult: labTestResult
-    });
-  } catch (error) {
-    console.error("Error updating documents:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to update documents", error });
-  }
+  //   });
+  // } catch (error) {
+  //   console.error("Error updating documents:", error);
+  //   res
+  //     .status(500)
+  //     .json({ success: false, message: "Failed to update documents", error });
+  // }
 
   //  code for storing lab data
 

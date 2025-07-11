@@ -1,8 +1,11 @@
 import Link from "next/link";
 import React from "react";
 import { color_schema } from "../../constant";
+import { ConsultationButton } from "../Common/commonUi";
+import { useRouter } from "next/router";
 
 const Demo5Hero5 = () => {
+  const router = useRouter();
   return (
     <section id="hero-5" className="bg-fixed hero-section division">
       <div className="container">
@@ -21,7 +24,7 @@ const Demo5Hero5 = () => {
                 className="steelblue-color"
                 style={{ color: `${color_schema.yellow}` }}
               >
-                <div style={{fontWeight: '800'}}>Best Quality</div>
+                <div style={{ fontWeight: "800" }}>Best Quality</div>
               </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
@@ -36,6 +39,7 @@ const Demo5Hero5 = () => {
                   <strong style={{ color: `${color_schema.green}` }}>
                     ANYTIME , ANYWHERE !
                   </strong>{" "}
+                  <br />
                   One-stop care: Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts
                   support your journey to a healthier you.
@@ -55,14 +59,11 @@ const Demo5Hero5 = () => {
                 </p>
               </div>
               {/* Button */}
-              <Link legacyBehavior href="/discover-more">
-                <a
-                  className="btn btn-blue blue-hover"
-                  style={{ backgroundColor: `${color_schema.yellow}` }}
-                >
-                  Discover More
-                </a>
-              </Link>
+              <div className="w-50">
+                <ConsultationButton path={"/discover-more"}>
+                  DISCOVER MORE
+                </ConsultationButton>
+              </div>
             </div>
           </div>
           {/* END HERO TEXT */}

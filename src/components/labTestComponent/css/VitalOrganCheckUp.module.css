@@ -31,13 +31,13 @@ border: 1px solid #4F6628
 
 
 .filterButton:hover {
-  background-color: #d1eca0;
+  background-color: #8e8333;
   color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filterButton.active {
-  background-color: #4F6628;
+  background-color: #8e8333;
   color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }

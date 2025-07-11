@@ -2,6 +2,7 @@ import { HiArrowCircleRight } from "react-icons/hi";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useState } from "react";
 import MoreModalComp from "../modal/MoreButtonModel";
+import styles from "../css/FirstSection.module.css";
 
 export const MoreButton = ({ healthCheckupData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,12 +17,13 @@ export const MoreButton = ({ healthCheckupData }) => {
 
   return (
     <div>
-      <div
-        style={{ color: "#4B82CB" }}
-        className="btn ml-5 mb-5 font-weight-bold"
-        onClick={handleOpenModal}
-      >
-        More <HiArrowCircleRight color="#4B82CB" />
+      <div className={`px-4 labtest-btn`} onClick={handleOpenModal}>
+        <div className="d-flex flex-direction-row h6 mt-2">
+          <div>More</div>
+          <div>
+            <HiArrowCircleRight color="#ffffff" />
+          </div>
+        </div>
       </div>
       {isModalOpen && (
         <MoreModalComp
@@ -63,15 +65,15 @@ export const useAddToCart = () => {
   return { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose };
 };
 
-export const calculateParameters = (testIncluded) => {
-  let parameter_count = 0;
-  // Loop through each item in the testIncluded array
-  for (let i = 0; i < testIncluded.length; i++) {
-    parameter_count += testIncluded[i].parameters.length;
-  }
+// export const calculateParameters = (testIncluded) => {
+//   let parameter_count = 0;
+//   // Loop through each item in the testIncluded array
+//   for (let i = 0; i < testIncluded.length; i++) {
+//     parameter_count += testIncluded[i].parameters.length;
+//   }
 
-  return parameter_count;
-};
+//   return parameter_count;
+// };
 
 export const storeHealthCheckupData = (data) => {
   // Clear existing healthCheckupData from localStorage
@@ -106,10 +108,9 @@ export const getLabCategoryId = (keyword, labTestCat) => {
   for (let i = 0; i < labTestCat.length; i++) {
     if (labTestCat[i].category_name === keyword) id = labTestCat[i]._id;
   }
-  console.log(id, 'id')
+  console.log(id, "id");
   return id;
 };
-
 
 export const filterActiveHealthTest = (data) => {
   return data.filter((item) => item.isActive === true);

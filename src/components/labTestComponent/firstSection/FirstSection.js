@@ -2,27 +2,63 @@ import { Container } from "react-bootstrap";
 import styles from "../css/FirstSection.module.css"; // Import the CSS module
 import { useRouter } from "next/router";
 import { CiSearch } from "react-icons/ci";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LabTesLandingPageHeader from "../../../layout/Header/LabTestLandingPageHeader";
 import { MdWifiCalling3 } from "react-icons/md";
 import { BiSolidDonateBlood } from "react-icons/bi";
 import { PiPaperPlaneTiltBold } from "react-icons/pi";
+import { useRef, useCallback } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
+import { useAddToCart } from "../common/CommonMethod";
+import { Snackbar } from "@mui/material";
+import Link from "next/link";
 
 export default function FirstSection() {
   const router = useRouter();
   const location = useState("noida");
+  // Close search results dropdown when clicking outside
+  const dropdownRef = useRef(null);
+  const allTestDetails = useSelector(
+    (state) => state.labtestHomepage.allTestDetails
+  );
+  const { snackbarOpen, handleAddToCart, handleSnackbarClose } = useAddToCart();
 
-  const handleLocationClick = () => {
-    // Your location click handler logic
-  };
+  // Search Bar Section
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const debounceTimeout = useRef(null);
+  const lastCall = useRef(0);
+
+  // Removed duplicate fetchTestDetails declaration to avoid redeclaration error
+
+  // Debounce + Throttle handler
+  const handleSearchChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearchTerm(value);
+
+      // Filter allTestDetails by title
+      if (value.trim() === "") {
+        setSearchResults([]);
+      } else {
+        const filtered = (allTestDetails || []).filter((test) =>
+          test.title.toLowerCase().includes(value.toLowerCase())
+        );
+        setSearchResults(filtered);
+      }
+    },
+    [allTestDetails]
+  );
 
   const testDetails = [
     {
       id: 1,
-      icon: <BiSolidDonateBlood />, 
+      icon: <BiSolidDonateBlood />,
       title: "Home Blood Test",
       time: "6AM - 10PM",
-      backgroundColor: "#DDE6C6", 
+      backgroundColor: "#DDE6C6",
     },
     {
       id: 2,
@@ -47,16 +83,38 @@ export default function FirstSection() {
     },
   ];
 
+  // State to store search results
+  const [searchResults, setSearchResults] = useState([]);
+  const dispatch = useDispatch();
+
+  const selectTestResult = (result) => {
+    // Navigate to the test details page with the selected result's ID
+    setSearchTerm(result.title);
+    setSearchResults([]);
+    dispatch(setHealthTestData(result));
+    router.push({ pathname: "/labTest/viewDetails" });
+  };
+
+  const handleResultButtonClick = (result) => {
+    // Prevent the dropdown from closing when clicking the "Add" button
+    handleAddToCart({ healthCheckupData: result });
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setSearchResults([]);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={styles.fullRow}>
       <Container>
-        {/* Header Section */}
-        <div className="row justify-content-center">
-          <div className="col">
-            <LabTesLandingPageHeader  />
-          </div>
-        </div>
-
         {/* Lab Report Text */}
         <div className="row justify-content-center">
           <div className={`col-12 ${styles.getLabReportTest}`}>
@@ -64,25 +122,61 @@ export default function FirstSection() {
             <div>Blood collected from your Doorstep.</div>
           </div>
         </div>
-
         {/* Subtext */}
         <div className="row justify-content-center">
           <div className={`col-12 ${styles.getLabReportSubText}`}>
             Fast. Convenient. Reliable. Your health, prioritized.
           </div>
         </div>
-
         {/* Search Bar Section */}
-        <div className={`row justify-content-center ${styles.thirdSection}`}>
-          <div className="col-sm-8 col-md-5 mb-3 d-flex">
+        <div className={`row ${styles.thirdSection}`}>
+          <div className="col-sm-8 col-md-5 mb-3 d-flex flex-row position-relative">
             <input
               className={styles.searchBar}
               placeholder="Search for tests"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              autoComplete="off"
             />
-            <CiSearch className={styles.searchIcon} size={20} />
+            <CiSearch className={`ml-2 ${styles.searchIcon}`} size={20} />
+            {searchTerm && searchResults.length > 0 && (
+              <div className={styles.autocompleteDropdown} ref={dropdownRef}>
+                <div className={styles.scrollableList}>
+                  {searchResults.map((result, idx) => (
+                    <div
+                      key={result.id || idx}
+                      className={styles.autocompleteDropdownItem}
+                    >
+                      <div
+                        className={styles.itemContent}
+                        onClick={() => selectTestResult(result)}
+                      >
+                        <span>{result.title}</span>
+                      </div>
+                      <div className="ml-auto">
+                        <div
+                          className={styles.itemButton}
+                          onClick={() => handleResultButtonClick(result)}
+                        >
+                          Add
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {searchResults.length > 5 && (
+                  <div className={styles.viewAllLink}>
+                    <Link href="/labTest/viewAllTestDetails">
+                      View all test details
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className={`col-sm-4 col-md-3 mb-3 ${styles.getQuotesNow}`}>
-            <div>Get Quotes Now   {<PiPaperPlaneTiltBold />}</div>
+            <div>Get Quotes Now {<PiPaperPlaneTiltBold />}</div>
             <div></div>
           </div>
           <div className="col-12 col-sm-8 col-md-4 d-flex justify-content-center">
@@ -95,7 +189,6 @@ export default function FirstSection() {
             </div>
           </div>
         </div>
-
         {/* Test Details Cards */}
         <div className={`row ${styles.testDetailsCard}`}>
           {testDetails.map((test) => (
@@ -124,6 +217,14 @@ export default function FirstSection() {
             </div>
           ))}
         </div>
+        {snackbarOpen && (
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleSnackbarClose}
+            message="Item added to cart"
+          />
+        )}
       </Container>
     </div>
   );

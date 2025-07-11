@@ -22,9 +22,12 @@ import {
 import { Snackbar } from "@mui/material";
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { price_symbol } from "../../../constant";
+import { useSelector } from "react-redux";
 
 const ViewDetails = () => {
-  const [healthCheckupData, setHealthCheckupData] = useState([]);
+  const healthCheckupData = useSelector(
+    (state) => state.labtestHomepage.healthTestData
+  );
   const [storedData, setStoredData] = useState();
   const [expandedTestIndex, setExpandedTestIndex] = useState(null);
 
@@ -34,25 +37,12 @@ const ViewDetails = () => {
 
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
-
-  useEffect(() => {
-    const storedData = getHealthCheckupData();
-    setHealthCheckupData(storedData[0]);
-    setStoredData(storedData);
-  }, []);
+  
+    console.log(healthCheckupData, "healthCheckupData IN VIEW DETAILS");
 
   return (
     <div>
       {/* First Section */}
-      <div className={`row ${styles.viewDetailsFirstSec}`}>
-        <Container>
-          <div className="row mt-4">
-            <div className="col">
-              <LabTesLandingPageHeader />
-            </div>
-          </div>
-        </Container>
-      </div>
 
       {/* Second Section */}
       <div className={`row mt-4 ${styles.viewDetailsSecondSec}`}>
@@ -79,7 +69,8 @@ const ViewDetails = () => {
 
             {/* Original Price */}
             <span className={`${styles.originalPrice} me-2`}>
-              M.R.P: {price_symbol}{healthCheckupData.price}
+              M.R.P: {price_symbol}
+              {healthCheckupData.price}
             </span>
 
             {/* Divider */}
@@ -114,27 +105,16 @@ const ViewDetails = () => {
           />
         </div>
       </div>
-
+      {/* test description */}
+       <div className="w-75 mr-auto ml-auto mt-5 mb-5">
+       {healthCheckupData.description}  
+       </div>
       {/* test details */}
       <div
         className={`d-flex flex-wrap justify-content-center mt-5 ${styles.testDetails}`}
       >
         {/* Includes */}
-        <div className="col-12 col-sm-6 col-lg-4 mb-3">
-          <div
-            className={`d-flex align-items-center p-3 border rounded ${styles.prequisiteContainer}`}
-          >
-            <FaSyringe size={20} className="me-3" />
-            <div className="ml-3">
-              <div className={`${styles.detailsSmallText}`}>Includes</div>
-              <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {healthCheckupData.test_included
-                  ? calculateParameters(healthCheckupData.test_included)
-                  : ""}
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Reports in */}
         <div className="col-12 col-sm-6 col-lg-4 mb-3">
@@ -212,9 +192,9 @@ const ViewDetails = () => {
         </div>
       </div>
       <div className={`${styles.testDetails}`}>
-        {healthCheckupData.test_included
-          ? healthCheckupData.test_included.map((includedTest, index) => (
-              <div key={includedTest._id} className={`mb-1`}>
+        {healthCheckupData.faqs && healthCheckupData.faqs.length > 0 ? 
+           healthCheckupData.faqs.map((faq, index) => (
+              <div key={faq._id} className={`mb-1`}>
                 {/* Accordion Header */}
                 <div
                   className={`p-3 d-flex justify-content-between align-items-center ${styles.testIncludedContainer}`}
@@ -222,7 +202,7 @@ const ViewDetails = () => {
                   style={{ cursor: "pointer" }}
                 >
                   <div className={`mb-0 ${styles.testIncludedName}`}>
-                    {includedTest.testName}
+                    {faq.question}
                   </div>
                   <span>{expandedTestIndex === index ? "-" : "+"}</span>
                 </div>
@@ -231,22 +211,22 @@ const ViewDetails = () => {
                 {expandedTestIndex === index && (
                   <div className="p-3 border border-top-0 rounded-bottom">
                     <p className={styles.testIncludedDesc}>
-                      {includedTest.description}
+                      {faq.answer}
                     </p>
 
                     {/* Parameters */}
-                    <ul className="list-unstyled">
+                    {/* <ul className="list-unstyled">
                       {includedTest.parameters.map((parameter, j) => (
                         <li key={j} className={styles.testIncludedDesc}>
                           {parameter}
                         </li>
                       ))}
-                    </ul>
+                    </ul> */}
                   </div>
                 )}
               </div>
             ))
-          : "No test found"}
+          : "No FAQS available for this test."}
         <div className={`ml-2 ${styles.relatedTestText}`}>Related Tests</div>
         <div className="d-flex flex-wrap mb-5">
           {console.log(storedData, "ehatl fadlaj")}

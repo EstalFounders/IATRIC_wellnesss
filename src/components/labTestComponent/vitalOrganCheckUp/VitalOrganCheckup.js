@@ -105,7 +105,7 @@ const VitalOrganCheckup = () => {
   // Finding the selected filter's details
   const selectedFilterDetails = filters.find(
     (filter) => filter.category === selectedFilter
-  ) 
+  );
 
   return (
     <>
@@ -128,7 +128,7 @@ const VitalOrganCheckup = () => {
             {filters.map((filter) => (
               <Col xs="auto" key={filter.category}>
                 <div
-                  className={`rounded-pill  ${styles.filterButton} ${
+                  className={`rounded-pill labtest-btn  ${styles.filterButton} ${
                     selectedFilter === filter.category ? styles.active : ""
                   }`}
                   onClick={() => setSelectedFilter(filter.category)}
@@ -153,7 +153,9 @@ const VitalOrganCheckup = () => {
             <Col xs={12} md={6}>
               <h3>{selectedFilterDetails.label}</h3>
               <p>{selectedFilterDetails.description}</p>
-              <MoreButton />
+              <Row className="d-flex justify-content-center align-items-center mt-5">
+                <MoreButton />
+              </Row>
             </Col>
           </Row>
         </div>

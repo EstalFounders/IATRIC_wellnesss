@@ -1,22 +1,26 @@
 // store/slices/appointmentSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  mostPopularCheckup: [],
+  allTestDetails: [],
+  healthTestData: ""
 };
 
 const labTestCateogryDataSlice = createSlice({
-  name: 'appointment',
+  name: "lab-test-details",
   initialState,
   reducers: {
-    setMostPopularCheckUp: (state, action) => {
-      state.mostPopularCheckup = action.payload;
+    setAllTestDetails: (state, action) => {
+      state.allTestDetails = action.payload;
     },
+    setHealthTestData: (state, action) => {
+      state.healthTestData = action.payload;
+    }
   },
 });
 
 // Export actions
-export const { setMostPopularCheckUp } = labTestCateogryDataSlice.actions;
+export const { setAllTestDetails, setHealthTestData } = labTestCateogryDataSlice.actions;
 
 // Export reducer
 export default labTestCateogryDataSlice.reducer;

@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { ConsultationButton } from "../Common/commonUi";
 
 const Demo5About6 = () => {
   return (
-    <section id="about-6" className="about-section division">
+    <section id="about-6" className="about-section division mt-5">
       <div className="container">
         <div className="row d-flex align-items-center">
           {/* TEXT BLOCK */}
@@ -27,21 +28,21 @@ const Demo5About6 = () => {
                 your busy life, at your own pace.
               </div>
               {/* Button */}
-              <Link legacyBehavior href="/all-doctors">
-                <a
-                  className="btn btn-blue blue-hover mt-25"
-                  style={{ backgroundColor: "#3b5f1d" }}
-                >
-                  Meet The Doctors
-                </a>
-              </Link>
+              <div>
+                <ConsultationButton path={"/all-doctors"}>
+                  MEET THE DOCTORS
+                </ConsultationButton>
+              </div>
             </div>
           </div>
           {/* END TEXT BLOCK */}
           {/* IMAGE BLOCK */}
           <div className="col-lg-6">
-            <div className="about-img text-center wow fadeInUp" data-wow-delay="0.6s">
-              <Image  
+            <div
+              className="about-img text-center wow fadeInUp"
+              data-wow-delay="0.2s"
+            >
+              <Image
                 width={500}
                 height={550}
                 className="img-fluid"

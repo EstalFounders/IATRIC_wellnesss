@@ -6,6 +6,7 @@ import ViewDoctorListComp from "./ViewDoctorListComp";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { color_schema } from "../../constant";
 
 const Tabs1 = () => {
   const [showDoctor, setShowDoctor] = useState(false);
@@ -201,6 +202,19 @@ const Tabs1 = () => {
     // Add your logic here for handling the service click
   };
 
+  // Utility function to bold specific keywords in the description
+  const boldKeywords = (text, keywords) => {
+    if (!keywords || keywords.length === 0) return text;
+    // Escape special characters for regex
+    const escapedKeywords = keywords.map((kw) =>
+      kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    );
+    const regex = new RegExp(`(${escapedKeywords.join("|")})`, "gi");
+    return text
+      .split(regex)
+      .map((part, i) => (regex.test(part) ? <b key={i}>{part}</b> : part));
+  };
+
   return (
     <section id="tabs-1" className="wide-100 tabs-section division">
       <div className="container">
@@ -223,7 +237,11 @@ const Tabs1 = () => {
                   )}
                   {currentServices.map((service, index) => (
                     <Nav.Item className="nav-item icon-xs" key={index} as="li">
-                      <Nav.Link className="nav-link" eventKey={`tab-${index}`}>
+                      <Nav.Link
+                        className="consultation-btn"
+                        style={{ color: `${color_schema.green}` }}
+                        eventKey={`tab-${index}`}
+                      >
                         <b>{service.name}</b>
                       </Nav.Link>
                     </Nav.Item>
@@ -245,21 +263,24 @@ const Tabs1 = () => {
                     key={index}
                     eventKey={`tab-${index}`}
                   >
-                    <div className="row d-flex align-items-center">
-                      <div className="col-lg-6">
-                        <div className="tab-img">
+                    <div className="row d-flex align-items-start">
+                      <div className="col-lg-6 d-flex align-items-start">
+                        <div className="tab-img" style={{ width: "100%" }}>
                           <Image
                             width={500}
                             height={550}
                             src={service.image}
                             alt="tab-image"
+                            style={{ objectFit: "cover", width: "100%" }}
                           />
                         </div>
                       </div>
-                      <div className="col-lg-6">
+                      <div className="col-lg-6 d-flex flex-column justify-content-start">
                         <div className="txt-block pc-30">
                           <span className="section-id blue-color">
-                            <h4>{service.subheading}</h4>
+                            <h4 style={{ marginTop: 0 }}>
+                              {service.subheading}
+                            </h4>
                           </span>
                           <h3
                             className="h3-md text- clickable-div mb-0"
@@ -275,7 +296,55 @@ const Tabs1 = () => {
                             {service.name}
                           </h3>
                           <div className="h5 box-list grey-color">
-                            {service.description}
+                            {
+                              // Pass keywords you want to bold for each service
+                              boldKeywords(service.description, [
+                                "General Physician",
+                                "trusted care",
+                                "Pediatrics",
+                                "monitoring",
+                                "immunizations",
+                                "Cardiology",
+                                "advanced care",
+                                "Dermatologist",
+                                "effective treatments",
+                                "Orthopaedics",
+                                "bone",
+                                "joint",
+                                "muscle disorders",
+                                "Gynaecology",
+                                "preventive screenings",
+                                "reproductive health care",
+                                "Ophthalmology",
+                                "comprehensive eye care",
+                                "Pulmonology",
+                                "respiratory",
+                                "lung conditions",
+                                "Psychiatrist",
+                                "mental health care",
+                                "Dentistry",
+                                "comprehensive oral care",
+                                "Physiotherapy",
+                                "restore movement",
+                                "Nursing care",
+                                "professional support",
+                                "Home care",
+                                "quality healthcare",
+                                "Medicine Delivery",
+                                "prescriptions",
+                                "Lab Investigation",
+                                "diagnostic tests",
+                                "Corporate Healthcare",
+                                "employee wellness",
+                                "Healthcamp",
+                                "community health camps",
+                                "Obstetrics",
+                                "pregnancy",
+                                "childbirth",
+                                "postpartum period",
+                                "personalized attention",
+                              ])
+                            }
                           </div>
                         </div>
                       </div>

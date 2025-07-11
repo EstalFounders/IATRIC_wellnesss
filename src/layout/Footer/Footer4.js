@@ -1,7 +1,12 @@
 import Link from "next/dist/client/link";
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import { FaFacebook, FaInstagram, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaPhoneAlt,
+} from "react-icons/fa";
 import { address, contact_no, email, facebook_page_url } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -27,8 +32,8 @@ const Footer4 = () => {
   };
 
   return (
-    <footer className="bg-image wide-40 footer division">
-      <div className="container h5 box-list grey-color">
+    <footer className="bg-image wide-40 footer division text-secondary">
+      <div className="container h5 box-list">
         {/* FOOTER CONTENT */}
         <div className="row">
           {/* FOOTER INFO */}
@@ -43,8 +48,8 @@ const Footer4 = () => {
                 alt="footer-logo"
               />
               {/* Text */}
-              <p className="p-sm mt-20">Unlocking your well-being</p>
-              <p className="p-sm mb-4">one step at a time.</p>
+              <div className="p-sm mt-20">Unlocking your well-being</div>
+              <div className="p-sm mb-4">one step at a time.</div>
               {/* Social Icons */}
               <div className="footer-socials-links mt-10">
                 <Row>
@@ -94,94 +99,75 @@ const Footer4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <h5 className="h5-xs">Our Location</h5>
+              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Our Location</u></div>
               {/* Address */}
-              <p>{address}</p>
+              <div>{address}</div>
               {/* Email */}
-              <p className="foo-email mt-20">
-                Email:
-                <Link legacyBehavior href="#">
+              <div className="foo-email mt-20 d-flex flex-row">
+                <div>Email:</div>
+                <div>
                   <a
                     className="ml-2"
                     onClick={(e) => {
                       handleEmail();
                       e.preventDefault();
                     }}
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#000000";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#ffffff";
-                    }}
+                
                   >
                     {email}
                   </a>
-                </Link>
-              </p>
+                </div>
+              </div>
               {/* Phone */}
-              <p>
-                Phone:{" "}
-                <Link legacyBehavior href="#">
+              <div className="d-flex flew-row">
+                <div>Phone: </div>
+                <div>
                   <a
-                    style={{ color: "#ffffff" }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleDialDialogOpen();
                     }}
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#000000";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#ffffff";
-                    }}
+                
                   >
                     {contact_no}
                   </a>
-                </Link>
-              </p>
+                </div>
+              </div>
             </div>
           </div>
           {/* FOOTER WORKING HOURS */}
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <h5 className="h5-xs">Working Time</h5>
+              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Working Time</u></div>
               {/* Working Hours */}
-              <p className="p-sm">
-                Mon - Sun - <span>8:00 AM - 8:00 PM</span>
-              </p>
+              <div className="p-sm text-nowrap">
+                Mon - Sun - 8:00 AM - 8:00 PM
+              </div>
             </div>
           </div>
           {/* FOOTER PHONE NUMBER */}
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <h5 className="h5-xs">Emergency Cases</h5>
+              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Emergency Cases</u></div>
               {/* Footer List */}
-              <h5 className="h5-xl blue-color">
-                <Link legacyBehavior href="#">
+              <div className="h5-xl">
                   <a
-                    style={{ color: "#FFFFFF" }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleDialDialogOpen();
                     }}
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#000000";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#FFFFFF";
-                    }}
+
                   >
                     <FaPhoneAlt /> {contact_no}
                   </a>
-                </Link>
-              </h5>
+              </div>
               {/* Text */}
-              <p className="p-sm mt-15">
+              <div className="p-sm mt-15">
                 Aliquam orci nullam undo tempor sapien gravida donec enim ipsum
                 porta justo velna aucto magna
-              </p>
+              </div>
             </div>
           </div>
         </div>
@@ -191,8 +177,9 @@ const Footer4 = () => {
           <div className="row">
             <div className="col-md-12 text-right">
               <p className="footer-copyright">
-              {new Date().getFullYear()} ©  <span>TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All
-                Rights Reserved
+                {new Date().getFullYear()} ©{" "}
+                <span>TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All Rights
+                Reserved
               </p>
             </div>
           </div>

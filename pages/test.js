@@ -72,7 +72,7 @@ export default function HomePage() {
 
   const handleFetch = async () => {
     try {
-      const response = await fetch("/api/lib/sendConsultationReminder", {
+      const response = await fetch("/api/test", {
         method: "POST",
       });
       const result = await response.json();

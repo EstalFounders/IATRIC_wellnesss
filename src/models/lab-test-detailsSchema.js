@@ -1,51 +1,33 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const testIncludedSchema = new Schema({
-  testName: { type: String, required: true },
-  description: { type: String, required: false },
-  parameters: [String]
-});
+// Sub-schema for FAQs
+const faqSchema = new Schema({
+  question: { type: String, required: true },
+  answer: { type: String, required: true }
+}, { _id: false });
 
-const labTestDetailsSchema = new Schema({
+// Main schema for Lab Test with FAQs
+const labTestFaqSchema = new Schema({
   title: { type: String, required: true },
-  description: { type: String, required: false },
+  description: { type: String },
   sample_required: [String],
   preparation_required: [String],
-  test_included: [testIncludedSchema],
+  faqs: [faqSchema], // ⬅️ Array of FAQs
   category_id: {
     type: Schema.Types.ObjectId,
     ref: "LabTest",
-    required: true,
   },
-  price: {
-    type: String,
-    required: true
-  },
-  discount: {
-    type: String,
-    required: true
-  },
-  report_within: {
-    type: String,
-    required: true
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-    required: true
-  }
+  price: { type: String, required: true },
+  discount: { type: String, required: true },
+  report_within: { type: String, required: true },
+  isActive: { type: Boolean, default: true }
+}, {
+  timestamps: true
 });
 
-// Use a unique model identifier
-const modelName = 'labTestDetails';
+// Export model with hot-reload support
+const modelName = 'LabTestDetails';
+const LabTestDetails = mongoose.models[modelName] || mongoose.model(modelName, labTestFaqSchema);
 
-// Check if the model already exists
-if (mongoose.models[modelName]) {
-  mongoose.deleteModel(modelName);
-}
-
-// Compile the model if it doesn't exist
-const LabTestDetails = mongoose.model(modelName, labTestDetailsSchema);
-
-export default LabTestDetails
+export default LabTestDetails;

@@ -50,29 +50,22 @@ const healthCheckupData = [
 const HealthyBodyCheckup = () => {
   return (
     <>
-    <Container>
-      <div className={`row align-items-center mb-5 p-2 ${styles.container}`}>
-        <div className="col text-center" style={{ marginTop: "5%" }}>
-          <div className={styles.healthyBodyCheckuptext}>
-            Checkup for Healthy Body
-          </div>
-          <div className={styles.healthyBodyCheckupSubtext}>
-            Lorem ipsum dolor sit amet consectetur. Mollis erat duis aliquam
-            mauris est risus lectus. Phasellus consequat urna tellus
+      <Container>
+        <div className={`row align-items-center mb-5 p-2 ${styles.container}`}>
+          <div className="col text-center" style={{ marginTop: "5%" }}>
+            <div className={styles.healthyBodyCheckuptext}>
+              Checkup for Healthy Body
+            </div>
+            <div className={styles.healthyBodyCheckupSubtext}>
+              Lorem ipsum dolor sit amet consectetur. Mollis erat duis aliquam
+              mauris est risus lectus. Phasellus consequat urna tellus
+            </div>
           </div>
         </div>
-      </div>
-      <div>
+        <div>
           <Row>
             {healthCheckupData.map((checkup, index) => (
-              <Col
-                key={index}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                className="mb-3"
-              >
+              <Col key={index} xs={12} sm={6} md={4} lg={3} className="mb-3">
                 <HealthyBodyCard
                   title={checkup.title}
                   description={checkup.description}
@@ -81,9 +74,11 @@ const HealthyBodyCheckup = () => {
               </Col>
             ))}
           </Row>
-          <MoreButton />
-        <LabTestimonial />
-      </div>
+          <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
+            <MoreButton />
+          </Row>
+          <LabTestimonial />
+        </div>
       </Container>
     </>
   );

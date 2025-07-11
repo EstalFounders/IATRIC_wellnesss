@@ -10,12 +10,17 @@ import {
   MoreButton,
 } from "../common/CommonMethod";
 import { useDispatch, useSelector } from "react-redux";
-import { setMostPopularCheckUp } from "../../../store/slices/labTest/labTestCategoryApiData";
+import {
+  allTestDetails,
+  setAllTestDetails,
+  setMostPopularCheckUp,
+} from "../../../store/slices/labTest/labTestCategoryApiData";
 
 const MostPopularCheckup = () => {
-  const healthCheckupData = useSelector(
-    (state) => state.labtestHomepage.mostPopularCheckup
-  );
+  const [healthCheckupData, setHealthCheckupData] = useState([]); // Initialize with an empty array
+  // useSelector(
+  //   (state) => state.labtestHomepage.allTestDetails
+  // );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
   const dispatch = useDispatch();
@@ -43,7 +48,7 @@ const MostPopularCheckup = () => {
       console.log(data, "40");
       const activeData = filterActiveHealthTest(data);
       // setHealthCheckUpData(activeData);
-      dispatch(setMostPopularCheckUp(activeData));
+      dispatch(setAllTestDetails(activeData));
       setLoading(false);
     } catch (err) {
       setError("Error fetching data");
@@ -83,8 +88,10 @@ const MostPopularCheckup = () => {
                   </Col>
                 ))}
           </Row>
-          <MoreButton healthCheckupData={healthCheckupData} />
         </div>
+        <Row className="d-flex justify-content-center align-items-center mt-4 mb-3">
+          <MoreButton healthCheckupData={healthCheckupData} />
+        </Row>
       </Container>
     </>
   );

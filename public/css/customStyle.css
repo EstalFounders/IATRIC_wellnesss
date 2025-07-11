@@ -1,0 +1,49 @@
+.labtest-bg-image {
+    background-image: url('/images/labtest/labTestFirstSectionBg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;  
+}
+
+.labtest-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  background-color: white;
+  color: #3b5f1d;
+  border: 1px solid #3b5f1d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bolder;
+  transition: background-color 0.3s ease; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+}
+
+.labtest-btn:hover {
+  background-color: #8e8333;
+  color: white;
+}
+
+
+.consultation-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: white;
+  color: #3b5f1d;
+  border: 1px solid #3b5f1d;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bolder;
+  transition: background-color 0.3s ease; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  
+}
+
+.consultation-btn:hover {
+  background-color: #8e8333;
+  color: white;
+}

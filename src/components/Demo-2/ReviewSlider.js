@@ -144,7 +144,7 @@ const ReviewSlider = () => {
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Srijan Singh</h5>
+                <h5 className="h5-sm">Vaishali Singh</h5>
                 <span>Photographer</span>
               </div>
             </div>

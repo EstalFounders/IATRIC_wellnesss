@@ -10,13 +10,16 @@ import {
 import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 import { price_symbol } from "../../../constant";
+import { useDispatch } from "react-redux";
+import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
+    const dispatch  = useDispatch();
   const router = useRouter();
   const handleViewDetails = (healthCheckupData) => {
-    storeHealthCheckupData(healthCheckupData);
+    dispatch(setHealthTestData(healthCheckupData))
     router.push({ pathname: "/labTest/viewDetails" });
   };
   return (
@@ -53,7 +56,7 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
             <TbKeyframes />
           </div>
           <strong className="font-weight-bold">
-            {calculateParameters(healthCheckupData.test_included)} parameters
+            {/* {calculateParameters(healthCheckupData.test_included)} parameters */}
           </strong>{" "}
           included
         </div>

@@ -5,6 +5,7 @@ import { api } from "../../constant";
 import { useDispatch, useSelector } from "react-redux";
 import { setAllDoctor } from "../../store/slices/superAdmin/homepageSlice";
 import DoctorCard from "../Common/DoctorCard";
+import { ConsultationButton } from "../Common/commonUi";
 
 const DoctorsSection = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
@@ -58,14 +59,10 @@ const DoctorsSection = () => {
         {/* ALL DOCTORS BUTTON */}
         <div className="row mt-4">
           <div className="col-md-12 text-center">
-            <div className="all-doctors mb-40">
-              <Link legacyBehavior href="/all-doctors">
-                <a
-                  className="btn btn-primary"
-                >
-                  Meet All Doctors
-                </a>
-              </Link>
+            <div className="all-doctors mb-40 w-25 mr-auto ml-auto">
+              <ConsultationButton path={"/all-doctors"}>
+                MEET THE DOCTORS
+              </ConsultationButton>
             </div>
           </div>
         </div>

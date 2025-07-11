@@ -4,6 +4,7 @@ import { contact_no } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../Common/PopupDialog";
 import { FaPhoneAlt } from "react-icons/fa";
+import { ConsultationButton } from "../Common/commonUi";
 
 const Demo5About2 = () => {
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
@@ -39,41 +40,35 @@ const Demo5About2 = () => {
             <div className="col-md-4">
               <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
                 {/* Title */}
-                <h5 className="h5-md steelblue-color">Opening Hours</h5>
-                {/* Table */}
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <td>Mon – Sun</td>
-                      <td> - </td>
-                      <td className="text-right">9:00 AM - 8:00 PM</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* ABOUT BOX #2 */}
+                <h4 className="h5-md steelblue-color">Opening Hours</h4>
+                        <table className="table">
+                          <tbody>
+                          <tr>
+                            <td style={{ fontSize: "1.0rem" }}>Mon – Sun</td>
+                            <td> - </td>
+                            <td className="text-right" style={{ fontSize: "1.0rem" }}>9:00 AM - 8:00 PM</td>
+                          </tr>
+                          </tbody>
+                        </table>
+                        </div>
+                      </div>
+                      {/* ABOUT BOX #2 */}
             <div className="col-md-4">
               <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                <h5 className="h5-md steelblue-color">Doctors Timetable</h5>
+                <h4 className="h5-md steelblue-color">Doctors Timetable</h4>
                 {/* Text */}
 
                 {/* Button */}
-                <Link legacyBehavior href="/timetable">
-                  <a
-                    className="btn btn-sm btn-blue blue-hover mt-2"
-                    style={{ backgroundColor: "#3b5f1d" }}
-                  >
-                    View Timetable
-                  </a>
-                </Link>
+                <div>
+                  <ConsultationButton path={"/timetable"}>View Timetable</ConsultationButton>
+                </div>
               </div>
             </div>
             {/* ABOUT BOX #3 */}
             <div className="col-md-4">
               <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
                 {/* Title */}
-                <h5 className="h5-md steelblue-color">Get in Touch</h5>
+                <h4 className="h5-md steelblue-color">Get in Touch</h4>
                 {/* Text */}
                 <h4 className="h4-sm emergency-call blue-color d-flex align-items-center">
                   <FaPhoneAlt className="mr-2" />
