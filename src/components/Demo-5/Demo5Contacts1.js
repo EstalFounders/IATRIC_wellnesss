@@ -6,6 +6,8 @@ import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
 import CircleLoader from "../circleLoader";
 import { ConsultationButton } from "../Common/commonUi";
+import { FaPhoneAlt } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 
 const Demo5Contacts1 = () => {
   const router = useRouter();
@@ -127,11 +129,11 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h2>Contact Us</h2>
+              <h2 className="text-dark">Contact Us</h2>
               <hr />
               <h5>Sector 57, Gurgaon Haryana-122003</h5>
               <h5>
-                Ph:{" "}
+                <FaPhoneAlt />{" "}
                 <Link legacyBehavior href="#">
                   <a
                     onClick={(e) => {
@@ -150,7 +152,7 @@ const Demo5Contacts1 = () => {
                 </Link>
               </h5>
               <h5>
-                Email:
+                <MdEmail size={25} />
                 <Link legacyBehavior href="#">
                   <a
                     className="ml-2"
@@ -172,7 +174,7 @@ const Demo5Contacts1 = () => {
             </div>
             {/* Working Hours */}
             <div className="contact-box mb-40">
-              <h2>Working Hours</h2>
+              <h2 className="text-dark">Working Hours</h2>
               <hr />
               <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
             </div>

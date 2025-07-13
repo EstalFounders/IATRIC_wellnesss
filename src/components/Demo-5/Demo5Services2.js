@@ -16,9 +16,14 @@ import {
   FaBaby,
   FaEye,
 } from "react-icons/fa";
-import { GiErlenmeyer, GiKneeCap, GiMedicinePills, GiMedicines } from "react-icons/gi";
+import {
+  GiErlenmeyer,
+  GiKneeCap,
+  GiMedicinePills,
+  GiMedicines,
+} from "react-icons/gi";
 import { BiInjection } from "react-icons/bi";
-import { services } from "../../constant";
+import { color_schema, services } from "../../constant";
 import { FaHeartPulse } from "react-icons/fa6";
 import { BsLungsFill } from "react-icons/bs";
 import { TbPhysotherapist } from "react-icons/tb";
@@ -30,7 +35,6 @@ const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Dummy data for services
-  
 
   // Calculate the index of the first service to be displayed on the current page
   const indexOfFirstService = (currentPage - 1) * servicesPerPage;
@@ -68,56 +72,72 @@ const Demo5Services2 = () => {
           return (
             <FaStethoscope
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 1:
           return (
             <FaBaby
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 2:
           return (
             <FaHeartPulse
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 3:
           return (
             <MdOutlineFace3
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 4:
           return (
             <GiKneeCap
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 5:
           return (
             <MdPregnantWoman
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 6:
           return (
             <FaEye
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 7:
           return (
             <BsLungsFill
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         default:
@@ -129,63 +149,81 @@ const Demo5Services2 = () => {
           return (
             <FaMedkit
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 9:
           return (
             <FaTooth
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
-          case 10:
+        case 10:
           return (
             <TbPhysotherapist
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 11:
           return (
             <BiInjection
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
-          case 12:
+        case 12:
           return (
             <FaUserNurse
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
-          case 13:
+        case 13:
           return (
             <GiMedicines
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         case 14:
           return (
             <GiErlenmeyer
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
-          case 15:
+        case 15:
           return (
             <FaStethoscope
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
-          case 16:
+        case 16:
           return (
             <RiTeamFill
               size={80}
-              color={hoveredIndex === index ? "#fafafa" : "#8e8333"}
+              color={
+                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
+              }
             />
           );
         default:
@@ -221,21 +259,23 @@ const Demo5Services2 = () => {
             <div className="row">
               {/* Render current services */}
               {currentServices.map((service, index) => (
-                <div className="col-sm-6 col-lg-3" key={index}>
+                <div className="col-sm-6 col-lg-3 mb-2" key={index}>
                   <div
-                    className="sbox-2"
+                    className="service-nav-link sbox-2 w-100 h-100 py-4"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
                     onTouchStart={() => setHoveredIndex(index)}
                     onTouchEnd={() => setHoveredIndex(null)}
-                    style={{ width: "100%" }}
                   >
                     <Link legacyBehavior href="/department-single">
                       <a onClick={() => handleIconClick(index)}>
                         {/* Render icon */}
                         {renderIcon(index)}
                         {/* Service title */}
-                        <h5 className="h5-sm sbox-2-title steelblue-color">
+                        <h5
+                          className="h5-sm sbox-2-title"
+                          style={{ color: `${color_schema.green}` }}
+                        >
                           {service}
                         </h5>
                       </a>

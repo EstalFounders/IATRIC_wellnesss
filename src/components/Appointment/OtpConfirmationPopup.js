@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { api } from "../../constant";
+import { ConsultationButton } from "../Common/commonUi";
 
 const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   // Refs and state for OTP input
@@ -121,86 +122,87 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
             height={150}
           />
         </div>
-        {/* Header */} 
+        {/* Header */}
         <div className="text-center text-primary mb-2 h1 font-bold">
-            <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
-                Verification Code
-            </span>
+          <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
+            Verification Code
+          </span>
         </div>
         <div className="text-sm text-center text-gray-600 mb-3">
-            <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
-                We have sent you a code on your WhatsApp. Please check and enter it below.
-            </span>
+          <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
+            We have sent you a code on your WhatsApp. Please check and enter it
+            below.
+          </span>
         </div>
 
         <div className="flex justify-center gap-3 mb-4 text-center">
-            {otp.map((digit, index) => (
-                <input
-                    key={index}
-                    type="text"
-                    maxLength="1"
-                    inputMode="numeric"
-                    value={digit}
-                    onChange={(e) => handleChange(e.target.value, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    ref={(el) => (inputRefs.current[index] = el)}
-                    className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
-                    style={{
-                        width: "40px",
-                        height: "50px",
-                        fontSize: "22px",
-                        backgroundColor: "#F9FAFB",
-                    }}
-                />
-            ))}
+          {otp.map((digit, index) => (
+            <input
+              key={index}
+              type="text"
+              maxLength="1"
+              inputMode="numeric"
+              value={digit}
+              onChange={(e) => handleChange(e.target.value, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              ref={(el) => (inputRefs.current[index] = el)}
+              className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
+              style={{
+                width: "40px",
+                height: "50px",
+                fontSize: "22px",
+                backgroundColor: "#F9FAFB",
+              }}
+            />
+          ))}
         </div>
 
         {/* Resend */}
-            <div className="text-center text-sm text-gray-500 mb-4">
-              <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
-                Didn’t receive the code?{" "}
-              </span>
-              <button
-                className={`font-semibold ${
-                  resendCooldown > 0
+        <div className="text-center text-sm text-gray-500 mb-4">
+          <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
+            Didn’t receive the code?{" "}
+          </span>
+          <button
+            className={`font-semibold ${
+              resendCooldown > 0
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-blue-600 hover:underline"
-                }`}
-                onClick={generateAndSendOtp}
-                disabled={resendCooldown > 0}
-                style={{
-                  fontSize: "1rem",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  backgroundColor: resendCooldown > 0 ? "#E5E7EB" : "#4A90E2",
-                  color: resendCooldown > 0 ? "#9CA3AF" : "#FFFFFF",
-                  cursor: resendCooldown > 0 ? "not-allowed" : "pointer",
-                  transition: "background-color 0.3s ease",
-                }}
-              >
-                Resend{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
-              </button>
-            </div>
-            {error && (
-              <div
-                className="text-red-500 text-center mb-4"
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  backgroundColor: "#FDEDEC",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #E74C3C",
-                }}
-              >
-                {error}
-              </div>
-            )}
-            {/* Submit */}
-        <div className="text-center">
-          <button onClick={handleSubmit} className="btn btn-primary mb-4">
-            Verify
+            }`}
+            onClick={generateAndSendOtp}
+            disabled={resendCooldown > 0}
+            style={{
+              fontSize: "1rem",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              backgroundColor: resendCooldown > 0 ? "#E5E7EB" : "#4A90E2",
+              color: resendCooldown > 0 ? "#9CA3AF" : "#FFFFFF",
+              cursor: resendCooldown > 0 ? "not-allowed" : "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+          >
+            Resend{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
           </button>
+        </div>
+        {error && (
+          <div
+            className="text-red-500 text-center mb-4"
+            style={{
+              fontSize: "1rem",
+              fontWeight: "bold",
+              backgroundColor: "#FDEDEC",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #E74C3C",
+            }}
+          >
+            {error}
+          </div>
+        )}
+        {/* Submit */}
+        <div className="text-center w-50 ml-auto mr-auto">
+          <ConsultationButton onClick={handleSubmit} className="mb-4">
+            Verify
+          </ConsultationButton>
         </div>
       </div>
     </div>

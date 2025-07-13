@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import About5 from "../src/components/Common/About-5";
 import Banner5 from "../src/components/Common/Banner-5";
 import Statistic1 from "../src/components/Common/Statistic-1";
@@ -13,63 +14,51 @@ import Demo5Hero5 from "../src/components/Demo-5/Demo5Hero5";
 import Demo5Pricing3 from "../src/components/Demo-5/Demo5Pricing3";
 import Demo5Services2 from "../src/components/Demo-5/Demo5Services2";
 import Layouts from "../src/layout/Layouts";
+import { eventEmitter } from "../src/constant";
+import cartEventEmitter from "../src/eventEmitter/CartEventEmitter";
+import HomepageComp from "../src/components/labTestComponent/HomepageComp";
 
 const Demo5 = () => {
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    // Listen for cart update events
+    cartEventEmitter.on(eventEmitter.navBarEventEmitter, (item) => {
+      setActiveSection(item);
+      console.log("Active Section Changed:", item);
+    });
+    // Clean up event listener
+    return () => {
+      cartEventEmitter.removeAllListeners("nav-option");
+    };
+  }, []);
+
   return (
-    <Layouts header={1} footer={4}>
-      <Demo5Hero5 />
-      {/* END HERO-5 */}
-      {/* ABOUT-2
-			============================================= */}
-      <Demo5About2 />
-      {/* END ABOUT-2 */}
-      {/* ABOUT-5~
-			============================================= */}
+    <Layouts header={1} footer={4} onNavClick={setActiveSection}>
+      {activeSection.toLowerCase() === "home" && (
+        <>
+          <Demo5Hero5 />
+          <Demo5About2 />
+          <Demo5Services2 />
+          <Tabs1 />
+          <About5 />
+          <Demo5About6 />
+          <Statistic1 />
+          <Demo5Doctors1 />
+          <Demo2Reviews2 />
+          <Demo5Pricing3 />
+          <Demo2Gallery1 />
+          <Demo5Blog1 />
+          <Demo5Contacts1 />
+          <Banner5 />
+        </>
+      )}
 
-      <Demo5Services2 />
-      <Tabs1 />
-      <About5 />
-
-      {/* END SERVICES-2 */}
-      {/* TABS-1
-			============================================= */}
-
-      {/* END TABS-1 */}
-      {/* ABOUT-6
-			============================================= */}
-      <Demo5About6 />
-      {/* END ABOUT-6 */}
-      {/* STATISTIC-1
-			============================================= */}
-      <Statistic1 />
-      {/* END STATISTIC-1 */}
-      {/* DOCTORS-1
-			============================================= */}
-      <Demo5Doctors1 />
-      {/* END DOCTORS-1 */}
-      {/* TESTIMONIALS-2
-			============================================= */}
-      <Demo2Reviews2 />
-      {/* END TESTIMONIALS-2 */}
-      {/* PRICING-3
-			============================================= */}
-      <Demo5Pricing3 />
-      {/* END PRICING-3 */}
-      {/* GALLERY-1
-			============================================= */}
-      <Demo2Gallery1 />
-      {/* END GALLERY-1 */}
-      {/* BLOG-1
-			============================================= */}
-      <Demo5Blog1 />
-      {/* END BLOG-1 */}
-      {/* CONTACTS-1
-			============================================= */}
-      <Demo5Contacts1 />
-      {/* END CONTACTS-1 */}
-      {/* BANNER-5
-			============================================= */}
-      <Banner5 />
+      {activeSection.toLowerCase() === "labtest" && (
+        <>
+          <HomepageComp />
+        </>
+      )}
     </Layouts>
   );
 };

@@ -6,26 +6,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAllDoctor } from "../../store/slices/superAdmin/homepageSlice";
 import DoctorCard from "../Common/DoctorCard";
 import { ConsultationButton } from "../Common/commonUi";
+import { fetchDoctors } from "../ApiService/ConsultationApiService";
 
 const DoctorsSection = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(api.addDoctor);
-        if (!response.ok) {
-          throw new Error("Failed to fetch");
-        }
-        const data = await response.json();
-        dispatch(setAllDoctor(data));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  console.log(doctors, "doctors indocter section");
 
-    fetchData(); // Call the fetchData function
+  useEffect(() => {
+    if(!doctors) {
+      fetchDoctors(dispatch);
+    }
   }, []); // Empty dependency array ensures the effect runs only once
 
   return (
@@ -41,10 +33,27 @@ const DoctorsSection = () => {
             <h3 className="h3-md text-dark">Our Medical Specialists</h3>
             {/* Text */}
             <div>
-              At Healthpath, we believe <strong>expert healthcare guidance</strong> should always be within reach. That&apos;s why our team of <strong>highly qualified medical specialists</strong> is available to provide you with reliable advice and support, <strong>even beyond traditional office hours</strong>.
+              At Healthpath, we believe{" "}
+              <strong>expert healthcare guidance</strong> should always be
+              within reach. That&apos;s why our team of{" "}
+              <strong>highly qualified medical specialists</strong> is available
+              to provide you with reliable advice and support,{" "}
+              <strong>even beyond traditional office hours</strong>.
             </div>
-            <div> <br></br>
-              We understand life doesn&apos;t follow a 9-to-5 schedule. That&apos;s why we offer a range of convenient options to <strong>connect with a certified healthcare professional</strong> precisely when you need it most. Whether you&apos;re seeking a <strong>virtual consultation</strong>, need urgent advice, or simply have a health question, our <strong>online doctors</strong> are here to ensure you receive timely, expert care from the comfort of your home. Get peace of mind with Healthpath&apos;s accessible and <strong>reliable telemedicine services</strong>.
+            <div>
+              {" "}
+              <br></br>
+              We understand life doesn&apos;t follow a 9-to-5 schedule.
+              That&apos;s why we offer a range of convenient options to{" "}
+              <strong>
+                connect with a certified healthcare professional
+              </strong>{" "}
+              precisely when you need it most. Whether you&apos;re seeking a{" "}
+              <strong>virtual consultation</strong>, need urgent advice, or
+              simply have a health question, our <strong>online doctors</strong>{" "}
+              are here to ensure you receive timely, expert care from the
+              comfort of your home. Get peace of mind with Healthpath&apos;s
+              accessible and <strong>reliable telemedicine services</strong>.
             </div>
           </div>
         </div>

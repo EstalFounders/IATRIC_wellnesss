@@ -1,3 +1,4 @@
+
 export const company_registrated_name = "Ttanshe health path pvt.ltd";
 export const certificate_img_path = "images/doctorCertificate/";
 export const profilePicture_img_path = "images/doctorPicture/";
@@ -164,4 +165,10 @@ export const facebook_page_url =
 export const color_schema = {
   green: "#3b5f1d",
   yellow: "#8e8333",
+};
+
+export const eventEmitter = {
+  cartEventEmitter: "cartUpdate",
+  navBarEventEmitter: "navbar-option",
+  labTestEventEmitter: "labTestUpdate",
 };

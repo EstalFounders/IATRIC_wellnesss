@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import ViewDoctorListComp from "../Common/ViewDoctorListComp";
+import { ConsultationButton } from "../Common/commonUi";
 
 const DepartmentDoctors1 = ({ serviceName, doctors }) => {
   console.log("Doctors in DepartmentDoctors1:", doctors);
@@ -12,9 +13,7 @@ const DepartmentDoctors1 = ({ serviceName, doctors }) => {
         <ViewDoctorListComp doctors={doctors} />
       </div>
       <div className="d-flex justify-content-center align-items-center p-4">
-        <Link href="/all-departments" className="btn btn-primary">
-          View All Doctors
-        </Link>
+        <ConsultationButton path={'/all-doctors'}>View All Doctors</ConsultationButton>
       </div>
     </div>
   );

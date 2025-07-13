@@ -4,7 +4,7 @@ import ViewAllTestDetails from "../../src/components/labTestComponent/ViewAllTes
 
 export default function Homepage() {
   return (
-    <Layouts header={6}>
+    <Layouts header={1}>
       <ViewAllTestDetails />
     </Layouts>
   );

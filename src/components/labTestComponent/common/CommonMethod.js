@@ -3,6 +3,7 @@ import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useState } from "react";
 import MoreModalComp from "../modal/MoreButtonModel";
 import styles from "../css/FirstSection.module.css";
+import { eventEmitter } from "../../../constant";
 
 export const MoreButton = ({ healthCheckupData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +47,7 @@ export const useAddToCart = () => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleAddToCart = (item) => {
-    cartEventEmitter.emit("cartUpdate", item);
+    cartEventEmitter.emit(eventEmitter.cartEventEmitter, item);
     setSnackbarOpen(true);
     setIsClicked(true);
 

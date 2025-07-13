@@ -10,13 +10,13 @@
 
 .labtest-btn {
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: 14px;
   background-color: white;
   color: #3b5f1d;
   border: 1px solid #3b5f1d;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bolder;
+  font-weight: bold;
   transition: background-color 0.3s ease; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   
@@ -29,12 +29,12 @@
 
 
 .consultation-btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   font-size: 16px;
   background-color: white;
   color: #3b5f1d;
   border: 1px solid #3b5f1d;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   text-align: center;
   font-weight: bolder;
@@ -47,3 +47,70 @@
   background-color: #8e8333;
   color: white;
 }
+
+.navbar-option {
+  padding: 8px 20px;
+  font-size: 18px;
+  background-color: white;
+  color: #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bolder;
+  transition: background-color 0.3s ease; 
+}
+.navbar-option:hover {
+  background-color: #8e8333;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.service-nav-link {
+  color: #3b5f1d;
+  font-weight:bold;
+  font-size: 16px;
+  padding: 20px 30px;
+  border-radius: 20px;
+  background-color: white;
+  border: 1px solid #3b5f1d;
+  transition: background-color 0.3s ease; 
+}
+
+.service-nav-link:hover {
+  background-color: #8e8333;
+  color: white;
+}
+
+.tab-nav-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  padding: 0 40px; /* leave space for arrows */
+}
+
+.arrow.left-arrow-fixed,
+.arrow.right-arrow-fixed {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.arrow.left-arrow-fixed {
+  left: 0;
+}
+
+.arrow.right-arrow-fixed {
+  right: 0;
+}
+
+.tab-buttons-container {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0 50px; /* match arrow padding */
+}
+

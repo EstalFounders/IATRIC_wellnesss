@@ -1,5 +1,4 @@
 import { Container } from "react-bootstrap";
-import LabTesLandingPageHeader from "../../../layout/Header/LabTestLandingPageHeader";
 import styles from "../css/ViewDetails.module.css";
 import { FaUserGroup } from "react-icons/fa6";
 import Image from "next/image";
@@ -23,6 +22,7 @@ import { Snackbar } from "@mui/material";
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { price_symbol } from "../../../constant";
 import { useSelector } from "react-redux";
+import { ConsultationButton } from "../../Common/commonUi";
 
 const ViewDetails = () => {
   const healthCheckupData = useSelector(
@@ -37,8 +37,8 @@ const ViewDetails = () => {
 
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
-  
-    console.log(healthCheckupData, "healthCheckupData IN VIEW DETAILS");
+
+  console.log(healthCheckupData, "healthCheckupData IN VIEW DETAILS");
 
   return (
     <div>
@@ -86,12 +86,12 @@ const ViewDetails = () => {
           </div>
 
           {/* Add to Cart Button */}
-          <button
-            className={`btn mt-3 ${styles.addToCartBtn}`}
+          <div
+            className="mt-3 bg-success"
             onClick={() => handleAddToCart({ healthCheckupData })}
           >
-            Add to Cart
-          </button>
+            <ConsultationButton>ADD TO CART</ConsultationButton>
+          </div>
         </div>
 
         {/* Image Section */}
@@ -106,15 +106,14 @@ const ViewDetails = () => {
         </div>
       </div>
       {/* test description */}
-       <div className="w-75 mr-auto ml-auto mt-5 mb-5">
-       {healthCheckupData.description}  
-       </div>
+      <div className="w-75 mr-auto ml-auto mt-5 mb-5">
+        {healthCheckupData.description}
+      </div>
       {/* test details */}
       <div
         className={`d-flex flex-wrap justify-content-center mt-5 ${styles.testDetails}`}
       >
         {/* Includes */}
-        
 
         {/* Reports in */}
         <div className="col-12 col-sm-6 col-lg-4 mb-3">
@@ -192,8 +191,8 @@ const ViewDetails = () => {
         </div>
       </div>
       <div className={`${styles.testDetails}`}>
-        {healthCheckupData.faqs && healthCheckupData.faqs.length > 0 ? 
-           healthCheckupData.faqs.map((faq, index) => (
+        {healthCheckupData.faqs && healthCheckupData.faqs.length > 0
+          ? healthCheckupData.faqs.map((faq, index) => (
               <div key={faq._id} className={`mb-1`}>
                 {/* Accordion Header */}
                 <div
@@ -210,9 +209,7 @@ const ViewDetails = () => {
                 {/* Accordion Body */}
                 {expandedTestIndex === index && (
                   <div className="p-3 border border-top-0 rounded-bottom">
-                    <p className={styles.testIncludedDesc}>
-                      {faq.answer}
-                    </p>
+                    <p className={styles.testIncludedDesc}>{faq.answer}</p>
 
                     {/* Parameters */}
                     {/* <ul className="list-unstyled">

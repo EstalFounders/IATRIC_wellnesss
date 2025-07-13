@@ -1,5 +1,4 @@
 import { Container } from "react-bootstrap";
-import LabTesLandingPageHeader from "../../../layout/Header/LabTestLandingPageHeader";
 import styles from "../css/UserLabReport.module.css";
 import { useState } from "react";
 
@@ -29,15 +28,6 @@ const LabReportComp = () => {
   return (
     <div>
       {/* First Section */}
-      <div className={`row ${styles.viewDetailsFirstSec}`}>
-        <Container>
-          <div className="row mt-4">
-            <div className="col">
-              <LabTesLandingPageHeader />
-            </div>
-          </div>
-        </Container>
-      </div>
 
       <div className="container mt-5">
         {/* Header Section */}

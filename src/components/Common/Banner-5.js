@@ -41,7 +41,7 @@ const Banner5 = () => {
           </div>
         </div>
         {/* BANNER IMAGE */}
-        <div className="row ml-5 mb-5">
+        <div className="row ml-5">
           <div className="col-lg-10 offset-lg-1">
             <div className="banner-5-img wow fadeInUp" data-wow-delay="0.4s">
               <Image

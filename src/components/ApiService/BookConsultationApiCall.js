@@ -1,6 +1,6 @@
 import { api } from "../../constant";
 
-const bookConsultationApiCall = async (consultationData, setIsLoading) => {
+export const bookConsultationApiCall = async (consultationData, setIsLoading) => {
     console.log("Booking consultation with data:", consultationData, "setIsLoading:", setIsLoading);
     try {
         setIsLoading(true);
@@ -25,5 +25,3 @@ const bookConsultationApiCall = async (consultationData, setIsLoading) => {
         setIsLoading(false);
     }
 };
-
-export default bookConsultationApiCall;

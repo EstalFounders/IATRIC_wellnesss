@@ -34,14 +34,20 @@ import { IS_NOW } from "../../../pages/api/utils/constants";
 import bookConsultationApiCall from "../ApiService/BookConsultationApiCall";
 import AppointmentForm from "./appointmentform";
 import bookConsultationFromAdmin from "../../../pages/superAdmin/bookConsultationFromAdmin";
-
-
-
+import { ConsultationButton } from "../Common/commonUi";
+import { fetchDoctors } from "../ApiService/ConsultationApiService";
+import { useDispatch } from "react-redux";
 
 const AppointmentPage = () => {
   const router = useRouter();
-  const isAppointmentPage = router.asPath.includes("/superAdmin/bookConsultationFromAdmin");
-  const bookFromAdmin = router.asPath.includes("/superAdmin/bookConsultationFromAdmin") ? false : true;
+  const isAppointmentPage = router.asPath.includes(
+    "/superAdmin/bookConsultationFromAdmin"
+  );
+  const bookFromAdmin = router.asPath.includes(
+    "/superAdmin/bookConsultationFromAdmin"
+  )
+    ? false
+    : true;
   // State variables
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -50,7 +56,8 @@ const AppointmentPage = () => {
   const [appointmentTime, setAppointmentTime] = useState(IS_NOW);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [availableSlotsFromServer, setAvailableSlotsFromServer] = useState([]);
-  const [openAvailableSlotsFromServer, setOpenAvailableSlotsFromServer] = useState(false);
+  const [openAvailableSlotsFromServer, setOpenAvailableSlotsFromServer] =
+    useState(false);
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -76,6 +83,7 @@ const AppointmentPage = () => {
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
+  const dispatch = useDispatch();
 
   // All state and setters/functions in one object
   const appointmentState = {
@@ -108,8 +116,8 @@ const AppointmentPage = () => {
     setName,
     setEmail,
     setMobNo,
-    setSelectedDate
-  }
+    setSelectedDate,
+  };
 
   // All functions that use state, update to use appointmentState
   const fetchSlots = async () => {
@@ -189,26 +197,10 @@ const AppointmentPage = () => {
   }, [appointmentState.selectedDoctorId, appointmentState.selectedDate]);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      const storedDoctors = sessionStorage.getItem("doctors");
-      if (storedDoctors) {
-        setDoctors(JSON.parse(storedDoctors));
-      } else {
-        try {
-          const response = await fetch(api.addDoctor);
-          if (!response.ok) {
-            throw new Error("Failed to fetch");
-          }
-          const data = await response.json();
-          sessionStorage.setItem("doctors", JSON.stringify(data));
-          setDoctors(data);
-        } catch (error) {
-          // handle error
-        }
+      if(!doctors) {
+        fetchDoctors(dispatch);
       }
-    };
-    fetchDoctors();
-  }, []);
+    }, []); // Empty dependency array ensures the effect runs only once
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
@@ -356,7 +348,10 @@ const AppointmentPage = () => {
 
   const bookConsultation = async () => {
     try {
-      const response = await bookConsultationApiCall(consultationData, setIsLoading);
+      const response = await bookConsultationApiCall(
+        consultationData,
+        setIsLoading
+      );
       const data = response;
       const message = data.json();
       if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
@@ -432,7 +427,9 @@ const AppointmentPage = () => {
                   </div>
                   {/* Data */}
                   <div className="txt-widget-data">
-                    <h5 className="h5-md steelblue-color">Dr. Jonathan Barnes</h5>
+                    <h5 className="h5-md steelblue-color">
+                      Dr. Jonathan Barnes
+                    </h5>
                     <span>Chief Medical Officer, Founder</span>
                     <p className="blue-color">1-800-1234-567</p>
                   </div>
@@ -445,9 +442,11 @@ const AppointmentPage = () => {
                   magna purus
                 </p>
                 {/* Button */}
-                <Link legacyBehavior href="/about">
-                  <a className="btn btn-blue blue-hover">Learn More</a>
-                </Link>
+                <div className="">
+                  <ConsultationButton path={"/about"}>
+                    Learn More
+                  </ConsultationButton>
+                </div>
               </div>
               {/* END TEXT WIDGET */}
               {/* SIDEBAR TABLE */}
@@ -457,7 +456,8 @@ const AppointmentPage = () => {
                 {/* Text */}
                 <p className="p-sm">
                   Porta semper lacus cursus, feugiat primis ultrice ligula risus
-                  auctor at tempus feugiat dolor lacinia cursus nulla vitae massa
+                  auctor at tempus feugiat dolor lacinia cursus nulla vitae
+                  massa
                 </p>
                 {/* Table */}
                 <table className="table">
@@ -488,12 +488,13 @@ const AppointmentPage = () => {
                 <h5 className="h5-xs">Need a personal health plan?</h5>
                 {/* Text */}
                 <p className="p-sm">
-                  Porta semper lacus cursus, and feugiat primis ultrice ligula at
-                  risus auctor
+                  Porta semper lacus cursus, and feugiat primis ultrice ligula
+                  at risus auctor
                 </p>
               </div>
               {/* END SIDEBAR TABLE */}
-            </aside>)}
+            </aside>
+          )}
           {/* END SIDEBAR */}
           <AppointmentBookingModal
             isOpen={bookingResponse}

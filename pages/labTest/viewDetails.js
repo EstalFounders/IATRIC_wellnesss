@@ -3,8 +3,8 @@ import Layouts from "../../src/layout/Layouts";
 
 export default function Homepage() {
   return (
-    <Layouts header={6}>
-    <ViewDetails />
+    <Layouts header={1}>
+      <ViewDetails />
     </Layouts>
   );
 }

@@ -11,6 +11,7 @@ import { address, contact_no, email, facebook_page_url } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { useRouter } from "next/router";
+import { MdEmail } from "react-icons/md";
 
 const Footer4 = () => {
   const router = useRouter();
@@ -99,12 +100,16 @@ const Footer4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Our Location</u></div>
+              <div className="h5-xs font-weight-bold text-dark mb-4">
+                <u>Our Location</u>
+              </div>
               {/* Address */}
               <div>{address}</div>
               {/* Email */}
               <div className="foo-email mt-20 d-flex flex-row">
-                <div>Email:</div>
+                <div>
+                  <MdEmail />
+                </div>
                 <div>
                   <a
                     className="ml-2"
@@ -112,7 +117,6 @@ const Footer4 = () => {
                       handleEmail();
                       e.preventDefault();
                     }}
-                
                   >
                     {email}
                   </a>
@@ -120,14 +124,15 @@ const Footer4 = () => {
               </div>
               {/* Phone */}
               <div className="d-flex flew-row">
-                <div>Phone: </div>
+                <div className="mr-2">
+                  <FaPhoneAlt />{" "}
+                </div>
                 <div>
                   <a
                     onClick={(e) => {
                       e.preventDefault();
                       handleDialDialogOpen();
                     }}
-                
                   >
                     {contact_no}
                   </a>
@@ -139,7 +144,9 @@ const Footer4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Working Time</u></div>
+              <div className="h5-xs font-weight-bold text-dark mb-4">
+                <u>Working Time</u>
+              </div>
               {/* Working Hours */}
               <div className="p-sm text-nowrap">
                 Mon - Sun - 8:00 AM - 8:00 PM
@@ -150,18 +157,19 @@ const Footer4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4"><u>Emergency Cases</u></div>
+              <div className="h5-xs font-weight-bold text-dark mb-4">
+                <u>Emergency Cases</u>
+              </div>
               {/* Footer List */}
               <div className="h5-xl">
-                  <a
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDialDialogOpen();
-                    }}
-
-                  >
-                    <FaPhoneAlt /> {contact_no}
-                  </a>
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDialDialogOpen();
+                  }}
+                >
+                  <FaPhoneAlt /> {contact_no}
+                </a>
               </div>
               {/* Text */}
               <div className="p-sm mt-15">
@@ -175,10 +183,10 @@ const Footer4 = () => {
         {/* FOOTER COPYRIGHT */}
         <div className="bottom-footer">
           <div className="row">
-            <div className="col-md-12 text-right">
-              <p className="footer-copyright">
+            <div className="col-md-12 text-righ text-dark">
+              <p className="footer-copyright text-dark text-right">
                 {new Date().getFullYear()} ©{" "}
-                <span>TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All Rights
+                <span className="text-dark">TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All Rights
                 Reserved
               </p>
             </div>

@@ -26,6 +26,7 @@ import {
 } from "../../store/slices/superAdmin/homepageSlice";
 import { calculateTotalIncome } from "./utility/helper";
 import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
+import { fetchDoctors } from "../ApiService/ConsultationApiService";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
@@ -44,22 +45,6 @@ export default function HomepageComp() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  async function fetchDoctors() {
-    try {
-      const response = await fetch(api.addDoctor); // Fetch data from the API
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json(); // Extract JSON data from the response
-      setDoctors(data); // Update state with fetched data
-      dispatch(setAllDoctor(data));
-    } catch (error) {
-      console.error("Error fetching data client:", error);
-    } finally {
-      setIsDoctorLoading(false);
-    }
-  }
-
   useEffect(() => {
     // If no data in local storage, fetch from API
     fetch(api.consiltationFee)
@@ -76,27 +61,34 @@ export default function HomepageComp() {
   }, []);
 
   useEffect(() => {
-    fetchDoctors(); // Call the fetchDoctors function when the component mounts
-  }, []);
+    if (!doctors) {
+      fetchDoctors(dispatch);
+    }
+  }, []); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
     setIsAppointmentLoading(true);
     const fetchData = async () => {
       try {
-        const [appointmentsResponse, labTestsResponse, labResponse, serviceOfferedResponse] =
-          await Promise.all([
-            fetch(api.bookConsultation), // Replace with actual API endpoint
-            fetch(api.bookLabTest), // Replace with actual API endpoint
-            fetch(api.addNewLab),
-            fetch(api.serviceOffered)
-          ]);
-
-        const [appointmentsData, labTestsData, labData, serviceOfferedData] = await Promise.all([
-          appointmentsResponse.json(),
-          labTestsResponse.json(),
-          labResponse.json(),
-          serviceOfferedResponse.json()
+        const [
+          appointmentsResponse,
+          labTestsResponse,
+          labResponse,
+          serviceOfferedResponse,
+        ] = await Promise.all([
+          fetch(api.bookConsultation), // Replace with actual API endpoint
+          fetch(api.bookLabTest), // Replace with actual API endpoint
+          fetch(api.addNewLab),
+          fetch(api.serviceOffered),
         ]);
+
+        const [appointmentsData, labTestsData, labData, serviceOfferedData] =
+          await Promise.all([
+            appointmentsResponse.json(),
+            labTestsResponse.json(),
+            labResponse.json(),
+            serviceOfferedResponse.json(),
+          ]);
         const appointments = appointmentsData.appointments;
         const labTest = labTestsData.labTests;
         setAppointments(appointments);
@@ -104,7 +96,7 @@ export default function HomepageComp() {
         dispatch(setAllappointments(appointments));
         dispatch(setAllLabTest(labTest));
         dispatch(setAllLab(labData));
-        dispatch(setServiceOffered(serviceOfferedData))
+        dispatch(setServiceOffered(serviceOfferedData));
         // Calculate totals
         const calculatedTotals = calculateTotalIncome(appointments, labTest);
         console.log(calculatedTotals.totatIncome, "calculated totals");

@@ -3,7 +3,7 @@ import HomepageComp from "../../src/components/labTestComponent/HomepageComp";
 
 export default function Homepage() {
   return (
-    <Layouts header={6}>
+    <Layouts header={1}>
       <HomepageComp />
     </Layouts>
   );

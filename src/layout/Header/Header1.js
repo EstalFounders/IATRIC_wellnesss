@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
+  FaArrowDown,
   FaAudible,
   FaFacebook,
   FaHome,
@@ -16,6 +17,7 @@ import {
   api,
   color_schema,
   contact_no,
+  eventEmitter,
   facebook_page_url,
   sessionStorageName,
 } from "../../constant";
@@ -25,6 +27,8 @@ import { useRouter } from "next/router";
 import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 import { ConsultationButton } from "../../components/Common/commonUi";
+import { IoMdArrowDropdown } from "react-icons/io";
+import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
@@ -42,6 +46,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   };
 
   const handleConsultationTypeOpenDialog = () => {
+    console.log("tesinafa");
     setIsConsultationTypeOpen(true);
   };
 
@@ -250,7 +255,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
       </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
-      <div className="wsmainfull menu clearfix d-none d-lg-block">
+      <div className="wsmainfull menu clearfix d-none d-lg-block py-1">
         <div className="wsmainwp clearfix">
           {/* LOGO IMAGE */}
           {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
@@ -273,21 +278,26 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             <ul className="wsmenu-list h6 font-weight-bold">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <Link legacyBehavior href="/">
-                  <a>
-                    Home{" "}
-                    <span
-                    // className="wsarrow" uncomment to enable down arrow
-                    />
-                  </a>
-                </Link>
+                <div
+                  className="mx-2 navbar-option mt-3"
+                  onClick={() => {
+                    cartEventEmitter.emit(
+                      eventEmitter.navBarEventEmitter,
+                      "home"
+                    );
+                    router.push("/");
+                  }}
+                >
+                  Home{" "}
+                </div>
               </li>
               {/* END DROPDOWN MENU */}
               {/* PAGES */}
               <li aria-haspopup="true">
-                <a href="#">
-                  Pages <span className="wsarrow" />
-                </a>
+                <div className="mx-2 navbar-option mt-3">
+                  Pages <IoMdArrowDropdown />
+                  {/* <span className="wsarrow" /> */}
+                </div>
                 <div className="wsmegamenu clearfix">
                   <div className="container">
                     <div className="row">
@@ -402,9 +412,9 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               {/* END PAGES */}
               {/* HALF MENU */}
               <li aria-haspopup="true">
-                <a href="#">
-                  Half Menu <span className="wsarrow" />
-                </a>
+                <div className="mx-2 navbar-option mt-3">
+                  Half Menu <IoMdArrowDropdown />
+                </div>
                 <div className="wsmegamenu clearfix halfmenu">
                   <div className="container-fluid">
                     <div className="row">
@@ -453,9 +463,9 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               {/* END HALF MENU */}
               {/* MEGAMENU */}
               <li aria-haspopup="true">
-                <a href="#">
-                  Mega Menu <span className="wsarrow" />
-                </a>
+                <div className="mx-2 navbar-option mt-3">
+                  Mega Menu <IoMdArrowDropdown />
+                </div>
                 <div className="wsmegamenu clearfix">
                   <div className="container">
                     <div className="row">
@@ -582,7 +592,22 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               {/* END MEGAMENU */}
               {/* SIMPLE NAVIGATION LINK */}
               <li className="nl-simple" aria-haspopup="true">
-                <a href="#">Simple Link</a>
+                <div
+                  className="mx-2 navbar-option mt-3"
+                  onClick={() => {
+                    router.push("/");
+                    cartEventEmitter.emit(
+                      eventEmitter.navBarEventEmitter,
+                      "labtest"
+                    );
+                    cartEventEmitter.emit(
+                      eventEmitter.labTestEventEmitter,
+                      "labtest"
+                    );
+                  }}
+                >
+                  Lab Tests
+                </div>
               </li>
               {/* NAVIGATION MENU BUTTON */}
               {!hiddenRoutes.includes(router.pathname) && (
@@ -590,6 +615,8 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   <div className="mt-3">
                     <ConsultationButton
                       onClick={handleConsultationTypeOpenDialog}
+                      bgColor={color_schema.green}
+                      color={"white"}
                     >
                       Book an Appointment
                     </ConsultationButton>

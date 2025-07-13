@@ -3,7 +3,6 @@ import styles from "../css/FirstSection.module.css"; // Import the CSS module
 import { useRouter } from "next/router";
 import { CiSearch } from "react-icons/ci";
 import { useEffect, useState } from "react";
-import LabTesLandingPageHeader from "../../../layout/Header/LabTestLandingPageHeader";
 import { MdWifiCalling3 } from "react-icons/md";
 import { BiSolidDonateBlood } from "react-icons/bi";
 import { PiPaperPlaneTiltBold } from "react-icons/pi";
@@ -14,6 +13,8 @@ import { setHealthTestData } from "../../../store/slices/labTest/labTestCategory
 import { useAddToCart } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
 import Link from "next/link";
+import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
+import { eventEmitter } from "../../../constant";
 
 export default function FirstSection() {
   const router = useRouter();
@@ -92,7 +93,8 @@ export default function FirstSection() {
     setSearchTerm(result.title);
     setSearchResults([]);
     dispatch(setHealthTestData(result));
-    router.push({ pathname: "/labTest/viewDetails" });
+    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, "viewDetails");
+    // router.push({ pathname: "/labTest/viewDetails" });
   };
 
   const handleResultButtonClick = (result) => {
@@ -111,6 +113,13 @@ export default function FirstSection() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const eventforViewAllTestDetails = () => {
+    cartEventEmitter.emit(
+      eventEmitter.labTestEventEmitter,
+      "viewAllTestDetails"
+    );
+  };
 
   return (
     <div className={styles.fullRow}>
@@ -146,11 +155,9 @@ export default function FirstSection() {
                     <div
                       key={result.id || idx}
                       className={styles.autocompleteDropdownItem}
+                      onClick={() => selectTestResult(result)}
                     >
-                      <div
-                        className={styles.itemContent}
-                        onClick={() => selectTestResult(result)}
-                      >
+                      <div className={styles.itemContent}>
                         <span>{result.title}</span>
                       </div>
                       <div className="ml-auto">
@@ -167,9 +174,11 @@ export default function FirstSection() {
 
                 {searchResults.length > 5 && (
                   <div className={styles.viewAllLink}>
-                    <Link href="/labTest/viewAllTestDetails">
+                    <div
+                      onClick={() => eventforViewAllTestDetails()}
+                    >
                       View all test details
-                    </Link>
+                    </div>
                   </div>
                 )}
               </div>

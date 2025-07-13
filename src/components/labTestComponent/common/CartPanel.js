@@ -12,7 +12,7 @@ import Preloader from "../../Preloader";
 import Image from "next/image";
 import { RequestOtp } from "../../../layout/Component/RequestOtp";
 import { OtpScreen } from "../../../layout/Component/OtpScreen";
-import { price_symbol } from "../../../constant";
+import { eventEmitter, price_symbol } from "../../../constant";
 
 const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   const [name, setName] = useState();
@@ -33,7 +33,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
   useEffect(() => {
     // Listen for cart update events
-    cartEventEmitter.on("cartUpdate", (item) => {
+    cartEventEmitter.on(eventEmitter.cartEventEmitter, (item) => {
       setCartItems((prevItems) => [...prevItems, item]);
       setCartItemsIds((prevIds) => [...prevIds, item["healthCheckupData"]._id]);
     });
@@ -224,7 +224,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
               </div>
             </div>
             <div
-              className={`clickable-div ${styles.proceedBtn}`}
+              className={`clickable-div labtest-btn mr-2 px-4 py-2`}
               onClick={hanleProceed}
             >
               Proceed

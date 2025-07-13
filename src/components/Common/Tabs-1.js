@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import { Nav, Tab } from "react-bootstrap";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import ViewDoctorListModel from "../model/ViewDoctorListModel";
-import ViewDoctorListComp from "./ViewDoctorListComp";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import { FaArrowAltCircleLeft, FaArrowCircleRight } from "react-icons/fa";
 import { color_schema } from "../../constant";
 
-const Tabs1 = () => {
-  const [showDoctor, setShowDoctor] = useState(false);
+const ServicesTabs = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
   let filteredDoctors = null;
   // Initialize services with a list of services
@@ -136,7 +132,7 @@ const Tabs1 = () => {
     },
     {
       id: 15,
-      name: "Corporate Healthcare",
+      name: "Corporate Health",
       image: "/images/corporate-healthcamp.jpg",
       subheading: "Workplace Wellness Simplified",
       description:
@@ -159,28 +155,29 @@ const Tabs1 = () => {
         "Our Obstetrics department provides comprehensive care for women throughout pregnancy, childbirth, and the postpartum period. We are dedicated to ensuring the health and well-being of both mother and baby with personalized attention and advanced medical support.",
     },
   ]);
-
+  const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
-
   const router = useRouter();
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
 
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
-
-  // Slice the services array to get the services for the current page
   const currentServices = services.slice(
     indexOfFirstService,
     indexOfLastService
   );
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+  };
 
   const handleServiceClick = (serviceName) => {
     filteredDoctors = doctors.filter((doctor) =>
@@ -202,10 +199,8 @@ const Tabs1 = () => {
     // Add your logic here for handling the service click
   };
 
-  // Utility function to bold specific keywords in the description
   const boldKeywords = (text, keywords) => {
     if (!keywords || keywords.length === 0) return text;
-    // Escape special characters for regex
     const escapedKeywords = keywords.map((kw) =>
       kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     );
@@ -216,156 +211,122 @@ const Tabs1 = () => {
   };
 
   return (
-    <section id="tabs-1" className="wide-100 tabs-section division">
+    <section className="custom-tabs-section mt-50">
       <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <Tab.Container defaultActiveKey={`tab-${services[0].id}`}>
-              <div id="tabs-nav" className="list-group text-center">
-                <Nav
-                  className="nav nav-pills justify-content-center"
-                  id="pills-tab"
-                  as="ul"
-                >
-                  {currentPage > 1 && (
-                    <FaChevronLeft
-                      className="nav-icon mt-3 mr-4"
-                      onClick={handlePrevPage}
-                      color="#8e8333"
-                      size={30}
-                    />
-                  )}
-                  {currentServices.map((service, index) => (
-                    <Nav.Item className="nav-item icon-xs" key={index} as="li">
-                      <Nav.Link
-                        className="consultation-btn"
-                        style={{ color: `${color_schema.green}` }}
-                        eventKey={`tab-${index}`}
-                      >
-                        <b>{service.name}</b>
-                      </Nav.Link>
-                    </Nav.Item>
-                  ))}
-                  {indexOfLastService < services.length && (
-                    <FaChevronRight
-                      className="nav-icon mt-3 mr-4"
-                      onClick={handleNextPage}
-                      color="#8e8333"
-                      size={30}
-                    />
-                  )}
-                </Nav>
+        <div className="tab-nav-wrapper position-relative">
+          <div className="arrow left-arrow-fixed" onClick={handlePrevPage}>
+            <FaArrowAltCircleLeft size={30} color={color_schema.yellow} />
+          </div>
+
+          <div className="tab-buttons-container d-flex justify-content-center align-items-center flex-grow-1">
+            {currentServices.map((service) => (
+              <div
+                key={service.id}
+                className={`tab-button service-nav-link text-uppercase mx-1 px-4 ${
+                  activeTab === service.id ? "active-tab" : ""
+                }`}
+                onClick={() => handleTabClick(service.id)}
+                style={{
+                  width: "280px", // fixed width for consistent layout
+                  textAlign: "center",
+                  fontSize: "1.1rem",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  // textOverflow: "ellipsis",
+                  cursor: "pointer",
+                }}
+              >
+                {service.name}
               </div>
-              <Tab.Content className="tab-content" id="pills-tabContent">
-                {currentServices.map((service, index) => (
-                  <Tab.Pane
-                    className="tab-pane fade"
-                    key={index}
-                    eventKey={`tab-${index}`}
-                  >
-                    <div className="row d-flex align-items-start">
-                      <div className="col-lg-6 d-flex align-items-start">
-                        <div className="tab-img" style={{ width: "100%" }}>
-                          <Image
-                            width={500}
-                            height={550}
-                            src={service.image}
-                            alt="tab-image"
-                            style={{ objectFit: "cover", width: "100%" }}
-                          />
-                        </div>
-                      </div>
-                      <div className="col-lg-6 d-flex flex-column justify-content-start">
-                        <div className="txt-block pc-30">
-                          <span className="section-id blue-color">
-                            <h4 style={{ marginTop: 0 }}>
-                              {service.subheading}
-                            </h4>
-                          </span>
-                          <h3
-                            className="h3-md text- clickable-div mb-0"
-                            style={{ cursor: "pointer" }}
-                            onMouseEnter={(e) =>
-                              (e.target.style.color = "#0056b3")
-                            }
-                            onMouseLeave={(e) =>
-                              (e.target.style.color = "black")
-                            }
-                            onClick={() => handleServiceClick(service.name)}
-                          >
-                            {service.name}
-                          </h3>
-                          <div className="h5 box-list grey-color">
-                            {
-                              // Pass keywords you want to bold for each service
-                              boldKeywords(service.description, [
-                                "General Physician",
-                                "trusted care",
-                                "Pediatrics",
-                                "monitoring",
-                                "immunizations",
-                                "Cardiology",
-                                "advanced care",
-                                "Dermatologist",
-                                "effective treatments",
-                                "Orthopaedics",
-                                "bone",
-                                "joint",
-                                "muscle disorders",
-                                "Gynaecology",
-                                "preventive screenings",
-                                "reproductive health care",
-                                "Ophthalmology",
-                                "comprehensive eye care",
-                                "Pulmonology",
-                                "respiratory",
-                                "lung conditions",
-                                "Psychiatrist",
-                                "mental health care",
-                                "Dentistry",
-                                "comprehensive oral care",
-                                "Physiotherapy",
-                                "restore movement",
-                                "Nursing care",
-                                "professional support",
-                                "Home care",
-                                "quality healthcare",
-                                "Medicine Delivery",
-                                "prescriptions",
-                                "Lab Investigation",
-                                "diagnostic tests",
-                                "Corporate Healthcare",
-                                "employee wellness",
-                                "Healthcamp",
-                                "community health camps",
-                                "Obstetrics",
-                                "pregnancy",
-                                "childbirth",
-                                "postpartum period",
-                                "personalized attention",
-                              ])
-                            }
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Tab.Pane>
-                ))}
-              </Tab.Content>
-            </Tab.Container>
+            ))}
+          </div>
+
+          <div className="arrow right-arrow-fixed" onClick={handleNextPage}>
+            <FaArrowCircleRight size={30} color={color_schema.yellow} />
           </div>
         </div>
+
+        <div className="custom-tab-content mt-5">
+          {services
+            .filter((service) => service.id === activeTab)
+            .map((service) => (
+              <div className="row" key={service.id}>
+                <div className="col-lg-6">
+                  <Image
+                    src={service.image}
+                    width={500}
+                    height={550}
+                    alt={service.name}
+                    style={{ objectFit: "cover", width: "100%" }}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <h4 className="section-subheading">
+                    <span className="section-id blue-color">
+                      <h4>{service.subheading}</h4>
+                    </span>
+                  </h4>
+                  <h3
+                    className="service-title clickable-div h3-md steelblue-color"
+                    onClick={() => handleServiceClick(service.name)}
+                  >
+                    {service.name}
+                  </h3>
+                  <div className="service-description h5 box-list grey-color">
+                    {boldKeywords(service.description, [
+                      "General Physician",
+                      "trusted care",
+                      "Pediatrics",
+                      "monitoring",
+                      "immunizations",
+                      "Cardiology",
+                      "advanced care",
+                      "Dermatologist",
+                      "effective treatments",
+                      "Orthopaedics",
+                      "bone",
+                      "joint",
+                      "muscle disorders",
+                      "Gynaecology",
+                      "preventive screenings",
+                      "reproductive health care",
+                      "Ophthalmology",
+                      "comprehensive eye care",
+                      "Pulmonology",
+                      "respiratory",
+                      "lung conditions",
+                      "Psychiatrist",
+                      "mental health care",
+                      "Dentistry",
+                      "comprehensive oral care",
+                      "Physiotherapy",
+                      "restore movement",
+                      "Nursing care",
+                      "professional support",
+                      "Home care",
+                      "quality healthcare",
+                      "Medicine Delivery",
+                      "prescriptions",
+                      "Lab Investigation",
+                      "diagnostic tests",
+                      "Corporate Healthcare",
+                      "employee wellness",
+                      "Healthcamp",
+                      "community health camps",
+                      "Obstetrics",
+                      "pregnancy",
+                      "childbirth",
+                      "postpartum period",
+                      "personalized attention",
+                    ])}
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
-      <ViewDoctorListModel
-        isOpen={showDoctor}
-        onClose={() => {
-          setShowDoctor(false);
-        }}
-      >
-        <ViewDoctorListComp doctors={filteredDoctors} />
-      </ViewDoctorListModel>
     </section>
   );
 };
 
-export default Tabs1;
+export default ServicesTabs;

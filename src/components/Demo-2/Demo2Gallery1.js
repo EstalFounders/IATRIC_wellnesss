@@ -62,7 +62,7 @@ const Demo2Gallery1 = () => {
               width={500}
               height={500}
               className="img-fluid"
-              src="/images/gallery/image-2.png"
+              src="/images/gallery/image-2.jpg"
               alt="gallery-image"
             />
             <div className="item-overlay" />
