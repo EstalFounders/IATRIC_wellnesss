@@ -155,9 +155,11 @@ export default function FirstSection() {
                     <div
                       key={result.id || idx}
                       className={styles.autocompleteDropdownItem}
-                      onClick={() => selectTestResult(result)}
                     >
-                      <div className={styles.itemContent}>
+                      <div
+                        className={styles.itemContent}
+                        onClick={() => selectTestResult(result)}
+                      >
                         <span>{result.title}</span>
                       </div>
                       <div className="ml-auto">
@@ -174,9 +176,7 @@ export default function FirstSection() {
 
                 {searchResults.length > 5 && (
                   <div className={styles.viewAllLink}>
-                    <div
-                      onClick={() => eventforViewAllTestDetails()}
-                    >
+                    <div onClick={() => eventforViewAllTestDetails()}>
                       View all test details
                     </div>
                   </div>

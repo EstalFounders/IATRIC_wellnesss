@@ -1,34 +1,47 @@
 import Image from "next/image";
 import React from "react";
+import ChatPeopleIcon, {
+  ClinicIcon,
+  CommunityIcon,
+  ConsultationSVGIcon,
+  CorporateHealthIcon,
+  HomecareIcon,
+} from "../../../public/svgIcon/discover-more-svg-icon";
+import { color_schema } from "../../constant";
 
 const DiscoverMoreComp = () => {
-const features = [
+  const features = [
     {
-        title: "Consultation",
-        description: "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
-        icon: "/images/discover-more/consultationIcon.png",
+      title: "Consultation",
+      description:
+        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
+      icon: <ConsultationSVGIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
     },
     {
-        title: "Homecare Services",
-        description: "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
-        icon: "/images/discover-more/homecare.png",
+      title: "Homecare Services",
+      description:
+        "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
+      icon: <HomecareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
     },
     {
-        title: "Specialized Clinic",
-        description: "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
-        icon: "/images/discover-more/specializedClinic.png",
+      title: "Specialized Clinic",
+      description:
+        "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
+      icon: <ClinicIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
     },
     {
-        title: "Community Health",
-        description: "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
-        icon: "/images/discover-more/communityhealth.png",
+      title: "Community Health",
+      description:
+        "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
+      icon: <CommunityIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
     },
     {
-        title: "Corporate Healthcare",
-        description: "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-        icon: "/images/discover-more/corporatehealth.png",
+      title: "Corporate Healthcare",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: <CorporateHealthIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
     },
-];
+  ];
 
   return (
     <div className="container py-5">
@@ -41,12 +54,12 @@ const features = [
         </p>
       </div>
 
-        <div className="row g-4 justify-content-center">
-          {features.map((item, index) => (
-            <div key={index} className="col-12 col-md-6 col-lg-4 p-4">
+      <div className="row g-4 justify-content-center">
+        {features.map((item, index) => (
+          <div key={index} className="col-12 col-md-6 col-lg-4 p-4">
             <div
               className="green-hover h-100 shadow-sm border-0 text-center p-4"
-              style={{ borderRadius: '10px', minWidth: '320px' }}
+              style={{ borderRadius: "10px", minWidth: "320px" }}
             >
               {/* Floating Icon */}
               <div
@@ -63,13 +76,14 @@ const features = [
                   marginTop: "-50px",
                 }}
               >
-                <Image
+                {/* <Image
                   src={item.icon}
                   alt={item.title}
                   width={60}
                   height={60}
                   className="img-fluid"
-                />
+                /> */}
+                {item.icon}
               </div>
 
               {/* Card Content */}

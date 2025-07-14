@@ -3,7 +3,14 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { PiShoppingCartSimpleBold } from "react-icons/pi";
-import { FaBars, FaFacebook, FaInstagram, FaLinkedin, FaMapMarkedAlt, FaWhatsapp } from "react-icons/fa";
+import {
+  FaBars,
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaMapMarkedAlt,
+  FaWhatsapp,
+} from "react-icons/fa";
 import Image from "next/image";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
 import { RequestOtp } from "../Component/RequestOtp";
@@ -15,7 +22,12 @@ import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
 import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
-import { address, contact_no, existingUser, facebook_page_url } from "../../constant";
+import {
+  address,
+  contact_no,
+  existingUser,
+  facebook_page_url,
+} from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import Link from "next/link";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
@@ -32,9 +44,9 @@ function LabTesLandingPageHeader() {
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
 
   const dialOptions = [
-      { label: "Dial", action: dial, icon: 0 },
-      { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
-    ];
+    { label: "Dial", action: dial, icon: 0 },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
+  ];
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -183,22 +195,28 @@ function LabTesLandingPageHeader() {
         </div>
         {/* END HEADER STRIP */}
       </div>
-      <Container className={styles.container}>
+      <Container className={`border-bottom ${styles.container}`}>
         <Row className={`align-items-center ${styles.row}`}>
           <Col xs={8} sm={4} md={2} className="d-flex align-items-center">
-            <Image src="/images/logo.png" width={50} height={35} alt="Logo" />
+            <Image src="/images/logo.png" width={120} height={60} alt="Logo" />
           </Col>
 
-          <Col md={6} className="d-none d-md-flex justify-content-center">
+          <Col md={6} className="d-md-flex justify-content-center">
             <div
-              className="mx-4 clickable-div"
+              className="mx-2 clickable-div navbar-option"
               onClick={() => router.push("/labTest/homepage")}
             >
               Home
             </div>
-            <div className="mx-4">Services</div>
-            <div className="mx-4">Blog</div>
-            <div className="mx-4">About</div>
+            <div className="mx-2 clickable-div navbar-option" onClick={() => router.push("/labTest/viewAllTestDetails")}>
+              All Tests
+            </div>
+            <div className="mx-2 clickable-div navbar-option" onClick={() => router.push("/appointment")}>
+              Consult
+            </div>
+            <div className="mx-2 clickable-div navbar-option">
+              About
+            </div>
           </Col>
 
           <Col xs={4} sm={4} md={3} className="d-flex justify-content-end">
@@ -262,7 +280,7 @@ function LabTesLandingPageHeader() {
               <>
                 <div
                   onClick={handlelogin}
-                  className={`clickable-div ${styles.loginButton}`}
+                  className={`clickable-div labtest-btn`}
                 >
                   Login
                 </div>
@@ -288,6 +306,7 @@ function LabTesLandingPageHeader() {
               className="clickable-div"
             />
           </Col>
+          
         </Row>
 
         {mobileMenuOpen && (
@@ -319,6 +338,7 @@ function LabTesLandingPageHeader() {
           )}
         </LabTestModel>
       </Container>
+      
     </>
   );
 }

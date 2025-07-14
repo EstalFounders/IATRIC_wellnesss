@@ -199,7 +199,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
           </div>
         )}
         {/* Submit */}
-        <div className="text-center w-50 ml-auto mr-auto">
+        <div className="text-center w-50 ml-auto mr-auto mb-3">
           <ConsultationButton onClick={handleSubmit} className="mb-4">
             Verify
           </ConsultationButton>
