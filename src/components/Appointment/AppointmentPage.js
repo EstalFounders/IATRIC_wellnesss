@@ -31,12 +31,12 @@ import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import { IS_NOW } from "../../../pages/api/utils/constants";
-import bookConsultationApiCall from "../ApiService/BookConsultationApiCall";
 import AppointmentForm from "./appointmentform";
 import bookConsultationFromAdmin from "../../../pages/superAdmin/bookConsultationFromAdmin";
 import { ConsultationButton } from "../Common/commonUi";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
 import { useDispatch } from "react-redux";
+import { bookConsultationApiCall } from "../ApiService/BookConsultationApiCall";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -73,7 +73,7 @@ const AppointmentPage = () => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
-  const [isLoading, setIsLoading] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [message, setMessage] = useState("");
   const [consultationprice, setConsultationPrice] = useState("");
@@ -348,9 +348,8 @@ const AppointmentPage = () => {
 
   const bookConsultation = async () => {
     try {
-      const response = await bookConsultationApiCall(
-        consultationData,
-        setIsLoading
+      const response = await bookConsultationApiCall({consultationData,
+        setIsLoading}
       );
       const data = response;
       const message = data.json();
