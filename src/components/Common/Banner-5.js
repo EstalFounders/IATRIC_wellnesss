@@ -26,9 +26,9 @@ const Banner5 = () => {
               <b>reach your wellness goals.</b> We achieve this through a
               powerful combination of <b>cutting-edge telemedicine services</b>{" "}
               and an unwavering commitment to your overall well-being. Whether
-              you&apos;re seeking online consultations or comprehensive home care,
-              our experts are dedicated to providing the highest standard of
-              medical support.
+              you&apos;re seeking online consultations or comprehensive home
+              care, our experts are dedicated to providing the highest standard
+              of medical support.
             </div>
             <div className="h5 box-list grey-color">
               Experience the Healthpath difference:{" "}
@@ -43,7 +43,7 @@ const Banner5 = () => {
         {/* BANNER IMAGE */}
         <div className="row ml-5">
           <div className="col-lg-10 offset-lg-1">
-            <div className="banner-5-img wow fadeInUp" data-wow-delay="0.4s">
+            <div className="banner-5-img">
               <Image
                 width={800}
                 height={600}

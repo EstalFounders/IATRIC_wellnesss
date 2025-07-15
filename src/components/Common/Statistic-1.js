@@ -9,7 +9,7 @@ const Statistic1 = () => {
         <div className="row">
           {/* STATISTIC BLOCK #1 */}
           <div className="col-md-6 col-lg-3 mr-auto ml-auto">
-            <div className="statistic-block icon-lg" data-wow-delay="0.4s">
+            <div className="statistic-block icon-lg">
               {/* Icon  */}
               <span className="flaticon-062-cardiogram-3" />
               {/* Text */}
@@ -21,7 +21,7 @@ const Statistic1 = () => {
           </div>
           {/* STATISTIC BLOCK #2 */}
           <div className="col-md-6 col-lg-3 mr-auto ml-auto">
-            <div className="statistic-block icon-lg" data-wow-delay="0.6s">
+            <div className="statistic-block icon-lg">
               {/* Icon  */}
               <span className="flaticon-137-doctor" />
               {/* Text */}

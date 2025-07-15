@@ -39,8 +39,7 @@ const Demo5About6 = () => {
           {/* IMAGE BLOCK */}
           <div className="col-lg-6">
             <div
-              className="about-img text-center wow fadeInUp"
-              data-wow-delay="0.2s"
+              className="about-img text-center"
             >
               <Image
                 width={500}
