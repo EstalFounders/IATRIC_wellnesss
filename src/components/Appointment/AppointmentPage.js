@@ -31,7 +31,7 @@ import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import { IS_NOW } from "../../../pages/api/utils/constants";
-import AppointmentForm from "./appointmentform";
+import AppointmentForm from "./Appointmentform";
 import bookConsultationFromAdmin from "../../../pages/superAdmin/bookConsultationFromAdmin";
 import { ConsultationButton } from "../Common/commonUi";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
@@ -197,10 +197,10 @@ const AppointmentPage = () => {
   }, [appointmentState.selectedDoctorId, appointmentState.selectedDate]);
 
   useEffect(() => {
-      if(!doctors) {
-        fetchDoctors(dispatch);
-      }
-    }, []); // Empty dependency array ensures the effect runs only once
+    if (!doctors) {
+      fetchDoctors(dispatch);
+    }
+  }, []); // Empty dependency array ensures the effect runs only once
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
@@ -348,9 +348,10 @@ const AppointmentPage = () => {
 
   const bookConsultation = async () => {
     try {
-      const response = await bookConsultationApiCall({consultationData,
-        setIsLoading}
-      );
+      const response = await bookConsultationApiCall({
+        consultationData,
+        setIsLoading,
+      });
       const data = response;
       const message = data.json();
       if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
@@ -384,6 +385,7 @@ const AppointmentPage = () => {
 
   const whatsappConfrimation = () => {
     setOtpConfirmationPopup(false);
+    console.log("OTP confirmed, proceeding with booking");
     bookConsultation();
   };
 
