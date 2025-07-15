@@ -9,18 +9,18 @@ import {
 } from "./CommonMethod";
 import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
-import { price_symbol } from "../../../constant";
+import { eventEmitter, price_symbol } from "../../../constant";
 import { useDispatch } from "react-redux";
 import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
-    const dispatch  = useDispatch();
+  const dispatch = useDispatch();
   const router = useRouter();
   const handleViewDetails = (healthCheckupData) => {
-    dispatch(setHealthTestData(healthCheckupData))
-    router.push({ pathname: "/labTest/viewDetails" });
+    dispatch(setHealthTestData(healthCheckupData));
+    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, "viewDetails");
   };
   return (
     <div className={styles.card}>
@@ -33,12 +33,17 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
               🩺
             </span>
           </div>
-          <div className={`col col-md-2 ${styles.discount}`}>
+          <div className={`col col-md-2 pt-2 ${styles.discount}`}>
             {healthCheckupData.discount}
+            {"%"}
           </div>
           <div className={`col ${styles.price}`}>
-            {price_symbol}{healthCheckupData.price}{" "}
-            <span className={styles.mrp}>{price_symbol}{healthCheckupData.mrp}</span>
+            {price_symbol}
+            {healthCheckupData.price}{" "}
+            <span className={styles.mrp}>
+              {price_symbol}
+              {healthCheckupData.mrp}
+            </span>
           </div>
         </div>
 

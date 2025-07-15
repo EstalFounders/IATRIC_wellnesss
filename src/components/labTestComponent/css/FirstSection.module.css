@@ -33,7 +33,7 @@
 }
 
 .thirdSection {
-  margin-top: 10%;
+  margin-top: 5%;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -49,11 +49,10 @@
   padding: 0 20px;
   font-size: 14px;
   font-weight: 700;
-  color: #737373;
 }
 
 .searchIcon {
-  background: #DDE6C6;
+  background: #3b5f1d;
   width: 56px;
   height: 58px;
   padding: 17.5px 17px 16.5px 15px;
@@ -65,11 +64,12 @@
 
 .getQuotesNow {
   text-align: center;
-  background-color: #DDE6C6;
+  background-color: #3b5f1d;
   padding: 16px;
   font-size: 14px;
   font-weight: 700;
   border-radius: 8px;
+  color: white;
 }
 
 .callingButton {
@@ -79,8 +79,8 @@ padding: 8px;
 gap: 10px;
 border-radius: 8px;
 border: 10px 0px 0px 0px;
-background-color: #DDE6C6;
-border: 10px solid #DDE6C6,
+background-color: #3b5f1d;
+/* border: 10px solid #8e8333, */
 
 }
 
@@ -92,7 +92,7 @@ border: 10px solid #DDE6C6,
 }
 
 .testDetailsCard {
-  margin-top: 10%;
+  margin-top: 7%;
 }
 
 .autocompleteDropdown {
