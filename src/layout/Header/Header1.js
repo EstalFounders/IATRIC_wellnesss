@@ -619,11 +619,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 <div
                   className="mx-2 navbar-option mt-3"
                   onClick={() => {
-                    router.push("/");
-                    cartEventEmitter.emit(
-                      eventEmitter.navBarEventEmitter,
-                      "labtest"
-                    );
+                    router.push("/labTest/homepage");
                     cartEventEmitter.emit(
                       eventEmitter.labTestEventEmitter,
                       "labtest"

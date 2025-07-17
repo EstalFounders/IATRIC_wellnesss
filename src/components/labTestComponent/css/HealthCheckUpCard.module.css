@@ -19,7 +19,7 @@
   }
   
   .discount {
-    color: #ffffff;
+    color: #8e8333;
     font-weight: bold;
     font-size: 20px;
 font-weight: 700;
@@ -57,6 +57,16 @@ line-height: 28.8px;
 text-align: left;
 margin-top: 50px;
 color: #ffffff;
+text-wrap: nowrap;
+  }
+  
+  .description {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #ffffff;
+    text-align: left;
+    margin-left: 5%;
+    margin-right: 5%;
 
 }
   
@@ -105,12 +115,16 @@ align-items: center;
     margin-left: 2%;
 justify-content: center;
 align-items: center;
-    background: linear-gradient(to bottom,#8e8333, #A69D50); /* Lighter Olive to Original Olive */
+    background: linear-gradient(to bottom,#3b5f1d, #A69D50); /* Lighter Olive to Original Olive */
     transition: background-color 0.3s ease; /* Smooth transition */
 }
   
   .upperSection {
-  background: linear-gradient(to right,#3b5f1d, #4CAF50 ); /* Lighter Green to Darker Green */
+  /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
+  background: linear-gradient(to top right, #3b5f1d, #8e8333);
   height: 150px;
   border-radius: 10px;
 }

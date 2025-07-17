@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { eventEmitter, price_symbol } from "../../../constant";
 import { useDispatch } from "react-redux";
 import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
@@ -20,7 +21,7 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
   const router = useRouter();
   const handleViewDetails = (healthCheckupData) => {
     dispatch(setHealthTestData(healthCheckupData));
-    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, "viewDetails");
+    router.push('/labTest/viewDetails')
   };
   return (
     <div className={styles.card}>
@@ -50,7 +51,40 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
         {/* Title Section */}
         <div className={styles.title}>
           <div className="mt-3">
-            <strong>{healthCheckupData.title}</strong>
+            {/*
+          OverlayTrigger wraps the element that will trigger the tooltip.
+          placement="top" means the tooltip will appear above the element.
+          overlay prop takes a function that returns the Tooltip component.
+          The Tooltip needs a unique 'id' prop.
+        */}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id={`tooltip-${healthCheckupData.id}`}>
+                  {healthCheckupData.title}
+                </Tooltip>
+              }
+            >
+              {/*
+            The strong tag now has inline styles for truncation.
+            - whiteSpace: 'nowrap' prevents text from wrapping to the next line.
+            - overflow: 'hidden' hides any content that overflows the element's box.
+            - textOverflow: 'ellipsis' displays an ellipsis (...) for clipped text.
+            - display: 'block' is crucial for text-overflow to work correctly on inline elements like <strong>.
+            - maxWidth: '100%' ensures it respects its parent's width.
+          */}
+              <strong
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "block",
+                  maxWidth: "100%", // Adjust this or its parent's width to control truncation point
+                }}
+              >
+                {healthCheckupData.title}
+              </strong>
+            </OverlayTrigger>
           </div>
         </div>
       </div>

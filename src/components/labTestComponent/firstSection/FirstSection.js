@@ -4,21 +4,17 @@ import { useRouter } from "next/router";
 import { CiSearch } from "react-icons/ci";
 import { useEffect, useState } from "react";
 import { MdDeliveryDining, MdWifiCalling3 } from "react-icons/md";
-import { BiSolidDonateBlood } from "react-icons/bi";
-import { PiPaperPlaneTiltBold } from "react-icons/pi";
 import { useRef, useCallback } from "react";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
 import { useAddToCart } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
-import Link from "next/link";
-import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
-import { color_schema, eventEmitter } from "../../../constant";
+import { color_schema } from "../../../constant";
 import { FaSearch } from "react-icons/fa";
 import { AiOutlineSafetyCertificate } from "react-icons/ai";
 import { HiOutlineDocumentReport } from "react-icons/hi";
-import { TbPercentage } from "react-icons/tb";
+import { TbCheckupList, TbPercentage } from "react-icons/tb";
+import { GrTest } from "react-icons/gr";
 
 export default function FirstSection() {
   const router = useRouter();
@@ -97,8 +93,7 @@ export default function FirstSection() {
     setSearchTerm(result.title);
     setSearchResults([]);
     dispatch(setHealthTestData(result));
-    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, "viewDetails");
-    // router.push({ pathname: "/labTest/viewDetails" });
+    router.push({ pathname: "/labTest/viewDetails" });
   };
 
   const handleResultButtonClick = (result) => {
@@ -119,10 +114,7 @@ export default function FirstSection() {
   }, []);
 
   const eventforViewAllTestDetails = () => {
-    cartEventEmitter.emit(
-      eventEmitter.labTestEventEmitter,
-      "viewAllTestDetails"
-    );
+    router.push("/labTest/viewAllTestDetails");
   };
 
   return (
@@ -159,7 +151,10 @@ export default function FirstSection() {
                     {test.icon}
                   </span>
                   <div className="d-flex align-items-center justify-content-center mb-2">
-                    <div style={{ fontWeight: "bold", fontSize: "1.3rem" }} className="mt-2">
+                    <div
+                      style={{ fontWeight: "bold", fontSize: "1.3rem" }}
+                      className="mt-2"
+                    >
                       {test.title}
                     </div>
                   </div>
@@ -170,13 +165,14 @@ export default function FirstSection() {
         </div>
         {/* Search Bar Section */}
         <div className={`row ${styles.thirdSection}`}>
-          <div className="col-sm-8 col-md-5 mb-3 d-flex flex-row position-relative">
+          <div className="col-sm-8 col-md-6 mb-3 d-flex flex-row d-flex justify-content-center">
             <input
-              className={styles.searchBar}
+              className={`${styles.searchBar}`}
               placeholder="Search for tests"
               value={searchTerm}
               onChange={handleSearchChange}
               autoComplete="off"
+              
             />
             <FaSearch
               className={`ml-2 labtest-searchIcon consultation-btn`}
@@ -222,12 +218,23 @@ export default function FirstSection() {
               </div>
             )}
           </div>
-          <div className={`col-sm-4 col-md-3 mb-3 consultation-btn`}>
-            <div className="mt-2">
-              Get Quotes Now {<PiPaperPlaneTiltBold />}
+          <div
+            className={`col-sm-4 col-md-2 mb-3 consultation-btn d-flex justify-content-center ml-5`}
+            onClick={() => eventforViewAllTestDetails()}
+          >
+            <div className="mt-2 h5 font-weight-bold">
+              Lab Tests  {<GrTest size={30} />}
             </div>
           </div>
-          <div className="col-12 col-sm-8 col-md-4 d-flex flew-row">
+          <div
+            className={`col-sm-4 col-md-2 mb-3 consultation-btn d-flex justify-content-center ml-5`}
+            
+          >
+            <div className="mt-2 h5 font-weight-bold">
+              Checkups {<TbCheckupList size={30} />}
+            </div>
+          </div>
+          {/* <div className="col-12 col-sm-8 col-md-3 d-flex flew-row  d-flex justify-content-center">
             <div
               className={`col-3 d-flex justify-content-center align-items-center consultation-btn`}
               style={{ width: "58px", height: "58px" }}
@@ -238,9 +245,9 @@ export default function FirstSection() {
               <div>24H Emergency</div>
               <div>876786543</div>
             </div>
-          </div>
+          </div> */}
         </div>
-        
+
         {snackbarOpen && (
           <Snackbar
             open={snackbarOpen}
