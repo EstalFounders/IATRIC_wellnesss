@@ -114,3 +114,38 @@
   padding: 0 50px; /* match arrow padding */
 }
 
+.labtes-cart-icon {
+  position: relative;
+  display: inline-block;
+  margin-left: 1rem;  
+}
+
+.cartItemCount {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #4F6628;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.on-hover-blue:hover {
+  color: #8e8333;
+  font-weight: bold;
+}
+.labtest-searchIcon {
+  background: white;
+  width: 56px;
+  height: 58px;
+  padding: 17.5px 17px 16.5px 15px;
+  gap: 10px;
+  border: 1px solid #3b5f1d;
+  border-radius: 0px 8px 8px 0px;
+}
+

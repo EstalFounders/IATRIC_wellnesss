@@ -3,10 +3,11 @@ import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useState } from "react";
 import MoreModalComp from "../modal/MoreButtonModel";
 import styles from "../css/FirstSection.module.css";
-import { eventEmitter } from "../../../constant";
+import { color_schema, eventEmitter } from "../../../constant";
 
 export const MoreButton = ({ healthCheckupData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -18,11 +19,16 @@ export const MoreButton = ({ healthCheckupData }) => {
 
   return (
     <div>
-      <div className={`px-4 labtest-btn`} onClick={handleOpenModal}>
+      <div
+        className={`px-4 labtest-btn`}
+        onClick={handleOpenModal}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div className="d-flex flex-direction-row h6 mt-2">
           <div>More</div>
-          <div>
-            <HiArrowCircleRight color="#ffffff" />
+          <div className="ml-2">
+            <HiArrowCircleRight color={isHovered ? color_schema.white: color_schema.black} />
           </div>
         </div>
       </div>
