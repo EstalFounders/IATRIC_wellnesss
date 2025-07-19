@@ -19,12 +19,13 @@
   }
   
   .discount {
-    color: #8e8333;
+    color: white;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 12px;
 font-weight: 700;
 line-height: 31.69px;
-
+border-radius: 10px;
+background-color: #559421;
   }
   
   .price {
@@ -115,7 +116,8 @@ align-items: center;
     margin-left: 2%;
 justify-content: center;
 align-items: center;
-    background: linear-gradient(to bottom,#3b5f1d, #A69D50); /* Lighter Olive to Original Olive */
+    /* background: linear-gradient(to bottom,#3b5f1d, #A69D50);  */
+    background-color: #3b5f1d;
     transition: background-color 0.3s ease; /* Smooth transition */
 }
   

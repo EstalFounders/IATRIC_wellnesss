@@ -21,10 +21,11 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
   const router = useRouter();
   const handleViewDetails = (healthCheckupData) => {
     dispatch(setHealthTestData(healthCheckupData));
-    router.push('/labTest/viewDetails')
+    router.push("/labTest/viewDetails");
   };
   return (
     <div className={styles.card}>
+      {console.log(healthCheckupData, "healthcheckup data")}
       {/* Header section with discount, price and MRP */}
       <div className={styles.upperSection}>
         <div className={`row ${styles.header}`}>
@@ -34,16 +35,17 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
               🩺
             </span>
           </div>
-          <div className={`col col-md-2 pt-2 ${styles.discount}`}>
-            {healthCheckupData.discount}
-            {"%"}
+          <div
+            className={`mr-1 ${styles.discount} d-flex align-items-center justify-content-center px-2 py-0`}
+          >
+            {healthCheckupData.discount}%off
           </div>
           <div className={`col ${styles.price}`}>
             {price_symbol}
             {healthCheckupData.price}{" "}
             <span className={styles.mrp}>
               {price_symbol}
-              {healthCheckupData.mrp}
+              {healthCheckupData.price}
             </span>
           </div>
         </div>
@@ -90,12 +92,13 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
       </div>
       {/* Details Section */}
       <div className={`row ${styles.details}`}>
+        {console.log(healthCheckupData.test_included, "test incldued")}
         <div className="col">
           <div className={`text-center ${styles.icon}`}>
             <TbKeyframes />
           </div>
           <strong className="font-weight-bold">
-            {/* {calculateParameters(healthCheckupData.test_included)} parameters */}
+            {calculateParameters(healthCheckupData.test_included)} parameters
           </strong>{" "}
           included
         </div>
@@ -104,7 +107,7 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
             <TbReportSearch />
           </div>
           <strong className="font-weight-bold">Report in </strong>
-          {healthCheckupData.report_within}
+          {healthCheckupData.reports_within}
         </div>
       </div>
 

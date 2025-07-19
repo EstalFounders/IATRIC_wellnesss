@@ -61,7 +61,7 @@ const DiscoverMoreComp = () => {
         </span>
         <h1 className="display-5 fw-bold">Discover More</h1>
         <div className="h5 box-list grey-color">
-          HealthPath's comprehensive healthcare solutions: Online Consultation,
+          HealthPath&apos;s comprehensive healthcare solutions: Online Consultation,
           Homecare, Specialized Clinic, Community Health, and Corporate
           Healthcare. Your path to well-being.
         </div>

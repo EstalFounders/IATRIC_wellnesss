@@ -174,3 +174,10 @@ export const eventEmitter = {
   navBarEventEmitter: "navbar-option",
   labTestEventEmitter: "labTestUpdate",
 };
+
+export const labtestCateogory = {
+  fullBodyCheckup: 'Full Body',
+  sexualHealth: 'Sexual Health',
+  allergyTestCheckup: 'Allergy'
+
+}

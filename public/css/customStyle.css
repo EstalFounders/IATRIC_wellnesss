@@ -148,4 +148,17 @@
   border: 1px solid #3b5f1d;
   border-radius: 0px 8px 8px 0px;
 }
+.bg-green-gradient {
+  background: linear-gradient(to top,#3b5f1d, #4bac54);
+}
+
+.bg-yellow-gradient {
+  background: linear-gradient(to top,#8e8333, #d1c35a);
+}
+
+.most-booked-checkup-style {
+  border-radius: 40px;
+  height: 200px;
+}
+
 

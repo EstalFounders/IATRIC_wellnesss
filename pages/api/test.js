@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
-import LabTest from "../../src/models/lab-test"; // Assuming you've defined a model schema
+import LabTest from "../../src/models/lab-test-packageSchema"; // Assuming you've defined a model schema
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
 import { contact_no, serviceOffered } from "../../src/constant";
@@ -10,6 +10,8 @@ import ServiceOffered from "../../src/models/serviceOffered";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import Slot from "../../src/models/slots";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
+import LabTestPackagesScehma from "../../src/models/lab-test-packageSchema";
+import LabTestPackagesCatgoryScehma from "../../src/models/lab-test-package-categorySchema";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -17,49 +19,75 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
-  try {
-    // Find all documents and group by title, collecting their _ids
-    const duplicates = await LabTestDetails.aggregate([
-      {
-        $group: {
-          _id: "$title",
-          ids: { $push: "$_id" },
-          count: { $sum: 1 }
-        }
-      },
-      { $match: { count: { $gt: 1 } } }
-    ]);
+  // try {
+  //   // Find all documents and group by title, collecting their _ids
+  //   const duplicates = await LabTestDetails.aggregate([
+  //     {
+  //       $group: {
+  //         _id: "$title",
+  //         ids: { $push: "$_id" },
+  //         count: { $sum: 1 }
+  //       }
+  //     },
+  //     { $match: { count: { $gt: 1 } } }
+  //   ]);
 
-    let deletedCount = 0;
+  //   let deletedCount = 0;
 
-    // For each group of duplicates, delete all but one
-    for (const dup of duplicates) {
-      // Keep the first _id, delete the rest
-      const idsToDelete = dup.ids.slice(1);
-      const result = await LabTestDetails.deleteMany({ _id: { $in: idsToDelete } });
-      deletedCount += result.deletedCount;
-    }
+  //   // For each group of duplicates, delete all but one
+  //   for (const dup of duplicates) {
+  //     // Keep the first _id, delete the rest
+  //     const idsToDelete = dup.ids.slice(1);
+  //     const result = await LabTestDetails.deleteMany({ _id: { $in: idsToDelete } });
+  //     deletedCount += result.deletedCount;
+  //   }
 
-    return res.status(200).json({
-      message: "Duplicate titles removed",
-      duplicatesFound: duplicates.length,
-      documentsDeleted: deletedCount
-    });
-  } catch (error) {
-    console.error("Error removing duplicates:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  //   return res.status(200).json({
+  //     message: "Duplicate titles removed",
+  //     duplicatesFound: duplicates.length,
+  //     documentsDeleted: deletedCount
+  //   });
+  // } catch (error) {
+  //   console.error("Error removing duplicates:", error);
+  //   return res.status(500).json({ message: "Internal server error" });
+  // }
 
-  // const filePath = path.join(process.cwd(), 'data/lab_test_faqs.json');
-  // const fileContents = fs.readFileSync(filePath, 'utf-8');
-  // const jsonData = JSON.parse(fileContents);
+  // const dataDir = path.join(process.cwd(), "data");
 
   // try {
-  //   const result = await LabTestDetails.insertMany(jsonData);
-  //   res.status(200).json({ message: "Imported successfully", count: result.length });
+  //   const files = fs.readdirSync(dataDir);
+  //   let totalInserted = 0;
+
+  //   for (const file of files) {
+  //     if (path.extname(file) === ".json") {
+  //       const filePath = path.join(dataDir, file);
+  //       const fileContents = fs.readFileSync(filePath, "utf-8");
+  //       const jsonData = JSON.parse(fileContents);
+
+  //       // Step 1: Insert category (file name as category_name)
+  //       const categoryDoc = await LabTestPackagesCatgoryScehma.create({
+  //         category_name: path.basename(file, ".json"),
+  //       });
+  //       const categoryId = categoryDoc._id;
+
+  //       // Step 2: Attach category_id to each item and insert into Packages collection
+  //       const dataWithCategory = jsonData.map((item) => ({
+  //         ...item,
+  //         category_id: categoryId,
+  //       }));
+
+  //       const result = await LabTestPackagesScehma.insertMany(dataWithCategory);
+  //       totalInserted += result.length;
+  //     }
+  //   }
+
+  //   res.status(200).json({
+  //     message: "All files imported successfully",
+  //     totalCount: totalInserted,
+  //   });
   // } catch (error) {
   //   console.error(error);
-  //   res.status(500).json({ error: "Failed to import" });
+  //   res.status(500).json({ error: "Failed to import data from files" });
   // }
 
   // try {
@@ -134,51 +162,63 @@ export default async function handler(req, res) {
   //     }
   //   }
 
-    // Update all documents to ensure the 'newField' exists with a default value if not present
-    // const consultationResult = await Appointment.updateMany(
-    //   { invoiceNumber: { $exists: true } },
-    //   { $rename: { "invoiceNumber": "invoiceId" } }
-    // );
+  // Update all documents to ensure the 'newField' exists with a default value if not present
+  // const consultationResult = await Appointment.updateMany(
+  //   { invoiceNumber: { $exists: true } },
+  //   { $rename: { "invoiceNumber": "invoiceId" } }
+  // );
 
-    // const consultationResult = await BookLabTest.updateMany(
-    //   { invoiceId: { $exists: false } },
-    //   { $set: { invoiceId: "" } },
-    //   { upsert: true } // Add the upsert option here
-    // );
+  //renaming any existing feild
+  const result = await LabTestDetails.updateMany(
+    { report_within: { $exists: true } }, // Query: Find documents that have the 'report_within' field
+    { $rename: { report_within: "reports_within" } } // Update: Rename 'report_within' to 'reports_within'
+  );
 
-    // const consultationResult = await Appointment.updateMany(
-    //   { invoiceNumber: { $exists: false } },
-    //   { $set: { invoiceNumber: "" } },
-    //   { upsert: true } // Add the upsert option here
-    // );
-    // const consultationResult = await ServiceOffered.updateMany(
-    //   { isActive: { $exists: false } },
-    //   { $set: { isActive: true } },
-    //   { upsert: true } // Add the upsert option here
-    // );
+  res.status(200).json({
+    message: "Database migration successful!",
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount,
+  });
 
-    // const consultationResult = await Appointment.updateMany(
-    //   { serviceType: { $exists: false } },
-    //   { $set: { serviceType: serviceOffered.consultation } },
-    //   { upsert: true } // Add the upsert option here
-    // );
+  // const consultationResult = await BookLabTest.updateMany(
+  //   { invoiceId: { $exists: false } },
+  //   { $set: { invoiceId: "" } },
+  //   { upsert: true } // Add the upsert option here
+  // );
 
-    // const labTestResult = await BookLabTest.updateMany(
-    //   { serviceType: { $exists: true } }, // Filter documents without the new field
-    //   { $set: { serviceType: serviceOffered.labTest } }, // Add the new field with a default value
-    //   { upsert: true }
-    // );
+  // const consultationResult = await Appointment.updateMany(
+  //   { invoiceNumber: { $exists: false } },
+  //   { $set: { invoiceNumber: "" } },
+  //   { upsert: true } // Add the upsert option here
+  // );
+  // const consultationResult = await ServiceOffered.updateMany(
+  //   { isActive: { $exists: false } },
+  //   { $set: { isActive: true } },
+  //   { upsert: true } // Add the upsert option here
+  // );
 
-    // 5. Send a response
-    // res.status(200).json({
-    //   message: "Column updated successfully",
-    //   updatedAppointments: updatedAppointments,
-      // updatedAppointmentCount: consultationResult.modifiedCount,
-      // upsertedAppointmentCount: consultationResult.upsertedCount,
-      // updatedLabTestCount: labTestResult.modifiedCount,
-      // upsertedLabTestCount: labTestResult.upsertedCount,
-      // consultationResult: consultationResult,
-      // labTestResult: labTestResult
+  // const consultationResult = await Appointment.updateMany(
+  //   { serviceType: { $exists: false } },
+  //   { $set: { serviceType: serviceOffered.consultation } },
+  //   { upsert: true } // Add the upsert option here
+  // );
+
+  // const labTestResult = await BookLabTest.updateMany(
+  //   { serviceType: { $exists: true } }, // Filter documents without the new field
+  //   { $set: { serviceType: serviceOffered.labTest } }, // Add the new field with a default value
+  //   { upsert: true }
+  // );
+
+  // 5. Send a response
+  // res.status(200).json({
+  //   message: "Column updated successfully",
+  //   updatedAppointments: updatedAppointments,
+  // updatedAppointmentCount: consultationResult.modifiedCount,
+  // upsertedAppointmentCount: consultationResult.upsertedCount,
+  // updatedLabTestCount: labTestResult.modifiedCount,
+  // upsertedLabTestCount: labTestResult.upsertedCount,
+  // consultationResult: consultationResult,
+  // labTestResult: labTestResult
   //   });
   // } catch (error) {
   //   console.error("Error updating documents:", error);
