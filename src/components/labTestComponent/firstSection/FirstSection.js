@@ -3,18 +3,21 @@ import styles from "../css/FirstSection.module.css"; // Import the CSS module
 import { useRouter } from "next/router";
 import { CiSearch } from "react-icons/ci";
 import { useEffect, useState } from "react";
-import { MdWifiCalling3 } from "react-icons/md";
-import { BiSolidDonateBlood } from "react-icons/bi";
-import { PiPaperPlaneTiltBold } from "react-icons/pi";
+import { MdDeliveryDining, MdWifiCalling3 } from "react-icons/md";
 import { useRef, useCallback } from "react";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
+import {
+  setAllTestDetails,
+  setHealthTestData,
+} from "../../../store/slices/labTest/labTestCategoryApiData";
 import { useAddToCart } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
-import Link from "next/link";
-import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
-import { eventEmitter } from "../../../constant";
+import { color_schema } from "../../../constant";
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineSafetyCertificate } from "react-icons/ai";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+import { TbCheckupList, TbPercentage } from "react-icons/tb";
+import { GrTest } from "react-icons/gr";
 
 export default function FirstSection() {
   const router = useRouter();
@@ -56,31 +59,31 @@ export default function FirstSection() {
   const testDetails = [
     {
       id: 1,
-      icon: <BiSolidDonateBlood />,
-      title: "Home Blood Test",
+      icon: <AiOutlineSafetyCertificate size={100} />,
+      title: "100 % Safe & hygienic",
       time: "6AM - 10PM",
-      backgroundColor: "#DDE6C6",
+      backgroundColor: `${color_schema.green}`,
     },
     {
       id: 2,
-      icon: <BiSolidDonateBlood />,
-      title: "Urine Test At Lab",
+      icon: <MdDeliveryDining size={100} />,
+      title: "Home Sample Collection",
       time: "7AM - 11PM",
-      backgroundColor: "#DDE6C6",
+      backgroundColor: `${color_schema.green}`,
     },
     {
       id: 3,
-      icon: <BiSolidDonateBlood />,
-      title: "Urine Test At Lab",
+      icon: <HiOutlineDocumentReport size={100} />,
+      title: "View Reports Online",
       time: "7AM - 11PM",
-      backgroundColor: "#DDE6C6",
+      backgroundColor: `${color_schema.green}`,
     },
     {
       id: 4,
-      icon: <BiSolidDonateBlood />,
-      title: "Urine Test At Lab",
+      icon: <TbPercentage size={100} />,
+      title: "Best Price Guarantee",
       time: "7AM - 11PM",
-      backgroundColor: "#DDE6C6",
+      backgroundColor: `${color_schema.green}`,
     },
   ];
 
@@ -93,8 +96,7 @@ export default function FirstSection() {
     setSearchTerm(result.title);
     setSearchResults([]);
     dispatch(setHealthTestData(result));
-    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, "viewDetails");
-    // router.push({ pathname: "/labTest/viewDetails" });
+    router.push({ pathname: "/labTest/viewDetails" });
   };
 
   const handleResultButtonClick = (result) => {
@@ -114,11 +116,27 @@ export default function FirstSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchAllLabTestsDetails = async () => {
+      try {
+        const response = await fetch("/api/labtestDetails"); // Replace with your API endpoint
+        const data = await response.json();
+        dispatch(setAllTestDetails(data));
+      } catch (err) {
+        setError("Error fetching data");
+        setLoading(false);
+      }
+    };
+
+    fetchAllLabTestsDetails();
+  }, []);
+
   const eventforViewAllTestDetails = () => {
-    cartEventEmitter.emit(
-      eventEmitter.labTestEventEmitter,
-      "viewAllTestDetails"
-    );
+    router.push("/labTest/viewAllTestDetails");
+  };
+
+  const ViewAllCheckUpDetails = () => {
+    router.push("/labTest/viewAllCheckups");
   };
 
   return (
@@ -137,17 +155,52 @@ export default function FirstSection() {
             Fast. Convenient. Reliable. Your health, prioritized.
           </div>
         </div>
+        {/* Test Details Cards */}
+        <div className={`row ${styles.testDetailsCard}`}>
+          {testDetails.map(
+            (
+              test,
+              index // Make sure to get the index from map
+            ) => (
+              <div
+                key={test.id}
+                className={`col-12 col-sm-6 col-md-3 mb-4 ${
+                  index !== testDetails.length - 1 ? "border-right" : "" // Apply border-right if it's NOT the last element
+                }`}
+              >
+                <div className="py-5 d-flex flex-column align-items-center justify-content-center text-center">
+                  <span style={{ fontSize: "40px", marginRight: "10px" }}>
+                    {test.icon}
+                  </span>
+                  <div className="d-flex align-items-center justify-content-center mb-2">
+                    <div
+                      style={{ fontWeight: "bold", fontSize: "1.3rem" }}
+                      className="mt-2"
+                    >
+                      {test.title}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+        </div>
         {/* Search Bar Section */}
         <div className={`row ${styles.thirdSection}`}>
-          <div className="col-sm-8 col-md-5 mb-3 d-flex flex-row position-relative">
+          <div className="col-sm-8 col-md-6 mb-3 d-flex flex-row d-flex justify-content-center">
             <input
-              className={styles.searchBar}
+              className={`${styles.searchBar}`}
               placeholder="Search for tests"
               value={searchTerm}
               onChange={handleSearchChange}
               autoComplete="off"
             />
-            <CiSearch className={`ml-2 ${styles.searchIcon}`} size={20} />
+            <FaSearch
+              className={`ml-2 labtest-searchIcon consultation-btn`}
+              color={color_schema.green}
+              size={20}
+              fontWeight={"bold"}
+            />
             {searchTerm && searchResults.length > 0 && (
               <div className={styles.autocompleteDropdown} ref={dropdownRef}>
                 <div className={styles.scrollableList}>
@@ -160,7 +213,9 @@ export default function FirstSection() {
                         className={styles.itemContent}
                         onClick={() => selectTestResult(result)}
                       >
-                        <span>{result.title}</span>
+                        <div className="on-hover-blue">
+                          <u>{result.title}</u>
+                        </div>
                       </div>
                       <div className="ml-auto">
                         <div
@@ -184,48 +239,38 @@ export default function FirstSection() {
               </div>
             )}
           </div>
-          <div className={`col-sm-4 col-md-3 mb-3 ${styles.getQuotesNow}`}>
-            <div>Get Quotes Now {<PiPaperPlaneTiltBold />}</div>
-            <div></div>
-          </div>
-          <div className="col-12 col-sm-8 col-md-4 d-flex justify-content-center">
-            <div className={`col-3 ${styles.callingButton}`}>
-              <MdWifiCalling3 size={30} />
+          <div
+            className={`col-sm-4 col-md-2 mb-3 consultation-btn d-flex justify-content-center ml-5`}
+            onClick={() => eventforViewAllTestDetails()}
+          >
+            <div className="mt-2 h5 font-weight-bold">
+              Lab Tests {<GrTest size={30} />}
             </div>
-            <div className={`col ${styles.emergencyText}`}>
+          </div>
+          <div
+            className={`col-sm-4 col-md-2 mb-3 consultation-btn d-flex justify-content-center ml-5`}
+          >
+            <div
+              className="mt-2 h5 font-weight-bold"
+              onClick={() => ViewAllCheckUpDetails()}
+            >
+              Checkups {<TbCheckupList size={30} />}
+            </div>
+          </div>
+          {/* <div className="col-12 col-sm-8 col-md-3 d-flex flew-row  d-flex justify-content-center">
+            <div
+              className={`col-3 d-flex justify-content-center align-items-center consultation-btn`}
+              style={{ width: "58px", height: "58px" }}
+            >
+              <MdWifiCalling3 size={30} color={color_schema.green} />
+            </div>
+            <div className={`${styles.emergencyText}`}>
               <div>24H Emergency</div>
               <div>876786543</div>
             </div>
-          </div>
+          </div> */}
         </div>
-        {/* Test Details Cards */}
-        <div className={`row ${styles.testDetailsCard}`}>
-          {testDetails.map((test) => (
-            <div key={test.id} className="col-12 col-sm-6 col-md-3  mb-4">
-              <div
-                style={{
-                  backgroundColor: test.backgroundColor,
-                  padding: "20px",
-                  borderRadius: "10px",
-                  textAlign: "left",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <div className="d-flex align-items-center mb-2">
-                  <span style={{ fontSize: "24px", marginRight: "10px" }}>
-                    {test.icon}
-                  </span>
-                  <div style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-                    {test.title}
-                  </div>
-                </div>
-                <div style={{ fontSize: "0.9rem", color: "#7a7a7a" }}>
-                  {test.time}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+
         {snackbarOpen && (
           <Snackbar
             open={snackbarOpen}

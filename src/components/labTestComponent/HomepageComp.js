@@ -18,61 +18,50 @@ import { eventEmitter } from "../../constant";
 import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import ViewDetails from "./viewDetails/ViewDetailsComp";
 import ViewAllTestDetails from "./ViewAllTestDetails";
+import MostBookedCheckups from "./mostBookedPackages/MostBookedCheckups";
 
 export default function HomepageComp() {
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState("labtest");
 
   const handleLocationClick = () => {
     // Your location click handler logic
   };
 
-  useEffect(() => {
-    // Listen for cart update events
-    cartEventEmitter.on(eventEmitter.labTestEventEmitter, (item) => {
-      setActiveSection(item);
-      console.log("Active Section Changed:", item);
-    });
-    // Clean up event listener
-    return () => {
-      cartEventEmitter.removeAllListeners("nav-option");
-    };
-  }, []);
-
   return (
     <>
       <div className="mt-2">
-        {activeSection.toLowerCase() === "labtest" && (
-          <>
-            <Row>
-              <Col>
-                <FirstSection />
-              </Col>
-            </Row>
-            <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
-              <Col>
-                <MostPopularCheckup />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <VitalOrganCheckup />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <HealthyBodyCheckup />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <FAQ />
-              </Col>
-            </Row>
-          </>
-        )}
-        {activeSection.toLowerCase() === "viewdetails" && <ViewDetails />}
-        {activeSection.toLowerCase() === "viewalltestdetails" && <ViewAllTestDetails />}
+        <>
+          <Row>
+            <Col>
+              <FirstSection />
+            </Col>
+          </Row>
+          <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
+            <Col>
+              <MostPopularCheckup />
+            </Col>
+          </Row>
+          <Row className="mt-5">
+            <Col>
+              <MostBookedCheckups />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <VitalOrganCheckup />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <HealthyBodyCheckup />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <FAQ />
+            </Col>
+          </Row>
+        </>
       </div>
     </>
   );

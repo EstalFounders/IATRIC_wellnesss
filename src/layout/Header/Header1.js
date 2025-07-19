@@ -29,6 +29,8 @@ import Image from "next/image";
 import { ConsultationButton } from "../../components/Common/commonUi";
 import { IoMdArrowDropdown } from "react-icons/io";
 import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
+import { FaCartShopping } from "react-icons/fa6";
+import CartPanel from "../../components/labTestComponent/common/CartPanel";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
@@ -36,6 +38,9 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
   const [consultationTypes, setConsultationTypes] = useState();
   const hiddenRoutes = ["/appointment", "/some-other-route"];
+  const [labtesttab, setLabtestTab] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -63,6 +68,14 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
     { label: "Dial", action: dial, icon: 0 },
     { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
   ];
+
+  const togglePanel = () => {
+    setIsPanelOpen(!isPanelOpen);
+  };
+
+  const updateCartItemCount = (count) => {
+    setCartItemCount(count);
+  };
 
   useEffect(() => {
     const processConsultations = (data) => {
@@ -113,6 +126,17 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
         );
     }
   }, []);
+
+  useEffect(() => {
+    console.log("cartItemCount changed:", cartItemCount);
+    if (cartItemCount > 0) {
+      setLabtestTab(true);
+      console.log("Labtest tab set to true (cart has items).");
+    } else {
+      setLabtestTab(false);
+      console.log("Labtest tab set to false (cart is empty).");
+    }
+  }, [cartItemCount]); //
 
   // Helper function to map names to icon numbers
   const getIconByName = (name) => {
@@ -193,10 +217,10 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   href={`tel:${contact_no}`}
                   className="callusbtn"
                   onMouseOver={(e) => {
-                    e.target.style.color = "#8e8333";
+                    e.target.style.color = `${color_schema.yellow}`;
                   }} // Change color on hover
                   onMouseOut={(e) => {
-                    e.target.style.color = "#ffffff";
+                    e.target.style.color = `${color_schema.white}`;
                   }}
                 >
                   <FaWhatsapp className="mx-1" />
@@ -595,11 +619,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 <div
                   className="mx-2 navbar-option mt-3"
                   onClick={() => {
-                    router.push("/");
-                    cartEventEmitter.emit(
-                      eventEmitter.navBarEventEmitter,
-                      "labtest"
-                    );
+                    router.push("/labTest/homepage");
                     cartEventEmitter.emit(
                       eventEmitter.labTestEventEmitter,
                       "labtest"
@@ -623,9 +643,25 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   </div>
                 </li>
               )}
+              {labtesttab && (
+                <li className="nl-simple" aria-haspopup="true">
+                  <div className="mt-4 labtes-cart-icon">
+                    <FaCartShopping
+                      size={20}
+                      color={color_schema.green}
+                      onClick={togglePanel}
+                    />
+                    <div className="cartItemCount">{cartItemCount}</div>
+                  </div>
+                </li>
+              )}
             </ul>
           </nav>
-
+          <CartPanel
+            isOpen={isPanelOpen}
+            togglePanel={togglePanel}
+            onUpdateCartItemCount={updateCartItemCount}
+          />
           {/* END MAIN MENU */}
         </div>
         <div>

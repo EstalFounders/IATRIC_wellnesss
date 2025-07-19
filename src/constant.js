@@ -165,6 +165,8 @@ export const facebook_page_url =
 export const color_schema = {
   green: "#3b5f1d",
   yellow: "#8e8333",
+  white: '#ffffff',
+  black: "#000000", 
 };
 
 export const eventEmitter = {
@@ -172,3 +174,10 @@ export const eventEmitter = {
   navBarEventEmitter: "navbar-option",
   labTestEventEmitter: "labTestUpdate",
 };
+
+export const labtestCateogory = {
+  fullBodyCheckup: 'Full Body',
+  sexualHealth: 'Sexual Health',
+  allergyTestCheckup: 'Allergy'
+
+}

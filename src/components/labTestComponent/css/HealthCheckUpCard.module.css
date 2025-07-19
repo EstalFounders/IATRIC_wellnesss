@@ -19,12 +19,13 @@
   }
   
   .discount {
-    color: #BA1A1A;
+    color: white;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 12px;
 font-weight: 700;
 line-height: 31.69px;
-
+border-radius: 10px;
+background-color: #559421;
   }
   
   .price {
@@ -33,14 +34,14 @@ line-height: 31.69px;
 font-weight: 500;
 line-height: 31.69px;
 text-align: left;
-color: #000000;
+color: #ffffff;
 top: 15px;
 
   }
   
   .mrp {
     text-decoration: line-through;
-    color: #A0A0A0;
+    color: #ffffff;
     font-size: 14px;
     margin-left: 5px;
 font-weight: 400;
@@ -56,7 +57,17 @@ font-weight: 500;
 line-height: 28.8px;
 text-align: left;
 margin-top: 50px;
-color: #011632;
+color: #ffffff;
+text-wrap: nowrap;
+  }
+  
+  .description {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #ffffff;
+    text-align: left;
+    margin-left: 5%;
+    margin-right: 5%;
 
 }
   
@@ -67,53 +78,58 @@ color: #011632;
   }
   
   .addToCartbutton {
-    width: 117px;
+     width: 120px;
     height: 33px;
     gap: 4px;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 17.07px;
-    text-align: center;
-    color: #2B3133;
-    display: flex;
+    padding: 22px 16px;
+font-size: 16px;
+font-weight: 700;
+line-height: 17.07px;
+text-align: center;
+color: #2B3133;
+border: 1px solid #3b5f1d;
+background-color: white;
+
+display: flex;
 justify-content: center;
 align-items: center;
-    
-    background-color: #C1E16C;
-
-    transition: background-color 0.3s ease; /* Smooth transition */
   }
   
   .addToCartbutton.clicked {
     background-color: #4F6628; /* Color for clicked state */
     color: white;
   }
-  
 
   .viewDetailsButton {
-    width: 117px;
+  width: 120px;
     height: 33px;
     gap: 4px;
+    padding: 22px 16px;
     border-radius: 8px;
-font-size: 14px;
-font-weight: 700;
-line-height: 17.07px;
-text-align: center;
-color: #2B3133;
-border: 2px solid #E9F2D1;
-background-color: white;
-margin-left: 2%;
-display: flex;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 17.07px;
+    text-align: center;
+    color: #ffffff;
+    display: flex;
+    margin-left: 2%;
 justify-content: center;
 align-items: center;
+    /* background: linear-gradient(to bottom,#3b5f1d, #A69D50);  */
+    background-color: #3b5f1d;
+    transition: background-color 0.3s ease; /* Smooth transition */
 }
   
   .upperSection {
-    background-color: #C1E16C;
-    height: 170px;
-    border-radius: 10px;
-  }
+  /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
+  background: linear-gradient(to top right, #3b5f1d, #8e8333);
+  height: 150px;
+  border-radius: 10px;
+}
   .icon {
     width: 40px;
     background-color: #DDE6C6;

@@ -14,10 +14,6 @@ const labTestFaqSchema = new Schema({
   sample_required: [String],
   preparation_required: [String],
   faqs: [faqSchema], // ⬅️ Array of FAQs
-  category_id: {
-    type: Schema.Types.ObjectId,
-    ref: "LabTest",
-  },
   price: { type: String, required: true },
   discount: { type: String, required: true },
   report_within: { type: String, required: true },

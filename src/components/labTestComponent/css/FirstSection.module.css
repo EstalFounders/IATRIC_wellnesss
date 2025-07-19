@@ -33,15 +33,19 @@
 }
 
 .thirdSection {
-  margin-top: 10%;
+  margin-top: 5%;
+  padding: 30px 40px;
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  margin-left: 10%;
+  border-radius: 20px;
+  background: linear-gradient(to top right, #3b5f1d, #8e8333);
+  border: 1px solid #3b5f1d;
   @media (max-width: 768px) {
     margin-top: 5%;
   }
 }
+
+
 
 .searchBar {
   width: 100%;
@@ -49,11 +53,19 @@
   padding: 0 20px;
   font-size: 14px;
   font-weight: 700;
-  color: #737373;
+  border-radius: 10px;
+  border: 1px solid #8e8333;
+}
+
+.searchBar:focus {
+  outline: none; /* Removes the default blue outline */
+  border-color: #8e8333; /* Changes the border color to a shade of green */
+  box-shadow: 0 0 0 3px rgba(142, 131, 51, 1) 
+  /* You can adjust the color and size of the box-shadow as needed */
 }
 
 .searchIcon {
-  background: #DDE6C6;
+  background: #3b5f1d;
   width: 56px;
   height: 58px;
   padding: 17.5px 17px 16.5px 15px;
@@ -63,14 +75,6 @@
   border: 1px solid #E6E6E6  
 }
 
-.getQuotesNow {
-  text-align: center;
-  background-color: #DDE6C6;
-  padding: 16px;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 8px;
-}
 
 .callingButton {
   width: 58px;
@@ -79,20 +83,20 @@ padding: 8px;
 gap: 10px;
 border-radius: 8px;
 border: 10px 0px 0px 0px;
-background-color: #DDE6C6;
-border: 10px solid #DDE6C6,
+background-color: #3b5f1d;
+/* border: 10px solid #8e8333, */
 
 }
 
 .emergencyText {
   font-size: 14px;
   font-weight: 600;
-  color: #3b5f1d;
+  color: #ffffff;
   margin-left: 10px;
 }
 
 .testDetailsCard {
-  margin-top: 10%;
+  margin-top: 7%;
 }
 
 .autocompleteDropdown {

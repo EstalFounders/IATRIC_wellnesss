@@ -124,7 +124,7 @@ const ViewDetails = () => {
             <div className="ml-3">
               <div className={`${styles.detailsSmallText}`}>Reports in</div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {healthCheckupData.report_within}
+                {healthCheckupData.reports_within}
               </div>
             </div>
           </div>
