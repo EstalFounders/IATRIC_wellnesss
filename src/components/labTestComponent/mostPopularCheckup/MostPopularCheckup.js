@@ -25,18 +25,10 @@ import {
 const MostPopularCheckup = () => {
   const healthCheckupData = useSelector(
     (state) => state.labtestHomepage.allCheckUpDetails
-  );  
+  );
   const categoryDetails = useSelector(
     (state) => state.labtestHomepage.categoryDetails
   );
-
-  const mostPopularCheckup = getCategoryCheckup(
-    labtestCateogory.fullBodyCheckup,
-    healthCheckupData,
-    categoryDetails
-  );
-
-  console.log(mostPopularCheckup, "most popular check up in 39");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
@@ -54,6 +46,17 @@ const MostPopularCheckup = () => {
 
     fetchCategories();
   }, [dispatch]);
+
+  console.log(
+    healthCheckupData,
+    "health checkup data on 33 in most popular checkup"
+  );
+
+  const mostPopularCheckup = getCategoryCheckup(
+    labtestCateogory.fullBodyCheckup,
+    healthCheckupData,
+    categoryDetails
+  );
 
   // Second: Run this only when categoryDetails is ready
   useEffect(() => {

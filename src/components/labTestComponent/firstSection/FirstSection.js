@@ -186,7 +186,7 @@ export default function FirstSection() {
           )}
         </div>
         {/* Search Bar Section */}
-        <div className={`row ${styles.thirdSection}`}>
+        <div className={`row ${styles.thirdSection} lab-test-bg-gradient`}>
           <div className="col-sm-8 col-md-6 mb-3 d-flex flex-row d-flex justify-content-center">
             <input
               className={`${styles.searchBar}`}

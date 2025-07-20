@@ -26,7 +26,7 @@ import { ConsultationButton } from "../../Common/commonUi";
 
 const ViewDetails = () => {
   const healthCheckupData = useSelector(
-    (state) => state.labtestHomepage.healthTestData
+    (state) => state.labtestHomepage.heatlhDataDetails
   );
   const [storedData, setStoredData] = useState();
   const [expandedTestIndex, setExpandedTestIndex] = useState(null);

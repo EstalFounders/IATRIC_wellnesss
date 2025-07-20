@@ -20,7 +20,6 @@ const ViewAllCheckUpDetails = () => {
 
   // Group tests by categoryId
   const groupedByCategory = categoryDetails.reduce((acc, category) => {
-    console.log(filteredTests, 'filtered test in 23')
     const categoryTests = filteredTests.filter(
       (test) => test.category_id === category._id
     );
@@ -53,12 +52,12 @@ const ViewAllCheckUpDetails = () => {
           border: "1px solid #ccc",
         }}
       />
-
+      <div></div>
       {groupedByCategory.length === 0 ? (
         <p className="text-muted">No checkups found</p>
       ) : (
         groupedByCategory.map((categoryGroup) => (
-          <div key={categoryGroup.categoryId} className="w-100 mb-5 px-3">
+          <div key={categoryGroup.categoryId} className="mb-5 px-3">
             {console.log(categoryGroup, 'cateogry group')}
             <h4 className="text-dark mb-3">{categoryGroup.categoryName}</h4>
             <div className="row">
@@ -76,7 +75,8 @@ const ViewAllCheckUpDetails = () => {
               ))}
             </div>
           </div>
-        ))
+        )
+      )
       )}
     </div>
   );

@@ -38,7 +38,7 @@
   display: flex;
   flex-wrap: wrap;
   border-radius: 20px;
-  background: linear-gradient(to top right, #3b5f1d, #8e8333);
+  
   border: 1px solid #3b5f1d;
   @media (max-width: 768px) {
     margin-top: 5%;

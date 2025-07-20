@@ -153,7 +153,7 @@ export const getCategoryCheckup = (
 
   // console.log(`Normalized Category Text: ${normalizedCategoryText}`);
   // console.log(`Matched Category ID: ${matchedCategoryId}`);
-   console.log(matchedCategoryId, healthCheckupData, 'data on 156 common mehod')
+  console.log(matchedCategoryId, healthCheckupData, "data on 156 common mehod");
   // 3. Then collect all the healthcheckupdata which has that _id as category_id and return
   if (matchedCategoryId) {
     const filteredCheckups = healthCheckupData.filter(
@@ -174,4 +174,38 @@ export const getCategoryCheckup = (
 
 export const filterActiveHealthTest = (data) => {
   return data.filter((item) => item.isActive === true);
+};
+
+export const calculateDiscountedPrice = (discount, price) => {
+  // Convert inputs to numbers to ensure calculations are correct
+  // Use parseFloat to handle potential decimal prices
+  const originalPrice = parseFloat(price);
+  const discountPercentage = parseFloat(discount);
+
+  // Basic validation: Check if inputs are valid numbers
+  if (isNaN(originalPrice) || isNaN(discountPercentage)) {
+    console.error(
+      "Invalid input for calculateDiscountedPrice: Price and Discount must be valid numbers."
+    );
+    return price; // Return Not-a-Number for invalid inputs
+  }
+
+  // Ensure discount percentage is within a sensible range (0-100)
+  if (discountPercentage < 0 || discountPercentage > 100) {
+    console.warn(
+      "Discount percentage is outside the typical range (0-100). Calculation proceeds."
+    );
+    // You might choose to return NaN or throw an error here depending on strictness
+  }
+
+  // Calculate the discount amount
+  const discountAmount = originalPrice * (discountPercentage / 100);
+
+  // Calculate the final discounted price
+  const discountedPrice = originalPrice - discountAmount;
+
+  // Optional: Round to 2 decimal places for currency, if needed
+  // return parseFloat(discountedPrice.toFixed(2));
+
+  return discountedPrice;
 };
