@@ -154,7 +154,9 @@
 
 .bg-yellow-gradient {
   background: linear-gradient(to top,#8e8333, #4f4b30);
+  background: linear-gradient(to top,#3b5f1d, #4bac54);
 }
+
 
 .most-booked-checkup-style {
   border-radius: 40px;
