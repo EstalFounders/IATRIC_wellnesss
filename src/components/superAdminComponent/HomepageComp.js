@@ -61,8 +61,9 @@ export default function HomepageComp() {
   }, []);
 
   useEffect(() => {
-    if (!doctors) {
-      fetchDoctors(dispatch);
+    console.log(doctors, "doctors in use eeffe");
+    if (!(doctors.length > 0)) {
+      fetchDoctors(dispatch, setDoctors,setIsDoctorLoading);
     }
   }, []); // Empty dependency array ensures the effect runs only once
 
