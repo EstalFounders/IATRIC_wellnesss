@@ -1,4 +1,3 @@
-
 export const company_registrated_name = "Ttanshe health path pvt.ltd";
 export const certificate_img_path = "images/doctorCertificate/";
 export const profilePicture_img_path = "images/doctorPicture/";
@@ -165,8 +164,8 @@ export const facebook_page_url =
 export const color_schema = {
   green: "#3b5f1d",
   yellow: "#8e8333",
-  white: '#ffffff',
-  black: "#000000", 
+  white: "#ffffff",
+  black: "#000000",
 };
 
 export const eventEmitter = {
@@ -176,8 +175,7 @@ export const eventEmitter = {
 };
 
 export const labtestCateogory = {
-  fullBodyCheckup: 'Full Body',
-  sexualHealth: 'Sexual Health',
-  allergyTestCheckup: 'Allergy'
-
-}
+  fullBodyCheckup: "Full Body",
+  sexualHealth: "Sexual Health",
+  allergyTestCheckup: "Allergy",
+};

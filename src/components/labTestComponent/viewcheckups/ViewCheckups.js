@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { ConsultationButton } from "../../Common/commonUi";
+import { HorizontalScrollContainer } from "../common/HorizontalContainer";
 
 const ViewCheckupsPage = () => {
   const router = useRouter();
   const { category } = router.query;
-  console.log(category, 'category in vie wcheckip page')
+  console.log(category, "category in vie wcheckip page");
 
   const healthCheckupData = useSelector(
     (state) => state.labtestHomepage.viewCheckups
@@ -24,19 +25,21 @@ const ViewCheckupsPage = () => {
       </header>
 
       <div className="row gy-4">
-        {healthCheckupData?.length > 0 ? (
-          healthCheckupData.map((checkup) => (
-            <div key={checkup.id} className="col-12 col-md-6 col-lg-4">
-              <HealthCheckupCard healthCheckupData={checkup} />
+        <HorizontalScrollContainer>
+          {healthCheckupData?.length > 0 ? (
+            healthCheckupData.map((checkup) => (
+              <div key={checkup.id}>
+                <HealthCheckupCard healthCheckupData={checkup} />
+              </div>
+            ))
+          ) : (
+            <div className="col-12">
+              <div className="alert alert-warning text-center">
+                No health checkups found in this category. Try another.
+              </div>
             </div>
-          ))
-        ) : (
-          <div className="col-12">
-            <div className="alert alert-warning text-center">
-              No health checkups found in this category. Try another.
-            </div>
-          </div>
-        )}
+          )}
+        </HorizontalScrollContainer>
       </div>
 
       <div className="mt-5 text-center">

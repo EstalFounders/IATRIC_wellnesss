@@ -1,9 +1,6 @@
 import { HiArrowCircleRight } from "react-icons/hi";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useRef, useState } from "react";
-import MoreModalComp from "../viewcheckups/ViewCheckups";
-import { useState } from "react";
-import MoreModalComp from "../viewcheckups/ViewCheckups";
 import styles from "../css/FirstSection.module.css";
 import { color_schema, eventEmitter } from "../../../constant";
 import { useRouter } from "next/router";

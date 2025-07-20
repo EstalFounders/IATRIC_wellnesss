@@ -54,7 +54,6 @@ const ViewAllCheckUpDetails = () => {
         }}
       />
 
-      <div></div>
       {groupedByCategory.length === 0 ? (
         <p className="text-muted">No checkups found</p>
       ) : (
@@ -70,29 +69,18 @@ const ViewAllCheckUpDetails = () => {
             </HorizontalScrollContainer>
           </div>
         ))
-          <div key={categoryGroup.categoryId} className="mb-5 px-3">
-            {console.log(categoryGroup, 'cateogry group')}
-            <h4 className="text-dark mb-3">{categoryGroup.categoryName}</h4>
-            <div className="row">
-              {categoryGroup.tests.map((checkup) => (
-                <Col
-                  key={checkup._id}
-                  xs={12}
-                  sm={6}
-                  md={4}
-                  lg={3}
-                  className="mb-4"
-                >
-                  <HealthCheckupCard healthCheckupData={checkup} />
-                </Col>
-              ))}
-            </div>
-          </div>
-        )
-      )
       )}
     </div>
   );
 };
 
 export default ViewAllCheckUpDetails;
+
+
+
+
+
+
+
+
+
