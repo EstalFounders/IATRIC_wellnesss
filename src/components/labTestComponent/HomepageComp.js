@@ -18,6 +18,7 @@ import { eventEmitter } from "../../constant";
 import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import ViewDetails from "./viewDetails/ViewDetailsComp";
 import ViewAllTestDetails from "./ViewAllTestDetails";
+import MostBookedCheckups from "./mostBookedPackages/MostBookedCheckups";
 
 export default function HomepageComp() {
   const router = useRouter();
@@ -38,6 +39,11 @@ export default function HomepageComp() {
           <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
             <Col>
               <MostPopularCheckup />
+            </Col>
+          </Row>
+          <Row className="mt-5">
+            <Col>
+              <MostBookedCheckups />
             </Col>
           </Row>
           <Row>

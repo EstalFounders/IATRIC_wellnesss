@@ -1,12 +1,11 @@
 import { dbConnect } from "../../src/lib/db";
-import LabTest from "../../src/models/lab-test";
-
+import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 export default async function handler(req, res) {
   await dbConnect();
 
   if (req.method === "GET") {
     try {
-      const labTests = await LabTest.find();
+      const labTests = await LabTestDetails.find();
       res.status(200).json(labTests);
     } catch (error) {
       res.status(500).json({ message: "Error fetching lab tests" });
@@ -18,10 +17,14 @@ export default async function handler(req, res) {
 
     try {
       // Find the lab test by ID and update with the request body
-      const updatedLabTest = await LabTest.findByIdAndUpdate(id, req.body, {
-        new: true, // Return the updated document
-        runValidators: true, // Enforce schema validation
-      });
+      const updatedLabTest = await LabTestDetails.findByIdAndUpdate(
+        id,
+        req.body,
+        {
+          new: true, // Return the updated document
+          runValidators: true, // Enforce schema validation
+        }
+      );
 
       if (!updatedLabTest) {
         return res
@@ -45,9 +48,15 @@ export default async function handler(req, res) {
           .json({ message: "Category name and description are required" });
       }
 
-      const newCategory = new LabTest({
-        category_name,
-        category_description,
+      const newCategory = new LabTestDetails({
+        title,
+        description,
+        sample_required,
+        preparation_required,
+        faqs,
+        price,
+        discount,
+        report_within,
       });
 
       const savedCategory = await newCategory.save();
@@ -64,7 +73,7 @@ export default async function handler(req, res) {
     const { id } = req.query;
     console.log(id, "id on server");
     try {
-      const deletedItem = await LabTest.deleteOne({ _id: id });
+      const deletedItem = await LabTestDetails.deleteOne({ _id: id });
 
       if (!deletedItem) {
         return res.status(404).json({ message: "Item not found" });

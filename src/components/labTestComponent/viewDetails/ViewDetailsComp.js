@@ -26,7 +26,7 @@ import { ConsultationButton } from "../../Common/commonUi";
 
 const ViewDetails = () => {
   const healthCheckupData = useSelector(
-    (state) => state.labtestHomepage.healthTestData
+    (state) => state.labtestHomepage.heatlhDataDetails
   );
   const [storedData, setStoredData] = useState();
   const [expandedTestIndex, setExpandedTestIndex] = useState(null);
@@ -124,7 +124,7 @@ const ViewDetails = () => {
             <div className="ml-3">
               <div className={`${styles.detailsSmallText}`}>Reports in</div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {healthCheckupData.report_within}
+                {healthCheckupData.reports_within}
               </div>
             </div>
           </div>

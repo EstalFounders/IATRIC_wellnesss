@@ -3,7 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   allTestDetails: [],
-  healthTestData: ""
+  allCheckUpDetails: [],
+  viewCheckups: [],
+  categoryDetails: [],
+  heatlhDataDetails:""
 };
 
 const labTestCateogryDataSlice = createSlice({
@@ -14,13 +17,28 @@ const labTestCateogryDataSlice = createSlice({
       state.allTestDetails = action.payload;
     },
     setHealthTestData: (state, action) => {
-      state.healthTestData = action.payload;
-    }
+      state.allCheckUpDetails = action.payload;
+    },
+    setViewCheckupsData: (state, action) => {
+      state.viewCheckups = action.payload;
+    },
+    setCategoryDetails: (state, action) => {
+      state.categoryDetails = action.payload;
+    },
+    setHealthDataDetails: (state, action) => {
+      state.heatlhDataDetails = action.payload;
+    },
   },
 });
 
 // Export actions
-export const { setAllTestDetails, setHealthTestData } = labTestCateogryDataSlice.actions;
+export const {
+  setAllTestDetails,
+  setHealthTestData,
+  setViewCheckupsData,
+  setCategoryDetails,
+  setHealthDataDetails
+} = labTestCateogryDataSlice.actions;
 
 // Export reducer
 export default labTestCateogryDataSlice.reducer;

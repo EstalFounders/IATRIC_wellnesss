@@ -3816,11 +3816,16 @@ td.text-right {
 
 #statistic-1 {
   background-image: url(../images/statistic1.png);
-  background-size: contain;
+  background-size: cover; /* Changed from 'contain' - will crop if aspect ratios differ */
   background-repeat: no-repeat;
   background-position: center;
-  padding-top: 80px;
-  padding-bottom: 40px;
+
+  /* Keep your original paddings or make them responsive with viewport units */
+  padding-top: 80px; /* Or use padding-top: 5vw; for responsive padding */
+  padding-bottom: 40px; /* Or use padding-bottom: 3vw; */
+
+  /* Optional: Ensure a minimum height for the section */
+  min-height: 200px; /* Or min-height: 30vh; for responsive minimum height */
 }
 
 #statistic-2 {

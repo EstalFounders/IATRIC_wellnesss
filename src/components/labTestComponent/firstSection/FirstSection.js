@@ -6,7 +6,10 @@ import { useEffect, useState } from "react";
 import { MdDeliveryDining, MdWifiCalling3 } from "react-icons/md";
 import { useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
+import {
+  setAllTestDetails,
+  setHealthTestData,
+} from "../../../store/slices/labTest/labTestCategoryApiData";
 import { useAddToCart } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
 import { color_schema } from "../../../constant";
@@ -113,8 +116,27 @@ export default function FirstSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchAllLabTestsDetails = async () => {
+      try {
+        const response = await fetch("/api/labtestDetails"); // Replace with your API endpoint
+        const data = await response.json();
+        dispatch(setAllTestDetails(data));
+      } catch (err) {
+        setError("Error fetching data");
+        setLoading(false);
+      }
+    };
+
+    fetchAllLabTestsDetails();
+  }, []);
+
   const eventforViewAllTestDetails = () => {
     router.push("/labTest/viewAllTestDetails");
+  };
+
+  const ViewAllCheckUpDetails = () => {
+    router.push("/labTest/viewAllCheckups");
   };
 
   return (
@@ -164,7 +186,7 @@ export default function FirstSection() {
           )}
         </div>
         {/* Search Bar Section */}
-        <div className={`row ${styles.thirdSection}`}>
+        <div className={`row ${styles.thirdSection} lab-test-bg-gradient`}>
           <div className="col-sm-8 col-md-6 mb-3 d-flex flex-row d-flex justify-content-center">
             <input
               className={`${styles.searchBar}`}
@@ -172,7 +194,6 @@ export default function FirstSection() {
               value={searchTerm}
               onChange={handleSearchChange}
               autoComplete="off"
-              
             />
             <FaSearch
               className={`ml-2 labtest-searchIcon consultation-btn`}
@@ -223,14 +244,16 @@ export default function FirstSection() {
             onClick={() => eventforViewAllTestDetails()}
           >
             <div className="mt-2 h5 font-weight-bold">
-              Lab Tests  {<GrTest size={30} />}
+              Lab Tests {<GrTest size={30} />}
             </div>
           </div>
           <div
             className={`col-sm-4 col-md-2 mb-3 consultation-btn d-flex justify-content-center ml-5`}
-            
           >
-            <div className="mt-2 h5 font-weight-bold">
+            <div
+              className="mt-2 h5 font-weight-bold"
+              onClick={() => ViewAllCheckUpDetails()}
+            >
               Checkups {<TbCheckupList size={30} />}
             </div>
           </div>

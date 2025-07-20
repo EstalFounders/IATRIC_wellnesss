@@ -3,6 +3,7 @@ import { TbKeyframes, TbReportSearch } from "react-icons/tb";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import styles from "../css/HealthCheckUpCard.module.css";
 import {
+  calculateDiscountedPrice,
   calculateParameters,
   storeHealthCheckupData,
   useAddToCart,
@@ -11,7 +12,9 @@ import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 import { eventEmitter, price_symbol } from "../../../constant";
 import { useDispatch } from "react-redux";
-import { setHealthTestData } from "../../../store/slices/labTest/labTestCategoryApiData";
+import {
+  setHealthDataDetails,
+} from "../../../store/slices/labTest/labTestCategoryApiData";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
@@ -20,109 +23,100 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const handleViewDetails = (healthCheckupData) => {
-    dispatch(setHealthTestData(healthCheckupData));
-    router.push('/labTest/viewDetails')
+    dispatch(setHealthDataDetails(healthCheckupData));
+    router.push("/labTest/viewDetails");
   };
   return (
     <div className={styles.card}>
       {/* Header section with discount, price and MRP */}
-      <div className={styles.upperSection}>
-        <div className={`row ${styles.header}`}>
-          <div className={`col col-md-7`}>
-            {/* You can replace this with an actual icon */}
-            <span role="img" aria-label="icon">
-              🩺
-            </span>
-          </div>
-          <div className={`col col-md-2 pt-2 ${styles.discount}`}>
-            {healthCheckupData.discount}
-            {"%"}
-          </div>
-          <div className={`col ${styles.price}`}>
-            {price_symbol}
-            {healthCheckupData.price}{" "}
-            <span className={styles.mrp}>
-              {price_symbol}
-              {healthCheckupData.mrp}
-            </span>
-          </div>
-        </div>
-
+      <div
+        className={`p-3 text-white lab-test-bg-gradient ${styles.upperSection}`}
+      >
         {/* Title Section */}
-        <div className={styles.title}>
-          <div className="mt-3">
-            {/*
-          OverlayTrigger wraps the element that will trigger the tooltip.
-          placement="top" means the tooltip will appear above the element.
-          overlay prop takes a function that returns the Tooltip component.
-          The Tooltip needs a unique 'id' prop.
-        */}
-            <OverlayTrigger
-              placement="top"
-              overlay={
-                <Tooltip id={`tooltip-${healthCheckupData.id}`}>
-                  {healthCheckupData.title}
-                </Tooltip>
-              }
-            >
-              {/*
-            The strong tag now has inline styles for truncation.
-            - whiteSpace: 'nowrap' prevents text from wrapping to the next line.
-            - overflow: 'hidden' hides any content that overflows the element's box.
-            - textOverflow: 'ellipsis' displays an ellipsis (...) for clipped text.
-            - display: 'block' is crucial for text-overflow to work correctly on inline elements like <strong>.
-            - maxWidth: '100%' ensures it respects its parent's width.
-          */}
-              <strong
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "block",
-                  maxWidth: "100%", // Adjust this or its parent's width to control truncation point
-                }}
-              >
-                {healthCheckupData.title}
-              </strong>
-            </OverlayTrigger>
-          </div>
+        <div className="mb-2">
+          <strong
+            className="d-block text-truncate h3"
+            style={{ maxWidth: "100%" }}
+            title={healthCheckupData.title}
+          >
+            {healthCheckupData.title}
+          </strong>
         </div>
-      </div>
-      {/* Details Section */}
-      <div className={`row ${styles.details}`}>
-        <div className="col">
-          <div className={`text-center ${styles.icon}`}>
-            <TbKeyframes />
+
+        {/* Price and Discount Section */}
+        <div className="d-flex align-items-center justify-content-between mt-2">
+          {/* Price block */}
+          <div>
+            <div className="d-flex align-items-center">
+              <span className="h5 mb-0 font-weight-bold">
+                ₹{" "}
+                {calculateDiscountedPrice(
+                  healthCheckupData.discount,
+                  healthCheckupData.price
+                )}
+              </span>
+              <span className="text-dark mr-2 ml-2 text-decoration-line-through">
+                ₹{healthCheckupData.price}
+              </span>
+            </div>
           </div>
-          <strong className="font-weight-bold">
-            {/* {calculateParameters(healthCheckupData.test_included)} parameters */}
-          </strong>{" "}
-          included
-        </div>
-        <div className="col">
-          <div className={`text-center ${styles.icon}`}>
-            <TbReportSearch />
-          </div>
-          <strong className="font-weight-bold">Report in </strong>
-          {healthCheckupData.report_within}
+
+          {/* Discount badge */}
+          {healthCheckupData.discount && (
+            <span className="badge bg-success text-white py-1 px-2">
+              {healthCheckupData.discount}% Off
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Buttons Section */}
-      <div className={`d-flex justify-content-center mt-3 ${styles.buttons}`}>
+      {/* Details Section */}
+      <div className="px-5">
         <div
-          className={`clickable-div ${styles.addToCartbutton} ${
-            isClicked ? styles.clicked : ""
-          }`}
-          onClick={() => handleAddToCart({ healthCheckupData })}
+          className={`row justify-content-center align-items-center text-center ${styles.details}`}
         >
-          Add to Cart
+          {console.log(healthCheckupData.test_included, "test included")}
+
+          <div className="col-auto d-flex flex-column align-items-center">
+            <div className={`mb-2 ${styles.icon}`}>
+              <TbKeyframes />
+            </div>
+            <div>
+              <strong className="font-weight-bold">
+                {calculateParameters(healthCheckupData.test_included)}{" "}
+                parameters
+              </strong>{" "}
+              included
+            </div>
+          </div>
+
+          <div className="col-auto d-flex flex-column align-items-center">
+            <div className={`mb-2 ${styles.icon}`}>
+              <TbReportSearch />
+            </div>
+            <div>
+              <strong className="font-weight-bold">Report in </strong>
+              {healthCheckupData.reports_within}
+            </div>
+          </div>
         </div>
-        <div
-          className={`clickable-div ${styles.viewDetailsButton}`}
-          onClick={() => handleViewDetails(healthCheckupData)}
-        >
-          View Details
+
+        {/* Buttons Section */}
+        <div className={`d-flex justify-content-center mt-2 p-3 ${styles.buttons}`}>
+          <div
+            className={`clickable-div text-nowrap ${styles.addToCartbutton} ${
+              isClicked ? styles.clicked : ""
+            }`}
+            onClick={() => handleAddToCart({ healthCheckupData })}
+          >
+            Add to Cart
+          </div>
+          <div
+            className={`clickable-div text-nowrap ${styles.viewDetailsButton}`}
+            onClick={() => handleViewDetails(healthCheckupData)}
+          >
+            View Details
+          </div>
         </div>
       </div>
       {snackbarOpen && (

@@ -5,6 +5,7 @@ import HealthCheckupCard from "../common/HealthCheckupCard";
 import { HiArrowCircleRight } from "react-icons/hi";
 import {
   filterActiveHealthTest,
+  getCategoryCheckup,
   getLabCategoryId,
   getLabTestCategory,
   MoreButton,
@@ -15,46 +16,68 @@ import {
   setAllTestDetails,
   setMostPopularCheckUp,
 } from "../../../store/slices/labTest/labTestCategoryApiData";
+import { labtestCateogory } from "../../../constant";
+import {
+  fetchLabCateogory,
+  fetchLabTestsDetails,
+} from "../apiService/HomePageService";
 
 const MostPopularCheckup = () => {
-  const [healthCheckupData, setHealthCheckupData] = useState([]); // Initialize with an empty array
-  // useSelector(
-  //   (state) => state.labtestHomepage.allTestDetails
-  // );
+  const healthCheckupData = useSelector(
+    (state) => state.labtestHomepage.allCheckUpDetails
+  );
+  const categoryDetails = useSelector(
+    (state) => state.labtestHomepage.categoryDetails
+  );
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
   const dispatch = useDispatch();
 
+  // First: Fetch category list
   useEffect(() => {
-    const fetchLabCateogory = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/labtest"); // Replace with your API endpoint
-        const data = await response.json();
-        const id = getLabCategoryId("FullBodyCheckup", data);
-        await fetchLabTestsDetails(id);
+        await fetchLabCateogory(dispatch);
       } catch (err) {
-        setError("Error fetching data");
-        setLoading(false);
+        setError("Failed to fetch categories");
       }
     };
 
-    fetchLabCateogory();
-  }, []);
+    fetchCategories();
+  }, [dispatch]);
 
-  const fetchLabTestsDetails = async (id) => {
-    try {
-      const response = await fetch(`/api/labtestcategorydetails/?id=${id}`); // Replace with your API endpoint
-      const data = await response.json();
-      console.log(data, "40");
-      const activeData = filterActiveHealthTest(data);
-      // setHealthCheckUpData(activeData);
-      dispatch(setAllTestDetails(activeData));
-      setLoading(false);
-    } catch (err) {
-      setError("Error fetching data");
-      setLoading(false);
-    }
-  };
+  console.log(
+    healthCheckupData,
+    "health checkup data on 33 in most popular checkup"
+  );
+
+  const mostPopularCheckup = getCategoryCheckup(
+    labtestCateogory.fullBodyCheckup,
+    healthCheckupData,
+    categoryDetails
+  );
+
+  // Second: Run this only when categoryDetails is ready
+  useEffect(() => {
+    const fetchTests = async () => {
+      if (categoryDetails && categoryDetails.length > 0) {
+        try {
+          await fetchLabTestsDetails(
+            labtestCateogory.fullBodyCheckup,
+            dispatch,
+            categoryDetails
+          );
+          setLoading(false);
+        } catch (err) {
+          setError("Failed to fetch test details");
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTests();
+  }, [categoryDetails, dispatch]);
 
   return (
     <>
@@ -62,25 +85,23 @@ const MostPopularCheckup = () => {
         <div className="row d-flex justify-content-center align-items-center">
           <div className="row">
             <div className="col" style={{ marginTop: "15%" }}>
-              <div className={styles.mostPopularText}>
-                Most Popular checkups
-              </div>
+              <div className={styles.mostPopularText}>Full Body checkups</div>
               <div className={styles.mostPopularTextSubtext}>
                 Lorem ipsum dolor sit amet consectetur.
               </div>
             </div>
           </div>
           <Row>
-            {loading && healthCheckupData > 0
+            {loading && mostPopularCheckup > 0
               ? "Please wait"
-              : healthCheckupData.map((checkup) => (
+              : mostPopularCheckup.map((checkup) => (
                   <Col
                     key={checkup._id}
                     xs={12}
                     sm={6}
                     md={4}
-                    lg={3}
-                    className="m-5"
+                    lg={4}
+                    className="mb-3"
                   >
                     {" "}
                     {/* Key should be here */}
@@ -90,7 +111,10 @@ const MostPopularCheckup = () => {
           </Row>
         </div>
         <Row className="d-flex justify-content-center align-items-center mt-4 mb-3">
-          <MoreButton healthCheckupData={healthCheckupData} />
+          <MoreButton
+            viewCheckupData={mostPopularCheckup}
+            category={labtestCateogory.fullBodyCheckup}
+          />
         </Row>
       </Container>
     </>
