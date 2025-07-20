@@ -184,6 +184,21 @@
   text-decoration: line-through;
 }
 
+/* Ensure the icon itself has a transition */
+.most-booked-checkup-style .checkup-arrow-col svg {
+  transition: transform 0.3s ease-out; /* Smooth animation */
+  transform-origin: center; /* Ensures it zooms from its center */
+}
+
+/* Apply zoom on hover of the parent .most-booked-checkup-style */
+.most-booked-checkup-style:hover .checkup-arrow-col svg {
+  transform: scale(1.3); /* Zooms in by 25% */
+}
+
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
+
 .scroll-container::-webkit-scrollbar {
   display: none;
 }

@@ -2,6 +2,9 @@ import { HiArrowCircleRight } from "react-icons/hi";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useRef, useState } from "react";
 import MoreModalComp from "../viewcheckups/ViewCheckups";
+import { useState } from "react";
+import MoreModalComp from "../viewcheckups/ViewCheckups";
+import styles from "../css/FirstSection.module.css";
 import { color_schema, eventEmitter } from "../../../constant";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
@@ -10,6 +13,8 @@ import React from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
 
+
+import { isValidObjectId } from "mongoose";
 
 export const MoreButton = ({ viewCheckupData, category }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -44,8 +49,6 @@ export const MoreButton = ({ viewCheckupData, category }) => {
     </div>
   );
 };
-
-
 
 export const handleCheckupCateogry = (
   dispatch,

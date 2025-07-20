@@ -8,6 +8,7 @@ import {
   getCategoryCheckup,
   handleCheckupCateogry,
 } from "../common/CommonMethod";
+import { getCategoryCheckup, handleCheckupCateogry } from "../common/CommonMethod";
 
 // Assuming color_schema is defined elsewhere
 const color_schema = {
@@ -41,6 +42,7 @@ export default function MostBookedCheckups() {
       height: "",
       onClick: (index) =>
         handleCheckupCateogryLocal("Full Body Checkup", index),
+      onClick: (index) => handleCheckupCateogryLocal("Full Body Checkup", index),
     },
     {
       title: "Sexual Health",
@@ -56,6 +58,7 @@ export default function MostBookedCheckups() {
       height: "h-50",
       onClick: (index) =>
         handleCheckupCateogryLocal("Full Body Checkup", index),
+      onClick: (index) => handleCheckupCateogryLocal("Women’s Health", index),
     },
     {
       title: "Allergy Checkup",
@@ -63,6 +66,7 @@ export default function MostBookedCheckups() {
       color: "bg-green-gradient",
       height: "",
       onClick: (index) => handleCheckupCateogryLocal("Allergy", index),
+      onClick: (index) => handleCheckupCateogryLocal("Allergy Checkup", index),
     },
   ];
 
@@ -82,6 +86,9 @@ export default function MostBookedCheckups() {
           >
             View All Checkups
           </div>
+            <div className="labtest-btn w-50 p-2 ml-auto mr-auto mt-4" onClick={() => router.push('/labTest/viewAllCheckups')}>
+              View All Checkups
+            </div>
         </div>
 
         {/* Right Grid Section */}
@@ -93,6 +100,7 @@ export default function MostBookedCheckups() {
                 className={`col-5 m-2 p-4 most-booked-checkup-style ${item.color} ${item.height} d-flex justify-content-center align-items-center`}
                 onClick={() => item.onClick(index)}
                 style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="row w-100">
                   <div className="row">
@@ -118,4 +126,5 @@ export default function MostBookedCheckups() {
       </div>
     </section>
   );
+}
 }

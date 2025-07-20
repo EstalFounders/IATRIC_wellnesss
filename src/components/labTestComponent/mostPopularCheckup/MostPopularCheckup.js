@@ -99,6 +99,20 @@ const MostPopularCheckup = () => {
               ? "Please wait"
               : mostPopularCheckup.map((checkup) => (
                   <div key={checkup._id}>
+          <Row>
+            {loading && mostPopularCheckup > 0
+              ? "Please wait"
+              : mostPopularCheckup.map((checkup) => (
+                  <Col
+                    key={checkup._id}
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={4}
+                    className="mb-3"
+                  >
+                    {" "}
+                    {/* Key should be here */}
                     <HealthCheckupCard healthCheckupData={checkup} />
                   </div>
                 ))}
