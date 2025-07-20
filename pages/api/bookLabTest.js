@@ -1,3 +1,6 @@
+// pages/api/bookLabTest.js
+import { dbConnect } from "../../src/lib/db";
+import BookLabTest from "../../src/models/bookLabTestSchema";
 // // pages/api/bookLabTest.js
 // import { dbConnect } from "../../src/lib/db";
 // import BookLabTest from "../../src/models/bookLabTestSchema";

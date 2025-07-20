@@ -21,6 +21,7 @@ import {
   fetchLabCateogory,
   fetchLabTestsDetails,
 } from "../apiService/HomePageService";
+import { HorizontalScrollContainer } from "../common/HorizontalContainer";
 
 const MostPopularCheckup = () => {
   const healthCheckupData = useSelector(
@@ -91,6 +92,13 @@ const MostPopularCheckup = () => {
               </div>
             </div>
           </div>
+
+          {/* Cards container with vertical scroll */}
+          <HorizontalScrollContainer>
+            {loading && mostPopularCheckup.length > 0
+              ? "Please wait"
+              : mostPopularCheckup.map((checkup) => (
+                  <div key={checkup._id}>
           <Row>
             {loading && mostPopularCheckup > 0
               ? "Please wait"
@@ -106,10 +114,12 @@ const MostPopularCheckup = () => {
                     {" "}
                     {/* Key should be here */}
                     <HealthCheckupCard healthCheckupData={checkup} />
-                  </Col>
+                  </div>
                 ))}
-          </Row>
+          </HorizontalScrollContainer>
         </div>
+
+        {/* More Button */}
         <Row className="d-flex justify-content-center align-items-center mt-4 mb-3">
           <MoreButton
             viewCheckupData={mostPopularCheckup}
