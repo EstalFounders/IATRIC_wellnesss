@@ -1,0 +1,16 @@
+/* In your CSS module (e.g., styles.module.css) */
+
+.fixedWidthScrollableContainer {
+  max-width: 1500px; 
+  /* Adjust this value based on your design. Common values are 960px, 1140px, 1200px, etc. */
+  /* You can also use percentage or viewport units like max-width: 90vw; */
+
+  overflow-x: hidden; /* Hide horizontal scrollbar, as Bootstrap columns usually handle this */
+  overflow-y: auto;   /* Enable vertical scrolling if content overflows vertically */
+
+  /* Optional: Set a height if you want vertical scrolling to kick in at a certain point */
+  /* height: 80vh; */ /* Example: Max height of 80% of viewport height */
+
+  /* Optional: Add some padding if the scrollbar appears too close to content */
+  /* padding-right: 15px; */
+}

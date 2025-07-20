@@ -6,6 +6,7 @@ const initialState = {
   allCheckUpDetails: [],
   viewCheckups: [],
   categoryDetails: [],
+  heatlhDataDetails:""
 };
 
 const labTestCateogryDataSlice = createSlice({
@@ -24,6 +25,9 @@ const labTestCateogryDataSlice = createSlice({
     setCategoryDetails: (state, action) => {
       state.categoryDetails = action.payload;
     },
+    setHealthDataDetails: (state, action) => {
+      state.heatlhDataDetails = action.payload;
+    },
   },
 });
 
@@ -33,6 +37,7 @@ export const {
   setHealthTestData,
   setViewCheckupsData,
   setCategoryDetails,
+  setHealthDataDetails
 } = labTestCateogryDataSlice.actions;
 
 // Export reducer

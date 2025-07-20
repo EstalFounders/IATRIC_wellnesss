@@ -149,16 +149,86 @@
   border-radius: 0px 8px 8px 0px;
 }
 .bg-green-gradient {
-  background: linear-gradient(to top,#3b5f1d, #4bac54);
+  background: linear-gradient(to top,#3b5f1d, #2d4c30);
 }
 
 .bg-yellow-gradient {
-  background: linear-gradient(to top,#8e8333, #d1c35a);
+  background: linear-gradient(to top,#8e8333, #4f4b30);
+  background: linear-gradient(to top,#3b5f1d, #4bac54);
 }
+
 
 .most-booked-checkup-style {
   border-radius: 40px;
   height: 200px;
 }
 
+.lab-test-bg-gradient {
+    /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
+  background: linear-gradient(to top right, #3b5f1d, #8e8333);
+}
 
+/* Ensure the icon itself has a transition */
+.most-booked-checkup-style .checkup-arrow-col svg {
+  transition: transform 0.3s ease-out; /* Smooth animation */
+  transform-origin: center; /* Ensures it zooms from its center */
+}
+
+/* Apply zoom on hover of the parent .most-booked-checkup-style */
+.most-booked-checkup-style:hover .checkup-arrow-col svg {
+  transform: scale(1.3); /* Zooms in by 25% */
+}
+
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
+
+/* Ensure the icon itself has a transition */
+.most-booked-checkup-style .checkup-arrow-col svg {
+  transition: transform 0.3s ease-out; /* Smooth animation */
+  transform-origin: center; /* Ensures it zooms from its center */
+}
+
+/* Apply zoom on hover of the parent .most-booked-checkup-style */
+.most-booked-checkup-style:hover .checkup-arrow-col svg {
+  transform: scale(1.3); /* Zooms in by 25% */
+}
+
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  z-index: 2;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.scroll-btn:hover {
+  background: #8e8333;
+}
+
+.scroll-btn.left {
+  left: 0.3rem;
+  margin-left: -7%;
+}
+
+.scroll-btn.right {
+  right: 0.3rem;
+  margin-right: -7%;
+}

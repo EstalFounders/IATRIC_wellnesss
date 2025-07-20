@@ -1,21 +1,19 @@
-// components/MostBookedCheckups.js
-import Link from "next/link";
-import { FaArrowAltCircleRight } from "react-icons/fa";
-import {
-  IoIosArrowDropdownCircle,
-  IoIosArrowDroprightCircle,
-  IoIosBody,
-} from "react-icons/io";
-import { color_schema, labtestCateogory } from "../../../constant";
+import React from "react";
+import { IoIosBody, IoIosArrowDroprightCircle } from "react-icons/io";
 import { PiVirusFill } from "react-icons/pi";
-import { fetchLabTestsDetails } from "../apiService/HomePageService";
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import {
   getCategoryCheckup,
-  getHealthCheckupData,
   handleCheckupCateogry,
 } from "../common/CommonMethod";
+
+// Assuming color_schema is defined elsewhere
+const color_schema = {
+  white: "#FFFFFF",
+  // ... other colors
+};
 
 export default function MostBookedCheckups() {
   const categoryDetails = useSelector(
@@ -35,37 +33,34 @@ export default function MostBookedCheckups() {
     );
     handleCheckupCateogry(dispatch, router, viewCheckupData, category);
   };
-
   const checkups = [
     {
       title: "Full Body Checkup",
       icon: <IoIosBody size={50} />,
-      color: "bg-yellow-gradient",
+      color: "bg-green-gradient",
       height: "",
-      onClick: () =>
-        handleCheckupCateogryLocal(labtestCateogory.fullBodyCheckup),
+      onClick: (index) => handleCheckupCateogryLocal("Full Body Checkup", index),
     },
     {
       title: "Sexual Health",
-      icon: "",
-      color: "bg-green-gradient",
+      icon: "", // Assuming you'll add an icon here
+      color: "bg-yellow-gradient",
       height: "h-50",
-      onClick: () => handleCheckupCateogryLocal(labtestCateogory.sexualHealth),
+      onClick: (index) => handleCheckupCateogryLocal("Sexual Health", index),
     },
     {
       title: "Women’s Health",
-      icon: "",
-      color: "bg-green-gradient",
+      icon: "", // Assuming you'll add an icon here
+      color: "bg-yellow-gradient",
       height: "h-50",
-      onClick: () => handleCheckupCateogryLocal("Full Body Checkup"),
+      onClick: (index) => handleCheckupCateogryLocal("Full Body Checkup", index),
     },
     {
       title: "Allergy Checkup",
       icon: <PiVirusFill size={50} />,
-      color: "bg-yellow-gradient",
+      color: "bg-green-gradient",
       height: "",
-      onClick: () =>
-        handleCheckupCateogryLocal(labtestCateogory.allergyTestCheckup),
+      onClick: (index) => handleCheckupCateogryLocal("Allergy", index),
     },
   ];
 
@@ -79,11 +74,12 @@ export default function MostBookedCheckups() {
             India’s fastest AI powered & temperature-controlled supply chain to
             collect and test your blood in freshest state.
           </p>
-          <Link href="/checkups">
-            <div className="labtest-btn w-50 p-2 ml-auto mr-auto mt-4">
-              View All Checkups
-            </div>
-          </Link>
+          <div
+            className="labtest-btn w-50 p-2 ml-auto mr-auto mt-4"
+            onClick={() => router.push("/labTest/viewAllCheckups")}
+          >
+            View All Checkups
+          </div>
         </div>
 
         {/* Right Grid Section */}
@@ -91,20 +87,22 @@ export default function MostBookedCheckups() {
           <div className="row">
             {checkups.map((item, index) => (
               <div
-                className={`col-5 m-2 p-4 most-booked-checkup-style ${item.color} ${item.height} d-flex justify-content-center align-items-center`}
-                onClick={() => item.onClick()}
                 key={index}
+                className={`col-5 m-2 p-4 most-booked-checkup-style ${item.color} ${item.height} d-flex justify-content-center align-items-center`}
+                onClick={() => item.onClick(index)}
+                style={{ cursor: "pointer" }}
               >
                 <div className="row w-100">
                   <div className="row">
                     <div className="col text-white h4">{item.title}</div>
-                    <div className="col">
-                      {
-                        <IoIosArrowDroprightCircle
-                          color={color_schema.white}
-                          size={30}
-                        />
-                      }
+                    {/* ADDED CLASS HERE: 'checkup-arrow-col' */}
+                    <div className="col checkup-arrow-col">
+                      {/* react-icons render SVG elements */}
+                      <IoIosArrowDroprightCircle
+                        color={color_schema.white}
+                        size={30}
+                        // No inline className for Tailwind here
+                      />
                     </div>
                   </div>
                   <div className="row">

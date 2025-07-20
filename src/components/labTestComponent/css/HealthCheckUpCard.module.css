@@ -1,11 +1,14 @@
 .card {
-    /* width: 352px; */
-    /* height: 402px; */
-    border: 1px solid #EDEDED;
-    border-radius: 10px;
-    padding: 20px;
+    width: 400px; 
+    /* border: 1px solid #EDEDED; */
+    border-radius: 30px;
     background-color: #F8FAF6;
   }
+
+  .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
   
   .header {
     /* display: flex; */
@@ -74,7 +77,6 @@ text-wrap: nowrap;
   .details {
     font-size: 14px;
     margin-top: 5%;
-    padding: 25px;
   }
   
   .addToCartbutton {
@@ -82,13 +84,12 @@ text-wrap: nowrap;
     height: 33px;
     gap: 4px;
     border-radius: 8px;
-    padding: 22px 16px;
 font-size: 16px;
 font-weight: 700;
 line-height: 17.07px;
 text-align: center;
 color: #2B3133;
-border: 1px solid #3b5f1d;
+border: 1px solid #8e8333;
 background-color: white;
 
 display: flex;
@@ -105,7 +106,6 @@ align-items: center;
   width: 120px;
     height: 33px;
     gap: 4px;
-    padding: 22px 16px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 700;
@@ -122,13 +122,7 @@ align-items: center;
 }
   
   .upperSection {
-  /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
-  /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
-  /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
-  /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
-  background: linear-gradient(to top right, #3b5f1d, #8e8333);
-  height: 150px;
-  border-radius: 10px;
+  border-radius: 30px 30px 0 0;
 }
   .icon {
     width: 40px;

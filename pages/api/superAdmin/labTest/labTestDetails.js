@@ -7,19 +7,19 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const labTestsDetails = await LabTestDetails.find({});
-      const allTestsIncluded = [
-        ...new Map(
-          labTestsDetails
-            .map((labTest) => labTest.test_included) // Extract `test_included` arrays
-            .flat() // Flatten the array of arrays
-            .filter((test) => test.testName && test.parameters.length !== 0) // Exclude empty or invalid test names
-            .map((test) => [test.testName, test]) // Map to [testName, test] key-value pairs
-        ).values(),
-      ];
+      // const allTestsIncluded = [
+      //   ...new Map(
+      //     labTestsDetails
+      //       .map((labTest) => labTest.test_included) // Extract `test_included` arrays
+      //       .flat() // Flatten the array of arrays
+      //       .filter((test) => test.testName && test.parameters.length !== 0) // Exclude empty or invalid test names
+      //       .map((test) => [test.testName, test]) // Map to [testName, test] key-value pairs
+      //   ).values(),
+      // ];
 
-      res.status(200).json(allTestsIncluded);
+      res.status(200).json(labTestsDetails);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching lab tests" });
+      res.status(500).json({ message: error });
     }
   }
 }

@@ -1,36 +1,35 @@
 import React from "react";
-import { Card, Button } from "react-bootstrap";
-import styles from "../css/HealthyBodyCard.module.css"; // Optional CSS module for extra styling
+import { Card } from "react-bootstrap";
+import styles from "../css/HealthyBodyCard.module.css"; // Optional: For override
 import { MoreButton } from "./CommonMethod";
 
 const HealthyBodyCard = ({ title, description, image }) => {
   return (
     <Card
-      className={`text-center ${styles.customCard}`}
-      style={{
-        borderRadius: "8px",
-        padding: "1rem",
-        backgroundColor: "#F4F8E8",
-      }}
+      className={`border-0 shadow-sm rounded-4 overflow-hidden ${styles.customCard}`}
+      style={{ minHeight: "100%", backgroundColor: "#ffffff" }}
     >
-      <Card.Img
-        variant="top"
-        src={image}
-        alt="Care of your Teeth"
-        className={styles.cardImage}
-        style={{ objectFit: "cover" }}
-      />
-      <Card.Body>
-        <div className={styles.cardTitle}>{title}</div>
+      {/* Image Banner */}
+      <div style={{ height: "180px", overflow: "hidden" }}>
+        <Card.Img
+          src={image}
+          alt={title}
+          className="w-100 h-100"
+          style={{ objectFit: "cover" }}
+        />
+      </div>
 
-        {/* Fix: Remove <Card.Text> and use a <div> instead */}
-        <div className={styles.cardDescription}>
-          <p>{description}</p>
-        </div>
+      {/* Body */}
+      <Card.Body className="d-flex flex-column justify-content-between p-3">
+        {/* Title */}
+        <h5 className={`fw-bold mb-2 text-center ${styles.cardTitle}`}>{title}</h5>
 
-        {/* Add the component here in the center */}
-        <div className="d-flex justify-content-center mt-3 mr-5">
-          <MoreButton /> {/* Replace with your actual component */}
+        {/* Description */}
+        <p className="text-muted small mb-3 text-center">{description}</p>
+
+        {/* CTA Button */}
+        <div className="d-flex justify-content-center mt-auto">
+          <MoreButton />
         </div>
       </Card.Body>
     </Card>

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Table, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Table,
+  Button,
+  Form,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { BiEdit } from "react-icons/bi";
 import TestDetailsCard from "./TestDetailsCard";
 import { useRouter } from "next/router";
@@ -8,10 +17,12 @@ import { MdDelete } from "react-icons/md";
 import ConfirmModal from "../model/ConfirmModel";
 import { roles } from "../../../constant";
 import { useSelector } from "react-redux";
+import { fetchLabCateogory, fetchLabTests } from "../apiService/labtestService";
 
 const LabTestComponent = () => {
   // State to store fetched data
   const [labTests, setLabTests] = useState([]);
+  const [labtestCategory, setLabTestCategory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [LoadingTest, setLoadingTest] = useState(false);
   const [error, setError] = useState(null);
@@ -36,31 +47,20 @@ const LabTestComponent = () => {
 
   // Fetch lab test details when component mounts
   useEffect(() => {
-    const fetchLabTests = async () => {
-      try {
-        const response = await fetch("/api/labtest"); // Replace with your API endpoint
-        const data = await response.json();
-        setLabTests(data);
-        setLoading(false);
-      } catch (err) {
-        setError("Error fetching data");
-        setLoading(false);
-      }
-    };
-
-    fetchLabTests();
+    fetchLabTests({ setLabTests, setLoading, setError });
+    fetchLabCateogory(setLabTestCategory);
   }, []);
 
   // Pagination calculation
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentLabTests = labTests.slice(indexOfFirstUser, indexOfLastUser);
+  const currentLabTests = labtestCategory.slice(indexOfFirstUser, indexOfLastUser);
 
   // Handle page change
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Filter lab tests based on search
-  const filteredLabTests = currentLabTests.filter((labTest) =>
+  const filteredLabTestsCategory = currentLabTests.filter((labTest) =>
     labTest.category_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -202,7 +202,7 @@ const LabTestComponent = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredLabTests.map((labTest) => (
+          {filteredLabTestsCategory.map((labTest) => (
             <tr key={labTest._id}>
               <td>
                 <BiEdit
@@ -242,7 +242,6 @@ const LabTestComponent = () => {
                         <MdDelete
                           style={{ cursor: "not-allowed", opacity: 0.5 }}
                           tabIndex={0} // Ensures it receives focus for tooltip
-                          
                         />
                       </span>
                     </OverlayTrigger>

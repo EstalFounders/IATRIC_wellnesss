@@ -21,22 +21,15 @@ import {
   fetchLabCateogory,
   fetchLabTestsDetails,
 } from "../apiService/HomePageService";
+import { HorizontalScrollContainer } from "../common/HorizontalContainer";
 
 const MostPopularCheckup = () => {
   const healthCheckupData = useSelector(
     (state) => state.labtestHomepage.allCheckUpDetails
-  );  
+  );
   const categoryDetails = useSelector(
     (state) => state.labtestHomepage.categoryDetails
   );
-
-  const mostPopularCheckup = getCategoryCheckup(
-    labtestCateogory.fullBodyCheckup,
-    healthCheckupData,
-    categoryDetails
-  );
-
-  console.log(mostPopularCheckup, "most popular check up in 39");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
@@ -54,6 +47,17 @@ const MostPopularCheckup = () => {
 
     fetchCategories();
   }, [dispatch]);
+
+  console.log(
+    healthCheckupData,
+    "health checkup data on 33 in most popular checkup"
+  );
+
+  const mostPopularCheckup = getCategoryCheckup(
+    labtestCateogory.fullBodyCheckup,
+    healthCheckupData,
+    categoryDetails
+  );
 
   // Second: Run this only when categoryDetails is ready
   useEffect(() => {
@@ -88,25 +92,20 @@ const MostPopularCheckup = () => {
               </div>
             </div>
           </div>
-          <Row>
-            {loading && mostPopularCheckup > 0
+
+          {/* Cards container with vertical scroll */}
+          <HorizontalScrollContainer>
+            {loading && mostPopularCheckup.length > 0
               ? "Please wait"
               : mostPopularCheckup.map((checkup) => (
-                  <Col
-                    key={checkup._id}
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={4}
-                    className="mb-3"
-                  >
-                    {" "}
-                    {/* Key should be here */}
+                  <div key={checkup._id}>
                     <HealthCheckupCard healthCheckupData={checkup} />
-                  </Col>
+                  </div>
                 ))}
-          </Row>
+          </HorizontalScrollContainer>
         </div>
+
+        {/* More Button */}
         <Row className="d-flex justify-content-center align-items-center mt-4 mb-3">
           <MoreButton
             viewCheckupData={mostPopularCheckup}
