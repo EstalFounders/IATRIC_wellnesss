@@ -28,11 +28,14 @@ import { FaHeartPulse } from "react-icons/fa6";
 import { BsLungsFill } from "react-icons/bs";
 import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
+import { handleServiceClick } from "../Common/commonMethod";
+import { useRouter } from "next/router";
 
 const Demo5Services2 = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 8;
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const router = useRouter();
 
   // Dummy data for services
 
@@ -60,7 +63,7 @@ const Demo5Services2 = () => {
     const currentIndex = indexOfFirstService + index;
     // Navigate to the corresponding component based on the index
     const serviceName = services[currentIndex];
-    history.push(`/department-single/${serviceName}`);
+    handleServiceClick(serviceName, index, router);
   };
 
   // Function to render the icon based on the index

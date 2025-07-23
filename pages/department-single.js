@@ -11,7 +11,7 @@ const DepartmentSingle = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
   let filterDoctors;
   const router = useRouter();
-  const { serviceName } = router.query;
+  const { serviceName, id } = router.query;
   const service = serviceName
     ? serviceName
         .replace(/-/g, " ")
@@ -37,10 +37,10 @@ const DepartmentSingle = () => {
     <Layouts>
       <PageBanner
         pageTitle={service}
-        motherTitle="Departments"
-        url="departments"
+        motherTitle="Our Departments"
+        url="all-departments"
       />
-      <DepartmentPage serviceName={service} />
+      <DepartmentPage serviceName={service} id={id} />
       <DepartmentDoctors1 serviceName={service} doctors={filterDoctors} />
       <About5 />
     </Layouts>
