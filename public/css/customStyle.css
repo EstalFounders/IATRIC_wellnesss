@@ -30,7 +30,7 @@
 
 .consultation-btn {
   padding: 8px 16px;
-  font-size: 16px;
+  font-size: 18px;
   background-color: white;
   color: #3b5f1d;
   border: 1px solid #3b5f1d;
@@ -154,7 +154,6 @@
 
 .bg-yellow-gradient {
   background: linear-gradient(to top,#8e8333, #4f4b30);
-  background: linear-gradient(to top,#3b5f1d, #4bac54);
 }
 
 
@@ -232,3 +231,5 @@
   right: 0.3rem;
   margin-right: -7%;
 }
+
+

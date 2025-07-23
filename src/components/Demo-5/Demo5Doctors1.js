@@ -70,7 +70,7 @@ const DoctorsSection = () => {
           <div className="col-md-12 text-center">
             <div className="all-doctors mb-40 w-25 mr-auto ml-auto">
               <ConsultationButton path={"/all-doctors"}>
-                MEET THE DOCTORS
+                Meet the Doctors
               </ConsultationButton>
             </div>
           </div>

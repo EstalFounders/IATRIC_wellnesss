@@ -1,4 +1,5 @@
 import Link from "next/dist/client/link";
+import Image from "next/image";
 import { useState } from "react";
 
 const MobileMenu = () => {
@@ -24,33 +25,38 @@ const MobileMenu = () => {
       <div className="wsmainwp clearfix">
         {/* LOGO IMAGE */}
         {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-        <div className="desktoplogo">
-          <a href="#hero-2">
-            <img
-              src="images/logo.png"
-              width={180}
-              height={40}
-              alt="header-logo"
-            />
-          </a>
-        </div>
+        {/* <div className="desktoplogo">
+          <Image
+            src="/images/logo.png"
+            width={180}
+            height={40}
+            alt="header-logo"
+          />
+        </div> */}
         {/* MAIN MENU */}
         <nav className="wsmenu clearfix" style={{ height: 294 }}>
           <div className="overlapblackbg" />
           <ul className="wsmenu-list">
             {/* DROPDOWN MENU */}
             <li aria-haspopup="true">
-              <span
+              {/* <span
                 className={`wsmenu-click ${activeArrow("home")}`}
                 onClick={() => activeMenuSet("home")}
               >
                 <i className="wsmenu-arrow" />
-              </span>
-              <a href="#" onClick={() => activeMenuSet("home")}>
-                Home <span className="wsarrow" />
-              </a>
-              <ul className="sub-menu" style={activeLi("home")}>
-                <li aria-haspopup="true">
+              </span> */}
+              <Link href="/">
+                <a onClick={() => activeMenuSet("home")}>
+                  Home
+                  {/* <span className="wsarrow" /> */}
+                </a>
+              </Link>
+              <Link legacyBehavior href="/labTest/homepage">
+                LabTest
+                {/* <span className="wsarrow" /> */}
+              </Link>
+              {/* <ul className="sub-menu" style={activeLi("home")}> */}
+              {/* <li aria-haspopup="true">
                   <Link legacyBehavior href="/demo-1">
                     Home Concept #1
                   </Link>
@@ -104,8 +110,8 @@ const MobileMenu = () => {
                   <Link legacyBehavior href="/demo-12">
                     Home Concept #12
                   </Link>
-                </li>
-              </ul>
+                </li> */}
+              {/* </ul> */}
             </li>{" "}
             {/* END DROPDOWN MENU */}
             {/* PAGES */}
