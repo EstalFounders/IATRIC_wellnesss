@@ -45,10 +45,12 @@ const MobileMenu = () => {
               >
                 <i className="wsmenu-arrow" />
               </span> */}
-              <a href="/" onClick={() => activeMenuSet("home")}>
+              <Link href="/" >
+              <a onClick={() => activeMenuSet("home")}>
                 Home
                 {/* <span className="wsarrow" /> */}
               </a>
+              </Link>
               <Link legacyBehavior href="/labTest/homepage">
                 LabTest
                 {/* <span className="wsarrow" /> */}
