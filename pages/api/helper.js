@@ -144,13 +144,13 @@ export async function findAvailableDoctorForNow(
   if (earlietslotdate.toDateString() !== selectedDateObj.toDateString()) {
     console.log(nextSlots, "next slots in helper 111");
     if (nextSlots.length > 0) {
-      res.status(200).json({
+      return res.status(200).json({
         message:
           "No slots available for today. Here are the next available slots.",
         nextSlots: nextSlots,
         status: SERVER_AVAILABLE_SLOTS_CODE,
       });
-      return; // Directly return the API result, preventing further processing
+      // Directly return the API result, preventing further processing
     }
   }
 

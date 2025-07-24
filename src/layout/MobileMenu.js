@@ -45,7 +45,7 @@ const MobileMenu = () => {
               >
                 <i className="wsmenu-arrow" />
               </span> */}
-              <Link href="/">
+              <Link legacyBehavior href="/">
                 <a onClick={() => activeMenuSet("home")}>
                   Home
                   {/* <span className="wsarrow" /> */}

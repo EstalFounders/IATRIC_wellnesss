@@ -49,6 +49,7 @@ const AppointmentPage = () => {
     ? false
     : true;
   // State variables
+  const [isDoctorLoading, setIsDoctorLoading] = useState();
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [doctorName, setDoctorName] = useState("");
@@ -197,8 +198,8 @@ const AppointmentPage = () => {
   }, [appointmentState.selectedDoctorId, appointmentState.selectedDate]);
 
   useEffect(() => {
-    if (!doctors) {
-      fetchDoctors(dispatch);
+    if (!(doctors > 0)) {
+      fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
     }
   }, []); // Empty dependency array ensures the effect runs only once
 
@@ -352,12 +353,15 @@ const AppointmentPage = () => {
         consultationData,
         setIsLoading,
       });
-      const data = response;
-      const message = data.json();
-      if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
+      const data = await response.json();
+      const message = data.message;
+      const nextSlots = data.nextSlots;
+      const status = data.status;
+      // const status = message
+      if (status === SERVER_AVAILABLE_SLOTS_CODE) {
         setOpenAvailableSlotsFromServer(true);
-        setAvailableSlotsFromServer(data.nextSlots);
-        setNoSLotAvailableMessage(data.message);
+        setAvailableSlotsFromServer(nextSlots);
+        setNoSLotAvailableMessage(message);
         return;
       }
       if (response.ok) {
