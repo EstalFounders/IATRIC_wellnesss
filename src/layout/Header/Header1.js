@@ -363,11 +363,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                           </Link>
                         </li>
                         <li>
-                          <Link legacyBehavior href="/department-single">
-                            <a>Department Single</a>
-                          </Link>
-                        </li>
-                        <li>
                           <Link legacyBehavior href="/all-doctors">
                             <a>Meet the Doctors</a>
                           </Link>

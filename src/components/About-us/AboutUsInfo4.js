@@ -2,6 +2,7 @@ import { fontWeight } from "@mui/system";
 import Image from "next/image";
 import React from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
+import { ConsultationButton } from "../Common/commonUi";
 
 const AboutUsInfo4 = () => {
   return (
@@ -26,24 +27,22 @@ const AboutUsInfo4 = () => {
               <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
-                  <h4>
-                  Welcome to Healthpath
-                  </h4>
+                  <h4>Welcome to Healthpath</h4>
                 </span>
                 {/* Title */}
-                
-               
+
                 {/* Title */}
                 <h3 className="h3-md steelblue-color">
                   Healthpath: Your Convenient Path to Innovative Healthcare
                 </h3>
                 {/* Text */}
                 <p className="h5 box-list grey-color">
-                  At Healthpath, we&apos;re revolutionizing healthcare by putting
+                  At Healthpath, we&apos;re revolutionizing healthcare by
+                  putting
                   <b> your convenience and well-being first.</b> We know that
                   managing busy schedules and dealing with long wait times can
-                  make accessing quality medical care a challenge. That&apos;s why
-                  we&apos;ve pioneered a unique approach, bringing{" "}
+                  make accessing quality medical care a challenge. That&apos;s
+                  why we&apos;ve pioneered a unique approach, bringing{" "}
                   <b>expert medical care directly to you.</b>
                 </p>
                 <p className="h5 box-list grey-color">
@@ -63,6 +62,13 @@ const AboutUsInfo4 = () => {
                   </b>
                 </p>
               </div>
+              <div className="mt-2 d-flex justify-content-center mt-5 mb-4">
+                <div className="w-25">
+                  <ConsultationButton path={"/appointment"}>
+                    Book Consultation
+                  </ConsultationButton>
+                </div>
+              </div>
             </div>
             {/* END TEXT BLOCK */}
           </div>
@@ -77,9 +83,7 @@ const AboutUsInfo4 = () => {
               <div className="txt-block pc-30" data-wow-delay="0.4s">
                 {/* Section ID */}
                 <span className="section-id blue-color">
-                  <h4>
-                  Highest Quality Care
-                  </h4>
+                  <h4>Highest Quality Care</h4>
                 </span>
 
                 {/* Title */}

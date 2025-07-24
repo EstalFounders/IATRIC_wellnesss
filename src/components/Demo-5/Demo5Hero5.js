@@ -61,7 +61,7 @@ const Demo5Hero5 = () => {
               {/* Button */}
               <div className="w-50">
                 <ConsultationButton path={"/discover-more"}>
-                  DISCOVER MORE
+                  Discover More
                 </ConsultationButton>
               </div>
             </div>

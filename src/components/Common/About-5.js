@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { ConsultationButton } from "./commonUi";
 
 const About5 = () => {
   return (
@@ -50,6 +51,13 @@ const About5 = () => {
                   height={34}
                   alt="signature-image"
                 /> */}
+              </div>
+              <div className="mt-5 mr-auto">
+                <div className="w-50">
+                  <ConsultationButton path={"/appointment"}>
+                    Book Consultation
+                  </ConsultationButton>
+                </div>
               </div>
             </div>
           </div>

@@ -28,9 +28,9 @@ const Demo5About6 = () => {
                 your busy life, at your own pace.
               </div>
               {/* Button */}
-              <div>
+              <div className="w-50 mr-auto mt-5">
                 <ConsultationButton path={"/all-doctors"}>
-                  MEET THE DOCTORS
+                  Meet the Doctors
                 </ConsultationButton>
               </div>
             </div>

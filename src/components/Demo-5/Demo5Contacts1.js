@@ -267,7 +267,7 @@ const Demo5Contacts1 = () => {
                 {/* Button */}
                 <div className="col-md-12 mt-15 form-btn d-flex d-inline-flex">
                   <ConsultationButton onClick={saveQuery}>
-                    TALK TO US
+                  Talk to Us
                   </ConsultationButton>
                   {loading ? (
                     <div className="mt-3 ml-5">

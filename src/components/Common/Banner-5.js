@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { ConsultationButton } from "./commonUi";
 
 const Banner5 = () => {
   return (
@@ -39,6 +40,13 @@ const Banner5 = () => {
               on your path to optimal health, wherever you are in India.
             </div>
           </div>
+          <div className="mt-2 mr-auto ml-auto mb-4">
+            <div className="">
+              <ConsultationButton path={"/appointment"}>
+                Book Consultation
+              </ConsultationButton>
+            </div>
+          </div>
         </div>
         {/* BANNER IMAGE */}
         <div className="row ml-5">
@@ -55,6 +63,7 @@ const Banner5 = () => {
           </div>
         </div>
       </div>
+
       {/* End container */}
     </section>
   );
