@@ -13,6 +13,8 @@ export const development_production_url =
   "https://vtdeveloper.d3pu3hm659dc5p.amplifyapp.com/";
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
+export const medicine_cart_details_local_info = "medicineCartItems";
+export const labtest_cart_details_local_info = "labTestcartItems"
 export const single_call = "single_call";
 export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
@@ -23,6 +25,7 @@ export const api = {
   addDoctor: "/api/addDoctor",
   doctorLogin: "/api/doctorLogin",
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
+  getAllMedicine: "/api/medicineInfo",
   prescriptionCall: "/api/prescription",
   sendWhatsAppCall: "/api/whatsApp",
   recommendedServies: "/api/lib/recommendedServices",
@@ -172,6 +175,7 @@ export const eventEmitter = {
   cartEventEmitter: "cartUpdate",
   navBarEventEmitter: "navbar-option",
   labTestEventEmitter: "labTestUpdate",
+  medicineCartEventEmitter: "medicine-cart-update",
 };
 
 export const labtestCateogory = {
@@ -179,3 +183,7 @@ export const labtestCateogory = {
   sexualHealth: "Sexual Health",
   allergyTestCheckup: "Allergy",
 };
+
+export const medicine_discount = 0.95;
+
+export const lab_test_discount = 0.95;

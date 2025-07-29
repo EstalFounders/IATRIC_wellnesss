@@ -5,19 +5,25 @@ import { AiFillDelete } from "react-icons/ai"; // For the delete icon
 import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { CiDiscount1 } from "react-icons/ci";
 import { HiOutlineShoppingCart } from "react-icons/hi";
-import { calculateTotalPrice } from "./CommonMethod";
+import { calculateTotalPrice, setLabTestCartItems } from "./CommonMethod";
 import { Container } from "react-bootstrap";
 import LabTestModel from "../modal/LabTestModel";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { RequestOtp } from "../../../layout/Component/RequestOtp";
 import { OtpScreen } from "../../../layout/Component/OtpScreen";
-import { eventEmitter, price_symbol } from "../../../constant";
+import {
+  eventEmitter,
+  lab_test_discount,
+  price_symbol,
+} from "../../../constant";
+import { useDispatch, useSelector } from "react-redux";
+import { setLabTestCartDetails } from "../../../store/slices/cartPanelData";
 
-const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
+const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
   const [name, setName] = useState();
   const [mobileNumber, setMobileNumber] = useState();
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(cartItem);
   const [paymentMethod, setPaymentMethod] = useState("onlinePay"); // Initialize state
   const [cartItemsIds, setCartItemsIds] = useState([]);
   const [isProceed, setIsProceed] = useState(false);
@@ -25,6 +31,8 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   const [loading, setLoading] = useState(false);
   const [responseSuccess, setReponseSuccess] = useState(false);
   const [otpRequested, setOtpRequested] = useState(false);
+  const dispatch = useDispatch();
+  // const cartItemsDetails =
 
   // Handler to update state
   const handlePaymentChange = (event) => {
@@ -34,8 +42,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   useEffect(() => {
     // Listen for cart update events
     cartEventEmitter.on(eventEmitter.cartEventEmitter, (item) => {
-      setCartItems((prevItems) => [...prevItems, item]);
-      setCartItemsIds((prevIds) => [...prevIds, item["healthCheckupData"]._id]);
+      dispatch(setLabTestCartDetails(Object.values(item)));
     });
     // Update parent with the cart item count
     if (onUpdateCartItemCount) {
@@ -47,6 +54,30 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       cartEventEmitter.removeAllListeners("cartUpdate");
     };
   }, [cartItems, onUpdateCartItemCount]);
+
+  useEffect(() => {
+    const handler = (item) => {
+      const medicine = item.medicine;
+
+      setCartItems((prevItems) => {
+        const updatedItems = [...prevItems, medicine];
+        setLabTestCartItems(updatedItems); // ✅ Store in localStorage
+        return updatedItems;
+      });
+
+      setCartItemsIds((prevIds) => [...prevIds, medicine._id]);
+
+      if (onUpdateCartItemCount) {
+        onUpdateCartItemCount((prev) => prev + 1);
+      }
+    };
+
+    cartEventEmitter.on(eventEmitter.labTestEventEmitter, handler);
+
+    return () => {
+      cartEventEmitter.off(eventEmitter.labTestEventEmitter, handler);
+    };
+  }, []);
 
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {
@@ -64,7 +95,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   // Calculate the total price with discount if online payment is selected
   const totalPrice =
     paymentMethod === "onlinePay"
-      ? calculateTotalPrice(cartItems) * 0.95 // Apply 5% discount
+      ? calculateTotalPrice(cartItems) * { lab_test_discount } // Apply 5% discount
       : calculateTotalPrice(cartItems);
 
   const handleClose = useCallback(() => {
@@ -152,12 +183,10 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
                   <PiShoppingCartSimpleBold size={30} className={styles.icon} />
                 </div>
                 <div className="col col-md-6">
-                  <div className={`row ${styles.itemTitle}`}>
-                    {item.healthCheckupData.title}
-                  </div>
+                  <div className={`row ${styles.itemTitle}`}>{item.title}</div>
                   <div className={`row ${styles.itemPrice}`}>
                     {price_symbol}
-                    {item.healthCheckupData.price}
+                    {item.price}
                   </div>
                 </div>
 

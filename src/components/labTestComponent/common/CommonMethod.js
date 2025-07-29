@@ -2,14 +2,16 @@ import { HiArrowCircleRight } from "react-icons/hi";
 import cartEventEmitter from "../../../eventEmitter/CartEventEmitter";
 import { useRef, useState } from "react";
 import styles from "../css/FirstSection.module.css";
-import { color_schema, eventEmitter } from "../../../constant";
+import {
+  color_schema,
+  eventEmitter,
+  labtest_cart_details_local_info,
+} from "../../../constant";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setViewCheckupsData } from "../../../store/slices/labTest/labTestCategoryApiData";
 import React from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
-
-
 
 import { isValidObjectId } from "mongoose";
 
@@ -62,7 +64,7 @@ export const handleCheckupCateogry = (
 
 export const calculateTotalPrice = (cartItems) => {
   return cartItems.reduce((total, item) => {
-    return total + parseFloat(item.healthCheckupData.price);
+    return total + parseFloat(item.price);
   }, 0);
 };
 
@@ -212,4 +214,26 @@ export const calculateDiscountedPrice = (discount, price) => {
   // return parseFloat(discountedPrice.toFixed(2));
 
   return discountedPrice;
+};
+
+export const getLabTestCartItems = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(labtest_cart_details_local_info);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error("Failed to parse cart from localStorage", error);
+    return [];
+  }
+};
+
+export const setLabTestCartItems = (items) => {
+  try {
+    localStorage.setItem(
+      labtest_cart_details_local_info,
+      JSON.stringify(items)
+    );
+  } catch (error) {
+    console.error("Failed to save cart to localStorage", error);
+  }
 };
