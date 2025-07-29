@@ -35,8 +35,11 @@ import AppointmentForm from "./Appointmentform";
 import bookConsultationFromAdmin from "../../../pages/superAdmin/bookConsultationFromAdmin";
 import { ConsultationButton } from "../Common/commonUi";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
-import { useDispatch } from "react-redux";
-import { bookConsultationApiCall } from "../ApiService/BookConsultationApiCall";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  bookConsultationApiCall,
+  getServiceOffered,
+} from "../ApiService/BookConsultationApiCall";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -69,6 +72,8 @@ const AppointmentPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
+  const [serviceType, setServiceType] = useState("Select Service");
+  const [serviceTypeId, setServiceTypeId] = useState();
   const [consultationType, setConsultationType] = useState("Call");
   const [consultationTypes, setConsultationTypes] = useState([]);
   const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -84,6 +89,9 @@ const AppointmentPage = () => {
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
+  const [services] = useState(
+    useSelector((state) => state.allDoctorS.serviceOffered)
+  );
   const dispatch = useDispatch();
 
   // All state and setters/functions in one object
@@ -110,6 +118,9 @@ const AppointmentPage = () => {
     consultationprice,
     slotEmpty,
     timeSelection,
+    serviceType,
+    services,
+    serviceTypeId,
   };
 
   const setter = {
@@ -118,6 +129,8 @@ const AppointmentPage = () => {
     setEmail,
     setMobNo,
     setSelectedDate,
+    setServiceType,
+    setServiceTypeId,
   };
 
   // All functions that use state, update to use appointmentState
@@ -139,6 +152,25 @@ const AppointmentPage = () => {
       setAvailableSlots([]);
     }
   };
+
+  useEffect(() => {
+    const { serviceParam } = router.query;
+    if (typeof serviceParam === "string") {
+      setServiceType(
+        services.map((service) => {
+          if (service.name.trim().includes(serviceParam.trim()))
+            return service.name;
+        })
+      );
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    const getServices = async () => {
+      await getServiceOffered({ dispatch });
+    };
+    getServices();
+  });
 
   useEffect(() => {
     const fetchConsultationFees = async () => {
@@ -345,6 +377,7 @@ const AppointmentPage = () => {
     patientMobNo: mobNo,
     consultationprice,
     consultationType,
+    serviceType,
   };
 
   const bookConsultation = async () => {

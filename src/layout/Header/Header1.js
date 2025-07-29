@@ -31,16 +31,33 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import { FaCartShopping } from "react-icons/fa6";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
+import MedicineCartPanel from "../../components/medicines/common/MedicineCartPanel";
+import { getMedicineCartItems } from "../../components/medicines/common/CommonMethod";
+import { getLabTestCartItems } from "../../components/labTestComponent/common/CommonMethod";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
+  const isLabTestPage = router.pathname.includes("/labTest");
+  const isMedicinePage = router.pathname.includes("/medicine");
+
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
   const [consultationTypes, setConsultationTypes] = useState();
   const hiddenRoutes = ["/appointment", "/some-other-route"];
   const [labtesttab, setLabtestTab] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0);
+
+  const [medicineCartItems, setMedicineCartItems] = useState(
+    getMedicineCartItems()
+  );
+  const [labTestCartItems, setLabTestCartItems] = useState(
+    getLabTestCartItems()
+  );
+  const [cartItemCount, setCartItemCount] = useState(labTestCartItems.length);
+  const [medicineCartItemCount, setMedicineCartItemCount] = useState(
+    medicineCartItems.length
+  );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isMedicinePanelOpen, setIsMedicinePanelOpen] = useState(false);
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -72,9 +89,15 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const togglePanel = () => {
     setIsPanelOpen(!isPanelOpen);
   };
+  const toggleMedicinePanel = () => {
+    setIsMedicinePanelOpen(!isMedicinePanelOpen);
+  };
 
   const updateCartItemCount = (count) => {
     setCartItemCount(count);
+  };
+  const updateMedicineCartItemCount = (count) => {
+    setMedicineCartItemCount(count);
   };
 
   useEffect(() => {
@@ -305,21 +328,17 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 <div
                   className="mx-2 navbar-option mt-3"
                   onClick={() => {
-                    cartEventEmitter.emit(
-                      eventEmitter.navBarEventEmitter,
-                      "home"
-                    );
-                    router.push("/");
+                    window.open("/", "_blank");
                   }}
                 >
-                  Home{" "}
+                  CONSULT DOCTORS{" "}
                 </div>
               </li>
               {/* END DROPDOWN MENU */}
               {/* PAGES */}
               <li aria-haspopup="true">
                 <div className="mx-2 navbar-option mt-3">
-                  Pages <IoMdArrowDropdown />
+                  PAGES <IoMdArrowDropdown />
                   {/* <span className="wsarrow" /> */}
                 </div>
                 <div className="wsmegamenu clearfix">
@@ -426,202 +445,35 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   </div>
                   {/* End container */}
                 </div>
+
                 {/* End wsmegamenu */}
               </li>
               {/* END PAGES */}
               {/* HALF MENU */}
               <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  Half Menu <IoMdArrowDropdown />
-                </div>
-                <div className="wsmegamenu clearfix halfmenu">
-                  <div className="container-fluid">
-                    <div className="row">
-                      {/* Links */}
-                      <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                        <li className="title">For Patients:</li>
-                        <li>
-                          <a href="#">Meet The Doctors</a>
-                        </li>
-                        <li>
-                          <a href="#">Patient Info Sheets</a>
-                        </li>
-                        <li>
-                          <a href="#">Online Patients Portal</a>
-                        </li>
-                        <li>
-                          <a href="#">Patients Testimonials</a>
-                        </li>
-                        <li>
-                          <a href="#">Blog &amp; Latest News</a>
-                        </li>
-                      </ul>
-                      {/* Links */}
-                      <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                        <li className="title">Quick Links:</li>
-                        <li>
-                          <a href="#">Terms &amp; Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Donor Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Workers Compensation</a>
-                        </li>
-                        <li>
-                          <a href="#">Insurance Information</a>
-                        </li>
-                        <li>
-                          <a href="#">After Hours Care</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+                <div
+                  className="mx-2 navbar-option mt-3"
+                  onClick={() => {
+                    window.open("/medicine/homepage", "_blank");
+                  }}
+                >
+                  {/* Half Menu <IoMdArrowDropdown /> */}
+                  MEDICINES{""}
                 </div>
               </li>
               {/* END HALF MENU */}
               {/* MEGAMENU */}
-              <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  Mega Menu <IoMdArrowDropdown />
-                </div>
-                <div className="wsmegamenu clearfix">
-                  <div className="container">
-                    <div className="row">
-                      {/* MEGAMENU QUICK LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Quick Links:</li>
-                        <li>
-                          <a href="#">For Referring Doctors</a>
-                        </li>
-                        <li>
-                          <a href="#">Terms &amp; Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Donor Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Patient Info Sheets</a>
-                        </li>
-                        <li>
-                          <a href="#">Online Patients Portal</a>
-                        </li>
-                        <li>
-                          <a href="#">Insurance Information</a>
-                        </li>
-                        <li>
-                          <a href="#">Patients Testimonials</a>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU FEATURED NEWS */}
-                      <div className="col-lg-5 col-md-12 col-xs-12">
-                        {/* Title */}
-                        <h3 className="title">Featured News:</h3>
-                        {/* Image */}
-                        <div className="fluid-width-video-wrapper">
-                          <img
-                            src="images/blog/featured-news.jpg"
-                            alt="featured-news"
-                          />
-                        </div>
-                        {/* Text */}
-                        <h5 className="h5-xs">
-                          <a href="#">5 Benefits of integrative medicine</a>
-                        </h5>
-                        <p className="wsmwnutxt">
-                          Porta semper lacus cursus, feugiat primis ultrice in
-                          ligula risus auctor tempus feugiat dolor impedit magna
-                          purus at pretium gravida donec
-                        </p>
-                      </div>
-                      {/* END MEGAMENU FEATURED NEWS */}
-                      {/* MEGAMENU LATEST NEWS */}
-                      <div className="col-lg-4 col-md-12 col-xs-12">
-                        {/* Title */}
-                        <h3 className="title">Latest News:</h3>
-                        {/* Latest News */}
-                        <ul className="latest-news">
-                          {/* Post #1 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-1.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Etiam sapien risus ante auctor tempus accumsan
-                                  an empor ...
-                                </a>
-                              </Link>
-                              <p>43 Comments</p>
-                            </div>
-                          </li>
-                          {/* Post #2 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-2.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Blandit tempor a sapien ipsum, porta risus
-                                  auctor justo ...
-                                </a>
-                              </Link>
-                              <p>38 Comments</p>
-                            </div>
-                          </li>
-                          {/* Post #3 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-3.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Cursus risus auctor tempus risus laoreet
-                                  turpis auctor varius ...
-                                </a>
-                              </Link>
-                              <p>29 Comments</p>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      {/* END MEGAMENU LATEST NEWS */}
-                    </div>
-                    {/* End row */}
-                  </div>
-                  {/* End container */}
-                </div>
-                {/* End wsmegamenu */}
-              </li>
+
               {/* END MEGAMENU */}
               {/* SIMPLE NAVIGATION LINK */}
               <li className="nl-simple" aria-haspopup="true">
                 <div
                   className="mx-2 navbar-option mt-3"
                   onClick={() => {
-                    router.push("/labTest/homepage");
-                    cartEventEmitter.emit(
-                      eventEmitter.labTestEventEmitter,
-                      "labtest"
-                    );
+                    window.open("/labTest/homepage", "_blank");
                   }}
                 >
-                  Lab Tests
+                  LAB TESTS
                 </div>
               </li>
               {/* NAVIGATION MENU BUTTON */}
@@ -638,7 +490,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   </div>
                 </li>
               )}
-              {labtesttab && (
+              {isLabTestPage && cartItemCount > 0 && (
                 <li className="nl-simple" aria-haspopup="true">
                   <div className="mt-4 labtes-cart-icon">
                     <FaCartShopping
@@ -650,13 +502,39 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   </div>
                 </li>
               )}
+
+              {isMedicinePage && medicineCartItemCount > 0 && (
+                <li className="nl-simple" aria-haspopup="true">
+                  <div className="mt-4 labtes-cart-icon">
+                    <FaCartShopping
+                      size={20}
+                      color={color_schema.green}
+                      onClick={toggleMedicinePanel}
+                    />
+                    <div className="cartItemCount">{medicineCartItemCount}</div>
+                  </div>
+                </li>
+              )}
             </ul>
           </nav>
-          <CartPanel
-            isOpen={isPanelOpen}
-            togglePanel={togglePanel}
-            onUpdateCartItemCount={updateCartItemCount}
-          />
+          {isLabTestPage && (
+            <CartPanel
+              isOpen={isPanelOpen}
+              togglePanel={togglePanel}
+              cartItem = {labTestCartItems}
+              onUpdateCartItemCount={updateCartItemCount}
+            />
+          )}
+
+          {isMedicinePage && (
+            <MedicineCartPanel
+              isOpen={isMedicinePanelOpen}
+              togglePanel={toggleMedicinePanel}
+              cartItem={medicineCartItems}
+              onUpdateCartItemCount={updateMedicineCartItemCount}
+            />
+          )}
+
           {/* END MAIN MENU */}
         </div>
         <div>

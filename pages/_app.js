@@ -36,18 +36,14 @@ function MyApp({ Component, pageProps, ...rest }) {
           rel="stylesheet"
         />
         <title>Health Path</title>
-        <link
-          rel="shortcut icon"
-          href="images/logo.png"
-          type="image/x-icon"
-        />
+        <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
       {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <Component {...pageProps} />
+            <Component {...props.pageProps} />
           </PersistGate>
         </Provider>
       </NoSsr>
@@ -55,4 +51,4 @@ function MyApp({ Component, pageProps, ...rest }) {
   );
 }
 
-export default  MyApp;
+export default MyApp;
