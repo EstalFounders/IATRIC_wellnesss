@@ -62,7 +62,7 @@ const ServicesTabs = () => {
             {currentServices.map((service) => (
               <div
                 key={service.id}
-                className={`tab-button service-nav-link text-uppercase mx-1 px-4 ${
+                className={`tab-button text-uppercase mx-1 px-4 ${
                   activeTab === service.id ? "active-tab" : ""
                 }`}
                 onClick={() => handleTabClick(service.id)}
