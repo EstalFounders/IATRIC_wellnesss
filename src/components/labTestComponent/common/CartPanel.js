@@ -40,44 +40,29 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
   };
 
   useEffect(() => {
-    // Listen for cart update events
-    cartEventEmitter.on(eventEmitter.cartEventEmitter, (item) => {
-      dispatch(setLabTestCartDetails(Object.values(item)));
-    });
-    // Update parent with the cart item count
-    if (onUpdateCartItemCount) {
-      onUpdateCartItemCount(cartItems.length);
-    }
-
-    // Clean up event listener
-    return () => {
-      cartEventEmitter.removeAllListeners("cartUpdate");
-    };
-  }, [cartItems, onUpdateCartItemCount]);
-
-  useEffect(() => {
     const handler = (item) => {
-      const medicine = item.medicine;
+      const healthCheckupData = item.healthCheckupData;
 
       setCartItems((prevItems) => {
-        const updatedItems = [...prevItems, medicine];
+        const updatedItems = [...prevItems, healthCheckupData];
         setLabTestCartItems(updatedItems); // ✅ Store in localStorage
         return updatedItems;
       });
 
-      setCartItemsIds((prevIds) => [...prevIds, medicine._id]);
+      setCartItemsIds((prevIds) => [...prevIds, healthCheckupData._id]);
 
       if (onUpdateCartItemCount) {
         onUpdateCartItemCount((prev) => prev + 1);
       }
     };
 
-    cartEventEmitter.on(eventEmitter.labTestEventEmitter, handler);
+    cartEventEmitter.on(eventEmitter.cartEventEmitter, handler);
 
     return () => {
-      cartEventEmitter.off(eventEmitter.labTestEventEmitter, handler);
+      cartEventEmitter.off(eventEmitter.cartEventEmitter, handler);
     };
   }, []);
+  
 
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {

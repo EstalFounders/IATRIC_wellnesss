@@ -1,5 +1,4 @@
-// src/components/medicines/MedicineDeliveryComp.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   TextField,
@@ -21,27 +20,31 @@ import {
 import axios from "axios";
 import { color_schema } from "../../constant";
 import { useAddToCart } from "./common/CommonMethod";
+import { useRouter } from "next/router";
 
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const PAGE_LIMIT = 50;
 
 const MedicineDeliveryComp = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+  const query = router.query;
+
+  const [searchTerm, setSearchTerm] = useState(query.search || "");
+  const [selectedAlphabet, setSelectedAlphabet] = useState(query.alpha || "A");
+  const [page, setPage] = useState(Number(query.page) || 1);
   const [medicines, setMedicines] = useState([]);
-  const [selectedAlphabet, setSelectedAlphabet] = useState("A");
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
+  const { snackbarOpen, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
 
-  const fetchMedicines = async (alphabet, page = 1) => {
+  // Fetch data from backend
+  const fetchMedicines = async (alphabet) => {
     setLoading(true);
     try {
       const res = await axios.get(`/api/medicineInfo`, {
-        params: { alphabet, page, limit: 50 },
+        params: { alphabet, limit: 1000 }, // get all to client-filter
       });
       setMedicines(res.data.medicines);
-      setTotalPages(res.data.totalPages);
     } catch (error) {
       console.error("Failed to fetch medicines", error);
     } finally {
@@ -50,11 +53,41 @@ const MedicineDeliveryComp = () => {
   };
 
   useEffect(() => {
-    fetchMedicines(selectedAlphabet, page);
-  }, [selectedAlphabet, page]);
+    fetchMedicines(selectedAlphabet);
+  }, [selectedAlphabet]);
+
+  // Sync URL when state changes
+  useEffect(() => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          alpha: selectedAlphabet,
+          search: searchTerm || undefined,
+          page,
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
+  }, [selectedAlphabet, searchTerm, page]);
+
+  // Filtered and paginated result
+  const filteredMedicines = useMemo(() => {
+    return medicines.filter((med) =>
+      med.name?.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+  }, [medicines, searchTerm]);
+
+  const totalPages = Math.ceil(filteredMedicines.length / PAGE_LIMIT);
+  const paginatedMedicines = useMemo(() => {
+    const start = (page - 1) * PAGE_LIMIT;
+    return filteredMedicines.slice(start, start + PAGE_LIMIT);
+  }, [filteredMedicines, page]);
 
   const handleAlphabetClick = (letter) => {
     setSelectedAlphabet(letter);
+    setSearchTerm("");
     setPage(1);
   };
 
@@ -62,9 +95,10 @@ const MedicineDeliveryComp = () => {
     setPage(value);
   };
 
-  const filtered = medicines.filter((med) =>
-    med.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
+  };
 
   return (
     <Box sx={{ px: 4, py: 5 }}>
@@ -80,7 +114,6 @@ const MedicineDeliveryComp = () => {
         <Box sx={{ my: 3, display: "flex", gap: 1, flexWrap: "wrap" }}>
           {ALPHABETS.map((letter) => {
             const isSelected = letter === selectedAlphabet;
-
             return (
               <Button
                 key={letter}
@@ -117,7 +150,7 @@ const MedicineDeliveryComp = () => {
         fullWidth
         placeholder="Search for medicine..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearchChange}
         InputProps={{
           startAdornment: <SearchIcon sx={{ mr: 1 }} />,
         }}
@@ -127,7 +160,7 @@ const MedicineDeliveryComp = () => {
       {/* Medicine List */}
       {!loading ? (
         <Grid container spacing={3}>
-          {filtered.map((medicine) => (
+          {paginatedMedicines.map((medicine) => (
             <Grid item xs={12} sm={6} md={4} key={medicine._id}>
               <Card
                 sx={{
@@ -216,6 +249,8 @@ const MedicineDeliveryComp = () => {
           />
         </Box>
       )}
+
+      {/* Snackbar */}
       {snackbarOpen && (
         <Snackbar
           open={snackbarOpen}
