@@ -1,304 +1,259 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import {
-  MdKeyboardDoubleArrowLeft,
-  MdKeyboardDoubleArrowRight,
-  MdOutlineFace3,
-  MdPregnantWoman,
-} from "react-icons/md";
+import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 import {
   FaStethoscope,
   FaTooth,
   FaMedkit,
   FaUserNurse,
-  FaHeart,
-  FaFemale,
   FaBaby,
   FaEye,
 } from "react-icons/fa";
-import {
-  GiErlenmeyer,
-  GiKneeCap,
-  GiMedicinePills,
-  GiMedicines,
-} from "react-icons/gi";
-import { BiInjection } from "react-icons/bi";
-import { color_schema, services } from "../../constant";
 import { FaHeartPulse } from "react-icons/fa6";
+import { MdOutlineFace3, MdPregnantWoman } from "react-icons/md";
+import { GiKneeCap, GiMedicines, GiErlenmeyer } from "react-icons/gi";
 import { BsLungsFill } from "react-icons/bs";
+import { BiInjection } from "react-icons/bi";
 import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
+import { color_schema, services } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
-import { useRouter } from "next/router";
 
 const Demo5Services2 = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const servicesPerPage = 8;
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
 
-  // Dummy data for services
+  const marqueeRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Calculate the index of the first service to be displayed on the current page
-  const indexOfFirstService = (currentPage - 1) * servicesPerPage;
+  useEffect(() => {
+    const el = marqueeRef.current;
+    let startX, scrollLeft;
 
-  // Get the services to be displayed on the current page
-  const currentServices = services.slice(
-    indexOfFirstService,
-    indexOfFirstService + servicesPerPage
-  );
+    const onTouchStart = (e) => {
+      startX = e.touches[0].pageX - el.offsetLeft;
+      scrollLeft = el.scrollLeft;
+    };
 
-  // Function to handle clicking on the next page arrow
-  const nextPage = () => {
-    setCurrentPage(currentPage + 1);
+    const onTouchMove = (e) => {
+      const x = e.touches[0].pageX - el.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      el.scrollLeft = scrollLeft - walk;
+    };
+
+    el.addEventListener("touchstart", onTouchStart);
+    el.addEventListener("touchmove", onTouchMove);
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
+  }, []);
+
+  const combinedServices = [...services, ...services];
+
+  // Mouse Events
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - marqueeRef.current.offsetLeft);
+    setScrollLeft(marqueeRef.current.scrollLeft);
   };
 
-  // Function to handle clicking on the previous page arrow
-  const prevPage = () => {
-    setCurrentPage(currentPage - 1);
+  const handleMouseLeave = () => {
+    setIsDragging(false);
   };
 
-  // Function to handle clicking on an icon
-  const handleIconClick = (index) => {
-    const currentIndex = indexOfFirstService + index;
-    // Navigate to the corresponding component based on the index
-    const serviceName = services[currentIndex];
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - marqueeRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // scroll-fast factor
+    marqueeRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleClick = (index) => {
+    const serviceName = services[index % services.length];
     handleServiceClick(serviceName, index, router);
   };
 
-  // Function to render the icon based on the index
   const renderIcon = (index) => {
-    const currentIndex = indexOfFirstService + index;
-    if (currentIndex < 8) {
-      switch (currentIndex) {
-        case 0:
-          return (
-            <FaStethoscope
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 1:
-          return (
-            <FaBaby
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 2:
-          return (
-            <FaHeartPulse
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 3:
-          return (
-            <MdOutlineFace3
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 4:
-          return (
-            <GiKneeCap
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 5:
-          return (
-            <MdPregnantWoman
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 6:
-          return (
-            <FaEye
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 7:
-          return (
-            <BsLungsFill
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        default:
-          return null;
-      }
-    } else {
-      switch (currentIndex) {
-        case 8:
-          return (
-            <FaMedkit
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 9:
-          return (
-            <FaTooth
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 10:
-          return (
-            <TbPhysotherapist
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 11:
-          return (
-            <BiInjection
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 12:
-          return (
-            <FaUserNurse
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 13:
-          return (
-            <GiMedicines
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 14:
-          return (
-            <GiErlenmeyer
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 15:
-          return (
-            <FaStethoscope
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        case 16:
-          return (
-            <RiTeamFill
-              size={80}
-              color={
-                hoveredIndex === index ? "#fafafa" : `${color_schema.green}`
-              }
-            />
-          );
-        default:
-          return null;
-      }
+    const actualIndex = index % services.length;
+
+    switch (actualIndex) {
+      case 0:
+        return (
+          <FaStethoscope
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 1:
+        return (
+          <FaBaby
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 2:
+        return (
+          <FaHeartPulse
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 3:
+        return (
+          <MdOutlineFace3
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 4:
+        return (
+          <GiKneeCap
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 5:
+        return (
+          <MdPregnantWoman
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 6:
+        return (
+          <FaEye
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 7:
+        return (
+          <BsLungsFill
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 8:
+        return (
+          <FaMedkit
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 9:
+        return (
+          <FaTooth
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 10:
+        return (
+          <TbPhysotherapist
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 11:
+        return (
+          <BiInjection
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 12:
+        return (
+          <FaUserNurse
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 13:
+        return (
+          <GiMedicines
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 14:
+        return (
+          <GiErlenmeyer
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 15:
+        return (
+          <FaStethoscope
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      case 16:
+        return (
+          <RiTeamFill
+            size={80}
+            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+          />
+        );
+      default:
+        return null;
     }
   };
 
   return (
-    <section
-      id="services-2"
-      className="bg-lightgrey wide-70 services-section division"
-    >
+    <section className="services-section bg-lightgrey wide-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             <h3 className="h3-md steelblue-color">Our Speciality</h3>
           </div>
         </div>
-        <div className="row align-items-center">
-          <div className="col-auto" style={{ marginBottom: 44 }}>
-            {/* Previous Page Arrow */}
-            {currentPage > 1 && (
-              <MdKeyboardDoubleArrowLeft
-                size={32}
-                color="#8e8333"
-                onClick={prevPage}
-                style={{ cursor: "pointer" }}
-              />
-            )}
-          </div>
-          <div className="col" style={{ overflowX: "auto" }}>
-            <div className="row">
-              {/* Render current services */}
-              {currentServices.map((service, index) => (
-                <div className="col-sm-6 col-lg-3 mb-2" key={index}>
-                  <div
-                    className="service-nav-link sbox-2 w-100 h-100 py-4"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    onTouchStart={() => setHoveredIndex(index)}
-                    onTouchEnd={() => setHoveredIndex(null)}
-                  >
-                    <Link legacyBehavior href="/department-single">
-                      <a onClick={() => handleIconClick(index)}>
-                        {/* Render icon */}
-                        {renderIcon(index)}
-                        {/* Service title */}
-                        <h5
-                          className="h5-sm sbox-2-title"
-                          style={{ color: `${color_schema.green}` }}
-                        >
-                          {service}
-                        </h5>
-                      </a>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+        <div className="row">
+          <section className="services-wrapper col-lg-12">
+            <div
+              className="services-marquee"
+              ref={marqueeRef}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={(e) => {
+                setIsPaused(false);
+                handleMouseLeave(e);
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+            >
+              <div className={`services-track ${isPaused ? "paused" : ""}`}>
+                {combinedServices.map((service, index) => {
+                  const actualIndex = index % services.length;
+
+                  return (
+                    <div
+                      className="service-card"
+                      key={index}
+                      onClick={() => handleClick(actualIndex)}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
+                      <div className="service-nav-link">
+                        <div className="service-icon">{renderIcon(index)}</div>
+                        <div className="service-title">{service}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          <div className="col-auto" style={{ marginBottom: 44 }}>
-            {/* Next Page Arrow */}
-            {services.length > indexOfFirstService + servicesPerPage && (
-              <MdKeyboardDoubleArrowRight
-                size={32}
-                onClick={nextPage}
-                color="#8e8333"
-                style={{ cursor: "pointer" }}
-              />
-            )}
-          </div>
+          </section>
         </div>
       </div>
     </section>

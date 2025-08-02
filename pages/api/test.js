@@ -12,6 +12,15 @@ import Slot from "../../src/models/slots";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 import LabTestPackagesScehma from "../../src/models/lab-test-packageSchema";
 import LabTestPackagesCatgoryScehma from "../../src/models/lab-test-package-categorySchema";
+import Medicine from "../../src/models/medicineInfo";
+
+function normalizeName(name) {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, ' ') // multiple spaces → single
+    .replace(/[^\w\s]/g, '') // remove special chars (optional)
+    .trim();
+}
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -19,75 +28,71 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
+  try {
+    // Find all documents and group by title, collecting their _ids
+    const allDocs = await LabTestDetails.find({}, { name: 1 });
+
+    const nameMap = new Map(); // normalizedName -> list of _ids
+
+    allDocs.forEach(doc => {
+      const normName = normalizeName(doc.name || '');
+      if (!nameMap.has(normName)) {
+        nameMap.set(normName, []);
+      }
+      nameMap.get(normName).push(doc._id);
+    });
+
+    const idsToDelete = [];
+
+    for (const [_, ids] of nameMap.entries()) {
+      if (ids.length > 1) {
+        // Keep the first one, delete the rest
+        idsToDelete.push(...ids.slice(1));
+      }
+    }
+
+    if (idsToDelete.length === 0) {
+      return res.status(200).json({ message: 'No duplicate names found', deletedCount: 0 });
+    }
+
+    const deleteResult = await LabTest.deleteMany({ _id: { $in: idsToDelete } });
+
+    res.status(200).json({
+      message: 'Duplicate lab test records deleted',
+      deletedCount: deleteResult.deletedCount,
+    });
+    
+  } catch (error) {
+    console.error("Error removing duplicates:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+
+  // const filePath = path.join(process.cwd(), 'data/indian_medicine_data.json');
+  // const fileContents = fs.readFileSync(filePath, 'utf-8');
+  // const jsonData = JSON.parse(fileContents);
+
   // try {
-  //   // Find all documents and group by title, collecting their _ids
-  //   const duplicates = await LabTestDetails.aggregate([
-  //     {
-  //       $group: {
-  //         _id: "$title",
-  //         ids: { $push: "$_id" },
-  //         count: { $sum: 1 }
-  //       }
-  //     },
-  //     { $match: { count: { $gt: 1 } } }
-  //   ]);
+  //   const existingDocs = await Medicine.find({}, { name: 1 });
+  //   const normalizedExistingNames = new Set(
+  //     existingDocs.map(doc => normalizeName(doc.name))
+  //   );
 
-  //   let deletedCount = 0;
+  //   // Filter new data by normalized name comparison
+  //   const newMedicines = jsonData.filter(item => {
+  //     const incomingName = normalizeName(item.name);
+  //     return !normalizedExistingNames.has(incomingName);
+  //   });
 
-  //   // For each group of duplicates, delete all but one
-  //   for (const dup of duplicates) {
-  //     // Keep the first _id, delete the rest
-  //     const idsToDelete = dup.ids.slice(1);
-  //     const result = await LabTestDetails.deleteMany({ _id: { $in: idsToDelete } });
-  //     deletedCount += result.deletedCount;
+  //   if (newMedicines.length === 0) {
+  //     return res.status(200).json({ message: 'No new data to import', count: 0 });
   //   }
 
-  //   return res.status(200).json({
-  //     message: "Duplicate titles removed",
-  //     duplicatesFound: duplicates.length,
-  //     documentsDeleted: deletedCount
-  //   });
-  // } catch (error) {
-  //   console.error("Error removing duplicates:", error);
-  //   return res.status(500).json({ message: "Internal server error" });
-  // }
-
-  // const dataDir = path.join(process.cwd(), "data");
-
-  // try {
-  //   const files = fs.readdirSync(dataDir);
-  //   let totalInserted = 0;
-
-  //   for (const file of files) {
-  //     if (path.extname(file) === ".json") {
-  //       const filePath = path.join(dataDir, file);
-  //       const fileContents = fs.readFileSync(filePath, "utf-8");
-  //       const jsonData = JSON.parse(fileContents);
-
-  //       // Step 1: Insert category (file name as category_name)
-  //       const categoryDoc = await LabTestPackagesCatgoryScehma.create({
-  //         category_name: path.basename(file, ".json"),
-  //       });
-  //       const categoryId = categoryDoc._id;
-
-  //       // Step 2: Attach category_id to each item and insert into Packages collection
-  //       const dataWithCategory = jsonData.map((item) => ({
-  //         ...item,
-  //         category_id: categoryId,
-  //       }));
-
-  //       const result = await LabTestPackagesScehma.insertMany(dataWithCategory);
-  //       totalInserted += result.length;
-  //     }
-  //   }
-
-  //   res.status(200).json({
-  //     message: "All files imported successfully",
-  //     totalCount: totalInserted,
-  //   });
+  //   // Insert the filtered new medicines
+  //   const result = await Medicine.insertMany(newMedicines);
+  //   res.status(200).json({ message: 'Imported successfully', count: result.length });
   // } catch (error) {
   //   console.error(error);
-  //   res.status(500).json({ error: "Failed to import data from files" });
+  //   res.status(500).json({ error: "Failed to import" });
   // }
 
   // try {
