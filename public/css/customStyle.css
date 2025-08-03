@@ -1,11 +1,11 @@
 .labtest-bg-image {
-    background-image: url('/images/labtest/labTestFirstSectionBg.png');
+  background-image: url("/images/labtest/labTestFirstSectionBg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
   align-items: center;
-  justify-content: center;  
+  justify-content: center;
 }
 
 .labtest-btn {
@@ -17,16 +17,14 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  
 }
 
 .labtest-btn:hover {
   background-color: #8e8333;
   color: white;
 }
-
 
 .consultation-btn {
   padding: 8px 16px;
@@ -39,9 +37,8 @@
   cursor: pointer;
   text-align: center;
   font-weight: bolder;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  
 }
 
 .consultation-btn:hover {
@@ -58,13 +55,42 @@
   cursor: pointer;
   text-align: center;
   font-weight: bolder;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
 }
 .navbar-option:hover {
   background-color: #8e8333;
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
+
+.service-tab {
+  position: relative;
+  padding: 12px 16px;
+  margin: 0 4px;
+  width: 280px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #495057;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom: 3px solid transparent;
+}
+
+.service-tab:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: #8e8333;
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
+  border-color: rgba(40, 167, 69, 0.1);
+}
+
 .services-marquee {
   overflow: hidden;
   width: 100%;
@@ -108,7 +134,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); 
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .service-nav-link:hover {
@@ -140,13 +166,12 @@
   }
 }
 
-
 .tab-nav-wrapper {
   display: flex;
   align-items: center;
   position: relative;
   width: 100%;
-  padding: 0 40px; 
+  padding: 0 40px;
 }
 
 .arrow.left-arrow-fixed,
@@ -177,22 +202,22 @@
 .labtes-cart-icon {
   position: relative;
   display: inline-block;
-  margin-left: 1rem;  
+  margin-left: 1rem;
 }
 
 .cartItemCount {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #4F6628;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #4f6628;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .on-hover-blue:hover {
@@ -209,13 +234,12 @@
   border-radius: 0px 8px 8px 0px;
 }
 .bg-green-gradient {
-  background: linear-gradient(to top,#3b5f1d, #2d4c30);
+  background: linear-gradient(to top, #3b5f1d, #2d4c30);
 }
 
 .bg-yellow-gradient {
-  background: linear-gradient(to top,#8e8333, #4f4b30);
+  background: linear-gradient(to top, #8e8333, #4f4b30);
 }
-
 
 .most-booked-checkup-style {
   border-radius: 40px;
@@ -223,7 +247,7 @@
 }
 
 .lab-test-bg-gradient {
-    /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
+  /* background: linear-gradient(to top right, #3b5f1d, #334b1f);  */
   /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
   /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
   /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
@@ -348,4 +372,74 @@
   margin-right: -7%;
 }
 
+.image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  transform: perspective(1000px) rotateY(8deg);
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
 
+.image:hover {
+  transform: perspective(1000px) rotateX(358deg) rotateY(0deg) scale(1.05);
+  box-shadow: 0 5px 5px #3b5f1d, inset 0 1px 4px #3b5f1d;
+}
+
+/* Tablet styles */
+@media (max-width: 991px) {
+  .image {
+    transform: perspective(800px) rotateY(6deg);
+    border-radius: 15px;
+  }
+  
+  .image:hover {
+    transform: perspective(800px) rotateX(358deg) rotateY(0deg) scale(1.03);
+    box-shadow: 0 4px 4px #3b5f1d, inset 0 1px 3px #3b5f1d;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .image {
+    transform: perspective(600px) rotateY(4deg);
+    border-radius: 12px;
+  }
+  
+  .image:hover {
+    transform: perspective(600px) rotateX(358deg) rotateY(0deg) scale(1.02);
+    box-shadow: 0 3px 3px #3b5f1d, inset 0 1px 2px #3b5f1d;
+  }
+}
+
+.heartbeat-wrapper {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .heartbeat {
+      display: inline-block;
+      height: 100px;
+      width: 2000px; /* enough to animate smoothly */
+      background: repeating-linear-gradient(
+        to right,
+        transparent 0 19%,
+        #8e8333 20% 21%,
+        transparent 22% 29%,
+        #8e8333 30% 31%,
+        transparent 32% 49%,
+        #8e8333 50% 51%,
+        transparent 52% 100%
+      );
+      animation: scroll 2s linear infinite;
+    }
+
+    @keyframes scroll {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(0%);
+      }
+    }
