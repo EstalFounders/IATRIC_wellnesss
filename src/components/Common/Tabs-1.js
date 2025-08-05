@@ -105,29 +105,35 @@ const ServicesTabs = () => {
           {services
             .filter((service) => service.id === activeTab)
             .map((service) => (
-              <div className="row" key={service.id}>
-                <div className="col-lg-6">
-                  <Image
-                    className="image"
-                    src={service.image}
-                    width={500}
-                    height={550}
-                    alt={service.name}
-                    style={{
-                      objectFit: "cover",
-                      width: "100%",
-                      borderRadius: "20px",
-                    }}
-                  />
+              <div
+                className="row align-items-center service-row"
+                key={service.id}
+              >
+                <div className="col-lg-6 mb-4 mb-lg-0">
+                  <div className="image-wrapper">
+                    <Image
+                      onClick={() =>
+                        handleServiceClickLocal(service.name, service.id)
+                      }
+                      className="image"
+                      src={service.image}
+                      alt={service.name}
+                      fill
+                      sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
+                      style={{
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="col-lg-6">
-                  <h4 className="section-subheading">
-                    <span className="section-id blue-color">
-                      <h4>{service.subheading}</h4>
-                    </span>
+
+                <div className="col-lg-6 d-flex flex-column justify-content-center text-column">
+                  <h4 className="section-subheading blue-color mb-2">
+                    {service.subheading}
                   </h4>
+
                   <h3
-                    className="service-title clickable-div h3-md steelblue-color"
+                    className="clickable-div h3-md steelblue-color mb-3"
                     onClick={() =>
                       handleServiceClickLocal(service.name, service.id)
                     }
@@ -140,7 +146,8 @@ const ServicesTabs = () => {
                   >
                     {service.name}
                   </h3>
-                  <div className="service-description h5 box-list grey-color">
+
+                  <div className="service-description h5 box-list grey-color mb-4">
                     {boldKeywords(service.description, [
                       "General Physician",
                       "trusted care",
@@ -188,8 +195,9 @@ const ServicesTabs = () => {
                       "personalized attention",
                     ])}
                   </div>
-                  <div className="mt-5 mr-auto">
-                    <div className="w-50">
+
+                  <div className="mt-5 w-100">
+                    <div className="w-50 mx-auto mx-lg-0">
                       <ConsultationButton path={"/appointment"}>
                         Book Consultation
                       </ConsultationButton>

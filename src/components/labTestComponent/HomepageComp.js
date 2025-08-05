@@ -19,6 +19,7 @@ import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import ViewDetails from "./viewDetails/ViewDetailsComp";
 import ViewAllTestDetails from "./ViewAllTestDetails";
 import MostBookedCheckups from "./mostBookedPackages/MostBookedCheckups";
+import AnimatedSection from "../../../public/animation/animationSection/AnimatedSection";
 
 export default function HomepageComp() {
   const router = useRouter();
@@ -36,31 +37,41 @@ export default function HomepageComp() {
               <FirstSection />
             </Col>
           </Row>
-          <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
-            <Col>
-              <MostPopularCheckup />
-            </Col>
-          </Row>
-          <Row className="mt-5">
-            <Col>
-              <MostBookedCheckups />
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <VitalOrganCheckup />
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <HealthyBodyCheckup />
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FAQ />
-            </Col>
-          </Row>
+          <AnimatedSection animation="fadeInUp" delay={0.1}>
+            <Row className="mt-5" style={{ backgroundColor: "#EFEFEF" }}>
+              <Col>
+                <MostPopularCheckup />
+              </Col>
+            </Row>
+          </AnimatedSection>
+          <AnimatedSection animation="fadeInUp" delay={0.1}>
+            <Row className="mt-5">
+              <Col>
+                <MostBookedCheckups />
+              </Col>
+            </Row>
+          </AnimatedSection>
+          <AnimatedSection animation="fadeInUp" delay={0.1}>
+            <Row>
+              <Col>
+                <VitalOrganCheckup />
+              </Col>
+            </Row>
+          </AnimatedSection>
+          <AnimatedSection animation="fadeInUp" delay={0.1}>
+            <Row>
+              <Col>
+                <HealthyBodyCheckup />
+              </Col>
+            </Row>
+          </AnimatedSection>
+          <AnimatedSection animation="fadeInUp" delay={0.1}>
+            <Row>
+              <Col>
+                <FAQ />
+              </Col>
+            </Row>
+          </AnimatedSection>
         </>
       </div>
     </>
