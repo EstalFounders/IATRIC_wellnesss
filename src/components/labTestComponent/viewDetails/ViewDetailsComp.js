@@ -224,7 +224,7 @@ const ViewDetails = () => {
               </div>
             ))
           : "No FAQS available for this test."}
-        <div className={`ml-2 ${styles.relatedTestText}`}>Related Tests</div>
+        <div className={`ml-2 ${styles.relatedTestText}`}>Frequently Booked</div>
         <div className="d-flex flex-wrap mb-5">
           {console.log(storedData, "ehatl fadlaj")}
           {storedData

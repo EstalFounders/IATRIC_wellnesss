@@ -32,14 +32,14 @@ const DiscoverMoreComp = () => {
       icon: <LabInvestigation color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
     },
-    {
-      title: "Medicine Delivery",
-      service: "community",
-      description:
-        "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
-      icon: <MedicineDelivery color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "View Details",
-    },
+    // {
+    //   title: "Medicine Delivery",
+    //   service: "community",
+    //   description:
+    //     "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
+    //   icon: <MedicineDelivery color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+    //   btntext: "View Details",
+    // },
     {
       title: "Community Care",
       service:"corporate",
@@ -119,7 +119,7 @@ const DiscoverMoreComp = () => {
                   path={"/discover-more"}
                   onClick={() =>
                     router.push(
-                      `/service-details/?serviceName=${item.title
+                      `/service-details/?Service=${item.title
                         .trim()
                         // .split(" ")
                         // .slice(1)

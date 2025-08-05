@@ -20,31 +20,37 @@ import {
 import axios from "axios";
 import { color_schema } from "../../constant";
 import { useAddToCart } from "./common/CommonMethod";
-import { useRouter } from "next/router";
+import { setMedicineDetail } from "../../store/slices/medicine/MedicineHomePageApiData";
+import { useDispatch } from "react-redux";
 
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const PAGE_LIMIT = 50;
 
 const MedicineDeliveryComp = () => {
-  const router = useRouter();
-  const query = router.query;
-
-  const [searchTerm, setSearchTerm] = useState(query.search || "");
-  const [selectedAlphabet, setSelectedAlphabet] = useState(query.alpha || "A");
-  const [page, setPage] = useState(Number(query.page) || 1);
-  const [medicines, setMedicines] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [allAlphabetMedicines, setAllAlphabetMedicines] = useState([]);
+  const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const [selectedAlphabet, setSelectedAlphabet] = useState("A");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const { snackbarOpen, handleAddToCart, handleSnackbarClose } =
+  const itemsPerPage = 25;
+  const dispatch = useDispatch();
+
+  const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
 
-  // Fetch data from backend
   const fetchMedicines = async (alphabet) => {
     setLoading(true);
     try {
       const res = await axios.get(`/api/medicineInfo`, {
-        params: { alphabet, limit: 1000 }, // get all to client-filter
+        params: { alphabet }, // should return all medicines with this alphabet
       });
-      setMedicines(res.data.medicines);
+      const all = res.data.medicines || [];
+      setAllAlphabetMedicines(all);
+      setFilteredMedicines(all);
+      setPage(1);
+      setTotalPages(Math.ceil(all.length / itemsPerPage));
     } catch (error) {
       console.error("Failed to fetch medicines", error);
     } finally {
@@ -56,48 +62,32 @@ const MedicineDeliveryComp = () => {
     fetchMedicines(selectedAlphabet);
   }, [selectedAlphabet]);
 
-  // Sync URL when state changes
   useEffect(() => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {
-          alpha: selectedAlphabet,
-          search: searchTerm || undefined,
-          page,
-        },
-      },
-      undefined,
-      { shallow: true }
+    const filtered = allAlphabetMedicines.filter((med) =>
+      med.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [selectedAlphabet, searchTerm, page]);
-
-  // Filtered and paginated result
-  const filteredMedicines = useMemo(() => {
-    return medicines.filter((med) =>
-      med.name?.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-  }, [medicines, searchTerm]);
-
-  const totalPages = Math.ceil(filteredMedicines.length / PAGE_LIMIT);
-  const paginatedMedicines = useMemo(() => {
-    const start = (page - 1) * PAGE_LIMIT;
-    return filteredMedicines.slice(start, start + PAGE_LIMIT);
-  }, [filteredMedicines, page]);
+    setFilteredMedicines(filtered);
+    setPage(1);
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+  }, [searchTerm, allAlphabetMedicines]);
 
   const handleAlphabetClick = (letter) => {
     setSelectedAlphabet(letter);
     setSearchTerm("");
-    setPage(1);
   };
 
   const handlePageChange = (_, value) => {
     setPage(value);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setPage(1);
+  const paginatedMedicines = filteredMedicines.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const handleViewDetails = (medicine) => {
+    dispatch(setMedicineDetail(medicine));
+    router.push("/medicine/viewDetails");
   };
 
   return (
@@ -161,7 +151,14 @@ const MedicineDeliveryComp = () => {
       {!loading ? (
         <Grid container spacing={3}>
           {paginatedMedicines.map((medicine) => (
-            <Grid item xs={12} sm={6} md={4} key={medicine._id}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={medicine._id}
+              onClick={() => handleViewDetails(medicine)}
+            >
               <Card
                 sx={{
                   height: "100%",

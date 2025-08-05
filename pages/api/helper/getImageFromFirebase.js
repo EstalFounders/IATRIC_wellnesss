@@ -1,5 +1,5 @@
 import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "../../../src/lib/firebase"; // Adjust the path to your Firebase config
+import { storage } from "../../../lib/firebase"; // Adjust the path to your Firebase config
 
 export default async function handler(req, res) {
   const { imageUrl } = req.query;

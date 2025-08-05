@@ -19,6 +19,7 @@ import {
   contact_no,
   eventEmitter,
   facebook_page_url,
+  labtest_cart_details_local_info,
   sessionStorageName,
 } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -521,7 +522,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             <CartPanel
               isOpen={isPanelOpen}
               togglePanel={togglePanel}
-              cartItem = {labTestCartItems}
+              cartItem={labTestCartItems}
               onUpdateCartItemCount={updateCartItemCount}
             />
           )}

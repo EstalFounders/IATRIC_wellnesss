@@ -12,7 +12,6 @@ import {
 import IconRenderer from "./IconRenderer"; // adjust path as needed
 import { color_schema } from "../../constant";
 
-// Sample item with `iconKey` instead of imported icon component
 const serviceDetails = {
   consultation: {
     seoTitle: "Expert Medical Consultation | Online & In-Clinic | HealthPath",
@@ -47,7 +46,6 @@ const serviceDetails = {
       },
     ],
   },
-
   "nursing-services": {
     seoTitle: "Home & In-Clinic Nursing Services | GDA Support | HealthPath",
     seoDescription:
@@ -72,7 +70,6 @@ const serviceDetails = {
       },
     ],
   },
-
   "lab-test": {
     seoTitle: "Home Lab Sample Collection & Testing | HealthPath",
     seoDescription:
@@ -92,7 +89,6 @@ const serviceDetails = {
       },
     ],
   },
-
   "medicine-delivery": {
     seoTitle: "Medicine Delivery & HomeCare Equipment | HealthPath",
     seoDescription:
@@ -118,7 +114,6 @@ const serviceDetails = {
       },
     ],
   },
-
   "community-care": {
     seoTitle: "Corporate & Community Healthcare Programs | HealthPath",
     seoDescription:
@@ -176,22 +171,22 @@ const serviceDetails = {
 
 const ServiceDetail = () => {
   const router = useRouter();
-  const { serviceName } = router.query;
+  const { Service } = router.query;
 
-  const normalizedParam = (serviceName || "")
+  const normalizedParam = (Service || "")
     .toLowerCase()
     .trim()
     .replace(/\s+/g, "-");
 
-  const service = serviceDetails[normalizedParam];
+  const medical_service = serviceDetails[normalizedParam];
 
   useEffect(() => {
-    if (!service && serviceName) {
-      console.warn(`No service detail found for: ${serviceName}`);
+    if (!medical_service && Service) {
+      console.warn(`No service detail found for: ${Service}`);
     }
-  }, [serviceName]);
+  }, [medical_service]);
 
-  if (!service) {
+  if (!medical_service) {
     return (
       <Container maxWidth="md" sx={{ py: 6 }}>
         <Typography variant="h4" color="error" gutterBottom>
@@ -205,126 +200,131 @@ const ServiceDetail = () => {
   return (
     <>
       <Head>
-        <title>{service.seoTitle}</title>
-        <meta name="description" content={service.seoDescription} />
+        <title>{medical_service.seoTitle}</title>
+        <meta name="description" content={medical_service.seoDescription} />
       </Head>
 
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
-          {service.seoTitle}
+          {medical_service.seoTitle}
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" paragraph>
-          {service.seoDescription}
+          {medical_service.seoDescription}
         </Typography>
 
         <Grid container spacing={4} sx={{ mt: 2 }}>
-          {service.online && (
-            <Grid item xs={12} md={6}>
-              <Typography variant="h5" gutterBottom>
-                Online Services
-              </Typography>
-              {service.online.map((item, idx) => (
-                <Card
-                  key={idx}
-                  sx={{
-                    p: 2,
-                    textAlign: "center",
-                    transition: "all 0.3s ease",
-                    cursor: "pointer",
-                    boxShadow: 3,
-                    marginTop: 4,
-                    borderRadius: 2,
-                    "&:hover": {
-                      boxShadow: 6,
-                      transform: "translateY(-4px) scale(1.02)",
-                      backgroundColor: "#eaf5e0ff", // subtle blue background on hover
-                    },
-                  }}
-                >
-                  <CardContent
-                    sx={{ display: "flex", gap: 2, alignItems: "center" }}
+          {/* Online Services */}
+          {medical_service.online && (
+            <>
+              <Grid item xs={12}>
+                <Typography variant="h5" gutterBottom>
+                  Online Services
+                </Typography>
+              </Grid>
+              {medical_service.online.map((item, idx) => (
+                <Grid item xs={12} sm={6} md={4} key={idx}>
+                  <Card
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      "&:hover": {
+                        boxShadow: 6,
+                        transform: "translateY(-4px) scale(1.02)",
+                        backgroundColor: "#eaf5e0ff",
+                      },
+                    }}
                   >
-                    <Box
-                      sx={{
-                        width: 50,
-                        height: 50,
-                        padding: 1,
-                        borderRadius: "50%",
-                        backgroundColor: "#ffffff", // or any custom color
-                        border: `1px solid ${color_schema.green}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
+                    <CardContent
+                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
                     >
-                      <IconRenderer name={item.iconKey} size={28} />
-                    </Box>
-
-                    <Box>
-                      <Typography variant="h6">{item.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
+                      <Box
+                        sx={{
+                          width: 50,
+                          height: 50,
+                          padding: 1,
+                          borderRadius: "50%",
+                          backgroundColor: "#ffffff",
+                          border: `1px solid ${color_schema.green}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <IconRenderer name={item.iconKey} size={28} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h6">{item.name}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
               ))}
-            </Grid>
+            </>
           )}
 
-          {service.offline && (
-            <Grid item xs={12} md={6}>
-              <Typography variant="h5" gutterBottom>
-                Offline Services
-              </Typography>
-              {service.offline.map((item, idx) => (
-                <Card
-                  key={idx}
-                  sx={{
-                    p: 2,
-                    textAlign: "center",
-                    transition: "all 0.3s ease",
-                    cursor: "pointer",
-                    boxShadow: 3,
-                    marginTop: 4,
-                    borderRadius: 2,
-                    "&:hover": {
-                      boxShadow: 6,
-                      transform: "translateY(-4px) scale(1.02)",
-                      backgroundColor: "#eaf5e0ff", // subtle blue background on hover
-                    },
-                  }}
-                >
-                  <CardContent
-                    sx={{ display: "flex", gap: 2, alignItems: "center" }}
+          {/* Offline Services */}
+          {medical_service.offline && (
+            <>
+              <Grid item xs={12}>
+                <Typography variant="h5" gutterBottom>
+                  Offline Services
+                </Typography>
+              </Grid>
+              {medical_service.offline.map((item, idx) => (
+                <Grid item xs={12} sm={6} md={4} key={idx}>
+                  <Card
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      "&:hover": {
+                        boxShadow: 6,
+                        transform: "translateY(-4px) scale(1.02)",
+                        backgroundColor: "#eaf5e0ff",
+                      },
+                    }}
                   >
-                    <Box
-                      sx={{
-                        width: 50,
-                        height: 50,
-                        padding: 1,
-                        borderRadius: "50%",
-                        backgroundColor: "#ffffff", // or any custom color
-                        border: `1px solid ${color_schema.green}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
+                    <CardContent
+                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
                     >
-                      <IconRenderer name={item.iconKey} size={36} />
-                    </Box>
-                    <Box>
-                      <Typography variant="h6">{item.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
+                      <Box
+                        sx={{
+                          width: 50,
+                          height: 50,
+                          padding: 1,
+                          borderRadius: "50%",
+                          backgroundColor: "#ffffff",
+                          border: `1px solid ${color_schema.green}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <IconRenderer name={item.iconKey} size={36} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h6">{item.name}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
               ))}
-            </Grid>
+            </>
           )}
         </Grid>
       </Container>

@@ -1,6 +1,6 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { invoice_img_path, prescription_img_path } from "./constant";
-import { storage } from "./lib/firebase";
+import { storage } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 
 export const animation = () => {

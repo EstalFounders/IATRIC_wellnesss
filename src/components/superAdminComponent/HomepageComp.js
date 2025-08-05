@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FaMoneyBill, FaUser } from "react-icons/fa";
 import { GrTest } from "react-icons/gr";
-import { api } from "../../constant";
+import { api, vapidKey } from "../../constant";
 import Preloader from "../Preloader";
 import { Alert, Snackbar } from "@mui/material";
 import AppointTable from "./common/AppointmentTable";
@@ -27,6 +27,9 @@ import {
 import { calculateTotalIncome } from "./utility/helper";
 import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
+import { messaging } from "../../../lib/firebase";
+import { getToken, onMessage } from "firebase/messaging";
+import NotificationHandler from "./common/NotificationHandler";
 
 export default function HomepageComp() {
   const [isDoctorLoading, setIsDoctorLoading] = useState(true);
@@ -44,6 +47,11 @@ export default function HomepageComp() {
   const [severity, setSeverity] = useState("success");
   const router = useRouter();
   const dispatch = useDispatch();
+
+
+
+
+  
 
   useEffect(() => {
     // If no data in local storage, fetch from API
@@ -63,9 +71,17 @@ export default function HomepageComp() {
   useEffect(() => {
     console.log(doctors, "doctors in use eeffe");
     if (!(doctors.length > 0)) {
-      fetchDoctors(dispatch, setDoctors,setIsDoctorLoading);
+      fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
     }
   }, []); // Empty dependency array ensures the effect runs only once
+
+  useEffect(() => {
+    // Listen to foreground messages
+    onMessage(messaging, (payload) => {
+      console.log("Message received in foreground:", payload);
+      alert(payload.notification.title + ": " + payload.notification.body);
+    });
+  }, []);
 
   useEffect(() => {
     setIsAppointmentLoading(true);
@@ -111,6 +127,22 @@ export default function HomepageComp() {
 
     fetchData();
   }, []);
+
+  const requestNotificationPermission = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getToken(messaging, {
+          vapidKey: vapidKey,
+        });
+        console.log("FCM Token:", token);
+      } else {
+        console.warn("Permission denied");
+      }
+    } catch (error) {
+      console.error("Error getting FCM token:", error);
+    }
+  };
 
   // const calculateStatistics = (appointments) => {
   //   const uniquePatients = new Set();
@@ -166,6 +198,7 @@ export default function HomepageComp() {
   return (
     <>
       <Row className="m-4">
+
         <Col style={{ marginTop: 60 }}>
           <CardDeck className="w-50 ml-auto mr-auto mt-4">
             <Card

@@ -11,7 +11,7 @@ export const RequestOtp = ({ onClose, handleOtpRequest, source }) => {
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value, "name and value");
+    console.log(name, value, "name and value"); 
     if (name === "name") setName(value);
 
     if (name === "mobNo") setMobileNumber(value);

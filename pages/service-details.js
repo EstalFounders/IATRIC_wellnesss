@@ -12,11 +12,11 @@ import { useRouter } from "next/router";
 
 const AboutUs = () => {
   const router = useRouter();
-  const { serviceName } = router.query;
+  const { Service } = router.query;
   return (
     <Layouts>
       <PageBanner
-        pageTitle={serviceName}
+        pageTitle={Service}
         motherTitle={"discover-more"}
         url={`discover-more/`}
       />

@@ -6,7 +6,7 @@ import {
   doctorStamp_img_path,
   profilePicture_img_path,
 } from "../../src/constant";
-import { storage } from "../../src/lib/firebase";
+import { storage } from "../../lib/firebase";
 import {
   deleteObject,
   getDownloadURL,

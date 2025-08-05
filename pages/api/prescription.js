@@ -3,7 +3,7 @@ import multiparty from "multiparty";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../../src/lib/firebase";
+import { storage } from "../../lib/firebase";
 import {
   api,
   appointment_status,

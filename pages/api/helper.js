@@ -499,4 +499,5 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
       WHATSAPP_REMINDER_TEMPLATE_DOCTOR
     );
   }
+  return appointment._id;
 };

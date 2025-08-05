@@ -88,3 +88,32 @@ export const isMobileValid = (mobNo) => {
   }
 }
 
+export const getFilteredNotifications = (notifications) => {
+  const leaveRequest = [];
+  const doctorUpdateRequests = [];
+  const consultationRequests = [];
+
+  notifications.forEach((notif) => {
+    switch (notif.title) {
+      case "leave-request":
+        leaveRequest.push(notif);
+        break;
+      case "doctor-update":
+        doctorUpdateRequests.push(notif);
+        break;
+      case "consultation-request":
+        consultationRequests.push(notif);
+        break;
+      default:
+        break;
+    }
+  });
+
+  return {
+    leaveRequest,
+    doctorUpdateRequests,
+    consultationRequests,
+  };
+};
+
+

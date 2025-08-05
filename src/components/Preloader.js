@@ -1,9 +1,10 @@
+import React from "react";
+import styles from "./Common/css/Preloader.module.css";
+
 const Preloader = () => {
   return (
-    <div id="loader-wrapper">
-      <div id="loader">
-        <div className="loader-inner"></div>
-      </div>
+    <div className={styles.heartbeatContainer}>
+      <div className={styles.heart}></div>
     </div>
   );
 };

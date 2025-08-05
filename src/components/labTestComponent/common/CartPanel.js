@@ -20,12 +20,17 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setLabTestCartDetails } from "../../../store/slices/cartPanelData";
 
-const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
+const CartPanel = ({
+  isOpen,
+  togglePanel,
+  cartItem,
+  onUpdateCartItemCount,
+}) => {
   const [name, setName] = useState();
   const [mobileNumber, setMobileNumber] = useState();
   const [cartItems, setCartItems] = useState(cartItem);
   const [paymentMethod, setPaymentMethod] = useState("onlinePay"); // Initialize state
-  const [cartItemsIds, setCartItemsIds] = useState([]);
+  const [cartItemsIds, setCartItemsIds] = useState(cartItem);
   const [isProceed, setIsProceed] = useState(false);
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
@@ -40,6 +45,7 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
   };
 
   useEffect(() => {
+    // Listen for cart update events
     const handler = (item) => {
       const healthCheckupData = item.healthCheckupData;
 
@@ -62,7 +68,6 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
       cartEventEmitter.off(eventEmitter.cartEventEmitter, handler);
     };
   }, []);
-  
 
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {
@@ -70,7 +75,7 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
       (_, index) => index !== indexToDelete
     );
     setCartItems(updatedCartItems); // Update the state with the new array
-
+    setLabTestCartItems(updatedCartItems);
     // Notify parent about cart item count update
     if (onUpdateCartItemCount) {
       onUpdateCartItemCount(updatedCartItems.length);
@@ -80,7 +85,7 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
   // Calculate the total price with discount if online payment is selected
   const totalPrice =
     paymentMethod === "onlinePay"
-      ? calculateTotalPrice(cartItems) * { lab_test_discount } // Apply 5% discount
+      ? calculateTotalPrice(cartItems) * lab_test_discount // Apply 5% discount
       : calculateTotalPrice(cartItems);
 
   const handleClose = useCallback(() => {
@@ -232,7 +237,7 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
               </div>
               <div className="ms-3">
                 <div className="fw-bold text-success">
-                  {price_symbol} {totalPrice}
+                  {price_symbol} {totalPrice.toLocaleString("en-IN")}
                 </div>
                 <div className="text-muted ml-1">{cartItems.length} tests</div>
               </div>
@@ -267,7 +272,11 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
             />
           ) : (
             // Display component when both otpRequested and responseSuccess are false
-            <OtpScreen onClose={handleClose} handleSubmitOtp={handleBookTest} />
+            <OtpScreen
+              onClose={handleClose}
+              mobile={mobileNumber}
+              handleSubmitOtp={handleBookTest}
+            />
           )}
           <div className="text-danger text-center mb-2">{error}</div>
         </LabTestModel>
@@ -275,6 +284,7 @@ const CartPanel = ({ isOpen, togglePanel,cartItem, onUpdateCartItemCount }) => {
       {loading ? <Preloader /> : ""}
     </Container>
   );
+  
 };
 
 export default CartPanel;

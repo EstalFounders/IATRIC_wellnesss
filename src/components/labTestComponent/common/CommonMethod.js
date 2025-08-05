@@ -64,7 +64,8 @@ export const handleCheckupCateogry = (
 
 export const calculateTotalPrice = (cartItems) => {
   return cartItems.reduce((total, item) => {
-    return total + parseFloat(item.price);
+    const price = parseFloat(item?.price) || 0;
+    return total + price;
   }, 0);
 };
 
@@ -73,7 +74,7 @@ export const useAddToCart = () => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleAddToCart = (item) => {
-    cartEventEmitter.emit(eventEmitter.cartEventEmitter, item);
+    cartEventEmitter.emit(eventEmitter.labTestEventEmitter, item);
     setSnackbarOpen(true);
     setIsClicked(true);
 

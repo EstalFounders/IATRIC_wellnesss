@@ -72,7 +72,6 @@ const AppointmentPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
-  const [serviceType, setServiceType] = useState("Select Service");
   const [serviceTypeId, setServiceTypeId] = useState();
   const [consultationType, setConsultationType] = useState("Call");
   const [consultationTypes, setConsultationTypes] = useState([]);
@@ -90,8 +89,10 @@ const AppointmentPage = () => {
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
   const [services] = useState(
-    useSelector((state) => state.allDoctorS.serviceOffered)
+    useSelector((state) => state.superAdminHomePage.serviceOffered)
   );
+  const [serviceType, setServiceType] = useState(services[0].name);
+
   const dispatch = useDispatch();
 
   // All state and setters/functions in one object
@@ -154,6 +155,13 @@ const AppointmentPage = () => {
   };
 
   useEffect(() => {
+    const getServices = async () => {
+      await getServiceOffered({ dispatch });
+    };
+    getServices();
+  }, []); 
+
+  useEffect(() => {
     const { serviceParam } = router.query;
     if (typeof serviceParam === "string") {
       setServiceType(
@@ -164,13 +172,6 @@ const AppointmentPage = () => {
       );
     }
   }, [router.query]);
-
-  useEffect(() => {
-    const getServices = async () => {
-      await getServiceOffered({ dispatch });
-    };
-    getServices();
-  });
 
   useEffect(() => {
     const fetchConsultationFees = async () => {

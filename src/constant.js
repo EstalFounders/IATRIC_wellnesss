@@ -14,7 +14,7 @@ export const development_production_url =
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
 export const medicine_cart_details_local_info = "medicineCartItems";
-export const labtest_cart_details_local_info = "labTestcartItems"
+export const labtest_cart_details_local_info = "labTestcartItems";
 export const single_call = "single_call";
 export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
@@ -32,6 +32,7 @@ export const api = {
   bookConsultation: "/api/bookConsultation/",
   bookLabTest: "/api/bookLabTest/",
   consiltationFee: "/api/superAdmin/consultationFee",
+  superAdmin_notification: "/api/superAdmin/notification",
   updateDoctorStatus: "/api/registerDoc/updateDoctorStatus",
   doctorUpdateRequest: "/api/registerDoc/doctorUpdateReq",
   leaveRequest: "/api/registerDoc/leaveRequest",
@@ -47,7 +48,7 @@ export const api = {
   getInvoice: "/api/helper/generateInvoice",
   uploadInvoice: "/api/helper/uploadInvoice",
   serviceOffered: "/api/superAdmin/serviceOffered",
-  sendOtp: "api/helper/whatsappConfirmationApi",
+  sendOtp: "/api/helper/whatsappConfirmationApi",
 };
 
 export const services = [
@@ -187,3 +188,6 @@ export const labtestCateogory = {
 export const medicine_discount = 0.95;
 
 export const lab_test_discount = 0.95;
+
+export const vapidKey =
+  "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";

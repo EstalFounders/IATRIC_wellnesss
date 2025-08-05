@@ -38,7 +38,6 @@ const AppointmentForm = ({
   sendWhatsAppConfirmation,
   handleCloseSnackBar,
 }) => {
-  
   return (
     <div className="col-lg-8">
       <div className="txt-block pr-30">
@@ -91,22 +90,22 @@ const AppointmentForm = ({
           />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="doctor-label">
+            <InputLabel id="service-label">
               {" "}
               {appointmentState.serviceType
                 ? appointmentState.serviceType
-                : "Select Service type"}
+                : "Select consultation type"}
             </InputLabel>
             <Select
               labelId="doctor-label"
               id="doctor"
               name="doctor"
-              // value={appointmentState.serviceType.toString()}
-              label="Select Service"
-              onChange={(e) => setter.setServiceTypeId(e.target.value)}
+              value={appointmentState.serviceType}
+              label="Select Doctor"
+              onChange={handleDoctorSelection}
             >
               {appointmentState.services.map((service) => (
-                <MenuItem key={service._id} value={service._id}>
+                <MenuItem key={service._id} value={service.name}>
                   {service.name}
                 </MenuItem>
               ))}
