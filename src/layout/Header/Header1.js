@@ -326,14 +326,9 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             <ul className="wsmenu-list h6 font-weight-bold">
               {/* DROPDOWN MENU */}
               <li aria-haspopup="true">
-                <div
-                  className="mx-2 navbar-option mt-3"
-                  onClick={() => {
-                    window.open("/", "_blank");
-                  }}
-                >
-                  CONSULT DOCTORS{" "}
-                </div>
+                <Link legacyBehavior href="/">
+                  CONSULT DOCTORS
+                </Link>
               </li>
               {/* END DROPDOWN MENU */}
               {/* PAGES */}
@@ -451,6 +446,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
               </li>
               {/* END PAGES */}
               {/* HALF MENU */}
+              
               <li aria-haspopup="true">
                 <div
                   className="mx-2 navbar-option mt-3"
@@ -458,10 +454,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                     window.open("/medicine/homepage", "_blank");
                   }}
                 >
-                  {/* Half Menu <IoMdArrowDropdown /> */}
-                  MEDICINES{""}
+                  Half Menu <IoMdArrowDropdown />
+                  {/* MEDICINES{""} */}
                 </div>
               </li>
+              
               {/* END HALF MENU */}
               {/* MEGAMENU */}
 

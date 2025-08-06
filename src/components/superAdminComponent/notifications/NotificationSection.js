@@ -8,8 +8,8 @@ import PreviewRequest from "./PreviewRequest";
 
 const ConsultationCard = ({ request }) => (
   <Box p={2} border={1} borderRadius={2}>
-    <Typography variant="subtitle1">Consultation Request</Typography>
-    <Typography>{request.title || "No title"}</Typography>
+    <Typography variant="subtitle1">{request.title}</Typography>
+    <Typography>{request.body || "No title"}</Typography>
   </Box>
 );
 

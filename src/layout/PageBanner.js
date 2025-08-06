@@ -25,7 +25,7 @@ const PageBanner = ({ pageTitle, motherTitle, url }) => {
                 </ol>
               </nav>
               {/* Title */}
-              <h4 className="h4-sm steelblue-color text-uppercase">{pageTitle}</h4>
+              {/* <h4 className="h4-sm steelblue-color text-uppercase">{pageTitle}</h4> */}
             </div>
           </div>
         </div>{" "}

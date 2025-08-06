@@ -40,6 +40,12 @@ import {
   bookConsultationApiCall,
   getServiceOffered,
 } from "../ApiService/BookConsultationApiCall";
+import CommonHealthConcerns from "./CommonHealthConcern";
+import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
+import HowItWorks from "./common/HowItsWorks";
+import Statistic1 from "../Common/Statistic-1";
+import FaqSection from "./common/FAQComponent";
+import BenefitSection from "./common/BenefitsSection";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -159,7 +165,7 @@ const AppointmentPage = () => {
       await getServiceOffered({ dispatch });
     };
     getServices();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     const { serviceParam } = router.query;
@@ -428,12 +434,9 @@ const AppointmentPage = () => {
   };
 
   return (
-    <div
-      id="appointment-page"
-      className="wide-60 appointment-page-section division"
-    >
-      <div className="container">
-        <div className="row">
+    <div id="" className="wide-60">
+      <div className="container-fluid">
+        <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
           <AppointmentForm
             appointmentState={appointmentState}
@@ -446,94 +449,31 @@ const AppointmentPage = () => {
             sendWhatsAppConfirmation={sendWhatsAppConfirmation}
             handleCloseSnackBar={handleCloseSnackBar}
           />
-          {/* END SERVICE DETAILS */}
-          {/* SIDEBAR */}
 
-          {!isAppointmentPage && (
-            <aside id="sidebar" className="col-lg-4">
-              {/* TEXT WIDGET */}
-              <div id="txt-widget" className="sidebar-div mb-50">
-                {/* Title */}
-                <h5 className="h5-sm steelblue-color">The Heart Of Clinic</h5>
-                {/* Head of Clinic */}
-                <div className="txt-widget-unit mb-15 clearfix d-flex align-items-center">
-                  {/* Avatar */}
-                  <div className="txt-widget-avatar">
-                    <img
-                      src="images/head-of-clinic.jpg"
-                      alt="testimonial-avatar"
-                    />
-                  </div>
-                  {/* Data */}
-                  <div className="txt-widget-data">
-                    <h5 className="h5-md steelblue-color">
-                      Dr. Jonathan Barnes
-                    </h5>
-                    <span>Chief Medical Officer, Founder</span>
-                    <p className="blue-color">1-800-1234-567</p>
-                  </div>
-                </div>
-                {/* End Head of Clinic */}
-                {/* Text */}
-                <p className="p-sm">
-                  An enim nullam tempor sapien at gravida donec pretium ipsum
-                  porta justo integer at odiovelna vitae auctor integer congue
-                  magna purus
-                </p>
-                {/* Button */}
-                <div className="">
-                  <ConsultationButton path={"/about"}>
-                    Learn More
-                  </ConsultationButton>
-                </div>
-              </div>
-              {/* END TEXT WIDGET */}
-              {/* SIDEBAR TABLE */}
-              <div className="sidebar-table blue-table sidebar-div mb-50">
-                {/* Title */}
-                <h5 className="h5-md">Working Time</h5>
-                {/* Text */}
-                <p className="p-sm">
-                  Porta semper lacus cursus, feugiat primis ultrice ligula risus
-                  auctor at tempus feugiat dolor lacinia cursus nulla vitae
-                  massa
-                </p>
-                {/* Table */}
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <td>Mon – Wed</td>
-                      <td> - </td>
-                      <td className="text-right">9:00 AM - 7:00 PM</td>
-                    </tr>
-                    <tr>
-                      <td>Thursday</td>
-                      <td> - </td>
-                      <td className="text-right">9:00 AM - 6:30 PM</td>
-                    </tr>
-                    <tr>
-                      <td>Friday</td>
-                      <td> - </td>
-                      <td className="text-right">9:00 AM - 6:00 PM</td>
-                    </tr>
-                    <tr className="last-tr">
-                      <td>Sun - Sun</td>
-                      <td>-</td>
-                      <td className="text-right">CLOSED</td>
-                    </tr>
-                  </tbody>
-                </table>
-                {/* Title */}
-                <h5 className="h5-xs">Need a personal health plan?</h5>
-                {/* Text */}
-                <p className="p-sm">
-                  Porta semper lacus cursus, and feugiat primis ultrice ligula
-                  at risus auctor
-                </p>
-              </div>
-              {/* END SIDEBAR TABLE */}
-            </aside>
-          )}
+          {/* common health concern treatment */}
+          <div className="w-75 w-md-100">
+            <CommonHealthConcerns />
+          </div>
+
+          <div>
+            <Demo5Doctors1 />
+          </div>
+
+          <div className="w-100 d-flex justify-content-center">
+            <HowItWorks />
+          </div>
+          <div className="w-100">
+            <Statistic1 />
+          </div>
+
+          <div>
+            <BenefitSection />
+          </div>
+
+          <div>
+            <FaqSection />
+          </div>
+
           {/* END SIDEBAR */}
           <AppointmentBookingModal
             isOpen={bookingResponse}

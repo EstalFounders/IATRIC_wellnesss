@@ -275,12 +275,12 @@ const AppointmentForm = ({
           </Box>
         </form>
 
-        <Typography variant="body2" color="textSecondary">
+        {/* <Typography variant="body2" color="textSecondary">
           * Porta semper lacus cursus, feugiat primis ultrice in ligula risus
           metus, primis in orci integer metus mollis faucibus enim. Nemo ipsam
           egestas volute turpis dolores ut aliquam quaerat sodales sapien undo
           pretium purus
-        </Typography>
+        </Typography> */}
       </div>
     </div>
   );
