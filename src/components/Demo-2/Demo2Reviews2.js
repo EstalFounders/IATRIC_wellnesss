@@ -5,7 +5,7 @@ const Demo2Reviews2 = () => {
   return (
     <section
       id="reviews-2"
-      className="bg-lightgrey wide-100 reviews-section division"
+      className="wide-100 reviews-section division"
     >
       <div className="container h5 box-list grey-color">
         {/* SECTION TITLE */}

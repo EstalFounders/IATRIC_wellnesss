@@ -1,13 +1,14 @@
 // store/slices/appointmentSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   allDoctors: [],
   doctorInfo: null,
+  serviceTypes: [],
 };
 
 const allDoctorsPageSlice = createSlice({
-  name: 'appointment',
+  name: "appointment",
   initialState,
   reducers: {
     setAllDoctors: (state, action) => {
@@ -15,6 +16,9 @@ const allDoctorsPageSlice = createSlice({
     },
     setDoctorInfo: (state, action) => {
       state.doctorInfo = action.payload;
+    },
+    setServiceTypes: () => {
+      state.serviceTypes = action.payload;
     },
   },
 });

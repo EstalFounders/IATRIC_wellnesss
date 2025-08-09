@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useSelector } from "react-redux";
-import { FaArrowAltCircleLeft, FaArrowCircleRight } from "react-icons/fa";
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import { color_schema } from "../../constant";
 import { handleServiceClick } from "./commonMethod";
 import { servicesData } from "../../../data/services";
@@ -16,6 +16,8 @@ const ServicesTabs = () => {
   const servicesPerPage = 4;
   const router = useRouter();
 
+  const totalPages = Math.ceil(services.length / servicesPerPage);
+
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
   const currentServices = services.slice(
@@ -24,12 +26,19 @@ const ServicesTabs = () => {
   );
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage((prev) => {
+      return prev < totalPages ? prev + 1 : prev;
+    });
   };
 
   const handlePrevPage = () => {
-    setCurrentPage((prev) => prev - 1);
+    setCurrentPage((prev) => {
+      return prev > 1 ? prev - 1 : prev;
+    });
   };
+
+  const canGoNext = currentPage < totalPages;
+  const canGoPrev = currentPage > 1;
 
   const handleTabClick = (id) => {
     setActiveTab(id);
@@ -54,35 +63,42 @@ const ServicesTabs = () => {
     <section className="custom-tabs-section mt-50">
       <div className="container">
         <div className="tab-nav-wrapper position-relative">
-          <div className="arrow left-arrow-fixed" onClick={handlePrevPage}>
+          <div
+            className={`arrow left-arrow-fixed ${!canGoPrev ? "disabled" : ""}`}
+            onClick={canGoPrev ? handlePrevPage : undefined}
+            style={{
+              opacity: canGoPrev ? 1 : 0.3,
+              cursor: canGoPrev ? "pointer" : "not-allowed",
+            }}
+          >
             <FaArrowAltCircleLeft size={30} color={color_schema.yellow} />
           </div>
 
-          <div className="tab-buttons-container d-flex justify-content-center align-items-center flex-grow-1">
+          <div className="tab-buttons-container d-flex justify-content-center align-items-center flex-grow-1 p-3">
             {currentServices.map((service) => (
               <div
                 key={service.id}
-                className={`tab-button service-nav-link text-uppercase mx-1 px-4 ${
+                className={`service-tab ${
                   activeTab === service.id ? "active-tab" : ""
                 }`}
                 onClick={() => handleTabClick(service.id)}
-                style={{
-                  width: "280px", // fixed width for consistent layout
-                  textAlign: "center",
-                  fontSize: "1.1rem",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  // textOverflow: "ellipsis",
-                  cursor: "pointer",
-                }}
               >
                 {service.name}
               </div>
             ))}
           </div>
 
-          <div className="arrow right-arrow-fixed" onClick={handleNextPage}>
-            <FaArrowCircleRight size={30} color={color_schema.yellow} />
+          <div
+            className={`arrow right-arrow-fixed ${
+              !canGoNext ? "disabled" : ""
+            }`}
+            onClick={canGoNext ? handleNextPage : undefined}
+            style={{
+              opacity: canGoNext ? 1 : 0.3,
+              cursor: canGoNext ? "pointer" : "not-allowed",
+            }}
+          >
+            <FaArrowAltCircleRight size={30} color={color_schema.yellow} />
           </div>
         </div>
 
@@ -90,23 +106,35 @@ const ServicesTabs = () => {
           {services
             .filter((service) => service.id === activeTab)
             .map((service) => (
-              <div className="row" key={service.id}>
-                <div className="col-lg-6">
-                  <Image
-                    src={service.image}
-                    width={500}
-                    height={550}
-                    alt={service.name}
-                    style={{ objectFit: "cover", width: "100%" }}
-                  />
+              <div
+                className="row align-items-center service-row"
+                key={service.id}
+              >
+                <div className="col-lg-6 mb-4 mb-lg-0">
+                  <div className="image-wrapper">
+                    <Image
+                      onClick={() =>
+                        handleServiceClickLocal(service.name, service.id)
+                      }
+                      className="image"
+                      src={service.image}
+                      alt={service.name}
+                      fill
+                      sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
+                      style={{
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="col-lg-6">
-                  <h4 className="section-subheading">
-                    <span className="section-id blue-color">
-                      <h4>{service.subheading}</h4>
-                    </span>
+
+                <div className="col-lg-6 d-flex flex-column justify-content-center text-column">
+                  <h4 className="section-subheading blue-color mb-2">
+                    {service.subheading}
                   </h4>
+
                   <h3
+                    className="clickable-div h3-md steelblue-color mb-3"
                     className="service-title clickable-div h3-md steelblue-color"
                     onClick={() =>
                       handleServiceClickLocal(service.name, service.id)
@@ -120,7 +148,8 @@ const ServicesTabs = () => {
                   >
                     {service.name}
                   </h3>
-                  <div className="service-description h5 box-list grey-color">
+
+                  <div className="service-description h5 box-list grey-color mb-4">
                     {boldKeywords(service.description, [
                       "General Physician",
                       "trusted care",
@@ -168,6 +197,9 @@ const ServicesTabs = () => {
                       "personalized attention",
                     ])}
                   </div>
+
+                  <div className="mt-5 w-100">
+                    <div className="w-50 mx-auto mx-lg-0">
                   <div className="mt-5 mr-auto">
                     <div className="w-50">
                       <ConsultationButton path={"/appointment"}>

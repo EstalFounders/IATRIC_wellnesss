@@ -1,5 +1,14 @@
 import { color_schema } from "../../src/constant";
 
+const dimension = {
+  width: 120,
+  height: 120,
+};
+
+export const GeneralPhysician = ({
+  className,
+  style = { color: `${color_schema.yellow}` },
+
 export const GeneralPhysician = ({
   className,
   style = { color: `${color_schema.yellow}` },
@@ -9,6 +18,8 @@ export const GeneralPhysician = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -43,6 +54,8 @@ export const PediatricsIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -77,12 +90,15 @@ export const PediatricsIcon = ({
 export const CardiologyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
+
   width = 120,
   height = 120,
   ...props
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -105,12 +121,15 @@ export const CardiologyIcon = ({
 export const DermatologistIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
+
   width = 120,
   height = 120,
   ...props
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -161,6 +180,8 @@ export const OrthopaedicsIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -189,6 +210,8 @@ export const GynaecologyIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -241,6 +264,8 @@ export const PhysiotherapyIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -289,6 +314,8 @@ export const PulmonologyIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -317,6 +344,8 @@ export const OphthalmologyIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -358,6 +387,8 @@ export const Psychiatrist = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -416,6 +447,8 @@ export const Dentistry = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -444,6 +477,8 @@ export const NursingCareIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -502,6 +537,8 @@ export const HomeCareIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -534,6 +571,8 @@ export const MedicineDelivery = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -592,6 +631,8 @@ export const LabInvestigation = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -620,6 +661,8 @@ export const CorporateHealthcareIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"
@@ -670,6 +713,8 @@ export const HealthCampIcon = ({
 }) => {
   return (
     <svg
+      width={dimension.width}
+      height={dimension.height}
       width={width}
       height={height}
       viewBox="0 0 48 48"

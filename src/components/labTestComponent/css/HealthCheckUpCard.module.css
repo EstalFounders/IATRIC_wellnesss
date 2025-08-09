@@ -80,7 +80,7 @@ text-wrap: nowrap;
   }
   
   .addToCartbutton {
-     width: 120px;
+     width: 200px;
     height: 33px;
     gap: 4px;
     border-radius: 8px;
@@ -95,6 +95,10 @@ background-color: white;
 display: flex;
 justify-content: center;
 align-items: center;
+  }
+  .addToCartbutton:hover {
+    background-color: #8e8333;
+    color: white;
   }
   
   .addToCartbutton.clicked {

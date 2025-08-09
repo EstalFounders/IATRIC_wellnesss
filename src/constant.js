@@ -10,9 +10,11 @@ export const contact_no = "+91 78959 59925";
 export const email = "customercare@healthpath.co.in";
 export const countryCode = "+91";
 export const development_production_url =
-  "https://vtdeveloper.d3pu3hm659dc5p.amplifyapp.com/";
+  "before-staging.d3pu3hm659dc5p.amplifyapp.com";
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
+export const medicine_cart_details_local_info = "medicineCartItems";
+export const labtest_cart_details_local_info = "labTestcartItems";
 export const single_call = "single_call";
 export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
@@ -23,12 +25,14 @@ export const api = {
   addDoctor: "/api/addDoctor",
   doctorLogin: "/api/doctorLogin",
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
+  getAllMedicine: "/api/medicineInfo",
   prescriptionCall: "/api/prescription",
   sendWhatsAppCall: "/api/whatsApp",
   recommendedServies: "/api/lib/recommendedServices",
   bookConsultation: "/api/bookConsultation/",
   bookLabTest: "/api/bookLabTest/",
   consiltationFee: "/api/superAdmin/consultationFee",
+  superAdmin_notification: "/api/superAdmin/notification",
   updateDoctorStatus: "/api/registerDoc/updateDoctorStatus",
   doctorUpdateRequest: "/api/registerDoc/doctorUpdateReq",
   leaveRequest: "/api/registerDoc/leaveRequest",
@@ -44,7 +48,7 @@ export const api = {
   getInvoice: "/api/helper/generateInvoice",
   uploadInvoice: "/api/helper/uploadInvoice",
   serviceOffered: "/api/superAdmin/serviceOffered",
-  sendOtp: "api/helper/whatsappConfirmationApi",
+  sendOtp: "/api/helper/whatsappConfirmationApi",
 };
 
 export const services = [
@@ -172,6 +176,7 @@ export const eventEmitter = {
   cartEventEmitter: "cartUpdate",
   navBarEventEmitter: "navbar-option",
   labTestEventEmitter: "labTestUpdate",
+  medicineCartEventEmitter: "medicine-cart-update",
 };
 
 export const labtestCateogory = {
@@ -179,3 +184,10 @@ export const labtestCateogory = {
   sexualHealth: "Sexual Health",
   allergyTestCheckup: "Allergy",
 };
+
+export const medicine_discount = 0.95;
+
+export const lab_test_discount = 0.95;
+
+export const vapidKey =
+  "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";

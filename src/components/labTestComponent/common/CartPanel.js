@@ -5,26 +5,39 @@ import { AiFillDelete } from "react-icons/ai"; // For the delete icon
 import { PiShoppingCartSimpleBold } from "react-icons/pi";
 import { CiDiscount1 } from "react-icons/ci";
 import { HiOutlineShoppingCart } from "react-icons/hi";
-import { calculateTotalPrice } from "./CommonMethod";
+import { calculateTotalPrice, setLabTestCartItems } from "./CommonMethod";
 import { Container } from "react-bootstrap";
 import LabTestModel from "../modal/LabTestModel";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { RequestOtp } from "../../../layout/Component/RequestOtp";
 import { OtpScreen } from "../../../layout/Component/OtpScreen";
-import { eventEmitter, price_symbol } from "../../../constant";
+import {
+  eventEmitter,
+  lab_test_discount,
+  price_symbol,
+} from "../../../constant";
+import { useDispatch, useSelector } from "react-redux";
+import { setLabTestCartDetails } from "../../../store/slices/cartPanelData";
 
-const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
+const CartPanel = ({
+  isOpen,
+  togglePanel,
+  cartItem,
+  onUpdateCartItemCount,
+}) => {
   const [name, setName] = useState();
   const [mobileNumber, setMobileNumber] = useState();
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(cartItem);
   const [paymentMethod, setPaymentMethod] = useState("onlinePay"); // Initialize state
-  const [cartItemsIds, setCartItemsIds] = useState([]);
+  const [cartItemsIds, setCartItemsIds] = useState(cartItem);
   const [isProceed, setIsProceed] = useState(false);
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
   const [responseSuccess, setReponseSuccess] = useState(false);
   const [otpRequested, setOtpRequested] = useState(false);
+  const dispatch = useDispatch();
+  // const cartItemsDetails =
 
   // Handler to update state
   const handlePaymentChange = (event) => {
@@ -33,20 +46,28 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
 
   useEffect(() => {
     // Listen for cart update events
-    cartEventEmitter.on(eventEmitter.cartEventEmitter, (item) => {
-      setCartItems((prevItems) => [...prevItems, item]);
-      setCartItemsIds((prevIds) => [...prevIds, item["healthCheckupData"]._id]);
-    });
-    // Update parent with the cart item count
-    if (onUpdateCartItemCount) {
-      onUpdateCartItemCount(cartItems.length);
-    }
+    const handler = (item) => {
+      const healthCheckupData = item.healthCheckupData;
 
-    // Clean up event listener
-    return () => {
-      cartEventEmitter.removeAllListeners("cartUpdate");
+      setCartItems((prevItems) => {
+        const updatedItems = [...prevItems, healthCheckupData];
+        setLabTestCartItems(updatedItems); // ✅ Store in localStorage
+        return updatedItems;
+      });
+
+      setCartItemsIds((prevIds) => [...prevIds, healthCheckupData._id]);
+
+      if (onUpdateCartItemCount) {
+        onUpdateCartItemCount((prev) => prev + 1);
+      }
     };
-  }, [cartItems, onUpdateCartItemCount]);
+
+    cartEventEmitter.on(eventEmitter.cartEventEmitter, handler);
+
+    return () => {
+      cartEventEmitter.off(eventEmitter.cartEventEmitter, handler);
+    };
+  }, []);
 
   // Function to handle deleting an item
   const handleDeleteItem = (indexToDelete) => {
@@ -54,7 +75,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       (_, index) => index !== indexToDelete
     );
     setCartItems(updatedCartItems); // Update the state with the new array
-
+    setLabTestCartItems(updatedCartItems);
     // Notify parent about cart item count update
     if (onUpdateCartItemCount) {
       onUpdateCartItemCount(updatedCartItems.length);
@@ -64,7 +85,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
   // Calculate the total price with discount if online payment is selected
   const totalPrice =
     paymentMethod === "onlinePay"
-      ? calculateTotalPrice(cartItems) * 0.95 // Apply 5% discount
+      ? calculateTotalPrice(cartItems) * lab_test_discount // Apply 5% discount
       : calculateTotalPrice(cartItems);
 
   const handleClose = useCallback(() => {
@@ -152,12 +173,10 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
                   <PiShoppingCartSimpleBold size={30} className={styles.icon} />
                 </div>
                 <div className="col col-md-6">
-                  <div className={`row ${styles.itemTitle}`}>
-                    {item.healthCheckupData.title}
-                  </div>
+                  <div className={`row ${styles.itemTitle}`}>{item.title}</div>
                   <div className={`row ${styles.itemPrice}`}>
                     {price_symbol}
-                    {item.healthCheckupData.price}
+                    {item.price}
                   </div>
                 </div>
 
@@ -218,7 +237,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
               </div>
               <div className="ms-3">
                 <div className="fw-bold text-success">
-                  {price_symbol} {totalPrice}
+                  {price_symbol} {totalPrice.toLocaleString("en-IN")}
                 </div>
                 <div className="text-muted ml-1">{cartItems.length} tests</div>
               </div>
@@ -253,7 +272,11 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
             />
           ) : (
             // Display component when both otpRequested and responseSuccess are false
-            <OtpScreen onClose={handleClose} handleSubmitOtp={handleBookTest} />
+            <OtpScreen
+              onClose={handleClose}
+              mobile={mobileNumber}
+              handleSubmitOtp={handleBookTest}
+            />
           )}
           <div className="text-danger text-center mb-2">{error}</div>
         </LabTestModel>
@@ -261,6 +284,7 @@ const CartPanel = ({ isOpen, togglePanel, onUpdateCartItemCount }) => {
       {loading ? <Preloader /> : ""}
     </Container>
   );
+  
 };
 
 export default CartPanel;

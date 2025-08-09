@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import HealthCheckupCard from "./common/HealthCheckupCard";
 import { Col } from "react-bootstrap";
 import { HorizontalScrollContainer } from "./common/HorizontalContainer";
+import { TiArrowBack } from "react-icons/ti";
 
 const ViewAllCheckUpDetails = () => {
   const [search, setSearch] = useState("");
@@ -36,7 +37,17 @@ const ViewAllCheckUpDetails = () => {
 
   return (
     <div className="d-flex flex-column align-items-center mt-5 labtest-bg-image">
-      <h2>All Checkups by Category</h2>
+      <div className="row">
+              <div className="col h2 d-flex align-items-center">
+                All Checkups
+                <span
+                  className="arrow-icon ml-2"
+                  onClick={() => window.history.back()}
+                >
+                  <TiArrowBack />
+                </span>
+              </div>
+            </div>
 
       <input
         type="text"

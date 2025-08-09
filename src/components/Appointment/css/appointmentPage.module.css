@@ -37,6 +37,9 @@ color: #939393;
     margin-top: 2%;
   }
   
+  
+
+
   .button {
     padding: 10px 15px;
     font-size: 16px;
@@ -63,7 +66,7 @@ color: #939393;
   .textarea::placeholder,
   .select::placeholder {
   color: #949494;
-font-size: 20px;
+font-size: 16px;
 font-weight: 400;
 line-height: 30px;
 text-align: left;
@@ -103,3 +106,6 @@ text-align: left;
 
   }
   
+  .select-service-dropdown {
+    
+  }

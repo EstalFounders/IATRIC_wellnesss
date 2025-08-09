@@ -1,18 +1,17 @@
-// import { dbConnect } from "../../src/lib/db";
-// import LabTest from "../../src/models/lab-test";
-// import Query from "../../src/models/query";
+import { dbConnect } from "../../src/lib/db";
+import Query from "../../src/models/query";
 
-// export default async function handler(req, res) {
-//   await dbConnect();
+export default async function handler(req, res) {
+  await dbConnect();
 
-//   if (req.method === "GET") {
-//     try {
-//       const labTests = await Query.find();
-//       res.status(200).json(labTests);
-//     } catch (error) {
-//       res.status(500).json({ message: "Error fetching lab tests" });
-//     }
-//   }
+  if (req.method === "GET") {
+    try {
+      const query = await Query.find();
+      res.status(200).json(query);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lab tests" });
+    }
+  }
 //   if (req.method === "PUT") {
 //     console.log(req.query, "req query");
 //     const { id } = req.query;
@@ -36,30 +35,30 @@
 //     }
 //   }
 
-//   if (req.method === "POST") {
-//     try {
-//       const payload = req.body;
+  if (req.method === "POST") {
+    try {
+      const payload = req.body;
 
-//       console.log(payload, "payload");
+      console.log(payload, "payload");
 
-//       if (!payload) {
-//         return res
-//           .status(400)
-//           .json({ message: "Category name and description are required" });
-//       }
+      if (!payload) {
+        return res
+          .status(400)
+          .json({ message: "Category name and description are required" });
+      }
 
-//       const newQuery = await Query.create(payload);
+      const newQuery = await Query.create(payload);
 
-//       const savedQuery = await newQuery.save();
+      const savedQuery = await newQuery.save();
 
-//       res.status(201).json(savedQuery);
-//     } catch (error) {
-//       console.log(error, "error");
-//       res
-//         .status(500)
-//         .json({ message: "Error creating category", error: error.message });
-//     }
-//   }
+      res.status(201).json(savedQuery);
+    } catch (error) {
+      console.log(error, "error");
+      res
+        .status(500)
+        .json({ message: "Error creating category", error: error.message });
+    }
+  }
 
 //   if (req.method === "DELETE") {
 //     const { id } = req.query;
@@ -81,4 +80,4 @@
 //   } else {
 //     return res.status(405).json({ message: "Method Not Allowed" });
 //   }
-// }
+}

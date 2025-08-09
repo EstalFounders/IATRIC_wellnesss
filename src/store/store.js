@@ -10,6 +10,7 @@ import otherDetailsSlice from "./slices/superAdmin/otherDetailsSlice";
 import labTestCateogryDataSlice from "./slices/labTest/labTestCategoryApiData";
 import allDoctorsPageSlice from "./slices/bookingWebsite/allDoctorsPageSlice";
 import userDetailsPageSlice from "./slices/authentication/userDetailsSlice";
+import medicineHomePageApiDataSlice from "./slices/medicine/MedicineHomePageApiData.js";
 
 const persistConfig = {
   key: "root",
@@ -35,6 +36,11 @@ const LabTestHomepageReducer = persistReducer(
 );
 const allDoctors = persistReducer(persistConfig, allDoctorsPageSlice);
 const userDetailsSlice = persistReducer(persistConfig, userDetailsPageSlice);
+const medicineDetailsSlice = persistReducer(
+  persistConfig,
+  medicineHomePageApiDataSlice
+);
+
 
 export const makeStore = () =>
   configureStore({
@@ -45,6 +51,7 @@ export const makeStore = () =>
       labtestHomepage: LabTestHomepageReducer,
       allDoctorS: allDoctors,
       userDetails: userDetailsSlice,
+      medicineDetails: medicineDetailsSlice,
       otherDetailsSlice: superAdminOtherDetailsReducer,
     },
     middleware: (getDefaultMiddleware) =>

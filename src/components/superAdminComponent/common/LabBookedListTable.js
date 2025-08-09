@@ -3,7 +3,6 @@ import { Button, Col, Row, Form, InputGroup } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import LabTestList from "../LabTest/LabTestsList";
 
-
 const LabBookedListTable = ({
   heading,
   isLoading,
@@ -16,13 +15,18 @@ const LabBookedListTable = ({
     useState(appointments);
 
   useEffect(() => {
-    // Filter appointments based on search term
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const results = appointments.filter(
-      (appointment) =>
-        appointment.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        appointment.paymentStatus.toLowerCase().includes(lowerCaseSearchTerm)
-    );
+
+    const results = appointments.filter((appointment) => {
+      const name = appointment.name || ""; // fallback to empty string
+      const status = appointment.paymentStatus || "";
+
+      return (
+        name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        status.toLowerCase().includes(lowerCaseSearchTerm)
+      );
+    });
+
     setFilteredAppointments(results);
   }, [searchTerm, appointments]);
 

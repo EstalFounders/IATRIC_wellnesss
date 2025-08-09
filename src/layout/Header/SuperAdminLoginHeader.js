@@ -9,6 +9,7 @@ import styles from "../css/SuperAdmin.module.css";
 import SuperAdminModel from "../../components/superAdminComponent/model/SuperAdminModel";
 import {
   api,
+  consultation,
   sessionStorageName,
   super_admin_info_local_sotrage,
 } from "../../constant";
@@ -21,6 +22,7 @@ import {
 } from "../../store/slices/notificationSectionApiData";
 import { handleDoctReqApproveOrRejectService } from "../../components/superAdminComponent/apiService/doctrReApproveOrRejectService";
 import { handleLeaveApproveOrRejectService } from "../../components/superAdminComponent/apiService/doctorLeaveApproveOrRejectService";
+import { getFilteredNotifications } from "../../helper";
 
 const SuperAdminLoginHeader = ({ session }) => {
   const router = useRouter();
@@ -30,6 +32,8 @@ const SuperAdminLoginHeader = ({ session }) => {
   const [newRequestCount, setNewRequestCount] = useState(0);
   const [leaveRequest, setLeaveRequest] = useState([]);
   const [newLeaveRequestCount, setNewLeaveRequestCount] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
   const dispatch = useDispatch();
 
   const showModel = () => {
@@ -62,21 +66,29 @@ const SuperAdminLoginHeader = ({ session }) => {
 
   const fetchAPIs = useCallback(async () => {
     try {
-      const [globalResponse, doctorUpdateResponse, leaveRequestResponse] =
-        await Promise.all([
-          fetch(api.globalVar),
-          fetch(api.doctorUpdateRequest),
-          fetch(api.leaveRequest),
-        ]);
-
-      const [globalData, doctorData, leaveData] = await Promise.all([
-        globalResponse.json(),
-        doctorUpdateResponse.json(),
-        leaveRequestResponse.json(),
+      const [
+        globalResponse,
+        doctorUpdateResponse,
+        leaveRequestResponse,
+        notificationResponse,
+      ] = await Promise.all([
+        fetch(api.globalVar),
+        fetch(api.doctorUpdateRequest),
+        fetch(api.leaveRequest),
+        fetch(api.superAdmin_notification),
       ]);
+
+      const [globalData, doctorData, leaveData, notificationData] =
+        await Promise.all([
+          globalResponse.json(),
+          doctorUpdateResponse.json(),
+          leaveRequestResponse.json(),
+          notificationResponse.json(),
+        ]);
       setGlobalVar(globalData); // Assuming globalVar has two elements now
       setDoctorUpdateRequests(doctorData);
       setLeaveRequest(leaveData); // Add a new state to store leave requests
+      setNotifications(notificationData);
       dispatch(setDoctorUpdateRequest(doctorData)); //getting error setLeave request so will put in seperate useEffect
       dispatch(setDoctorLeaveRequest(leaveData));
     } catch (error) {
@@ -128,6 +140,9 @@ const SuperAdminLoginHeader = ({ session }) => {
     });
   };
 
+  const { consultationRequests } = getFilteredNotifications(notifications);
+  console.log(consultationRequests, 'consultation request')
+
   //need to create admin panel to approve and reject doctor update request
 
   return (
@@ -151,7 +166,7 @@ const SuperAdminLoginHeader = ({ session }) => {
               <div className={styles.cartIconContainer} onClick={showModel}>
                 <IoIosNotifications size={30} />
                 <div className={styles.cartItemCount}>
-                  {newRequestCount + newLeaveRequestCount}
+                  {notifications.length}
                 </div>
               </div>
               <div className="ml-2">
@@ -161,10 +176,11 @@ const SuperAdminLoginHeader = ({ session }) => {
           )}
         </Col>
       </Row>
-      <SuperAdminModel isOpen={show} onClose={closeModel} className="w-100">
+      <SuperAdminModel isOpen={show} onClose={closeModel}>
         <NotificationSection
           doctorUpdateRequests={doctorUpdateRequests}
           leaveRequest={leaveRequest}
+          consultationRequests={consultationRequests}
           handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
           handleLeaveApproveOrReject={handleLeaveApproveOrReject}
         />

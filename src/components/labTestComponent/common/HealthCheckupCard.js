@@ -12,9 +12,7 @@ import { Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 import { eventEmitter, price_symbol } from "../../../constant";
 import { useDispatch } from "react-redux";
-import {
-  setHealthDataDetails,
-} from "../../../store/slices/labTest/labTestCategoryApiData";
+import { setHealthDataDetails } from "../../../store/slices/labTest/labTestCategoryApiData";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const HealthCheckupCard = ({ healthCheckupData }) => {
@@ -26,8 +24,12 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
     dispatch(setHealthDataDetails(healthCheckupData));
     router.push("/labTest/viewDetails");
   };
+
   return (
-    <div className={styles.card}>
+    <div
+      className={styles.card}
+      onClick={() => handleViewDetails(healthCheckupData)}
+    >
       {/* Header section with discount, price and MRP */}
       <div
         className={`p-3 text-white lab-test-bg-gradient ${styles.upperSection}`}
@@ -75,8 +77,6 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
         <div
           className={`row justify-content-center align-items-center text-center ${styles.details}`}
         >
-          {console.log(healthCheckupData.test_included, "test included")}
-
           <div className="col-auto d-flex flex-column align-items-center">
             <div className={`mb-2 ${styles.icon}`}>
               <TbKeyframes />
@@ -102,21 +102,26 @@ const HealthCheckupCard = ({ healthCheckupData }) => {
         </div>
 
         {/* Buttons Section */}
-        <div className={`d-flex justify-content-center mt-2 p-3 ${styles.buttons}`}>
+        <div
+          className={`d-flex justify-content-center mt-2 p-3 ${styles.buttons}`}
+        >
           <div
             className={`clickable-div text-nowrap ${styles.addToCartbutton} ${
               isClicked ? styles.clicked : ""
             }`}
-            onClick={() => handleAddToCart({ healthCheckupData })}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent parent onClick
+              handleAddToCart({ healthCheckupData });
+            }}
           >
             Add to Cart
           </div>
-          <div
+
+          {/* <div
             className={`clickable-div text-nowrap ${styles.viewDetailsButton}`}
-            onClick={() => handleViewDetails(healthCheckupData)}
           >
             View Details
-          </div>
+          </div> */}
         </div>
       </div>
       {snackbarOpen && (

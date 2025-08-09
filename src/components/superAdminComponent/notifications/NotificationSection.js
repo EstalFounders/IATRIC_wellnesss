@@ -1,112 +1,151 @@
+// NotificationSection.jsx
 import React, { useState } from "react";
-import styles from "../css/NotificationSection.module.css";
-import { Button, Col, ListGroup, Row } from "react-bootstrap";
-import NotifcationPreviewModel from "../model/NotificationPreviewModel";
+import { Box, Grid, Typography, Tabs, Tab, Badge, Paper } from "@mui/material";
 import DoctorUpdateReqCard from "./DoctorUpdateReqCard";
-import PreviewRequest from "./PreviewRequest";
 import LeaveReqCard from "./LeaveReqCard";
+import NotifcationPreviewModel from "../model/NotificationPreviewModel";
+import PreviewRequest from "./PreviewRequest";
+
+const ConsultationCard = ({ request }) => (
+  <Box p={2} border={1} borderRadius={2}>
+    <Typography variant="subtitle1">{request.title}</Typography>
+    <Typography>{request.body || "No title"}</Typography>
+  </Box>
+);
+
+const LabTestCard = ({ request }) => (
+  <Box p={2} border={1} borderRadius={2}>
+    <Typography variant="subtitle1">Lab Test Request</Typography>
+    <Typography>{request.title || "No title"}</Typography>
+  </Box>
+);
 
 const NotificationSection = ({
-  doctorUpdateRequests,
-  leaveRequest,
+  consultationRequests = [],
+  labTestRequests = [],
+  doctorUpdateRequests = [],
+  leaveRequest = [],
   handleDoctReqApproveOrReject,
   handleLeaveApproveOrReject,
 }) => {
-  console.log(leaveRequest, "leave request");
-
+  const [activeTab, setActiveTab] = useState(0);
   const [show, setShow] = useState(false);
-  const [activeTab, setActiveTab] = useState("Doctor Update"); // State to track active tab
-  const [previewRequest, setPreviewRequest] = useState();
+  const [previewRequest, setPreviewRequest] = useState(null);
 
-  const showModel = () => {
-    setShow(true);
+  const tabs = [
+    { label: "Consultation", count: consultationRequests.length },
+    { label: "Lab Test", count: labTestRequests.length },
+    { label: "Doctor Update", count: doctorUpdateRequests.length },
+    { label: "Leave", count: leaveRequest.length },
+  ];
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
-  const closeModel = () => {
-    setShow(false);
-  };
+  const showModel = () => setShow(true);
+  const closeModel = () => setShow(false);
 
-  const handleReview = (index) => {
-    console.log("Reviewed request ID:", index);
-    setPreviewRequest(doctorUpdateRequests[index]);
+  const handleReview = (request) => {
+    setPreviewRequest(request);
     showModel();
-    // Add API call or navigation logic for review here
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 0:
+        return consultationRequests.map((request, index) => (
+          <Box key={index} mb={2}>
+            <ConsultationCard request={request} />
+          </Box>
+        ));
+      case 1:
+        return labTestRequests.map((request, index) => (
+          <Box key={index} mb={2}>
+            <LabTestCard request={request} />
+          </Box>
+        ));
+      case 2:
+        return doctorUpdateRequests.map((request, index) => (
+          <Box key={index} mb={2}>
+            <DoctorUpdateReqCard
+              index={index}
+              request={request}
+              handleReview={() => handleReview(request)}
+              handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
+            />
+            <NotifcationPreviewModel isOpen={show}>
+              <PreviewRequest
+                request={previewRequest}
+                handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
+                onClose={closeModel}
+              />
+            </NotifcationPreviewModel>
+          </Box>
+        ));
+      case 3:
+        return leaveRequest.map((request, index) => (
+          <Box key={index} mb={2}>
+            <LeaveReqCard
+              request={request}
+              handleReview={() => handleReview(request)}
+              handleLeaveApproveOrReject={handleLeaveApproveOrReject}
+            />
+          </Box>
+        ));
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className={`mb-2 ${styles.notificationsection}`}>
-      <h2 className="mb-4">Requests</h2>
-      <Row>
-        <Col>
-          <div className="tabs">
-            <Button
-              variant="link"
-              className={`text-decoration-none position-relative w-25 ${
-                activeTab === "Doctor Update" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("Doctor Update")} // Set active tab
-            >
-              Doctor Update
-              <span className="position-absolute badge bg-white rounded-circle px-2 py-1 mt-2 ml-1">
-                {doctorUpdateRequests.length}
-              </span>
-            </Button>
+    <Box p={2}>
+      <Typography variant="h5" gutterBottom>
+        Notifications
+      </Typography>
 
-            <Button
-              variant="link"
-              className={`text-decoration-none ml-2 w-25 ${
-                activeTab === "Leave" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("Leave")} // Set active tab
-            >
-              Leave
-              <span className="position-absolute badge bg-white rounded-circle px-2 py-1 mt-2 ml-1">
-                {leaveRequest.length}
-              </span>
-            </Button>
-          </div>
-        </Col>
-      </Row>
-      <ListGroup className="mt-3">
-        {activeTab === "Doctor Update" &&
-          doctorUpdateRequests.map((request, index) => (
-            <React.Fragment key={request.id || index}>
-              <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                <DoctorUpdateReqCard
-                  index={index}
-                  request={request}
-                  handleReview={handleReview}
-                  handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
-                />
-              </ListGroup.Item>
-              <NotifcationPreviewModel
-                isOpen={show}
-                key={`${request._id || index}-model`}
-              >
-                <PreviewRequest
-                  request={previewRequest}
-                  handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
-                  onClose={closeModel}
-                />
-              </NotifcationPreviewModel>
-            </React.Fragment>
+      <Paper elevation={3} sx={{ borderRadius: 2, mb: 2 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          aria-label="Notification Tabs"
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          {tabs.map((tab, index) => (
+            <Tab
+              key={index}
+              label={
+                <Badge
+                  color="success"
+                  badgeContent={tab.count}
+                  sx={{ mr: 1 }}
+                >
+                  {tab.label}
+                </Badge>
+              }
+            />
           ))}
+        </Tabs>
+      </Paper>
 
-        {activeTab === "Leave" &&
-          leaveRequest.map((request, index) => (
-            <ListGroup.Item
-              key={request.id || index} // Use a unique key
-              className="d-flex justify-content-between align-items-center"
-            >
-              <LeaveReqCard
-                request={request}
-                handleReview={handleReview}
-                handleLeaveApproveOrReject={handleLeaveApproveOrReject}
-              />
-            </ListGroup.Item>
-          ))}
-      </ListGroup>
-    </div>
+      {/* Scrollable content container */}
+      <Box
+        sx={{
+          maxHeight: "450px", // adjust as needed
+          overflowY: "auto",
+          pr: 1,
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            {renderContent()}
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

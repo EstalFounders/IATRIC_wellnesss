@@ -37,6 +37,8 @@ import {
   getReminderMessageBodyDoctor,
   getReminderMessageBodyPatient,
 } from "./utils/whatsappMessageBodies";
+import { sendAdminNotification } from "./lib/sendNotification";
+import Notification from "../../src/models/NotificationSchema";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -211,20 +213,19 @@ export default async function handler(req, res) {
 
       console.log(meetingId, "meeting id");
 
+      let result;
       // Handle consultation types
       switch (consultationType) {
         case "Call":
         case "Video":
           // Store appointment details
-          await bookConsultation({ bookConsultationParams });
-
+          result = await bookConsultation({ bookConsultationParams });
           break;
-
         case "Home visit":
         case "Clinic":
           // Simply book the consultation
           // Store appointment details
-          await bookConsultation({ bookConsultationParams });
+          result = await bookConsultation({ bookConsultationParams });
           break;
 
         default:
@@ -232,6 +233,15 @@ export default async function handler(req, res) {
             message: "Invalid consultation type.",
           });
       }
+      await Notification.create({
+        title: "New Consultation",
+        body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
+        read: false,
+      });
+      // await sendAdminNotification({
+      //   title: "Consultation Booked",
+      //   body: `Patient ${name} has booked consultation`
+      // })
       await session.commitTransaction();
       session.endSession();
       res.status(200).json({ message: "Consultation booked successfully" });

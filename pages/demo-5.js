@@ -17,6 +17,8 @@ import Layouts from "../src/layout/Layouts";
 import { eventEmitter } from "../src/constant";
 import cartEventEmitter from "../src/eventEmitter/CartEventEmitter";
 import HomepageComp from "../src/components/labTestComponent/HomepageComp";
+import AnimatedSection from "../public/animation/animationSection/AnimatedSection";
+import MedicalCertificate from "../src/components/Demo-5/MedicalCertificate";
 
 const Demo5 = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -24,20 +26,61 @@ const Demo5 = () => {
   return (
     <Layouts header={1} footer={4} onNavClick={setActiveSection}>
       <>
+        {/* Hero - No animation as it's immediately visible */}
         <Demo5Hero5 />
-        <Demo5About2 />
-        <Demo5Services2 />
-        <Tabs1 />
-        <About5 />
-        <Demo5About6 />
-        <Statistic1 />
-        <Demo5Doctors1 />
-        <Demo2Reviews2 />
-        <Demo5Pricing3 />
-        <Demo2Gallery1 />
-        <Demo5Blog1 />
-        <Demo5Contacts1 />
-        <Banner5 />
+        
+        {/* Wrap each component with AnimatedSection */}
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Demo5About2 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo5Services2 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <MedicalCertificate />
+        </AnimatedSection>
+
+        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Tabs1 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.3}>
+          <About5 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo5About6 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo5Doctors1 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.3} duration={1.2}>
+          <Demo2Reviews2 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Demo5Pricing3 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo2Gallery1 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Demo5Blog1 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo5Contacts1 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Banner5 />
+        </AnimatedSection> */}
       </>
     </Layouts>
   );

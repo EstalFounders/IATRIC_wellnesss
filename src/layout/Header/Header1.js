@@ -1,5 +1,5 @@
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
@@ -19,6 +19,7 @@ import {
   contact_no,
   eventEmitter,
   facebook_page_url,
+  labtest_cart_details_local_info,
   sessionStorageName,
 } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -31,16 +32,33 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import { FaCartShopping } from "react-icons/fa6";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
+import MedicineCartPanel from "../../components/medicines/common/MedicineCartPanel";
+import { getMedicineCartItems } from "../../components/medicines/common/CommonMethod";
+import { getLabTestCartItems } from "../../components/labTestComponent/common/CommonMethod";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
+  const isLabTestPage = router.pathname.includes("/labTest");
+  const isMedicinePage = router.pathname.includes("/medicine");
+
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
   const [consultationTypes, setConsultationTypes] = useState();
   const hiddenRoutes = ["/appointment", "/some-other-route"];
   const [labtesttab, setLabtestTab] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0);
+
+  const [medicineCartItems, setMedicineCartItems] = useState(
+    getMedicineCartItems()
+  );
+  const [labTestCartItems, setLabTestCartItems] = useState(
+    getLabTestCartItems()
+  );
+  const [cartItemCount, setCartItemCount] = useState(labTestCartItems.length);
+  const [medicineCartItemCount, setMedicineCartItemCount] = useState(
+    medicineCartItems.length
+  );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isMedicinePanelOpen, setIsMedicinePanelOpen] = useState(false);
 
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -72,9 +90,15 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const togglePanel = () => {
     setIsPanelOpen(!isPanelOpen);
   };
+  const toggleMedicinePanel = () => {
+    setIsMedicinePanelOpen(!isMedicinePanelOpen);
+  };
 
   const updateCartItemCount = (count) => {
     setCartItemCount(count);
+  };
+  const updateMedicineCartItemCount = (count) => {
+    setMedicineCartItemCount(count);
   };
 
   useEffect(() => {
@@ -186,110 +210,13 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
-      <div
-        className="headtoppart clearfix"
-        style={{ backgroundColor: "#3b5f1d" }}
-      >
-        <div className="headerwp clearfix">
-          {/* Address */}
-          <div className="headertopleft">
-            <div className="address clearfix">
-              <span>
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    <FaMapMarkedAlt className="mx-1" />
-                    <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                      {address}
-                    </b>
-                  </span>
-                </a>
-              </span>
-              <Link legacyBehavior href="/">
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDialDialogOpen();
-                  }}
-                  href={`tel:${contact_no}`}
-                  className="callusbtn"
-                  onMouseOver={(e) => {
-                    e.target.style.color = `${color_schema.yellow}`;
-                  }} // Change color on hover
-                  onMouseOut={(e) => {
-                    e.target.style.color = `${color_schema.white}`;
-                  }}
-                >
-                  <FaWhatsapp className="mx-1" />
-                  <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                    {contact_no}
-                  </b>
-                </a>
-              </Link>
-            </div>
-            <PopupDialog
-              isOpen={isDialDialogOpen}
-              onClose={handleCloseDialDialog}
-              options={dialOptions}
-            />
-          </div>
-          {/* Social Links */}
-          <div className="headertopright">
-            {/* <a className="googleicon" title="Google" href="#">
-              <i className="fab fa-google" />
-              <span className="mobiletext02">Google</span>
-            </a> */}
-            <a
-              className="linkedinicon"
-              title="Linkedin"
-              target="blank"
-              href="https://www.linkedin.com/in/iatrichealthcare/"
-            >
-              <FaLinkedin size={25} />
-              <span className="mobiletext02">Linkedin</span>
-            </a>
-            <a
-              className="instagramicon"
-              title="Instagram"
-              target="blank"
-              href="https://www.instagram.com/iatric.healthcare/"
-            >
-              <FaInstagram size={25} />
-              <span className="mobiletext02">Instagram</span>
-            </a>
-
-            {/* <a className="twittericon" title="Twitter" href="#">
-              <i className="fab fa-twitter" />
-              <span className="mobiletext02">Twitter</span>
-            </a> */}
-            <a
-              className="facebookicon"
-              title="Facebook"
-              target="blank"
-              href={facebook_page_url}
-            >
-              <FaFacebook size={25} />
-              <span className="mobiletext02">Facebook</span>
-            </a>
-          </div>
-        </div>
-      </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
-      <div className="wsmainfull menu clearfix d-none d-lg-block py-1">
-        <div className="wsmainwp clearfix">
-          {/* LOGO IMAGE */}
-          {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-
-          {/* MAIN MENU */}
-          <nav className="wsmenu clearfix">
-            <div
-              className="desktoplogo"
-              style={{ position: "absolute", left: 0 }}
-            >
+      <div>
+        <div className="container">
+          <div className="d-flex align-items-center justify-content-between">
+            {/* Left: LOGO */}
+            <div>
               <a href="#">
                 <Image
                   src="/images/logo.png"
@@ -299,19 +226,50 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 />
               </a>
             </div>
-            <ul className="wsmenu-list h6 font-weight-bold">
-              {/* DROPDOWN MENU */}
-              <li aria-haspopup="true">
+
+            {/* Center: MENU */}
+            <nav className="wsmenu">
+              <ul className="wsmenu-list h6 font-weight-bold d-flex gap-4 mb-0">
+                <li>
+                  <Link legacyBehavior href="/">
+                    <a className="nav-link">Home</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/about-us">
+                    <a className="nav-link">About Us</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/labTest/homepage">
+                    <a className="nav-link">Lab Test</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/service-1">
+                    <a className="nav-link">Contact Us</a>
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            {/* Right: Button + Cart Icons */}
+            <div className="d-flex align-items-center gap-3">
+              {!hiddenRoutes.includes(router.pathname) && (
+                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
+                  Find a Doctor
+                </ConsultationButton>
+              )}
+
+              {isLabTestPage && cartItemCount > 0 && (
                 <div
-                  className="mx-2 navbar-option mt-3"
-                  onClick={() => {
-                    cartEventEmitter.emit(
-                      eventEmitter.navBarEventEmitter,
-                      "home"
-                    );
-                    router.push("/");
-                  }}
+                  className="position-relative"
+                  onClick={togglePanel}
+                  role="button"
                 >
+                  <FaCartShopping size={20} color={color_schema.green} />
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                    {cartItemCount}
                   Home{" "}
                 </div>
               </li>
@@ -424,249 +382,51 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                     </div>
                     {/* End row */}
                   </div>
-                  {/* End container */}
                 </div>
-                {/* End wsmegamenu */}
-              </li>
-              {/* END PAGES */}
-              {/* HALF MENU */}
-              <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  Half Menu <IoMdArrowDropdown />
-                </div>
-                <div className="wsmegamenu clearfix halfmenu">
-                  <div className="container-fluid">
-                    <div className="row">
-                      {/* Links */}
-                      <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                        <li className="title">For Patients:</li>
-                        <li>
-                          <a href="#">Meet The Doctors</a>
-                        </li>
-                        <li>
-                          <a href="#">Patient Info Sheets</a>
-                        </li>
-                        <li>
-                          <a href="#">Online Patients Portal</a>
-                        </li>
-                        <li>
-                          <a href="#">Patients Testimonials</a>
-                        </li>
-                        <li>
-                          <a href="#">Blog &amp; Latest News</a>
-                        </li>
-                      </ul>
-                      {/* Links */}
-                      <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                        <li className="title">Quick Links:</li>
-                        <li>
-                          <a href="#">Terms &amp; Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Donor Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Workers Compensation</a>
-                        </li>
-                        <li>
-                          <a href="#">Insurance Information</a>
-                        </li>
-                        <li>
-                          <a href="#">After Hours Care</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              {/* END HALF MENU */}
-              {/* MEGAMENU */}
-              <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  Mega Menu <IoMdArrowDropdown />
-                </div>
-                <div className="wsmegamenu clearfix">
-                  <div className="container">
-                    <div className="row">
-                      {/* MEGAMENU QUICK LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        <li className="title">Quick Links:</li>
-                        <li>
-                          <a href="#">For Referring Doctors</a>
-                        </li>
-                        <li>
-                          <a href="#">Terms &amp; Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Donor Privacy Policy</a>
-                        </li>
-                        <li>
-                          <a href="#">Patient Info Sheets</a>
-                        </li>
-                        <li>
-                          <a href="#">Online Patients Portal</a>
-                        </li>
-                        <li>
-                          <a href="#">Insurance Information</a>
-                        </li>
-                        <li>
-                          <a href="#">Patients Testimonials</a>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU FEATURED NEWS */}
-                      <div className="col-lg-5 col-md-12 col-xs-12">
-                        {/* Title */}
-                        <h3 className="title">Featured News:</h3>
-                        {/* Image */}
-                        <div className="fluid-width-video-wrapper">
-                          <img
-                            src="images/blog/featured-news.jpg"
-                            alt="featured-news"
-                          />
-                        </div>
-                        {/* Text */}
-                        <h5 className="h5-xs">
-                          <a href="#">5 Benefits of integrative medicine</a>
-                        </h5>
-                        <p className="wsmwnutxt">
-                          Porta semper lacus cursus, feugiat primis ultrice in
-                          ligula risus auctor tempus feugiat dolor impedit magna
-                          purus at pretium gravida donec
-                        </p>
-                      </div>
-                      {/* END MEGAMENU FEATURED NEWS */}
-                      {/* MEGAMENU LATEST NEWS */}
-                      <div className="col-lg-4 col-md-12 col-xs-12">
-                        {/* Title */}
-                        <h3 className="title">Latest News:</h3>
-                        {/* Latest News */}
-                        <ul className="latest-news">
-                          {/* Post #1 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-1.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Etiam sapien risus ante auctor tempus accumsan
-                                  an empor ...
-                                </a>
-                              </Link>
-                              <p>43 Comments</p>
-                            </div>
-                          </li>
-                          {/* Post #2 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-2.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Blandit tempor a sapien ipsum, porta risus
-                                  auctor justo ...
-                                </a>
-                              </Link>
-                              <p>38 Comments</p>
-                            </div>
-                          </li>
-                          {/* Post #3 */}
-                          <li className="clearfix d-flex align-items-center">
-                            {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-3.jpg"
-                              alt="blog-post-preview"
-                            />
-                            {/* Text */}
-                            <div className="post-summary">
-                              <Link legacyBehavior href="/single-post">
-                                <a>
-                                  Cursus risus auctor tempus risus laoreet
-                                  turpis auctor varius ...
-                                </a>
-                              </Link>
-                              <p>29 Comments</p>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      {/* END MEGAMENU LATEST NEWS */}
-                    </div>
-                    {/* End row */}
-                  </div>
-                  {/* End container */}
-                </div>
-                {/* End wsmegamenu */}
-              </li>
-              {/* END MEGAMENU */}
-              {/* SIMPLE NAVIGATION LINK */}
-              <li className="nl-simple" aria-haspopup="true">
+              )}
+
+              {isMedicinePage && medicineCartItemCount > 0 && (
                 <div
-                  className="mx-2 navbar-option mt-3"
-                  onClick={() => {
-                    router.push("/labTest/homepage");
-                    cartEventEmitter.emit(
-                      eventEmitter.labTestEventEmitter,
-                      "labtest"
-                    );
-                  }}
+                  className="position-relative"
+                  onClick={toggleMedicinePanel}
+                  role="button"
                 >
-                  Lab Tests
+                  <FaCartShopping size={20} color={color_schema.green} />
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                    {medicineCartItemCount}
+                  </div>
                 </div>
-              </li>
-              {/* NAVIGATION MENU BUTTON */}
-              {!hiddenRoutes.includes(router.pathname) && (
-                <li className="nl-simple" aria-haspopup="true">
-                  <div className="mt-3">
-                    <ConsultationButton
-                      onClick={handleConsultationTypeOpenDialog}
-                      bgColor={color_schema.green}
-                      color={"white"}
-                    >
-                      Book an Appointment
-                    </ConsultationButton>
-                  </div>
-                </li>
               )}
-              {labtesttab && (
-                <li className="nl-simple" aria-haspopup="true">
-                  <div className="mt-4 labtes-cart-icon">
-                    <FaCartShopping
-                      size={20}
-                      color={color_schema.green}
-                      onClick={togglePanel}
-                    />
-                    <div className="cartItemCount">{cartItemCount}</div>
-                  </div>
-                </li>
-              )}
-            </ul>
-          </nav>
+            </div>
+          </div>
+        </div>
+
+        {/* Panels */}
+        {isLabTestPage && (
           <CartPanel
             isOpen={isPanelOpen}
             togglePanel={togglePanel}
+            cartItem={labTestCartItems}
             onUpdateCartItemCount={updateCartItemCount}
           />
-          {/* END MAIN MENU */}
-        </div>
-        <div>
-          <PopupDialog
-            isOpen={isConsultationTypeOpen}
-            onClose={handleConsultationTypeCloseDialog}
-            options={consultationTypes}
+        )}
+
+        {isMedicinePage && (
+          <MedicineCartPanel
+            isOpen={isMedicinePanelOpen}
+            togglePanel={toggleMedicinePanel}
+            cartItem={medicineCartItems}
+            onUpdateCartItemCount={updateMedicineCartItemCount}
           />
-        </div>
+        )}
+
+        <PopupDialog
+          isOpen={isConsultationTypeOpen}
+          onClose={handleConsultationTypeCloseDialog}
+          options={consultationTypes}
+        />
       </div>
+
       <MobileMenu />
       {/* END NAVIGATION MENU */}
     </header>
