@@ -46,6 +46,7 @@ import HowItWorks from "./common/HowItsWorks";
 import Statistic1 from "../Common/Statistic-1";
 import FaqSection from "./common/FAQComponent";
 import BenefitSection from "./common/BenefitsSection";
+import Demo2Reviews2 from "../Demo-2/Demo2Reviews2";
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -464,6 +465,10 @@ const AppointmentPage = () => {
           </div>
           <div className="w-100">
             <Statistic1 />
+          </div>
+
+          <div>
+            <Demo2Reviews2 />
           </div>
 
           <div>

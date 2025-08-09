@@ -1,5 +1,6 @@
 /* @import "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap";
 @import "https://fonts.googleapis.com/css?family=Lato:400,700,900,900&display=swap"; */
+/* @import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap'); */
 @import "https://use.fontawesome.com/releases/v5.7.2/css/all.css";
 @import "../public/css/bootstrap.min";
 @import "../public/demo/style";
@@ -18,9 +19,6 @@
 @import "../public/css/customStyle.css";
 
 
-body {
-  font-family: 'TT Ramillas' !important; 
-}
 
 .owl-carousel {
   display: block !important;

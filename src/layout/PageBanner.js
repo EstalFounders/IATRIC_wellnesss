@@ -16,10 +16,15 @@ const PageBanner = ({ pageTitle, motherTitle, url }) => {
                   </li>
                   {motherTitle && (
                     <li className="breadcrumb-item">
-                      <a href={`/${url}`}>{motherTitle}</a>
+                      <Link legacyBehavior href={`/${url}`}>
+                        {motherTitle}
+                      </Link>
                     </li>
                   )}
-                  <li className="breadcrumb-item active text-uppercase" aria-current="page">
+                  <li
+                    className="breadcrumb-item active text-uppercase"
+                    aria-current="page"
+                  >
                     {pageTitle}
                   </li>
                 </ol>

@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Typography, Grid, Avatar } from "@mui/material";
 import {
   TouchApp,
   ChatBubbleOutline,
@@ -23,58 +22,56 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <Box sx={{ textAlign: "center", py: 6, px: 2}}>
-      <Typography variant="h4" fontWeight={600} mb={5}>
-        How it works
-      </Typography>
+    <div className="container my-5">
+      <div className="position-relative">
+        {/* Centered Heading */}
+        <h3
+          className="text-center mb-4 tex-dark h3-md"
+          style={{
+            position: "absolute",
+            top: "-40px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            fontWeight: 600,
+          }}
+        >
+          How It Works
+        </h3>
 
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        spacing={3}
-        sx={{ position: "relative", maxWidth: 1000 }}
-      >
-        {steps.map((step, index) => (
-          <Grid
-            item
-            xs={12}
-            sm={4}
-            key={index}
-            sx={{ position: "relative", textAlign: "center" }}
-          >
-            <Avatar
-              sx={{
-                bgcolor: "#f4f2fa",
-                width: 80,
-                height: 80,
-                margin: "0 auto",
-                mb: 2,
-              }}
+        <div className="row d-flex justify-content-between align-items-center position-relative ml-5">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className="text-center flex-fill mt-5"
+              style={{ zIndex: 2 }}
             >
-              {step.icon}
-            </Avatar>
-            <Typography variant="body1">{step.label}</Typography>
-
-            {/* Connecting lines */}
-            {index < steps.length - 1 && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50px",
-                  right: "-50%",
-                  width: "100%",
-                  height: "2px",
-                  bgcolor: "#e0e0e0",
-                  zIndex: -1,
-                  display: { xs: "none", sm: "block" },
+              <div
+                className="rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  backgroundColor: "#e6f4ea",
+                  color: "#3b5f1d",
                 }}
-              />
-            )}
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+              >
+                {step.icon}
+              </div>
+              <div style={{ fontWeight: 500 }}>{step.label}</div>
+            </div>
+          ))}
+
+          {/* Dotted connecting line */}
+          <div
+            className="position-absolute top-50 start-0 w-100"
+            style={{
+              borderTop: "2px solid #3b5f1d",
+              zIndex: 1,
+              transform: "translateY(-50%)",
+            }}
+          ></div>
+        </div>
+      </div>
+    </div>
   );
 };
 

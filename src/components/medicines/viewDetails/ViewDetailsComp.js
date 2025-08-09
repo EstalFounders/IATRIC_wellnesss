@@ -19,10 +19,10 @@ import {
   useAddToCart,
 } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
-import HealthCheckupCard from "../common/HealthCheckupCard";
 import { price_symbol } from "../../../constant";
 import { useSelector } from "react-redux";
 import { ConsultationButton } from "../../Common/commonUi";
+import HealthCheckupCard from "../../labTestComponent/common/HealthCheckupCard";
 
 const ViewDetails = () => {
   const medicine = useSelector(
@@ -50,7 +50,7 @@ const ViewDetails = () => {
         <div className={`col-12 col-md-6 mb-3 ${styles.productCard}`}>
           {/* Title */}
           <div className={`mt-4 text-center ${styles.productTitle}`}>
-            {healthCheckupData.title}
+            {medicine.title}
           </div>
 
           {/* Price Details */}
@@ -59,18 +59,18 @@ const ViewDetails = () => {
           >
             {/* Discount */}
             <span className={`${styles.discount} me-2`}>
-              -{healthCheckupData.discount}%
+              -{medicine.discount}%
             </span>
 
             {/* Current Price */}
             <span className={`${styles.currentPrice} me-2`}>
-              {healthCheckupData.price}
+              {medicine.price}
             </span>
 
             {/* Original Price */}
             <span className={`${styles.originalPrice} me-2`}>
               M.R.P: {price_symbol}
-              {healthCheckupData.price}
+              {medicine.price}
             </span>
 
             {/* Divider */}
@@ -88,7 +88,7 @@ const ViewDetails = () => {
           {/* Add to Cart Button */}
           <div
             className="mt-3 bg-success"
-            onClick={() => handleAddToCart({ healthCheckupData })}
+            onClick={() => handleAddToCart({ medicine })}
           >
             <ConsultationButton>ADD TO CART</ConsultationButton>
           </div>
@@ -107,7 +107,7 @@ const ViewDetails = () => {
       </div>
       {/* test description */}
       <div className="w-75 mr-auto ml-auto mt-5 mb-5">
-        {healthCheckupData.description}
+        {medicine.description}
       </div>
       {/* test details */}
       <div
@@ -124,7 +124,7 @@ const ViewDetails = () => {
             <div className="ml-3">
               <div className={`${styles.detailsSmallText}`}>Reports in</div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {healthCheckupData.reports_within}
+                {medicine.reports_within}
               </div>
             </div>
           </div>
@@ -141,7 +141,7 @@ const ViewDetails = () => {
                 Sample Required
               </div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
-                {formatPreparationRequired(healthCheckupData.sample_required)}
+                {formatPreparationRequired(medicine.sample_required)}
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ const ViewDetails = () => {
               <div className={`${styles.detailsSmallText}`}>Fasting</div>
               <div className={`mb-0 ${styles.detailsSmallTextValue}`}>
                 {formatPreparationRequired(
-                  healthCheckupData.preparation_required
+                  medicine.preparation_required
                 )}
               </div>
             </div>

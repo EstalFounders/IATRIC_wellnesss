@@ -24,74 +24,60 @@ const Demo5About2 = () => {
     <section id="about-2" className="about-section division">
       <div className="container">
         {/* Content Boxes */}
-        <div className="abox-2-holder">
-          <div className="text-center mb-4 mt-4">
-            {/* Heading */}
+        <div className="abox-2-holder py-5">
+          <div className="text-center mb-5">
             <h1 className="steelblue-color">Welcome to Healthpath</h1>
-            <p className="h5 box-list grey-color mx-5 w-50 mr-auto  ml-auto">
-              At Healthpath, we are dedicated to providing exceptional
-              healthcare services. Explore our working hours, doctor&apos;s
-              timetable and ways to get in touch with us.
+            <div className="h5 mx-auto w-75">
+              At Healthpath, we are committed to providing expert medical
+              consultations and quality healthcare. We offer seamless
+              appointment booking, experienced doctors, and reliable patient
+              care every day.
+            </div>
+            <p className="mt-3 h6 text-muted">
+              Opening Hours:{" "}
+              <strong>Monday – Sunday | 9:00 AM - 8:00 PM</strong>
             </p>
-          </div>
-          <hr className="w-75" />
-          <div className="row mx-4">
-            {/* ABOUT BOX #1 */}
-            <div className="col-md-4">
-              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                {/* Title */}
-                <h4 className="h5-md steelblue-color">Opening Hours</h4>
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <td style={{ fontSize: "1.0rem" }}>Mon – Sun</td>
-                      <td> - </td>
-                      <td className="text-right" style={{ fontSize: "1.0rem" }}>
-                        9:00 AM - 8:00 PM
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* ABOUT BOX #2 */}
-            <div className="col-md-4">
-              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                <h4 className="h5-md steelblue-color">Doctors Timetable</h4>
-                {/* Text */}
 
-                {/* Button */}
-                <div className="w-75">
-                  <ConsultationButton path={"/discover-more"}>
-                    Timetable
-                  </ConsultationButton>
-                </div>
+            {/* Buttons */}
+            <div className="mt-4 d-flex justify-content-center flex-wrap gap-3">
+              <div>
+                <ConsultationButton path="/discover-more">
+                  Find a Doctor
+                </ConsultationButton>
+              </div>
+              <div className="ml-3">
+                <ConsultationButton path="/discover-more">
+                  <FaPhoneAlt className="mr-2" />
+                  Call to Book
+                </ConsultationButton>
               </div>
             </div>
-            {/* ABOUT BOX #3 */}
-            <div className="col-md-4">
-              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                {/* Title */}
-                <h4 className="h5-md steelblue-color">Get in Touch</h4>
-                {/* Text */}
-                <h4 className="h4-sm emergency-call blue-color d-flex align-items-center">
+          </div>
+          <div className="row">
+            <div className="col-md-6 mb-4">
+              <div className="h-100 p-4 text-center shadow-sm border rounded">
+                <h5 className="steelblue-color mb-3">Our Doctors</h5>
+                <p>
+                  Browse through our panel of experienced and certified doctors,
+                  available for online and offline consultations.
+                </p>
+                <ConsultationButton path="/doctors">
+                  View Doctors
+                </ConsultationButton>
+              </div>
+            </div>
+
+            <div className="col-md-6 mb-4">
+              <div className="h-100 p-4 text-center shadow-sm border rounded">
+                <h5 className="steelblue-color mb-3">Need Help?</h5>
+                <p>
+                  For appointment booking, support or any questions, feel free
+                  to contact us directly.
+                </p>
+                <ConsultationButton path="/doctors">
                   <FaPhoneAlt className="mr-2" />
-                  <a
-                    style={{ color: "#8e8333" }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDialDialogOpen();
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#3b5f1d";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#8e8333";
-                    }}
-                  >
-                    {contact_no}
-                  </a>
-                </h4>
+                  Contact Support
+                </ConsultationButton>
               </div>
             </div>
           </div>

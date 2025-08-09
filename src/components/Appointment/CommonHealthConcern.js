@@ -1,138 +1,41 @@
 import React, { useRef } from "react";
-import {
-  Box,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  IconButton,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { healthConcerns } from "../../../data/HealthConcern";
+import { HorizontalScrollContainer } from "../labTestComponent/common/HorizontalContainer";
 import { ConsultationButton } from "../Common/commonUi";
 
 const CommonHealthConcerns = () => {
-  const scrollRef = useRef(null);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      scrollRef.current.scrollTo({
-        left:
-          direction === "left"
-            ? scrollLeft - clientWidth
-            : scrollLeft + clientWidth,
-        behavior: "smooth",
-      });
-    }
-  };
-
   return (
-    <Box sx={{ px: { xs: 2, sm: 4, md: 8 }, py: { xs: 4, sm: 6 } }}>
-      <Typography
-        variant="h4"
-        fontWeight={600}
-        gutterBottom
-        textAlign={{ xs: "center", sm: "left" }}
-      >
+    <div className="container py-5">
+      <h3 className="h3-md text-dark text-center">
         Common Health Concerns
-      </Typography>
-
-      <Typography
-        variant="subtitle1"
-        color="text.secondary"
-        mb={3}
-        textAlign={{ xs: "center", sm: "left" }}
-      >
+      </h3>
+      <div className="text-muted text-center text-md-start mb-4">
         Consult a doctor online for any health issue
-      </Typography>
-
-      <Box sx={{ position: "relative" }}>
-        {/* Left Arrow */}
-        {!isSmallScreen && (
-          <IconButton
-            onClick={() => scroll("left")}
-            sx={{
-              position: "absolute",
-              left: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 1,
-              bgcolor: "white",
-              boxShadow: 2,
-              marginLeft: '2px'
-            }}
-          >
-            <ArrowBackIos />
-          </IconButton>
-        )}
-
-        {/* Scrollable List */}
-        <Box
-          ref={scrollRef}
-          sx={{
-            display: "flex",
-            overflowX: "auto",
-            scrollBehavior: "smooth",
-            gap: 2,
-            pb: 1,
-            px: isSmallScreen ? 0 : 4,
-            scrollbarWidth: "none", // hide for Firefox
-            "&::-webkit-scrollbar": { display: "none" }, // hide for Chrome
-          }}
-        >
+      </div>
+      <div className="row">
+        <HorizontalScrollContainer>
           {healthConcerns.map((item, index) => (
-            <Card
+            <div
               key={index}
-              sx={{
-                minWidth: { xs: 240, sm: 260 },
-                maxWidth: 280,
-                flex: "0 0 auto",
-                boxShadow: 3,
-              }}
+              className="card flex-shrink-0"
+              style={{ minWidth: "240px", maxWidth: "280px" }}
             >
-              <CardMedia
-                component="img"
-                height="160"
-                image={item.image}
+              <img
+                src={item.image}
+                className="card-img-top"
                 alt={item.title}
+                style={{ height: "160px", objectFit: "cover" }}
               />
-              <CardContent>
-                <Typography variant="h6" fontWeight={600}>
-                  {item.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" mb={1}>
-                  ₹ {item.price}
-                </Typography>
+              <div className="card-body">
+                <h5 className="card-title fw-bold">{item.title}</h5>
+                <p className="card-text text-muted">&#8377; {item.price}</p>
                 <ConsultationButton>Consult Now</ConsultationButton>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
-        </Box>
-
-        {/* Right Arrow */}
-        {!isSmallScreen && (
-          <IconButton
-            onClick={() => scroll("right")}
-            sx={{
-              position: "absolute",
-              right: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 1,
-              bgcolor: "white",
-              boxShadow: 2,
-            }}
-          >
-            <ArrowForwardIos />
-          </IconButton>
-        )}
-      </Box>
-    </Box>
+        </HorizontalScrollContainer>
+      </div>
+    </div>
   );
 };
 

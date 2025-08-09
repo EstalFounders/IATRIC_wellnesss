@@ -1,5 +1,5 @@
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { Col, Container, Row } from "react-bootstrap";
 import {
@@ -210,110 +210,13 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
-      <div
-        className="headtoppart clearfix"
-        style={{ backgroundColor: "#3b5f1d" }}
-      >
-        <div className="headerwp clearfix">
-          {/* Address */}
-          <div className="headertopleft">
-            <div className="address clearfix">
-              <span>
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    <FaMapMarkedAlt className="mx-1" />
-                    <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                      {address}
-                    </b>
-                  </span>
-                </a>
-              </span>
-              <Link legacyBehavior href="/">
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDialDialogOpen();
-                  }}
-                  href={`tel:${contact_no}`}
-                  className="callusbtn"
-                  onMouseOver={(e) => {
-                    e.target.style.color = `${color_schema.yellow}`;
-                  }} // Change color on hover
-                  onMouseOut={(e) => {
-                    e.target.style.color = `${color_schema.white}`;
-                  }}
-                >
-                  <FaWhatsapp className="mx-1" />
-                  <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                    {contact_no}
-                  </b>
-                </a>
-              </Link>
-            </div>
-            <PopupDialog
-              isOpen={isDialDialogOpen}
-              onClose={handleCloseDialDialog}
-              options={dialOptions}
-            />
-          </div>
-          {/* Social Links */}
-          <div className="headertopright">
-            {/* <a className="googleicon" title="Google" href="#">
-              <i className="fab fa-google" />
-              <span className="mobiletext02">Google</span>
-            </a> */}
-            <a
-              className="linkedinicon"
-              title="Linkedin"
-              target="blank"
-              href="https://www.linkedin.com/in/iatrichealthcare/"
-            >
-              <FaLinkedin size={25} />
-              <span className="mobiletext02">Linkedin</span>
-            </a>
-            <a
-              className="instagramicon"
-              title="Instagram"
-              target="blank"
-              href="https://www.instagram.com/iatric.healthcare/"
-            >
-              <FaInstagram size={25} />
-              <span className="mobiletext02">Instagram</span>
-            </a>
-
-            {/* <a className="twittericon" title="Twitter" href="#">
-              <i className="fab fa-twitter" />
-              <span className="mobiletext02">Twitter</span>
-            </a> */}
-            <a
-              className="facebookicon"
-              title="Facebook"
-              target="blank"
-              href={facebook_page_url}
-            >
-              <FaFacebook size={25} />
-              <span className="mobiletext02">Facebook</span>
-            </a>
-          </div>
-        </div>
-      </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
-      <div className="wsmainfull menu clearfix d-none d-lg-block py-1">
-        <div className="wsmainwp clearfix">
-          {/* LOGO IMAGE */}
-          {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-
-          {/* MAIN MENU */}
-          <nav className="wsmenu clearfix">
-            <div
-              className="desktoplogo"
-              style={{ position: "absolute", left: 0 }}
-            >
+      <div>
+        <div className="container">
+          <div className="d-flex align-items-center justify-content-between">
+            {/* Left: LOGO */}
+            <div>
               <a href="#">
                 <Image
                   src="/images/logo.png"
@@ -323,226 +226,96 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 />
               </a>
             </div>
-            <ul className="wsmenu-list h6 font-weight-bold">
-              {/* DROPDOWN MENU */}
-              <li aria-haspopup="true">
-                <Link legacyBehavior href="/">
-                  CONSULT DOCTORS
-                </Link>
-              </li>
-              {/* END DROPDOWN MENU */}
-              {/* PAGES */}
-              <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  PAGES <IoMdArrowDropdown />
-                  {/* <span className="wsarrow" /> */}
-                </div>
-                <div className="wsmegamenu clearfix">
-                  <div className="container">
-                    <div className="row">
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Standard Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/about-us">
-                            <a>About Us</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/who-we-are">
-                            <a>Who We Are</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/all-services">
-                            <a>Our Services</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/service-1">
-                            <a>Contact Us</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="#">
-                            <a>Join Us</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Medical Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/all-departments">
-                            <a>Our Departments</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/all-doctors">
-                            <a>Meet the Doctors</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Special Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/pricing-1">
-                            <a>Pricing Packages #1</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/pricing-2">
-                            <a>Pricing Packages #2</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/appointment">
-                            <a>Make an Appointment</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/faqs">
-                            <a>FAQs Page</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/terms">
-                            <a>Terms of Use</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Auxiliary Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/gallery">
-                            <a>Our Gallery</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/blog-listing">
-                            <a>Blog Listing Page</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/single-post">
-                            <a>Single Blog Post</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/contacts-2">
-                            <a>Contact Us #2</a>
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                    {/* End row */}
-                  </div>
-                  {/* End container */}
-                </div>
 
-                {/* End wsmegamenu */}
-              </li>
-              {/* END PAGES */}
-              {/* HALF MENU */}
-              
-              <li aria-haspopup="true">
-                <div
-                  className="mx-2 navbar-option mt-3"
-                  onClick={() => {
-                    window.open("/medicine/homepage", "_blank");
-                  }}
-                >
-                  Half Menu <IoMdArrowDropdown />
-                  {/* MEDICINES{""} */}
-                </div>
-              </li>
-              
-              {/* END HALF MENU */}
-              {/* MEGAMENU */}
+            {/* Center: MENU */}
+            <nav className="wsmenu">
+              <ul className="wsmenu-list h6 font-weight-bold d-flex gap-4 mb-0">
+                <li>
+                  <Link legacyBehavior href="/">
+                    <a className="nav-link">Home</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/about-us">
+                    <a className="nav-link">About Us</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/labTest/homepage">
+                    <a className="nav-link">Lab Test</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link legacyBehavior href="/service-1">
+                    <a className="nav-link">Contact Us</a>
+                  </Link>
+                </li>
+              </ul>
+            </nav>
 
-              {/* END MEGAMENU */}
-              {/* SIMPLE NAVIGATION LINK */}
-              <li className="nl-simple" aria-haspopup="true">
-                <div
-                  className="mx-2 navbar-option mt-3"
-                  onClick={() => {
-                    window.open("/labTest/homepage", "_blank");
-                  }}
-                >
-                  LAB TESTS
-                </div>
-              </li>
-              {/* NAVIGATION MENU BUTTON */}
+            {/* Right: Button + Cart Icons */}
+            <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
-                <li className="nl-simple" aria-haspopup="true">
-                  <div className="mt-3">
-                    <ConsultationButton
-                      onClick={handleConsultationTypeOpenDialog}
-                      bgColor={color_schema.green}
-                      color={"white"}
-                    >
-                      Book an Appointment
-                    </ConsultationButton>
-                  </div>
-                </li>
+                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
+                  Find a Doctor
+                </ConsultationButton>
               )}
+
               {isLabTestPage && cartItemCount > 0 && (
-                <li className="nl-simple" aria-haspopup="true">
-                  <div className="mt-4 labtes-cart-icon">
-                    <FaCartShopping
-                      size={20}
-                      color={color_schema.green}
-                      onClick={togglePanel}
-                    />
-                    <div className="cartItemCount">{cartItemCount}</div>
+                <div
+                  className="position-relative"
+                  onClick={togglePanel}
+                  role="button"
+                >
+                  <FaCartShopping size={20} color={color_schema.green} />
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                    {cartItemCount}
                   </div>
-                </li>
+                </div>
               )}
 
               {isMedicinePage && medicineCartItemCount > 0 && (
-                <li className="nl-simple" aria-haspopup="true">
-                  <div className="mt-4 labtes-cart-icon">
-                    <FaCartShopping
-                      size={20}
-                      color={color_schema.green}
-                      onClick={toggleMedicinePanel}
-                    />
-                    <div className="cartItemCount">{medicineCartItemCount}</div>
+                <div
+                  className="position-relative"
+                  onClick={toggleMedicinePanel}
+                  role="button"
+                >
+                  <FaCartShopping size={20} color={color_schema.green} />
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                    {medicineCartItemCount}
                   </div>
-                </li>
+                </div>
               )}
-            </ul>
-          </nav>
-          {isLabTestPage && (
-            <CartPanel
-              isOpen={isPanelOpen}
-              togglePanel={togglePanel}
-              cartItem={labTestCartItems}
-              onUpdateCartItemCount={updateCartItemCount}
-            />
-          )}
-
-          {isMedicinePage && (
-            <MedicineCartPanel
-              isOpen={isMedicinePanelOpen}
-              togglePanel={toggleMedicinePanel}
-              cartItem={medicineCartItems}
-              onUpdateCartItemCount={updateMedicineCartItemCount}
-            />
-          )}
-
-          {/* END MAIN MENU */}
+            </div>
+          </div>
         </div>
-        <div>
-          <PopupDialog
-            isOpen={isConsultationTypeOpen}
-            onClose={handleConsultationTypeCloseDialog}
-            options={consultationTypes}
+
+        {/* Panels */}
+        {isLabTestPage && (
+          <CartPanel
+            isOpen={isPanelOpen}
+            togglePanel={togglePanel}
+            cartItem={labTestCartItems}
+            onUpdateCartItemCount={updateCartItemCount}
           />
-        </div>
+        )}
+
+        {isMedicinePage && (
+          <MedicineCartPanel
+            isOpen={isMedicinePanelOpen}
+            togglePanel={toggleMedicinePanel}
+            cartItem={medicineCartItems}
+            onUpdateCartItemCount={updateMedicineCartItemCount}
+          />
+        )}
+
+        <PopupDialog
+          isOpen={isConsultationTypeOpen}
+          onClose={handleConsultationTypeCloseDialog}
+          options={consultationTypes}
+        />
       </div>
+
       <MobileMenu />
       {/* END NAVIGATION MENU */}
     </header>

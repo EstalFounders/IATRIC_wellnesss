@@ -1,4 +1,4 @@
-.heartbeatContainer {
+.pulseContainer {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -9,49 +9,26 @@
   align-items: center;
 }
 
-.heart {
-  width: 50px;
-  height: 50px;
-  background-color: #3b5f1d;
-  position: relative;
-  transform: rotate(-45deg);
-  animation: heartbeat 1.2s infinite;
-}
-
-.heart::before,
-.heart::after {
-  content: "";
-  width: 50px;
-  height: 50px;
-  background-color: #3b5f1d;
+.pulse {
+  width: 30px;
+  height: 30px;
+  border: 4px solid #3b5f1d;
   border-radius: 50%;
-  position: absolute;
+  opacity: 0.6;
+  animation: pulse-animation 1.5s infinite;
 }
 
-.heart::before {
-  top: -25px;
-  left: 0;
-}
-
-.heart::after {
-  left: 25px;
-  top: 0;
-}
-
-@keyframes heartbeat {
+@keyframes pulse-animation {
   0% {
-    transform: scale(1) rotate(-45deg);
+    transform: scale(0.9);
+    opacity: 1;
   }
-  25% {
-    transform: scale(1.2) rotate(-45deg);
-  }
-  50% {
-    transform: scale(1) rotate(-45deg);
-  }
-  75% {
-    transform: scale(1.2) rotate(-45deg);
+  70% {
+    transform: scale(1.8);
+    opacity: 0;
   }
   100% {
-    transform: scale(1) rotate(-45deg);
+    transform: scale(0.9);
+    opacity: 0;
   }
 }

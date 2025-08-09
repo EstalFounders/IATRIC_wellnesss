@@ -10,7 +10,7 @@ export const contact_no = "+91 78959 59925";
 export const email = "customercare@healthpath.co.in";
 export const countryCode = "+91";
 export const development_production_url =
-  "https://vtdeveloper.d3pu3hm659dc5p.amplifyapp.com/";
+  "before-staging.d3pu3hm659dc5p.amplifyapp.com";
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
 export const medicine_cart_details_local_info = "medicineCartItems";

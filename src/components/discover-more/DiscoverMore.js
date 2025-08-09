@@ -74,7 +74,7 @@ const DiscoverMoreComp = () => {
         {features.map((item, index) => (
           <div key={index} className="col-12 col-md-6 col-lg-4 p-4">
             <div
-              className="green-hover h-100 shadow-sm border-0 text-center p-4"
+              className="h-100 shadow-sm border-0 text-center p-4"
               style={{ borderRadius: "10px", minWidth: "320px" }}
             >
               {/* Floating Icon */}

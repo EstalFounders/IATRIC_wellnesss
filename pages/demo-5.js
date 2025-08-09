@@ -18,6 +18,7 @@ import { eventEmitter } from "../src/constant";
 import cartEventEmitter from "../src/eventEmitter/CartEventEmitter";
 import HomepageComp from "../src/components/labTestComponent/HomepageComp";
 import AnimatedSection from "../public/animation/animationSection/AnimatedSection";
+import MedicalCertificate from "../src/components/Demo-5/MedicalCertificate";
 
 const Demo5 = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -37,7 +38,11 @@ const Demo5 = () => {
           <Demo5Services2 />
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={0.1}>
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <MedicalCertificate />
+        </AnimatedSection>
+
+        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Tabs1 />
         </AnimatedSection>
 
@@ -48,10 +53,6 @@ const Demo5 = () => {
         <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo5About6 />
         </AnimatedSection>
-
-        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
-          <Statistic1 />
-        </AnimatedSection> */}
 
         <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo5Doctors1 />
@@ -79,7 +80,7 @@ const Demo5 = () => {
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Banner5 />
-        </AnimatedSection>
+        </AnimatedSection> */}
       </>
     </Layouts>
   );
