@@ -50,6 +50,11 @@ const MobileMenu = () => {
                   Home
                   {/* <span className="wsarrow" /> */}
                 </a>
+              <Link href="/" >
+              <a onClick={() => activeMenuSet("home")}>
+                Home
+                {/* <span className="wsarrow" /> */}
+              </a>
               </Link>
               <Link legacyBehavior href="/labTest/homepage">
                 LabTest
@@ -57,6 +62,7 @@ const MobileMenu = () => {
               </Link>
               {/* <ul className="sub-menu" style={activeLi("home")}> */}
               {/* <li aria-haspopup="true">
+                {/* <li aria-haspopup="true">
                   <Link legacyBehavior href="/demo-1">
                     Home Concept #1
                   </Link>

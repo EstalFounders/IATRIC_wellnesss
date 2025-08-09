@@ -17,6 +17,8 @@ import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
 import { color_schema, services } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
+import { handleServiceClick } from "../Common/commonMethod";
+import { useRouter } from "next/router";
 
 const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -79,6 +81,11 @@ const Demo5Services2 = () => {
 
   const handleClick = (index) => {
     const serviceName = services[index % services.length];
+  // Function to handle clicking on an icon
+  const handleIconClick = (index) => {
+    const currentIndex = indexOfFirstService + index;
+    // Navigate to the corresponding component based on the index
+    const serviceName = services[currentIndex];
     handleServiceClick(serviceName, index, router);
   };
 

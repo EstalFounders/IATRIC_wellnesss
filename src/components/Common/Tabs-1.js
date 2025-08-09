@@ -9,6 +9,7 @@ import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
 
 const ServicesTabs = () => {
+  // Initialize services with a list of services
   const [services] = useState(servicesData);
   const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,6 +135,7 @@ const ServicesTabs = () => {
 
                   <h3
                     className="clickable-div h3-md steelblue-color mb-3"
+                    className="service-title clickable-div h3-md steelblue-color"
                     onClick={() =>
                       handleServiceClickLocal(service.name, service.id)
                     }
@@ -198,6 +200,8 @@ const ServicesTabs = () => {
 
                   <div className="mt-5 w-100">
                     <div className="w-50 mx-auto mx-lg-0">
+                  <div className="mt-5 mr-auto">
+                    <div className="w-50">
                       <ConsultationButton path={"/appointment"}>
                         Book Consultation
                       </ConsultationButton>

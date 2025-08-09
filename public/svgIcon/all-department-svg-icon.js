@@ -9,12 +9,19 @@ export const GeneralPhysician = ({
   className,
   style = { color: `${color_schema.yellow}` },
 
+export const GeneralPhysician = ({
+  className,
+  style = { color: `${color_schema.yellow}` },
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -41,13 +48,16 @@ export const GeneralPhysician = ({
 export const PediatricsIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -81,12 +91,16 @@ export const CardiologyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
 
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -108,12 +122,16 @@ export const DermatologistIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
 
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -156,13 +174,16 @@ export const DermatologistIcon = ({
 export const OrthopaedicsIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -183,13 +204,16 @@ export const OrthopaedicsIcon = ({
 export const GynaecologyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -234,13 +258,16 @@ export const GynaecologyIcon = ({
 export const PhysiotherapyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -281,13 +308,16 @@ export const PhysiotherapyIcon = ({
 export const PulmonologyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -308,13 +338,16 @@ export const PulmonologyIcon = ({
 export const OphthalmologyIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -348,13 +381,16 @@ import React from "react";
 export const Psychiatrist = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -405,13 +441,16 @@ export const Psychiatrist = ({
 export const Dentistry = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -432,13 +471,16 @@ export const Dentistry = ({
 export const NursingCareIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -489,13 +531,16 @@ export const NursingCareIcon = ({
 export const HomeCareIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -520,13 +565,16 @@ export const HomeCareIcon = ({
 export const MedicineDelivery = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -577,13 +625,16 @@ export const MedicineDelivery = ({
 export const LabInvestigation = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -604,13 +655,16 @@ export const LabInvestigation = ({
 export const CorporateHealthcareIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -653,13 +707,16 @@ export const CorporateHealthcareIcon = ({
 export const HealthCampIcon = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
+  width = 120,
+  height = 120,
   ...props
 }) => {
   return (
     <svg
       width={dimension.width}
       height={dimension.height}
+      width={width}
+      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
