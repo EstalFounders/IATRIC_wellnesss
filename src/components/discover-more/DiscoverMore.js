@@ -15,8 +15,6 @@ const DiscoverMoreComp = () => {
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <ConsultationSVGIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Consultation",
     },
     {
       title: "Nursing Services",
@@ -25,8 +23,6 @@ const DiscoverMoreComp = () => {
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
       icon: <HomeCareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <HomecareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book HomeService",
     },
     {
       title: "Lab Test",
@@ -35,8 +31,6 @@ const DiscoverMoreComp = () => {
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
       icon: <LabInvestigation color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <ClinicIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Clinic",
     },
     // {
     //   title: "Medicine Delivery",
@@ -53,18 +47,6 @@ const DiscoverMoreComp = () => {
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      title: "Community Health",
-      description:
-        "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
-      icon: <CommunityIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Community Package",
-    },
-    {
-      title: "Corporate Healthcare",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Corporate Package",
     },
   ];
 

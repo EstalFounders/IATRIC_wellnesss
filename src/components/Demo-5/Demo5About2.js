@@ -50,39 +50,6 @@ const Demo5About2 = () => {
                   <FaPhoneAlt className="mr-2" />
                   Call to Book
                 </ConsultationButton>
-          </div>
-          <hr className="w-75" />
-          <div className="row mx-4">
-            {/* ABOUT BOX #1 */}
-            <div className="col-md-4">
-              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                {/* Title */}
-                <h4 className="h5-md steelblue-color">Opening Hours</h4>
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <td style={{ fontSize: "1.0rem" }}>Mon – Sun</td>
-                      <td> - </td>
-                      <td className="text-right" style={{ fontSize: "1.0rem" }}>
-                        9:00 AM - 8:00 PM
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* ABOUT BOX #2 */}
-            <div className="col-md-4">
-              <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                <h4 className="h5-md steelblue-color">Doctors Timetable</h4>
-                {/* Text */}
-
-                {/* Button */}
-                <div className="w-75">
-                  <ConsultationButton path={"/discover-more"}>
-                    TimeTable
-                  </ConsultationButton>
-                </div>
               </div>
             </div>
           </div>
