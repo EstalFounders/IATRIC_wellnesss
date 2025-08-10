@@ -1,11 +1,17 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
+import { fetchBasicConfiguration } from "../ApiService/UtilService";
 
 const Demo5Hero5 = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    fetchBasicConfiguration();
+  }, []);
+
   return (
     <section id="hero-5" className="bg-fixed hero-section division">
       <div className="container">
