@@ -4,12 +4,14 @@ import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { fetchBasicConfiguration } from "../ApiService/UtilService";
+import { useDispatch } from "react-redux";
 
 const Demo5Hero5 = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchBasicConfiguration();
+    fetchBasicConfiguration(dispatch);
   }, []);
 
   return (

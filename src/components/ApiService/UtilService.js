@@ -1,6 +1,8 @@
 import { api } from "../../constant";
+import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
 
-export const fetchBasicConfiguration = async () => {
+export const fetchBasicConfiguration = async (dispatch) => {
   try {
     const [doctorResponse, serviceOfferedResponse] = await Promise.all([
       fetch(api.addDoctor), // Replace with actual API endpoint
@@ -13,11 +15,8 @@ export const fetchBasicConfiguration = async () => {
     ]);
     const doctor = doctorData;
     const serviceOfferd = serviceOfferedData;
-    // dispatch(setAllappointments(appointments));
-    // dispatch(setAllLabTest(labTest));
-    // dispatch(setAllLab(labData));
-    // dispatch(setServiceOffered(serviceOfferedData));
-    // Calculate totals
+    dispatch(setAllDoctors(doctor));
+    dispatch(setServiceOffered(serviceOfferd));
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
