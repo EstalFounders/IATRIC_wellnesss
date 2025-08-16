@@ -3,20 +3,18 @@ import React from "react";
 import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
-import { CorporateHealthcareIcon, GeneralPhysician, HomeCareIcon, LabInvestigation, MedicineDelivery, NursingCareIcon } from "../../../public/svgIcon/all-department-svg-icon";
+import { CorporateHealthcareIcon, GeneralPhysician, HealthCampIcon, HomeCareIcon, LabInvestigation, MedicineDelivery, NursingCareIcon } from "../../../public/svgIcon/all-department-svg-icon";
 
 const DiscoverMoreComp = () => {
   const router = useRouter();
   const features = [
     {
       title: "Consultation",
-        service: "Consultation",
+      service: "Consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <ConsultationSVGIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Consultation",
     },
     {
       title: "Nursing Services",
@@ -25,8 +23,6 @@ const DiscoverMoreComp = () => {
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
       icon: <HomeCareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <HomecareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book HomeService",
     },
     {
       title: "Lab Test",
@@ -35,36 +31,21 @@ const DiscoverMoreComp = () => {
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
       icon: <LabInvestigation color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      icon: <ClinicIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Clinic",
     },
-    // {
-    //   title: "Medicine Delivery",
-    //   service: "community",
-    //   description:
-    //     "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
-    //   icon: <MedicineDelivery color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-    //   btntext: "View Details",
-    // },
     {
       title: "Community Care",
       service:"corporate",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+      icon: <HealthCampIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: "View Details",
-      title: "Community Health",
-      description:
-        "Join community wellness programs and health initiatives that promote healthy living, disease prevention, and overall well-being for individuals and families.",
-      icon: <CommunityIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Community Package",
     },
     {
       title: "Corporate Healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
-      btntext: "Book Corporate Package",
+      icon: <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+      btntext: "View Details",
     },
   ];
 

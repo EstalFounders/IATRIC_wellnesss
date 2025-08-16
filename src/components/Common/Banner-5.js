@@ -8,17 +8,17 @@ const Banner5 = () => {
       <div className="">
         {/* SECTION TITLE */}
         {/* BANNER IMAGE */}
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="banner-5-img">
+        <div className="row d-flex justify-content-center align-items-center">
+          <div className="col-lg-12 d-flex justify-content-center align-items-center">
+            {/* <div className="banner-5-img"> */}
               <Image
-                width={1000}
+                width={1150}
                 height={600}
                 className="img-fluid"
                 src="/images/image-07.png"
                 alt="banner-image"
               />
-            </div>
+            {/* </div> */}
           </div>
         </div>
       </div>

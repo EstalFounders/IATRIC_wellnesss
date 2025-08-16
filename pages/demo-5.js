@@ -13,6 +13,7 @@ import Demo5Doctors1 from "../src/components/Demo-5/Demo5Doctors1";
 import Demo5Hero5 from "../src/components/Demo-5/Demo5Hero5";
 import Demo5Pricing3 from "../src/components/Demo-5/Demo5Pricing3";
 import Demo5Services2 from "../src/components/Demo-5/Demo5Services2";
+import Demo5Services1 from "../src/components/Demo-5/Demo5Services1";
 import Layouts from "../src/layout/Layouts";
 import { eventEmitter } from "../src/constant";
 import cartEventEmitter from "../src/eventEmitter/CartEventEmitter";
@@ -34,6 +35,10 @@ const Demo5 = () => {
         {/* Wrap each component with AnimatedSection */}
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5About2 />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Demo5Services1 />
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.2}>
@@ -76,8 +81,6 @@ const Demo5 = () => {
         {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo2Gallery1 />
         </AnimatedSection> */}
-
-        
 
         {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Blog1 />

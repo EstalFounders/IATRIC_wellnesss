@@ -111,54 +111,6 @@ export const servicesData = [
   },
   {
     id: 11,
-    name: "Nursing care",
-    image: "/images/nursing-care.png",
-    subheading: "Skilled Support, Compassionate Touch",
-    description:
-      "Our Nursing Care services provide professional support for patients at home or in clinical settings. We ensure comfort, safety, and expert medical attention for those in need of ongoing care.",
-  },
-  {
-    id: 12,
-    name: "Home care",
-    image: "/images/home-care.jpeg",
-    subheading: "In-Home Medical Assistance",
-    description:
-      "Our Home Care services bring quality healthcare to your doorstep. We offer medical and non-medical support for patients who prefer the comfort of home.",
-  },
-  {
-    id: 13,
-    name: "Medicine Delivery",
-    image: "/images/medicine-delivery.jpg",
-    subheading: "Quick Access to Medications",
-    description:
-      "Our Medicine Delivery service ensures you receive your prescriptions quickly and safely at your doorstep. We partner with trusted pharmacies to provide genuine medicines and hassle-free delivery.",
-  },
-  {
-    id: 14,
-    name: "Lab Investigation",
-    image: "/images/lab-investigation.jpg",
-    subheading: "Accurate Results, On Your Schedule",
-    description:
-      "Our Lab Investigation services offer accurate and timely diagnostic tests for a wide range of health conditions. We use advanced technology to ensure reliable results and support your treatment plan.",
-  },
-  {
-    id: 15,
-    name: "Corporate Health",
-    image: "/images/corporate-healthcamp.jpg",
-    subheading: "Workplace Wellness Simplified",
-    description:
-      "Our Corporate Healthcare solutions promote employee wellness and productivity. We offer customized health checkups, wellness programs, and on-site medical services for organizations of all sizes.",
-  },
-  {
-    id: 16,
-    name: "Healthcamp",
-    image: "/images/heatlhcamp.jpg",
-    subheading: "Community Checkups & Screenings",
-    description:
-      "Our Healthcamp services organize community health camps for preventive screenings, health education, and early detection of diseases. We bring healthcare to underserved areas, promoting wellness for all.",
-  },
-  {
-    id: 17,
     name: "Obstetrics",
     image: "/images/Obstetrics.jpg",
     subheading: "Safe Delivery, Expert Care",
