@@ -67,11 +67,11 @@ const Demo5About2 = () => {
             <h1 className="steelblue-color">Welcome to Healthpath</h1>
             <div className="h5 mx-auto w-75">
               At Healthpath, we are committed to providing expert medical
-              consultations and quality healthcare. We offer seamless
+              consultations and quality healthcare. <br /> We offer seamless
               appointment booking, experienced doctors, and reliable patient
               care every day.
             </div>
-            <p className="mt-3 h6 text-muted">
+            <p className="mt-3 h3">
               Opening Hours:{" "}
               <strong>Monday – Sunday | 9:00 AM - 8:00 PM</strong>
             </p>
@@ -90,43 +90,6 @@ const Demo5About2 = () => {
                 </ConsultationButton>
               </div>
               <hr className="w-75" />
-              <div className="row mx-4">
-                {/* ABOUT BOX #1 */}
-                <div className="col-md-4">
-                  <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                    {/* Title */}
-                    <h4 className="h5-md steelblue-color">Opening Hours</h4>
-                    <table className="table">
-                      <tbody>
-                        <tr>
-                          <td style={{ fontSize: "1.0rem" }}>Mon – Sun</td>
-                          <td> - </td>
-                          <td
-                            className="text-right"
-                            style={{ fontSize: "1.0rem" }}
-                          >
-                            9:00 AM - 8:00 PM
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                {/* ABOUT BOX #2 */}
-                <div className="col-md-4">
-                  <div className="abox-2 h-100 d-flex flex-column justify-content-center align-items-center">
-                    <h4 className="h5-md steelblue-color">Doctors Timetable</h4>
-                    {/* Text */}
-
-                    {/* Button */}
-                    <div className="w-75">
-                      <ConsultationButton path={"/discover-more"}>
-                        TimeTable
-                      </ConsultationButton>
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div className="row">
                 <div className="col-md-6 mb-4">
                   <div className="h-100 p-4 text-center shadow-sm border rounded">

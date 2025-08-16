@@ -98,7 +98,7 @@ const AppointmentPage = () => {
   const services = useState(
     useSelector((state) => state.superAdminHomePage.serviceOffered)
   );
-  const [serviceType, setServiceType] = useState(services[0].name);
+  const [serviceType, setServiceType] = useState(services[0]?.name);
 
   const dispatch = useDispatch();
 

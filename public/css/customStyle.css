@@ -118,13 +118,23 @@
   cursor: grabbing;
 }
 
+/* Left scrolling (Specialties) */
 .services-track {
   display: flex;
   width: max-content;
   animation: scroll-left 30s linear infinite;
 }
 
-.services-track.paused {
+/* Right scrolling (Departments) */
+.services-track-rtl {
+  display: flex;
+  width: max-content;
+  animation: scroll-right 15s linear infinite;
+}
+
+/* Pause for both */
+.services-track.paused,
+.services-track-rtl.paused {
   animation-play-state: paused;
 }
 
@@ -154,8 +164,43 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
+.service-nav-link {
+  width: 100%;
+  height: 80%;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: white;
+  border: 2px solid white;
+  transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
 .service-nav-link:hover {
   background-color: #8e8333;
+  transform: translateY(-6px) scale(1.03);
+}
+
+.service-nav-link-dept {
+  width: 100%;
+  height: 80%;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: white;
+  border: 2px solid white;
+  transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.service-nav-link-dept:hover {
+  background-color: #3b5f1d;
   transform: translateY(-6px) scale(1.03);
 }
 
@@ -170,10 +215,32 @@
   transition: color 0.3s ease;
 }
 
+.service-title-dept {
+  font-size: 21px;
+  text-align: center;
+  color: #8e8333;
+  transition: color 0.3s ease;
+}
+
 .service-nav-link:hover .service-title {
   color: white;
 }
 
+
+.service-icon-dept svg {
+  color: #8e8333; /* yellow default */
+  transition: color 0.3s ease;
+}
+
+.service-nav-link-dept:hover .service-icon-dept svg {
+  color: white; /* on hover white */
+}
+
+.service-nav-link-dept:hover .service-title-dept {
+  color: white;
+} 
+
+/* Animations */
 @keyframes scroll-left {
   0% {
     transform: translateX(0%);
@@ -182,6 +249,18 @@
     transform: translateX(-50%);
   }
 }
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+
+
 
 .tab-nav-wrapper {
   display: flex;

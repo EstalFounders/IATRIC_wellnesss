@@ -63,12 +63,6 @@ export const services = [
   "Psychiatrist",
   "Dentistry",
   "Physiotherapy",
-  "Nursing care",
-  "Home care",
-  "Medicine Delivery",
-  "Lab Investigation",
-  "Corporate Healthcare",
-  "Healthcamp",
 ];
 
 export const consultationTypeMapping = {

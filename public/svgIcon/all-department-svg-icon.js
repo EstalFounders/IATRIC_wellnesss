@@ -7,7 +7,7 @@ const dimension = {
 
 export const GeneralPhysician = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -20,7 +20,7 @@ export const GeneralPhysician = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className} // Allows passing Tailwind or Bootstrap classes
-      style={style} // Allows passing inline styles
+      // Allows passing inline styles
       {...props} // Pass any other SVG attributes
     >
       <path
@@ -41,7 +41,7 @@ export const GeneralPhysician = ({
 
 export const PediatricsIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -54,7 +54,7 @@ export const PediatricsIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className} // Allows passing Tailwind or Bootstrap classes
-      style={style} // Allows passing inline styles
+      // Allows passing inline styles
       {...props} // Pass any other SVG attributes
     >
       <path
@@ -81,7 +81,7 @@ export const PediatricsIcon = ({
 
 export const CardiologyIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
 
   width = 120,
   height = 120,
@@ -95,7 +95,7 @@ export const CardiologyIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className} // Allows passing CSS classes (e.g., Bootstrap text-colors)
-      style={style} // Allows passing inline styles (e.g., { color: 'red' })
+      // Allows passing inline styles (e.g., { color: 'red' })
       {...props} // Pass any other SVG attributes (e.g., aria-label)
     >
       <path
@@ -110,7 +110,7 @@ export const CardiologyIcon = ({
 
 export const DermatologistIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
 
   width = 120,
   height = 120,
@@ -124,7 +124,7 @@ export const DermatologistIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -161,7 +161,7 @@ export const DermatologistIcon = ({
 
 export const OrthopaedicsIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -174,7 +174,7 @@ export const OrthopaedicsIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -189,7 +189,7 @@ export const OrthopaedicsIcon = ({
 
 export const GynaecologyIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -202,7 +202,7 @@ export const GynaecologyIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -241,7 +241,7 @@ export const GynaecologyIcon = ({
 
 export const PhysiotherapyIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -254,7 +254,7 @@ export const PhysiotherapyIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -289,7 +289,7 @@ export const PhysiotherapyIcon = ({
 
 export const PulmonologyIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -302,7 +302,7 @@ export const PulmonologyIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -317,7 +317,7 @@ export const PulmonologyIcon = ({
 
 export const OphthalmologyIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -330,7 +330,7 @@ export const OphthalmologyIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -358,7 +358,7 @@ import React from "react";
 
 export const Psychiatrist = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -371,7 +371,7 @@ export const Psychiatrist = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -416,7 +416,7 @@ export const Psychiatrist = ({
 
 export const Dentistry = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -429,7 +429,7 @@ export const Dentistry = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -444,7 +444,7 @@ export const Dentistry = ({
 
 export const NursingCareIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -457,7 +457,7 @@ export const NursingCareIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -502,7 +502,7 @@ export const NursingCareIcon = ({
 
 export const HomeCareIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -515,7 +515,7 @@ export const HomeCareIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -534,7 +534,7 @@ export const HomeCareIcon = ({
 
 export const MedicineDelivery = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -547,7 +547,7 @@ export const MedicineDelivery = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -592,7 +592,7 @@ export const MedicineDelivery = ({
 
 export const LabInvestigation = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -605,7 +605,7 @@ export const LabInvestigation = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -620,7 +620,7 @@ export const LabInvestigation = ({
 
 export const CorporateHealthcareIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
+  
   width = 120,
   height = 120,
   ...props
@@ -633,7 +633,7 @@ export const CorporateHealthcareIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
+      
       {...props}
     >
       <path
@@ -670,7 +670,6 @@ export const CorporateHealthcareIcon = ({
 
 export const HealthCampIcon = ({
   className,
-  style = { color: `${color_schema.yellow}` },
   width = 120,
   height = 120,
   ...props
@@ -683,7 +682,6 @@ export const HealthCampIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={style}
       {...props}
     >
       <path

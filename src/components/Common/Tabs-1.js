@@ -73,7 +73,7 @@ const ServicesTabs = () => {
   };
 
   return (
-    <section className="custom-tabs-section mt-50">
+    <section className="custom-tabs-section mt-50 pb-100">
       <div className="container">
         <div className="tab-nav-wrapper position-relative">
           <div

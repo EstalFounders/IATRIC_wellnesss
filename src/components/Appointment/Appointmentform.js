@@ -39,17 +39,13 @@ const AppointmentForm = ({
   handleCloseSnackBar,
 }) => {
   return (
-    <div className="col-lg-8">
-      <div className="txt-block pr-30">
-        <Typography variant="h4" className={styles.makeAppointmentText}>
-          Make Appointment
-        </Typography>
-        <Typography className={styles.makeAppointmentSubText}>
-          Porta semper lacus cursus, feugiat primis ultrice in ligula risus
-          auctor tempus feugiat dolor lacinia cubilia curae integer congue leo
-          metus, primis in orci integer metus mollis faucibus
-        </Typography>
+    <div className="col-lg-8 flex-column justify-content-center align-items-center">
+      {/* <div className="txt-block pr-30 bg-success"> */}
+      <div className="col-lg-4 mr-0">
+        <div className="h4">Make Appointment</div>
+      </div>
 
+      <div className="col-lg-4">
         <form onSubmit={(e) => e.preventDefault()} className="appointment-form">
           <TextField
             multiline
@@ -274,14 +270,8 @@ const AppointmentForm = ({
             </ConsultationButton>
           </Box>
         </form>
-
-        {/* <Typography variant="body2" color="textSecondary">
-          * Porta semper lacus cursus, feugiat primis ultrice in ligula risus
-          metus, primis in orci integer metus mollis faucibus enim. Nemo ipsam
-          egestas volute turpis dolores ut aliquam quaerat sodales sapien undo
-          pretium purus
-        </Typography> */}
       </div>
+      {/* </div> */}
     </div>
   );
 };

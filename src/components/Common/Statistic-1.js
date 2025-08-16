@@ -16,7 +16,7 @@ const Statistic1 = () => {
               <h5 className="statistic-number">
                 9, <Counter end={632} />
               </h5>
-              <p className="txt-400">Happy Patients</p>
+              <h4 className="txt-400">Happy Patients</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #2 */}
@@ -28,7 +28,7 @@ const Statistic1 = () => {
               <h5 className="statistic-number">
                 <Counter end={178} />
               </h5>
-              <p className="txt-400">Qualified Doctors</p>
+              <h4 className="txt-400">Qualified Doctors</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #3 */}
