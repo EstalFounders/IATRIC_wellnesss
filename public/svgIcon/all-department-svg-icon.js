@@ -8,10 +8,6 @@ const dimension = {
 export const GeneralPhysician = ({
   className,
   style = { color: `${color_schema.yellow}` },
-
-export const GeneralPhysician = ({
-  className,
-  style = { color: `${color_schema.yellow}` },
   width = 120,
   height = 120,
   ...props
@@ -20,8 +16,6 @@ export const GeneralPhysician = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -56,8 +50,6 @@ export const PediatricsIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -99,8 +91,6 @@ export const CardiologyIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -130,8 +120,6 @@ export const DermatologistIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -182,8 +170,6 @@ export const OrthopaedicsIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -212,8 +198,6 @@ export const GynaecologyIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -266,8 +250,6 @@ export const PhysiotherapyIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -316,8 +298,6 @@ export const PulmonologyIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -346,8 +326,6 @@ export const OphthalmologyIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -389,8 +367,6 @@ export const Psychiatrist = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -449,8 +425,6 @@ export const Dentistry = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -479,8 +453,6 @@ export const NursingCareIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -539,8 +511,6 @@ export const HomeCareIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -573,8 +543,6 @@ export const MedicineDelivery = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -633,8 +601,6 @@ export const LabInvestigation = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -663,8 +629,6 @@ export const CorporateHealthcareIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -715,8 +679,6 @@ export const HealthCampIcon = ({
     <svg
       width={dimension.width}
       height={dimension.height}
-      width={width}
-      height={height}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

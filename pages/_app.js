@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps, ...rest }) {
       setLoader(false);
     }, 1000);
   });
-
+  
   return (
     <Fragment>
       <Head>

@@ -95,7 +95,7 @@ const AppointmentPage = () => {
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
-  const [services] = useState(
+  const services = useState(
     useSelector((state) => state.superAdminHomePage.serviceOffered)
   );
   const [serviceType, setServiceType] = useState(services[0].name);
@@ -462,17 +462,6 @@ const AppointmentPage = () => {
 
           <div className="w-100 d-flex justify-content-center">
             <HowItWorks />
-          </div>
-          <div className="w-100">
-            <Statistic1 />
-          </div>
-
-          <div>
-            <Demo2Reviews2 />
-          </div>
-
-          <div>
-            <BenefitSection />
           </div>
 
           <div>

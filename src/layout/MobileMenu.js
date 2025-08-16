@@ -50,15 +50,12 @@ const MobileMenu = () => {
                   Home
                   {/* <span className="wsarrow" /> */}
                 </a>
-              <Link href="/" >
-              <a onClick={() => activeMenuSet("home")}>
-                Home
-                {/* <span className="wsarrow" /> */}
-              </a>
               </Link>
               <Link legacyBehavior href="/labTest/homepage">
-                LabTest
-                {/* <span className="wsarrow" /> */}
+                <a onClick={() => activeMenuSet("labTest")}>
+                  LabTest
+                  {/* <span className="wsarrow" /> */}
+                </a>
               </Link>
               {/* <ul className="sub-menu" style={activeLi("home")}> */}
               {/* <li aria-haspopup="true">
@@ -475,5 +472,6 @@ const MobileMenu = () => {
     </div>
   );
 };
+
 
 export default MobileMenu;

@@ -191,3 +191,6 @@ export const lab_test_discount = 0.95;
 
 export const vapidKey =
   "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";
+
+
+export const callToBook = "Call to Book";  

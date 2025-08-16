@@ -18,7 +18,9 @@ import { eventEmitter } from "../src/constant";
 import cartEventEmitter from "../src/eventEmitter/CartEventEmitter";
 import HomepageComp from "../src/components/labTestComponent/HomepageComp";
 import AnimatedSection from "../public/animation/animationSection/AnimatedSection";
-import MedicalCertificate from "../src/components/Demo-5/MedicalCertificate";
+import HowItWorks from "../src/components/Appointment/common/HowItsWorks";
+import BenefitSection from "../src/components/Appointment/common/BenefitsSection";
+import FaqSection from "../src/components/Appointment/common/FAQComponent";
 
 const Demo5 = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -28,7 +30,7 @@ const Demo5 = () => {
       <>
         {/* Hero - No animation as it's immediately visible */}
         <Demo5Hero5 />
-        
+
         {/* Wrap each component with AnimatedSection */}
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5About2 />
@@ -38,41 +40,48 @@ const Demo5 = () => {
           <Demo5Services2 />
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={0.2}>
-          <MedicalCertificate />
-        </AnimatedSection>
-
-        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Tabs1 />
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={0.3}>
+        {/* <AnimatedSection animation="fadeInUp" delay={0.3}>
           <About5 />
-        </AnimatedSection>
+        </AnimatedSection> */}
 
-        <AnimatedSection animation="fadeInUp" delay={0.2}>
+        {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo5About6 />
-        </AnimatedSection>
+        </AnimatedSection> */}
+
+        {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo5Doctors1 />
+        </AnimatedSection> */}
 
         <AnimatedSection animation="fadeInUp" delay={0.2}>
-          <Demo5Doctors1 />
-        </AnimatedSection>
-
-        <AnimatedSection animation="fadeInUp" delay={0.3} duration={1.2}>
-          <Demo2Reviews2 />
+          <Statistic1 />
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Pricing3 />
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={0.2}>
-          <Demo2Gallery1 />
+
+        <AnimatedSection animation="fadeInUp" delay={0.3} duration={1.2}>
+          <Demo2Reviews2 />
         </AnimatedSection>
 
-        <AnimatedSection animation="fadeInUp" delay={0.1}>
+        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <Demo5Pricing3 />
+        </AnimatedSection> */}
+
+        {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <Demo2Gallery1 />
+        </AnimatedSection> */}
+
+        
+
+        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Blog1 />
-        </AnimatedSection>
+        </AnimatedSection> */}
 
         <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo5Contacts1 />
@@ -80,7 +89,11 @@ const Demo5 = () => {
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Banner5 />
-        </AnimatedSection> */}
+        </AnimatedSection> 
+
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <BenefitSection />
+        </AnimatedSection>
       </>
     </Layouts>
   );

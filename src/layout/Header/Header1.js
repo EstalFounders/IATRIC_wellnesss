@@ -35,15 +35,20 @@ import CartPanel from "../../components/labTestComponent/common/CartPanel";
 import MedicineCartPanel from "../../components/medicines/common/MedicineCartPanel";
 import { getMedicineCartItems } from "../../components/medicines/common/CommonMethod";
 import { getLabTestCartItems } from "../../components/labTestComponent/common/CommonMethod";
+import { fetchConsultations } from "../../components/ApiService/UtilService";
+import { useDispatch, useSelector } from "react-redux";
 
 const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const isLabTestPage = router.pathname.includes("/labTest");
   const isMedicinePage = router.pathname.includes("/medicine");
 
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
-  const [consultationTypes, setConsultationTypes] = useState();
+  const consultationTypes = useSelector(
+    (state) => state.otherConfigSlice.activeConsultation
+  );
   const hiddenRoutes = ["/appointment", "/some-other-route"];
   const [labtesttab, setLabtestTab] = useState(false);
 
@@ -82,11 +87,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
     router.push("/appointment");
   };
 
-  const dialOptions = [
-    { label: "Dial", action: dial, icon: 0 },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb, icon: 1 },
-  ];
-
   const togglePanel = () => {
     setIsPanelOpen(!isPanelOpen);
   };
@@ -102,52 +102,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   };
 
   useEffect(() => {
-    const processConsultations = (data) => {
-      // Filter active items and transform into consultationOptions format
-      console.log(data, "56 processed consultation");
-      const activeConsultations = data
-        .filter((item) => item.isActive)
-        .map((item) => ({
-          label: item.name,
-          action: () => handleNavigate(item.name),
-          icon: getIconByName(item.name),
-        }));
-
-      console.log(activeConsultations, "active consultation");
-
-      // Set options and store in sessionStorage
-      setConsultationTypes(activeConsultations);
-      sessionStorage.setItem(
-        sessionStorageName.ConsultationFee,
-        JSON.stringify(data)
-      );
-    };
-
-    const storedConsultations = sessionStorage.getItem(
-      sessionStorageName.ConsultationFee
-    );
-
-    const parsedConsultations = JSON.parse(storedConsultations);
-
-    console.log(parsedConsultations, "stored consultation in header");
-
-    if (parsedConsultations && parsedConsultations.length > 0) {
-      console.log(parsedConsultations, "paresed consultation 83");
-      processConsultations(parsedConsultations);
-    } else {
-      fetch(api.consiltationFee)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch consultations");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          processConsultations(data);
-        })
-        .catch((error) =>
-          console.error("Error fetching consultations:", error)
-        );
+    if (!consultationTypes || consultationTypes.length === 0) {
+      const getConsultation = async () => {
+        await fetchConsultations(dispatch);
+      };
+      getConsultation();
     }
   }, []);
 
@@ -163,18 +122,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   }, [cartItemCount]); //
 
   // Helper function to map names to icon numbers
-  const getIconByName = (name) => {
-    const iconMapping = {
-      call: 2,
-      video: 3,
-      clinic: 4,
-      home_visit: 5,
-    };
-
-    // Normalize the name to lowercase for case-insensitive matching
-    const normalizedName = name.toLowerCase();
-    return iconMapping[normalizedName] || 0; // Default to 0 if name doesn't match
-  };
 
   return (
     <header id="header" className="header">
@@ -210,6 +157,97 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
         </Link>
       </div>
       {/* HEADER STRIP */}
+      <div
+        className="headtoppart clearfix"
+        style={{ backgroundColor: "#3b5f1d" }}
+      >
+        <div className="headerwp clearfix">
+          {/* Address */}
+          <div className="headertopleft">
+            <div className="address clearfix">
+              <span>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    <FaMapMarkedAlt className="mx-1" />
+                    <b style={{ fontWeight: "bold", fontSize: 14 }}>
+                      Sector 57 , Gurgaon Haryana-122003
+                    </b>
+                  </span>
+                </a>
+              </span>
+              <Link legacyBehavior href="/">
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDialDialogOpen();
+                  }}
+                  href={`tel:${contact_no}`}
+                  className="callusbtn"
+                  onMouseOver={(e) => {
+                    e.target.style.color = "#8e8333";
+                  }} // Change color on hover
+                  onMouseOut={(e) => {
+                    e.target.style.color = "#ffffff";
+                  }}
+                >
+                  <FaWhatsapp className="mx-1" />
+                  <b style={{ fontWeight: "bold", fontSize: 14 }}>
+                    {contact_no}
+                  </b>
+                </a>
+              </Link>
+            </div>
+            {/* <PopupDialog
+              isOpen={isDialDialogOpen}
+              onClose={handleCloseDialDialog}
+              options={dialOptions}
+            /> */}
+          </div>
+          {/* Social Links */}
+          <div className="headertopright">
+            {/* <a className="googleicon" title="Google" href="#">
+              <i className="fab fa-google" />
+              <span className="mobiletext02">Google</span>
+            </a> */}
+            <a
+              className="linkedinicon"
+              title="Linkedin"
+              target="blank"
+              href="https://www.linkedin.com/in/iatrichealthcare/"
+            >
+              <FaLinkedin size={25} />
+              <span className="mobiletext02">Linkedin</span>
+            </a>
+            <a
+              className="instagramicon"
+              title="Instagram"
+              target="blank"
+              href="https://www.instagram.com/iatric.healthcare/"
+            >
+              <FaInstagram size={25} />
+              <span className="mobiletext02">Instagram</span>
+            </a>
+
+            {/* <a className="twittericon" title="Twitter" href="#">
+              <i className="fab fa-twitter" />
+              <span className="mobiletext02">Twitter</span>
+            </a> */}
+            <a
+              className="facebookicon"
+              title="Facebook"
+              target="blank"
+              href="https://www.facebook.com/iatrichealthcare"
+            >
+              <FaFacebook size={25} />
+              <span className="mobiletext02">Facebook</span>
+            </a>
+          </div>
+        </div>
+      </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
       <div>
@@ -242,7 +280,13 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 </li>
                 <li>
                   <Link legacyBehavior href="/labTest/homepage">
-                    <a className="nav-link">Lab Test</a>
+                    <a
+                      className="nav-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Lab Test
+                    </a>
                   </Link>
                 </li>
                 <li>
@@ -270,117 +314,6 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   <FaCartShopping size={20} color={color_schema.green} />
                   <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
                     {cartItemCount}
-                  Home{" "}
-                </div>
-              </li>
-              {/* END DROPDOWN MENU */}
-              {/* PAGES */}
-              <li aria-haspopup="true">
-                <div className="mx-2 navbar-option mt-3">
-                  Pages <IoMdArrowDropdown />
-                  {/* <span className="wsarrow" /> */}
-                </div>
-                <div className="wsmegamenu clearfix">
-                  <div className="container">
-                    <div className="row">
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Standard Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/about-us">
-                            <a>About Us</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/who-we-are">
-                            <a>Who We Are</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/all-services">
-                            <a>Our Services</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/service-1">
-                            <a>Contact Us</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="#">
-                            <a>Join Us</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Medical Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/all-departments">
-                            <a>Our Departments</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/all-doctors">
-                            <a>Meet the Doctors</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Special Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/pricing-1">
-                            <a>Pricing Packages #1</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/pricing-2">
-                            <a>Pricing Packages #2</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/appointment">
-                            <a>Make an Appointment</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/faqs">
-                            <a>FAQs Page</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/terms">
-                            <a>Terms of Use</a>
-                          </Link>
-                        </li>
-                      </ul>
-                      {/* MEGAMENU LINKS */}
-                      <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                        {/* <li className="title">Auxiliary Pages:</li> */}
-                        <li>
-                          <Link legacyBehavior href="/gallery">
-                            <a>Our Gallery</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/blog-listing">
-                            <a>Blog Listing Page</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/single-post">
-                            <a>Single Blog Post</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/contacts-2">
-                            <a>Contact Us #2</a>
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                    {/* End row */}
                   </div>
                 </div>
               )}

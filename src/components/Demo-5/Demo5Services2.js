@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/router";
 import {
   FaStethoscope,
   FaTooth,
@@ -17,7 +16,6 @@ import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
 import { color_schema, services } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
-import { handleServiceClick } from "../Common/commonMethod";
 import { useRouter } from "next/router";
 
 const Demo5Services2 = () => {
@@ -32,6 +30,8 @@ const Demo5Services2 = () => {
 
   useEffect(() => {
     const el = marqueeRef.current;
+    if (!el) return; // null check ✅
+
     let startX, scrollLeft;
 
     const onTouchStart = (e) => {
@@ -81,190 +81,193 @@ const Demo5Services2 = () => {
 
   const handleClick = (index) => {
     const serviceName = services[index % services.length];
-  // Function to handle clicking on an icon
-  const handleIconClick = (index) => {
-    const currentIndex = indexOfFirstService + index;
-    // Navigate to the corresponding component based on the index
-    const serviceName = services[currentIndex];
-    handleServiceClick(serviceName, index, router);
-  };
+    // Function to handle clicking on an icon
+    const handleIconClick = (index) => {
+      const currentIndex = indexOfFirstService + index;
+      // Navigate to the corresponding component based on the index
+      const serviceName = services[currentIndex];
+      handleServiceClick(serviceName, index, router);
+    };
 
-  const renderIcon = (index) => {
-    const actualIndex = index % services.length;
+    const renderIcon = (index) => {
+      const actualIndex = index % services.length;
 
-    switch (actualIndex) {
-      case 0:
-        return (
-          <FaStethoscope
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 1:
-        return (
-          <FaBaby
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 2:
-        return (
-          <FaHeartPulse
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 3:
-        return (
-          <MdOutlineFace3
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 4:
-        return (
-          <GiKneeCap
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 5:
-        return (
-          <MdPregnantWoman
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 6:
-        return (
-          <FaEye
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 7:
-        return (
-          <BsLungsFill
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 8:
-        return (
-          <FaMedkit
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 9:
-        return (
-          <FaTooth
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 10:
-        return (
-          <TbPhysotherapist
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 11:
-        return (
-          <BiInjection
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 12:
-        return (
-          <FaUserNurse
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 13:
-        return (
-          <GiMedicines
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 14:
-        return (
-          <GiErlenmeyer
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 15:
-        return (
-          <FaStethoscope
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 16:
-        return (
-          <RiTeamFill
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+      switch (actualIndex) {
+        case 0:
+          return (
+            <FaStethoscope
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 1:
+          return (
+            <FaBaby
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 2:
+          return (
+            <FaHeartPulse
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 3:
+          return (
+            <MdOutlineFace3
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 4:
+          return (
+            <GiKneeCap
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 5:
+          return (
+            <MdPregnantWoman
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 6:
+          return (
+            <FaEye
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 7:
+          return (
+            <BsLungsFill
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 8:
+          return (
+            <FaMedkit
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 9:
+          return (
+            <FaTooth
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 10:
+          return (
+            <TbPhysotherapist
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 11:
+          return (
+            <BiInjection
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 12:
+          return (
+            <FaUserNurse
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 13:
+          return (
+            <GiMedicines
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 14:
+          return (
+            <GiErlenmeyer
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 15:
+          return (
+            <FaStethoscope
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        case 16:
+          return (
+            <RiTeamFill
+              size={80}
+              color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+            />
+          );
+        default:
+          return null;
+      }
+    };
 
-  return (
-    <section className="services-section wide-70">
-      <div className="container">
-        <div className="row">
-          <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Our Speciality</h3>
+    return (
+      <section className="services-section wide-70">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-10 offset-lg-1 section-title">
+              <h3 className="h3-md steelblue-color">Our Speciality</h3>
+            </div>
+          </div>
+          <div className="row">
+            <section className="services-wrapper col-lg-12">
+              <div
+                className="services-marquee"
+                ref={marqueeRef}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={(e) => {
+                  setIsPaused(false);
+                  handleMouseLeave(e);
+                }}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+              >
+                <div className={`services-track ${isPaused ? "paused" : ""}`}>
+                  {combinedServices.map((service, index) => {
+                    const actualIndex = index % services.length;
+
+                    return (
+                      <div
+                        className="service-card"
+                        key={index}
+                        onClick={() => handleClick(actualIndex)}
+                        onMouseEnter={() => setHoveredIndex(index)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                      >
+                        <div className="service-nav-link">
+                          <div className="service-icon">
+                            {renderIcon(index)}
+                          </div>
+                          <div className="service-title">{service}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
           </div>
         </div>
-        <div className="row">
-          <section className="services-wrapper col-lg-12">
-            <div
-              className="services-marquee"
-              ref={marqueeRef}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={(e) => {
-                setIsPaused(false);
-                handleMouseLeave(e);
-              }}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseMove={handleMouseMove}
-            >
-              <div className={`services-track ${isPaused ? "paused" : ""}`}>
-                {combinedServices.map((service, index) => {
-                  const actualIndex = index % services.length;
-
-                  return (
-                    <div
-                      className="service-card"
-                      key={index}
-                      onClick={() => handleClick(actualIndex)}
-                      onMouseEnter={() => setHoveredIndex(index)}
-                      onMouseLeave={() => setHoveredIndex(null)}
-                    >
-                      <div className="service-nav-link">
-                        <div className="service-icon">{renderIcon(index)}</div>
-                        <div className="service-title">{service}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
 };
 
 export default Demo5Services2;
