@@ -211,7 +211,7 @@ const Demo5Services2 = () => {
   };
 
   return (
-    <section className="services-section wide-70">
+    <section className="services-section pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
@@ -219,7 +219,7 @@ const Demo5Services2 = () => {
           </div>
         </div>
         <div className="row">
-          <section className="services-wrapper col-lg-12">
+          <section className="col-lg-12">
             <div
               className="services-marquee"
               ref={marqueeRef}

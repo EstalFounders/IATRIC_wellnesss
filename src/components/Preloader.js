@@ -1,12 +1,12 @@
-import React from "react";
-import styles from "./Common/css/Preloader.module.css";
+import Image from "next/image";
 
 const Preloader = () => {
   return (
-    <div className={styles.pulseContainer}>
-      <div className={styles.pulse} style={{ animationDelay: '0s' }}></div>
-      <div className={styles.pulse} style={{ animationDelay: '0.5s' }}></div>
-      <div className={styles.pulse} style={{ animationDelay: '1s' }}></div>
+    <div id="loader-wrapper">
+      <div id="loader">
+        {/* <div className="loader-inner"></div> */}
+        <Image src="/images/loader.gif" alt="Loading..." width={250} height={200} />
+      </div>
     </div>
   );
 };

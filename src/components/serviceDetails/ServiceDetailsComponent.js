@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import {
@@ -8,9 +8,12 @@ import {
   Card,
   CardContent,
   Box,
+  Button,
 } from "@mui/material";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
-import { color_schema } from "../../constant";
+import { callToBook, color_schema } from "../../constant";
+import { ConsultationButton } from "../Common/commonUi";
+import CalltoBookPopup from "../Common/CalltoBookPopup";
 
 const serviceDetails = {
   consultation: {
@@ -28,7 +31,7 @@ const serviceDetails = {
         name: "Video",
         iconKey: "video",
         description:
-          "Face-to-face video consultations with experienced healthcare professionals at your convenience.",
+          "Face-to-face video consultations with experienced professionals at your convenience.",
       },
     ],
     offline: [
@@ -172,6 +175,7 @@ const serviceDetails = {
 const ServiceDetail = () => {
   const router = useRouter();
   const { Service } = router.query;
+  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
   const normalizedParam = (Service || "")
     .toLowerCase()
@@ -180,11 +184,17 @@ const ServiceDetail = () => {
 
   const medical_service = serviceDetails[normalizedParam];
 
-  useEffect(() => {
-    if (!medical_service && Service) {
-      console.warn(`No service detail found for: ${Service}`);
-    }
-  }, [medical_service]);
+  const handleOpenCalltoBookDialog = (serviceName) => {
+    setIsCalltoBookDialog(true);
+  };
+  const handleCloseCalltoBookDialog = () => {
+    setIsCalltoBookDialog(false);
+  };
+
+  const handleCalltoBookPopupSubmit = (mobNo) => {
+    setMobNo(mobNo);
+    setOtpConfirmationPopup(true);
+  };
 
   if (!medical_service) {
     return (
@@ -226,7 +236,10 @@ const ServiceDetail = () => {
                   <Card
                     sx={{
                       p: 2,
-                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%", // Make card take full available height
+                      justifyContent: "space-between", // Push button to bottom if added later
                       transition: "all 0.3s ease",
                       cursor: "pointer",
                       boxShadow: 3,
@@ -239,7 +252,12 @@ const ServiceDetail = () => {
                     }}
                   >
                     <CardContent
-                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "flex-start", // Keep icon + text aligned at top
+                        flexGrow: 1, // Make content stretch
+                      }}
                     >
                       <Box
                         sx={{
@@ -259,11 +277,22 @@ const ServiceDetail = () => {
                       </Box>
                       <Box>
                         <Typography variant="h6">{item.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ flexGrow: 1 }}
+                        >
                           {item.description}
                         </Typography>
                       </Box>
                     </CardContent>
+                    <div>
+                      <ConsultationButton
+                        onClick={() => handleOpenCalltoBookDialog(item.name)}
+                      >
+                        {callToBook}
+                      </ConsultationButton>
+                    </div>
                   </Card>
                 </Grid>
               ))}
@@ -283,7 +312,10 @@ const ServiceDetail = () => {
                   <Card
                     sx={{
                       p: 2,
-                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%", // Make card take full available height
+                      justifyContent: "space-between", // Push button to bottom if added later
                       transition: "all 0.3s ease",
                       cursor: "pointer",
                       boxShadow: 3,
@@ -296,7 +328,12 @@ const ServiceDetail = () => {
                     }}
                   >
                     <CardContent
-                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "flex-start", // Keep icon + text aligned at top
+                        flexGrow: 1, // Make content stretch
+                      }}
                     >
                       <Box
                         sx={{
@@ -312,24 +349,39 @@ const ServiceDetail = () => {
                           flexShrink: 0,
                         }}
                       >
-                        <IconRenderer name={item.iconKey} size={36} />
+                        <IconRenderer name={item.iconKey} size={28} />
                       </Box>
                       <Box>
                         <Typography variant="h6">{item.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ flexGrow: 1 }}
+                        >
                           {item.description}
                         </Typography>
                       </Box>
                     </CardContent>
+                    <div>
+                      <ConsultationButton
+                        onClick={() => handleOpenCalltoBookDialog(item.name)}
+                      >
+                        {callToBook}
+                      </ConsultationButton>
+                    </div>
                   </Card>
                 </Grid>
               ))}
             </>
           )}
         </Grid>
+        <CalltoBookPopup
+          show={isCalltoBookDialog}
+          onClose={handleCloseCalltoBookDialog}
+          onSubmit={handleCalltoBookPopupSubmit}
+        />
       </Container>
     </>
   );
 };
-
 export default ServiceDetail;

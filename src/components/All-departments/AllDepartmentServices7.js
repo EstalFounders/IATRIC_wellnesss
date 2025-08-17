@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { HorizontalScrollContainer } from "../Common/HorizontalContainer";
-import { color_schema } from "../../constant";
+import { callToBook, color_schema } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
 import { useRouter } from "next/router";
 import { AllDepartmentService } from "../../../data/services";
@@ -100,7 +100,7 @@ const AllDepartmentServices7 = () => {
           <div className="mt-5 mr-auto ml-auto">
             <div className="">
               <ConsultationButton path={"/appointment"}>
-                Book Consultation
+                {callToBook}
               </ConsultationButton>
             </div>
           </div>

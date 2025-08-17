@@ -96,12 +96,10 @@ const AppointmentPage = () => {
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
-  const [services] = useState(
+  const services = useState(
     useSelector((state) => state.superAdminHomePage.serviceOffered)
   );
-  const [serviceType, setServiceType] = useState(
-    Array.isArray(services) && services.length > 0 ? services[0].name : ""
-  );
+  const [serviceType, setServiceType] = useState(services[0]?.name);
 
   const dispatch = useDispatch();
 
@@ -165,13 +163,11 @@ const AppointmentPage = () => {
   };
 
   useEffect(() => {
-    if (!services || services.length === 0) {
-      const getServices = async () => {
-        await getServiceOffered({ dispatch });
-      };
-      getServices();
-    }
-  }, [services, dispatch]);
+    const getServices = async () => {
+      await getServiceOffered({ dispatch });
+    };
+    getServices();
+  }, []);
 
   useEffect(() => {
     const { serviceParam } = router.query;
@@ -243,7 +239,7 @@ const AppointmentPage = () => {
   }, [appointmentState.selectedDoctorId, appointmentState.selectedDate]);
 
   useEffect(() => {
-    if (!doctors || doctors.length === 0) {
+    if (!(doctors > 0)) {
       fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
     }
   }, [doctors, dispatch]);
@@ -467,17 +463,6 @@ const AppointmentPage = () => {
 
           <div className="w-100 d-flex justify-content-center">
             <HowItWorks />
-          </div>
-          <div className="w-100">
-            <Statistic1 />
-          </div>
-
-          <div>
-            <Demo2Reviews2 />
-          </div>
-
-          <div>
-            <BenefitSection />
           </div>
 
           <div>

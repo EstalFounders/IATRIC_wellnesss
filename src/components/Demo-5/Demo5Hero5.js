@@ -42,11 +42,12 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
-                <div className="h5">
+                <div className="h5 mx-auto steelblue-color">
                   Get optimal health ,{" "}
                   <strong style={{ color: `${color_schema.green}` }}>
                     ANYTIME , ANYWHERE !
                   </strong>{" "}
+                  <br />
                   <br />
                   One-stop care: Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts

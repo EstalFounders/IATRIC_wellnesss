@@ -3,14 +3,14 @@ import React from "react";
 import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
-import { CorporateHealthcareIcon, GeneralPhysician, HomeCareIcon, LabInvestigation, MedicineDelivery, NursingCareIcon } from "../../../public/svgIcon/all-department-svg-icon";
+import { CorporateHealthcareIcon, GeneralPhysician, HealthCampIcon, HomeCareIcon, LabInvestigation, MedicineDelivery, NursingCareIcon } from "../../../public/svgIcon/all-department-svg-icon";
 
 const DiscoverMoreComp = () => {
   const router = useRouter();
   const features = [
     {
       title: "Consultation",
-        service: "Consultation",
+      service: "Consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
@@ -43,6 +43,13 @@ const DiscoverMoreComp = () => {
     {
       title: "Community Care",
       service:"corporate",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: <HealthCampIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+      btntext: "View Details",
+    },
+    {
+      title: "Corporate Healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
