@@ -31,7 +31,6 @@ const Demo5 = () => {
       <>
         {/* Hero - No animation as it's immediately visible */}
         <Demo5Hero5 />
-
         {/* Wrap each component with AnimatedSection */}
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5About2 />

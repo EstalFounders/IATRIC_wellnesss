@@ -72,7 +72,8 @@ const AppointmentPage = () => {
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [doctors, setDoctors] = useState([]);
+  const storedDoctors = useSelector((state) => state.allDoctorS.allDoctors);
+  const [doctors, setDoctors] = useState(storedDoctors);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [symptoms, setSymptoms] = useState("");
@@ -241,7 +242,7 @@ const AppointmentPage = () => {
     if (!(doctors > 0)) {
       fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
     }
-  }, []); // Empty dependency array ensures the effect runs only once
+  }, [doctors, dispatch]);
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;

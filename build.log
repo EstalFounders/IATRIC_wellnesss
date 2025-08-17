@@ -230,15 +230,11 @@ Failed to compile.
 40:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'storedDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/Appointment/AppointmentPage.js
-169:6  Warning: React Hook useEffect has a missing dependency: 'dispatch'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-181:6  Warning: React Hook useEffect has a missing dependency: 'services'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-238:6  Warning: React Hook useEffect has a missing dependency: 'fetchSlots'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-244:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'doctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-308:6  Warning: React Hook useEffect has missing dependencies: 'consultationType' and 'filterDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-315:6  Warning: React Hook useEffect has a missing dependency: 'doctorChoice'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-
-./src/components/Appointment/CommonHealthConcern.js
-23:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+197:6  Warning: React Hook useEffect has a missing dependency: 'fetchSlots'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+203:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'doctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+267:6  Warning: React Hook useEffect has missing dependencies: 'consultationType' and 'filterDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+274:6  Warning: React Hook useEffect has a missing dependency: 'doctorChoice'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+424:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/components/Appointment/OtpConfirmationPopup.js
 19:6  Warning: React Hook useEffect has a missing dependency: 'generateAndSendOtp'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -259,9 +255,6 @@ Failed to compile.
 
 ./src/components/Common/Info-2.js
 106:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
-./src/components/Common/Tabs-1.js
-215:4  Error: Parsing error: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (215:4)
 
 ./src/components/Common/Testimonials-2.js
 38:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -556,9 +549,6 @@ Failed to compile.
 
 ./src/components/Demo-4/Demo4Video2.js
 32:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
-./src/components/Demo-5/Demo5About2.js
-126:14  Error: Parsing error: Unterminated JSX contents. (126:14)
 
 ./src/components/Demo-5/Demo5Blog1.js
 31:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
