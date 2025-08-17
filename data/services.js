@@ -535,3 +535,66 @@ export const AllServiceTab = [
     ],
   },
 ];
+
+export const testimonials = [
+  {
+    name: "Shrey Johri",
+    role: "Software Engineer",
+    text: `"Healthpath has truly changed how I manage my health. Booking an online consultation was incredibly easy, and I spoke to a doctor within minutes. No more waiting rooms!"`,
+    image: null, // null means initials
+  },
+  {
+    name: "Adhira Saxena",
+    role: "Brand Manager",
+    text: `"The convenience is unmatched. I got expert medical advice from my living room, saving me so much time and hassle. Highly recommend their virtual consultations."`,
+    image: null,
+  },
+  {
+    name: "Jayant Bhatia",
+    role: "Businessman",
+    text: `"I love that I can securely share my medical history with my family and specialists. It makes coordinating care so much simpler and less stressful."`,
+    image: null,
+  },
+  {
+    name: "Akhand Seth",
+    role: "Engineer",
+    text: `"The doctors at Healthpath are so understanding and thorough, even online. I felt genuinely heard and received excellent, personalized care."`,
+    image: null,
+  },
+  {
+    name: "Vaishali Singh",
+    role: "Photographer",
+    text: `"Finally, a healthcare service that fits my busy schedule! Being able to connect with a doctor anytime, anywhere has been a game-changer for my well-being."`,
+    image: null,
+  },
+  {
+    name: "Mohit Arora",
+    role: "Cloud Engineer",
+    text: `"The peace of mind knowing I can get reliable medical guidance instantly is invaluable. Healthpath has become my go-to for all my health concerns."`,
+    image: null,
+  },
+  {
+    name: "Saksham Gaur",
+    role: "Student",
+    text: `"I was hesitant about online consultations, but Healthpath made it so seamless and professional. It's truly an innovative approach to healthcare."`,
+    image: null,
+  },
+  {
+    name: "Kajol Wadhwani",
+    role: "Chartered Accountant",
+    text: `"From skipping traffic to avoiding long queues, Healthpath has made healthcare accessible and stress-free. My health journey feels much more manageable now."`,
+    image: null,
+  },
+  {
+    name: "Anjali Srivastava",
+    role: "Housewife",
+    text: `"The platform is incredibly user-friendly, and the support team is fantastic. It's clear that patient well-being is their top priority."`,
+    image: null,
+  },
+  {
+    name: "Divansh Arora",
+    role: "Chef",
+    text: `"Healthpath has empowered me to take control of my health. The ability to connect with specialists and manage my records from home is revolutionary."`,
+    image: null,
+  },
+];

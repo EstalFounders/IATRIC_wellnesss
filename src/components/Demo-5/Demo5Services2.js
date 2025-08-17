@@ -211,7 +211,7 @@ const Demo5Services2 = () => {
   };
 
   return (
-    <section className="services-section bg-lightgrey pb-70">
+    <section className="services-section pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">

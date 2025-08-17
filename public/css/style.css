@@ -4416,6 +4416,22 @@ td.text-right {
   border-radius: 6px;
 }
 
+.initials-avatar{
+  font-family: 'candara', 'sans-serif';
+  width: 100px;
+  height: 100px;
+  border-radius: 60%;
+  background-color: white;
+  color: #8e8333;
+  font-size: 3rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
 .bg-lightgrey .review-2 {
   background-color: #fff;
   border: 1px solid #f5f5f5;
@@ -4432,6 +4448,10 @@ td.text-right {
   display: inline-block;
   float: left;
 }
+
+
+
+#reviews-1 .testimonial-avatar
 
 /*------------------------------------------*/
 /*    Testimonial Message Avatar 

@@ -65,7 +65,7 @@ const Demo5About2 = () => {
         <div className="abox-2-holder py-5">
           <div className="text-center mb-5">
             <h1 className="steelblue-color">Welcome to Healthpath</h1>
-            <div className="h5 mx-auto w-75">
+            <div className="h5 mx-auto steelblue-color w-100">
               At Healthpath, we are committed to providing expert medical
               consultations and quality healthcare. <br /> We offer seamless
               appointment booking, experienced doctors, and reliable patient
@@ -90,21 +90,21 @@ const Demo5About2 = () => {
                 </ConsultationButton>
               </div>
               <hr className="w-75" />
-              <div className="row">
-                <div className="col-md-6 mb-4">
-                  <div className="h-100 p-4 text-center shadow-sm border rounded">
-                    <h5 className="steelblue-color mb-3">Our Doctors</h5>
-                    <p>
+              <div className="row d-flex justify-content-center align-items-center">
+                <div className="col-md-8 mb-4">
+                  <div className="h-100 p-4 text-center">
+                    <h2 className="steelblue-color mb-3">Our Doctors</h2>
+                    <div className="h5 steelblue-color mx-auto w-100 pb-10">
                       Browse through our panel of experienced and certified
-                      doctors, available for online and offline consultations.
-                    </p>
+                      doctors, available for online and offline consultations across India.
+                    </div>
                     <ConsultationButton path="/doctors">
                       View Doctors
                     </ConsultationButton>
                   </div>
                 </div>
 
-                <div className="col-md-6 mb-4">
+                {/* <div className="col-md-6 mb-4">
                   <div className="h-100 p-4 text-center shadow-sm border rounded">
                     <h5 className="steelblue-color mb-3">Need Help?</h5>
                     <p>
@@ -116,7 +116,7 @@ const Demo5About2 = () => {
                       Contact Support
                     </ConsultationButton>
                   </div>
-                </div>
+                </div> */}
               </div>
               {/* End row */}
               <PopupDialog

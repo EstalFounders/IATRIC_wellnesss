@@ -53,8 +53,7 @@ const Demo5Services1 = () => {
       icon: <HealthCampIcon size={70} />,
       btntext: "View Details",
     },
-    {
-      title: "Corporate Healthcare",
+    {      title: "Corporate Healthcare",
       service: "corporate-healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
@@ -115,7 +114,7 @@ const Demo5Services1 = () => {
   };
 
   return (
-    <section className="services-section bg-lightgrey pb-70">
+    <section className="services-section pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
