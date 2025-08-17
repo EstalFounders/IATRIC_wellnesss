@@ -5,7 +5,7 @@ const Preloader = () => {
     <div id="loader-wrapper">
       <div id="loader">
         {/* <div className="loader-inner"></div> */}
-        <Image src="/images/loader.gif" alt="Loading..." width={200} height={150} />
+        <Image src="/images/loader.gif" alt="Loading..." width={250} height={200} />
       </div>
     </div>
   );

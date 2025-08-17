@@ -4,7 +4,8 @@ import { testimonial2Props } from "../../sliderProps";
 import { Autoplay } from "swiper";
 import { getInitials } from "../Common/commonMethod";
 import { testimonials } from "../../../data/services";
-
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
+import { color_schema } from "../../constant";
 
 const Testimonials = testimonials;
 
@@ -29,20 +30,34 @@ const ReviewSlider = () => {
           className="owl-carousel owl-theme reviews-holder"
         >
           {Testimonials.map((t, i) => (
-            <SwiperSlide className="review-2" key={i}>
-              <div className="review-txt text-center">
-                {/* Quote */}
-                <div className="quote">
-                  <Image
-                    width={200}
-                    height={200}
-                    src="/images/quote.png"
-                    alt="quote-img"
-                  />
-                </div>
+            <SwiperSlide key={i}>
+              <div
+                className="review-card position-relative p-4 d-flex flex-column justify-content-between text-center my-5"
+              >
+                {/* Quote Icons */}
+                <FaQuoteLeft
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    left: "10px",
+                    fontSize: "20px",
+                    color: `${color_schema.green}`,
+                    opacity: 0.6,
+                  }}
+                />
+                <FaQuoteRight
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "10px",
+                    fontSize: "20px",
+                    color: `${color_schema.green}`,
+                    opacity: 0.6,
+                  }}
+                />
 
-                {/* Author Avatar */}
-                <div className="testimonial-avatar">
+                {/* Avatar */}
+                <div className="testimonial-avatar mb-3">
                   {t.image ? (
                     <Image
                       width={100}
@@ -58,13 +73,15 @@ const ReviewSlider = () => {
                   )}
                 </div>
 
-                {/* Testimonial Text */}
-                <p>{t.text}</p>
+                {/* Text */}
+                <p className="testimonial-text flex-grow-1 fst-italic">
+                  {t.text}
+                </p>
 
-                {/* Testimonial Author */}
-                <div className="review-author">
-                  <h5 className="h5-sm">{t.name}</h5>
-                  <span>{t.role}</span>
+                {/* Author */}
+                <div className="review-author mt-3">
+                  <h5 className="h5-sm mb-1">{t.name}</h5>
+                  {/* <span className="text-muted">{t.role}</span> */}
                 </div>
               </div>
             </SwiperSlide>

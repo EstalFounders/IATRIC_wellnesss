@@ -554,3 +554,17 @@
         transform: translateX(0%);
       }
     }
+
+    .review-card {
+  min-height: 350px;   /* ensures all cards are at least this tall */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.testimonial-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 0 10px;
+}
+

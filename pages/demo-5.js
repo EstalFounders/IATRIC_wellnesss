@@ -86,9 +86,9 @@ const Demo5 = () => {
           <Demo5Blog1 />
         </AnimatedSection> */}
 
-        <AnimatedSection animation="fadeInUp" delay={0.2}>
+        {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo5Contacts1 />
-        </AnimatedSection>
+        </AnimatedSection> */}
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Banner5 />
