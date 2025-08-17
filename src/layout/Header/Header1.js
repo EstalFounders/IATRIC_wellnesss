@@ -301,7 +301,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
                 <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
-                  Find a Doctor
+                  Consult now
                 </ConsultationButton>
               )}
 

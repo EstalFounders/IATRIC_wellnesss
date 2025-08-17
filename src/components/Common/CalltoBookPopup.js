@@ -3,6 +3,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import { ConsultationButton } from "./commonUi";
 import { color_schema } from "../../constant";
 import { isMobileValid } from "../../helper";
@@ -42,9 +44,23 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
     >
       {/* Header */}
       <DialogTitle
-        className="bg-green-gradient text-center text-white"
+        className="bg-green-gradient text-center text-white relative"
+        style={{ position: "relative", paddingRight: "3rem" }}
       >
-        <b>Book Your Service</b>
+        <b>Connect with HealthPath team</b>
+        {/* Close Button */}
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
       {/* Body */}
@@ -53,8 +69,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
           className="text-muted text-center mb-4"
           style={{ fontSize: "1rem", lineHeight: "1.5" }}
         >
-          Enter your mobile number and our medical team will call you back
-          shortly.
+          Enter your mobile number, and our team will call you back shortly.
         </p>
 
         <input
@@ -64,12 +79,9 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
             border: `2px solid ${color_schema.green}`,
             transition: "all 0.3s ease",
           }}
-          placeholder="Enter mobile number"
+          placeholder="Enter your 10 digit mobile number"
           value={mobNo}
           onChange={(e) => setMobNo(e.target.value)}
-          onFocus={(e) =>
-            (e.target.style.border = `2px solid ${color_schema.green}`)
-          }
         />
 
         {response && (
@@ -87,23 +99,13 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
       >
         <ConsultationButton
           style={{
-            backgroundColor: "#ccc",
-            color: "#333",
-            borderRadius: "25px",
-          }}
-          onClick={onClose}
-        >
-          Cancel
-        </ConsultationButton>
-        <ConsultationButton
-          style={{
             backgroundColor: color_schema.green,
             color: "white",
             borderRadius: "25px",
           }}
           onClick={handleSubmit}
         >
-          Submit
+          Book a call back
         </ConsultationButton>
       </DialogActions>
     </Dialog>
