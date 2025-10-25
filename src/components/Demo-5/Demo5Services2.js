@@ -17,6 +17,7 @@ import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
 import { color_schema, services } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
+import { CardiologyIcon, Dentistry, DermatologistIcon, GeneralPhysician, GynaecologyIcon, OphthalmologyIcon, OrthopaedicsIcon, PediatricsIcon, PhysiotherapyIcon, Psychiatrist, PulmonologyIcon } from "../../../public/svgIcon/all-department-svg-icon";
 
 const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -88,77 +89,77 @@ const Demo5Services2 = () => {
     switch (actualIndex) {
       case 0:
         return (
-          <FaStethoscope
+          <GeneralPhysician
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 1:
         return (
-          <FaBaby
+          <PediatricsIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 2:
         return (
-          <FaHeartPulse
+          <CardiologyIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 3:
         return (
-          <MdOutlineFace3
+          <DermatologistIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 4:
         return (
-          <GiKneeCap
+          <OrthopaedicsIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 5:
         return (
-          <MdPregnantWoman
+          <GynaecologyIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 6:
         return (
-          <FaEye
+          <OphthalmologyIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 7:
         return (
-          <BsLungsFill
+          <PulmonologyIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 8:
         return (
-          <FaMedkit
+          <Psychiatrist
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 9:
         return (
-          <FaTooth
+          <Dentistry
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />
         );
       case 10:
         return (
-          <TbPhysotherapist
+          <PhysiotherapyIcon
             size={80}
             color={hoveredIndex === index ? "#fafafa" : color_schema.green}
           />

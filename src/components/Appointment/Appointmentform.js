@@ -1,259 +1,134 @@
-import React from "react";
-import styles from "./css/appointmentPage.module.css";
-import { isWithinBusinessHours, formatTime } from "../helper";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { CHOOSE_TIME } from "../../constant";
-import { IS_NOW } from "../../../pages/api/utils/constants";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { ConsultationButton } from "../Common/commonUi";
+import React, { useState, useCallback, useEffect } from "react";
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
-  Radio,
   RadioGroup,
   FormControlLabel,
+  Radio,
   Typography,
   Box,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-
-const slotMessage = (
-  <Typography variant="body2" color="error" fontWeight="bold">
-    SLOTS WILL BE GENERATED SOON
-  </Typography>
-);
+import { ConsultationButton } from "../Common/commonUi";
+import styles from "./css/appointmentPage.module.css";
+import { fetchServiceSuggestions } from "../ApiService/UtilService";
 
 const AppointmentForm = ({
   appointmentState,
   setter,
-  handleDoctorChoiceChange,
-  handleDoctorSelection,
-  handleTimeSelection,
-  handleSlotSelection,
-  handleConsultationChange,
-  sendWhatsAppConfirmation,
   handleCloseSnackBar,
+  sendWhatsAppConfirmation,
 }) => {
+  const [descriptionOptions, setDescriptionOptions] = useState([]);
+
+  const description = appointmentState.symptoms;
+
+  // useEffect(() => {
+  //   // This effect will run whenever the 'description' state changes.
+  //   // The utility function already contains the check for an empty string.
+  //   fetchServiceSuggestions(description, setDescriptionOptions);
+
+  //   // This cleanup function is crucial to cancel any pending API calls
+  //   // when the component unmounts or before the next effect runs.
+  //   return () => {
+  //     fetchServiceSuggestions.cancel();
+  //   };
+  // }, [description]); // The effect's dependency array
+
+  // Trigger fetch on blur or stop typing
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setter.setSymptoms(value);
+    // fetchSuggestions(value);
+  };
+
   return (
     <div className="col-lg-8">
       <div className="txt-block pr-30">
         <Typography variant="h4" className={styles.makeAppointmentText}>
           Make Appointment
         </Typography>
-        <Typography className={styles.makeAppointmentSubText}>
-          Porta semper lacus cursus, feugiat primis ultrice in ligula risus
-          auctor tempus feugiat dolor lacinia cubilia curae integer congue leo
-          metus, primis in orci integer metus mollis faucibus
-        </Typography>
 
         <form onSubmit={(e) => e.preventDefault()} className="appointment-form">
+          {/* Name */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+          
           <TextField
-            multiline
-            rows={0}
-            fullWidth
-            label="Describe your symptoms..."
-            variant="outlined"
-            margin="normal"
-            value={appointmentState.symptoms}
-            onChange={(e) => setter.setSymptoms(e.target.value)}
-          />
-          <TextField
-            fullWidth
+          className="w-50"
             label="Name"
             variant="outlined"
             margin="normal"
             value={appointmentState.name}
             onChange={(e) => setter.setName(e.target.value)}
           />
-          <TextField
-            fullWidth
-            label="Email"
-            variant="outlined"
-            type="email"
-            margin="normal"
-            value={appointmentState.email}
-            onChange={(e) => setter.setEmail(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Mobile Number"
-            variant="outlined"
-            type="tel"
-            margin="normal"
-            inputProps={{ minLength: 10, maxLength: 10 }}
-            value={appointmentState.mobNo}
-            onChange={(e) => setter.setMobNo(e.target.value)}
-          />
+          </div>
 
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="service-label">
-              {" "}
-              {appointmentState.serviceType
-                ? appointmentState.serviceType
-                : "Select consultation type"}
-            </InputLabel>
-            <Select
-              labelId="doctor-label"
-              id="doctor"
-              name="doctor"
-              value={appointmentState.serviceType}
-              label="Select Doctor"
-              onChange={handleDoctorSelection}
-            >
-              {appointmentState.services.map((service) => (
-                <MenuItem key={service._id} value={service.name}>
-                  {service.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <Typography variant="h6" className={styles.priceText}>
-            Price: {appointmentState.consultationprice} /-
-          </Typography>
-
-          {/* Consultation Type */}
-          <RadioGroup
-            row
-            value={appointmentState.consultationType}
-            onChange={handleConsultationChange}
-            style={{ justifyContent: "center", marginBottom: "20px" }}
-          >
-            {appointmentState.consultationTypes
-              .filter((item) => item.isActive)
-              .map((option) => (
-                <FormControlLabel
-                  key={option._id}
-                  value={option.name}
-                  control={<Radio />}
-                  label={<strong>{option.name}</strong>}
-                />
-              ))}
-          </RadioGroup>
-
-          {/* Doctor Choice */}
-          <RadioGroup
-            row
-            value={appointmentState.doctorChoice}
-            onChange={handleDoctorChoiceChange}
-            style={{ justifyContent: "center", marginBottom: "20px" }}
-          >
-            <FormControlLabel
-              value="any"
-              control={<Radio />}
-              label="Any Doctor"
+          {/* Description */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <TextField
+              className="w-50"
+              multiline
+              rows={1}
+              label="Describe your symptoms..."
+              variant="outlined"
+              margin="normal"
+              value={appointmentState.symptoms}
+              onChange={handleDescriptionChange}
+              // onBlur={() => fetchSuggestions(appointmentState.symptoms)}
             />
-            {appointmentState.consultationType !== "Home Visit" && (
-              <FormControlLabel
-                value="choose"
-                control={<Radio />}
-                label="Choose a Doctor"
-              />
-            )}
-          </RadioGroup>
+          </div>
 
-          {/* Conditional Doctor Selection */}
-          {appointmentState.doctorChoice === "choose" && (
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="doctor-label">
-                {" "}
-                {appointmentState.consultationType
-                  ? "Select doctor"
-                  : "Select consultation type"}
-              </InputLabel>
-              <Select
-                labelId="doctor-label"
-                id="doctor"
-                name="doctor"
-                value={appointmentState.selectedDoctorId}
-                label="Select Doctor"
-                onChange={handleDoctorSelection}
-              >
-                {appointmentState.filteredDoctors.map((doctor) => (
-                  <MenuItem key={doctor._id} value={doctor._id}>
-                    {doctor.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
-          {/* Time Selection */}
-          <RadioGroup
-            row
-            value={appointmentState.timeSelection}
-            onChange={handleTimeSelection}
-            style={{ justifyContent: "center", marginBottom: "20px" }}
-          >
-            {isWithinBusinessHours && (
-              <FormControlLabel
-                value={IS_NOW}
-                control={<Radio />}
-                label={IS_NOW}
-              />
-            )}
-            <FormControlLabel
-              value={CHOOSE_TIME}
-              control={<Radio />}
-              label="Choose Time"
-            />
-          </RadioGroup>
-
-          {/* Date Picker and Slots */}
-          {appointmentState.timeSelection === CHOOSE_TIME && (
+          {/* Dynamically generated radio buttons from description API */}
+          {descriptionOptions.length > 0 && (
             <>
-              <DatePicker
-                selected={appointmentState.selectedDate}
-                onChange={(date) => setter.setSelectedDate(date)}
-                inline
-                minDate={new Date()}
-              />
-              <Box display="flex" flexWrap="wrap" justifyContent="center">
-                {(appointmentState.doctorChoice === "choose"
-                  ? appointmentState.availableSlots
-                  : appointmentState.locallyCreatedSlots
-                )
-                  .filter((slot) => {
-                    const now = new Date();
-                    return (
-                      !slot.isBooked &&
-                      new Date(slot.startTime).getTime() > now.getTime()
-                    );
-                  })
-                  .map((slot) => (
-                    <Box
-                      key={slot._id}
-                      onClick={() => handleSlotSelection(slot)}
-                      sx={{
-                        color: "black",
-                        backgroundColor:
-                          appointmentState.selectedSlot?._id === slot._id
-                            ? "#9f9856"
-                            : "white",
-                        border: "1px solid black",
-                        p: 1,
-                        m: 1,
-                        borderRadius: 1,
-                        width: "30%",
-                        maxWidth: "160px",
-                        textAlign: "center",
-                        cursor: "pointer",
-                        transition: "background-color 0.3s",
-                        fontSize: "0.9rem",
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                    </Box>
-                  ))}
-              </Box>
+              <Typography variant="subtitle1" mt={2}>
+                Select Closest Match:
+              </Typography>
+              <RadioGroup
+                value={appointmentState.selectedSymptom || ""}
+                onChange={(e) => setter.setSelectedSymptom?.(e.target.value)}
+              >
+                {descriptionOptions.map((option, idx) => (
+                  <FormControlLabel
+                    key={idx}
+                    value={option}
+                    control={<Radio />}
+                    label={option}
+                  />
+                ))}
+              </RadioGroup>
             </>
           )}
 
+          {/* Mobile Number */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <TextField
+              className="w-50"
+              label="Mobile Number"
+              variant="outlined"
+              type="tel"
+              margin="normal"
+              inputProps={{ minLength: 10, maxLength: 10 }}
+              value={appointmentState.mobNo}
+              onChange={(e) => setter.setMobNo(e.target.value)}
+            />
+          </div>
+
+          {/* Consultation Type */}
+          <Typography variant="h6" mt={3} className="text-center">
+            Consultation Type
+          </Typography>
+          <RadioGroup
+            row
+            value={appointmentState.consultationType}
+            onChange={(e) => setter.setConsultationType(e.target.value)}
+            style={{ justifyContent: "center", marginBottom: "20px" }}
+          >
+            <FormControlLabel value="Call" control={<Radio />} label="Call" />
+            <FormControlLabel value="Video" control={<Radio />} label="Video" />
+          </RadioGroup>
+
+          {/* Snackbar for messages */}
           <Snackbar
             open={appointmentState.openSnackBar}
             autoHideDuration={6000}
@@ -268,19 +143,13 @@ const AppointmentForm = ({
             </Alert>
           </Snackbar>
 
+          {/* Submit button */}
           <Box mt={4} mb={4} display="flex" justifyContent="center">
             <ConsultationButton onClick={sendWhatsAppConfirmation}>
-              {appointmentState.isLoading ? "......" : "Consult"}
+              {appointmentState.isLoading ? "Loading..." : "Consult"}
             </ConsultationButton>
           </Box>
         </form>
-
-        {/* <Typography variant="body2" color="textSecondary">
-          * Porta semper lacus cursus, feugiat primis ultrice in ligula risus
-          metus, primis in orci integer metus mollis faucibus enim. Nemo ipsam
-          egestas volute turpis dolores ut aliquam quaerat sodales sapien undo
-          pretium purus
-        </Typography> */}
       </div>
     </div>
   );

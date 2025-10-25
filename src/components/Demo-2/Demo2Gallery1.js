@@ -10,7 +10,7 @@ const Demo2Gallery1 = () => {
     setSrc(src);
   };
   return (
-    <div id="gallery-1" className="gallery-section division">
+    <div id="gallery-1" className="gallery-section division wide-100">
       {image && <Popup content={{ src, name: "image" }} close={setImage} />}
       {/* SECTION TITLE */}
       <div className="container h5 box-list grey-color">

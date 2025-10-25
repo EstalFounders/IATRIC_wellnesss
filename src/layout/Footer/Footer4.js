@@ -5,6 +5,7 @@ import {
   FaFacebook,
   FaInstagram,
   FaLinkedin,
+  FaMapMarkedAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
 import { address, contact_no, email, facebook_page_url } from "../../constant";
@@ -12,6 +13,7 @@ import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { useRouter } from "next/router";
 import { MdEmail } from "react-icons/md";
+import { FaPhoneVolume } from "react-icons/fa6";
 
 const Footer4 = () => {
   const router = useRouter();
@@ -36,7 +38,7 @@ const Footer4 = () => {
     <footer className="bg-image wide-40 footer division text-secondary">
       <div className="container h5 box-list">
         {/* FOOTER CONTENT */}
-        <div className="row">
+        <div className="row d-flex justify-content-around">
           {/* FOOTER INFO */}
           <div className="col-md-6 col-lg-3">
             <div className="footer-info mb-40">
@@ -44,25 +46,35 @@ const Footer4 = () => {
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
               <img
                 src="/images/logo-grey.png"
-                width={180}
-                height={40}
+                width={200}
+                height={60}
                 alt="footer-logo"
               />
               {/* Text */}
-              <div className="p-sm mt-20">Unlocking your well-being</div>
-              <div className="p-sm mb-4">one step at a time.</div>
+              <div
+                className="p-sm mt-20"
+                style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
+              >
+                Unlocking your well-being
+              </div>
+              <div
+                className="p-sm mb-4"
+                style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
+              >
+                one step at a time.
+              </div>
               {/* Social Icons */}
               <div className="footer-socials-links mt-10">
                 <Row>
                   <Col className="text-center" md={2}>
                     <a
-                      className="linkedinicon"
-                      title="Linkedin"
+                      className="facebookicon"
+                      title="Facebook"
                       target="blank"
-                      href="https://www.linkedin.com/in/iatrichealthcare/"
+                      href={facebook_page_url}
                     >
-                      <FaLinkedin size={40} color="#0077b5" />
-                      <span className="mobiletext02">Linkedin</span>
+                      <FaFacebook size={40} color="#316FF6" />
+                      <span className="mobiletext02">Facebook</span>
                     </a>
                   </Col>
                   <Col className="text-center" md={2}>
@@ -76,37 +88,60 @@ const Footer4 = () => {
                       <span className="mobiletext02">Instagram</span>
                     </a>
                   </Col>
+                  <Col className="text-center" md={2}>
+                    <a
+                      className="linkedinicon"
+                      title="Linkedin"
+                      target="blank"
+                      href="https://www.linkedin.com/in/iatrichealthcare/"
+                    >
+                      <FaLinkedin size={40} color="#0077b5" />
+                      <span className="mobiletext02">Linkedin</span>
+                    </a>
+                  </Col>
 
                   {/* <a className="twittericon" title="Twitter" href="#">
               <i className="fab fa-twitter" />
               <span className="mobiletext02">Twitter</span>
             </a> */}
-                  <Col className="text-center" md={2}>
-                    <a
-                      className="facebookicon"
-                      title="Facebook"
-                      target="blank"
-                      href={facebook_page_url}
-                    >
-                      <FaFacebook size={40} color="#316FF6" />
-                      <span className="mobiletext02">Facebook</span>
-                    </a>
-                  </Col>
                 </Row>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOTER WORKING HOURS */}
+          <div className="col-md-6 col-lg-3">
+            <div className="footer-box mb-40">
+              {/* Title */}
+              <div className="h5-xs font-weight-bold text-dark mb-4">
+                <u>Working Time</u>
+              </div>
+              {/* Working Hours */}
+              <div
+                className="p-sm text-nowrap"
+                style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
+              >
+                Mon - Sun - 8:00 AM - 8:00 PM
               </div>
             </div>
           </div>
           {/* FOOTER CONTACTS */}
           <div className="col-md-6 col-lg-3">
-            <div className="footer-box mb-40">
+            <div
+              className="footer-box mb-40"
+              style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
+            >
               {/* Title */}
               <div className="h5-xs font-weight-bold text-dark mb-4">
-                <u>Our Location</u>
+                <u>Reach us</u>
               </div>
               {/* Address */}
-              <div>{address}</div>
+              <span>
+                <FaMapMarkedAlt className="mx-1" />
+                <b>{address}</b>
+              </span>
               {/* Email */}
-              <div className="foo-email mt-20 d-flex flex-row">
+              <div className="foo-email mt-20 d-flex flex-row mb-4">
                 <div>
                   <MdEmail />
                 </div>
@@ -125,7 +160,7 @@ const Footer4 = () => {
               {/* Phone */}
               <div className="d-flex flew-row">
                 <div className="mr-2">
-                  <FaPhoneAlt />{" "}
+                  <FaPhoneVolume />{" "}
                 </div>
                 <div>
                   <a
@@ -140,44 +175,6 @@ const Footer4 = () => {
               </div>
             </div>
           </div>
-          {/* FOOTER WORKING HOURS */}
-          <div className="col-md-6 col-lg-3">
-            <div className="footer-box mb-40">
-              {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4">
-                <u>Working Time</u>
-              </div>
-              {/* Working Hours */}
-              <div className="p-sm text-nowrap">
-                Mon - Sun - 8:00 AM - 8:00 PM
-              </div>
-            </div>
-          </div>
-          {/* FOOTER PHONE NUMBER */}
-          <div className="col-md-6 col-lg-3">
-            <div className="footer-box mb-40">
-              {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4">
-                <u>Emergency Cases</u>
-              </div>
-              {/* Footer List */}
-              <div className="h5-xl">
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDialDialogOpen();
-                  }}
-                >
-                  <FaPhoneAlt /> {contact_no}
-                </a>
-              </div>
-              {/* Text */}
-              <div className="p-sm mt-15">
-                Aliquam orci nullam undo tempor sapien gravida donec enim ipsum
-                porta justo velna aucto magna
-              </div>
-            </div>
-          </div>
         </div>
         {/* END FOOTER CONTENT */}
         {/* FOOTER COPYRIGHT */}
@@ -186,8 +183,10 @@ const Footer4 = () => {
             <div className="col-md-12 text-righ text-dark">
               <p className="footer-copyright text-dark text-right">
                 {new Date().getFullYear()} ©{" "}
-                <span className="text-dark">TTANSHE HEALTHPATH PRIVATE LIMITED</span>. All Rights
-                Reserved
+                <span className="text-dark">
+                  TTANSHE HEALTHPATH PRIVATE LIMITED
+                </span>
+                . All Rights Reserved
               </p>
             </div>
           </div>

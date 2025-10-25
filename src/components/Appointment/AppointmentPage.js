@@ -1,27 +1,16 @@
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   api,
   CHOOSE_TIME,
   consultationTypeMapping,
   IN_TWENTY_MINUTES_NOW,
-  isNow,
   SERVER_AVAILABLE_SLOTS_CODE,
   sessionStorageName,
 } from "../../constant";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import CustomDialog from "../CustomPopup";
-import {
-  formatTime,
-  generateSlotsForChooseTime,
-  isWithinBusinessHours,
-} from "../helper";
+import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
 import { useRouter } from "next/router";
 import styles from "./css/appointmentPage.module.css";
-import { style } from "@mui/system";
 import Preloader from "../Preloader";
 import AppointmentBookingModal from "./modal/AppointmentBookingModal";
 import Image from "next/image";
@@ -32,8 +21,6 @@ import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
-import bookConsultationFromAdmin from "../../../pages/superAdmin/bookConsultationFromAdmin";
-import { ConsultationButton } from "../Common/commonUi";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -43,13 +30,11 @@ import {
 import CommonHealthConcerns from "./CommonHealthConcern";
 import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
-import Statistic1 from "../Common/Statistic-1";
 import FaqSection from "./common/FAQComponent";
-import BenefitSection from "./common/BenefitsSection";
-import Demo2Reviews2 from "../Demo-2/Demo2Reviews2";
 
 const AppointmentPage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const isAppointmentPage = router.asPath.includes(
     "/superAdmin/bookConsultationFromAdmin"
   );
@@ -101,7 +86,7 @@ const AppointmentPage = () => {
   );
   const [serviceType, setServiceType] = useState(services[0]?.name);
 
-  const dispatch = useDispatch();
+  const dispAlltch = useDispatch();
 
   // All state and setters/functions in one object
   const appointmentState = {
@@ -167,7 +152,7 @@ const AppointmentPage = () => {
       await getServiceOffered({ dispatch });
     };
     getServices();
-  }, []);
+  }, [dispatch]); // Add dispatch as dependency
 
   useEffect(() => {
     const { serviceParam } = router.query;
@@ -242,7 +227,7 @@ const AppointmentPage = () => {
     if (!(doctors > 0)) {
       fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
     }
-  }, [doctors, dispatch]);
+  }, []);
 
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
@@ -354,7 +339,6 @@ const AppointmentPage = () => {
   const sendWhatsAppConfirmation = () => {
     if (
       !name.trim() ||
-      !email.trim() ||
       !mobNo.trim() ||
       !symptoms.trim() ||
       !consultationType.trim() ||

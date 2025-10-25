@@ -88,8 +88,8 @@ body {
 
 
 .wide-100 {
-  padding-top: 100px;
-  padding-bottom: 100px;
+  padding-top: 50px;
+  padding-bottom: 50px;
 }
 
 .wide-90 {
@@ -1390,7 +1390,7 @@ ul.content-list li:last-child {
   /*------------------------------------------*/
 
 span.section-id {
-  font-size: 0.825rem;
+  font-size: 0.8rem;
   font-weight: 900;
   text-transform: uppercase;
   display: block;
@@ -1688,7 +1688,10 @@ span.id-color {
   padding: 5px 15px 5px 15px;
   margin-left: 0;
   
+  
 }
+
+
 
 #header-2 .wsmainfull.cloned .header-button {
   display: none;
@@ -1982,7 +1985,7 @@ p.header-widget-phone {
 }
 
 #hero-5 {
-  background-image: url(../images/hero-5.jpg);
+  background-image: url(../images/hero-5.png);
   padding-top: 90px;
   padding-bottom: 210px;
   width: 95%;

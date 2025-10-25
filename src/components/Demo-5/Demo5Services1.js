@@ -118,7 +118,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Departments</h3>
+            <h3 className="h3-md steelblue-color">Patient Services</h3>
           </div>
         </div>
 

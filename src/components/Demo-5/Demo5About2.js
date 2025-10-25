@@ -12,7 +12,7 @@ import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
 import { Alert, Snackbar } from "@mui/material";
 
 const Demo5About2 = () => {
-  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState();
+  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
   const [mobNo, setMobNo] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
@@ -62,7 +62,7 @@ const Demo5About2 = () => {
     <section id="about-2" className="about-section division">
       <div className="container">
         {/* Content Boxes */}
-        <div className="abox-2-holder py-5">
+        <div className="abox-2-holder py-2">
           <div className="text-center mb-5">
             <h1 className="steelblue-color">Welcome to Healthpath</h1>
             <div className="h5 mx-auto steelblue-color w-100">

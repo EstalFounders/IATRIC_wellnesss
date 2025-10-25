@@ -10,8 +10,8 @@ const Demo5Pricing3 = () => {
           <div className="col-lg-6">
             <div className="txt-block pc-30 mb-40">
               {/* Section ID */}
-              <span className="section-id blue-color">
-                <h4>Healthpath pricing</h4>
+              <span className="blue-color" style={{ fontSize: "1.8rem", fontWeight: "600" }}>
+                Healthpath pricing
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">

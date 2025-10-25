@@ -6,19 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAllDoctor } from "../../store/slices/superAdmin/homepageSlice";
 import DoctorCard from "../Common/DoctorCard";
 import { ConsultationButton } from "../Common/commonUi";
-import { fetchDoctors } from "../ApiService/ConsultationApiService";
 
 const DoctorsSection = () => {
   const doctors = useSelector((state) => state.allDoctorS.allDoctors);
   const dispatch = useDispatch();
-
-  console.log(doctors, "doctors indocter section");
-
-  useEffect(() => {
-    if(!doctors) {
-      fetchDoctors(dispatch);
-    }
-  }, []); // Empty dependency array ensures the effect runs only once
 
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">

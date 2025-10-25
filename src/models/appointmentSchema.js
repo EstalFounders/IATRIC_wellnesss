@@ -26,7 +26,6 @@ const appointmentSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
   },
   patientMobNo: {
     type: Number,
@@ -37,8 +36,8 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
   },
   consultationprice: {
-   type: Number,
-   required: true,
+    type: Number,
+    required: true,
   },
   appointmentTime: {
     type: Date,
@@ -68,7 +67,7 @@ const appointmentSchema = new mongoose.Schema({
 });
 
 // Use a unique model identifier
-const modelName = 'Appointment';
+const modelName = "Appointment";
 
 // Check if the model already exists
 if (mongoose.models[modelName]) {

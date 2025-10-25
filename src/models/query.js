@@ -5,11 +5,9 @@ const querySchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     email: {
       type: String,
-      // required: true,
     },
     mobile_number: {
       type: Number,

@@ -24,6 +24,7 @@ const benefits = [
 
 const BenefitSection = () => {
   return (
+    <div className="wide-100">
     <Container sx={{ py: 5 }}>
       <Typography variant="h4" align="center" gutterBottom>
         Why Choose Us?
@@ -45,7 +46,9 @@ const BenefitSection = () => {
         ))}
       </Grid>
     </Container>
+    </div>
   );
+  
 };
 
 export default BenefitSection;
