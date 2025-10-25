@@ -68,7 +68,6 @@ const Demo5 = () => {
           <Demo5Pricing3 />
         </AnimatedSection>
 
-
         <AnimatedSection animation="fadeInUp" delay={0.3} duration={1.2}>
           <Demo2Reviews2 />
         </AnimatedSection>
