@@ -77,9 +77,9 @@ const Demo5 = () => {
           <Demo5Pricing3 />
         </AnimatedSection> */}
 
-        {/* <AnimatedSection animation="fadeInUp" delay={0.2}>
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo2Gallery1 />
-        </AnimatedSection> */}
+        </AnimatedSection>
 
         {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Blog1 />
@@ -89,9 +89,9 @@ const Demo5 = () => {
           <Demo5Contacts1 />
         </AnimatedSection> */}
 
-        <AnimatedSection animation="fadeInUp" delay={0.1}>
+        {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Banner5 />
-        </AnimatedSection> 
+        </AnimatedSection>  */}
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <BenefitSection />

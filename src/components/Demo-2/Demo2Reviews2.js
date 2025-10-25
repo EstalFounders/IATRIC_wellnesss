@@ -4,7 +4,7 @@ import ReviewSlider from "./ReviewSlider";
 const Demo2Reviews2 = () => {
   return (
     <section id="reviews-2" className="wide-100 reviews-section division">
-      <div className="container h5 box-list grey-color">
+      <div className="container h5 grey-color">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">

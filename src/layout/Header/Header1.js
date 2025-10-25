@@ -11,10 +11,14 @@ import {
   FaLinkedin,
   FaMapMarkedAlt,
   FaPhone,
+  FaPhoneAlt,
 } from "react-icons/fa";
+import { FaPhoneVolume } from "react-icons/fa6";
+
 import {
   address,
   api,
+  booking_btn_txt,
   color_schema,
   contact_no,
   eventEmitter,
@@ -152,7 +156,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             }}
             className="callusbtn"
           >
-            <FaWhatsapp className="mx-1" />
+            <FaPhone className="mx-1" />
           </a>
         </Link>
       </div>
@@ -173,8 +177,8 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                 >
                   <span>
                     <FaMapMarkedAlt className="mx-1" />
-                    <b style={{ fontWeight: "bold", fontSize: 14 }}>
-                      Sector 57 , Gurgaon Haryana-122003
+                    <b style={{ fontWeight: "bold", fontSize: 16 }}>
+                      {address}
                     </b>
                   </span>
                 </a>
@@ -194,8 +198,8 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                     e.target.style.color = "#ffffff";
                   }}
                 >
-                  <FaWhatsapp className="mx-1" />
-                  <b style={{ fontWeight: "bold", fontSize: 14 }}>
+                  <FaPhoneVolume className="mx-1" />
+                  <b style={{ fontWeight: "bold", fontSize: 16 }}>
                     {contact_no}
                   </b>
                 </a>
@@ -267,16 +271,131 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
 
             {/* Center: MENU */}
             <nav className="wsmenu">
-              <ul className="wsmenu-list h6 font-weight-bold d-flex gap-4 mb-0">
+              <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
                 <li>
                   <Link legacyBehavior href="/">
                     <a className="nav-link">Home</a>
                   </Link>
                 </li>
-                <li>
-                  <Link legacyBehavior href="/about-us">
-                    <a className="nav-link">About Us</a>
-                  </Link>
+                <li aria-haspopup="true">
+                  <a href="#">
+                    Pages <span className="wsarrow" />
+                  </a>
+                  <div className="wsmegamenu clearfix">
+                    <div className="container">
+                      <div className="row">
+                        {/* MEGAMENU LINKS */}
+                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
+                          <li className="title">Standard Pages:</li>
+                          <li>
+                            <Link legacyBehavior href="/about-us">
+                              <a>About Us</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/about-us">
+                              <a>Mission / Plans</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/who-we-are">
+                              <a>Who We Are</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/all-services">
+                              <a>Our Services</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/service-1">
+                              <a>Contact Us</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/join-us">
+                              <a>Join Us</a>
+                            </Link>
+                          </li>
+                        </ul>
+                        {/* MEGAMENU LINKS */}
+                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
+                          <li className="title">Medical Pages:</li>
+                          <li>
+                            <Link legacyBehavior href="/all-departments">
+                              <a>Our Departments</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/department-single">
+                              <a>Department Single</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/all-doctors">
+                              <a>Meet the Doctors</a>
+                            </Link>
+                          </li>
+                        </ul>
+                        {/* MEGAMENU LINKS */}
+                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
+                          <li className="title">Special Pages:</li>
+                          <li>
+                            <Link legacyBehavior href="/pricing-1">
+                              <a>Pricing Packages #1</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/pricing-2">
+                              <a>Pricing Packages #2</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/appointment">
+                              <a>Make an Appointment</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/faqs">
+                              <a>FAQs Page</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/terms">
+                              <a>Terms of Use</a>
+                            </Link>
+                          </li>
+                        </ul>
+                        {/* MEGAMENU LINKS */}
+                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
+                          <li className="title">Auxiliary Pages:</li>
+                          <li>
+                            <Link legacyBehavior href="/gallery">
+                              <a>Our Gallery</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/blog-listing">
+                              <a>Blog Listing Page</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/single-post">
+                              <a>Single Blog Post</a>
+                            </Link>
+                          </li>
+                          <li>
+                            <Link legacyBehavior href="/contacts-2">
+                              <a>Contact Us #2</a>
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                      {/* End row */}
+                    </div>
+                    {/* End container */}
+                  </div>
+                  {/* End wsmegamenu */}
                 </li>
                 <li>
                   <Link legacyBehavior href="/labTest/homepage">
@@ -301,7 +420,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
                 <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
-                  Consult now
+                  {booking_btn_txt}
                 </ConsultationButton>
               )}
 

@@ -29,7 +29,7 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
   const router = useRouter();
   const theme = useTheme();
   const numberToIcon = {
-    0: FiPhoneCall,
+    0: FiPhoneCall, 
     1: FaWhatsapp,
     2: IoMdCall,
     3: FaVideo,

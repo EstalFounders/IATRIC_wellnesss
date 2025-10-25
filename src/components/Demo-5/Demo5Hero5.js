@@ -32,7 +32,7 @@ const Demo5Hero5 = () => {
                 className="steelblue-color"
                 style={{ color: `${color_schema.yellow}` }}
               >
-                <div style={{ fontWeight: "800" }}>Best Quality</div>
+                <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>Best Quality</div>
               </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
@@ -49,7 +49,7 @@ const Demo5Hero5 = () => {
                   </strong>{" "}
                   <br />
                   <br />
-                  One-stop care: Consult top doctors online, visit our clinic,
+                  <b style={{color: '#3b5f1d'}}>One-stop care:</b> Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts
                   support your journey to a healthier you.
                 </div>

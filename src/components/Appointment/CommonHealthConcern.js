@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { healthConcerns } from "../../../data/HealthConcern";
 import { HorizontalScrollContainer } from "../labTestComponent/common/HorizontalContainer";
 import { ConsultationButton } from "../Common/commonUi";
+import { booking_btn_txt } from "../../constant";
 
 const CommonHealthConcerns = () => {
   return (
@@ -29,7 +30,7 @@ const CommonHealthConcerns = () => {
               <div className="card-body">
                 <h5 className="card-title fw-bold">{item.title}</h5>
                 <p className="card-text text-muted">&#8377; {item.price}</p>
-                <ConsultationButton>Consult Now</ConsultationButton>
+                <ConsultationButton>{booking_btn_txt}</ConsultationButton>
               </div>
             </div>
           ))}

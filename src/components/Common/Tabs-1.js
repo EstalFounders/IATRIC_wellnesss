@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
-import { callToBook, color_schema, serviceOffered } from "../../constant";
+import { booking_btn_txt, callToBook, color_schema, serviceOffered } from "../../constant";
 import { handleServiceClick } from "./commonMethod";
 import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
@@ -120,11 +120,12 @@ const ServicesTabs = () => {
             .filter((service) => service.id === activeTab)
             .map((service) => (
               <div
-                className="row align-items-center service-row"
+                className="row align-items-start service-row"
                 key={service.id}
               >
+                {/* Left Column - Image */}
                 <div className="col-lg-6 mb-4 mb-lg-0">
-                  <div className="image-wrapper">
+                  <div className="image-wrapper position-relative">
                     <Image
                       onClick={() =>
                         handleServiceClickLocal(service.name, service.id)
@@ -134,18 +135,22 @@ const ServicesTabs = () => {
                       alt={service.name}
                       fill
                       sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
-                      style={{
-                        objectFit: "cover",
-                      }}
+                      style={{ objectFit: "cover" }}
                     />
                   </div>
                 </div>
 
-                <div className="col-lg-6 d-flex flex-column justify-content-center text-column">
-                  <h4 className="section-subheading blue-color mb-2">
+                {/* Right Column - Text */}
+                <div className="col-lg-6 d-flex flex-column justify-content-start text-column">
+                  {/* Subheading */}
+                  <h4
+                    className="section-subheading blue-color mb-3"
+                    style={{ fontSize: "1.8rem", fontWeight: "600" }}
+                  >
                     {service.subheading}
                   </h4>
 
+                  {/* Heading */}
                   <h3
                     className="clickable-div h3-md steelblue-color mb-3"
                     onClick={() =>
@@ -157,11 +162,16 @@ const ServicesTabs = () => {
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.color = `#000000`)
                     }
+                    style={{ fontWeight: "700" }}
                   >
                     {service.name}
                   </h3>
 
-                  <div className="service-description h5 box-list grey-color mb-4">
+                  {/* Description */}
+                  <div
+                    className="service-description h5 box-list grey-color mb-4"
+                    style={{ lineHeight: "1.6" }}
+                  >
                     {boldKeywords(service.description, [
                       "General Physician",
                       "trusted care",
@@ -210,7 +220,8 @@ const ServicesTabs = () => {
                     ])}
                   </div>
 
-                  <div className="mt-5 w-100">
+                  {/* Call to Book Button */}
+                  <div className="mt-4 w-100">
                     <div className="w-50 mx-auto mx-lg-0">
                       <ConsultationButton
                         path={"/appointment"}
@@ -220,7 +231,7 @@ const ServicesTabs = () => {
                           )
                         }
                       >
-                        {callToBook}
+                        {booking_btn_txt}
                       </ConsultationButton>
                     </div>
                   </div>

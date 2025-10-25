@@ -20,6 +20,7 @@ export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
 export const isNow = "Now";
 export const SERVER_AVAILABLE_SLOTS_CODE = "304";
+export const booking_btn_txt = "Consult Now"
 
 export const api = {
   addDoctor: "/api/addDoctor",
@@ -44,11 +45,13 @@ export const api = {
   addNewOffer: "/api/superAdmin/addNewOffer",
   globalVar: "/api/globalVar",
   userQuery: "/api/userQuery",
+  joinUsQuery: "/api/joinUsQuery",
   getImageFomrFirebase: "/api/helper/getImageFromFirebase",
   getInvoice: "/api/helper/generateInvoice",
   uploadInvoice: "/api/helper/uploadInvoice",
   serviceOffered: "/api/superAdmin/serviceOffered",
   sendOtp: "/api/helper/whatsappConfirmationApi",
+  serviceSuggestion: "/api/helper/getServiceSuggestion",
 };
 
 export const services = [
@@ -187,4 +190,4 @@ export const vapidKey =
   "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";
 
 
-export const callToBook = "Get a call back";  
+export const callToBook = "Get a Call back";  
