@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import HealthCheckupCard from "../common/HealthCheckupCard";
 import { ConsultationButton } from "../../Common/commonUi";
 import { HorizontalScrollContainer } from "../common/HorizontalContainer";
+import { BackButton } from "../common/CommonMethod";
 
 const ViewCheckupsPage = () => {
   const router = useRouter();
@@ -42,14 +43,7 @@ const ViewCheckupsPage = () => {
         </HorizontalScrollContainer>
       </div>
 
-      <div className="mt-5 text-center">
-        <div
-          className="labtest-btn w-25 font-weight-bold mr-auto ml-auto py-3"
-          onClick={() => router.back()}
-        >
-          ← Back
-        </div>
-      </div>
+      <BackButton Router={router} />
     </div>
   );
 };
