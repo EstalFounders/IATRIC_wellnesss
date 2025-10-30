@@ -230,14 +230,17 @@ Failed to compile.
 40:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'storedDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/Appointment/AppointmentPage.js
-197:6  Warning: React Hook useEffect has a missing dependency: 'fetchSlots'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-203:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'doctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-267:6  Warning: React Hook useEffect has missing dependencies: 'consultationType' and 'filterDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-274:6  Warning: React Hook useEffect has a missing dependency: 'doctorChoice'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-424:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+167:6  Warning: React Hook useEffect has a missing dependency: 'services'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+224:6  Warning: React Hook useEffect has a missing dependency: 'fetchSlots'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+230:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'doctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+294:6  Warning: React Hook useEffect has missing dependencies: 'consultationType' and 'filterDoctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+301:6  Warning: React Hook useEffect has a missing dependency: 'doctorChoice'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/Appointment/CommonHealthConcern.js
+24:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/components/Appointment/OtpConfirmationPopup.js
-19:6  Warning: React Hook useEffect has a missing dependency: 'generateAndSendOtp'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+19:5  Warning: React Hook useEffect has a missing dependency: 'generateAndSendOtp'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/Blog-listing/BlogPage.js
 15:6  Warning: React Hook useEffect has a missing dependency: 'sort'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -555,9 +558,6 @@ Failed to compile.
 65:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 99:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
-./src/components/Demo-5/Demo5Doctors1.js
-21:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'doctors'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-
 ./src/components/Demo-5/Demo5Gallery1.js
 30:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 54:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -567,6 +567,9 @@ Failed to compile.
 150:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 174:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 198:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/Demo-5/Demo5Hero5.js
+15:6  Warning: React Hook useEffect has a missing dependency: 'dispatch'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/Demo-5/Demo5Reviews2.js
 35:41  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -587,9 +590,6 @@ Failed to compile.
 265:41  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 289:41  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 296:41  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
-./src/components/Demo-5/Demo5Services2.js
-20:9  Error: Parsing error: Identifier 'handleServiceClick' has already been declared. (20:9)
 
 ./src/components/Demo-5/Demo5Tabs1.js
 65:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -877,6 +877,10 @@ Failed to compile.
 ./src/components/Pricing-2/Pricing2Page.js
 157:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
+./src/components/SearchComponent.js
+92:40  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+92:71  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
 ./src/components/Service-1/Service1Doctors1.js
 29:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 62:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -918,12 +922,8 @@ Failed to compile.
 273:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 377:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
-./src/components/discover-more/DiscoverMore.js
-18:14  Error: 'ConsultationSVGIcon' is not defined.  react/jsx-no-undef
-28:14  Error: 'HomecareIcon' is not defined.  react/jsx-no-undef
-38:14  Error: 'ClinicIcon' is not defined.  react/jsx-no-undef
-59:14  Error: 'CommunityIcon' is not defined.  react/jsx-no-undef
-66:14  Error: 'CorporateHealthIcon' is not defined.  react/jsx-no-undef
+./src/components/blogComponent/NewsLetterComp.js
+88:62  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./src/components/labTestComponent/common/CartPanel.js
 70:6  Warning: React Hook useEffect has a missing dependency: 'onUpdateCartItemCount'. Either include it or remove the dependency array. If 'onUpdateCartItemCount' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
@@ -946,9 +946,6 @@ Failed to compile.
 
 ./src/components/registerDocComponent/lib/DoctorPrescriptionGenerator.js
 237:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
-./src/components/serviceDetails/ServiceDetailsComponent.js
-187:6  Warning: React Hook useEffect has a missing dependency: 'Service'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/superAdminComponent/ConsultationFee.js
 26:6  Warning: React Hook useEffect has a missing dependency: 'storedConsultations'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -981,13 +978,15 @@ Failed to compile.
 14:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Footer/Footer4.js
-45:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+47:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Footer/Footer5.js
 15:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Header/Header1.js
-275:14  Error: Parsing error: Expected corresponding JSX closing tag for <div>. (275:14)
+115:6  Warning: React Hook useEffect has missing dependencies: 'consultationTypes' and 'dispatch'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+144:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+280:17  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
 
 ./src/layout/Header/Header2.js
 20:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -1113,7 +1112,16 @@ Failed to compile.
 105:6  Warning: React Hook useEffect has a missing dependency: 'calculateCounts'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/layout/MobileMenu.js
-121:12  Error: Parsing error: Expected corresponding JSX closing tag for <Link>. (121:12)
+41:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
+121:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
+267:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
+327:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
+374:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+399:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+416:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+433:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+459:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
+463:13  Warning: The attribute aria-haspopup is not supported by the role listitem. This role is implicit on the element li.  jsx-a11y/role-supports-aria-props
 
 ./src/lib/ImageUploader.js
 41:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
