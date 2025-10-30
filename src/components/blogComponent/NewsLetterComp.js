@@ -85,8 +85,8 @@ const NewsLetterComp = () => {
           ) : (
             /* Success Message */
             <Alert variant="success" className="d-inline-block">
-              <strong>Thank you for subscribing!</strong> You'll receive our
-              next newsletter soon.
+              <strong>Thank you for subscribing!</strong> You&apos;ll receive
+              our next newsletter soon.
             </Alert>
           )}
         </Col>

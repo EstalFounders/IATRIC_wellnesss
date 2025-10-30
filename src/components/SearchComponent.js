@@ -89,7 +89,8 @@ const SearchDropdown = ({
       ) : (
         <div style={{ padding: "25px 20px", textAlign: "center" }}>
           <div className="text-muted" style={{ fontSize: "1rem" }}>
-            No articles found matching "<strong>{searchQuery}</strong>"
+            No articles found matching &quot;<strong>{searchQuery}</strong>
+            &quot;
           </div>
           <div className="text-muted small mt-1">
             Try different keywords or browse our categories
