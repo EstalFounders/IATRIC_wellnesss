@@ -1,5 +1,30 @@
 import React from "react";
 import { FaCalendarAlt, FaClock } from "react-icons/fa";
+import ArticleCard from "./ArticleCard";
+import { useRouter } from "next/router";
+
+const sampleBlog = {
+  category: "Cardiology",
+  title:
+    "Understanding Heart Disease: Early Warning Signs You Shouldn't Ignore",
+  description: `
+Heart disease remains one of the leading causes of death globally. Recognizing early symptoms can significantly improve outcomes.
+
+### Common Warning Signs
+- Chest pain or discomfort
+- Shortness of breath
+- Unexplained fatigue
+- Dizziness or nausea
+
+### Prevention
+Maintain a healthy lifestyle: regular exercise, balanced diet, and routine check-ups.
+
+Early detection saves lives — listen to your body and consult your doctor when in doubt.
+  `,
+  date: "Jan 15, 2025",
+  readTime: "6 min read",
+  author: "Dr. Sarah Chen",
+};
 
 const articles = [
   {
@@ -60,12 +85,13 @@ const articles = [
 ];
 
 const LatestArticlesComp = () => {
+  const router = useRouter();
   return (
     <div className="container my-5">
       {/* Section Header */}
       <div className="text-center mb-5">
-        <h2 className="fw-bold">Latest Articles</h2>
-        <p className="text-muted">
+        <span className="h1 font-weight-bold">Latest Articles</span>
+        <p className="text-muted h4">
           Stay updated with the newest medical insights and health research
         </p>
       </div>
@@ -75,30 +101,11 @@ const LatestArticlesComp = () => {
         {articles.map((article, index) => (
           <div key={index} className="col-md-6 col-lg-4 mb-4">
             {/* Added d-flex flex-column to make it a flex container */}
-            <div className="card border-0 shadow-lg h-100 p-3 rounded-4 d-flex flex-column">
-              <span className="mb-2 latest-article-category-badge w-50 text-center">
-                {article.category}
-              </span>
-
-              {/* This div wraps the title/description and takes up remaining space */}
-              <div className="flex-grow-1 mb-3">
-                <h6 className="fw-bold">{article.title}</h6>
-                <p className="text-muted small">{article.description}</p>
-              </div>
-
-              {/* **FIX: Use mt-auto to push the separator and footer to the bottom** */}
-              <hr className="mt-auto" />
-
-              <div className="d-flex justify-content-between align-items-center text-muted small">
-                <span>
-                  <FaCalendarAlt className="me-1" /> {article.date}
-                </span>
-                <span>
-                  <FaClock className="me-1" /> {article.readTime}
-                </span>
-                <span className="fw-semibold text-dark">{article.author}</span>
-              </div>
-            </div>
+            <ArticleCard
+              articleCardDetails={article}
+              article={sampleBlog}
+              router={router}
+            />
           </div>
         ))}
       </div>

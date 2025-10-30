@@ -409,6 +409,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
                   </Link>
                 </li>
                 <li>
+                  <Link legacyBehavior href="/blog/homepage">
+                    <a className="nav-link" target="_blank">Blog</a>
+                  </Link>
+                </li>
+                <li>
                   <Link legacyBehavior href="/service-1">
                     <a className="nav-link">Contact Us</a>
                   </Link>

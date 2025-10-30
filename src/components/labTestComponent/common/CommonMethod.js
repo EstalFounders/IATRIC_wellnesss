@@ -14,6 +14,7 @@ import React from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
 import { isValidObjectId } from "mongoose";
+import { setViewArticle, setViewCategory } from "../../../store/slices/blog/utilBlogStore";
 
 export const MoreButton = ({ viewCheckupData, category }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -237,4 +238,28 @@ export const setLabTestCartItems = (items) => {
   } catch (error) {
     console.error("Failed to save cart to localStorage", error);
   }
+};
+
+export const BackButton = (Router) => {
+  return (
+    <div className="mt-5 text-center">
+      <div
+        className="labtest-btn w-25 font-weight-bold mr-auto ml-auto py-3"
+        onClick={() => Router.Router.back()}
+      >
+        ← Back
+      </div>
+    </div>
+  );
+};
+
+export const handleViewCateogory = (categoryDetails, dispatch,router) => {
+  console.log(router, "router in common method",dispatch, categoryDetails);
+  dispatch(setViewCategory(categoryDetails));
+  router.push("/blog/categorysingle");
+};
+
+export const handleViewArticle = (categoryDetails, dispatch,router) => {
+  dispatch(setViewArticle(categoryDetails));
+  router.push("/blog/blogpost");
 };

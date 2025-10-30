@@ -1,4 +1,6 @@
 import React from "react";
+import BlogCategoryCard from "./CategoryCard";
+import { useRouter } from "next/router";
 
 const categories = [
   {
@@ -23,19 +25,19 @@ const categories = [
   },
   {
     title: "General Health",
-    description:
-      "Overall wellness, preventive care, and medical updates",
+    description: "Overall wellness, preventive care, and medical updates",
     articles: 54,
     image: "/images/generalhealth.jpg",
   },
 ];
 
 const ExploreByCategoryComp = () => {
+  const router = useRouter();
   return (
     <div className="container my-5">
       <div className="text-center mb-4">
-        <h2 className="fw-bold">Explore by Category</h2>
-        <p className="text-muted">
+        <span className="fw-bold h1 font-weight-bold">Explore by Category</span>
+        <p className="text-muted h4">
           Browse our comprehensive collection of medical articles organized by
           specialty
         </p>
@@ -44,32 +46,7 @@ const ExploreByCategoryComp = () => {
       <div className="row g-4 justify-content-center">
         {categories.map((cat, index) => (
           <div key={index} className="col-md-6 col-lg-3">
-            <div className="card border-0 shadow-sm h-100">
-              <div
-                className="rounded-top"
-                style={{
-                  height: "160px",
-                //   backgroundImage: `url(${cat.image})`,
-                backgroundImage: `url("/images/dentistry.jpg")`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  borderTopLeftRadius: "12px",
-                  borderTopRightRadius: "12px",
-                }}
-              ></div>
-              <div className="card-body">
-                <h5 className="fw-bold">{cat.title}</h5>
-                <p className="text-muted small">{cat.description}</p>
-                <div className="d-flex justify-content-between align-items-center font-weight-bold" style={{color: '#8e8333'}}>
-                  <span className="fw-semibold">
-                    {cat.articles} Articles
-                  </span>
-                  <a href="#" className="text-decoration-none">
-                    Explore →
-                  </a>
-                </div>
-              </div>
-            </div>
+            <BlogCategoryCard categoryDetails={cat} router={router} />
           </div>
         ))}
       </div>
