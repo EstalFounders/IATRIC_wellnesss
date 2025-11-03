@@ -1,5 +1,6 @@
 import { signIn } from "next-auth/react";
 import { api, contact_no } from "./constant";
+import { Pagination } from "react-bootstrap";
 
 export const loginUser = async ({ email, password }) => {
   console.log("login user console");
@@ -56,3 +57,63 @@ export const convertTimeIntoDate = (dateString) => {
   console.log(updatedDate, 'updated date in helper')
   return updatedDate;
 };
+
+export const CustomPagination = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  if (totalPages <= 1) return null; // Don't render pagination if only one page exists.
+
+  return (
+    <Pagination className="justify-content-center mt-4">
+      {[...Array(totalPages).keys()].map((_, index) => (
+        <Pagination.Item
+          key={index}
+          active={index + 1 === currentPage}
+          onClick={() => onPageChange(index + 1)}
+        >
+          {index + 1}
+        </Pagination.Item>
+      ))}
+    </Pagination>
+  );
+};
+
+export const isMobileValid = (mobNo) => {
+  const isValidMobile = /^[0-9]{10}$/.test(mobNo); // Checks if mobNo is exactly 10 digits
+
+  if(isValidMobile) {
+      return true
+  } else {
+    return false
+  }
+}
+
+export const getFilteredNotifications = (notifications) => {
+  const leaveRequest = [];
+  const doctorUpdateRequests = [];
+  const consultationRequests = [];
+
+  notifications.forEach((notif) => {
+    switch (notif.title) {
+      case "leave-request":
+        leaveRequest.push(notif);
+        break;
+      case "doctor-update":
+        doctorUpdateRequests.push(notif);
+        break;
+      case "consultation-request":
+        consultationRequests.push(notif);
+        break;
+      default:
+        break;
+    }
+  });
+
+  return {
+    leaveRequest,
+    doctorUpdateRequests,
+    consultationRequests,
+  };
+};
+
+

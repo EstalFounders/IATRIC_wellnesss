@@ -1,8 +1,13 @@
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { invoice_img_path, prescription_img_path } from "./constant";
+import { storage } from "../lib/firebase";
+import { v4 as uuidv4 } from "uuid";
+
 export const animation = () => {
   if (typeof window !== "undefined") {
-    window.WOW = require("wowjs");
+     window.WOW = require("wowjs");
   }
-  new WOW.WOW().init();
+  new WOW.WOW({ live: false, mobile: true }).init();
 };
 export const stickyNav = () => {
   let offset = window.scrollY;
@@ -61,4 +66,34 @@ export const getPagination = (totalNumber, sort) => {
     .fill()
     .map((_, idx) => idx + 1);
   return arr;
+};
+
+export const sendPrescriptionToFirebase = async (file, details) => {
+  console.log(details.patientName, "details");
+  const storageRef = ref(
+    storage,
+    `${prescription_img_path}/patient=${details.patientName},doctor=${
+      details.doctorName
+    }_${uuidv4()}`
+  );
+  const metadata = {
+    contentType: file.type,
+  };
+  await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(storageRef);
+  return url;
+};
+
+export const sendInvoiceToFirebase = async (file, invoiceNumber) => {
+  console.log(invoiceNumber, "invoice no", file, "file");
+  const storageRef = ref(
+    storage,
+    `${invoice_img_path}/invoiceNo=${invoiceNumber}_${uuidv4()}`
+  );
+  const metadata = {
+    contentType: file.type,
+  };
+  await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(storageRef);
+  return url;
 };

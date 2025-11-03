@@ -1,30 +1,32 @@
 import React from "react";
-import ReviewSlider from "../ReviewSlider";
+import ReviewSlider from "./ReviewSlider";
 
 const Demo2Reviews2 = () => {
   return (
-    <section
-      id="reviews-2"
-      className="bg-lightgrey wide-100 reviews-section division"
-    >
-      <div className="container">
+    <section id="reviews-2" className="wide-100 reviews-section division">
+      <div className="container h5 grey-color">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">What Our Patients Say</h3>
+            <h3 className="h3-md text-dark">What Our Patients Say</h3>
             {/* Text */}
-            <p>
-              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
-              primis libero at tempus, blandit posuere ligula varius congue
-              cursus porta feugiat
-            </p>
+            <div>
+              <div className="h5 box-list grey-color">
+                At Healthpath, the heart of our success lies in the positive
+                experiences of our patients. We&apos;re incredibly proud of the
+                trust placed in us and the real difference we make in
+                people&apos;s lives. Here&apos;s what some of our patients have
+                to say about their Healthpath experience:
+              </div>
+            </div>
           </div>
+          {/* END SECTION TITLE */}
+          {/* TESTIMONIALS CONTENT */}
+
+          {/* END TESTIMONIALS CONTENT */}
         </div>
-        {/* END SECTION TITLE */}
-        {/* TESTIMONIALS CONTENT */}
-        <ReviewSlider />
-        {/* END TESTIMONIALS CONTENT */}
+          <ReviewSlider />
       </div>
       {/* End container */}
     </section>

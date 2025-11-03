@@ -19,7 +19,6 @@
   .dropdown-menu {
     position: fixed;
     top: 60px; /* Adjust this value based on your header's height */
-    right: 0;
     background-color: #CDD5CC;
     border: 1px solid #ccc;
     border-radius: 4px;

@@ -1,0 +1,9 @@
+#invoiceContainer {
+    overflow: auto !important; /* Allow scrolling */
+  }
+  
+  @media print {
+    #invoiceContainer {
+      overflow: visible !important;
+    }
+  }

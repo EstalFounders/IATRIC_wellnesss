@@ -1,5 +1,6 @@
 // models/appointmentModel.js
 import mongoose from "mongoose";
+import { appointment_status } from "../constant";
 
 const appointmentSchema = new mongoose.Schema({
   meetingId: {
@@ -25,7 +26,6 @@ const appointmentSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
   },
   patientMobNo: {
     type: Number,
@@ -34,7 +34,10 @@ const appointmentSchema = new mongoose.Schema({
   consultationType: {
     type: String,
     required: true,
-    enum: ["Call", "Video", "Home visit", "Clinic"],
+  },
+  consultationprice: {
+    type: Number,
+    required: true,
   },
   appointmentTime: {
     type: Date,
@@ -43,8 +46,7 @@ const appointmentSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    default: "open",
-    enum: ["open", "completed", "cancelled"],
+    default: appointment_status.open,
   },
   patientMeetingUrl: {
     type: String,
@@ -55,10 +57,17 @@ const appointmentSchema = new mongoose.Schema({
   prescriptionUrl: {
     type: String,
   },
+  invoiceId: {
+    type: String,
+    default: "",
+  },
+  serviceType: {
+    type: String,
+  },
 });
 
 // Use a unique model identifier
-const modelName = 'Appointment';
+const modelName = "Appointment";
 
 // Check if the model already exists
 if (mongoose.models[modelName]) {
@@ -66,8 +75,6 @@ if (mongoose.models[modelName]) {
 }
 
 // Compile the model if it doesn't exist
-const Slot = mongoose.model(modelName, appointmentSchema);
-
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
 export default Appointment;

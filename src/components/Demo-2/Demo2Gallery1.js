@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Popup from "../Popup";
+import Image from "next/image";
 
 const Demo2Gallery1 = () => {
   const [image, setImage] = useState(false);
@@ -9,22 +10,21 @@ const Demo2Gallery1 = () => {
     setSrc(src);
   };
   return (
-    <div id="gallery-1" className="gallery-section division">
+    <div id="gallery-1" className="gallery-section division wide-100">
       {image && <Popup content={{ src, name: "image" }} close={setImage} />}
       {/* SECTION TITLE */}
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">Your Partner in Health</h3>
+            <h3 className="h3-md text-dark">Your Partner in Health</h3>
             {/* Text */}
-            <p>
-              We believe in being more than just a healthcare provider.
-              We&apos;re your partner in health, walking alongside you on your
-              wellness journey. We offer personalized care, support, and
-              resources to help you achieve your health goals, every step of the
-              way.
-            </p>
+            <div>
+              At Healthpath, we&apos;re more than just a <strong>healthcare provider</strong>; we&apos;re truly <strong>your partner in health</strong>. We walk alongside you on your entire <strong>wellness journey</strong>, committed to helping you achieve your personal health goals.
+            </div><br></br>
+            <div>
+              We offer <strong>personalized care</strong>, dedicated support, and essential resources every step of the way. With Healthpath, you gain a trusted ally focused on your <strong>long-term well-being</strong>, ensuring you receive the <strong>comprehensive care</strong> and guidance you need to thrive. Choose Healthpath for a collaborative approach to your health, where your success is our shared mission.
+            </div>
           </div>
         </div>
       </div>
@@ -34,9 +34,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image  
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-1.jpg"
+              src="/images/gallery/image-1.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -56,9 +58,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-2.jpg"
+              src="/images/gallery/image-2.jpg"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -78,9 +82,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-3.jpg"
+              src="/images/gallery/image-3.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -100,9 +106,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-4.jpg"
+              src="/images/gallery/image-4.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -122,9 +130,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-5.jpg"
+              src="/images/gallery/image-5.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -144,9 +154,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-6.jpg"
+              src="/images/gallery/image-6.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -166,9 +178,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-7.jpg"
+              src="/images/gallery/image-7.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />
@@ -188,9 +202,11 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <img
+            <Image
+              width={500}
+              height={500}
               className="img-fluid"
-              src="images/gallery/image-8.jpg"
+              src="/images/gallery/image-8.png"
               alt="gallery-image"
             />
             <div className="item-overlay" />

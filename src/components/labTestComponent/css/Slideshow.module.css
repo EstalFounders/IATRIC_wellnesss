@@ -1,0 +1,26 @@
+.carousel {
+    margin: 20px 0 10px 0;
+        
+  }
+  
+  .carouselImage {
+    object-fit: cover;
+    max-height: 550px;
+    border-radius: 10px;
+    border-color: black;
+    border-width: 10;
+  }
+
+  
+  @media (max-width: 768px) {
+    .carouselImage {
+      max-height: 300px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .carouselImage {
+      max-height: 200px;
+    }
+  }
+  

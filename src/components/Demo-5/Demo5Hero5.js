@@ -1,7 +1,19 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+import { color_schema } from "../../constant";
+import { ConsultationButton } from "../Common/commonUi";
+import { useRouter } from "next/router";
+import { fetchBasicConfiguration } from "../ApiService/UtilService";
+import { useDispatch } from "react-redux";
 
 const Demo5Hero5 = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetchBasicConfiguration(dispatch);
+  }, []);
+
   return (
     <section id="hero-5" className="bg-fixed hero-section division">
       <div className="container">
@@ -10,14 +22,17 @@ const Demo5Hero5 = () => {
           <div className="col-md-9 col-lg-7 col-xl-6">
             <div
               className="hero-5-strip bg-blue white-color"
-              style={{ backgroundColor: "#3b5f1d" }}
+              style={{ backgroundColor: `${color_schema.green}` }}
             >
-              <h5>Iatric Healthcare Provides</h5>
+              <div className="h2 m-0 font-weight-bold">HealthPath Provides</div>
             </div>
             <div className="hero-txt">
               {/* Title */}
-              <h4 className="steelblue-color" style={{ color: "#8e8333" }}>
-                <b>Best Quality</b>
+              <h4
+                className="steelblue-color"
+                style={{ color: `${color_schema.yellow}` }}
+              >
+                <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>Best Quality</div>
               </h4>
               <h3 className="steelblue-color">
                 Medical treatment for you and your family
@@ -27,15 +42,17 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
-                <p>
-                  Get optimal health,{" "}
-                  <strong style={{ color: "#8e8333" }}>
-                    <b>ANYTIME, ANYWHERE!</b>
+                <div className="h5 mx-auto steelblue-color">
+                  Get optimal health ,{" "}
+                  <strong style={{ color: `${color_schema.green}` }}>
+                    ANYTIME , ANYWHERE !
                   </strong>{" "}
-                  One-stop care: Consult top doctors online, visit our clinic,
+                  <br />
+                  <br />
+                  <b style={{color: '#3b5f1d'}}>One-stop care:</b> Consult top doctors online, visit our clinic,
                   or get home visits & lab tests. Our pharmacy & rehab experts
                   support your journey to a healthier you.
-                </p>
+                </div>
               </div>
               {/* CONTENT BOX #3 */}
               <div className="box-list grey-color mb-15">
@@ -51,14 +68,11 @@ const Demo5Hero5 = () => {
                 </p>
               </div>
               {/* Button */}
-              <Link legacyBehavior href="/about-us">
-                <a
-                  className="btn btn-blue blue-hover"
-                  style={{ backgroundColor: "#8e8333" }}
-                >
+              <div className="w-50">
+                <ConsultationButton path={"/discover-more"}>
                   Discover More
-                </a>
-              </Link>
+                </ConsultationButton>
+              </div>
             </div>
           </div>
           {/* END HERO TEXT */}

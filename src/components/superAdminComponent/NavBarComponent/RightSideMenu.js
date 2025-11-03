@@ -6,11 +6,11 @@ import styles from './RightSideMenu.module.css';
 import { FaAngleDown } from 'react-icons/fa';
 import { super_admin_info_local_sotrage } from "../../../constant";
 
-const Dropdown = () => {
+const RightSideMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const super_admin_info = JSON.parse(
-    localStorage.getItem(super_admin_info_local_sotrage)
+    sessionStorage.getItem(super_admin_info_local_sotrage)
   );
 
   const toggleDropdown = () => {
@@ -18,16 +18,22 @@ const Dropdown = () => {
   };
 
   const handleItemClick = async (item) => {
-    console.log(`Clicked on ${item}`);
-    if(item == 'logout') 
-    try {
-        await signOut();
-        // Additional logic after successful sign-out
-        router.push("/registerDoc/onload"); // Redirect to the login screen
-      } catch (error) {
-        console.error("Error during sign-out:", error);
-      }
-  };
+      console.log(`Clicked on ${item}`);
+      if(item == 'logout') 
+      try {
+          await signOut(
+            {
+              callbackUrl: "/superAdmin/onload",
+              redirect: true,
+            }
+          );
+          // Additional logic after successful sign-out
+          // router.push("/superAdmin/onload"); // Redirect to the login screen
+        } catch (error) {
+          console.error("Error during sign-out:", error);
+        }
+    };
+
 
   return (
     <div className={styles.dropdown}>
@@ -56,4 +62,4 @@ const Dropdown = () => {
   );
 };
 
-export default Dropdown;
+export default RightSideMenu;

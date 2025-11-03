@@ -1,0 +1,35 @@
+.dropdownContainer {
+    position: relative;
+    width: 100%;
+  }
+  
+  .dropdownSelected {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    text-align: left;
+  }
+  
+  .dropdownOptions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    background-color: #ffffff;
+    z-index: 10;
+  }
+  
+  .dropdownOption {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .dropdownOption:hover {
+    background-color: #e9ecef;
+  }
+  

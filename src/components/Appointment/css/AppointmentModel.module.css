@@ -1,0 +1,28 @@
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+  }
+  
+  .modalContent {
+    width: 100%; 
+    max-width: 835px;
+    background-color:white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .requestOtp {
+font-size: 32px;
+font-weight: 600;
+line-height: 39.01px;
+color: black;
+  }
+  

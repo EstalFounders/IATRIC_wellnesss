@@ -1,0 +1,96 @@
+/* styles/ViewCheckupsPage.module.css */
+
+.pageContainer {
+  padding: 40px 20px;
+  background-color: #f8f9fa; /* Light background for the whole page */
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  font-family: 'Inter', sans-serif; /* Consistent font */
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.pageTitle {
+  font-size: 3.5rem; /* Large, prominent title */
+  font-weight: 700;
+  color: #2c3e50; /* Darker text for contrast */
+  margin-bottom: 15px;
+  letter-spacing: -0.02em; /* Slightly tighter letter spacing */
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  color: #7f8c8d; /* Muted subtitle color */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cardsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center cards in the grid */
+  gap: 20px; /* Space between cards */
+  padding: 20px 0;
+}
+
+.cardWrapper {
+  flex: 0 0 auto; /* Prevent stretching */
+  width: 100%; /* Default for mobile */
+  max-width: 350px; /* Max width for individual card on larger screens */
+  /* Adjust breakpoints if needed, e.g., for col-md-4 */
+  /* For Bootstrap grid, you'd rely on col classes, but for custom flex grid, these are useful */
+}
+
+/* Media queries for responsiveness, mimicking Bootstrap cols */
+@media (min-width: 576px) { /* Small devices (sm) */
+  .cardWrapper {
+    width: calc(50% - 20px); /* Two cards per row with gap */
+  }
+}
+
+@media (min-width: 768px) { /* Medium devices (md) */
+  .cardWrapper {
+    width: calc(33.333% - 20px); /* Three cards per row with gap */
+  }
+}
+
+@media (min-width: 992px) { /* Large devices (lg) */
+  .cardWrapper {
+    width: calc(25% - 20px); /* Four cards per row with gap */
+  }
+}
+
+
+.noTestsMessage {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #95a5a6;
+  padding: 50px;
+  background-color: #ecf0f1;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+.backButtonContainer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.backButton {
+  background-color: #3498db; /* Blue button */
+  color: #ffffff;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.backButton:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}

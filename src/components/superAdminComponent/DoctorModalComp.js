@@ -2,44 +2,65 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
-import { convertDateIntoTime, convertTimeIntoDate } from "../../helper";
+import {
+  convertDateIntoTime,
+  convertTimeIntoDate,
+  isMobileValid,
+} from "../../helper";
+import {
+  DoctorType,
+  superAdminConsultationtype,
+  userTypeConstant,
+} from "../../constant";
+import { useSelector } from "react-redux";
 
-const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
-  
+const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
+  console.log(doctor, "doctor in modal");
+  const consultationTypeStore = useSelector(
+    (state) => state.otherDetailsSlice.consultationType
+  );
   const [editedDoctor, setEditedDoctor] = useState({ ...doctor });
   const [profilePicturePreview, setProfilePicturePreview] = useState(
     doctor.profilePictureUrl
   );
+  const [slotStartTime, setSlotStartTime] = useState(
+    convertDateIntoTime(editedDoctor.slotStartTime)
+  );
+  const [slotEndTime, setSlotEndTime] = useState(
+    convertDateIntoTime(editedDoctor.slotEndTime)
+  );
 
-  const [slotStartTime, setSlotStartTime] = useState(convertDateIntoTime(editedDoctor.slotStartTime))
-  const [slotEndTime, setSlotEndTime] = useState(convertDateIntoTime(editedDoctor.slotEndTime))
+  const [selectedTypes, setSelectedTypes] = useState(
+    editedDoctor.consultationType || ""
+  );
+
+  console.log(selectedTypes, "selectedTypes");
 
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-    
-      if (name === "slotStartTime" || name === "slotEndTime") {
-        const updatedTime = convertTimeIntoDate(value);
-        if (name === "slotStartTime") {
-          setSlotStartTime(value);
-          setEditedDoctor({
-            ...editedDoctor,
-            slotStartTime: updatedTime,
-          });
-        } else {
-          setSlotEndTime(value);
-          setEditedDoctor({
-            ...editedDoctor,
-            slotEndTime: updatedTime,
-          });
-        }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "slotStartTime" || name === "slotEndTime") {
+      const updatedTime = convertTimeIntoDate(value);
+      if (name === "slotStartTime") {
+        setSlotStartTime(value);
+        setEditedDoctor({
+          ...editedDoctor,
+          slotStartTime: updatedTime,
+        });
       } else {
-        setEditedDoctor({ ...editedDoctor, [name]: value });
+        setSlotEndTime(value);
+        setEditedDoctor({
+          ...editedDoctor,
+          slotEndTime: updatedTime,
+        });
       }
-    };
-    
+    } else {
+      setEditedDoctor({ ...editedDoctor, [name]: value });
+    }
+  };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -74,10 +95,28 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
   };
 
   const handleSave = () => {
-    console.log(editedDoctor, 'edited doctor')
+    console.log(editedDoctor, "edited doctor");
+    if (!isMobileValid(editedDoctor.mobileNumber)) {
+      alert("Please enter a valid mobile number");
+      return;
+    }
     onSave(editedDoctor);
     handleClose();
   };
+
+  const handleCheckboxChange = (type) => {
+    let updatedTypes;
+    if (selectedTypes.includes(type)) {
+      updatedTypes = selectedTypes.filter((item) => item !== type); // Remove if already selected
+    } else {
+      updatedTypes = [...selectedTypes, type]; // Add if not selected
+    }
+
+    setSelectedTypes(updatedTypes);
+    setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+  };
+
+  console.log(editedDoctor, "edited doctor");
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -96,6 +135,17 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
                   type="text"
                   name="name"
                   value={editedDoctor.name}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group controlId="mobileNumber" className="mb-3">
+                <Form.Label>
+                  <b>Mobile Number</b>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="mobileNumber"
+                  value={editedDoctor.mobileNumber}
                   onChange={handleChange}
                 />
               </Form.Group>
@@ -177,12 +227,19 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
                 <Form.Label>
                   <b>Consultation Type</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="consultationType"
-                  value={editedDoctor.consultationType}
-                  onChange={handleChange}
-                />
+                <div>
+                  {consultationTypeStore.map((type) => (
+                    <Form.Check
+                      key={type._id} // Assuming each 'type' has a unique '_id' field
+                      type="checkbox"
+                      label={type.name} // Assuming 'name' is a property of each type
+                      value={type.name}
+                      checked={selectedTypes.includes(type.name)}
+                      onChange={() => handleCheckboxChange(type.name)}
+                      className="mb-2"
+                    />
+                  ))}
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -222,12 +279,23 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
                 <Form.Label>
                   <b>Doctor Type</b>
                 </Form.Label>
-                <Form.Control
+                <select
                   type="text"
                   name="doctorType"
                   value={editedDoctor.doctorType}
                   onChange={handleChange}
-                />
+                  className="w-100 py-2"
+                >
+                  <option value="" disabled>
+                    Select an option
+                  </option>
+                  <option value={DoctorType.Company}>
+                    {DoctorType.Company}
+                  </option>
+                  <option value={DoctorType.Individual}>
+                    {DoctorType.Individual}
+                  </option>
+                </select>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -279,67 +347,72 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave }) => {
               </Form.Group>
             </Col>
           </Row>
-          <Row>
-            <Col md={6}>
-              {/* Diplomas Certificates */}
-              <Form.Group controlId="diplomasCertificates" className="mb-3">
-                <Form.Label>
-                  <b>Diplomas Certificates</b>
-                </Form.Label>
-                <Form.Control
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleDiplomasCertificatesChange}
-                />
-                {diplomasCertificatesPreview &&
-                  diplomasCertificatesPreview.map((url, index) => (
-                    <div key={index} style={{ position: "relative" }}>
+          {origin !== userTypeConstant.doctor ? (
+            <Row>
+              <Col md={6}>
+                {/* Diplomas Certificates */}
+                <Form.Group controlId="diplomasCertificates" className="mb-3">
+                  <Form.Label>
+                    <b>Diplomas Certificates</b>
+                  </Form.Label>
+                  <Form.Control
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleDiplomasCertificatesChange}
+                  />
+                  {diplomasCertificatesPreview &&
+                    diplomasCertificatesPreview.map((url, index) => (
+                      <div key={index} style={{ position: "relative" }}>
+                        <img
+                          src={url}
+                          alt={`Diploma ${index + 1}`}
+                          style={{ width: "100%", marginTop: "10px" }}
+                        />
+                        <FaTrash
+                          style={{
+                            cursor: "pointer",
+                            position: "absolute",
+                            top: "5px",
+                            right: "5px",
+                          }}
+                          onClick={() => handleDeleteDiplomasCertificate(index)}
+                        />
+                      </div>
+                    ))}
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                {/* Profile Picture */}
+                <Form.Group controlId="profilePicture" className="mb-3">
+                  <Form.Label>
+                    <b>Profile Picture</b>
+                  </Form.Label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePictureChange}
+                  />
+
+                  {profilePicturePreview && (
+                    <>
                       <img
-                        src={url}
-                        alt={`Diploma ${index + 1}`}
+                        src={profilePicturePreview}
+                        alt="Profile"
                         style={{ width: "100%", marginTop: "10px" }}
                       />
                       <FaTrash
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: "5px",
-                          right: "5px",
-                        }}
-                        onClick={() => handleDeleteDiplomasCertificate(index)}
+                        style={{ cursor: "pointer", marginTop: "5px" }}
+                        onClick={handleDeleteProfilePicture}
                       />
-                    </div>
-                  ))}
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              {/* Profile Picture */}
-              <Form.Group controlId="profilePicture" className="mb-3">
-                <Form.Label>
-                  <b>Profile Picture</b>
-                </Form.Label>
-                <Form.Control
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePictureChange}
-                />
-                {profilePicturePreview && (
-                  <>
-                    <img
-                      src={profilePicturePreview}
-                      alt="Profile"
-                      style={{ width: "100%", marginTop: "10px" }}
-                    />
-                    <FaTrash
-                      style={{ cursor: "pointer", marginTop: "5px" }}
-                      onClick={handleDeleteProfilePicture}
-                    />
-                  </>
-                )}
-              </Form.Group>
-            </Col>
-          </Row>
+                    </>
+                  )}
+                </Form.Group>
+              </Col>
+            </Row>
+          ) : (
+            ""
+          )}
         </Form>
       </ModalBody>
       <Modal.Footer>

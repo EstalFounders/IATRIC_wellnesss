@@ -1,0 +1,84 @@
+.invoiceContainer {
+    width: 720px;
+    margin: auto;
+    border: 1px solid #ddd;
+    padding: 24px;
+    background-color: #fff;
+    color: #000;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logoArea img {
+    width: 150px;
+    height: auto;
+  }
+  
+  .headerText h1 {
+    font-size: 48px;
+    font-weight: bold;
+  }
+  
+  .addressBlock {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .addressBlock div {
+    width: 30%;
+    font-size: 14px;
+  }
+  
+  .itemTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .itemTable th,
+  .itemTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .itemTable th {
+    background-color: #d4bc91;
+  }
+  
+  .summary {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .totalLine {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .terms {
+    font-size: 13px;
+    margin-top: 20px;
+  }
+  
+  .terms ul {
+    margin-top: 5px;
+    padding-left: 18px;
+  }
+  
+  .footer {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 40px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }
+  

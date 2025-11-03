@@ -1,280 +1,111 @@
+import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { HorizontalScrollContainer } from "../Common/HorizontalContainer";
+import { callToBook, color_schema } from "../../constant";
+import { handleServiceClick } from "../Common/commonMethod";
+import { useRouter } from "next/router";
+import { AllDepartmentService } from "../../../data/services";
+import { ConsultationButton } from "../Common/commonUi";
 
 const AllDepartmentServices7 = () => {
+  const [services] = useState(AllDepartmentService);
+
+  const router = useRouter();
+  const handleClickService = (serviceName, index) => {
+    handleServiceClick(serviceName, index, router);
+  };
+
   return (
     <section
       id="services-7"
-      className="bg-lightgrey wide-70 servicess-section division"
+      className="bg-lightgrey py-5 servicess-section division"
     >
       <div className="container">
-        <div className="row">
-          {/* SERVICE BOXES */}
-          <div className="col-lg-8">
-            <div className="row">
-              {/* SERVICE BOX #1 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.4s"
-                >
-                  <Link legacyBehavior href="/service-1">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-083-stethoscope blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">Pediatrics</h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #1 */}
-              {/* SERVICE BOX #2 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.6s"
-                >
-                  <Link legacyBehavior href="/service-2">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-047-head blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">Neurology</h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #2 */}
-              {/* SERVICE BOX #3 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.4s"
-                >
-                  <Link legacyBehavior href="/service-1">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-015-blood-donation-1 blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">Haematology</h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #3*/}
-              {/* SERVICE BOX #4 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.6s"
-                >
-                  <Link legacyBehavior href="/service-2">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-048-lungs blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">
-                          X-Ray Diagnostic
-                        </h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #4 */}
-              {/* SERVICE BOX #5 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.4s"
-                >
-                  <Link legacyBehavior href="/service-1">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-060-cardiogram-4 blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">Cardiology</h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #5 */}
-              {/* SERVICE BOX #6 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.6s"
-                >
-                  <Link legacyBehavior href="/service-2">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-031-scanner blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">
-                          MRI Diagnostics
-                        </h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #6 */}
-              {/* SERVICE BOX #7 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.4s"
-                >
-                  <Link legacyBehavior href="/service-1">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-076-microscope blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">
-                          Laboratory Services
-                        </h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #7 */}
-              {/* SERVICE BOX #8 */}
-              <div className="col-md-6">
-                <div
-                  className="sbox-7 icon-xs wow fadeInUp"
-                  data-wow-delay="0.6s"
-                >
-                  <Link legacyBehavior href="/service-2">
-                    <a>
-                      {/* Icon */}
-                      <span className="flaticon-068-ambulance-3 blue-color" />
-                      {/* Text */}
-                      <div className="sbox-7-txt">
-                        {/* Title */}
-                        <h5 className="h5-sm steelblue-color">
-                          Emergency Help
-                        </h5>
-                        {/* Text */}
-                        <p className="p-sm">
-                          Porta semper lacus at cursus primis ultrice in ligula
-                          risus an auctor tempus feugiat dolor
-                        </p>
-                      </div>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              {/* END SERVICE BOX #8 */}
-            </div>
+        {/* Section Header */}
+        <div className="text-center mb-5">
+          <h3 className="h3-md">Our Medical Services</h3>
+          <div className="blue-color text-uppercase mt-4">
+            <h4>Comprehensive, Specialized & Caring</h4>
           </div>
-          {/* END SERVICE BOXES */}
-          {/* INFO TABLE */}
-          <div className="col-lg-4">
-            <div
-              className="services-7-table blue-table mb-30 wow fadeInUp"
-              data-wow-delay="0.6s"
-            >
-              {/* Title */}
-              <h4 className="h4-xs">Opening Hours:</h4>
-              {/* Text */}
-              <p className="p-sm">
-                Porta semper lacus cursus and feugiat primis ultrice ligula
-                risus auctor tempus feugiat and dolor lacinia cursus
-              </p>
-              {/* Table */}
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <td>Mon – Wed</td>
-                    <td> - </td>
-                    <td className="text-right">9:00 AM - 7:00 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Thursday</td>
-                    <td> - </td>
-                    <td className="text-right">9:00 AM - 6:30 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Friday</td>
-                    <td> - </td>
-                    <td className="text-right">9:00 AM - 6:00 PM</td>
-                  </tr>
-                  <tr className="last-tr">
-                    <td>Sun - Sun</td>
-                    <td>-</td>
-                    <td className="text-right">CLOSED</td>
-                  </tr>
-                </tbody>
-              </table>
-              {/* Title */}
-              <h5 className="h5-sm">Need a personal health plan?</h5>
-              {/* Text */}
-              <p className="p-sm">
-                Porta semper lacus cursus, and feugiat primis ultrice ligula at
-                risus auctor
-              </p>
-            </div>
+
+          <div className="h5 box-list grey-color ml-auto mr-auto">
+            Explore our range of expert medical services tailored to meet the
+            health needs of you and your family. From diagnostics to specialist
+            care — we’ve got you covered.
           </div>
-          {/* END INFO TABLE */}
         </div>
-        {/* End row */}
+
+        {/* Services Cards */}
+        <div className="row">
+          <HorizontalScrollContainer>
+            {services.map((service, idx) => (
+              <div
+                key={idx}
+                className="col-md-4 col-sm-6"
+                style={{ minWidth: "500px" }}
+                onClick={() => handleClickService(service.title, idx)}
+              >
+                <div
+                  className="bg-white p-4 shadow-sm mb-4 h-100 d-flex flex-column align-items-center text-center"
+                  style={{ borderRadius: "10px" }}
+                >
+                  <Link legacyBehavior href="">
+                    <a className="text-decoration-none text-dark w-100">
+                      {/* Icon in Circle */}
+                      <div
+                        className="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-3"
+                        style={{
+                          width: "120px",
+                          height: "120px",
+                          // backgroundColor: `${color_schema.yellow}`,
+                        }}
+                      >
+                        {service.icon}
+                      </div>
+
+                      {/* Text content with hover-only effect */}
+                      <div
+                        className="p-3 rounded"
+                        style={{
+                          transition: "all 0.3s ease-in-out",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.boxShadow =
+                            "0 8px 20px rgba(0, 0, 0, 0.1)")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.boxShadow = "none")
+                        }
+                      >
+                        <h5 className="fw-bold text-dark mb-2">
+                          {service.title}
+                        </h5>
+                        <p
+                          className="text-muted"
+                          style={{
+                            lineHeight: "1.6",
+                            fontSize: "0.95rem",
+                          }}
+                        >
+                          {service.description}
+                        </p>
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </HorizontalScrollContainer>
+          <div className="mt-5 mr-auto ml-auto">
+            <div className="">
+              <ConsultationButton path={"/appointment"}>
+                {callToBook}
+              </ConsultationButton>
+            </div>
+          </div>
+        </div>
       </div>
-      {/* End container */}
     </section>
   );
 };

@@ -4,15 +4,18 @@ import Preloader from "../src/components/Preloader";
 import { animation } from "../src/utils";
 import "../styles/globals.css";
 import { NoSsr } from "@mui/material";
-import { Chat } from 'stream-chat-react';
-import { ChatProvider, VideoProvider } from '@stream-io/video-react-sdk';
-import 'stream-chat-react/dist/css/index.css';
-import '../pages/meeting/meetingStyles.css'
+import { Chat } from "stream-chat-react";
+import { ChatProvider, VideoProvider } from "@stream-io/video-react-sdk";
+import "stream-chat-react/dist/css/index.css";
+import { wrapper } from "../src/store/store";
+import { persistStore } from "redux-persist";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
-  // const [clientReady, setClientReady] = useState(false);
+  const { store, props } = wrapper.useWrappedStore(rest);
+  const persistor = persistStore(store);
 
   useEffect(() => {
     animation();
@@ -20,7 +23,7 @@ function MyApp({ Component, pageProps }) {
       setLoader(false);
     }, 1000);
   });
-
+  
   return (
     <Fragment>
       <Head>
@@ -32,17 +35,17 @@ function MyApp({ Component, pageProps }) {
           href="https://fonts.googleapis.com/css?family=Lato:400,700,900,900&display=swap"
           rel="stylesheet"
         />
-        <title>Iatric Healthcare</title>
-        <link
-          rel="shortcut icon"
-          href="images/favicon.ico"
-          type="image/x-icon"
-        />
-        <link rel="icon" href="images/favicon.ico" type="image/x-icon"></link>
+        <title>Health Path</title>
+        <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
+        <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
       {loader && <Preloader />}
       <NoSsr>
-        <Component {...pageProps} />
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Component {...props.pageProps} />
+          </PersistGate>
+        </Provider>
       </NoSsr>
     </Fragment>
   );

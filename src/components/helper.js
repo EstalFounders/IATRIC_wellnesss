@@ -1,7 +1,21 @@
-
-export const generateSlotsForChooseTime = (selectedDate, startHour, endHour, intervalMinutes) => {
+export const generateSlotsForChooseTime = (
+  selectedDate,
+  startHour,
+  endHour,
+  intervalMinutes
+) => {
   const slots = [];
-  let currentTime = new Date(selectedDate);
+
+  const today = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 5); // Allow slots only for up to 6 days from today
+
+  const selected = new Date(selectedDate);
+  if (selected > maxDate) {
+    return []; // Return empty slots if selected date exceeds allowed range
+  }
+
+  let currentTime = new Date(selected);
   currentTime.setHours(startHour, 0, 0, 0);
   const endTime = new Date(currentTime);
   endTime.setHours(endHour, 0, 0, 0);
@@ -11,25 +25,43 @@ export const generateSlotsForChooseTime = (selectedDate, startHour, endHour, int
       _id: currentTime.toISOString(),
       startTime: new Date(currentTime),
       endTime: new Date(currentTime.getTime() + intervalMinutes * 60000),
-      isBooked: false, // Assuming initially all slots are not booked
+      isBooked: false, // Initially all slots are not booked
     };
     slots.push(slot);
     currentTime = new Date(currentTime.getTime() + intervalMinutes * 60000);
   }
+
   return slots;
 };
 
 export const isWithinBusinessHours = () => {
   const now = new Date();
   const hours = now.getHours();
-  return hours >= 9 && hours < 21;
+  return hours >= 9 && hours < 23;
+};
+
+export const formatTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
 };
 
 
 
+export const extractDate = (timestamp) => {
+  const date = new Date(timestamp);
 
-  
+  // Using toLocaleDateString() with specific options for day, month, and year
+  const options = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Asia/Kolkata", // Ensure IST time zone
+  };
 
-
-
-
+  return date.toLocaleDateString("en-IN", options);
+};

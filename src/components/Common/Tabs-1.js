@@ -1,229 +1,252 @@
 import React, { useState } from "react";
-import { Nav, Tab } from "react-bootstrap";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { useSelector } from "react-redux";
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { booking_btn_txt, callToBook, color_schema, serviceOffered } from "../../constant";
+import { handleServiceClick } from "./commonMethod";
+import { servicesData } from "../../../data/services";
+import { ConsultationButton } from "./commonUi";
+import CalltoBookPopup from "./CalltoBookPopup";
 
-const Tabs1 = () => {
-  const [services] = useState([
-    {
-      id: 0,
-      name: "General Physician",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of General Physician service...",
-    },
-    {
-      id: 1,
-      name: "Pediatrics",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Pediatrics service...",
-    },
-    {
-      id: 2,
-      name: "Cardiology",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Cardiology service...",
-    },
-    {
-      id: 3,
-      name: "Dermatologist",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Dermatologist service...",
-    },
-    {
-      id: 4,
-      name: "Orthopaedics",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Orthopaedics...",
-    },
-    {
-      id: 5,
-      name: "Gynaecology",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Gynaecology...",
-    },
-    {
-      id: 6,
-      name: "Ophthalmology",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Ophthalmology...",
-    },
-    {
-      id: 7,
-      name: "Pulmonology",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Pulmonology...",
-    },
-    {
-      id: 8,
-      name: "Psychiatrist",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Psychiatrist...",
-    },
-    {
-      id: 9,
-      name: "Dentistry",
-      image: "images/hematology_700x700.jpg",
-      description: "Description of Dentistry...",
-    },
-    {
-      id: 10,
-      name: "Physiotherapy",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Physiotherapy...",
-    },
-    {
-      id: 11,
-      name: "Nursing care",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Nursing care...",
-    },
-    {
-      id: 12,
-      name: "Home care",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Home care...",
-    },
-    {
-      id: 13,
-      name: "Medicine Delivery",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Medicine Delivery...",
-    },
-    {
-      id: 14,
-      name: "Lab Investigation",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Lab Investigation...",
-    },
-    {
-      id: 15,
-      name: "Corporate Healthcare",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Corporate Healthcare...",
-    },
-    {
-      id: 16,
-      name: "Healthcamp",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Healthcamp...",
-    },
-    {
-      id: 17,
-      name: "Obstetrics",
-      image: "images/pediatrics_700x700.jpg",
-      description: "Description of Obstetrics...",
-    },
-  ]);
-
+const ServicesTabs = () => {
+  const [services] = useState(servicesData);
+  const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
+  const router = useRouter();
+  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
+  const totalPages = Math.ceil(services.length / servicesPerPage);
 
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
-
-  // Slice the services array to get the services for the current page
   const currentServices = services.slice(
     indexOfFirstService,
     indexOfLastService
   );
 
+  const handleOpenCalltoBookDialog = () => {
+    setIsCalltoBookDialog(true);
+  };
+  const handleCloseCalltoBookDialog = () => {
+    setIsCalltoBookDialog(false);
+  };
+
+  const handleCalltoBookPopupSubmit = (mobNo) => {
+    setMobNo(mobNo);
+    setOtpConfirmationPopup(true);
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => {
+      return prev < totalPages ? prev + 1 : prev;
+    });
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => {
+      return prev > 1 ? prev - 1 : prev;
+    });
+  };
+
+  const canGoNext = currentPage < totalPages;
+  const canGoPrev = currentPage > 1;
+
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+  };
+
+  const handleServiceClickLocal = (serviceName, id) => {
+    handleServiceClick(serviceName, id, router);
+  };
+
+  const boldKeywords = (text, keywords) => {
+    if (!keywords || keywords.length === 0) return text;
+    const escapedKeywords = keywords.map((kw) =>
+      kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    );
+    const regex = new RegExp(`(${escapedKeywords.join("|")})`, "gi");
+    return text
+      .split(regex)
+      .map((part, i) => (regex.test(part) ? <b key={i}>{part}</b> : part));
+  };
+
   return (
-    <section id="tabs-1" className="wide-100 tabs-section division">
+    <section className="custom-tabs-section mt-50 pb-100">
       <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <Tab.Container defaultActiveKey={`tab-${services[0].id}`}>
-              <div id="tabs-nav" className="list-group text-center">
-                <Nav
-                  className="nav nav-pills justify-content-center"
-                  id="pills-tab"
-                  as="ul"
-                >
-                  {currentPage > 1 && (
-                    <FaChevronLeft
-                      className="nav-icon mt-3 mr-4"
-                      onClick={handlePrevPage}
-                      color="#8e8333"
-                      size={30}
-                    />
-                  )}
-                  {currentServices.map((service, index) => (
-                    <Nav.Item className="nav-item icon-xs" key={index} as="li">
-                      <Nav.Link className="nav-link" eventKey={`tab-${index}`}>
-                        <b>{service.name}</b>
-                      </Nav.Link>
-                    </Nav.Item>
-                  ))}
-                  {indexOfLastService < services.length && (
-                    <FaChevronRight
-                      className="nav-icon mt-3 mr-4"
-                      onClick={handleNextPage}
-                      color="#8e8333"
-                      size={30}
-                    />
-                  )}
-                </Nav>
+        <div className="tab-nav-wrapper position-relative">
+          <div
+            className={`arrow left-arrow-fixed ${!canGoPrev ? "disabled" : ""}`}
+            onClick={canGoPrev ? handlePrevPage : undefined}
+            style={{
+              opacity: canGoPrev ? 1 : 0.3,
+              cursor: canGoPrev ? "pointer" : "not-allowed",
+            }}
+          >
+            <FaArrowAltCircleLeft size={30} color={color_schema.yellow} />
+          </div>
+
+          <div className="tab-buttons-container d-flex justify-content-center align-items-center flex-grow-1 p-3">
+            {currentServices.map((service) => (
+              <div
+                key={service.id}
+                className={`service-tab ${
+                  activeTab === service.id ? "active-tab" : ""
+                }`}
+                onClick={() => handleTabClick(service.id)}
+              >
+                {service.name}
               </div>
-              <Tab.Content className="tab-content" id="pills-tabContent">
-                {currentServices.map((service, index) => (
-                  <Tab.Pane
-                    className="tab-pane fade"
-                    key={index}
-                    eventKey={`tab-${index}`}
-                  >
-                    <div className="row d-flex align-items-center">
-                      <div className="col-lg-6">
-                        <div className="tab-img">
-                          <img
-                            className="img-fluid"
-                            src={service.image}
-                            alt="tab-image"
-                          />
-                        </div>
-                      </div>
-                      <div className="col-lg-6">
-                        <div className="txt-block pc-30">
-                          <h3 className="h3-md steelblue-color">
-                            {service.name}
-                          </h3>
-                          <p className="mb-30">{service.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </Tab.Pane>
-                ))}
-              </Tab.Content>
-            </Tab.Container>
-            {/* <div className="navigation-icons text-center mt-1">
-              {currentPage > 1 && (
-                <FaChevronLeft
-                  className="nav-icon"
-                  onClick={handlePrevPage}
-                  color="#8e8333"
-                  size={30}
-                />
-              )}
-              {indexOfLastService < services.length && (
-                <FaChevronRight
-                  className="nav-icon"
-                  onClick={handleNextPage}
-                  color="#8e8333"
-                  size={30}
-                />
-              )}
-            </div> */}
+            ))}
+          </div>
+
+          <div
+            className={`arrow right-arrow-fixed ${
+              !canGoNext ? "disabled" : ""
+            }`}
+            onClick={canGoNext ? handleNextPage : undefined}
+            style={{
+              opacity: canGoNext ? 1 : 0.3,
+              cursor: canGoNext ? "pointer" : "not-allowed",
+            }}
+          >
+            <FaArrowAltCircleRight size={30} color={color_schema.yellow} />
           </div>
         </div>
+
+        <div className="custom-tab-content mt-5">
+          {services
+            .filter((service) => service.id === activeTab)
+            .map((service) => (
+              <div
+                className="row align-items-start service-row"
+                key={service.id}
+              >
+                {/* Left Column - Image */}
+                <div className="col-lg-6 mb-4 mb-lg-0">
+                  <div className="image-wrapper position-relative">
+                    <Image
+                      onClick={() =>
+                        handleServiceClickLocal(service.name, service.id)
+                      }
+                      className="image"
+                      src={service.image}
+                      alt={service.name}
+                      fill
+                      sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Right Column - Text */}
+                <div className="col-lg-6 d-flex flex-column justify-content-start text-column">
+                  {/* Subheading */}
+                  <h4
+                    className="section-subheading blue-color mb-3"
+                    style={{ fontSize: "1.8rem", fontWeight: "600" }}
+                  >
+                    {service.subheading}
+                  </h4>
+
+                  {/* Heading */}
+                  <h3
+                    className="clickable-div h3-md steelblue-color mb-3"
+                    onClick={() =>
+                      handleServiceClickLocal(service.name, service.id)
+                    }
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.color = `${color_schema.yellow}`)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = `#000000`)
+                    }
+                    style={{ fontWeight: "700" }}
+                  >
+                    {service.name}
+                  </h3>
+
+                  {/* Description */}
+                  <div
+                    className="service-description h5 box-list grey-color mb-4"
+                    style={{ lineHeight: "1.6" }}
+                  >
+                    {boldKeywords(service.description, [
+                      "General Physician",
+                      "trusted care",
+                      "Pediatrics",
+                      "monitoring",
+                      "immunizations",
+                      "Cardiology",
+                      "advanced care",
+                      "Dermatologist",
+                      "effective treatments",
+                      "Orthopaedics",
+                      "bone",
+                      "joint",
+                      "muscle disorders",
+                      "Gynaecology",
+                      "preventive screenings",
+                      "reproductive health care",
+                      "Ophthalmology",
+                      "comprehensive eye care",
+                      "Pulmonology",
+                      "respiratory",
+                      "lung conditions",
+                      "Psychiatrist",
+                      "mental health care",
+                      "Dentistry",
+                      "comprehensive oral care",
+                      "Physiotherapy",
+                      "restore movement",
+                      "Nursing care",
+                      "professional support",
+                      "Home care",
+                      "quality healthcare",
+                      "Medicine Delivery",
+                      "prescriptions",
+                      "Lab Investigation",
+                      "diagnostic tests",
+                      "Corporate Healthcare",
+                      "employee wellness",
+                      "Healthcamp",
+                      "community health camps",
+                      "Obstetrics",
+                      "pregnancy",
+                      "childbirth",
+                      "postpartum period",
+                      "personalized attention",
+                    ])}
+                  </div>
+
+                  {/* Call to Book Button */}
+                  <div className="mt-4 w-100">
+                    <div className="w-50 mx-auto mx-lg-0">
+                      <ConsultationButton
+                        path={"/appointment"}
+                        onClick={() =>
+                          handleOpenCalltoBookDialog(
+                            serviceOffered.consultation
+                          )
+                        }
+                      >
+                        {booking_btn_txt}
+                      </ConsultationButton>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
+      <CalltoBookPopup
+        show={isCalltoBookDialog}
+        onClose={handleCloseCalltoBookDialog}
+        onSubmit={handleCalltoBookPopupSubmit}
+      />
     </section>
   );
 };
 
-export default Tabs1;
+export default ServicesTabs;

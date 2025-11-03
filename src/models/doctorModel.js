@@ -12,6 +12,16 @@ const doctorSchema = new Schema({
     required: true,
     unique: true,
   },
+  gender: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  mobileNumber: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   expertise: {
     type: String,
     required: [true, "Area of expertise is required"],
@@ -38,7 +48,11 @@ const doctorSchema = new Schema({
     required: true,
   },
   consultationType: {
-    type: String,
+    type: Array,
+    required: true,
+  },
+  serviceOffered: {
+    type: Array,
     required: true,
   },
   location: {
@@ -87,6 +101,7 @@ const doctorSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  isActive: { type: Boolean, default: true }
 });
 
 // Check if the model already exists to prevent overwriting

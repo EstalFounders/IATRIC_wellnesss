@@ -1,64 +1,193 @@
+export const company_registrated_name = "Ttanshe health path pvt.ltd";
 export const certificate_img_path = "images/doctorCertificate/";
 export const profilePicture_img_path = "images/doctorPicture/";
 export const doctorStamp_img_path = "images/doctorStamp/";
 export const doctorSignature_img_path = "images/doctorSignature/";
 export const prescription_img_path = "images/prescription/";
+export const invoice_img_path = "images/invoice/";
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
-export const contact_no = "+91 96259 42020";
-export const email= 'iatrichealthcare@gmail.com'
-export const twilioPhoneNumber = '+14155238886'
-export const countryCode = "+91" 
-export const development_production_url = "https://development.d2xrlfkxmadgut.amplifyapp.com/"
-export const doctor_info_local_storage = 'doctor_info'
-export const super_admin_info_local_sotrage= 'super_admin_info'
+export const contact_no = "+91 78959 59925";
+export const email = "customercare@healthpath.co.in";
+export const countryCode = "+91";
+export const development_production_url =
+  "before-staging.d3pu3hm659dc5p.amplifyapp.com";
+export const doctor_info_local_storage = "doctor_info";
+export const super_admin_info_local_sotrage = "super_admin_info";
+export const medicine_cart_details_local_info = "medicineCartItems";
+export const labtest_cart_details_local_info = "labTestcartItems";
+export const single_call = "single_call";
+export const invoice_bill_yellow_color = "#d1bd9a";
+export const company_font_family = "TT Ramillas";
+export const isNow = "Now";
+export const SERVER_AVAILABLE_SLOTS_CODE = "304";
+export const booking_btn_txt = "Consult Now"
 
 export const api = {
-    addDoctor: "/api/addDoctor",
-    doctorLogin: "/api/doctorLogin",
-    medicineInfoApiCall: "/api/medicineInfo?medicineName=",
-    prescriptionCall: "/api/prescription",
-    sendWhatsAppCall: "/api/whatsApp",
-    recommendedServies: "/api/lib/recommendedServices",
-    bookConsultation: "/api/bookConsultation/"
-}
+  addDoctor: "/api/addDoctor",
+  doctorLogin: "/api/doctorLogin",
+  medicineInfoApiCall: "/api/medicineInfo?medicineName=",
+  getAllMedicine: "/api/medicineInfo",
+  prescriptionCall: "/api/prescription",
+  sendWhatsAppCall: "/api/whatsApp",
+  recommendedServies: "/api/lib/recommendedServices",
+  bookConsultation: "/api/bookConsultation/",
+  bookLabTest: "/api/bookLabTest/",
+  consiltationFee: "/api/superAdmin/consultationFee",
+  superAdmin_notification: "/api/superAdmin/notification",
+  updateDoctorStatus: "/api/registerDoc/updateDoctorStatus",
+  doctorUpdateRequest: "/api/registerDoc/doctorUpdateReq",
+  leaveRequest: "/api/registerDoc/leaveRequest",
+  labTest: "/api/labtest",
+  labTestCategoryDetails: "/api/labtestcategorydetails",
+  labTestDetails: "/api/superAdmin/labTest/labTestDetails",
+  doctorEarning: "/api/registerDoc/doctorEarnings",
+  addNewLab: "/api/superAdmin/addNewLab",
+  addNewOffer: "/api/superAdmin/addNewOffer",
+  globalVar: "/api/globalVar",
+  userQuery: "/api/userQuery",
+  joinUsQuery: "/api/joinUsQuery",
+  getImageFomrFirebase: "/api/helper/getImageFromFirebase",
+  getInvoice: "/api/helper/generateInvoice",
+  uploadInvoice: "/api/helper/uploadInvoice",
+  serviceOffered: "/api/superAdmin/serviceOffered",
+  sendOtp: "/api/helper/whatsappConfirmationApi",
+  serviceSuggestion: "/api/helper/getServiceSuggestion",
+};
 
 export const services = [
-    "General Physician",
-    "Pediatrics",
-    "Cardiology",
-    "Dermatologist",
-    "Orthopaedics",
-    "Gynaecology",
-    "Ophthalmology",
-    "Pulmonology",
-    "Psychiatrist",
-    "Dentistry",
-    "Physiotherapy",
-    "Nursing care",
-    "Home care",
-    "Medicine Delivery",
-    "Lab Investigation",
-    "Corporate Healthcare",
-    "Healthcamp",
-    "Obstetrics",
-]
+  "General Physician",
+  "Pediatrics",
+  "Cardiology",
+  "Dermatologist",
+  "Orthopaedics",
+  "Gynaecology & Obstetrics",
+  "Ophthalmology",
+  "Pulmonology",
+  "Psychiatrist",
+  "Dentistry",
+  "Physiotherapy",
+];
 
 export const consultationTypeMapping = {
-    "Call": "Online consultations",
-    "Video": "Online consultations",
-    "Clinic": "Offline consultations",
-    "Home Visit": "Home visit"
-  };
+  Call: "Call",
+  Video: "Video",
+  Clinic: "Clinic",
+  "Home Visit": "Home visit",
+};
 
-export const consultationTypeConstant =  {
-    call: "Call",
-    video: "Video",
-    clinic: "Clinic",
-    home_visit:"Home Visit"
-}
+// export const consultationTypeConstant =  {
+//     call: "Call",
+//     video: "Video",
+//     clinic: "Clinic",
+//     home_visit:"Home Visit"
+// }
 
 export const userTypeConstant = {
-    patient: 'patient',
-    doctor: 'doctor'
-}
+  patient: "patient",
+  doctor: "doctor",
+};
 
+export const existingUser = "existing";
+export const newUser = "new";
+export const IN_TWENTY_MINUTES_NOW = "in_twenty_minutes_now";
+
+export const appointment_status = {
+  total: "TOTAL",
+  open: "OPEN",
+  completed: "COMPLETED",
+  pending: "PENDING",
+  confirmed: "CONFIRMED",
+  cancelled: "CANCELLED",
+  rescheduled: "RESCHEDULED",
+};
+
+export const labTest_status = {
+  total: "TOTAL",
+  completed: "COMPLETED",
+  pending: "PENDING",
+  unpaid: "UNPAID",
+  cancelled: "CANCELLED",
+  paid: "PAID",
+};
+
+export const labTest_payment_status = {
+  PAID: "paid",
+  UNPAID: "unpaid",
+};
+
+export const consultation = "Consultation";
+
+export const sessionStorageName = {
+  ConsultationFee: "ConsultationFee",
+  SelectedLabel: "selectedLabel",
+  doctorUpdateRequest: "doctorUpdateRequest",
+  leaveUpdateRequest: "leaveUpdateRequest",
+};
+
+export const price_symbol = "₹";
+export const showUpdate = "showUpdate";
+export const discount_type = {
+  Percentage: "Percentage",
+  Fixed: "Fixed",
+  Free: "Free",
+};
+
+export const roles = {
+  superAdmin: "superAdmin",
+  doctor: "doctor",
+  patient: "patient",
+  employe: "employe",
+};
+
+export const superAdminConsultationtype = [
+  "Call",
+  "Video",
+  "Home visit",
+  "Clinic",
+];
+
+export const DoctorType = {
+  Company: "Company",
+  Individual: "Indiividual",
+};
+
+export const serviceOffered = {
+  consultation: "Consultation",
+  labTest: "Labtest",
+};
+
+export const CHOOSE_TIME = "ChooseTime";
+
+export const address = "Sector 57 , Gurgaon, Haryana-122003";
+export const facebook_page_url =
+  "https://www.facebook.com/share/12GvMifXjiF/?mibextid=wwXIfr";
+
+export const color_schema = {
+  green: "#3b5f1d",
+  yellow: "#8e8333",
+  white: "#ffffff",
+  black: "#000000",
+};
+
+export const eventEmitter = {
+  cartEventEmitter: "cartUpdate",
+  navBarEventEmitter: "navbar-option",
+  labTestEventEmitter: "labTestUpdate",
+  medicineCartEventEmitter: "medicine-cart-update",
+};
+
+export const labtestCateogory = {
+  fullBodyCheckup: "Full Body",
+  sexualHealth: "Sexual Health",
+  allergyTestCheckup: "Allergy",
+};
+
+export const medicine_discount = 0.95;
+
+export const lab_test_discount = 0.95;
+
+export const vapidKey =
+  "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";
+
+
+export const callToBook = "Get a Call back";  

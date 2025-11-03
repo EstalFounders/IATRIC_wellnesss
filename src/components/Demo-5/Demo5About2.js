@@ -1,127 +1,164 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { contact_no } from "../../constant";
+import { callToBook, contact_no } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../Common/PopupDialog";
+import { FaPhoneAlt } from "react-icons/fa";
+import { ConsultationButton } from "../Common/commonUi";
+import CalltoBookPopup from "../Common/CalltoBookPopup";
+import { useSelector } from "react-redux";
+import WhatsappConfirmationModel from "../Appointment/modal/WhatsappConfirmationModel";
+import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
+import { Alert, Snackbar } from "@mui/material";
 
 const Demo5About2 = () => {
-  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
-  const handleDialDialogOpen = () => {
-    setIsDialDialogOpen(true);
-  };
-  const handleCloseDialDialog = () => {
-    setIsDialDialogOpen(false);
+  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
+  const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
+  const [mobNo, setMobNo] = useState("");
+  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
+  const [response, setResponse] = useState();
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [severity, setSeverity] = useState("success");
+
+  const whatsappConfrimation = () => {
+    setOtpConfirmationPopup(false);
+    console.log("OTP confirmed, proceeding with booking");
+    setResponse("We have recieved your query, Will get back to you soon");
   };
 
-  const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
-  ];
+  const handleCalltoBookPopupSubmit = (mobNo) => {
+    setMobNo(mobNo);
+    setOtpConfirmationPopup(true);
+  };
+
+  const consultationTypes = useSelector(
+    (state) => state.otherConfigSlice.activeConsultation
+  );
+
+  const handleConsultationTypeOpenDialog = () => {
+    setIsConsultationTypeOpen(true);
+  };
+
+  const handleConsultationTypeCloseDialog = () => {
+    setIsConsultationTypeOpen(false);
+  };
+
+  const handleOpenCalltoBookDialog = () => {
+    setIsCalltoBookDialog(true);
+  };
+  const handleCloseCalltoBookDialog = () => {
+    setIsCalltoBookDialog(false);
+  };
+
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackBar(false);
+  };
 
   return (
     <section id="about-2" className="about-section division">
       <div className="container">
-        <div className="abox-2-holder">
-          <div className="row">
-            {/* ABOUT BOX #1 */}
-            <div className="col-md-12 col-lg-4">
-              <div className="abox-2">
-                {/* Title */}
-                <h5 className="h5-md steelblue-color">Opening Hours</h5>
-                {/* Table */}
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <td>Mon – Sun</td>
-                      <td> - </td>
-                      <td className="text-right">9:00 AM - 8:00 PM</td>
-                    </tr>
-                    {/* <tr>
-                                            <td>Thursday</td>
-                                            <td> - </td>
-                                            <td className="text-right">
-                                                9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Friday</td>
-                                            <td> - </td>
-                                            <td className="text-right">
-                                                9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr>
-                                        <tr className="last-tr">
-                                            <td>Sun - Sun</td>
-                                            <td>-</td>
-                                            <td className="text-right">
-                                            9:00 AM - 8:00 PM
-                                            </td>
-                                        </tr> */}
-                  </tbody>
-                </table>
-              </div>
+        {/* Content Boxes */}
+        <div className="abox-2-holder py-2">
+          <div className="text-center mb-5">
+            <h1 className="steelblue-color">Welcome to Healthpath</h1>
+            <div className="h5 mx-auto steelblue-color w-100">
+              At Healthpath, we are committed to providing expert medical
+              consultations and quality healthcare. <br /> We offer seamless
+              appointment booking, experienced doctors, and reliable patient
+              care every day.
             </div>
-            {/* ABOUT BOX #2 */}
-            <div className="col-md-6 col-lg-4">
-              <div className="abox-2">
-                <h5 className="h5-md steelblue-color">Doctors Timetable</h5>
-                {/* Text */}
-                <p>
-                  {/* An magnis nulla dolor at sapien augue iaculis purus tempor
-                  magna ipsum vitae and purus primis ipsum magna ipsum at tempus
-                  feugiat dolor impedit felis magna ipsum primis cubilia laoreet
-                  augue suscipit lectus mauris */}
-                </p>
-                {/* Button */}
-                <Link legacyBehavior href="/timetable">
-                  <a
-                    className="btn btn-sm btn-blue blue-hover mt-25"
-                    style={{ backgroundColor: "#3b5f1d" }}
-                  >
-                    View Timetable
-                  </a>
-                </Link>
+            <p className="mt-3 h3">
+              Opening Hours:{" "}
+              <strong>Monday – Sunday | 9:00 AM - 8:00 PM</strong>
+            </p>
+
+            {/* Buttons */}
+            <div className="mt-4 d-flex justify-content-center flex-wrap gap-3">
+              <div>
+                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
+                  Find a Doctor
+                </ConsultationButton>
               </div>
-            </div>
-            {/* ABOUT BOX #3 */}
-            <div className="col-md-6 col-lg-4">
-              <div className="abox-2">
-                {/* Title */}
-                <h5 className="h5-md steelblue-color">Get in Touch</h5>
-                {/* Text */}
-                <h4 className="h4-sm emergency-call blue-color">
-                  <i className="fas fa-phone" />
-                  <a
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDialDialogOpen();
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.color = "#3b5f1d";
-                    }} // Change color on hover
-                    onMouseOut={(e) => {
-                      e.target.style.color = "#8e8333";
-                    }}
-                  >
-                    {contact_no}
-                  </a>
-                </h4>
-                <p className="mt-20">
-                  Your health is our priority at Iatric Healthcare. Whether you
-                  have questions, concerns, or need to schedule an appointment,
-                  we&apos;re here to assist you every step of the way. Committed
-                  to your satisfaction, we eagerly anticipate partnering with
-                  you on your healthcare journey.
-                </p>
+              <div className="ml-3">
+                <ConsultationButton onClick={handleOpenCalltoBookDialog}>
+                  <FaPhoneAlt className="mr-2" />
+                  {callToBook}
+                </ConsultationButton>
               </div>
+              <hr className="w-75" />
+              <div className="row d-flex justify-content-center align-items-center">
+                <div className="col-md-8 mb-4">
+                  <div className="h-100 p-4 text-center">
+                    <h2 className="steelblue-color mb-3">Our Doctors</h2>
+                    <div className="h5 steelblue-color mx-auto w-100 pb-10">
+                      Browse through our panel of experienced and certified
+                      doctors, available for online and offline consultations across India.
+                    </div>
+                    <ConsultationButton path="/doctors">
+                      View Doctors
+                    </ConsultationButton>
+                  </div>
+                </div>
+
+                {/* <div className="col-md-6 mb-4">
+                  <div className="h-100 p-4 text-center shadow-sm border rounded">
+                    <h5 className="steelblue-color mb-3">Need Help?</h5>
+                    <p>
+                      For appointment booking, support or any questions, feel
+                      free to contact us directly.
+                    </p>
+                    <ConsultationButton path="/doctors">
+                      <FaPhoneAlt className="mr-2" />
+                      Contact Support
+                    </ConsultationButton>
+                  </div>
+                </div> */}
+              </div>
+              {/* End row */}
+              <PopupDialog
+                isOpen={isConsultationTypeOpen}
+                onClose={handleConsultationTypeCloseDialog}
+                options={consultationTypes}
+              />
+              <CalltoBookPopup
+                show={isCalltoBookDialog}
+                onClose={handleCloseCalltoBookDialog}
+                onSubmit={handleCalltoBookPopupSubmit}
+              />
+
+              <WhatsappConfirmationModel
+                isOpen={otpConfirmationPopup}
+                onClose={() => setOtpConfirmationPopup(false)}
+              >
+                <OtpConfirmationPopup
+                  mobile={mobNo}
+                  onConfirm={whatsappConfrimation}
+                />
+              </WhatsappConfirmationModel>
             </div>
+            <Snackbar
+              open={openSnackBar}
+              autoHideDuration={6000}
+              onClose={handleCloseSnackBar}
+            >
+              <Alert
+                onClose={handleCloseSnackBar}
+                severity={severity}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {response}
+              </Alert>
+            </Snackbar>
           </div>
-          {/* End row */}
-          <PopupDialog
-            isOpen={isDialDialogOpen}
-            onClose={handleCloseDialDialog}
-            options={dialOptions}
-          />
+          {/* End abox-2-holder */}
         </div>
       </div>
       {/* End container */}

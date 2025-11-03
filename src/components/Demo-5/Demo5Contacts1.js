@@ -1,13 +1,29 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { contact_no, email } from "../../constant";
+import { api, contact_no, email } from "../../constant";
 import PopupDialog from "../Common/PopupDialog";
-import { dial, openSupportWhatsAppWeb } from "../../helper";
+import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
+import CircleLoader from "../circleLoader";
+import { ConsultationButton } from "../Common/commonUi";
+import { FaPhoneAlt } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 
 const Demo5Contacts1 = () => {
   const router = useRouter();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    mobile_number: "",
+    patient: "",
+    visited_before: "",
+    message: "",
+  });
+  const [error, setError] = useState();
+
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
   };
@@ -19,32 +35,93 @@ const Demo5Contacts1 = () => {
     router.push(`mailto:${email}`);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value, "name value");
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const dialOptions = [
     { label: "Dial", action: dial },
     { label: "Whatsapp", action: openSupportWhatsAppWeb },
   ];
+
+  const saveQuery = async (e) => {
+    setLoading(true);
+    if (!isMobileValid(formData.mobile_number)) {
+      setIsSuccess(false);
+      setError("Please enter a valid mobile number");
+      return;
+    }
+
+    console.log(formData, "form data of query");
+    const res = await fetch(api.userQuery, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      setIsSuccess(true);
+      setLoading(false);
+      setError("Query saved successfully");
+      setFormData({
+        name: "",
+        email: "",
+        mobile_number: "",
+        patient: "",
+        visited_before: "",
+        message: "",
+      });
+    } else {
+      setError("Failed to save query. Please try again later.");
+    }
+  };
 
   return (
     <section
       id="contacts-1"
       className="bg-lightgrey wide-60 contacts-section division"
     >
-      <div className="container">
+      <div className="container h5 box-list grey-color">
         {/* SECTION TITLE */}
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">
+            <h3 className="h3-md text-dark">
               Need Help? We&apos;re Here to Talk
             </h3>
+            <h3 className="h3-md text-dark">Contact Healthpath Today</h3>
             {/* Text */}
-            <p>
-              Feeling unsure or in need of guidance? At Iatric Healthcare,
-              we&apos;re here to listen. Don&apos;t hesitate to reach out with
-              any questions, concerns, or simply to discuss your healthcare
-              goals. We&apos;re dedicated to providing personalized support and
-              helping you navigate your wellness journey.
-            </p>
+            <div>
+              Feeling unsure about your health or in need of expert guidance? At
+              Healthpath, we&apos;re always here to listen and provide the
+              support you need. Don&apos;t hesitate to{" "}
+              <strong>
+                reach out with any questions, concerns, or simply to discuss
+                your healthcare goals
+              </strong>
+              .
+            </div>
+            <div>
+              We&apos;re dedicated to offering{" "}
+              <strong>personalized support</strong> and helping you confidently
+              navigate your wellness journey. Whether you need an{" "}
+              <strong>online consultation</strong>, have a question about our
+              telemedicine services, or want to learn more about{" "}
+              <strong>accessing expert medical care</strong> from home, our team
+              is ready to assist. <strong>Contact Healthpath today</strong> and
+              let us be your partner in health. Feeling unsure or in need of
+              guidance? At Healthpath, we&apos;re here to listen. Don&apos;t
+              hesitate to reach out with any questions, concerns, or simply to
+              discuss your healthcare goals. We&apos;re dedicated to providing
+              personalized support and helping you navigate your wellness
+              journey.
+            </div>
           </div>
         </div>
         <div className="row">
@@ -52,11 +129,11 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">General Information</h5>
-              <p>Sector 57 ,</p>
-              <p>Gurgaon Haryana-122003</p>
-              <p>
-                Ph:{" "}
+              <h2 className="text-dark">Contact Us</h2>
+              <hr />
+              <h5>Sector 57, Gurgaon Haryana-122003</h5>
+              <h5>
+                <FaPhoneAlt />{" "}
                 <Link legacyBehavior href="#">
                   <a
                     onClick={(e) => {
@@ -73,9 +150,9 @@ const Demo5Contacts1 = () => {
                     {contact_no}
                   </a>
                 </Link>
-              </p>
-              <p>
-                Email:{" "}
+              </h5>
+              <h5>
+                <MdEmail size={25} />
                 <Link legacyBehavior href="#">
                   <a
                     className="ml-2"
@@ -93,26 +170,13 @@ const Demo5Contacts1 = () => {
                     {email}
                   </a>
                 </Link>
-              </p>
+              </h5>
             </div>
-            {/* Patient Experience */}
-            {/* <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">Patient Experience</h5>
-              <p>Hannah Harper - Patient Experience Coordinator</p>
-              <p>Phone: +12 9 8765 4321</p>
-              <p>
-                Email:
-                <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com" className="blue-color">
-                    hello@yourdomain.com
-                  </a>
-                </Link>
-              </p>
-            </div> */}
             {/* Working Hours */}
             <div className="contact-box mb-40">
-              <h5 className="h5-sm steelblue-color">Working Hours</h5>
-              <p>Monday – Sunday : 9:00 AM - 8:00 PM</p>
+              <h2 className="text-dark">Working Hours</h2>
+              <hr />
+              <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
             </div>
           </div>
           {/* END CONTACTS INFO */}
@@ -136,26 +200,14 @@ const Demo5Contacts1 = () => {
                       className="form-control name"
                       placeholder="Your Name*"
                       required="required"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       data-error="Enter no more than (2) characters."
                     />
                     <div className="help-block with-errors" />
                   </div>
                 </div>
                 {/* Email */}
-                <div className="col-md-12 col-lg-6">
-                  <div className="form-group">
-                    <input
-                      id="form_email"
-                      className="form-control email"
-                      type="email"
-                      name="email"
-                      placeholder="Your Email"
-                      required="required"
-                      data-error="Email is required"
-                    />
-                    <div className="help-block with-errors" />
-                  </div>
-                </div>
                 {/* Phone */}
                 <div className="col-md-12 col-lg-6">
                   <div className="form-group">
@@ -163,21 +215,27 @@ const Demo5Contacts1 = () => {
                       id="form_phone"
                       className="form-control phone"
                       type="tel"
-                      name="phone"
+                      name="mobile_number"
                       placeholder="Your Phone Number"
                       required="required"
+                      value={formData.mobile_number}
+                      onChange={handleInputChange}
                       data-error="Please enter only digits."
                     />
                     <div className="help-block with-errors" />
                   </div>
                 </div>
                 {/* Select Input */}
-                <div className="col-md-12 col-lg-6">
+                {/* <div className="col-md-12 col-lg-6">
                   <div className="form-group">
                     <select
                       id="inlineFormCustomSelect1"
-                      name="patient"
+                      name="visited_before"
                       className="custom-select patient"
+                      required="required"
+                      data-error="Select an option."
+                      value={formData.visited_before}
+                      onChange={handleInputChange}
                     >
                       <option>Have You Visited Us Before?*</option>
                       <option>New Patient</option>
@@ -185,7 +243,7 @@ const Demo5Contacts1 = () => {
                       <option>Other</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Message */}
                 <div className="col-md-12 input-message">
@@ -194,11 +252,12 @@ const Demo5Contacts1 = () => {
                       id="form-message"
                       className="form-control message"
                       name="message"
-                      rows={6}
+                      rows={8}
                       placeholder="Your Message ..."
                       required="required"
                       data-error="Enter no more than (10) characters."
-                      defaultValue=""
+                      value={formData.message}
+                      onChange={handleInputChange}
                     />
                     <div className="help-block with-errors" />
                   </div>
@@ -206,14 +265,15 @@ const Demo5Contacts1 = () => {
                 {/* Contact Form Message */}
                 <div className="messages" />
                 {/* Button */}
-                <div className="col-md-12 mt-15 form-btn">
-                  <button
-                    type="submit"
-                    className="btn btn-md btn-blue blue-hover submit"
-                    style={{ backgroundColor: "#3b5f1d" }}
-                  >
-                    Talk to Us
-                  </button>
+                <div className="col-md-12 mt-15 form-btn d-flex d-inline-flex">
+                  <ConsultationButton onClick={saveQuery}>
+                  Talk to Us
+                  </ConsultationButton>
+                  {loading ? (
+                    <div className="mt-3 ml-5">
+                      <CircleLoader />
+                    </div>
+                  ) : null}
                 </div>
               </form>
             </div>
@@ -227,6 +287,14 @@ const Demo5Contacts1 = () => {
           options={dialOptions}
         />
       </div>
+      <div
+        className={`text-center ${
+          isSuccess ? "text-success" : "text-danger"
+        } font-weight-bold`}
+      >
+        {error}
+      </div>
+
       {/* End container */}
     </section>
   );

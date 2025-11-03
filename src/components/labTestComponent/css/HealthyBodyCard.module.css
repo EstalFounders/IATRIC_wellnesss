@@ -1,0 +1,50 @@
+.customCard {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .customCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+  
+  .cardImage {
+    height: 100px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .cardTitle {
+font-size: 22px;
+font-weight: 700;
+line-height: 18.9px;
+letter-spacing: 0.015em;
+text-align: center;
+color: #ffffff;
+  }
+
+  .cardDescription {
+font-size: 18px;
+font-weight: 400;
+line-height: 27.9px;
+letter-spacing: 0.015em;
+text-align: center;
+color: #ffffff;
+
+  }
+
+  .moreButton {
+font-size: 16px;
+font-weight: 400;
+line-height: 24.8px;
+letter-spacing: 0.015em;
+text-align: left;
+
+  }
+  

@@ -9,26 +9,26 @@ const Statistic1 = () => {
         <div className="row">
           {/* STATISTIC BLOCK #1 */}
           <div className="col-md-6 col-lg-3 mr-auto ml-auto">
-            <div className="statistic-block icon-lg" data-wow-delay="0.4s">
+            <div className="statistic-block icon-lg">
               {/* Icon  */}
               <span className="flaticon-062-cardiogram-3" />
               {/* Text */}
               <h5 className="statistic-number">
                 9, <Counter end={632} />
               </h5>
-              <p className="txt-400">Happy Patients</p>
+              <h4 className="txt-400">Happy Patients</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #2 */}
           <div className="col-md-6 col-lg-3 mr-auto ml-auto">
-            <div className="statistic-block icon-lg" data-wow-delay="0.6s">
+            <div className="statistic-block icon-lg">
               {/* Icon  */}
               <span className="flaticon-137-doctor" />
               {/* Text */}
               <h5 className="statistic-number">
                 <Counter end={178} />
               </h5>
-              <p className="txt-400">Qualified Doctors</p>
+              <h4 className="txt-400">Qualified Doctors</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #3 */}

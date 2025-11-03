@@ -1,11 +1,17 @@
 // Dropdown.js
+import React, { useState } from "react";
+import { FiCircle } from "react-icons/fi";
+import styles from "./RightSideMenu.module.css";
+import { FaAngleDown } from "react-icons/fa";
 import { signOut } from "next-auth/react";
-import React, { useState } from 'react';
-import { FiCircle } from 'react-icons/fi';
-import styles from './RightSideMenu.module.css';
-import { FaAngleDown } from 'react-icons/fa';
 
-const Dropdown = () => {
+const Dropdown = ({
+  user,
+  onLogout,
+  handleShowModel,
+  handleShowLeaveReqestModel,
+}) => {
+  console.log(user, "doctor name on right side menu");
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -14,11 +20,15 @@ const Dropdown = () => {
 
   const handleItemClick = async (item) => {
     console.log(`Clicked on ${item}`);
-    if(item == 'logout') 
-    try {
-        await signOut();
+    if (item == "Profile") handleShowModel();
+    if (item == "Leave Request") handleShowLeaveReqestModel();
+    if (item == "Logout")
+      try {
+        await signOut({
+          callbackUrl: "/registerDoc/login",
+          redirect: true,
+        });
         // Additional logic after successful sign-out
-        router.push("/registerDoc/onload"); // Redirect to the login screen
       } catch (error) {
         console.error("Error during sign-out:", error);
       }
@@ -26,23 +36,35 @@ const Dropdown = () => {
 
   return (
     <div className={styles.dropdown}>
-      <div className={styles['dropdown-toggle']} onClick={toggleDropdown}>
-        <strong>Dr Satvik</strong>
-      <FaAngleDown size={20}  className={styles['arrow-icon']} /> 
+      <div className={styles["dropdown-toggle"]} onClick={toggleDropdown}>
+        <strong>{user ? user.user.name.split(" ")[0] : null}</strong>
+        <FaAngleDown size={20} className={styles["arrow-icon"]} />
       </div>
 
       {isOpen && (
-        <div className={styles['dropdown-menu']}>
-          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item1')}>
+        <div className={styles["dropdown-menu"]}>
+          <div
+            className={styles["dropdown-item"]}
+            onClick={() => handleItemClick("item1")}
+          >
             Item 1
           </div>
-          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item2')}>
-            Item 2
+          <div
+            className={styles["dropdown-item"]}
+            onClick={() => handleItemClick("Leave Request")}
+          >
+            Leave Request
           </div>
-          <div className={styles['dropdown-item']} onClick={() => handleItemClick('item3')}>
-            Item 3
+          <div
+            className={styles["dropdown-item"]}
+            onClick={() => handleItemClick("Profile")}
+          >
+            Your Profile
           </div>
-          <div className={styles['dropdown-item']} onClick={() => handleItemClick('logout')}>
+          <div
+            className={styles["dropdown-item"]}
+            onClick={() => handleItemClick("Logout")}
+          >
             Logout
           </div>
         </div>

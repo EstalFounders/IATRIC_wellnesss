@@ -1,10 +1,11 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { testimonial2Props } from "../sliderProps";
+import Image from "next/image";
 
 const ReviewSlider = () => {
   return (
-    <div className="row">
-      <div className="col-md-12">
+        <div className="row">
+          <div className="col-md-12">
         <Swiper
           {...testimonial2Props}
           className="owl-carousel owl-theme reviews-holder"
@@ -14,24 +15,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-1.jpg"
+                <Image
+                  width={300}
+                  height={300}
+                  quality={100} // Ensures max quality
+                  src="/images/review-author-1.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Etiam sapien sem at sagittis congue an augue massa varius
-                egestas a suscipit magna undo tempus aliquet porta vitae
-              </p>
+                &quot;Healthpath has truly changed how I manage my health. <strong>Booking an online consultation was incredibly easy</strong>, and I spoke to a doctor within minutes. No more waiting rooms!&quot;              </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Scott Boxer</h5>
-                <span>Programmer</span>
+                <h5 className="h5-sm">Shrey Johri</h5>
+                <span>Software Engineer</span>
               </div>
             </div>
           </SwiperSlide>
@@ -41,25 +43,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-2.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-2.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Mauris donec ociis magnisa a sapien etiam sapien congue augue
-                egestas et ultrice vitae purus diam integer congue magna ligula
-                egestas
+                &quot;The convenience is unmatched. I got expert medical advice from my living room, <strong>saving me so much time and hassle</strong>. Highly recommend their virtual consultations.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Penelopa Peterson</h5>
-                <span>Project Manager</span>
+                <h5 className="h5-sm">Adhira Saxena</h5>
+                <span>Brand Manager</span>
               </div>
             </div>
           </SwiperSlide>
@@ -69,24 +71,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-3.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-3.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                At sagittis congue augue an egestas magna ipsum vitae purus
-                ipsum primis undo cubilia laoreet augue
+                &quot;I love that I can <strong>securely share my medical history</strong> with my family and specialists. It makes coordinating care so much simpler and less stressful.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">M.Scanlon</h5>
-                <span>Photographer</span>
+                <h5 className="h5-sm">Jayant Bhatia</h5>
+                <span>Businessman</span>
               </div>
             </div>
           </SwiperSlide>
@@ -96,24 +99,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-4.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-4.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Mauris donec ociis magnis sapien etiam sapien congue augue
-                pretium ligula a lectus aenean magna mauris
+                &quot;The doctors at Healthpath are so understanding and thorough, even online. I felt genuinely heard and received <strong>excellent, personalized care</strong>.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Jeremy Kruse</h5>
-                <span>Graphic Designer</span>
+                <h5 className="h5-sm">Akhand Seth</h5>
+                <span>Engineer</span>
               </div>
             </div>
           </SwiperSlide>
@@ -123,24 +127,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-5.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-5.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                An augue in cubilia laoreet magna suscipit egestas magna ipsum
-                at purus ipsum primis in augue ulta ligula egestas
+                &quot;Finally, a healthcare service that fits my busy schedule! Being able to <strong>connect with a doctor anytime, anywhere</strong> has been a game-changer for my well-being.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Evelyn Martinez</h5>
-                <span>Senior UX/UI Designer</span>
+                <h5 className="h5-sm">Srijan Singh</h5>
+                <span>Photographer</span>
               </div>
             </div>
           </SwiperSlide>
@@ -150,24 +155,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-6.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-6.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                An augue cubilia laoreet undo magna at risus suscipit egestas
-                magna an ipsum ligula vitae and purus ipsum primis
+                &quot;The peace of mind knowing I can get <strong>reliable medical guidance instantly</strong> is invaluable. Healthpath has become my go-to for all my health concerns.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Dan Hodges</h5>
-                <span>Internet Surfer</span>
+                <h5 className="h5-sm">Mohit Arora</h5>
+                <span>Cloud Engineer</span>
               </div>
             </div>
           </SwiperSlide>
@@ -177,24 +183,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-7.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-7.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Augue egestas volutpat egestas augue in cubilia laoreet magna
-                suscipit luctus and dolor blandit vitae
+                &quot;I was hesitant about online consultations, but Healthpath made it so seamless and professional. It&apos;s truly an <strong>innovative approach to healthcare</strong>.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Isabel M.</h5>
-                <span>SEO Manager</span>
+                <h5 className="h5-sm">Saksham Gaur</h5>
+                <span>Student</span>
               </div>
             </div>
           </SwiperSlide>
@@ -204,24 +211,25 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-8.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-8.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Augue egestas volutpat egestas augue in cubilia laoreet magna
-                suscipit luctus and dolor blandit vitae
+                &quot;From skipping traffic to avoiding long queues, Healthpath has <strong>made healthcare accessible and stress-free</strong>. My health journey feels much more manageable now.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Alex Ross</h5>
-                <span>Patient</span>
+                <h5 className="h5-sm">Kajol Wadhwani</h5>
+                <span>Chartered Accountant</span>
               </div>
             </div>
           </SwiperSlide>
@@ -231,32 +239,61 @@ const ReviewSlider = () => {
             <div className="review-txt text-center">
               {/* Quote */}
               <div className="quote">
-                <img src="images/quote.png" alt="quote-img" />
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
               </div>
               {/* Author Avatar */}
               <div className="testimonial-avatar">
-                <img
-                  src="images/review-author-9.jpg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-9.jpg"
                   alt="testimonial-avatar"
                 />
               </div>
               {/* Testimonial Text */}
               <p>
-                Augue egestas volutpat egestas augue in cubilia laoreet magna
-                suscipit luctus magna dolor neque vitae
+                &quot;The platform is incredibly user-friendly, and the support team is fantastic. It&apos;s clear that <strong>patient well-being is their top priority</strong>.&quot;
               </p>
               {/* Testimonial Author */}
               <div className="review-author">
-                <h5 className="h5-sm">Alisa Milano</h5>
+                <h5 className="h5-sm">Anjali Srivastava</h5>
                 <span>Housewife</span>
               </div>
             </div>
           </SwiperSlide>
           {/* END TESTIMONIAL #9 */}
+          {/* TESTIMONIAL #10*/}
+          <SwiperSlide className="review-2">
+            <div className="review-txt text-center">
+              {/* Quote */}
+              <div className="quote">
+                <Image width={200} height={200} src="/images/quote.png" alt="quote-img" />
+              </div>
+              {/* Author Avatar */}
+              <div className="testimonial-avatar">
+                <Image
+                  width={100}
+                  height={100}
+                  src="/images/review-author-8.jpg"
+                  alt="testimonial-avatar"
+                />
+              </div>
+              {/* Testimonial Text */}
+              <p>
+                &quot;Healthpath has empowered me to take control of my health. The ability to <strong>connect with specialists and manage my records from home</strong> is revolutionary.&quot;
+              </p>
+              {/* Testimonial Author */}
+              <div className="review-author">
+                <h5 className="h5-sm">Divansh Arora</h5>
+                <span>Chef</span>
+              </div>
+            </div>
+          </SwiperSlide>
+          {/* END TESTIMONIAL #10 */}
           <div className="owl-dots"></div>
         </Swiper>
       </div>
-    </div>
+        </div>
   );
 };
 

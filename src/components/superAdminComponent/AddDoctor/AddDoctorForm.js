@@ -1,14 +1,20 @@
 // AddDoctorForm.js
 import React, { useEffect, useState } from "react";
 import styles from "./AddDoctorForm.module.css";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
-import { api } from "../../../constant.js";
+import {
+  api,
+  DoctorType,
+  superAdminConsultationtype,
+} from "../../../constant.js";
 import TimePicker from "react-time-picker";
 import CustomDialog from "../../CustomPopup.js";
-import { convertTimeIntoDate } from "../../../helper.js";
+import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setConsultationType } from "../../../store/slices/superAdmin/otherDetailsSlice.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -21,12 +27,16 @@ const AddDoctorForm = () => {
   const [slotEndTime, setSlotEndTime] = useState("21:00");
   const [message, setMessage] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedService, setSelectedService] = useState([]);
+  const dispatch = useDispatch();
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
     email: "",
     expertise: "",
     degree: "",
+    gender: "",
     language: "",
     workDays: "",
     overview: "",
@@ -34,16 +44,67 @@ const AddDoctorForm = () => {
     workExperience: "",
     educationTraining: "",
     consultationType: "",
+    serviceOffered: "",
     password: "",
-    doctorType: "individual",
+    doctorType: DoctorType.INDIVIDUAL,
     price: "",
     slotStartTime: "",
     slotEndTime: "",
+    mobileNumber: "",
   });
 
-  const handleConsultationTypeChange = (e) => {
-    const selectedType = e.target.value;
-    setDoctorDetails({ ...doctorDetails, consultationType: e.target.value });
+  const storedService = useSelector(
+    (state) => state.superAdminHomePage.serviceOffered
+  );
+
+  const consultationTypeStore = useSelector(
+    (state) => state.otherDetailsSlice.consultationType
+  );
+
+  const handleAddType = (e) => {
+    const value = e.target.value;
+
+    if (value && !selectedTypes.includes(value)) {
+      setSelectedTypes((prevTypes) => {
+        const updatedTypes = [...prevTypes, value];
+
+        // Update doctorDetails with the new consultationType
+        setDoctorDetails((prevDetails) => ({
+          ...prevDetails,
+          consultationType: updatedTypes, // Ensure it updates with latest array
+        }));
+
+        return updatedTypes;
+      });
+    }
+  };
+
+  // Remove option from array when "tag" is clicked
+  const handleRemoveType = (type) => {
+    setSelectedTypes(selectedTypes.filter((item) => item !== type));
+  };
+
+  const handleAddService = (e) => {
+    const value = e.target.value;
+
+    if (value && !selectedService.includes(value)) {
+      setSelectedService((prevTypes) => {
+        const updatedService = [...prevTypes, value];
+
+        // Update doctorDetails with the new consultationType
+        setDoctorDetails((prevDetails) => ({
+          ...prevDetails,
+          serviceOffered: updatedService, // Ensure it updates with latest array
+        }));
+
+        return updatedService;
+      });
+    }
+  };
+
+  // Remove option from array when "tag" is clicked
+  const handleRemoveService = (type) => {
+    setSelectedService(selectedService.filter((item) => item !== type));
   };
 
   const handleLocationTextChange = (e) => {
@@ -62,14 +123,18 @@ const AddDoctorForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, 'name', value, 'value') 
+    console.log(name, "name", value, "value");
     // Parse the selected time
     if (name === "slotStartTime" || name === "slotEndTime") {
-      {name === "slotStartTime" ? setSlotStartTime(value) : setSlotEndTime(value)}  
+      {
+        name === "slotStartTime"
+          ? setSlotStartTime(value)
+          : setSlotEndTime(value);
+      }
       // const [hours, minutes] = value.split(":");
       // const updatedDate = new Date(); // You can set a specific date here if needed
       // updatedDate.setHours(hours, minutes, 0, 0);
-      
+
       setDoctorDetails({
         ...doctorDetails,
         [name]: convertTimeIntoDate(value),
@@ -94,20 +159,25 @@ const AddDoctorForm = () => {
     }
   };
 
-  
-
   const handleSubmit = async (e) => {
     console.log(doctorDetails, "doctor details");
     setLoader(true);
     e.preventDefault();
 
     if (doctorDetails.password != cpassword) {
+      setLoader(false);
       return handleShowDialog("Password is not matching");
+    }
+    if (!isMobileValid(doctorDetails.mobileNumber)) {
+      setLoader(false);
+      return handleShowDialog("Please correct mobile number");
     }
 
     const formData = new FormData();
     formData.append("name", doctorDetails.name);
     formData.append("email", doctorDetails.email);
+    formData.append("gender", doctorDetails.gender);
+    formData.append("mobileNumber", doctorDetails.mobileNumber);
     formData.append("expertise", doctorDetails.expertise);
     formData.append("degree", doctorDetails.degree);
     formData.append("language", doctorDetails.language);
@@ -134,13 +204,13 @@ const AddDoctorForm = () => {
         method: "POST",
         body: formData,
       });
-      
+
       if (response.ok) {
-        handleShowDialog(response.message)
+        handleShowDialog("Doctor registered successfully");
         // Reset form fields or navigate to another page
       } else {
         console.error("Error adding doctor:", response.statusText);
-        handleShowDialog("Something went wrong, please try again")
+        handleShowDialog("Something went wrong, please try again");
       }
     } catch (error) {
       console.error("Error adding doctor:", error.message);
@@ -172,6 +242,18 @@ const AddDoctorForm = () => {
               type="email"
               name="email"
               value={doctorDetails.email}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label className={styles.label}>
+            <b>Mobile Number:</b>
+            <input
+              className={styles.input}
+              type="number"
+              name="mobileNumber"
+              value={doctorDetails.mobileNumber}
               onChange={handleChange}
               required
             />
@@ -228,36 +310,101 @@ const AddDoctorForm = () => {
           {/* <label htmlFor="consultationType" className={styles.label}>
             Consultation Type:
           </label> */}
-          <select
-            id="consultationType"
-            className={styles.input}
-            style={{ marginLeft: 10 }}
-            value={doctorDetails.consultationType}
-            onChange={handleConsultationTypeChange}
-          >
-            <option value="">Select Consultation Type</option>
-            <option value="Online consultations">Online consultations</option>
-            <option value="Off-line consultations">
-              Off-line consultations
-            </option>
-            <option value="Home visit">Home visit</option>
-          </select>
-          {(doctorDetails.consultationType === "Off-line consultations" ||
-            doctorDetails.consultationType === "Home visit") && (
-            <div>
-              <label htmlFor="Location" className="ml-3">
-                Location:
-              </label>
-              <input
-                type="text"
-                id="Location"
-                className={styles.input}
-                style={{ marginLeft: 10 }}
-                value={doctorDetails.location}
-                onChange={handleLocationTextChange}
-              />
+          <div className="font-weight-bold row ml-0">
+            <div className="col-md-6">
+            <label>Select Consultation Type:</label>
+            <select
+              id="consultationType"
+              className={styles.input}
+              onChange={handleAddType}
+              value=""
+            >
+              <option value="" disabled>
+                Select options
+              </option>
+              {consultationTypeStore.map((option) => (
+                <option
+                  key={option._id}
+                  value={option.name}
+                  disabled={selectedTypes.includes(option.name)}
+                >
+                  {option.isActive ? option.name : null}
+                </option>
+              ))}
+            </select>
+
+            {/* Display selected options as "tags" */}
+            <div className={styles.tagsContainer}>
+              {selectedTypes.map((type) => (
+                <div key={type} className={styles.tag}>
+                  {type}
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() => handleRemoveType(type)}
+                  >
+                    ✖
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
+
+            {/* Location input for specific consultation types */}
+            {(selectedTypes.includes("Off-line consultations") ||
+              selectedTypes.includes("Home visit")) && (
+              <div>
+                <label htmlFor="Location" className="ml-3">
+                  Location:
+                </label>
+                <input
+                  type="text"
+                  id="Location"
+                  className={styles.input}
+                  placeholder="Enter location"
+                />
+              </div>
+            )}
+            </div>
+
+            <div className="font-weight-bold col-md-6">
+              <label>Select Services Offered:</label>
+              <select
+                id="ServicesOffered"
+                className={styles.input}
+                onChange={handleAddService}
+                value=""
+              >
+                <option value="" disabled>
+                  Select options
+                </option>
+                {storedService.map((option) => (
+                  <option
+                    key={option._id}
+                    value={option.name}
+                    disabled={selectedService.includes(option.name)}
+                  >
+                    {option.isActive ? option.name : null}
+                  </option>
+                ))}
+              </select>
+
+              {/* Display selected options as "tags" */}
+              <div className={styles.tagsContainer}>
+                {selectedService.map((type) => (
+                  <div key={type} className={styles.tag}>
+                    {type}
+                    <button
+                      type="button"
+                      className={styles.removeButton}
+                      onClick={() => handleRemoveService(type)}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <label className={styles.label}>
             <b>Works Days:</b>
@@ -315,8 +462,12 @@ const AddDoctorForm = () => {
                   onChange={handleChange}
                   className={styles.select}
                 >
-                  <option value="individual">Individual</option>
-                  <option value="company">Company</option>
+                  <option value={DoctorType.Individual}>
+                    {DoctorType.Individual}
+                  </option>
+                  <option value={DoctorType.Company}>
+                    {DoctorType.Company}
+                  </option>
                 </select>
               </label>
             </Col>
@@ -331,8 +482,8 @@ const AddDoctorForm = () => {
                   name="slotStartTime"
                   value={slotStartTime}
                   onChange={handleChange}
-                  min="09:00"
-                  max="21:00"
+                  min="08:00"
+                  max="23:00"
                   className={styles.input}
                 />
               </label>
@@ -347,8 +498,8 @@ const AddDoctorForm = () => {
                   name="slotEndTime"
                   value={slotEndTime}
                   onChange={handleChange}
-                  min="09:00"
-                  max="21:00"
+                  min={slotStartTime}
+                  max="23:00"
                   className={styles.input}
                 />
               </label>
@@ -434,17 +585,49 @@ const AddDoctorForm = () => {
         </Row>
 
         <Row className="mt-4">
+          <Col className="text-right">
+            <label className={styles.label}>
+              <b>Male</b>
+              <input
+                // className={styles.input}
+                className="ml-1"
+                type="radio"
+                name="gender"
+                value="male"
+                onChange={handleChange}
+                required
+              />
+            </label>
+          </Col>
+          <Col className="text-left">
+            <label className={styles.label}>
+              <b>Female</b>
+              <input
+                // className={styles.input}
+                className="ml-1"
+                type="radio"
+                name="gender"
+                value="female"
+                onChange={handleChange}
+                required
+              />
+            </label>
+          </Col>
+        </Row>
+
+        <Row className="mt-4">
           <Col className="text-center">
             <button className={styles.button} type="submit">
               Add Doctor
             </button>
           </Col>
         </Row>
+
         <CustomDialog
-            show={showDialog}
-            handleClose={handleCloseDialog}
-            message={message}
-          />
+          show={showDialog}
+          handleClose={handleCloseDialog}
+          message={message}
+        />
       </form>
       {loader && <Preloader />}
     </div>

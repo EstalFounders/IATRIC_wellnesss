@@ -7,49 +7,95 @@ import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import { api } from "../../constant";
+import {
+  api,
+  appointment_status,
+  doctor_info_local_storage,
+} from "../../constant";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
+import { useSelector } from "react-redux";
+import {
+  ADVICES,
+  CHIEF_COMPLAINTS_TXT,
+  KNOWN_CASES_TXT,
+  LAST_HEALTH_TEXT_DONE_TXT,
+  NOTES,
+  TEST_ADVICES,
+  UNDER_TREATMENT_TXT,
+} from "./utils/constant";
+import { IoIosClose } from "react-icons/io";
+import { BiPencil, BiSolidPencil } from "react-icons/bi";
 
 const PrescriptionComp = () => {
-    
+  const [availableTests, setAvailableTests] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [medicineForms, setMedicineForms] = useState([]);
-  const [doctors, setDoctors] = useState([]);
   const [showPasswordPopup, setPasswordPopup] = useState(false);
-  const [doctorPassword, setDoctorPassword] = useState("");
+  const doctorInfo = JSON.parse(
+    sessionStorage.getItem(doctor_info_local_storage)
+  );
+  const [doctors, setDoctors] = useState(doctorInfo.user);
+  const [doctorPassword, setDoctorPassword] = useState(doctors.password);
 
+  const appointments = useSelector((state) => state.appointment.appointments);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedName, setSelectedName] = useState("");
+  const [testAdviceSearchTerm, setTestAdviceSearchTerm] = useState("");
+  const [testAdviceSuggestions, setTestAdviceSuggestions] = useState([]);
+  const [showTestAdviceDropdown, setShowTestAdviceDropdown] = useState(false);
+
+  console.log(doctorInfo, "doctoinfo", appointments, "appointments");
   const [updatedFormDetails, setUpdatedFormDetails] = useState({
     doctorName: "",
-    pateintName: "",
+    doctorDegree: doctorInfo.user.degree,
+    doctorMobNo: doctorInfo.user.mobileNumber,
+    patientName: "",
     age: "",
     gender: "Male",
     patientNo: "",
+    patientId: "",
     anyDrugAllergy: "No known allergy from medicine",
-    lastDoctorVisit: "Within 1 month",
+    // lastDoctorVisit: "Within 1 month",
     lastHealthTest: "Within 6 months",
     medicineInfo: [],
-    presentIllness: "",
-    presentIllnessSinceWhen: "",
-    currentStatusPresentIllness: "",
+    knownCases: "",
+    underTreatmentSince: "",
+    cheifCompalaints: "",
+    advices: "",
+    notes: "",
+    testAdvices: [],
     doctorStampUrl: "",
     doctorSignatureUrl: "",
+    appointmentId: "",
     // Add more fields as needed
   });
 
   const handleMedicineFormChange = (formValues, index) => {
-    console.log(formValues, 'form value in homepage')
+    console.log(formValues, "form value in homepage");
     const updatedMedicineForms = [...medicineForms];
     updatedMedicineForms[index] = formValues;
     setMedicineForms(updatedMedicineForms);
   };
 
   const handleOtherFormDetailsChange = (formValues, index) => {
-    const { name, value } = formValues.target;
-    setUpdatedFormDetails((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (formValues.target) {
+      // Handling a single input change (like before)
+      const { name, value } = formValues.target;
+      setUpdatedFormDetails((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    } else {
+      // Handling multiple field updates
+      setUpdatedFormDetails((prevState) => ({
+        ...prevState,
+        ...formValues, // Spread the formValues object to update multiple keys
+      }));
+    }
   };
 
   const handleDeleteMedicineForm = (index) => {
@@ -64,7 +110,9 @@ const PrescriptionComp = () => {
   };
 
   const doctorPasswordValidation = (password) => {
-    const isPasswordCorrect = bcrypt.compareSync(password, doctorPassword);
+    console.log(password, "password in prescription");
+    const isPasswordCorrect = password === doctorPassword;
+    // = bcrypt.compareSync(password, doctorPassword);
 
     if (isPasswordCorrect) {
       setPasswordPopup(false);
@@ -78,51 +126,180 @@ const PrescriptionComp = () => {
 
   // Function to handle preview button click
   const handlePreview = () => {
-    if (!doctorPassword) {
-      return window.alert("Please select doctor");
-    }
+    // if (!doctorPassword) {
+    //   return window.alert("Please select doctor");
+    // }
     setPasswordPopup(true);
     setUpdatedFormDetails({
       ...updatedFormDetails,
       medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+      doctorName: doctors.name,
+      doctorStampUrl: doctors.doctorStampUrl,
+      doctorSignatureUrl: doctors.doctorSignatureUrl,
     });
     // togglePreview();
     // Optionally, you can also perform any other actions here before showing the preview
     console.log(updatedFormDetails, "updated form details before");
   };
 
-  useEffect(() => {
-    // Update medicineInfo whenever medicineForms changes
-    setUpdatedFormDetails({
-      ...updatedFormDetails,
-      medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
-    });
-  }, []);
+  // useEffect(() => {
+  //   // Update medicineInfo whenever medicineForms changes
+  //   setUpdatedFormDetails({
+  //     ...updatedFormDetails,
+  //     medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+  //   });
+  // }, [medicineForms, updatedFormDetails]);
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const response = await fetch(api.addDoctor);
-        const data = await response.json();
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  // const handleDoctorSelect = (event) => {
+  //   const selectedDoctor = JSON.parse(event.target.value);
+  //   setUpdatedFormDetails({
+  //     ...updatedFormDetails,
+  //     doctorName: selectedDoctor.name,
+  //     doctorStampUrl: selectedDoctor.doctorStampUrl,
+  //     doctorSignatureUrl: selectedDoctor.doctorSignatureUrl,
+  //   });
+  //   setDoctorPassword(selectedDoctor.password);
+  // };
 
-    fetchDoctors();
-  }, []);
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    console.log(value, "value in handle input change 149");
+    setSearchTerm(value);
+    // Show dropdown immediately when input changes
+    setShowDropdown(true);
 
-  const handleDoctorSelect = (event) => {
-    const selectedDoctor = JSON.parse(event.target.value);
-    setUpdatedFormDetails({
-      ...updatedFormDetails,
-      doctorName: selectedDoctor.name,
-      doctorStampUrl: selectedDoctor.doctorStampUrl,
-      doctorSignatureUrl: selectedDoctor.doctorSignatureUrl,
-    });
-    setDoctorPassword(selectedDoctor.password);
+    const filteredAppointments = appointments.filter(
+      (appointment) =>
+        appointment.name &&
+        appointment.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setSuggestions(filteredAppointments);
+
+    // Call the original change handler if you need to track the raw input
+    if (isEditing) {
+      handleOtherFormDetailsChange({ patientName: value });
+    }
   };
+
+  const handleInputClick = () => {
+    // Show the full list of names when the input is clicked (if not already shown)
+    if (!showDropdown) {
+      setSuggestions(appointments);
+      setShowDropdown(true);
+    }
+    setIsEditing(false); // Reset to view mode on click
+    setSelectedName("");
+  };
+
+  const handleSuggestionClick = (appointment) => {
+    setSearchTerm(appointment.name);
+    setSelectedName(appointment.name); // Store the selected name
+    setShowDropdown(false);
+    setIsEditing(false); // Go to view mode after selection
+    handleOtherFormDetailsChange({
+      patientName: appointment.name,
+      patientId: appointment._id,
+      patientNo: appointment.patientMobNo,
+      appointmentId: appointment._id,
+    });
+    // handleOtherFormDetailsChange({
+    //   target: { name: "patientId", value: appointment._id },
+    // });
+    // handleOtherFormDetailsChange({
+    //   target: { name: "patientNo", value: appointment.patientMobNo },
+    // });
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 100);
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  useEffect(() => {
+    // Initialize suggestions with all appointments on initial load
+    setSuggestions(appointments);
+  }, [appointments]);
+
+  const handleTestAdviceInputChange = (event) => {
+    const value = event.target.value;
+    setTestAdviceSearchTerm(value);
+    setShowTestAdviceDropdown(true);
+
+    const filteredAdvices = availableTests.filter((test) =>
+      test.testName.toLowerCase().includes(value.toLowerCase())
+    );
+    const testName = filteredAdvices.map((test) => test.testName);
+    console.log(testName, "test name");
+    setTestAdviceSuggestions(testName);
+  };
+
+  const handleTestAdviceSuggestionClick = (advice) => {
+    console.log(advice, "advice");
+    setUpdatedFormDetails((prevDetails) => ({
+      ...prevDetails,
+      testAdvices: [...prevDetails.testAdvices, advice],
+    }));
+    setTestAdviceSearchTerm("");
+    setTestAdviceSuggestions([]);
+    setShowTestAdviceDropdown(false);
+  };
+
+  const handleInputKeyDown = (event) => {
+    if (event.key === "Enter" && testAdviceSearchTerm) {
+      const matchingTest = availableTests.find(
+        (test) =>
+          test.testName.toLowerCase() === testAdviceSearchTerm.toLowerCase()
+      );
+      if (matchingTest) {
+        setUpdatedFormDetails((prevDetails) => ({
+          ...prevDetails,
+          testAdvices: [...prevDetails.testAdvices, matchingTest.testName], // Changed this line
+        }));
+      } else {
+        setUpdatedFormDetails((prevDetails) => ({
+          ...prevDetails,
+          testAdvices: [...prevDetails.testAdvices, testAdviceSearchTerm],
+        }));
+      }
+      setTestAdviceSearchTerm("");
+    }
+  };
+
+  const handleTestAdviceBlur = () => {
+    setTimeout(() => {
+      setShowTestAdviceDropdown(false);
+    }, 100);
+  };
+
+  const handleRemoveAdvice = (index) => {
+    setUpdatedFormDetails((prevDetails) => ({
+      ...prevDetails,
+      testAdvices: prevDetails.testAdvices.filter((_, i) => i !== index),
+    }));
+  };
+
+  const fetchAvailableTests = async () => {
+    try {
+      // setIsLoadingTests(true); // Show loader while fetching
+      const response = await fetch(api.labTestDetails); // Replace with your API endpoint
+      const data = await response.json();
+      console.log(data, "data on 59");
+      setAvailableTests(data || []); // Assuming the API returns { tests: [...] }
+    } catch (error) {
+      console.error("Error fetching available tests:", error);
+    } finally {
+      // setIsLoadingTests(false); // Hide loader once done
+    }
+  };
+
+  useEffect(() => {
+    fetchAvailableTests();
+  }, []);
 
   // CSS for the modal
   const modalStyle = {
@@ -159,7 +336,7 @@ const PrescriptionComp = () => {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "TT Ramillas, sans-serif",
       }}
     >
       <h1
@@ -175,40 +352,138 @@ const PrescriptionComp = () => {
           <div style={{ display: "grid", gap: "10px" }}>
             <div className="row">
               <div className="col">
-                <select
-                  onChange={handleDoctorSelect}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    width: "100%",
-                  }}
-                >
-                  <option value="">Select a Doctor</option>
-                  {doctors.map((doctor) => (
-                    <option key={doctor._id} value={JSON.stringify(doctor)}>
-                      {doctor.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="font-weight-bold">
+                  {" "}
+                  Dr {doctorInfo.user.name}
+                </div>
               </div>
             </div>
             <Row>
               <Col>
                 <label>
                   Patient Name:
-                  <input
-                    type="text"
-                    name="pateintName"
+                  <div
                     style={{
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      width: "100%",
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
                     }}
-                    required
-                    onChange={handleOtherFormDetailsChange}
-                  />
+                  >
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        name="patientName"
+                        style={{
+                          padding: "10px",
+                          borderRadius: "5px",
+                          border: "1px solid #ccc",
+                          width: "100%",
+                          marginRight: "8px",
+                        }}
+                        required
+                        value={searchTerm}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        autoComplete="off"
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          padding: "10px",
+                          borderRadius: "5px",
+                          border: "1px solid #ccc",
+                          width: "100%",
+                          marginRight: "8px",
+                          cursor: "pointer",
+                          backgroundColor: "#f0f0f0",
+                        }}
+                        onClick={handleInputClick}
+                      >
+                        {selectedName || "Select Patient"}
+                      </div>
+                    )}
+                    {console.log(
+                      isEditing,
+                      "isEditing",
+                      selectedName,
+                      "selectedName"
+                    )}
+                    {!isEditing && selectedName && (
+                      <BiSolidPencil size={16} onClick={handleEditClick} />
+                    )}
+                    {showDropdown && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 2px)",
+                          left: 0,
+                          width: "100%",
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "5px",
+                          zIndex: 10,
+                          maxHeight: "150px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {suggestions
+                          .filter(
+                            (appointment) =>
+                              appointment.status !==
+                              appointment_status.completed
+                          )
+                          .map((appointment) => (
+                            <div
+                              key={appointment.id || appointment.name}
+                              style={{ padding: "8px", cursor: "pointer" }}
+                              onClick={() => handleSuggestionClick(appointment)}
+                            >
+                              {appointment.name}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                    {showDropdown && suggestions.length === 0 && searchTerm && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 2px)",
+                          left: 0,
+                          width: "100%",
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "5px",
+                          zIndex: 10,
+                          padding: "8px",
+                          fontStyle: "italic",
+                          color: "#777",
+                        }}
+                      >
+                        No matching patients
+                      </div>
+                    )}
+                    {showDropdown &&
+                      suggestions.length === 0 &&
+                      !searchTerm && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 2px)",
+                            left: 0,
+                            width: "100%",
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "5px",
+                            zIndex: 10,
+                            padding: "8px",
+                            fontStyle: "italic",
+                            color: "#777",
+                          }}
+                        >
+                          No appointments available
+                        </div>
+                      )}
+                  </div>
                 </label>
               </Col>
               <Col md={2}>
@@ -253,9 +528,9 @@ const PrescriptionComp = () => {
           </div>
         </div>
         <div style={{ marginBottom: "20px" }}>
-          <h2>Present Illness</h2>
+          <h2>{KNOWN_CASES_TXT}</h2>
           <input
-            name="presentIllness"
+            name="knownCases"
             type="text"
             style={{
               padding: "10px",
@@ -269,9 +544,9 @@ const PrescriptionComp = () => {
           />
         </div>
         <div style={{ marginBottom: "20px" }}>
-          <h2>Present Illness Since When</h2>
+          <h2>{UNDER_TREATMENT_TXT}</h2>
           <input
-            name="presentIllnessSinceWhen"
+            name="underTreatmentSince"
             type="text"
             style={{
               padding: "10px",
@@ -285,9 +560,9 @@ const PrescriptionComp = () => {
           />
         </div>
         <div style={{ marginBottom: "20px" }}>
-          <h2>Currrent Status of Present Illness</h2>
+          <h2>{CHIEF_COMPLAINTS_TXT}</h2>
           <input
-            name="currentStatusPresentIllness"
+            name="cheifCompalaints"
             type="text"
             style={{
               padding: "10px",
@@ -326,30 +601,7 @@ const PrescriptionComp = () => {
           </label>
         </div>
         <div style={{ marginBottom: "20px" }}>
-          <h2>Last Doctor Visit</h2>
-          <label>
-            When was the last doctor visit:
-            <select
-              name="lastDoctorVisit"
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                width: "100%",
-              }}
-              required
-              onChange={handleOtherFormDetailsChange}
-              value={updatedFormDetails.lastDoctorVisit}
-            >
-              <option value="within_1_month">Within 1 month</option>
-              <option value="Within 3 months">Within 3 months</option>
-              <option value="Within 6 months">Within 6 months</option>
-              <option value="Over 6 months ago">Over 6 months ago</option>
-            </select>
-          </label>
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Last Health Test</h2>
+          <h2>{LAST_HEALTH_TEXT_DONE_TXT}</h2>
           <label>
             When was the last health test:
             <select
@@ -368,6 +620,135 @@ const PrescriptionComp = () => {
               <option value="Over 6 months ago">Over 6 months ago</option>
             </select>
           </label>
+        </div>
+        <div style={{ marginBottom: "20px" }}>
+          <h2>{ADVICES}</h2>
+          <input
+            name="advices"
+            type="text"
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+            pattern="[0-9]{10}"
+            required
+            onChange={handleOtherFormDetailsChange}
+          />
+        </div>
+        <div style={{ marginBottom: "20px" }}>
+          <h2>{NOTES}</h2>
+          <input
+            name="notes"
+            type="text"
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+            pattern="[0-9]{10}"
+            required
+            onChange={handleOtherFormDetailsChange}
+          />
+        </div>
+        <div style={{ marginBottom: "20px" }}>
+          <h2>Test Advices</h2>
+          <div style={{ position: "relative" }}>
+            <input
+              name="testAdvicesInput"
+              type="text"
+              style={{
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
+                width: "100%",
+              }}
+              value={testAdviceSearchTerm}
+              onChange={handleTestAdviceInputChange}
+              onKeyDown={handleInputKeyDown}
+              onBlur={handleTestAdviceBlur}
+            />
+            {showTestAdviceDropdown && testAdviceSuggestions.length > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 2px)",
+                  left: 0,
+                  width: "100%",
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  zIndex: 10,
+                  maxHeight: "150px",
+                  overflowY: "auto",
+                }}
+              >
+                {testAdviceSuggestions.map((advice) => (
+                  <div
+                    key={advice}
+                    style={{ padding: "8px", cursor: "pointer" }}
+                    onClick={() => handleTestAdviceSuggestionClick(advice)}
+                  >
+                    {advice}
+                  </div>
+                ))}
+              </div>
+            )}
+            {showTestAdviceDropdown &&
+              testAdviceSuggestions.length === 0 &&
+              testAdviceSearchTerm && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 2px)",
+                    left: 0,
+                    width: "100%",
+                    backgroundColor: "white",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    zIndex: 10,
+                    padding: "8px",
+                    fontStyle: "italic",
+                    color: "#777",
+                  }}
+                >
+                  No matching tests
+                </div>
+              )}
+          </div>
+          {updatedFormDetails.testAdvices.length > 0 && (
+            <div style={{ marginTop: "10px" }}>
+              <strong>Added Tests:</strong>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {updatedFormDetails.testAdvices.map((advice, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "4px 8px",
+                      backgroundColor: "#e0e0e0",
+                      borderRadius: "16px",
+                      border: "1px solid #ccc",
+                      gap: "4px",
+                    }}
+                  >
+                    <span>{advice}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveAdvice(index)}
+                      className="p-0 h-6 w-6"
+                    >
+                      <IoIosClose className="h-4 w-4 text-gray-600 hover:text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div
           className="text-center mb-4"

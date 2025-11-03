@@ -50,7 +50,6 @@ Extra @Media Query
     font-weight: normal;
     font-size: 12px;
     line-height: 18px;
-    font-family: Helvetica, sans-serif;
     -webkit-font-smoothing: subpixel-antialiased;
     font-smoothing: antialiased;
     font-smooth: antialiased;
@@ -172,7 +171,9 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li a {
-    color: #666;
+    color: #000;
+    font-size: 17px ;
+    font-weight: 600;
 }
 
 .wsmenu>.wsmenu-list>li:hover>a {

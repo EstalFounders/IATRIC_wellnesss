@@ -1,0 +1,136 @@
+.card {
+    width: 400px; 
+    /* border: 1px solid #EDEDED; */
+    border-radius: 30px;
+    background-color: #F8FAF6;
+  }
+
+  .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+  
+  .header {
+    /* display: flex; */
+    /* justify-content: space-between; */
+    align-items: center;
+    margin: 0px 2px 0px 2px;
+  }
+  
+  .icon {
+    font-size: 24px;
+  }
+  
+  .discount {
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+font-weight: 700;
+line-height: 31.69px;
+border-radius: 10px;
+background-color: #559421;
+  }
+  
+  .price {
+    font-size: 16px;
+    font-weight: bold;
+font-weight: 500;
+line-height: 31.69px;
+text-align: left;
+color: #ffffff;
+top: 15px;
+
+  }
+  
+  .mrp {
+    text-decoration: line-through;
+    color: #ffffff;
+    font-size: 14px;
+    margin-left: 5px;
+font-weight: 400;
+line-height: 17.07px;
+text-align: left;
+
+  }
+  
+  .title {
+    margin-left: 5%;
+font-size: 24px;
+font-weight: 500;
+line-height: 28.8px;
+text-align: left;
+margin-top: 50px;
+color: #ffffff;
+text-wrap: nowrap;
+  }
+  
+  .description {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #ffffff;
+    text-align: left;
+    margin-left: 5%;
+    margin-right: 5%;
+
+}
+  
+  .details {
+    font-size: 14px;
+    margin-top: 5%;
+  }
+  
+  .addToCartbutton {
+     width: 200px;
+    height: 33px;
+    gap: 4px;
+    border-radius: 8px;
+font-size: 16px;
+font-weight: 700;
+line-height: 17.07px;
+text-align: center;
+color: #2B3133;
+border: 1px solid #8e8333;
+background-color: white;
+
+display: flex;
+justify-content: center;
+align-items: center;
+  }
+  .addToCartbutton:hover {
+    background-color: #8e8333;
+    color: white;
+  }
+  
+  .addToCartbutton.clicked {
+    background-color: #4F6628; /* Color for clicked state */
+    color: white;
+  }
+
+  .viewDetailsButton {
+  width: 120px;
+    height: 33px;
+    gap: 4px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 17.07px;
+    text-align: center;
+    color: #ffffff;
+    display: flex;
+    margin-left: 2%;
+justify-content: center;
+align-items: center;
+    /* background: linear-gradient(to bottom,#3b5f1d, #A69D50);  */
+    background-color: #3b5f1d;
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+  
+  .upperSection {
+  border-radius: 30px 30px 0 0;
+}
+  .icon {
+    width: 40px;
+    background-color: #DDE6C6;
+    border-radius: 50px;
+  }
+  

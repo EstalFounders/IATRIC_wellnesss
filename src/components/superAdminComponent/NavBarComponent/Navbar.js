@@ -43,9 +43,18 @@ function Navbar() {
               return (
                 <li key={index} className={item.cName}>
                   <Link href={item.path}>
-                    <div className="mt-3 m-3">
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       {item.icon}
-                      <span className={styles.span}>{item.title}</span>
+                      <span
+                        className={styles.span}
+                        style={{
+                          marginLeft: "6px",
+                          whiteSpace: "nowrap",
+                          fontSize: "1rem",
+                        }}
+                      >
+                        {item.title}
+                      </span>
                     </div>
                   </Link>
                 </li>

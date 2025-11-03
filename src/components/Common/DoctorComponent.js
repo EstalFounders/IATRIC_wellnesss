@@ -20,7 +20,7 @@ export const DoctorComponent = ({ doctor }) => (
         <span>{doctor.gender}</span>
         {/* Button */}
         <Link legacyBehavior href="/">
-          <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+          <a className="btn btn-sm btn-blue blue-hover mt-15">
             View Profile
           </a>
         </Link>

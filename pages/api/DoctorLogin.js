@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
-  const parsedJsonRequest = JSON.parse(req.body);
+  const parsedJsonRequest = JSON.parse(req.body); 
   const { email, password } = parsedJsonRequest;
   // Validate email and password (you can add more validation logic here)
   console.log(email, "credentails email and password", password);

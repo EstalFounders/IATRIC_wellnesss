@@ -1,0 +1,109 @@
+.container {
+    font-weight: 700;
+    margin-top: 1rem;
+  }
+  
+  .row {
+    padding: 18px 13px;
+    gap: 10px;
+    border-radius: 10px;
+    border: 1px solid #EDEDED;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    background-color: white;
+  }
+  
+  .loginButton {
+    background-color: #D1ECA0;
+    width: 74px;
+    height: 33px;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    line-height: 17.07px;
+  }
+  
+  .navLink {
+    color: #000;
+  }
+  
+  .dropdownMenu {
+    position: absolute;
+    z-index: 1050;
+    top: 100%;
+    left: 0;
+    margin-left: 30%;
+    margin-top: 11%;
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    border: 1px solid #EBEBEB
+    
+  }
+  
+  .mobileNav {
+    background-color: #ffffff;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    right: 2px;
+    text-align: center;
+    z-index: 1050;
+    border: 1px solid #EDEDED;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  }
+  
+  .mobileNavLink {
+    padding: 10px 0;
+    border-bottom: 1px solid #EDEDED;
+  }
+  
+  .cartIconContainer {
+    position: relative;
+    display: inline-block;
+    margin-left: 1rem;
+  }
+  
+  .cartItemCount {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #4F6628;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .username {
+font-size: 14px;
+font-weight: 700;
+line-height: 17.07px;
+color: #737373;
+  }
+
+  .usernamedropdown {
+font-size: 16px;
+font-weight: 700;
+line-height: 19.5px;
+color: black;
+  }
+
+  .emaildropdown {
+font-size: 16px;
+font-weight: 500;
+line-height: 19.5px;
+letter-spacing: -0.01em;
+color: #999999;
+  }
+
+.dropdownItem {
+font-size: 14px;
+font-weight: 500;
+line-height: 17.07px;
+letter-spacing: -0.01em;
+  }
+  

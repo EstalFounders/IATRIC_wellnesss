@@ -6,7 +6,7 @@ import {
   doctorStamp_img_path,
   profilePicture_img_path,
 } from "../../src/constant";
-import { storage } from "../../src/lib/firebase";
+import { storage } from "../../lib/firebase";
 import {
   deleteObject,
   getDownloadURL,
@@ -18,7 +18,6 @@ import Doctor from "../../src/models/doctorModel";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
-import { convertTimeIntoDate, generateSlotsForMonth } from "./helper";
 import Slot from "../../src/models/slots";
 
 // Global variable to store the database connection
@@ -137,7 +136,7 @@ export default async function handler(req, res) {
             })
           );
 
-          const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
+          // const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
 
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
@@ -147,12 +146,22 @@ export default async function handler(req, res) {
           );
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
-            ...stringFields, // Assuming fields contain other doctor details like name, email, etc.
-            password: hashedPassword,
-            profilePictureUrl, // Now profilePictureUrl is accessible here
+            ...stringFields,
+            password: fields.password[0],
+            profilePictureUrl,
             diplomasCertificatesUrls,
             doctorStampUrl,
             doctorSignatureUrl,
+            consultationType: stringFields.consultationType
+              ? stringFields.consultationType
+                  .split(",")
+                  .map((type) => type.trim())
+              : [], // Convert to array & trim spaces
+            serviceOffered: stringFields.serviceOffered
+              ? stringFields.serviceOffered
+                  .split(",")
+                  .map((type) => type.trim())
+              : [], // Convert to array & trim spaces
           });
 
           console.log(addedDoctor._id, "Doctor Added");
@@ -303,6 +312,11 @@ export default async function handler(req, res) {
           ...stringFields,
           profilePictureUrl,
           diplomasCertificatesUrls,
+          consultationType: stringFields.consultationType
+            ? stringFields.consultationType
+                .split(",")
+                .map((type) => type.trim())
+            : [], // Convert to array & trim spaces
         };
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,

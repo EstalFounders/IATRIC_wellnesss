@@ -37,15 +37,16 @@ const Layouts = ({ children, header, footer }) => {
       case 4:
         return <Header4 toggleMenu={() => openClick()} toggle={toggle} />;
       case 5:
-        return <Header5 toggleMenu={() => openClick()} toggle={toggle} />;
+        return null
+        // return <Header5 toggleMenu={() => openClick()} toggle={toggle} />;
       case 6:
-        return <SuperAdminLoginHeader session={false} />;
+        // return <LabTesLandingPageHeader />;
       case 7:
         return <SuperAdminLoginHeader session={true} />;
-      case 8:
-        return <RegisterDocLoginHeader session={false} />;
+      // case 8:
+      //   return <RegisterDocLoginHeader session={false} />;
       case 9:
-        return <RegisterDocLoginHeader session={true} />;
+        return <RegisterDocLoginHeader />;
       default:
         return <Header1 toggleMenu={() => openClick()} toggle={toggle} />;
     }
