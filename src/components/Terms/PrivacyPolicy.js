@@ -81,7 +81,7 @@ const PrivacyPolicy = () => (
       </li>
       <li>
         If you have questions, or wish to exercise your rights, contact our
-        Privacy Officer at: <Link>privacy@yourwebsite.com</Link>
+        Privacy Officer at:{"customercare@healthpath.co.in"}
       </li>
     </ul>
     <h2>Cookies & Tracking</h2>

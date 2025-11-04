@@ -78,7 +78,8 @@ const TermsPage = () => (
     <h2>Contact Us</h2>
     <p>
       If you have any questions about these Terms, please email us at{" "}
-      <a href="mailto:support@yourwebsite.com">support@yourwebsite.com</a>.
+      <a href="mailto:support@yourwebsite.com">customercare@healthpath.co.in</a>
+      .
     </p>
   </div>
 );
