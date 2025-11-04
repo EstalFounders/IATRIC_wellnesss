@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const PrivacyPolicy = () => (
@@ -80,8 +81,7 @@ const PrivacyPolicy = () => (
       </li>
       <li>
         If you have questions, or wish to exercise your rights, contact our
-        Privacy Officer at:{" "}
-        <a href="mailto:privacy@yourwebsite.com">privacy@yourwebsite.com</a>
+        Privacy Officer at: <Link>privacy@yourwebsite.com</Link>
       </li>
     </ul>
     <h2>Cookies & Tracking</h2>
