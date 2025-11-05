@@ -22,7 +22,7 @@ const Demo5Services1 = () => {
   // ✅ Duplicate your `features[]` array locally
   const features = [
     {
-      title: "Consultation",
+      title: "docctor Consultation",
       service: "Consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
@@ -30,7 +30,7 @@ const Demo5Services1 = () => {
       btntext: "View Details",
     },
     {
-      title: "Nursing Services",
+      title: "Home Care",
       service: "home care",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
@@ -38,7 +38,7 @@ const Demo5Services1 = () => {
       btntext: "View Details",
     },
     {
-      title: "Lab Test",
+      title: "Lab Test and dignostics",
       service: "lab-test",
       description:
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
@@ -53,7 +53,8 @@ const Demo5Services1 = () => {
       icon: <HealthCampIcon size={70} />,
       btntext: "View Details",
     },
-    {      title: "Corporate Healthcare",
+    {
+      title: "Corporate Healthcare",
       service: "corporate-healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
@@ -118,7 +119,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Patient Services</h3>
+            <div className="font-weight-bold display-4">Patient Services</div>
           </div>
         </div>
 
@@ -147,7 +148,7 @@ const Demo5Services1 = () => {
                   >
                     <div className="service-nav-link-dept">
                       <div className="service-icon-dept">{item.icon}</div>
-                      <div className="service-title-dept">{item.title}</div>
+                      <div className="service-title-dept font-weight-bold">{item.title}</div>
                     </div>
                   </div>
                 ))}

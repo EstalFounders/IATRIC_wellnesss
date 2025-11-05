@@ -121,7 +121,9 @@ const Footer4 = () => {
                 className="p-sm text-nowrap"
                 style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
               >
-                Mon - Sun - 8:00 AM - 8:00 PM
+                <span>Mon - Sun </span>
+                <br />
+                <span>8:00 AM - 8:00 PM</span>
               </div>
             </div>
           </div>
@@ -136,9 +138,9 @@ const Footer4 = () => {
                 <u>Reach us</u>
               </div>
               {/* Address */}
-              <span>
-                <FaMapMarkedAlt className="mx-1" />
-                <b>{address}</b>
+              <span className="d-flex flex-row">
+                <FaMapMarkedAlt size={30} />
+                <b className="ml-2">{address}</b>
               </span>
               {/* Email */}
               <div className="foo-email mt-20 d-flex flex-row mb-4">
