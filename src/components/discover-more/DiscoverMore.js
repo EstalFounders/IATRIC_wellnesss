@@ -3,13 +3,22 @@ import React from "react";
 import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
-import { CorporateHealthcareIcon, GeneralPhysician, HealthCampIcon, HomeCareIcon, LabInvestigation, MedicineDelivery, NursingCareIcon } from "../../../public/svgIcon/all-department-svg-icon";
+import {
+  CorporateHealthcareIcon,
+  GeneralPhysician,
+  HealthCampIcon,
+  HomeCareIcon,
+  LabInvestigation,
+  MedicineDelivery,
+  NursingCareIcon,
+  PhysiotherapyIcon,
+} from "../../../public/svgIcon/all-department-svg-icon";
 
 const DiscoverMoreComp = () => {
   const router = useRouter();
   const features = [
     {
-      title: "Consultation",
+      title: "Doctor Consultation",
       service: "Consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
@@ -17,7 +26,7 @@ const DiscoverMoreComp = () => {
       btntext: "View Details",
     },
     {
-      title: "Nursing Services",
+      title: "Nursing care",
       service: "home care",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
@@ -25,7 +34,7 @@ const DiscoverMoreComp = () => {
       btntext: "View Details",
     },
     {
-      title: "Lab Test",
+      title: "Lab Test & Diagnostics",
       service: "lab-test",
       description:
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
@@ -42,7 +51,7 @@ const DiscoverMoreComp = () => {
     // },
     {
       title: "Community Care",
-      service:"corporate",
+      service: "corporate",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <HealthCampIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
@@ -52,7 +61,27 @@ const DiscoverMoreComp = () => {
       title: "Corporate Healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+      icon: (
+        <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />
+      ), // Using the SVG icon component
+      btntext: "View Details",
+    },
+    {
+      title: "Home Care",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: (
+        <HomeCareIcon color={`${color_schema.yellow}`} size={70} />
+      ), // Using the SVG icon component
+      btntext: "View Details",
+    },
+    {
+      title: "Pyhsiotherapy",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: (
+        <PhysiotherapyIcon color={`${color_schema.yellow}`} size={70} />
+      ), // Using the SVG icon component
       btntext: "View Details",
     },
   ];
@@ -126,8 +155,8 @@ const DiscoverMoreComp = () => {
                   path={"/discover-more"}
                   onClick={() =>
                     router.push(
-                      `/service-details/?Service=${item.title
-                        .trim()
+                      `/service-details/?Service=${
+                        item.title.trim()
                         // .split(" ")
                         // .slice(1)
                       }`

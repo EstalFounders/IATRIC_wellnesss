@@ -9,6 +9,8 @@ import { color_schema } from "../../constant";
 
 const Testimonials = testimonials;
 
+const avatarColors = ["#8e8333", "#3b5f1d"];
+
 const ReviewSlider = () => {
   return (
     <div className="row">
@@ -31,9 +33,7 @@ const ReviewSlider = () => {
         >
           {Testimonials.map((t, i) => (
             <SwiperSlide key={i}>
-              <div
-                className="review-card position-relative p-4 d-flex flex-column justify-content-between text-center my-5"
-              >
+              <div className="review-card position-relative p-4 d-flex flex-column justify-content-between text-center my-5">
                 {/* Quote Icons */}
                 <FaQuoteLeft
                   style={{
@@ -67,7 +67,13 @@ const ReviewSlider = () => {
                       className="testimonial-avatar"
                     />
                   ) : (
-                    <div className="initials-avatar mx-auto">
+                    <div
+                      className="initials-avatar mx-auto"
+                      style={{
+                        backgroundColor: avatarColors[i % 2],
+                        color: "#fff",
+                      }}
+                    >
                       {getInitials(t.name)}
                     </div>
                   )}

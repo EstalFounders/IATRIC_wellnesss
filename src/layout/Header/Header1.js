@@ -78,8 +78,8 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   };
 
   const handleConsultationTypeOpenDialog = () => {
-    console.log("tesinafa");
-    setIsConsultationTypeOpen(true);
+    router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
+    // setIsConsultationTypeOpen(true);
   };
 
   const handleConsultationTypeCloseDialog = () => {
@@ -477,11 +477,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
           />
         )}
 
-        <PopupDialog
+        {/* <PopupDialog
           isOpen={isConsultationTypeOpen}
           onClose={handleConsultationTypeCloseDialog}
           options={consultationTypes}
-        />
+        /> */}
       </div>
 
       <MobileMenu />

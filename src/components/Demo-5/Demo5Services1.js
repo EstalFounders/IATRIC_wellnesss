@@ -7,6 +7,9 @@ import {
   HealthCampIcon,
   HomeCareIcon,
   LabInvestigation,
+  NursingCare,
+  NursingCareIcon,
+  PhysiotherapyIcon,
 } from "../../../public/svgIcon/all-department-svg-icon";
 
 const Demo5Services1 = () => {
@@ -22,11 +25,19 @@ const Demo5Services1 = () => {
   // ✅ Duplicate your `features[]` array locally
   const features = [
     {
-      title: "docctor Consultation",
+      title: "Doctor Consultation",
       service: "Consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician size={70} />,
+      btntext: "View Details",
+    },
+    {
+      title: "Nursing Care",
+      service: "Consultation",
+      description:
+        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
+      icon: <NursingCareIcon size={70} />,
       btntext: "View Details",
     },
     {
@@ -38,7 +49,7 @@ const Demo5Services1 = () => {
       btntext: "View Details",
     },
     {
-      title: "Lab Test and dignostics",
+      title: "Blood Test & Diagnostics",
       service: "lab-test",
       description:
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
@@ -59,6 +70,14 @@ const Demo5Services1 = () => {
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon size={70} />,
+      btntext: "View Details",
+    },
+    {
+      title: "Physoiotherapy",
+      service: "corporate-healthcare",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: <PhysiotherapyIcon size={70} />,
       btntext: "View Details",
     },
   ];
@@ -119,7 +138,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold display-4">Patient Services</div>
+            <div className="font-weight-bold h1 text-uppercase">SERVICES</div>
           </div>
         </div>
 
@@ -148,7 +167,9 @@ const Demo5Services1 = () => {
                   >
                     <div className="service-nav-link-dept">
                       <div className="service-icon-dept">{item.icon}</div>
-                      <div className="service-title-dept font-weight-bold">{item.title}</div>
+                      <div className="service-title-dept font-weight-bold">
+                        {item.title}
+                      </div>
                     </div>
                   </div>
                 ))}
