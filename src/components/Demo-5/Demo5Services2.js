@@ -228,7 +228,7 @@ const Demo5Services2 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold display-4">Our Speciality</div>
+            <div className="font-weight-bold h1 text-uppercase">Our Speciality</div>
           </div>
         </div>
         <div className="row">

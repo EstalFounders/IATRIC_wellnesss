@@ -20,7 +20,7 @@ export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
 export const isNow = "Now";
 export const SERVER_AVAILABLE_SLOTS_CODE = "304";
-export const booking_btn_txt = "Consult Now"
+export const booking_btn_txt = "Book Now"
 
 export const api = {
   addDoctor: "/api/addDoctor",

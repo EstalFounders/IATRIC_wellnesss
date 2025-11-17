@@ -16,8 +16,12 @@ const Demo2Reviews2 = () => {
                 At Healthpath, the heart of our success lies in the positive
                 experiences of our patients. We&apos;re incredibly proud of the
                 trust placed in us and the real difference we make in
-                people&apos;s lives. Here&apos;s what some of our patients have
-                to say about their Healthpath experience:
+                people&apos;s lives.
+                <br />
+                <div className="mt-3">
+                Here&apos;s what some of our patients have to say about their
+                Healthpath experience:
+                </div>
               </div>
             </div>
           </div>
@@ -26,7 +30,7 @@ const Demo2Reviews2 = () => {
 
           {/* END TESTIMONIALS CONTENT */}
         </div>
-          <ReviewSlider />
+        <ReviewSlider />
       </div>
       {/* End container */}
     </section>

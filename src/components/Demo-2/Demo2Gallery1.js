@@ -20,10 +20,23 @@ const Demo2Gallery1 = () => {
             <h3 className="h3-md text-dark">Your Partner in Health</h3>
             {/* Text */}
             <div>
-              At Healthpath, we&apos;re more than just a <strong>healthcare provider</strong>; we&apos;re truly <strong>your partner in health</strong>. We walk alongside you on your entire <strong>wellness journey</strong>, committed to helping you achieve your personal health goals.
-            </div><br></br>
-            <div>
-              We offer <strong>personalized care</strong>, dedicated support, and essential resources every step of the way. With Healthpath, you gain a trusted ally focused on your <strong>long-term well-being</strong>, ensuring you receive the <strong>comprehensive care</strong> and guidance you need to thrive. Choose Healthpath for a collaborative approach to your health, where your success is our shared mission.
+              At Healthpath, we&apos;re more than just a{" "}
+              <strong>healthcare provider</strong>; we&apos;re truly{" "}
+              <strong>your partner in health</strong>.
+              <br />
+              We walk alongside you on your entire{" "}
+              <strong>wellness journey</strong>, committed to helping you
+              achieve your personal health goals.We offer{" "}
+              <strong>personalized care</strong>, dedicated support, and
+              essential resources every step of the way.
+              <br />
+              <div className="mt-3">
+              With Healthpath, you gain a trusted ally focused on your{" "}
+              <strong>long-term well-being</strong>, ensuring you receive the{" "}
+              <strong>comprehensive care</strong> and guidance you need to
+              thrive. Choose Healthpath for a collaborative approach to your
+              health, where your success is our shared mission.
+              </div>  
             </div>
           </div>
         </div>
@@ -34,7 +47,7 @@ const Demo2Gallery1 = () => {
         <div className="col-md-6 col-lg-3 gallery-item">
           <div className="hover-overlay">
             {/* Gallery Image */}
-            <Image  
+            <Image
               width={500}
               height={500}
               className="img-fluid"
