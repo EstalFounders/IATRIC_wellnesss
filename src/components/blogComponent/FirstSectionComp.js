@@ -1,4 +1,3 @@
-
 import { useRouter } from "next/router";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { MdSearch, MdClose } from "react-icons/md";
@@ -65,7 +64,8 @@ const mockArticles = [
 
 // Dropdown component that uses Portal
 
-const FirstSectionComp = ({}) => {
+const FirstSectionComp = ({ articles }) => {
+  const ArticleList = articles;
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -110,7 +110,7 @@ const FirstSectionComp = ({}) => {
   // Configure Fuse.js for fuzzy search with new article structure
   const fuse = useMemo(
     () =>
-      new Fuse(mockArticles, {
+      new Fuse(ArticleList, {
         keys: [
           { name: "title", weight: 0.5 },
           { name: "category", weight: 0.3 },

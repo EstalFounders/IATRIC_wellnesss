@@ -82,6 +82,27 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     };
   };
 
+  const handleDownloadPDF = async () => {
+    setLoading(true);
+    try {
+      const doc = new jsPDF();
+      const canvas = await html2canvas(document.getElementById("pdfContainer"));
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgProps = doc.getImageProperties(imgData);
+      const pdfWidth = doc.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      doc.save(`Prescription_${data.patientName}_${Date.now()}.pdf`);
+    } catch (error) {
+      console.error("PDF download error:", error.message);
+      window.alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreatePDF = async () => {
     setLoading(true);
     try {
@@ -330,8 +351,18 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
             id="sendButton"
             onClick={handleCreatePDF}
             style={{ backgroundColor: "#8e8333" }}
+            disabled
           >
             <strong>Send PDF</strong>
+          </Button>
+        </div>
+        <div className="col mb-3">
+          <Button
+            id="downloadButton"
+            onClick={handleDownloadPDF}
+            style={{ backgroundColor: "#3a5e1c" }}
+          >
+            <strong>Download PDF</strong>
           </Button>
         </div>
         <div className="col mb-3">
@@ -343,7 +374,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           >
             <strong>Sign PDF</strong>
           </div>
-        </div>  
+        </div>
       </div>
       {loading ? <Preloader /> : null}
     </div>

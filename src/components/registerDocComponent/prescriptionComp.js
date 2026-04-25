@@ -25,7 +25,7 @@ import {
   UNDER_TREATMENT_TXT,
 } from "./utils/constant";
 import { IoIosClose } from "react-icons/io";
-import { BiPencil, BiSolidPencil } from "react-icons/bi";
+import { BiPencil, BiSolidPencil, BiPlus } from "react-icons/bi";
 
 const PrescriptionComp = () => {
   const [availableTests, setAvailableTests] = useState([]);
@@ -47,6 +47,7 @@ const PrescriptionComp = () => {
   const [testAdviceSearchTerm, setTestAdviceSearchTerm] = useState("");
   const [testAdviceSuggestions, setTestAdviceSuggestions] = useState([]);
   const [showTestAdviceDropdown, setShowTestAdviceDropdown] = useState(false);
+  const [allTestNames, setAllTestNames] = useState([]);
 
   console.log(doctorInfo, "doctoinfo", appointments, "appointments");
   const [updatedFormDetails, setUpdatedFormDetails] = useState({
@@ -230,12 +231,18 @@ const PrescriptionComp = () => {
     setTestAdviceSearchTerm(value);
     setShowTestAdviceDropdown(true);
 
-    const filteredAdvices = availableTests.filter((test) =>
-      test.testName.toLowerCase().includes(value.toLowerCase())
+    if (!value.trim()) {
+      // Show all available tests when search is empty
+      setTestAdviceSuggestions(allTestNames.slice(0, 50));
+      return;
+    }
+
+    const searchLower = value.toLowerCase();
+    const filteredAdvices = (allTestNames || []).filter((name) =>
+      (name && typeof name === 'string' && name.toLowerCase().includes(searchLower))
     );
-    const testName = filteredAdvices.map((test) => test.testName);
-    console.log(testName, "test name");
-    setTestAdviceSuggestions(testName);
+    console.log("Search value:", value, "filtered:", filteredAdvices, "all:", allTestNames);
+    setTestAdviceSuggestions(filteredAdvices.slice(0, 50));
   };
 
   const handleTestAdviceSuggestionClick = (advice) => {
@@ -251,14 +258,13 @@ const PrescriptionComp = () => {
 
   const handleInputKeyDown = (event) => {
     if (event.key === "Enter" && testAdviceSearchTerm) {
-      const matchingTest = availableTests.find(
-        (test) =>
-          test.testName.toLowerCase() === testAdviceSearchTerm.toLowerCase()
+      const matchingTest = allTestNames.find(
+        (name) => name.toLowerCase() === testAdviceSearchTerm.toLowerCase()
       );
       if (matchingTest) {
         setUpdatedFormDetails((prevDetails) => ({
           ...prevDetails,
-          testAdvices: [...prevDetails.testAdvices, matchingTest.testName], // Changed this line
+          testAdvices: [...prevDetails.testAdvices, matchingTest],
         }));
       } else {
         setUpdatedFormDetails((prevDetails) => ({
@@ -285,15 +291,34 @@ const PrescriptionComp = () => {
 
   const fetchAvailableTests = async () => {
     try {
-      // setIsLoadingTests(true); // Show loader while fetching
-      const response = await fetch(api.labTestDetails); // Replace with your API endpoint
+      const response = await fetch(`${api.labTestDetails}?t=${Date.now()}`);
       const data = await response.json();
-      console.log(data, "data on 59");
-      setAvailableTests(data || []); // Assuming the API returns { tests: [...] }
+      console.log("Lab test data:", data);
+
+      const extractedTests = [];
+
+      if (Array.isArray(data)) {
+        data.forEach((labTest) => {
+          // If test_included exists (nested structure)
+          if (labTest.test_included && Array.isArray(labTest.test_included)) {
+            labTest.test_included.forEach((test) => {
+              if (test.testName) {
+                extractedTests.push(test.testName);
+              }
+            });
+          }
+          // If title exists directly (flat structure)
+          if (labTest.title) {
+            extractedTests.push(labTest.title);
+          }
+        });
+      }
+
+      console.log("Extracted test names:", extractedTests);
+      setAvailableTests(extractedTests.map((name) => ({ testName: name })));
+      setAllTestNames(extractedTests);
     } catch (error) {
       console.error("Error fetching available tests:", error);
-    } finally {
-      // setIsLoadingTests(false); // Hide loader once done
     }
   };
 
@@ -410,6 +435,17 @@ const PrescriptionComp = () => {
                     )}
                     {!isEditing && selectedName && (
                       <BiSolidPencil size={16} onClick={handleEditClick} />
+                    )}
+                    {!isEditing && !selectedName && (
+                      <BiPlus
+                        size={18}
+                        onClick={() => {
+                          setIsEditing(true);
+                          setSelectedName("");
+                          setSearchTerm("");
+                        }}
+                        style={{ cursor: "pointer", marginLeft: "8px" }}
+                      />
                     )}
                     {showDropdown && (
                       <div
@@ -697,8 +733,8 @@ const PrescriptionComp = () => {
               </div>
             )}
             {showTestAdviceDropdown &&
-              testAdviceSuggestions.length === 0 &&
-              testAdviceSearchTerm && (
+              testAdviceSearchTerm &&
+              testAdviceSuggestions.length === 0 && (
                 <div
                   style={{
                     position: "absolute",
