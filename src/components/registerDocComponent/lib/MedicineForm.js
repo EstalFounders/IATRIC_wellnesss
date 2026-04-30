@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { api } from "../../../constant";
+import { postMedicineApi } from "../utils/helperApi";
 
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
@@ -17,6 +18,7 @@ const MedicineForm = ({ onChange }) => {
   const [error, setError] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isMedicineIncluded, setMedicineIncluded] = useState("");
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +37,9 @@ const MedicineForm = ({ onChange }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${api.medicineInfoApiCall}${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(
+        `${api.medicineInfoApiCall}${encodeURIComponent(searchTerm)}`,
+      );
       const data = await response.json();
       const medicines = data?.medicines || [];
       setMedicinesInfo(medicines);
@@ -56,7 +60,11 @@ const MedicineForm = ({ onChange }) => {
       case "medicineName":
         setMedicineName(value);
         if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => handleMedicineSearch(value), 300);
+        debounceRef.current = setTimeout(
+          () => handleMedicineSearch(value),
+          300,
+        );
+        emitEvent();
         break;
       case "unit":
         setUnit(value);
@@ -100,9 +108,14 @@ const MedicineForm = ({ onChange }) => {
     setMedicineGeneric(medicine.salt);
     setShowDropdown(false);
     setMedicinesInfo([]);
-    onChange({
-      medicineName: medicine.name,
-      medicineGeneric: medicine.salt,
+
+    emitEvent();
+  };
+
+  const emitEvent = () => {
+    const updatedData = {
+      medicineName,
+      medicineGeneric,
       unit,
       dosage,
       days: daysRef.current,
@@ -110,17 +123,25 @@ const MedicineForm = ({ onChange }) => {
       noOfTimes,
       time,
       medicationSchedule,
-    });
+      isMedicineIncluded, // Make sure this key is exactly what you want
+    };
+
+    console.log("Child sending:", updatedData); // Check your console!
+    onChange(updatedData);
   };
 
   const handleKeyDown = (e) => {
     if (!showDropdown || medicinesInfo.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev < medicinesInfo.length - 1 ? prev + 1 : 0));
+      setSelectedIndex((prev) =>
+        prev < medicinesInfo.length - 1 ? prev + 1 : 0,
+      );
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : medicinesInfo.length - 1));
+      setSelectedIndex((prev) =>
+        prev > 0 ? prev - 1 : medicinesInfo.length - 1,
+      );
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
       handleMedicineSelect(medicinesInfo[selectedIndex]);
@@ -181,7 +202,11 @@ const MedicineForm = ({ onChange }) => {
                   autoComplete="off"
                 />
                 {loading && (
-                  <small style={{ position: "absolute", right: "10px", top: "10px" }}>...</small>
+                  <small
+                    style={{ position: "absolute", right: "10px", top: "10px" }}
+                  >
+                    ...
+                  </small>
                 )}
                 {showDropdown && medicinesInfo.length > 0 && (
                   <div
@@ -204,7 +229,8 @@ const MedicineForm = ({ onChange }) => {
                         style={{
                           padding: "8px",
                           cursor: "pointer",
-                          backgroundColor: index === selectedIndex ? "#e0e0e0" : "white",
+                          backgroundColor:
+                            index === selectedIndex ? "#e0e0e0" : "white",
                         }}
                         onClick={() => handleMedicineSelect(medicine)}
                         onMouseEnter={() => setSelectedIndex(index)}
@@ -216,31 +242,58 @@ const MedicineForm = ({ onChange }) => {
                     ))}
                   </div>
                 )}
-                {showDropdown && medicinesInfo.length === 0 && !loading && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      width: "100%",
-                      padding: "8px",
-                      backgroundColor: "white",
-                      border: "1px solid #ccc",
-                      borderRadius: "5px",
-                      zIndex: 10,
-                      fontStyle: "italic",
-                      color: "#777",
-                    }}
-                  >
-                    No medicines found
-                  </div>
-                )}
+                {showDropdown &&
+                  medicinesInfo.length === 0 &&
+                  !loading &&
+                  medicineName && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        width: "100%",
+                        padding: "8px",
+                        backgroundColor: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                        zIndex: 10,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span style={{ fontStyle: "italic", color: "#777" }}>
+                        No medicines found
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setMedicinesInfo([]);
+                          onChange({
+                            medicineName,
+                            medicineGeneric: "",
+                            unit,
+                            dosage,
+                            days: daysRef.current,
+                            frequency,
+                            noOfTimes,
+                            time,
+                            medicationSchedule,
+                          });
+                        }}
+                      >
+                        Add &quot;{medicineName}&quot; anyway
+                      </button>
+                    </div>
+                  )}
               </div>
             </label>
             {error && <div className="text-danger small">{error}</div>}
           </div>
         </div>
-                <div className="row">
+        <div className="row">
           <div className="col">
             <label>
               Dosage:

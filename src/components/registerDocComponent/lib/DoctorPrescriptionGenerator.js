@@ -83,6 +83,11 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
   };
 
   const handleDownloadPDF = async () => {
+    if (!signatureUrl || !stampUrl) {
+      window.alert("Please sign the prescription before downloading.");
+      return;
+    }
+
     setLoading(true);
     try {
       const doc = new jsPDF();
@@ -95,6 +100,51 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
       doc.save(`Prescription_${data.patientName}_${Date.now()}.pdf`);
+
+      // Generate blob for Firebase upload and background save
+      const blob = doc.output("blob");
+      const details = {
+        patientName: data.patientName,
+        doctorName: data.doctorName,
+      };
+
+      const prescriptionUrl = await sendPrescriptionToFirebase(blob, details);
+
+      if (prescriptionUrl) {
+        // Call background API to save prescription to database
+        await fetch(`${api.helperApi}?action=savePrescription`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            appointmentId: data.appointmentId,
+            doctorId: data.doctorId,
+            doctorName: data.doctorName,
+            doctorEmail: data.doctorEmail,
+            doctorPhone: data.doctorPhone,
+            doctorRegistrationNo: data.doctorRegistrationNo,
+            doctorSpeciality: data.doctorSpeciality,
+            doctorStampUrl: data.doctorStampUrl,
+            doctorSignatureUrl: data.doctorSignatureUrl,
+            patientId: data.patientId,
+            patientName: data.patientName,
+            patientAge: data.age,
+            patientGender: data.gender,
+            patientPhone: data.patientNo,
+            patientEmail: data.patientEmail,
+            patientAddress: data.patientAddress,
+            chiefComplaints: data.cheifCompalaints ? [data.cheifCompalaints] : [],
+            diagnosis: data.diagnosis,
+            medicalHistory: data.knownCases ? [data.knownCases] : [],
+            allergies: data.anyDrugAllergy ? [data.anyDrugAllergy] : [],
+            medicines: data.medicineInfo,
+            tests: data.testAdvices ? [{ testName: data.testAdvices }] : [],
+            advice: data.advices,
+            followUpDate: data.followUpdateDate,
+            notes: data.notes,
+            prescriptionPdfUrl: prescriptionUrl,
+          }),
+        });
+      }
     } catch (error) {
       console.error("PDF download error:", error.message);
       window.alert("Something went wrong. Please try again.");

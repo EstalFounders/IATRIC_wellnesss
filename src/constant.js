@@ -178,7 +178,7 @@ export const eventEmitter = {
   medicineCartEventEmitter: "medicine-cart-update",
 };
 
-export const apiAction = { fetchCateogories: "fetchCateogories" };
+export const apiAction = { fetchCateogories: "fetchCateogories", savePrescription: "savePrescription", getPrescription: "getPrescription" };
 
 export const labtestCateogory = {
   fullBodyCheckup: "Full Body",

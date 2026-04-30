@@ -72,6 +72,7 @@ const PrescriptionComp = () => {
     doctorStampUrl: "",
     doctorSignatureUrl: "",
     appointmentId: "",
+    doctorId: "",
     // Add more fields as needed
   });
 
@@ -133,7 +134,8 @@ const PrescriptionComp = () => {
     setPasswordPopup(true);
     setUpdatedFormDetails({
       ...updatedFormDetails,
-      medicineInfo: [...medicineForms], // Update medicineInfo with the contents of medicineForms
+      medicineInfo: [...medicineForms],
+      doctorId: doctors._id,
       doctorName: doctors.name,
       doctorStampUrl: doctors.doctorStampUrl,
       doctorSignatureUrl: doctors.doctorSignatureUrl,
@@ -717,15 +719,23 @@ const PrescriptionComp = () => {
                   border: "1px solid #ccc",
                   borderRadius: "5px",
                   zIndex: 10,
-                  maxHeight: "150px",
+                  maxHeight: "200px",
                   overflowY: "auto",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                 }}
               >
-                {testAdviceSuggestions.map((advice) => (
+                {testAdviceSuggestions.map((advice, index) => (
                   <div
                     key={advice}
-                    style={{ padding: "8px", cursor: "pointer" }}
+                    style={{
+                      padding: "10px 12px",
+                      cursor: "pointer",
+                      borderBottom: "1px solid #f0f0f0",
+                      transition: "background-color 0.15s",
+                    }}
                     onClick={() => handleTestAdviceSuggestionClick(advice)}
+                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#f5f5f5")}
+                    onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
                   >
                     {advice}
                   </div>
@@ -745,12 +755,30 @@ const PrescriptionComp = () => {
                     border: "1px solid #ccc",
                     borderRadius: "5px",
                     zIndex: 10,
-                    padding: "8px",
-                    fontStyle: "italic",
-                    color: "#777",
+                    padding: "12px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   }}
                 >
-                  No matching tests
+                  <span style={{ fontStyle: "italic", color: "#777" }}>
+                    No matching tests
+                  </span>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                      setUpdatedFormDetails((prevDetails) => ({
+                        ...prevDetails,
+                        testAdvices: [...prevDetails.testAdvices, testAdviceSearchTerm],
+                      }));
+                      setTestAdviceSearchTerm("");
+                      setShowTestAdviceDropdown(false);
+                    }}
+                  >
+                    Add &quot;{testAdviceSearchTerm}&quot; anyway
+                  </Button>
                 </div>
               )}
           </div>
