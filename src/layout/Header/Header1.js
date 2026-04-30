@@ -254,7 +254,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
       </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
-      <div>
+      <div className="wsmainfull menu clearfix">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between">
             {/* Left: LOGO */}

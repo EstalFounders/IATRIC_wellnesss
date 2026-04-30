@@ -13,14 +13,37 @@ import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 import LabTestPackagesScehma from "../../src/models/lab-test-packageSchema";
 import LabTestPackagesCatgoryScehma from "../../src/models/lab-test-package-categorySchema";
 import Medicine from "../../src/models/medicineInfo";
+import ArticlePostCategory from "../../src/models/postArticleCategorySchema";
+import { create } from "lodash";
 
 function normalizeName(name) {
   return name
     .toLowerCase()
-    .replace(/\s+/g, ' ') // multiple spaces → single
-    .replace(/[^\w\s]/g, '') // remove special chars (optional)
+    .replace(/\s+/g, " ") // multiple spaces → single
+    .replace(/[^\w\s]/g, "") // remove special chars (optional)
     .trim();
 }
+
+const categories = [
+  {
+    categoryName: "Cardiology",
+    description:
+      "Heart health, cardiovascular diseases, and latest cardiac research.",
+  },
+  {
+    categoryName: "Nutrition",
+    description: "Diet tips, nutritional science, and healthy eating guides.",
+  },
+  {
+    categoryName: "Mental Health",
+    description:
+      "Psychological wellness, mental health conditions, and therapy insights.",
+  },
+  {
+    categoryName: "General Health",
+    description: "Overall wellness, preventive care, and medical updates.",
+  },
+];
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -29,39 +52,47 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
   try {
+    // Create and save all categories
+    const createdCategories = [];
+    for (let i = 0; i < categories.length; i++) {
+      console.log(categories[i].categoryName);
+      const createCategoryTable = new ArticlePostCategory(categories[i]);
+      const saved = await createCategoryTable.save();
+      createdCategories.push(saved);
+    }
+        // const findall = await ArticlePostCategory.find();
     // Find all documents and group by title, collecting their _ids
-    const allDocs = await LabTestDetails.find({}, { name: 1 });
+    // const allDocs = await LabTestDetails.find({}, { name: 1 });
 
-    const nameMap = new Map(); // normalizedName -> list of _ids
+    // const nameMap = new Map(); // normalizedName -> list of _ids
 
-    allDocs.forEach(doc => {
-      const normName = normalizeName(doc.name || '');
-      if (!nameMap.has(normName)) {
-        nameMap.set(normName, []);
-      }
-      nameMap.get(normName).push(doc._id);
-    });
+    // allDocs.forEach(doc => {
+    //   const normName = normalizeName(doc.name || '');
+    //   if (!nameMap.has(normName)) {
+    //     nameMap.set(normName, []);
+    //   }
+    //   nameMap.get(normName).push(doc._id);
+    // });
 
-    const idsToDelete = [];
+    // const idsToDelete = [];
 
-    for (const [_, ids] of nameMap.entries()) {
-      if (ids.length > 1) {
-        // Keep the first one, delete the rest
-        idsToDelete.push(...ids.slice(1));
-      }
-    }
+    // for (const [_, ids] of nameMap.entries()) {
+    //   if (ids.length > 1) {
+    //     // Keep the first one, delete the rest
+    //     idsToDelete.push(...ids.slice(1));
+    //   }
+    // }
 
-    if (idsToDelete.length === 0) {
-      return res.status(200).json({ message: 'No duplicate names found', deletedCount: 0 });
-    }
+    // if (idsToDelete.length === 0) {
+    //   return res.status(200).json({ message: 'No duplicate names found', deletedCount: 0 });
+    // }
 
-    const deleteResult = await LabTest.deleteMany({ _id: { $in: idsToDelete } });
+    // const deleteResult = await LabTest.deleteMany({ _id: { $in: idsToDelete } });
 
     res.status(200).json({
-      message: 'Duplicate lab test records deleted',
-      deletedCount: deleteResult.deletedCount,
+      message: "successfully created category table",
+      result: createdCategories,
     });
-    
   } catch (error) {
     console.error("Error removing duplicates:", error);
     return res.status(500).json({ message: "Internal server error" });
