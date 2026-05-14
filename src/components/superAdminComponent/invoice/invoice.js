@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { ListGroup } from "react-bootstrap";
-import LeaveReqCard from "../notifications/LeaveReqCard";
-import { handleLeaveApproveOrRejectService } from "../apiService/doctorLeaveApproveOrRejectService";
 import { api } from "../../../constant";
 import InvoiceCard from "./InvoiceCard";
 import NotifcationPreviewModel from "../model/NotificationPreviewModel";
 import GenerateInvoiceImage from "./generateInvoiceImage";
+import CreateInvoiceModal from "./CreateInvoiceModal";
 
 const InvoiceComp = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,7 +14,8 @@ const InvoiceComp = () => {
   const [invoice, setInvoice] = useState([]);
   const [filteredReq, setFilteredRq] = useState(invoice);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const invoiceRef = React.useRef();
 
   useEffect(() => {
@@ -45,8 +44,14 @@ const InvoiceComp = () => {
   }
 
   const closePreview = () => {
-    setShow(false)
-  }
+    setShow(false);
+  };
+
+  const handleManualInvoiceSubmit = (invoiceData) => {
+    setShowCreateModal(false);
+    setSelectedInvoice([invoiceData]);
+    setShow(true);
+  };
 
   // const removeInvoice = (invoiceNumber) => {
   //   const updatedInvoice = invoice.filter((req) => req.invoiceNumber !== invoiceNumber);
@@ -74,8 +79,16 @@ const InvoiceComp = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* Search Bar */}
-      <div style={{ marginBottom: "20px" }}>
+      {/* Search Bar + Create Invoice */}
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          flexWrap: "wrap",
+        }}
+      >
         <input
           type="text"
           placeholder="Search invoice..."
@@ -89,29 +102,42 @@ const InvoiceComp = () => {
             borderRadius: "4px",
           }}
         />
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowCreateModal(true)}
+        >
+          + Create Invoice
+        </button>
       </div>
+
       {filteredReq && filteredReq.length > 0
         ? filteredReq.map((req, index) => (
-            <React.Fragment key={req.id || index}>
-              <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                <InvoiceCard
-                  key={index}
-                  request={req}
-                  openPreview={openPreview}
-                />
-                <NotifcationPreviewModel
-                  isOpen={show}
-                  key={`${req.id || index}-model`}
-                >
-                  <GenerateInvoiceImage
-                    request={selectedInvoice}
-                    onClose={closePreview}
-                  />
-                </NotifcationPreviewModel>
-              </ListGroup.Item>
-            </React.Fragment>
+            <ListGroup.Item
+              key={req.id || index}
+              className="d-flex justify-content-between align-items-center"
+            >
+              <InvoiceCard request={req} openPreview={openPreview} />
+            </ListGroup.Item>
           ))
         : "No Request found"}
+
+      {/* Invoice preview modal (shared) */}
+      <NotifcationPreviewModel isOpen={show}>
+        {selectedInvoice && (
+          <GenerateInvoiceImage
+            request={selectedInvoice}
+            onClose={closePreview}
+          />
+        )}
+      </NotifcationPreviewModel>
+
+      {/* Manual create invoice modal */}
+      {showCreateModal && (
+        <CreateInvoiceModal
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleManualInvoiceSubmit}
+        />
+      )}
     </div>
   );
 };
