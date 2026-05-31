@@ -1,34 +1,37 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { callToBook, contact_no } from "../../constant";
+import { api, callToBook, contact_no } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../Common/PopupDialog";
 import { FaPhoneAlt } from "react-icons/fa";
 import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
 import { useSelector } from "react-redux";
-import WhatsappConfirmationModel from "../Appointment/modal/WhatsappConfirmationModel";
-import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
 import { Alert, Snackbar } from "@mui/material";
 
 const Demo5About2 = () => {
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
   const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
-  const [mobNo, setMobNo] = useState("");
-  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [response, setResponse] = useState();
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [severity, setSeverity] = useState("success");
 
-  const whatsappConfrimation = () => {
-    setOtpConfirmationPopup(false);
-    console.log("OTP confirmed, proceeding with booking");
-    setResponse("We have recieved your query, Will get back to you soon");
-  };
-
-  const handleCalltoBookPopupSubmit = (mobNo) => {
-    setMobNo(mobNo);
-    setOtpConfirmationPopup(true);
+  const handleCalltoBookPopupSubmit = async (mobNo) => {
+    setIsCalltoBookDialog(false);
+    try {
+      const res = await fetch(api.userQuery, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile_number: Number(mobNo) }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setResponse("We have received your query, we'll get back to you soon");
+      setSeverity("success");
+    } catch {
+      setResponse("Something went wrong. Please try again.");
+      setSeverity("error");
+    }
+    setOpenSnackBar(true);
   };
 
   const consultationTypes = useSelector(
@@ -104,7 +107,7 @@ const Demo5About2 = () => {
                       doctors. Available for online and offline consultations
                       across India.
                     </div>
-                    <ConsultationButton path="/doctors">
+                    <ConsultationButton path="/all-doctors">
                       View Doctors
                     </ConsultationButton>
                   </div>
@@ -121,16 +124,6 @@ const Demo5About2 = () => {
                 onClose={handleCloseCalltoBookDialog}
                 onSubmit={handleCalltoBookPopupSubmit}
               />
-
-              <WhatsappConfirmationModel
-                isOpen={otpConfirmationPopup}
-                onClose={() => setOtpConfirmationPopup(false)}
-              >
-                <OtpConfirmationPopup
-                  mobile={mobNo}
-                  onConfirm={whatsappConfrimation}
-                />
-              </WhatsappConfirmationModel>
             </div>
             <Snackbar
               open={openSnackBar}

@@ -19,7 +19,7 @@ const DiscoverMoreComp = () => {
   const features = [
     {
       title: "Doctor Consultation",
-      service: "Consultation",
+      service: "consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
@@ -27,7 +27,7 @@ const DiscoverMoreComp = () => {
     },
     {
       title: "Nursing care",
-      service: "home care",
+      service: "nursing-services",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
       icon: <HomeCareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
@@ -51,7 +51,7 @@ const DiscoverMoreComp = () => {
     // },
     {
       title: "Community Care",
-      service: "corporate",
+      service: "community-care",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <HealthCampIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
@@ -154,13 +154,8 @@ const DiscoverMoreComp = () => {
                 <ConsultationButton
                   path={"/discover-more"}
                   onClick={() =>
-                    router.push(
-                      `/service-details/?Service=${
-                        item.title.trim()
-                        // .split(" ")
-                        // .slice(1)
-                      }`
-                    )
+                    item.service &&
+                    router.push(`/service-details/?Service=${item.service}`)
                   }
                 >
                   {item.btntext}

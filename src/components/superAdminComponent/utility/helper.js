@@ -30,12 +30,82 @@ export const calculateTotalIncome = (appointments, labTests) => {
 };
 
 export const calculateDiscountedPrice = (price, discountPercentage) => {
-    if (!price || !discountPercentage) return price || 0;
-  
-    const discountAmount = (price * discountPercentage) / 100;
-    const discountedPrice = price - discountAmount;
-  
-    return parseFloat(discountedPrice.toFixed(2));
-  };
+  if (!price || !discountPercentage) return price || 0;
 
-  
+  const discountAmount = (price * discountPercentage) / 100;
+  const discountedPrice = price - discountAmount;
+
+  return parseFloat(discountedPrice.toFixed(2));
+};
+
+export function priceToWords(amount) {
+  const num = Math.floor(Number(amount));
+  if (!num || isNaN(num)) return "";
+  if (num === 0) return "Zero";
+
+  const units = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  function convert(n) {
+    if (n < 20) return units[n];
+    if (n < 100)
+      return tens[Math.floor(n / 10)] + (n % 10 ? " " + units[n % 10] : "");
+    if (n < 1000)
+      return (
+        units[Math.floor(n / 100)] +
+        " Hundred" +
+        (n % 100 ? " " + convert(n % 100) : "")
+      );
+    if (n < 100000)
+      return (
+        convert(Math.floor(n / 1000)) +
+        " Thousand" +
+        (n % 1000 ? " " + convert(n % 1000) : "")
+      );
+    if (n < 10000000)
+      return (
+        convert(Math.floor(n / 100000)) +
+        " Lakh" +
+        (n % 100000 ? " " + convert(n % 100000) : "")
+      );
+    return (
+      convert(Math.floor(n / 10000000)) +
+      " Crore" +
+      (n % 10000000 ? " " + convert(n % 10000000) : "")
+    );
+  }
+
+  return convert(num);
+}

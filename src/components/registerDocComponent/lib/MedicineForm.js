@@ -9,7 +9,7 @@ const MedicineForm = ({ onChange }) => {
   const [unit, setUnit] = useState("");
   const [dosage, setDosage] = useState("");
   const daysRef = useRef("");
-  const [frequency, setFrequency] = useState("");
+  const [frequency, setFrequency] = useState([]);
   const [noOfTimes, setNoOfTimes] = useState("");
   const [time, setTime] = useState("");
   const [medicationSchedule, setMedicationSchedule] = useState("As Required");
@@ -75,9 +75,22 @@ const MedicineForm = ({ onChange }) => {
       case "days":
         daysRef.current = value;
         break;
-      case "frequency":
-        setFrequency(value);
-        break;
+      case "frequency": {
+        const selectedFreqs = Array.from(e.target.selectedOptions, (opt) => opt.value);
+        setFrequency(selectedFreqs);
+        onChange({
+          medicineName,
+          medicineGeneric,
+          unit,
+          dosage,
+          days: daysRef.current,
+          frequency: selectedFreqs.join(", "),
+          noOfTimes,
+          time,
+          medicationSchedule,
+        });
+        return;
+      }
       case "time":
         setTime(value);
         break;
@@ -96,7 +109,7 @@ const MedicineForm = ({ onChange }) => {
       unit,
       dosage,
       days: daysRef.current,
-      frequency,
+      frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
       noOfTimes,
       time,
       medicationSchedule,
@@ -119,11 +132,11 @@ const MedicineForm = ({ onChange }) => {
       unit,
       dosage,
       days: daysRef.current,
-      frequency,
+      frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
       noOfTimes,
       time,
       medicationSchedule,
-      isMedicineIncluded, // Make sure this key is exactly what you want
+      isMedicineIncluded,
     };
 
     console.log("Child sending:", updatedData); // Check your console!
@@ -277,7 +290,7 @@ const MedicineForm = ({ onChange }) => {
                             unit,
                             dosage,
                             days: daysRef.current,
-                            frequency,
+                            frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
                             noOfTimes,
                             time,
                             medicationSchedule,
@@ -290,6 +303,11 @@ const MedicineForm = ({ onChange }) => {
                   )}
               </div>
             </label>
+            {medicineGeneric && (
+              <small style={{ display: "block", color: "#555", marginTop: "3px" }}>
+                Generic: <em>{medicineGeneric}</em>
+              </small>
+            )}
             {error && <div className="text-danger small">{error}</div>}
           </div>
         </div>
@@ -335,11 +353,13 @@ const MedicineForm = ({ onChange }) => {
               Frequency:
               <select
                 name="frequency"
+                multiple
                 style={{
-                  padding: "10px",
+                  padding: "6px",
                   borderRadius: "5px",
                   border: "1px solid #ccc",
                   width: "100%",
+                  height: "auto",
                 }}
                 onChange={handleInputChange}
                 value={frequency}

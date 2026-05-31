@@ -142,10 +142,10 @@ export const roles = {
 };
 
 export const superAdminConsultationtype = [
-  "Call",
-  "Video",
-  "Home visit",
-  "Clinic",
+  { name: "Call" },
+  { name: "Video" },
+  { name: "Home visit" },
+  { name: "Clinic" },
 ];
 
 export const DoctorType = {

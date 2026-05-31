@@ -8,6 +8,7 @@ import {
 } from "../../../constant";
 import Preloader from "../../Preloader";
 import { sendInvoiceToFirebase } from "../../../utils";
+import { priceToWords } from "../utility/helper";
 
 const GenerateInvoiceImage = ({ request, onClose }) => {
   console.log("request", request);
@@ -57,8 +58,6 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
       const pdfWidth = doc.internal.pageSize.getWidth();
       const pdfHeight = doc.internal.pageSize.getHeight();
       doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-      doc.save(`${invoiceNumber}.pdf`);
 
       const blob = doc.output("blob");
       const invoiceUrl = await sendInvoiceToFirebase(blob, invoiceNumber);
@@ -221,7 +220,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
         {/* Terms and Conditions */}
         <div className="mb-4 d-flex flex-row">
           <div className="font-weight-bold">TOTAL IN WORDS:</div>
-          <div className="ml-3 text-uppercase">One Hundred Only</div>
+          <div className="ml-3 text-uppercase">{priceToWords(totalPrice)}</div>
         </div>
         <div>
           <hr />

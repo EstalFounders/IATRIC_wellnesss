@@ -16,6 +16,7 @@ import {
 } from "./lib/communication";
 import Appointment from "../../src/models/appointmentSchema";
 import mongoose from "mongoose";
+import { dbConnect } from "../../src/lib/db";
 import { WHATSAPP_PRESCRIPTION_TEMPLATE } from "./utils/constants";
 import { formatPhoneNumber } from "./utils/commonmethod";
 
@@ -23,73 +24,54 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
-  // console.log(files, 'files', fields, 'fields'); // Keep this for debugging
-  let session; // Declare session variable
+  let session;
   try {
-    // Start a Mongoose session for the transaction
+    await dbConnect();
+
     session = await mongoose.startSession();
     session.startTransaction();
+
     const { prescriptionUrl, appointmentId } = req.body;
 
-    console.log(
-      "prescriptionUrl",
-      prescriptionUrl,
-      "appointmentId",
-      appointmentId
-    );
+    console.log("prescriptionUrl", prescriptionUrl, "appointmentId", appointmentId);
 
-    // Update the Appointment document *within the transaction*
     const updateStatus = await Appointment.findByIdAndUpdate(
       appointmentId,
       {
         prescriptionUrl: prescriptionUrl,
-        status: appointment_status.completed, //  Use the string directly, or define it elsewhere.
+        status: appointment_status.completed,
       },
-      { new: true, session } // Pass the session here!
+      { new: true, session }
     );
 
     if (!updateStatus) {
-      throw new Error("Failed to update appointment status"); //  Throw an error to rollback
+      throw new Error("Failed to update appointment status");
     }
-    const prescriptionTemplateMessage = {
-      patient_name: updateStatus.name,
-      prescription_url: prescriptionUrl,
-    };
-    console.log(
-      formatPhoneNumber(updateStatus.patientMobNo),
-      "formatted phone number",
-      updateStatus.patientMobNo,
-      "patient mobile number",
-      updateStatus,
-      "update status"
-    );
-    await sendWhatsAppConfirmation(
-      formatPhoneNumber(updateStatus.patientMobNo.toString()),
-      prescriptionTemplateMessage,
-      WHATSAPP_PRESCRIPTION_TEMPLATE
-    );
-    // send pdf url to patient whatsapp
-    // const number = 7455992234;
-    // const sendPdfUrl = await sendWhatsAppMessage(number, prescriptionUrl); // Await here
 
-    // if (!sendPdfUrl) {
-    //   throw new Error("Failed to send whastapp");
-    // }
-
-    // If all operations were successful, commit the transaction
+    // Commit BEFORE the WhatsApp call so a network failure there
+    // cannot roll back the prescriptionUrl write.
     await session.commitTransaction();
     session.endSession();
+    session = null;
+
+    // WhatsApp notification — failure is logged but does not undo the DB write.
+    try {
+      await sendWhatsAppConfirmation(
+        formatPhoneNumber(updateStatus.patientMobNo.toString()),
+        { patient_name: updateStatus.name, prescription_url: prescriptionUrl },
+        WHATSAPP_PRESCRIPTION_TEMPLATE
+      );
+    } catch (whatsappError) {
+      console.error("WhatsApp prescription notification failed:", whatsappError);
+    }
 
     res.status(200).json({ status: "send successfully" });
   } catch (error) {
-    // If any error occurred, roll back the transaction
     if (session) {
       await session.abortTransaction();
       session.endSession();
     }
     console.error("Error:", error);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message }); // Include the error message
+    res.status(500).json({ error: "Internal Server Error", message: error.message });
   }
 }
