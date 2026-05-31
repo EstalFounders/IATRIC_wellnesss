@@ -164,6 +164,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       });
       element.style.transform = originalTransform;
 
+      const canvas = await html2canvas(element);
+      element.style.transform = originalTransform;
+
+      const doc = new jsPDF();
       const imgData = canvas.toDataURL("image/png");
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
