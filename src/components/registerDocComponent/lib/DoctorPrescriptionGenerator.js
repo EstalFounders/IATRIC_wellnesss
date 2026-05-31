@@ -43,13 +43,16 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       if (firebasePath) {
         try {
           const response = await fetch(
-            `${api.getImageFomrFirebase}?imageUrl=${encodeURIComponent(firebasePath)}`
+            `${api.getImageFomrFirebase}?imageUrl=${encodeURIComponent(firebasePath)}`,
           );
           if (response.ok) {
             const blob = await response.blob();
             setter(URL.createObjectURL(blob));
           } else {
-            console.error(`Failed to fetch image for ${firebasePath}:`, response.status);
+            console.error(
+              `Failed to fetch image for ${firebasePath}:`,
+              response.status,
+            );
           }
         } catch (error) {
           console.error(`Error fetching image for ${firebasePath}:`, error);
@@ -61,7 +64,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       }
     };
 
-    if (data.doctorSignatureUrl) fetchImage(data.doctorSignatureUrl, setSignatureUrl);
+    if (data.doctorSignatureUrl)
+      fetchImage(data.doctorSignatureUrl, setSignatureUrl);
     if (data.doctorStampUrl) fetchImage(data.doctorStampUrl, setStampUrl);
 
     return () => {
@@ -96,7 +100,11 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       element.style.transform = originalTransform;
 
       const imgData = canvas.toDataURL("image/png");
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
       const pdfWidth = 210;
       const pageHeight = 297;
@@ -164,12 +172,12 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       });
       element.style.transform = originalTransform;
 
-      const canvas = await html2canvas(element);
-      element.style.transform = originalTransform;
-
-      const doc = new jsPDF();
       const imgData = canvas.toDataURL("image/png");
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
       const pdfWidth = 210;
       const pageHeight = 297;
@@ -192,7 +200,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         doctorName: data.doctorName,
       });
 
-      if (!prescriptionUrl) throw new Error("Failed to upload PDF to Firebase.");
+      if (!prescriptionUrl)
+        throw new Error("Failed to upload PDF to Firebase.");
 
       const response = await fetch(api.prescriptionCall, {
         method: "POST",
@@ -345,7 +354,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
             </div>
             <div>
               <h6 className="text-left">
-                * Apply generic equivalent wherever applicable subject to Availability
+                * Apply generic equivalent wherever applicable subject to
+                Availability
               </h6>
             </div>
             <div className="row mr-4 mt-5" style={{ height: "70px" }}>
@@ -360,12 +370,22 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               <div className="col text-right mt-2">
                 <div>
                   {stampUrl && (
-                    <Image src={stampUrl} alt="Doctor Stamp" width={100} height={70} />
+                    <Image
+                      src={stampUrl}
+                      alt="Doctor Stamp"
+                      width={100}
+                      height={70}
+                    />
                   )}
                 </div>
                 <div className="mt-2">
                   {signatureUrl && (
-                    <Image src={signatureUrl} alt="Doctor Signature" width={100} height={70} />
+                    <Image
+                      src={signatureUrl}
+                      alt="Doctor Signature"
+                      width={100}
+                      height={70}
+                    />
                   )}
                 </div>
                 <div className="float-right mt-5 mr-4">
