@@ -154,15 +154,33 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       const originalTransform = element.style.transform;
       element.style.transform = "none";
 
-      const canvas = await html2canvas(element);
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: PDF_WIDTH,
+        scrollY: -window.scrollY,
+      });
       element.style.transform = originalTransform;
 
-      const doc = new jsPDF();
       const imgData = canvas.toDataURL("image/png");
-      const imgProps = doc.getImageProperties(imgData);
-      const pdfWidth = doc.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+      const pdfWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      doc.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
 
       const blob = doc.output("blob");
       const prescriptionUrl = await sendPrescriptionToFirebase(blob, {
@@ -182,7 +200,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       });
 
       if (response.ok) {
-        window.alert("PDF sent successfully.");
+        window.alert("Prescription sent successfully.");
       } else {
         console.error("Error saving prescription URL:", response.statusText);
         window.alert("Something went wrong. Please try again.");
@@ -368,22 +386,24 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       >
         <Button
           onClick={handleCreatePDF}
+          disabled={loading}
           style={{ backgroundColor: "#8e8333", border: "none" }}
-          disabled
         >
-          <strong>Send PDF</strong>
+          <strong>{loading ? "Sending..." : "Send PDF"}</strong>
         </Button>
         <Button
           onClick={handleDownloadPDF}
+          disabled={loading}
           style={{ backgroundColor: "#3a5e1c", border: "none" }}
         >
           <strong>Download PDF</strong>
         </Button>
         <Button
           onClick={signPrescription}
+          disabled={loading || signNstampLoader}
           style={{ backgroundColor: "#8e8333", border: "none" }}
         >
-          <strong>Sign PDF</strong>
+          <strong>{signNstampLoader ? "Signing..." : "Sign PDF"}</strong>
         </Button>
       </div>
 

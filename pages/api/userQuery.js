@@ -1,5 +1,8 @@
 import { dbConnect } from "../../src/lib/db";
 import Query from "../../src/models/query";
+import { sendWhatsAppConfirmation } from "./lib/communication";
+import { formatPhoneNumber } from "./utils/commonmethod";
+import { company_number, WHATSAPP_USER_QUERY_TEMPLATE } from "./utils/constants";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -50,6 +53,14 @@ export default async function handler(req, res) {
       const newQuery = await Query.create(payload);
 
       const savedQuery = await newQuery.save();
+
+// await sendWhatsAppConfirmation(
+//     formatPhoneNumber(company_number),
+//     payload,
+//     WHATSAPP_USER_QUERY_TEMPLATE
+//   );
+ 
+      
 
       res.status(201).json(savedQuery);
     } catch (error) {

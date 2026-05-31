@@ -1,0 +1,114 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Fast2SMS WhatsApp Message API",
+    "description": "A single GET endpoint to send various types of WhatsApp messages (Text, Media, Variables) by changing the query parameters.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://www.fast2sms.com"
+    }
+  ],
+  "paths": {
+    "/dev/whatsapp": {
+      "get": {
+        "tags": [
+          "Sending Messages"
+        ],
+        "summary": "Send WhatsApp Message",
+        "description": "Send templates with text, variables, or media depending on the provided parameters.",
+        "operationId": "sendWhatsappMessage",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "query",
+            "description": "Your API Key.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "YOUR_API_KEY"
+            }
+          },
+          {
+            "name": "message_id",
+            "in": "query",
+            "description": "The unique ID of the template you want to send.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 9
+            }
+          },
+          {
+            "name": "phone_number_id",
+            "in": "query",
+            "description": "The WABA Phone Number ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "579519398574288"
+            }
+          },
+          {
+            "name": "numbers",
+            "in": "query",
+            "description": "Destination mobile number.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "9999999999"
+            }
+          },
+          {
+            "name": "variables_values",
+            "in": "query",
+            "description": "Required if the template has variables ({{1}}, {{2}}). Join multiple values with a pipe `|`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Var1|Var2|Var3"
+            }
+          },
+          {
+            "name": "media_url",
+            "in": "query",
+            "description": "Required if the template has a Header Media (Image/Video/PDF).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "https://example.com/image.png"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message Sent Successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message sent successfully"
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "example": "6a3b2c1d"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

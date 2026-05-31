@@ -457,8 +457,8 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     doctorMeetingUrl
   );
 
-  const patientMobileNo = appointment.patientMobNo.toString();
-  const doctorMobileNumber = doctorMobileNo.toString();
+  const patientMobileNo = appointment.patientMobNo?.toString() ?? "";
+  const doctorMobileNumber = doctorMobileNo?.toString() ?? "";
 
   console.log(
     formatPhoneNumber(doctorMobileNumber),

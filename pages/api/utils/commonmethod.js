@@ -197,12 +197,6 @@ export async function updateInvoiceNumberInDatabase(item, invoiceId) {
   }
 }
 
-export const gallaboxReqHeaders = {
-  apiSecret: process.env.GALLABOX_API_SECRET,
-  apiKey: process.env.GALLABOX_API_KEY,
-  "Content-Type": "application/json",
-};
-
 export const formatPhoneNumber = (phoneNumberString) => {
   if (typeof phoneNumberString !== "string") return null;
   console.log(phoneNumberString, "last 10 digits 200");

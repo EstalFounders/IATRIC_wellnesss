@@ -23,7 +23,6 @@ import {
   extractTime,
   formatData,
 } from "../../src/components/registerDocComponent/utils/helper";
-import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { format } from "path";
 import {
@@ -105,7 +104,7 @@ export default async function handler(req, res) {
 
     const clientSideAppointmentTime = appointmentTime;
 
-    try {
+    try { 
       console.log(req.body);
       session = await mongoose.startSession();
       session.startTransaction();
@@ -233,11 +232,11 @@ export default async function handler(req, res) {
             message: "Invalid consultation type.",
           });
       }
-      await Notification.create({
-        title: "New Consultation",
-        body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
-        read: false,
-      });
+      // await Notification.create({
+      //   title: "New Consultation",
+      //   body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
+      //   read: false,
+      // });
       // await sendAdminNotification({
       //   title: "Consultation Booked",
       //   body: `Patient ${name} has booked consultation`

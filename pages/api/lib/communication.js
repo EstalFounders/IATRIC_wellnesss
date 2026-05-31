@@ -1,29 +1,46 @@
-import { gallaboxReqHeaders } from "../utils/commonmethod";
-import { GALLABOX_API, WHATSAPP_CONFIRMATION_TEMPLATE } from "../utils/constants";
-import { createWhatsAppTemplatePayload } from "./model/whatsappConfirmationTemp";
+import { buildWhatsAppPayload } from "./model/smsTemplates";
+import fast2Sms from "@api/fast2sms";
 
+fast2Sms.auth(process.env.FASTSMS_API_TOKEN);
+
+/**
+ * Sends a WhatsApp template message via Fast2SMS WhatsApp Business API.
+ * Signature kept identical to the old implementation for zero caller changes.
+ */
 export async function sendWhatsAppConfirmation(number, body, template) {
-  console.log(number, "number", body, "body");
-  const {appointment_date, appointment_time,  doctor_name, patient_name,consultation_type, contact_us} = body;
-  console.log(appointment_date, appointment_time,  doctor_name, patient_name,consultation_type, contact_us);
-  const data = createWhatsAppTemplatePayload({
-    channelId: process.env.GALLABOX_CHANNEL_ID,
-    recipientName: patient_name,
-    recipientPhone: number,
-    templateName: template,
-    bodyValues: body,
-  });
-  console.log("payload", data, "header", gallaboxReqHeaders);
-  // Call the sendWhatsAppMessage function
+  const { message_id, variables_values } = buildWhatsAppPayload(template, body);
+  console.log("Built WhatsApp Payload:", { message_id, variables_values });
+  return sendWhatsApp(number, message_id, variables_values);
+}
+
+/**
+ * Core Fast2SMS WhatsApp sender.
+ * @param {string} number           - Last 10 digits prefixed with country code, e.g. "919876543210"
+ * @param {string|number} message_id - Fast2SMS approved WhatsApp template ID
+ * @param {string} variables_values  - Pipe-separated template variable values, e.g. "John|4 PM"
+ */
+export async function sendWhatsApp(number, message_id, variables_values) {
   try {
-    const response = await fetch(GALLABOX_API.send_whatsapp_with_template, {
-      method: "POST",
-      headers: gallaboxReqHeaders,
-      body: JSON.stringify(data),
+    const response = await fast2Sms.sendWhatsappMessage({
+      authorization: process.env.FASTSMS_API_TOKEN,
+      message_id: String(message_id),
+      phone_number_id: process.env.FASTSMS_WA_PHONE_NUMBER_ID,
+
+      numbers: number,
+
+      // Example: "Vinay|Dr Sharma|30 May 2026|5:30 PM"
+      variables_values,
     });
-    console.log("response", response);  
-  } catch (error) {
-    console.error("Error sending message:", error);
+
+    console.log("Fast2SMS WhatsApp Response:", response.data);
+
+    return response.data;
+  } catch (err) {
+    console.error(
+      "Fast2SMS WhatsApp Error:",
+      err?.response?.data || err.message,
+    );
+
+    throw err;
   }
-  // Assuming sendWhatsAppMessage returns a success response
 }

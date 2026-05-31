@@ -36,10 +36,18 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
         style: {
           borderRadius: "20px",
           boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+          margin: "auto",
         },
       }}
       BackdropProps={{
         style: { backgroundColor: "rgba(0,0,0,0.5)" },
+      }}
+      sx={{
+        "& .MuiDialog-container": {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
       }}
     >
       {/* Header */}

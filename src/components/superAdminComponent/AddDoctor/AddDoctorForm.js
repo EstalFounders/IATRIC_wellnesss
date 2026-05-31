@@ -15,6 +15,7 @@ import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setConsultationType } from "../../../store/slices/superAdmin/otherDetailsSlice.js";
+import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -60,6 +61,17 @@ const AddDoctorForm = () => {
   const consultationTypeStore = useSelector(
     (state) => state.otherDetailsSlice.consultationType
   );
+
+  useEffect(() => {
+    if (!storedService || storedService.length === 0) {
+      fetch(api.serviceOffered)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) dispatch(setServiceOffered(data));
+        })
+        .catch((err) => console.error("Failed to fetch services:", err));
+    }
+  }, []);
 
   const handleAddType = (e) => {
     const value = e.target.value;
@@ -322,13 +334,13 @@ const AddDoctorForm = () => {
               <option value="" disabled>
                 Select options
               </option>
-              {consultationTypeStore.map((option) => (
+              {superAdminConsultationtype.map((option) => (
                 <option
-                  key={option._id}
+                  key={option.name}
                   value={option.name}
                   disabled={selectedTypes.includes(option.name)}
                 >
-                  {option.isActive ? option.name : null}
+                  {option.name}
                 </option>
               ))}
             </select>
@@ -377,15 +389,17 @@ const AddDoctorForm = () => {
                 <option value="" disabled>
                   Select options
                 </option>
-                {storedService.map((option) => (
-                  <option
-                    key={option._id}
-                    value={option.name}
-                    disabled={selectedService.includes(option.name)}
-                  >
-                    {option.isActive ? option.name : null}
-                  </option>
-                ))}
+                {storedService
+                  .filter((option) => option.isActive !== false)
+                  .map((option) => (
+                    <option
+                      key={option._id || option.name}
+                      value={option.name}
+                      disabled={selectedService.includes(option.name)}
+                    >
+                      {option.name}
+                    </option>
+                  ))}
               </select>
 
               {/* Display selected options as "tags" */}
@@ -537,49 +551,47 @@ const AddDoctorForm = () => {
 
           <Row>
             <Col>
-              <label className={styles.label}>
+              <div className={styles.label}>
                 <b>Diplomas and Certificates:</b>
                 <ImageUploader
                   id="diplomasCertificates"
                   multiple={true}
                   onImagesChange={handleImagesChange}
                 />
-              </label>
+              </div>
             </Col>
             <Col>
-              <label className={styles.label}>
+              <div className={styles.label}>
                 <b>Doctor Picture:</b>
                 <ImageUploader
                   id="profilePicture"
                   multiple={true}
                   onImagesChange={handleImagesChange}
                 />
-              </label>
+              </div>
             </Col>
           </Row>
 
           <Row>
             <Col md={6}>
-              <label className={styles.label}>
+              <div className={styles.label}>
                 <b>Digital Signature:</b>
                 <ImageUploader
                   id="doctorSignature"
                   multiple={false}
                   onImagesChange={handleImagesChange}
-                  required
                 />
-              </label>
+              </div>
             </Col>
             <Col>
-              <label className={styles.label}>
+              <div className={styles.label}>
                 <b>Doctor Stamp:</b>
                 <ImageUploader
                   id="doctorStamp"
                   multiple={false}
                   onImagesChange={handleImagesChange}
-                  required
                 />
-              </label>
+              </div>
             </Col>
           </Row>
         </Row>

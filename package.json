@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@api/fast2sms": "file:.api/apis/fast2sms",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.9",

@@ -116,15 +116,19 @@ async function savePrescription(req, res) {
       prescriptionData.patientId = patientId;
     }
 
-    const prescription = new Prescription(prescriptionData);
-
-    await prescription.save();
-
-    // Update appointment with prescription URL
-    if (appointmentId && mongoose.Types.ObjectId.isValid(appointmentId)) {
+    // Update appointment with prescription URL FIRST so it is always persisted,
+    // even when the full prescription document cannot be created.
+    if (appointmentId && mongoose.Types.ObjectId.isValid(appointmentId) && prescriptionPdfUrl) {
       await Appointment.findByIdAndUpdate(appointmentId, {
         prescriptionUrl: prescriptionPdfUrl,
       });
+    }
+
+    // Only create the full Prescription document when the required fields are present.
+    let prescription = null;
+    if (doctorId && patientName) {
+      prescription = new Prescription(prescriptionData);
+      await prescription.save();
     }
 
     res.status(200).json({ success: true, prescription });

@@ -26,7 +26,7 @@ const Demo5Services1 = () => {
   const features = [
     {
       title: "Doctor Consultation",
-      service: "Consultation",
+      service: "consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician size={70} />,
@@ -34,7 +34,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Nursing Care",
-      service: "Consultation",
+      service: "nursing-services",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <NursingCareIcon size={70} />,
@@ -42,7 +42,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Home Care",
-      service: "home care",
+      service: "nursing-services",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
       icon: <HomeCareIcon size={70} />,
@@ -58,7 +58,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Community Care",
-      service: "corporate",
+      service: "community-care",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <HealthCampIcon size={70} />,
@@ -66,15 +66,13 @@ const Demo5Services1 = () => {
     },
     {
       title: "Corporate Healthcare",
-      service: "corporate-healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon size={70} />,
       btntext: "View Details",
     },
     {
-      title: "Physoiotherapy",
-      service: "corporate-healthcare",
+      title: "Physiotherapy",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <PhysiotherapyIcon size={70} />,
@@ -128,9 +126,10 @@ const Demo5Services1 = () => {
     marqueeRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // ✅ Click redirect
   const handleClick = (item) => {
-    router.push(`/service-details/?Service=${item.title.trim()}`);
+    if (item.service) {
+      router.push(`/service-details/?Service=${item.service}`);
+    }
   };
 
   return (
