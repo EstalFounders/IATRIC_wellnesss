@@ -4,7 +4,7 @@
   padding: 40px 20px;
   background-color: #f8f9fa; /* Light background for the whole page */
   min-height: 100vh; /* Ensure it takes full viewport height */
-  font-family: 'Inter', sans-serif; /* Consistent font */
+ font-family: 'TT Ramillas', serif;
 }
 
 .pageHeader {

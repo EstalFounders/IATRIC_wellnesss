@@ -30,6 +30,7 @@ const emptyItem = () => ({
 const CreateInvoiceModal = ({ onClose, onSubmit }) => {
   const [form, setForm] = useState({
     name: "",
+    doctorName: "",
     mobNo: "",
     address: "",
     invoiceNumber: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -179,7 +180,21 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Row 2 — Address */}
+          {/* Row 2 — Doctor Name */}
+          <div className="row g-3 mb-3">
+            <div className="col-12 col-sm-6">
+              <label style={labelStyle}>Doctor Name</label>
+              <input
+                type="text"
+                style={inputStyle}
+                placeholder="Enter doctor name"
+                value={form.doctorName}
+                onChange={(e) => updateField("doctorName", e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Row 3 — Address */}
           <div className="row g-3 mb-3">
             <div className="col-12">
               <label style={labelStyle}>Address</label>

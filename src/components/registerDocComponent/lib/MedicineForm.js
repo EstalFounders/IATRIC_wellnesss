@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { api } from "../../../constant";
 import { postMedicineApi } from "../utils/helperApi";
+import FrequencyTimeSelector from "./FrequencyTimeSelector";
 
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
@@ -9,9 +10,9 @@ const MedicineForm = ({ onChange }) => {
   const [unit, setUnit] = useState("");
   const [dosage, setDosage] = useState("");
   const daysRef = useRef("");
-  const [frequency, setFrequency] = useState([]);
+  const [frequency, setFrequency] = useState("");
   const [noOfTimes, setNoOfTimes] = useState("");
-  const [time, setTime] = useState("");
+  const [selectedTimes, setSelectedTimes] = useState([]);
   const [medicationSchedule, setMedicationSchedule] = useState("As Required");
   const [loading, setLoading] = useState(false);
   const [medicinesInfo, setMedicinesInfo] = useState([]);
@@ -75,25 +76,6 @@ const MedicineForm = ({ onChange }) => {
       case "days":
         daysRef.current = value;
         break;
-      case "frequency": {
-        const selectedFreqs = Array.from(e.target.selectedOptions, (opt) => opt.value);
-        setFrequency(selectedFreqs);
-        onChange({
-          medicineName,
-          medicineGeneric,
-          unit,
-          dosage,
-          days: daysRef.current,
-          frequency: selectedFreqs.join(", "),
-          noOfTimes,
-          time,
-          medicationSchedule,
-        });
-        return;
-      }
-      case "time":
-        setTime(value);
-        break;
       case "medicationSchedule":
         setMedicationSchedule(value);
         break;
@@ -109,9 +91,9 @@ const MedicineForm = ({ onChange }) => {
       unit,
       dosage,
       days: daysRef.current,
-      frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
+      frequency,
       noOfTimes,
-      time,
+      time: selectedTimes.join(", "),
       medicationSchedule,
     });
   };
@@ -132,9 +114,9 @@ const MedicineForm = ({ onChange }) => {
       unit,
       dosage,
       days: daysRef.current,
-      frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
+      frequency,
       noOfTimes,
-      time,
+      time: selectedTimes.join(", "),
       medicationSchedule,
       isMedicineIncluded,
     };
@@ -349,33 +331,36 @@ const MedicineForm = ({ onChange }) => {
         </div>
         <div className="row">
           <div className="col">
-            <label>
-              Frequency:
-              <select
-                name="frequency"
-                multiple
-                style={{
-                  padding: "6px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                  height: "auto",
-                }}
-                onChange={handleInputChange}
-                value={frequency}
-              >
-                <option value="SELECT">Select Frequency</option>
-                <option value="DAILY">DAILY</option>
-                <option value="WEEKLY">WEEKLY</option>
-                <option value="MONTHLY">MONTHLY</option>
-                <option value="SOS">SOS</option>
-                <option value="AS REQUIRED">AS REQUIRED</option>
-                <option value="ALTERNATIVE DAYS">ALTERNATIVE DAYS</option>
-                <option value="BI WEEKLY">BI WEEKLY</option>
-                <option value="BI MONTHLY">BI MONTHLY</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
+            <FrequencyTimeSelector
+              onFrequencyChange={(freq) => {
+                setFrequency(freq);
+                onChange({
+                  medicineName,
+                  medicineGeneric,
+                  unit,
+                  dosage,
+                  days: daysRef.current,
+                  frequency: freq,
+                  noOfTimes,
+                  time: selectedTimes.join(", "),
+                  medicationSchedule,
+                });
+              }}
+              onTimesChange={(times) => {
+                setSelectedTimes(times);
+                onChange({
+                  medicineName,
+                  medicineGeneric,
+                  unit,
+                  dosage,
+                  days: daysRef.current,
+                  frequency,
+                  noOfTimes,
+                  time: times.join(", "),
+                  medicationSchedule,
+                });
+              }}
+            />
           </div>
           <div className="col">
             <label>
@@ -393,29 +378,6 @@ const MedicineForm = ({ onChange }) => {
             </label>
           </div>
         </div>
-
-        <label>
-          Time:
-          <select
-            name="time"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            onChange={handleInputChange}
-            value={time}
-          >
-            <option value="select">Select Time</option>
-            <option value="MORNING">MORNING</option>
-            <option value="AFTERNOON">AFTERNOON</option>
-            <option value="EVENING">EVENING</option>
-            <option value="NIGHT">NIGHT</option>
-            <option value="SOS">SOS</option>
-            {/* Add more options as needed */}
-          </select>
-        </label>
         <label>
           Medication Schedule:
           <select

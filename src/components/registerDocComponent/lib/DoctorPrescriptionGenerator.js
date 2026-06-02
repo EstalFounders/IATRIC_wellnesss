@@ -3,16 +3,10 @@ import React, { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Button } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, color_schema, style_schema } from "../../../constant";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { formatData } from "../utils/helper";
-import {
-  CHIEF_COMPLAINTS_TXT,
-  HISTORY_KNOWN_ALLERGY_TXT,
-  KNOWN_CASES_TXT,
-  UNDER_TREATMENT_TXT,
-} from "../utils/constant";
 import CircleLoader from "../../circleLoader";
 import { sendPrescriptionToFirebase } from "../../../utils";
 
@@ -226,36 +220,16 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     }
   };
 
-  const columnWidths = {
-    no: "5%",
-    medicine: "35%",
-    generic: "10%",
-    dosage: "35%",
-    duration: "15%",
-  };
+  const G = color_schema.green; // #3b5f1d
+  const RULE = "1px solid #aaa";
 
-  const tableHeaders = Object.entries(columnWidths).map(([key, width]) => (
-    <th key={key} style={{ width }}>
-      {key.charAt(0).toUpperCase() + key.slice(1)}
-    </th>
-  ));
-
-  const transformedData = data.medicineInfo.map((item) => ({
-    medicine: item.medicineName,
-    generic: item.medicineGeneric,
-    dosage: `${item.dosage} ${item.unit}: ${item.noOfTimes} times ${item.frequency}: ${item.medicationSchedule}`,
-    duration: item.days,
-  }));
-
-  const tableRows = transformedData.map((rowData, index) => (
-    <tr key={index}>
-      <td style={{ fontSize: "12px" }}>{index + 1}</td>
-      <td style={{ fontSize: "12px" }}>{rowData.medicine}</td>
-      <td style={{ fontSize: "12px" }}>{rowData.generic}</td>
-      <td style={{ fontSize: "12px" }}>{rowData.dosage}</td>
-      <td style={{ fontSize: "12px" }}>{rowData.duration}</td>
-    </tr>
-  ));
+  // Advices → indented line items (comma or newline separated)
+  const adviceItems = data.advices
+    ? String(data.advices)
+        .split(/[,\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
 
   return (
     <div
@@ -265,15 +239,16 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         alignItems: "center",
         width: "100%",
         padding: "16px 0",
+        fontFamily: style_schema.font_family || "TT Ramillas, serif",
       }}
     >
-      {/* Scaled preview wrapper — keeps pdfContainer at PDF_WIDTH for accurate capture */}
+      {/* Scaled preview wrapper */}
       <div
         style={{
           width: `${PDF_WIDTH * previewScale}px`,
           height: `${PDF_HEIGHT * previewScale}px`,
           overflow: "hidden",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+          boxShadow: "0 2px 16px rgba(0,0,0,0.18)",
         }}
       >
         <div
@@ -281,115 +256,336 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           style={{
             transformOrigin: "top left",
             transform: `scale(${previewScale})`,
-            textAlign: "center",
+            width: `${PDF_WIDTH}px`,
+            minHeight: `${PDF_HEIGHT}px`,
+            backgroundColor: "#ffffff",
             backgroundImage: `url('/images/Doctor/prescriptionLetterHead.jpg')`,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
-            width: `${PDF_WIDTH}px`,
-            minHeight: `${PDF_HEIGHT}px`,
-            fontFamily: "TT Ramillas, sans-serif",
-            backgroundColor: "#ffffff",
+            boxSizing: "border-box",
+            position: "relative",
           }}
         >
-          <div className="h6 font-weight-bold mt-5">{`Date - ${formatData(new Date())}`}</div>
+          {/* ══ DOCTOR CREDENTIALS — overlaid top-right on letterhead ══ */}
           <div
-            id="pdfContent"
-            style={{ marginTop: "27%", marginLeft: "5%", marginRight: "5%" }}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "22px 32px 0 0",
+            }}
           >
-            <div className="row mt-2">
-              <div className="col text-left h6" md={10}>
-                <div className="font-weight-bold">ID - {data.patientId}</div>
-                <div>{`${data.patientName} (${data.gender.slice(0, 1)}) / ${data.age}Y / ${data.patientNo}`}</div>
+            <div style={{ textAlign: "right", lineHeight: "1.4" }}>
+              <div style={{ fontSize: "14px", color: "#111" }}>
+                Dr.{data.doctorName}
               </div>
-              <div className="text-right mr-2 h6">
-                <div className="text-primary font-weight-bold">
-                  <b>Dr.</b>
-                  {data.doctorName}
-                </div>
-                <div>{`${data.doctorDegree} | Reg No.270988`}</div>
-                <div>{`Mob No. ${data.doctorMobNo}`}</div>
+              <div style={{ fontSize: "13px", color: "#222" }}>
+                {data.doctorDegree
+                  ? data.doctorDegree.split(",")[0].trim()
+                  : "Family Physician"}
               </div>
-            </div>
-            <div md={2} className="col text-left">
-              <img
-                className="img-fluid"
-                src="/images/Doctor/RXIcon.png"
-                alt="Rx logo"
-                width={30}
-              />
-            </div>
-            <div className="row mt-2">
-              <div className="col text-left">
-                <h6>
-                  <b>{KNOWN_CASES_TXT}</b> - {data.knownCases}
-                </h6>
+
+              <div style={{ fontSize: "13px", color: "#222" }}>
+                Reg no : {data.doctorRegNo || "10152"}
               </div>
             </div>
-            <div className="row mt-2">
-              <div className="col text-left">
-                <h6>
-                  <b>{HISTORY_KNOWN_ALLERGY_TXT}</b> - {data.anyDrugAllergy}
-                </h6>
-              </div>
-            </div>
-            <div className="row mt-2">
-              <div className="col text-left">
-                <h6>
-                  <b>{CHIEF_COMPLAINTS_TXT}</b> - {data.cheifCompalaints}
-                </h6>
-                <h6>
-                  <b>{UNDER_TREATMENT_TXT}</b> - {data.underTreatmentSince}
-                </h6>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col">
-                <table className="border border-dark m-2 rounded">
-                  <thead className="border border-dark text-dark h6">
-                    <tr>{tableHeaders}</tr>
-                  </thead>
-                  <tbody>{tableRows}</tbody>
-                </table>
-              </div>
-            </div>
-            <div>
-              <h6 className="text-left">
-                * Apply generic equivalent wherever applicable subject to
-                Availability
-              </h6>
-            </div>
-            <div className="row mr-4 mt-5" style={{ height: "70px" }}>
-              <div className="col text-left h6">
-                <b>Advices - </b>
-                <div>{data.advices}</div>
-                <b>Notes - </b>
-                <div>{data.notes}</div>
-                <b>Test Adviced</b>
-                <div>{data.testAdvices}</div>
-              </div>
-              <div className="col text-right mt-2">
+          </div>
+
+          {/* ══ MAIN CONTENT — starts below letterhead image ══ */}
+          <div style={{ marginTop: "20%", padding: "0 32px" }}>
+            {/* ── Patient row ── */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                borderTop: RULE,
+                borderBottom: RULE,
+                padding: "7px 0",
+                fontSize: "13px",
+              }}
+            >
+              <div style={{ lineHeight: "1.6" }}>
+                <div>Patient id&nbsp;{data.patientId}</div>
                 <div>
+                  {data.patientName}&nbsp;,&nbsp;{data.age}&nbsp;yr&nbsp;,&nbsp;
+                  {data.gender ? data.gender.slice(0, 1).toUpperCase() : ""}
+                </div>
+              </div>
+              <div>{formatData(new Date())}</div>
+            </div>
+
+            {/* ── Clinical section — 2-column plain text ── */}
+            <div
+              style={{
+                display: "flex",
+                marginTop: "12px",
+                paddingBottom: "12px",
+                borderBottom: RULE,
+                fontSize: "13px",
+              }}
+            >
+              {/* Left */}
+              <div style={{ flex: 1, paddingRight: "20px", lineHeight: "1.6" }}>
+                <div style={{ fontWeight: 500 }}>
+                  HOPI (History of present illness)
+                </div>
+                <div style={{ marginBottom: "8px" }}>
+                  {data.cheifCompalaints || "—"}
+                </div>
+                <div style={{ fontWeight: 500 }}>Provisional diagnosis</div>
+                <div>
+                  {data.provisionalDiagnosis || data.underTreatmentSince || "—"}
+                </div>
+              </div>
+              {/* Right */}
+              <div style={{ flex: 1, paddingLeft: "20px", lineHeight: "1.6" }}>
+                <div style={{ fontWeight: 500 }}>Known Case of</div>
+                <div style={{ marginBottom: "8px" }}>
+                  {data.knownCases || "NA"}
+                </div>
+                <div style={{ fontWeight: 500 }}>History of known allergy</div>
+                <div>{data.anyDrugAllergy || "NA"}</div>
+              </div>
+            </div>
+
+            {/* ── Rx + Medicine table ── */}
+            <div style={{ marginTop: "10px", position: "relative" }}>
+              {/* "HealthPath" watermark text behind table */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  pointerEvents: "none",
+                  zIndex: 0,
+                  overflow: "hidden",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "72px",
+                    fontWeight: 800,
+                    color: G,
+                    opacity: 0.06,
+                    whiteSpace: "nowrap",
+                    userSelect: "none",
+                    letterSpacing: "4px",
+                  }}
+                >
+                  HealthPath
+                </span>
+              </div>
+
+              {/* Rx icon */}
+              <div
+                style={{ position: "relative", zIndex: 1, marginBottom: "4px" }}
+              >
+                <img
+                  src="/images/Doctor/RXIcon.png"
+                  alt="Rx"
+                  style={{ width: "34px", mixBlendMode: "multiply" }}
+                />
+              </div>
+
+              {/* Table */}
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  position: "relative",
+                  zIndex: 1,
+                  border: "1px solid #bbb",
+                  fontSize: "12px",
+                  backgroundColor: "transparent",
+                }}
+              >
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #bbb" }}>
+                    {[
+                      ["S No.", "5%", "center"],
+                      ["Medicine Name", "20%", "left"],
+                      ["Generic Name", "20%", "left"],
+                      ["Dosage", "38%", "left"],
+                      ["Duration", "17%", "left"],
+                    ].map(([label, width, align]) => (
+                      <th
+                        key={label}
+                        style={{
+                          width,
+                          padding: "7px 8px",
+                          textAlign: align,
+                          fontWeight: 700,
+                          fontSize: "12px",
+                          borderRight: "1px solid #bbb",
+                          background: "transparent",
+                        }}
+                      >
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.medicineInfo.map((item, idx) => (
+                    <tr
+                      key={idx}
+                      style={{
+                        borderBottom: "1px solid #ddd",
+                        background: "transparent",
+                      }}
+                    >
+                      <td
+                        style={{
+                          padding: "7px 8px",
+                          textAlign: "center",
+                          borderRight: "1px solid #ddd",
+                          background: "transparent",
+                        }}
+                      >
+                        {idx + 1}.
+                      </td>
+                      <td
+                        style={{
+                          padding: "7px 8px",
+                          borderRight: "1px solid #ddd",
+                          background: "transparent",
+                        }}
+                      >
+                        {item.medicineName}
+                      </td>
+                      <td
+                        style={{
+                          padding: "7px 8px",
+                          borderRight: "1px solid #ddd",
+                          background: "transparent",
+                        }}
+                      >
+                        {item.medicineGeneric || "—"}
+                      </td>
+                      <td
+                        style={{
+                          padding: "7px 8px",
+                          borderRight: "1px solid #ddd",
+                          lineHeight: "1.5",
+                          background: "transparent",
+                        }}
+                      >
+                        {item.noOfTimes && item.frequency && (
+                          <div>
+                            {item.noOfTimes === "1"
+                              ? "Once"
+                              : item.noOfTimes === "2"
+                                ? "Twice"
+                                : `${item.noOfTimes} times`}{" "}
+                            daily
+                          </div>
+                        )}
+                        {(item.medicationSchedule || item.time) && (
+                          <div style={{ color: "#444" }}>
+                            (
+                            {[item.medicationSchedule, item.time]
+                              .filter(Boolean)
+                              .join(" ")}
+                            )
+                          </div>
+                        )}
+                        {item.dosage && item.unit && (
+                          <div style={{ color: "#666", fontSize: "11px" }}>
+                            {item.dosage} {item.unit}
+                          </div>
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          padding: "7px 8px",
+                          background: "transparent",
+                        }}
+                      >
+                        {item.days}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Footer content ── */}
+            <div style={{ marginTop: "18px", fontSize: "13px" }}>
+              {/* Test advices */}
+              <div style={{ marginBottom: "10px" }}>
+                Test advices &ndash;&nbsp;
+                <span>{data.testAdvices || "NA"}</span>
+              </div>
+
+              {/* Advice indented list */}
+              <div style={{ marginBottom: "10px" }}>
+                <div>Advice &ndash;</div>
+                {adviceItems.map((item, i) => (
+                  <div
+                    key={i}
+                    style={{ marginLeft: "24px", lineHeight: "1.7" }}
+                  >
+                    {item}
+                  </div>
+                ))}
+                {data.notes && (
+                  <div style={{ marginLeft: "24px", lineHeight: "1.7" }}>
+                    {data.notes}
+                  </div>
+                )}
+              </div>
+
+              {/* Sign-off row: stamp+sig left | doctor block right */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  marginTop: "24px",
+                }}
+              >
+                {/* Stamp + signature images */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    alignItems: "flex-end",
+                  }}
+                >
                   {stampUrl && (
                     <Image
                       src={stampUrl}
                       alt="Doctor Stamp"
-                      width={100}
-                      height={70}
+                      width={90}
+                      height={60}
+                      style={{ mixBlendMode: "multiply" }}
                     />
                   )}
-                </div>
-                <div className="mt-2">
                   {signatureUrl && (
                     <Image
                       src={signatureUrl}
                       alt="Doctor Signature"
-                      width={100}
-                      height={70}
+                      width={90}
+                      height={60}
+                      style={{ mixBlendMode: "multiply" }}
                     />
                   )}
-                </div>
-                <div className="float-right mt-5 mr-4">
                   {signNstampLoader && <CircleLoader />}
+                </div>
+
+                {/* Doctor sign-off */}
+                <div style={{ textAlign: "right", lineHeight: "1.6" }}>
+                  <div style={{ fontWeight: 700, color: G, fontSize: "14px" }}>
+                    Dr. {data.doctorName}
+                  </div>
+                  <div style={{ color: G, fontSize: "13px" }}>
+                    General Physician
+                  </div>
+                  <div style={{ color: G, fontSize: "13px" }}>
+                    DMC-&nbsp;{data.doctorRegNo || "—"}
+                  </div>
                 </div>
               </div>
             </div>
