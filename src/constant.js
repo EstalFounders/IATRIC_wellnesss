@@ -171,6 +171,10 @@ export const color_schema = {
   black: "#000000",
 };
 
+export const style_schema = {
+  font_family: "TT Ramillas, serif",
+};
+
 export const eventEmitter = {
   cartEventEmitter: "cartUpdate",
   navBarEventEmitter: "navbar-option",

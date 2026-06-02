@@ -42,6 +42,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       const combinedService = {
         // serviceIds: `${appointment._id},${matchingLabTest._id}`,
         name: appointment.name + " + " + matchingLabTest.name,
+        doctorName: appointment.doctorId?.name || "",
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice + matchingLabTest.totalPrice,
@@ -87,6 +88,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       const appointmentService = {
         // serviceIds: appointment._id,
         name: appointment.name,
+        doctorName: appointment.doctorId?.name || "",
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice,

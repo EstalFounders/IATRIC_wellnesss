@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const appointments = await Appointment.find({
       status: appointment_status.completed,
       invoiceId: "",
-    }).lean();
+    }).populate("doctorId", "name").lean();
 
     const labTests = await BookLabTest.find({
       status: appointment_status.completed,
