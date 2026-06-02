@@ -49,7 +49,7 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
     return {
       doctor_name: doctorName,
       patient_name: patientName,
-      AppointmentTime: appointmentTime, // Note: Case-sensitive for templates
+      appointment_time: appointmentTime,
       meeting_url: meetingUrl,
     };
   };

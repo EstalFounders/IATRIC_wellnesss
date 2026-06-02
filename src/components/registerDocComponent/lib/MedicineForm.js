@@ -1,28 +1,71 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { api } from "../../../constant";
+import { postMedicineApi } from "../utils/helperApi";
+import FrequencyTimeSelector from "./FrequencyTimeSelector";
 
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
-  const [medicineNotFound, setMedicineNotFound] = useState("");
   const [medicineGeneric, setMedicineGeneric] = useState("");
   const [unit, setUnit] = useState("");
   const [dosage, setDosage] = useState("");
   const daysRef = useRef("");
   const [frequency, setFrequency] = useState("");
   const [noOfTimes, setNoOfTimes] = useState("");
-  const [time, setTime] = useState("");
+  const [selectedTimes, setSelectedTimes] = useState([]);
   const [medicationSchedule, setMedicationSchedule] = useState("As Required");
-  const [loading, setLoading] = useState(false); // State to track loading status
-  const [medicinesInfo, setMedicinesInfo] = useState([]); // State to store fetched medicines
-  const [error, setError] = useState(null); // State to store error message
+  const [loading, setLoading] = useState(false);
+  const [medicinesInfo, setMedicinesInfo] = useState([]);
+  const [error, setError] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isMedicineIncluded, setMedicineIncluded] = useState("");
+  const debounceRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   // Function to handle changes in input fields
+  const handleMedicineSearch = useCallback(async (searchTerm) => {
+    if (!searchTerm.trim()) {
+      setMedicinesInfo([]);
+      setShowDropdown(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${api.medicineInfoApiCall}${encodeURIComponent(searchTerm)}`,
+      );
+      const data = await response.json();
+      const medicines = data?.medicines || [];
+      setMedicinesInfo(medicines);
+      setShowDropdown(medicines.length > 0);
+      setSelectedIndex(-1);
+    } catch (err) {
+      console.error("Error fetching medicine:", err);
+      setError("Failed to fetch medicines");
+      setMedicinesInfo([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     switch (name) {
       case "medicineName":
         setMedicineName(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(
+          () => handleMedicineSearch(value),
+          300,
+        );
+        emitEvent();
         break;
       case "unit":
         setUnit(value);
@@ -31,13 +74,7 @@ const MedicineForm = ({ onChange }) => {
         setDosage(value);
         break;
       case "days":
-        daysRef.current = value; // Update the ref directly
-        break;
-      case "frequency":
-        setFrequency(value);
-        break;
-      case "time":
-        setTime(value);
+        daysRef.current = value;
         break;
       case "medicationSchedule":
         setMedicationSchedule(value);
@@ -48,48 +85,64 @@ const MedicineForm = ({ onChange }) => {
       default:
         break;
     }
-    // Call the parent onChange function to pass the updated values
     onChange({
       medicineName,
       medicineGeneric,
       unit,
       dosage,
-      days: daysRef.current, // Access the value directly from the ref
+      days: daysRef.current,
       frequency,
       noOfTimes,
-      time,
+      time: selectedTimes.join(", "),
       medicationSchedule,
     });
   };
 
-  const handleFindMedicine = async () => {
-    setLoading(true); // Set loading to true before fetching data
-    setError(null); // Clear previous error message
-    setMedicineNotFound(null) 
-    // Call the function to find medicine
-    try {
-      // Fetch data from DailyMed API
-      const response = await fetch(`${api.medicineInfoApiCall}${medicineName}`);
-      const data = await response.json();
-      console.log(data, "data in client side");
-      if (data && data.length > 0) {
-        setMedicinesInfo(data);
-      } else {
-        setMedicinesInfo([]);
-        setMedicineNotFound("no medicine found");
-      }
-    } catch (error) {
-      console.error("Error fetching medicine information:", error);
-      setError("Error fetching medicine information:");
-    } finally {
-      setLoading(false); // Set loading to false after fetching data
-    }
+  const handleMedicineSelect = (medicine) => {
+    setMedicineName(medicine.name);
+    setMedicineGeneric(medicine.salt);
+    setShowDropdown(false);
+    setMedicinesInfo([]);
+
+    emitEvent();
   };
 
-  const handleMedicineSelect = (event) => {
-    const medicine = event.target[event.target.selectedIndex].title;
-    setMedicineName(medicine);
-    setMedicineGeneric(event.target.value);
+  const emitEvent = () => {
+    const updatedData = {
+      medicineName,
+      medicineGeneric,
+      unit,
+      dosage,
+      days: daysRef.current,
+      frequency,
+      noOfTimes,
+      time: selectedTimes.join(", "),
+      medicationSchedule,
+      isMedicineIncluded,
+    };
+
+    console.log("Child sending:", updatedData); // Check your console!
+    onChange(updatedData);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || medicinesInfo.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) =>
+        prev < medicinesInfo.length - 1 ? prev + 1 : 0,
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) =>
+        prev > 0 ? prev - 1 : medicinesInfo.length - 1,
+      );
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      e.preventDefault();
+      handleMedicineSelect(medicinesInfo[selectedIndex]);
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+    }
   };
 
   return (
@@ -127,64 +180,119 @@ const MedicineForm = ({ onChange }) => {
           <div className="col mt-3" xs={12} md={4}>
             <label>
               Medicine Name:
-              <input
-                type="text"
-                name="medicineName"
-                value={medicineName}
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                  marginRight: "10px",
-                }}
-                onChange={handleInputChange}
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  name="medicineName"
+                  value={medicineName}
+                  style={{
+                    padding: "10px",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc",
+                    width: "100%",
+                    marginRight: "10px",
+                  }}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  autoComplete="off"
+                />
+                {loading && (
+                  <small
+                    style={{ position: "absolute", right: "10px", top: "10px" }}
+                  >
+                    ...
+                  </small>
+                )}
+                {showDropdown && medicinesInfo.length > 0 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      width: "100%",
+                      maxHeight: "200px",
+                      overflowY: "auto",
+                      backgroundColor: "white",
+                      border: "1px solid #ccc",
+                      borderRadius: "5px",
+                      zIndex: 10,
+                    }}
+                  >
+                    {medicinesInfo.slice(0, 50).map((medicine, index) => (
+                      <div
+                        key={medicine._id}
+                        style={{
+                          padding: "8px",
+                          cursor: "pointer",
+                          backgroundColor:
+                            index === selectedIndex ? "#e0e0e0" : "white",
+                        }}
+                        onClick={() => handleMedicineSelect(medicine)}
+                        onMouseEnter={() => setSelectedIndex(index)}
+                      >
+                        <strong>{medicine.name}</strong>
+                        <br />
+                        <small>{medicine.salt}</small>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {showDropdown &&
+                  medicinesInfo.length === 0 &&
+                  !loading &&
+                  medicineName && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        width: "100%",
+                        padding: "8px",
+                        backgroundColor: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                        zIndex: 10,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span style={{ fontStyle: "italic", color: "#777" }}>
+                        No medicines found
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setMedicinesInfo([]);
+                          onChange({
+                            medicineName,
+                            medicineGeneric: "",
+                            unit,
+                            dosage,
+                            days: daysRef.current,
+                            frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
+                            noOfTimes,
+                            time,
+                            medicationSchedule,
+                          });
+                        }}
+                      >
+                        Add &quot;{medicineName}&quot; anyway
+                      </button>
+                    </div>
+                  )}
+              </div>
             </label>
-            <div className="text-danger">{medicineNotFound}</div>
+            {medicineGeneric && (
+              <small style={{ display: "block", color: "#555", marginTop: "3px" }}>
+                Generic: <em>{medicineGeneric}</em>
+              </small>
+            )}
+            {error && <div className="text-danger small">{error}</div>}
           </div>
         </div>
-        <div className="row">
-          <div className="col">
-            <div className="mb-2">
-              <small>Click Find Medicine</small>
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <span
-              style={{
-                textDecoration: "underline",
-                cursor: "pointer",
-                display: "block", // Ensure clickable text is displayed as block element
-                textAlign: "center", // Center the text on mobile devices
-              }}
-              className="text-primary"
-              onClick={handleFindMedicine}
-            >
-              Find Medicine
-            </span>
-          </div>
-        </div>
-        {loading && <div>Loading...</div>}
-        {error && <div>Error: {error}</div>}
-        {medicinesInfo != "" && !error && (
-          <select onChange={handleMedicineSelect}>
-            <option>Select a medicine</option>
-            {medicinesInfo.map((medicine) => (
-              <option
-                key={medicine._id}
-                value={medicine.salt}
-                title={medicine.name} // Set full title as tooltip
-              >
-                {medicine.name.length > 20
-                  ? `${medicine.name.slice(0, 33)}...`
-                  : medicine.name}
-              </option>
-            ))}
-          </select>
-        )}
         <div className="row">
           <div className="col">
             <label>
@@ -223,31 +331,36 @@ const MedicineForm = ({ onChange }) => {
         </div>
         <div className="row">
           <div className="col">
-            <label>
-              Frequency:
-              <select
-                name="frequency"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-                onChange={handleInputChange}
-                value={frequency}
-              >
-                <option value="SELECT">Select Frequency</option>
-                <option value="DAILY">DAILY</option>
-                <option value="WEEKLY">WEEKLY</option>
-                <option value="MONTHLY">MONTHLY</option>
-                <option value="SOS">SOS</option>
-                <option value="AS REQUIRED">AS REQUIRED</option>
-                <option value="ALTERNATIVE DAYS">ALTERNATIVE DAYS</option>
-                <option value="BI WEEKLY">BI WEEKLY</option>
-                <option value="BI MONTHLY">BI MONTHLY</option>
-                {/* Add more options as needed */}
-              </select>
-            </label>
+            <FrequencyTimeSelector
+              onFrequencyChange={(freq) => {
+                setFrequency(freq);
+                onChange({
+                  medicineName,
+                  medicineGeneric,
+                  unit,
+                  dosage,
+                  days: daysRef.current,
+                  frequency: freq,
+                  noOfTimes,
+                  time: selectedTimes.join(", "),
+                  medicationSchedule,
+                });
+              }}
+              onTimesChange={(times) => {
+                setSelectedTimes(times);
+                onChange({
+                  medicineName,
+                  medicineGeneric,
+                  unit,
+                  dosage,
+                  days: daysRef.current,
+                  frequency,
+                  noOfTimes,
+                  time: times.join(", "),
+                  medicationSchedule,
+                });
+              }}
+            />
           </div>
           <div className="col">
             <label>
@@ -265,29 +378,6 @@ const MedicineForm = ({ onChange }) => {
             </label>
           </div>
         </div>
-
-        <label>
-          Time:
-          <select
-            name="time"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            onChange={handleInputChange}
-            value={time}
-          >
-            <option value="select">Select Time</option>
-            <option value="MORNING">MORNING</option>
-            <option value="AFTERNOON">AFTERNOON</option>
-            <option value="EVENING">EVENING</option>
-            <option value="NIGHT">NIGHT</option>
-            <option value="SOS">SOS</option>
-            {/* Add more options as needed */}
-          </select>
-        </label>
         <label>
           Medication Schedule:
           <select

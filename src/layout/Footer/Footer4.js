@@ -31,6 +31,7 @@ const Footer4 = () => {
   ];
 
   const handleEmail = () => {
+    console.log("Email clicked");
     router.push(`mailto:${email}`);
   };
 
@@ -73,7 +74,7 @@ const Footer4 = () => {
                       target="blank"
                       href={facebook_page_url}
                     >
-                      <FaFacebook size={40} color="#316FF6" />
+                      <FaFacebook size={40} color="#ffffff" />
                       <span className="mobiletext02">Facebook</span>
                     </a>
                   </Col>
@@ -84,7 +85,7 @@ const Footer4 = () => {
                       target="blank"
                       href="https://www.instagram.com/iatric.healthcare/"
                     >
-                      <FaInstagram size={40} color="#cd486b" />
+                      <FaInstagram size={40} color="#ffffff" />
                       <span className="mobiletext02">Instagram</span>
                     </a>
                   </Col>
@@ -95,7 +96,7 @@ const Footer4 = () => {
                       target="blank"
                       href="https://www.linkedin.com/in/iatrichealthcare/"
                     >
-                      <FaLinkedin size={40} color="#0077b5" />
+                      <FaLinkedin size={40} color="#ffffff" />
                       <span className="mobiletext02">Linkedin</span>
                     </a>
                   </Col>
@@ -113,15 +114,17 @@ const Footer4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="footer-box mb-40">
               {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4">
-                <u>Working Time</u>
+              <div className="h5-xs font-weight-bold text-white mb-4">
+                <u>Working Hours</u>
               </div>
               {/* Working Hours */}
               <div
                 className="p-sm text-nowrap"
                 style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
               >
-                Mon - Sun - 8:00 AM - 8:00 PM
+                <span>Monday - Sunday </span>
+                <br />
+                <span>8:00 AM - 8:00 PM</span>
               </div>
             </div>
           </div>
@@ -132,13 +135,13 @@ const Footer4 = () => {
               style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
             >
               {/* Title */}
-              <div className="h5-xs font-weight-bold text-dark mb-4">
+              <div className="h5-xs font-weight-bold text-white mb-4">
                 <u>Reach us</u>
               </div>
               {/* Address */}
-              <span>
-                <FaMapMarkedAlt className="mx-1" />
-                <b>{address}</b>
+              <span className="d-flex flex-row">
+                <FaMapMarkedAlt size={30} />
+                <b className="ml-2">{address}</b>
               </span>
               {/* Email */}
               <div className="foo-email mt-20 d-flex flex-row mb-4">

@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const now = new Date();
     const twentyMinutesFromNow = new Date(now.getTime() + 20 * 60 * 1000);
 
-    // 1. Get upcoming appointments within 10 minutes
+    // 1. Get upcoming appointments within 20 minutes
     const upcomingAppointments = await Appointment.find({
       appointmentTime: { $gte: now, $lte: twentyMinutesFromNow },
       status: new RegExp(appointment_status.open, "i"), // 'i' flag for case-insensitive
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       const reminderMessageBodyPateint = {
         doctor_name: doctor.name,
         patient_name: appointment.name,
-        AppointmentTime: appointmentTime,
+        appointment_time: appointmentTime,
         meeting_url: appointment.patientMeetingUrl,
       };
 

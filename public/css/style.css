@@ -1985,7 +1985,7 @@ p.header-widget-phone {
 }
 
 #hero-5 {
-  background-image: url(../images/hero-5.png);
+  background-image: url(../images/hero-5.jpg);
   padding-top: 90px;
   padding-bottom: 210px;
   width: 95%;
@@ -3825,17 +3825,16 @@ td.text-right {
 
 #statistic-1 {
   background-image: url(../images/statistic1.png);
-  background-size: cover; /* Changed from 'contain' - will crop if aspect ratios differ */
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-
-  /* Keep your original paddings or make them responsive with viewport units */
-  padding-top: 80px; /* Or use padding-top: 5vw; for responsive padding */
-  padding-bottom: 40px; /* Or use padding-bottom: 3vw; */
-
-  /* Optional: Ensure a minimum height for the section */
-  min-height: 200px; /* Or min-height: 30vh; for responsive minimum height */
+  padding-top: 80px;
+  padding-bottom: 40px;
+  min-height: 200px;
+  color: white;
 }
+
+
 
 #statistic-2 {
   padding-top: 80px;

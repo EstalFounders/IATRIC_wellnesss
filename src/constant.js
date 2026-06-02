@@ -20,7 +20,7 @@ export const invoice_bill_yellow_color = "#d1bd9a";
 export const company_font_family = "TT Ramillas";
 export const isNow = "Now";
 export const SERVER_AVAILABLE_SLOTS_CODE = "304";
-export const booking_btn_txt = "Consult Now"
+export const booking_btn_txt = "Book Now";
 
 export const api = {
   addDoctor: "/api/addDoctor",
@@ -52,6 +52,8 @@ export const api = {
   serviceOffered: "/api/superAdmin/serviceOffered",
   sendOtp: "/api/helper/whatsappConfirmationApi",
   serviceSuggestion: "/api/helper/getServiceSuggestion",
+  postArticle: "/api/superAdmin/postArticle",
+  helperApi: "/api/helperApi",
 };
 
 export const services = [
@@ -140,10 +142,10 @@ export const roles = {
 };
 
 export const superAdminConsultationtype = [
-  "Call",
-  "Video",
-  "Home visit",
-  "Clinic",
+  { name: "Call" },
+  { name: "Video" },
+  { name: "Home visit" },
+  { name: "Clinic" },
 ];
 
 export const DoctorType = {
@@ -169,12 +171,18 @@ export const color_schema = {
   black: "#000000",
 };
 
+export const style_schema = {
+  font_family: "TT Ramillas, serif",
+};
+
 export const eventEmitter = {
   cartEventEmitter: "cartUpdate",
   navBarEventEmitter: "navbar-option",
   labTestEventEmitter: "labTestUpdate",
   medicineCartEventEmitter: "medicine-cart-update",
 };
+
+export const apiAction = { fetchCateogories: "fetchCateogories", savePrescription: "savePrescription", getPrescription: "getPrescription" };
 
 export const labtestCateogory = {
   fullBodyCheckup: "Full Body",
@@ -189,5 +197,4 @@ export const lab_test_discount = 0.95;
 export const vapidKey =
   "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";
 
-
-export const callToBook = "Get a Call back";  
+export const callToBook = "Get a Call back";

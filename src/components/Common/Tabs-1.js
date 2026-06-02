@@ -3,7 +3,12 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
-import { booking_btn_txt, callToBook, color_schema, serviceOffered } from "../../constant";
+import {
+  booking_btn_txt,
+  callToBook,
+  color_schema,
+  serviceOffered,
+} from "../../constant";
 import { handleServiceClick } from "./commonMethod";
 import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
@@ -120,7 +125,7 @@ const ServicesTabs = () => {
             .filter((service) => service.id === activeTab)
             .map((service) => (
               <div
-                className="row align-items-start service-row"
+                className="row align-items-center service-row"
                 key={service.id}
               >
                 {/* Left Column - Image */}
@@ -141,7 +146,7 @@ const ServicesTabs = () => {
                 </div>
 
                 {/* Right Column - Text */}
-                <div className="col-lg-6 d-flex flex-column justify-content-start text-column">
+                <div className="col-lg-6 d-flex flex-column justify-content-center text-column">
                   {/* Subheading */}
                   <h4
                     className="section-subheading blue-color mb-3"

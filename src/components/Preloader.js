@@ -1,12 +1,10 @@
 import Image from "next/image";
+import styles from "./Common/css/Preloader.module.css";
 
 const Preloader = () => {
   return (
-    <div id="loader-wrapper">
-      <div id="loader">
-        {/* <div className="loader-inner"></div> */}
-        <Image src="/images/loader.gif" alt="Loading..." width={250} height={200} />
-      </div>
+    <div className={styles.overlay}>
+      <Image src="/images/loader.gif" alt="Loading..." width={250} height={200} />
     </div>
   );
 };

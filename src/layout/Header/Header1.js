@@ -78,8 +78,8 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
   };
 
   const handleConsultationTypeOpenDialog = () => {
-    console.log("tesinafa");
-    setIsConsultationTypeOpen(true);
+    router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
+    // setIsConsultationTypeOpen(true);
   };
 
   const handleConsultationTypeCloseDialog = () => {
@@ -254,7 +254,7 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
       </div>
       {/* END HEADER STRIP */}
       {/* NAVIGATION MENU */}
-      <div>
+      <div className="wsmainfull menu clearfix">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between">
             {/* Left: LOGO */}
@@ -477,11 +477,11 @@ const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
           />
         )}
 
-        <PopupDialog
+        {/* <PopupDialog
           isOpen={isConsultationTypeOpen}
           onClose={handleConsultationTypeCloseDialog}
           options={consultationTypes}
-        />
+        /> */}
       </div>
 
       <MobileMenu />

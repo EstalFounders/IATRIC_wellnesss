@@ -39,8 +39,10 @@ export default async function handler(req, res) {
     for (const item of items) {
       await updateInvoiceNumberInDatabase(item, invoiceId);
     }
+    console.log("payload", payload);
     const invoiceMessage = {
       patient_name: payload.name,
+      doctor_name: payload.doctorName || payload.doctor_name,
       invoice_number: invoiceNumber,
       total_amount: payload.totalPrice,
       invoice_url: payload.invoiceUrl,

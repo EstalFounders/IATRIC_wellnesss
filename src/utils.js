@@ -77,10 +77,10 @@ export const sendPrescriptionToFirebase = async (file, details) => {
     }_${uuidv4()}`
   );
   const metadata = {
-    contentType: file.type,
+    contentType: file.type || "application/pdf",
   };
-  await uploadBytes(storageRef, file, metadata);
-  const url = await getDownloadURL(storageRef);
+  const snapshot = await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(snapshot.ref);
   return url;
 };
 
@@ -91,9 +91,9 @@ export const sendInvoiceToFirebase = async (file, invoiceNumber) => {
     `${invoice_img_path}/invoiceNo=${invoiceNumber}_${uuidv4()}`
   );
   const metadata = {
-    contentType: file.type,
+    contentType: file.type || "application/pdf",
   };
-  await uploadBytes(storageRef, file, metadata);
-  const url = await getDownloadURL(storageRef);
+  const snapshot = await uploadBytes(storageRef, file, metadata);
+  const url = await getDownloadURL(snapshot.ref);
   return url;
 };

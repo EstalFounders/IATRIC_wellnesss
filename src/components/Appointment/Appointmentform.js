@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   RadioGroup,
@@ -11,36 +11,43 @@ import {
 } from "@mui/material";
 import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
-import { fetchServiceSuggestions } from "../ApiService/UtilService";
+import { CHOOSE_TIME, IS_NOW } from "../../constant";
+import { formatTime } from "../helper";
+
+const toLocalDateString = (date) => {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 const AppointmentForm = ({
   appointmentState,
   setter,
   handleCloseSnackBar,
   sendWhatsAppConfirmation,
+  handleTimeSelection,
+  handleSlotSelection,
+  handleConsultationChange,
 }) => {
-  const [descriptionOptions, setDescriptionOptions] = useState([]);
+  const [descriptionOptions] = useState([]);
 
-  const description = appointmentState.symptoms;
-
-  // useEffect(() => {
-  //   // This effect will run whenever the 'description' state changes.
-  //   // The utility function already contains the check for an empty string.
-  //   fetchServiceSuggestions(description, setDescriptionOptions);
-
-  //   // This cleanup function is crucial to cancel any pending API calls
-  //   // when the component unmounts or before the next effect runs.
-  //   return () => {
-  //     fetchServiceSuggestions.cancel();
-  //   };
-  // }, [description]); // The effect's dependency array
-
-  // Trigger fetch on blur or stop typing
   const handleDescriptionChange = (e) => {
-    const value = e.target.value;
-    setter.setSymptoms(value);
-    // fetchSuggestions(value);
+    setter.setSymptoms(e.target.value);
   };
+
+  const handleDateChange = (e) => {
+    const [year, month, day] = e.target.value.split("-");
+    setter.setSelectedDate(new Date(year, month - 1, day));
+  };
+
+  const today = toLocalDateString(new Date());
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 5);
+  const maxDateStr = toLocalDateString(maxDate);
+
+  const selectedDateStr =
+    appointmentState.selectedDate instanceof Date
+      ? toLocalDateString(appointmentState.selectedDate)
+      : today;
 
   return (
     <div className="col-lg-8">
@@ -52,18 +59,17 @@ const AppointmentForm = ({
         <form onSubmit={(e) => e.preventDefault()} className="appointment-form">
           {/* Name */}
           <div style={{ display: "flex", justifyContent: "center" }}>
-          
-          <TextField
-          className="w-50"
-            label="Name"
-            variant="outlined"
-            margin="normal"
-            value={appointmentState.name}
-            onChange={(e) => setter.setName(e.target.value)}
-          />
+            <TextField
+              className="w-50"
+              label="Name"
+              variant="outlined"
+              margin="normal"
+              value={appointmentState.name}
+              onChange={(e) => setter.setName(e.target.value)}
+            />
           </div>
 
-          {/* Description */}
+          {/* Symptoms */}
           <div style={{ display: "flex", justifyContent: "center" }}>
             <TextField
               className="w-50"
@@ -74,11 +80,9 @@ const AppointmentForm = ({
               margin="normal"
               value={appointmentState.symptoms}
               onChange={handleDescriptionChange}
-              // onBlur={() => fetchSuggestions(appointmentState.symptoms)}
             />
           </div>
 
-          {/* Dynamically generated radio buttons from description API */}
           {descriptionOptions.length > 0 && (
             <>
               <Typography variant="subtitle1" mt={2}>
@@ -121,14 +125,86 @@ const AppointmentForm = ({
           <RadioGroup
             row
             value={appointmentState.consultationType}
-            onChange={(e) => setter.setConsultationType(e.target.value)}
+            onChange={handleConsultationChange}
             style={{ justifyContent: "center", marginBottom: "20px" }}
           >
             <FormControlLabel value="Call" control={<Radio />} label="Call" />
             <FormControlLabel value="Video" control={<Radio />} label="Video" />
           </RadioGroup>
 
-          {/* Snackbar for messages */}
+          {/* When */}
+          <Typography variant="h6" mt={2} className="text-center">
+            When?
+          </Typography>
+          <RadioGroup
+            row
+            value={appointmentState.timeSelection}
+            onChange={handleTimeSelection}
+            style={{ justifyContent: "center", marginBottom: "12px" }}
+          >
+            <FormControlLabel value={IS_NOW} control={<Radio />} label="Now" />
+            <FormControlLabel
+              value={CHOOSE_TIME}
+              control={<Radio />}
+              label="Choose Time"
+            />
+          </RadioGroup>
+
+          {/* Date + slot picker */}
+          {appointmentState.timeSelection === CHOOSE_TIME && (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={2}
+              mb={2}
+            >
+              <input
+                type="date"
+                className={styles.input}
+                style={{ width: "50%" }}
+                min={today}
+                max={maxDateStr}
+                value={selectedDateStr}
+                onChange={handleDateChange}
+              />
+
+              {(() => {
+                const now = new Date();
+                const futureSlots = (appointmentState.locallyCreatedSlots || []).filter(
+                  (slot) => new Date(slot.startTime) > now
+                );
+                return futureSlots.length > 0 ? (
+                  <select
+                    className={styles.input}
+                    style={{ width: "50%" }}
+                    value={appointmentState.selectedSlot?._id || ""}
+                    onChange={(e) => {
+                      const slot = futureSlots.find(
+                        (s) => s._id === e.target.value
+                      );
+                      if (slot) handleSlotSelection(slot);
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select a time slot
+                    </option>
+                    {futureSlots.map((slot) => (
+                      <option key={slot._id} value={slot._id}>
+                        {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    No slots available for the selected date.
+                  </Typography>
+                );
+              })()}
+            </Box>
+          )}
+
+          {/* Snackbar */}
           <Snackbar
             open={appointmentState.openSnackBar}
             autoHideDuration={6000}
@@ -143,7 +219,7 @@ const AppointmentForm = ({
             </Alert>
           </Snackbar>
 
-          {/* Submit button */}
+          {/* Submit */}
           <Box mt={4} mb={4} display="flex" justifyContent="center">
             <ConsultationButton onClick={sendWhatsAppConfirmation}>
               {appointmentState.isLoading ? "Loading..." : "Consult"}

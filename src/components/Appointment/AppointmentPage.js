@@ -353,6 +353,11 @@ const AppointmentPage = () => {
       handleOpenSnackBar();
       return;
     }
+    if (timeSelection === CHOOSE_TIME && !selectedSlot) {
+      setSnackBarMessage("Please select a time slot.");
+      handleOpenSnackBar();
+      return;
+    }
     setOtpConfirmationPopup(true);
     setAvailableSlotsFromServer(true);
   };

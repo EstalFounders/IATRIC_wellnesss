@@ -17,7 +17,19 @@ import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
 import { color_schema, services } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
-import { CardiologyIcon, Dentistry, DermatologistIcon, GeneralPhysician, GynaecologyIcon, OphthalmologyIcon, OrthopaedicsIcon, PediatricsIcon, PhysiotherapyIcon, Psychiatrist, PulmonologyIcon } from "../../../public/svgIcon/all-department-svg-icon";
+import {
+  CardiologyIcon,
+  Dentistry,
+  DermatologistIcon,
+  GeneralPhysician,
+  GynaecologyIcon,
+  OphthalmologyIcon,
+  OrthopaedicsIcon,
+  PediatricsIcon,
+  PhysiotherapyIcon,
+  Psychiatrist,
+  PulmonologyIcon,
+} from "../../../public/svgIcon/all-department-svg-icon";
 
 const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -216,7 +228,7 @@ const Demo5Services2 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Our Speciality</h3>
+            <div className="font-weight-bold h1 text-uppercase">Our Speciality</div>
           </div>
         </div>
         <div className="row">
@@ -247,7 +259,7 @@ const Demo5Services2 = () => {
                     >
                       <div className="service-nav-link">
                         <div className="service-icon">{renderIcon(index)}</div>
-                        <div className="service-title">{service}</div>
+                        <div className="service-title font-weight-bold">{service}</div>
                       </div>
                     </div>
                   );

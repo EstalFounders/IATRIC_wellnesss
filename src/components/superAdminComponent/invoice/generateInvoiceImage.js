@@ -8,6 +8,7 @@ import {
 } from "../../../constant";
 import Preloader from "../../Preloader";
 import { sendInvoiceToFirebase } from "../../../utils";
+import { priceToWords } from "../utility/helper";
 
 const GenerateInvoiceImage = ({ request, onClose }) => {
   console.log("request", request);
@@ -23,6 +24,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
   const {
     name,
     mobNo,
+    address,
     invoiceNumber,
     subTotal,
     totalPrice,
@@ -37,68 +39,29 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
   const generatePDF = async () => {
     setLoader(true);
 
-    // Get the invoice container element
-    const element = document.getElementById("invoiceContainer");
-
-    // Store original styles
-    const originalStyles = {
-      overflow: element.style.overflow,
-      position: element.style.position,
-      left: element.style.left,
-      top: element.style.top,
-      height: element.style.height,
-      width: element.style.width,
-    };
-
-    // Calculate required dimensions
-    const scrollHeight = element.scrollHeight;
-    const scrollWidth = element.scrollWidth;
-
     try {
-      // Apply temporary styles individually
-      element.style.overflow = "visible";
-      element.style.position = "absolute";
-      element.style.left = "0";
-      element.style.top = "0";
-      element.style.height = `${scrollHeight}px`;
-      element.style.width = `${scrollWidth}px`;
+      const invoiceElement = document.getElementById("invoiceContainer");
 
-      // Capture full content
-      const canvas = await html2canvas(element, {
-        scrollX: 0,
-        scrollY: 0,
-        width: scrollWidth,
-        height: scrollHeight,
-        windowWidth: scrollWidth,
-        windowHeight: scrollHeight,
+      const canvas = await html2canvas(invoiceElement, {
+        scale: 2,
         useCORS: true,
-        allowTaint: true,
+        logging: false,
       });
 
-      // Reset styles
-      Object.keys(originalStyles).forEach((key) => {
-        element.style[key] = originalStyles[key];
-      });
-
-      // Convert canvas to PDF
-      const doc = new jsPDF();
       const imgData = canvas.toDataURL("image/png");
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width / 2, canvas.height / 2],
+      });
 
-      // Calculate PDF dimensions while maintaining aspect ratio
       const pdfWidth = doc.internal.pageSize.getWidth();
-      const pdfHeight = (scrollHeight * pdfWidth) / scrollWidth;
-
-      // Add image to PDF
+      const pdfHeight = doc.internal.pageSize.getHeight();
       doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-      // Save the PDF
       const blob = doc.output("blob");
-
       const invoiceUrl = await sendInvoiceToFirebase(blob, invoiceNumber);
-      // doc.save(`${invoiceNumber}.pdf`);
 
-      // const formData = new FormData();
-      // formData.append("invoice", blob, "invoice.pdf");
       const payload = {
         data: {
           ...data,
@@ -114,54 +77,46 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
       });
 
       if (response.ok) {
-        setLoader(false);
         window.alert("Invoice sent.");
-        // Reset form fields or navigate to another page
       } else {
         console.error("Error uploading pdf:", response.statusText);
-        window.alert("something went wrong, Please try again");
+        window.alert("Something went wrong. Please try again.");
       }
     } catch (error) {
       console.error("Error generating PDF:", error);
-      // Handle error appropriately
+      window.alert("Error generating PDF. Please try again.");
     } finally {
-      // Ensure styles are reset even if an error occurs
-      Object.keys(originalStyles).forEach((key) => {
-        element.style[key] = originalStyles[key];
-      });
       setLoader(false);
     }
   };
 
   return (
     <div>
+      {/* Scrollable preview shell — does NOT wrap invoiceContainer so html2canvas captures full height */}
+      <div style={{ overflow: "auto",
+         maxHeight: "75vh", border: "1px solid #dee2e6", 
+         borderRadius: "4px", 
+          }}>
       <div
         id="invoiceContainer"
-        className="border rounded bg-white"
+        className="bg-white"
         style={{
+          minWidth: "900px",
           width: "100%",
-          height: "800px", // Changed from fixed height
-          minHeight: "900px", // Added minimum height
-          overflow: "auto",
-          display: "flex",
-          flexDirection: "column",
-          padding: "20px",
-          // position: "relative",
+          padding: "32px 40px",
         }}
       >
         <div className="row">
-          <div className="col-md-8 mt-5">
+          <div className="col-md-8">
             <h3 className="text-uppercase">{company_registrated_name}</h3>
             <h1 className="display-3">INVOICE</h1>
           </div>
           <div className="col-md-4 d-flex align-items-center justify-content-center">
             <img
-              // className="img-fluid"
               src="/images/invoicelogo.png"
               alt="Logo"
               height={150}
               width={150}
-              // style={{ maxHeight: "250px", objectFit: "contain" }}
             />
           </div>
         </div>
@@ -174,8 +129,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
               <b>Name:</b> {name}
             </div>
             <div className="h6">
-              <b>Address:</b>
-              {/* {address} */}
+              <b>Address:</b> {address}
             </div>
             <div className="h6">
               <b>Contact:</b> {mobNo}
@@ -266,7 +220,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
         {/* Terms and Conditions */}
         <div className="mb-4 d-flex flex-row">
           <div className="font-weight-bold">TOTAL IN WORDS:</div>
-          <div className="ml-3 text-uppercase">One Hundred Only</div>
+          <div className="ml-3 text-uppercase">{priceToWords(totalPrice)}</div>
         </div>
         <div>
           <hr />
@@ -286,7 +240,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
 
         {/* Footer */}
         <div
-          className=" row text-center border-top p-3"
+          className="row text-center border-top p-3"
           style={{ backgroundColor: `${invoice_bill_yellow_color}` }}
         >
           <div className="col-md-6 text-left">
@@ -302,28 +256,35 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
           </div>
         </div>
       </div>
-      <div className="row mt-3 mb-3" style={{ marginLeft: "40%" }}>
-        <div className="col col-md-2 mr-5">
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              generatePDF();
-            }}
-          >
-            Generate & Send
-          </button>
-        </div>
-        <div className="col ml-5">
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              onClose();
-            }}
-          >
-            Close
-          </button>
-        </div>
       </div>
+
+      {/* Buttons — fixed at bottom center, independent of invoice width */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 999,
+          display: "flex",
+          gap: "16px",
+        }}
+      >
+        <button
+          className="btn btn-primary"
+          onClick={() => generatePDF()}
+        >
+          Generate & Send
+        </button>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => onClose()}
+        >
+          Close
+        </button>
+      </div>
+
       {loader && <Preloader />}
     </div>
   );

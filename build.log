@@ -2,7 +2,7 @@
 > build
 > next build
 
-  ▲ Next.js 14.2.30
+  ▲ Next.js 14.2.35
   - Environments: .env.production, .env
 
    Linting and checking validity of types ...
@@ -905,9 +905,6 @@ Failed to compile.
 673:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 735:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
-./src/components/Terms/TermsPage.js
-40:7  Error: Do not use an `<a>` element to navigate to `/privacy-policy/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
-
 ./src/components/Who-we-are/WhoWeAreInfo1.js
 15:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
@@ -916,6 +913,9 @@ Failed to compile.
 169:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 273:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 377:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/blogComponent/FirstSectionComp.js
+126:5  Warning: React Hook useMemo has a missing dependency: 'ArticleList'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/labTestComponent/common/CartPanel.js
 70:6  Warning: React Hook useEffect has a missing dependency: 'onUpdateCartItemCount'. Either include it or remove the dependency array. If 'onUpdateCartItemCount' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
@@ -937,7 +937,10 @@ Failed to compile.
 74:6  Warning: React Hook useEffect has a missing dependency: 'dispatch'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/registerDocComponent/lib/DoctorPrescriptionGenerator.js
-237:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+167:12  Error: Parsing error: Identifier 'canvas' has already been declared. (167:12)
+
+./src/components/superAdminComponent/AddDoctor/AddDoctorForm.js
+74:6  Warning: React Hook useEffect has missing dependencies: 'dispatch' and 'storedService'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/superAdminComponent/ConsultationFee.js
 26:6  Warning: React Hook useEffect has a missing dependency: 'storedConsultations'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -955,7 +958,7 @@ Failed to compile.
 36:6  Warning: React Hook useEffect has a missing dependency: 'storedService'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/components/superAdminComponent/invoice/generateInvoiceImage.js
-158:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+115:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Component/OtpScreen.js
 18:6  Warning: React Hook useEffect has a missing dependency: 'generateAndSendOtp'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -970,7 +973,7 @@ Failed to compile.
 14:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Footer/Footer4.js
-47:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+48:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/layout/Footer/Footer5.js
 15:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element

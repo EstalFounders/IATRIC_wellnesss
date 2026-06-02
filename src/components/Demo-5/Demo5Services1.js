@@ -7,6 +7,9 @@ import {
   HealthCampIcon,
   HomeCareIcon,
   LabInvestigation,
+  NursingCare,
+  NursingCareIcon,
+  PhysiotherapyIcon,
 } from "../../../public/svgIcon/all-department-svg-icon";
 
 const Demo5Services1 = () => {
@@ -22,23 +25,31 @@ const Demo5Services1 = () => {
   // ✅ Duplicate your `features[]` array locally
   const features = [
     {
-      title: "Consultation",
-      service: "Consultation",
+      title: "Doctor Consultation",
+      service: "consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
       icon: <GeneralPhysician size={70} />,
       btntext: "View Details",
     },
     {
-      title: "Nursing Services",
-      service: "home care",
+      title: "Nursing Care",
+      service: "nursing-services",
+      description:
+        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
+      icon: <NursingCareIcon size={70} />,
+      btntext: "View Details",
+    },
+    {
+      title: "Home Care",
+      service: "nursing-services",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
       icon: <HomeCareIcon size={70} />,
       btntext: "View Details",
     },
     {
-      title: "Lab Test",
+      title: "Blood Test & Diagnostics",
       service: "lab-test",
       description:
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
@@ -47,17 +58,24 @@ const Demo5Services1 = () => {
     },
     {
       title: "Community Care",
-      service: "corporate",
+      service: "community-care",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <HealthCampIcon size={70} />,
       btntext: "View Details",
     },
-    {      title: "Corporate Healthcare",
-      service: "corporate-healthcare",
+    {
+      title: "Corporate Healthcare",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon size={70} />,
+      btntext: "View Details",
+    },
+    {
+      title: "Physiotherapy",
+      description:
+        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      icon: <PhysiotherapyIcon size={70} />,
       btntext: "View Details",
     },
   ];
@@ -108,9 +126,10 @@ const Demo5Services1 = () => {
     marqueeRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // ✅ Click redirect
   const handleClick = (item) => {
-    router.push(`/service-details/?Service=${item.title.trim()}`);
+    if (item.service) {
+      router.push(`/service-details/?Service=${item.service}`);
+    }
   };
 
   return (
@@ -118,7 +137,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <h3 className="h3-md steelblue-color">Patient Services</h3>
+            <div className="font-weight-bold h1 text-uppercase">SERVICES</div>
           </div>
         </div>
 
@@ -147,7 +166,9 @@ const Demo5Services1 = () => {
                   >
                     <div className="service-nav-link-dept">
                       <div className="service-icon-dept">{item.icon}</div>
-                      <div className="service-title-dept">{item.title}</div>
+                      <div className="service-title-dept font-weight-bold">
+                        {item.title}
+                      </div>
                     </div>
                   </div>
                 ))}
