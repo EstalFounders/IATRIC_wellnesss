@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   api,
   company_registrated_name,
+  contact_no,
+  gst_no,
   invoice_bill_yellow_color,
 } from "../../../constant";
 import Preloader from "../../Preloader";
@@ -139,7 +141,10 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
             <h4>FROM:</h4>
             <div>
               HEALTHPATH F-33 RIGROSS COMPLEX C,BLOCK SECTOR 57 GURGAON ,HARYANA
-              CONTACT : +91 84485 59925 GSTIN : XXXXXXXXXXXXXX
+              CONTACT : {contact_no} 
+              <div>
+              GSTIN : {gst_no}
+              </div>
             </div>
           </div>
           <div className="col-md-4 text-md-end">

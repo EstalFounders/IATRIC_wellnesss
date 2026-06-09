@@ -10,7 +10,10 @@ const Demo5Pricing3 = () => {
           <div className="col-lg-6">
             <div className="txt-block pc-30 mb-40">
               {/* Section ID */}
-              <span className="blue-color" style={{ fontSize: "1.8rem", fontWeight: "600" }}>
+              <span
+                className="blue-color"
+                style={{ fontSize: "1.8rem", fontWeight: "600" }}
+              >
                 Healthpath pricing
               </span>
               {/* Title */}
@@ -45,28 +48,28 @@ const Demo5Pricing3 = () => {
                       <th scope="row">1</th>
                       <td>X-Ray</td>
                       <td>
-                        From <span>$325.00</span>
+                        <span className="text-muted">Coming Soon</span>
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">2</th>
                       <td>Magnetic Resonance Imaging</td>
                       <td>
-                        From <span>$435.00</span>
+                        <span className="text-muted">Coming Soon</span>
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">3</th>
                       <td>Computer Tomography</td>
                       <td>
-                        From <span>$315.00</span>
+                        <span className="text-muted">Coming Soon</span>
                       </td>
                     </tr>
                     <tr className="last-tr">
                       <th scope="row">4</th>
                       <td>Laboratory Tests</td>
                       <td>
-                        From <span>$90.00</span>
+                        <span className="text-muted">Coming Soon</span>
                       </td>
                     </tr>
                   </tbody>

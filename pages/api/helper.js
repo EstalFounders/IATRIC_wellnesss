@@ -417,6 +417,13 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
 
   console.log(slot, "updated slot");
 
+  // Ensure meeting URLs have https:// prefix before storing
+  const ensureHttps = (url) => {
+    if (!url || typeof url !== "string") return url;
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://${url}`;
+  };
+
   // Step 2: Create the appointment
   const appointment = await Appointment.create({
     meetingId,
@@ -429,8 +436,8 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     consultationType,
     consultationprice,
     appointmentTime,
-    patientMeetingUrl,
-    doctorMeetingUrl,
+    patientMeetingUrl: ensureHttps(patientMeetingUrl),
+    doctorMeetingUrl: ensureHttps(doctorMeetingUrl),
     prescriptionUrl,
   });
 
