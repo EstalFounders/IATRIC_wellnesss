@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Chip from "@mui/material/Chip";
 import { color_schema } from "../../../constant";
 
 const FREQUENCIES = [
@@ -14,150 +17,121 @@ const FREQUENCIES = [
 
 const TIMES = ["Morning", "Afternoon", "Evening", "Night"];
 
-const pillBase = {
-  padding: "5px 14px",
-  borderRadius: "999px",
-  cursor: "pointer",
-  fontSize: "13px",
-  fontWeight: 500,
-  transition: "all 0.15s ease",
-  lineHeight: "1.5",
-  display: "inline-flex",
-  alignItems: "center",
-  background: "none",
-  whiteSpace: "nowrap",
+/**
+ * MUI theme overrides for compact Autocomplete styling.
+ * Applied via sx prop to keep inputs compact and consistent.
+ */
+const autocompleteSx = {
+  "& .MuiAutocomplete-inputRoot": {
+    paddingTop: "2px",
+    paddingBottom: "2px",
+    fontSize: "13px",
+  },
+  "& .MuiAutocomplete-input": {
+    padding: "2px 4px !important",
+    fontSize: "13px",
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#ccc",
+  },
+  "& .MuiChip-root": {
+    height: "22px",
+    fontSize: "11px",
+  },
 };
 
-const pillInactive = {
-  ...pillBase,
-  border: "1.5px solid #ccc",
-  color: "#444",
-};
-
-const pillActive = {
-  ...pillBase,
-  border: `2px solid ${color_schema.green}`,
-  background: color_schema.green,
-  color: "#fff",
+const labelStyle = {
+  fontWeight: 600,
+  fontSize: "12px",
+  marginBottom: "2px",
+  display: "block",
+  color: "#333",
 };
 
 const FrequencyTimeSelector = ({ onFrequencyChange, onTimesChange }) => {
   const [frequency, setFrequency] = useState("");
   const [selectedTimes, setSelectedTimes] = useState([]);
 
-  const handleFrequencyClick = (freq) => {
-    const next = frequency === freq ? "" : freq;
+  const handleFrequencyChange = (_event, newValue) => {
+    // newValue is the selected frequency string or null (when cleared)
+    const next = newValue ?? "";
     setFrequency(next);
     onFrequencyChange?.(next);
   };
 
-  const handleTimeToggle = (time) => {
-    const next = selectedTimes.includes(time)
-      ? selectedTimes.filter((t) => t !== time)
-      : [...selectedTimes, time];
-    setSelectedTimes(next);
-    onTimesChange?.(next);
-  };
-
-  const removeTime = (time) => {
-    const next = selectedTimes.filter((t) => t !== time);
-    setSelectedTimes(next);
-    onTimesChange?.(next);
+  const handleTimesChange = (_event, newValue) => {
+    // newValue is an array of selected time strings
+    setSelectedTimes(newValue);
+    onTimesChange?.(newValue);
   };
 
   return (
-    <div style={{ display: "grid", gap: "16px" }}>
-      {/* ── Frequency ── */}
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* ── Frequency (searchable single-select dropdown) ── */}
       <div>
-        <label style={{ fontWeight: 600, fontSize: "13px", marginBottom: "8px", display: "block" }}>
-          Frequency:
-        </label>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {FREQUENCIES.map((freq) => (
-            <button
-              key={freq}
-              type="button"
-              onClick={() => handleFrequencyClick(freq)}
-              style={frequency === freq ? pillActive : pillInactive}
-            >
-              {freq}
-            </button>
-          ))}
-        </div>
-
-        {frequency && (
-          <div style={{ marginTop: "8px", fontSize: "13px", color: "#555" }}>
-            Selected:{" "}
-            <strong style={{ color: `${color_schema.yellow}` }}>{frequency}</strong>
-          </div>
-        )}
+        <label style={labelStyle}>Frequency:</label>
+        <Autocomplete
+          size="small"
+          options={FREQUENCIES}
+          value={frequency || null}
+          onChange={handleFrequencyChange}
+          disableClearable={false}
+          clearOnEscape
+          fullWidth
+          sx={autocompleteSx}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Search or select frequency..."
+              variant="outlined"
+              size="small"
+            />
+          )}
+        />
       </div>
 
-      {/* ── Time ── */}
+      {/* ── Time (multi-select dropdown with chips) ── */}
       <div>
-        <label style={{ fontWeight: 600, fontSize: "13px", marginBottom: "8px", display: "block" }}>
-          Time:
-        </label>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {TIMES.map((time) => {
-            const active = selectedTimes.includes(time);
-            return (
-              <button
-                key={time}
-                type="button"
-                onClick={() => handleTimeToggle(time)}
-                style={active ? pillActive : pillInactive}
-              >
-                {time}
-              </button>
-            );
-          })}
-        </div>
-
-        {selectedTimes.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "10px" }}>
-            {selectedTimes.map((time) => (
-              <span
-                key={time}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  padding: "3px 10px 3px 12px",
-                  borderRadius: "999px",
-                  background: "#e8f0fe",
-                  color: `${color_schema.yellow}`,
-                  fontSize: "12px",
-                  fontWeight: 600,
+        <label style={labelStyle}>Time:</label>
+        <Autocomplete
+          size="small"
+          multiple
+          options={TIMES}
+          value={selectedTimes}
+          onChange={handleTimesChange}
+          disableClearable={false}
+          fullWidth
+          sx={autocompleteSx}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option}
+                size="small"
+                sx={{
+                  height: "22px",
+                  fontSize: "11px",
+                  backgroundColor: "#e8f0fe",
                   border: "1px solid #bfcdfa",
+                  color: color_schema.yellow,
+                  fontWeight: 600,
+                  "& .MuiChip-deleteIcon": {
+                    color: color_schema.yellow,
+                    fontSize: "16px",
+                  },
                 }}
-              >
-                {time}
-                <button
-                  type="button"
-                  onClick={() => removeTime(time)}
-                  aria-label={`Remove ${time}`}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: `${color_schema.yellow}`,
-                    padding: "0 2px",
-                    fontSize: "15px",
-                    lineHeight: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    fontWeight: 700,
-                  }}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Select time..."
+              variant="outlined"
+              size="small"
+            />
+          )}
+        />
       </div>
     </div>
   );

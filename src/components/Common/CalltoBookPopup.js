@@ -9,7 +9,7 @@ import { ConsultationButton } from "./commonUi";
 import { color_schema } from "../../constant";
 import { isMobileValid } from "../../helper";
 
-const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
+const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
   const [mobNo, setMobNo] = useState("");
   const [response, setResponse] = useState("");
 
@@ -23,7 +23,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit }) => {
       return;
     }
     setResponse("");
-    onSubmit(mobNo);
+    onOtpRequired(mobNo);
   };
 
   return (

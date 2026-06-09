@@ -26,8 +26,8 @@ const Footer4 = () => {
   };
 
   const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+    { label: "Dial", action: dial,icon: 0 },
+    { label: "Whatsapp", action: openSupportWhatsAppWeb,icon: 1 },
   ];
 
   const handleEmail = () => {

@@ -4,6 +4,23 @@ import { api } from "../../../constant";
 import { postMedicineApi } from "../utils/helperApi";
 import FrequencyTimeSelector from "./FrequencyTimeSelector";
 
+/* ── Shared compact input/select styles ── */
+const inputStyle = {
+  padding: "6px 8px",
+  borderRadius: "5px",
+  border: "1px solid #ccc",
+  width: "100%",
+  fontSize: "13px",
+};
+
+const labelStyle = {
+  fontWeight: 600,
+  fontSize: "12px",
+  marginBottom: "2px",
+  display: "block",
+  color: "#333",
+};
+
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
   const [medicineGeneric, setMedicineGeneric] = useState("");
@@ -146,20 +163,16 @@ const MedicineForm = ({ onChange }) => {
   };
 
   return (
-    <div style={{ marginBottom: "20px" }}>
-      <div style={{ display: "grid", gap: "10px" }}>
-        <div className="row">
-          <div className="col mt-3" xs={12} md={8}>
-            <label>
+    <div style={{ marginBottom: "12px" }}>
+      <div style={{ display: "grid", gap: "6px" }}>
+        {/* ── Row 1: Unit + Medicine Name ── */}
+        <Row>
+          <Col xs={12} md={8}>
+            <label style={labelStyle}>
               UNIT:
               <select
                 name="unit"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onChange={handleInputChange}
                 value={unit}
               >
@@ -173,32 +186,25 @@ const MedicineForm = ({ onChange }) => {
                 <option value="PUFF">PUFF</option>
                 <option value="PACKET">PACKET</option>
                 <option value="SACHET">SACHET</option>
-                {/* Add more options as needed */}
               </select>
             </label>
-          </div>
-          <div className="col mt-3" xs={12} md={4}>
-            <label>
+          </Col>
+          <Col xs={12} md={4}>
+            <label style={labelStyle}>
               Medicine Name:
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
                   name="medicineName"
                   value={medicineName}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    width: "100%",
-                    marginRight: "10px",
-                  }}
+                  style={inputStyle}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   autoComplete="off"
                 />
                 {loading && (
                   <small
-                    style={{ position: "absolute", right: "10px", top: "10px" }}
+                    style={{ position: "absolute", right: "8px", top: "8px" }}
                   >
                     ...
                   </small>
@@ -210,7 +216,7 @@ const MedicineForm = ({ onChange }) => {
                       top: "100%",
                       left: 0,
                       width: "100%",
-                      maxHeight: "200px",
+                      maxHeight: "180px",
                       overflowY: "auto",
                       backgroundColor: "white",
                       border: "1px solid #ccc",
@@ -222,7 +228,7 @@ const MedicineForm = ({ onChange }) => {
                       <div
                         key={medicine._id}
                         style={{
-                          padding: "8px",
+                          padding: "6px 8px",
                           cursor: "pointer",
                           backgroundColor:
                             index === selectedIndex ? "#e0e0e0" : "white",
@@ -247,7 +253,7 @@ const MedicineForm = ({ onChange }) => {
                         top: "100%",
                         left: 0,
                         width: "100%",
-                        padding: "8px",
+                        padding: "6px 8px",
                         backgroundColor: "white",
                         border: "1px solid #ccc",
                         borderRadius: "5px",
@@ -257,7 +263,7 @@ const MedicineForm = ({ onChange }) => {
                         alignItems: "center",
                       }}
                     >
-                      <span style={{ fontStyle: "italic", color: "#777" }}>
+                      <span style={{ fontStyle: "italic", color: "#777", fontSize: "13px" }}>
                         No medicines found
                       </span>
                       <button
@@ -279,58 +285,50 @@ const MedicineForm = ({ onChange }) => {
                           });
                         }}
                       >
-                        Add &quot;{medicineName}&quot; anyway
+                        Add "{medicineName}" anyway
                       </button>
                     </div>
                   )}
               </div>
             </label>
             {medicineGeneric && (
-              <small style={{ display: "block", color: "#555", marginTop: "3px" }}>
+              <small style={{ display: "block", color: "#555", marginTop: "2px", fontSize: "11px" }}>
                 Generic: <em>{medicineGeneric}</em>
               </small>
             )}
-            {error && <div className="text-danger small">{error}</div>}
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <label>
+            {error && <div className="text-danger small" style={{ fontSize: "11px" }}>{error}</div>}
+          </Col>
+        </Row>
+
+        {/* ── Row 2: Dosage + Days (combined on one row) ── */}
+        <Row>
+          <Col xs={12} md={6}>
+            <label style={labelStyle}>
               Dosage:
               <input
                 type="text"
                 name="dosage"
-                style={{
-                  padding: "8px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onChange={handleInputChange}
               />
             </label>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <label>
+          </Col>
+          <Col xs={12} md={6}>
+            <label style={labelStyle}>
               Days:
               <input
                 type="text"
                 name="days"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onChange={handleInputChange}
               />
             </label>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
+          </Col>
+        </Row>
+
+        {/* ── Row 3: FrequencyTimeSelector + No of times ── */}
+        <Row>
+          <Col xs={12} md={8}>
             <FrequencyTimeSelector
               onFrequencyChange={(freq) => {
                 setFrequency(freq);
@@ -361,33 +359,25 @@ const MedicineForm = ({ onChange }) => {
                 });
               }}
             />
-          </div>
-          <div className="col">
-            <label>
+          </Col>
+          <Col xs={12} md={4}>
+            <label style={labelStyle}>
               No of times:
               <input
                 name="noOfTimes"
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onChange={handleInputChange}
               />
             </label>
-          </div>
-        </div>
-        <label>
+          </Col>
+        </Row>
+
+        {/* ── Row 4: Medication Schedule ── */}
+        <label style={labelStyle}>
           Medication Schedule:
           <select
             name="medicationSchedule"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
+            style={inputStyle}
             onChange={handleInputChange}
             value={medicationSchedule}
           >
@@ -396,7 +386,6 @@ const MedicineForm = ({ onChange }) => {
             <option value="BEFORE MEAL">BEFORE MEAL</option>
             <option value="AFTER MEAL">AFTER MEAL</option>
             <option value="SOS">SOS</option>
-            {/* Add more options as needed */}
           </select>
         </label>
       </div>

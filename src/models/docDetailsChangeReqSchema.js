@@ -10,7 +10,7 @@ const DocDetailsChangeReqSchema = new Schema({
   },
   name: {
     type: String,
-    required: true
+    required: false
   },
   updatedFields: { type: Object, required: true }, // The fields the doctor wants to update
   status: { type: String, default: "pending" }, // "pending", "approved", "rejected"

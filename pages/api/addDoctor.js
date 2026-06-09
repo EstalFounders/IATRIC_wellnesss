@@ -186,6 +186,7 @@ export default async function handler(req, res) {
     }
   } else if (req.method === "GET") {
     console.log("get method calling");
+    
     try {
       const doctors = await Doctor.find();
       res.status(200).json(doctors);

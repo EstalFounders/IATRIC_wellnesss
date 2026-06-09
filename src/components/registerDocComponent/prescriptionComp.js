@@ -1,6 +1,6 @@
 // pages/homepage.js
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Button, Col, Row } from "react-bootstrap";
 import MedicineForm from "../registerDocComponent/lib/MedicineForm";
@@ -33,7 +33,7 @@ const PrescriptionComp = () => {
   const [medicineForms, setMedicineForms] = useState([]);
   const [showPasswordPopup, setPasswordPopup] = useState(false);
   const doctorInfo = JSON.parse(
-    sessionStorage.getItem(doctor_info_local_storage)
+    sessionStorage.getItem(doctor_info_local_storage),
   );
   const [doctors, setDoctors] = useState(doctorInfo.user);
   const [doctorPassword, setDoctorPassword] = useState(doctors.password);
@@ -48,11 +48,13 @@ const PrescriptionComp = () => {
   const [testAdviceSuggestions, setTestAdviceSuggestions] = useState([]);
   const [showTestAdviceDropdown, setShowTestAdviceDropdown] = useState(false);
   const [allTestNames, setAllTestNames] = useState([]);
+  const [testAdviceDropdownStyle, setTestAdviceDropdownStyle] = useState({});
+  const testAdviceContainerRef = useRef(null);
 
-  console.log(doctorInfo, "doctoinfo", appointments, "appointments");
   const [updatedFormDetails, setUpdatedFormDetails] = useState({
     doctorName: "",
     doctorDegree: doctorInfo.user.degree,
+    doctorSepecialization: "",
     doctorMobNo: doctorInfo.user.mobileNumber,
     patientName: "",
     age: "",
@@ -128,21 +130,15 @@ const PrescriptionComp = () => {
 
   // Function to handle preview button click
   const handlePreview = () => {
-    // if (!doctorPassword) {
-    //   return window.alert("Please select doctor");
-    // }
     setPasswordPopup(true);
-    setUpdatedFormDetails({
-      ...updatedFormDetails,
+    setUpdatedFormDetails((prev) => ({
+      ...prev,
       medicineInfo: [...medicineForms],
       doctorId: doctors._id,
       doctorName: doctors.name,
       doctorStampUrl: doctors.doctorStampUrl,
       doctorSignatureUrl: doctors.doctorSignatureUrl,
-    });
-    // togglePreview();
-    // Optionally, you can also perform any other actions here before showing the preview
-    console.log(updatedFormDetails, "updated form details before");
+    }));
   };
 
   // useEffect(() => {
@@ -165,16 +161,17 @@ const PrescriptionComp = () => {
   // };
 
   const handleInputChange = (event) => {
-    const value = event.target.value;
+    const value = event?.target?.value;
+    if (value == null) return;
     console.log(value, "value in handle input change 149");
     setSearchTerm(value);
     // Show dropdown immediately when input changes
     setShowDropdown(true);
 
-    const filteredAppointments = appointments.filter(
+    const filteredAppointments = (appointments || []).filter(
       (appointment) =>
-        appointment.name &&
-        appointment.name.toLowerCase().includes(value.toLowerCase())
+        appointment?.name &&
+        appointment.name.toLowerCase().includes(value.toLowerCase()),
     );
     setSuggestions(filteredAppointments);
 
@@ -191,7 +188,6 @@ const PrescriptionComp = () => {
       setShowDropdown(true);
     }
     setIsEditing(false); // Reset to view mode on click
-    setSelectedName("");
   };
 
   const handleSuggestionClick = (appointment) => {
@@ -228,10 +224,47 @@ const PrescriptionComp = () => {
     setSuggestions(appointments);
   }, [appointments]);
 
+  useEffect(() => {
+    // Initialize suggestions with all appointments on initial load
+    if (!isEditing) {
+      // Extract the last 4 digits of the mobile number if it exists, otherwise use a fallback string
+      const lastDigits = updatedFormDetails.patientMobNo
+        ? updatedFormDetails.patientMobNo.slice(-4)
+        : "0000";
+
+      // Fallback ID format: PatientName_1234 (sanitized to remove spaces)
+      const fallbackId = `${(updatedFormDetails.patientName || "Patient").replace(/\s+/g, "")}_${lastDigits}`;
+
+      handleOtherFormDetailsChange({
+        patientId: updatedFormDetails.patientId || fallbackId,
+      });
+    }
+  }, [isEditing]);
+
+  const updateTestAdviceDropdownPosition = useCallback(() => {
+    if (testAdviceContainerRef.current) {
+      const rect = testAdviceContainerRef.current.getBoundingClientRect();
+      setTestAdviceDropdownStyle({
+        position: "fixed",
+        top: `${rect.bottom + 2}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        zIndex: 10000,
+        backgroundColor: "white",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        maxHeight: "200px",
+        overflowY: "auto",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+      });
+    }
+  }, []);
+
   const handleTestAdviceInputChange = (event) => {
     const value = event.target.value;
     setTestAdviceSearchTerm(value);
     setShowTestAdviceDropdown(true);
+    setTimeout(updateTestAdviceDropdownPosition, 0);
 
     if (!value.trim()) {
       // Show all available tests when search is empty
@@ -240,10 +273,20 @@ const PrescriptionComp = () => {
     }
 
     const searchLower = value.toLowerCase();
-    const filteredAdvices = (allTestNames || []).filter((name) =>
-      (name && typeof name === 'string' && name.toLowerCase().includes(searchLower))
+    const filteredAdvices = (allTestNames || []).filter(
+      (name) =>
+        name &&
+        typeof name === "string" &&
+        name.toLowerCase().includes(searchLower),
     );
-    console.log("Search value:", value, "filtered:", filteredAdvices, "all:", allTestNames);
+    console.log(
+      "Search value:",
+      value,
+      "filtered:",
+      filteredAdvices,
+      "all:",
+      allTestNames,
+    );
     setTestAdviceSuggestions(filteredAdvices.slice(0, 50));
   };
 
@@ -258,10 +301,20 @@ const PrescriptionComp = () => {
     setShowTestAdviceDropdown(false);
   };
 
+  const handleTestAdviceFocus = () => {
+    if (testAdviceSearchTerm || allTestNames.length > 0) {
+      setShowTestAdviceDropdown(true);
+      if (!testAdviceSearchTerm.trim()) {
+        setTestAdviceSuggestions(allTestNames.slice(0, 50));
+      }
+      setTimeout(updateTestAdviceDropdownPosition, 0);
+    }
+  };
+
   const handleInputKeyDown = (event) => {
     if (event.key === "Enter" && testAdviceSearchTerm) {
       const matchingTest = allTestNames.find(
-        (name) => name.toLowerCase() === testAdviceSearchTerm.toLowerCase()
+        (name) => name.toLowerCase() === testAdviceSearchTerm.toLowerCase(),
       );
       if (matchingTest) {
         setUpdatedFormDetails((prevDetails) => ({
@@ -279,9 +332,10 @@ const PrescriptionComp = () => {
   };
 
   const handleTestAdviceBlur = () => {
+    // Increased timeout to allow suggestion click to register
     setTimeout(() => {
       setShowTestAdviceDropdown(false);
-    }, 100);
+    }, 200);
   };
 
   const handleRemoveAdvice = (index) => {
@@ -327,6 +381,20 @@ const PrescriptionComp = () => {
   useEffect(() => {
     fetchAvailableTests();
   }, []);
+
+  // Reposition dropdown on scroll/resize while visible, to keep it anchored to the input
+  useEffect(() => {
+    if (!showTestAdviceDropdown) return;
+    const handleScrollOrResize = () => {
+      updateTestAdviceDropdownPosition();
+    };
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [showTestAdviceDropdown, updateTestAdviceDropdownPosition]);
 
   // CSS for the modal
   const modalStyle = {
@@ -397,22 +465,42 @@ const PrescriptionComp = () => {
                     }}
                   >
                     {isEditing ? (
-                      <input
-                        type="text"
-                        name="patientName"
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                          marginRight: "8px",
-                        }}
-                        required
-                        value={searchTerm}
-                        onChange={handleInputChange}
-                        onBlur={handleBlur}
-                        autoComplete="off"
-                      />
+                      <>
+                        <input
+                          type="text"
+                          name="patientName"
+                          style={{
+                            padding: "10px",
+                            borderRadius: "5px",
+                            border: "1px solid #ccc",
+                            width: "100%",
+                            marginRight: "8px",
+                          }}
+                          required
+                          value={searchTerm}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                        />
+                        <input
+                          type="tel"
+                          name="patientNo"
+                          placeholder="Mobile No"
+                          style={{
+                            padding: "10px",
+                            borderRadius: "5px",
+                            border: "1px solid #ccc",
+                            width: "100%",
+                            marginRight: "8px",
+                          }}
+                          value={updatedFormDetails.patientNo}
+                          onChange={(e) =>
+                            handleOtherFormDetailsChange({
+                              patientNo: e.target.value,
+                            })
+                          }
+                        />
+                      </>
                     ) : (
                       <div
                         style={{
@@ -429,12 +517,7 @@ const PrescriptionComp = () => {
                         {selectedName || "Select Patient"}
                       </div>
                     )}
-                    {console.log(
-                      isEditing,
-                      "isEditing",
-                      selectedName,
-                      "selectedName"
-                    )}
+
                     {!isEditing && selectedName && (
                       <BiSolidPencil size={16} onClick={handleEditClick} />
                     )}
@@ -468,7 +551,7 @@ const PrescriptionComp = () => {
                           .filter(
                             (appointment) =>
                               appointment.status !==
-                              appointment_status.completed
+                              appointment_status.completed,
                           )
                           .map((appointment) => (
                             <div
@@ -693,7 +776,7 @@ const PrescriptionComp = () => {
         </div>
         <div style={{ marginBottom: "20px" }}>
           <h2>Test Advices</h2>
-          <div style={{ position: "relative" }}>
+          <div ref={testAdviceContainerRef} style={{ position: "relative" }}>
             <input
               name="testAdvicesInput"
               type="text"
@@ -707,23 +790,11 @@ const PrescriptionComp = () => {
               onChange={handleTestAdviceInputChange}
               onKeyDown={handleInputKeyDown}
               onBlur={handleTestAdviceBlur}
+              onFocus={handleTestAdviceFocus}
+              autoComplete="off"
             />
             {showTestAdviceDropdown && testAdviceSuggestions.length > 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(100% + 2px)",
-                  left: 0,
-                  width: "100%",
-                  backgroundColor: "white",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  zIndex: 10,
-                  maxHeight: "200px",
-                  overflowY: "auto",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                }}
-              >
+              <div style={testAdviceDropdownStyle}>
                 {testAdviceSuggestions.map((advice, index) => (
                   <div
                     key={advice}
@@ -734,8 +805,12 @@ const PrescriptionComp = () => {
                       transition: "background-color 0.15s",
                     }}
                     onClick={() => handleTestAdviceSuggestionClick(advice)}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#f5f5f5")}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#f5f5f5")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "white")
+                    }
                   >
                     {advice}
                   </div>
@@ -747,19 +822,13 @@ const PrescriptionComp = () => {
               testAdviceSuggestions.length === 0 && (
                 <div
                   style={{
-                    position: "absolute",
-                    top: "calc(100% + 2px)",
-                    left: 0,
-                    width: "100%",
-                    backgroundColor: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                    zIndex: 10,
+                    ...testAdviceDropdownStyle,
+                    maxHeight: "auto",
+                    overflowY: "visible",
                     padding: "12px",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   }}
                 >
                   <span style={{ fontStyle: "italic", color: "#777" }}>
@@ -771,13 +840,16 @@ const PrescriptionComp = () => {
                     onClick={() => {
                       setUpdatedFormDetails((prevDetails) => ({
                         ...prevDetails,
-                        testAdvices: [...prevDetails.testAdvices, testAdviceSearchTerm],
+                        testAdvices: [
+                          ...prevDetails.testAdvices,
+                          testAdviceSearchTerm,
+                        ],
                       }));
                       setTestAdviceSearchTerm("");
                       setShowTestAdviceDropdown(false);
                     }}
                   >
-                    Add &quot;{testAdviceSearchTerm}&quot; anyway
+                    Add "{testAdviceSearchTerm}" anyway
                   </Button>
                 </div>
               )}
@@ -857,6 +929,7 @@ const PrescriptionComp = () => {
             onSubmit={doctorPasswordValidation}
           />
         )}
+        <div style={{ height: "30px" }} />
       </div>
       {/* Preview Modal */}
       {previewVisible && (
