@@ -159,6 +159,7 @@ export const serviceOffered = {
 };
 
 export const CHOOSE_TIME = "ChooseTime";
+export const IS_NOW = "Now";
 
 export const address = "Sector 57 , Gurgaon, Haryana-122003";
 export const facebook_page_url =
@@ -198,3 +199,4 @@ export const vapidKey =
   "BKcSS5CS3PZ8UEH5QxWcNzzeGDLLIra1YN8QRjEk9_36aZ_dkBPSiQ06XNOoeLAhkn0RT_yj5-zZLhXOB_YyrLE";
 
 export const callToBook = "Get a Call back";
+export const gst_no = "06AALCT8239J1ZS";

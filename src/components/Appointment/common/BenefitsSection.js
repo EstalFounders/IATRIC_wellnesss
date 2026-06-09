@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { FaHospital, FaUserCheck, FaClock } from "react-icons/fa";
 import { MdAccessAlarms } from "react-icons/md";
+import { useRouter } from "next/router";
 
 const benefits = [
   {
@@ -29,6 +30,12 @@ const benefits = [
 ];
 
 const BenefitSection = () => {
+  const router = useRouter();
+
+  const handleBenefitClick = () => {
+    router.push("/appointment");
+  };
+
   return (
     <div className="">
       <Container className="py-5">
@@ -37,8 +44,9 @@ const BenefitSection = () => {
           {benefits.map((benefit, index) => (
             <Col key={index} xs={12} sm={6} md={3} className="mb-4">
               <Card
-                className="h-100 shadow-sm rounded"
-                style={{ borderRadius: "1rem" }}
+                className="h-100 shadow-sm rounded clickable-div"
+                style={{ borderRadius: "1rem", cursor: "pointer" }}
+                onClick={handleBenefitClick}
               >
                 <Card.Body className="text-center">
                   <div className="mb-3">{benefit.icon}</div>

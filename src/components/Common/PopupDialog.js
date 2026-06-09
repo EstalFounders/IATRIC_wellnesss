@@ -57,7 +57,14 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
                   <StyledListItem
                     button
                     key={index}
-                    onClick={() => handleNavigate(option.navigateTo)}
+                    onClick={() => {
+                      if (option.action) {
+                        option.action();
+                        onClose();
+                      } else {
+                        handleNavigate(option.navigateTo);
+                      }
+                    }}
                     className="border mt-1"
                   >
                     <Row>

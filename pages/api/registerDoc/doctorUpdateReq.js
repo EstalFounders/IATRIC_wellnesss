@@ -36,6 +36,8 @@ export default async function handler(req, res) {
         updatedFields: changedFields,
       });
 
+      console.log(newRequest, "new request");
+
       await newRequest.save();
 
       res

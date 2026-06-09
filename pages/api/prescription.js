@@ -31,36 +31,46 @@ export default async function handler(req, res) {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const { prescriptionUrl, appointmentId } = req.body;
+    // Destructure explicit fields from req.body to safely use as lookups or fallbacks
+    // patientNo is sent from the frontend (dynamic mobile input); patientMobNo from DB lookup
+    const { prescriptionUrl, appointmentId, name, patientNo, patientMobNo } = req.body;
 
     console.log("prescriptionUrl", prescriptionUrl, "appointmentId", appointmentId);
 
-    const updateStatus = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      {
-        prescriptionUrl: prescriptionUrl,
-        status: appointment_status.completed,
-      },
-      { new: true, session }
-    );
+    let updateStatus = null;
 
-    if (!updateStatus) {
-      throw new Error("Failed to update appointment status");
+    // 1. Only query DB if appointmentId exists and is structurally a valid Mongoose ObjectId
+    if (appointmentId && mongoose.Types.ObjectId.isValid(appointmentId)) {
+      updateStatus = await Appointment.findByIdAndUpdate(
+        appointmentId,
+        {
+          prescriptionUrl: prescriptionUrl,
+          status: appointment_status.completed,
+        },
+        { new: true, session }
+      );
     }
 
-    // Commit BEFORE the WhatsApp call so a network failure there
-    // cannot roll back the prescriptionUrl write.
+    // Commit the database transaction safely
     await session.commitTransaction();
     session.endSession();
     session = null;
 
-    // WhatsApp notification — failure is logged but does not undo the DB write.
+    // 2. WhatsApp Notification Flow
     try {
-      await sendWhatsAppConfirmation(
-        formatPhoneNumber(updateStatus.patientMobNo.toString()),
-        { patient_name: updateStatus.name, prescription_url: prescriptionUrl },
-        WHATSAPP_PRESCRIPTION_TEMPLATE
-      );
+      // Determine recipient details (use updated DB values, or fall back to payload fields)
+      const recipientNumber = updateStatus?.patientMobNo || patientNo || patientMobNo;
+      const recipientName = updateStatus?.name || name || "Patient";
+
+      if (recipientNumber) {
+        await sendWhatsAppConfirmation(
+          formatPhoneNumber(recipientNumber.toString()),
+          { patient_name: recipientName, prescription_url: prescriptionUrl },
+          WHATSAPP_PRESCRIPTION_TEMPLATE
+        );
+      } else {
+        console.warn("Skipping WhatsApp: No phone number provided in request or database.");
+      }
     } catch (whatsappError) {
       console.error("WhatsApp prescription notification failed:", whatsappError);
     }
