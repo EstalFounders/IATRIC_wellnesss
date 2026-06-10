@@ -10,7 +10,6 @@
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   pointer-events: all;
-<<<<<<< HEAD
   will-change: opacity;
   transform: translateZ(0);
   animation: fadeIn 0.25s ease forwards;
@@ -29,12 +28,4 @@
 @keyframes fadeOut {
   from { opacity: 1; }
   to   { opacity: 0; }
-=======
-  animation: fadeIn 0.25s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
->>>>>>> 6a241c1226b3b5aa3bf3c5f1f64e1141f1dca89f
 }

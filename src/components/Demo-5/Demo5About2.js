@@ -8,11 +8,8 @@ import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
 import { useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
-<<<<<<< HEAD
 import WhatsappConfirmationModel from "../Appointment/modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
-=======
->>>>>>> 6a241c1226b3b5aa3bf3c5f1f64e1141f1dca89f
 
 const Demo5About2 = () => {
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
@@ -43,6 +40,7 @@ const Demo5About2 = () => {
 
   const consultationTypes = useSelector(
     (state) => state.otherConfigSlice.activeConsultation,
+    (state) => state.otherConfigSlice.activeConsultation,
   );
 
   const handleConsultationTypeOpenDialog = () => {
@@ -68,7 +66,6 @@ const Demo5About2 = () => {
     setOpenSnackBar(false);
   };
 
-<<<<<<< HEAD
   const handleOtpRequired = (mobNo) => {
     setOtpMobNo(mobNo);
     setIsCalltoBookDialog(false);
@@ -153,78 +150,6 @@ const Demo5About2 = () => {
               <Snackbar
                 open={openSnackBar}
                 autoHideDuration={6000}
-=======
-  return (
-    <section id="about-2" className="about-section division">
-      <div className="container">
-        {/* Content Boxes */}
-        <div className="abox-2-holder py-2">
-          <div className="text-center mb-5">
-            <h1 className="steelblue-color">Welcome to Healthpath</h1>
-            <div className="h5 mx-auto steelblue-color w-100">
-              At Healthpath, we are committed to provide expert medical care.{" "}
-              <br /> We offer all time seamless doctor consultation, nursing
-              care, home care, lab test diagnostics and coporate healthcare
-              <br />
-              <div
-                className="font-weight-bold h4 mt-2"
-                style={{ color: "#3b5f1d" }}
-              >
-                Book Online With Our Experienced Team
-              </div>
-            </div>
-            <p className="mt-3 h3">
-              <strong>Monday – Sunday | 8:00 AM - 8:00 PM</strong>
-            </p>
-
-            {/* Buttons */}
-            <div className="mt-4 d-flex justify-content-center flex-wrap gap-3">
-              <div>
-                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
-                  <div className="">Book Now</div>
-                </ConsultationButton>
-              </div>
-              <div className="ml-3">
-                <ConsultationButton onClick={handleOpenCalltoBookDialog}>
-                  {/* <FaPhoneAlt className="mr-2" /> */}
-                  {callToBook}
-                </ConsultationButton>
-              </div>
-              <hr className="w-75" />
-              <div className="row d-flex justify-content-center align-items-center">
-                <div className="col-md-8 mb-4">
-                  <div className="h-100 p-4 text-center">
-                    <h2 className="steelblue-color mb-3">Our Doctors Panel</h2>
-                    <div className="h5 steelblue-color mx-auto w-100 pb-10">
-                      Browse through our panel of experienced and certified
-                      doctors. Available for online and offline consultations
-                      across India.
-                    </div>
-                    <ConsultationButton path="/all-doctors">
-                      View Doctors
-                    </ConsultationButton>
-                  </div>
-                </div>
-              </div>
-              {/* End row */}
-              <PopupDialog
-                isOpen={isConsultationTypeOpen}
-                onClose={handleConsultationTypeCloseDialog}
-                options={consultationTypes}
-              />
-              <CalltoBookPopup
-                show={isCalltoBookDialog}
-                onClose={handleCloseCalltoBookDialog}
-                onSubmit={handleCalltoBookPopupSubmit}
-              />
-            </div>
-            <Snackbar
-              open={openSnackBar}
-              autoHideDuration={6000}
-              onClose={handleCloseSnackBar}
-            >
-              <Alert
->>>>>>> 6a241c1226b3b5aa3bf3c5f1f64e1141f1dca89f
                 onClose={handleCloseSnackBar}
               >
                 <Alert
