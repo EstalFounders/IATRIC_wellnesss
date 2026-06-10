@@ -241,7 +241,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           <div
             style={{
               position: "absolute",
-              top: "65%",
+              top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               textAlign: "center",
