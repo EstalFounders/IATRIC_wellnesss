@@ -19,6 +19,8 @@ const Demo5About2 = () => {
   const [severity, setSeverity] = useState("success");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [otpMobNo, setOtpMobNo] = useState("");
+  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
+  const [otpMobNo, setOtpMobNo] = useState("");
 
   const handleCalltoBookPopupSubmit = async (mobNo) => {
     setIsCalltoBookDialog(false);
@@ -170,6 +172,13 @@ const Demo5About2 = () => {
         </div>
       </section>
       {/* End container */}
+      <WhatsappConfirmationModel
+        isOpen={otpConfirmationPopup}
+        onClose={() => setOtpConfirmationPopup(false)}
+      >
+        <OtpConfirmationPopup mobile={otpMobNo} onConfirm={handleOtpConfirm} />
+      </WhatsappConfirmationModel>
+    </div>
       <WhatsappConfirmationModel
         isOpen={otpConfirmationPopup}
         onClose={() => setOtpConfirmationPopup(false)}
