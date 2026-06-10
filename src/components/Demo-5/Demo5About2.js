@@ -38,10 +38,10 @@ const Demo5About2 = () => {
     setOpenSnackBar(true);
   };
 
-  const consultationTypes = useSelector(
-    (state) => state.otherConfigSlice.activeConsultation,
-    (state) => state.otherConfigSlice.activeConsultation,
-  );
+const consultationTypes = useSelector(
+  (state) => state.otherConfigSlice?.activeConsultation
+);
+
 
   const handleConsultationTypeOpenDialog = () => {
     setIsConsultationTypeOpen(true);
