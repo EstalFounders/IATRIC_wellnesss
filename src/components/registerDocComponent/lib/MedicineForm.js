@@ -285,7 +285,7 @@ const MedicineForm = ({ onChange }) => {
                           });
                         }}
                       >
-                        Add "{medicineName}" anyway
+                        Add &quot;{medicineName}&quot; anyway
                       </button>
                     </div>
                   )}
