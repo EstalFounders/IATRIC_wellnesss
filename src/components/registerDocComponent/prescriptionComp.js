@@ -842,7 +842,7 @@ const PrescriptionComp = () => {
                       setShowTestAdviceDropdown(false);
                     }}
                   >
-                    Add &quot;{testAdviceSearchTerm}&quot; anyway
+                    Add "{testAdviceSearchTerm}" anyway
                   </Button>
                 </div>
               )}
