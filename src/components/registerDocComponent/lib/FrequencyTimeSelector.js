@@ -105,6 +105,7 @@ const FrequencyTimeSelector = ({ onFrequencyChange, onTimesChange }) => {
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip
+                key={option}
                 label={option}
                 size="small"
                 sx={{

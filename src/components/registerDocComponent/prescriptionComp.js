@@ -279,14 +279,7 @@ const PrescriptionComp = () => {
         typeof name === "string" &&
         name.toLowerCase().includes(searchLower),
     );
-    console.log(
-      "Search value:",
-      value,
-      "filtered:",
-      filteredAdvices,
-      "all:",
-      allTestNames,
-    );
+
     setTestAdviceSuggestions(filteredAdvices.slice(0, 50));
   };
 
@@ -849,7 +842,7 @@ const PrescriptionComp = () => {
                       setShowTestAdviceDropdown(false);
                     }}
                   >
-                    Add "{testAdviceSearchTerm}" anyway
+                    Add &quot;{testAdviceSearchTerm}&quot; anyway
                   </Button>
                 </div>
               )}
