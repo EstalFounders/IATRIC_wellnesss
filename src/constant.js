@@ -158,6 +158,11 @@ export const serviceOffered = {
   labTest: "Labtest",
 };
 
+export const serviceCategoryType = {
+  MAJOR: "MAJOR",
+  SUB: "SUB",
+};
+
 export const CHOOSE_TIME = "ChooseTime";
 export const IS_NOW = "Now";
 

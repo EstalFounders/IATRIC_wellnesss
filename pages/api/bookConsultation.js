@@ -41,10 +41,15 @@ import Notification from "../../src/models/NotificationSchema";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    const { doctorId } = req.query; // Get the doctorId from the query parameters
+    const { doctorId, meetingId } = req.query;
 
     try {
       await dbConnect();
+
+      if (meetingId) {
+        const appointment = await Appointment.findOne({ meetingId });
+        return res.status(200).json({ appointment });
+      }
 
       let appointments;
       if (doctorId) {
