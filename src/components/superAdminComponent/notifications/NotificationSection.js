@@ -1,23 +1,29 @@
-// NotificationSection.jsx
 import React, { useState } from "react";
-import { Box, Grid, Typography, Tabs, Tab, Badge, Paper } from "@mui/material";
+import styles from "./NotificationSection.module.css";
 import DoctorUpdateReqCard from "./DoctorUpdateReqCard";
 import LeaveReqCard from "./LeaveReqCard";
 import NotifcationPreviewModel from "../model/NotificationPreviewModel";
 import PreviewRequest from "./PreviewRequest";
 
 const ConsultationCard = ({ request }) => (
-  <Box p={2} border={1} borderRadius={2}>
-    <Typography variant="subtitle1">{request.title}</Typography>
-    <Typography>{request.body || "No title"}</Typography>
-  </Box>
+  <div className={styles.simpleCard}>
+    <div className={styles.simpleCardTitle}>{request.title || "Consultation"}</div>
+    <div className={styles.simpleCardBody}>{request.body || "No details"}</div>
+  </div>
 );
 
 const LabTestCard = ({ request }) => (
-  <Box p={2} border={1} borderRadius={2}>
-    <Typography variant="subtitle1">Lab Test Request</Typography>
-    <Typography>{request.title || "No title"}</Typography>
-  </Box>
+  <div className={styles.simpleCard}>
+    <div className={styles.simpleCardTitle}>Lab Test Request</div>
+    <div className={styles.simpleCardBody}>{request.title || "No details"}</div>
+  </div>
+);
+
+const EmptyState = ({ message }) => (
+  <div className={styles.emptyState}>
+    <span className={styles.emptyStateIcon}>📬</span>
+    {message || "No notifications"}
+  </div>
 );
 
 const NotificationSection = ({
@@ -39,9 +45,7 @@ const NotificationSection = ({
     { label: "Leave", count: leaveRequest.length },
   ];
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  const totalCount = tabs.reduce((sum, t) => sum + t.count, 0);
 
   const showModel = () => setShow(true);
   const closeModel = () => setShow(false);
@@ -54,44 +58,43 @@ const NotificationSection = ({
   const renderContent = () => {
     switch (activeTab) {
       case 0:
+        if (consultationRequests.length === 0) return <EmptyState message="No consultation notifications" />;
         return consultationRequests.map((request, index) => (
-          <Box key={index} mb={2}>
-            <ConsultationCard request={request} />
-          </Box>
+          <ConsultationCard key={index} request={request} />
         ));
       case 1:
+        if (labTestRequests.length === 0) return <EmptyState message="No lab test notifications" />;
         return labTestRequests.map((request, index) => (
-          <Box key={index} mb={2}>
-            <LabTestCard request={request} />
-          </Box>
+          <LabTestCard key={index} request={request} />
         ));
       case 2:
+        if (doctorUpdateRequests.length === 0) return <EmptyState message="No doctor update requests" />;
         return doctorUpdateRequests.map((request, index) => (
-          <Box key={index} mb={2}>
+          <div key={index}>
             <DoctorUpdateReqCard
               index={index}
               request={request}
               handleReview={() => handleReview(request)}
               handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
             />
-            <NotifcationPreviewModel isOpen={show}>
+            <NotifcationPreviewModel isOpen={show && previewRequest?._id === request._id}>
               <PreviewRequest
                 request={previewRequest}
                 handleDoctReqApproveOrReject={handleDoctReqApproveOrReject}
                 onClose={closeModel}
               />
             </NotifcationPreviewModel>
-          </Box>
+          </div>
         ));
       case 3:
+        if (leaveRequest.length === 0) return <EmptyState message="No leave requests" />;
         return leaveRequest.map((request, index) => (
-          <Box key={index} mb={2}>
-            <LeaveReqCard
-              request={request}
-              handleReview={() => handleReview(request)}
-              handleLeaveApproveOrReject={handleLeaveApproveOrReject}
-            />
-          </Box>
+          <LeaveReqCard
+            key={index}
+            request={request}
+            handleReview={() => handleReview(request)}
+            handleLeaveApproveOrReject={handleLeaveApproveOrReject}
+          />
         ));
       default:
         return null;
@@ -99,53 +102,31 @@ const NotificationSection = ({
   };
 
   return (
-    <Box p={2}>
-      <Typography variant="h5" gutterBottom>
-        Notifications
-      </Typography>
+    <div className={styles.notificationContainer}>
+      <div className={styles.header}>
+        <h5 className={styles.headerTitle}>Notifications</h5>
+        <span className={styles.headerCount}>{totalCount} total</span>
+      </div>
 
-      <Paper elevation={3} sx={{ borderRadius: 2, mb: 2 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="Notification Tabs"
-          indicatorColor="primary"
-          textColor="primary"
-        >
+      <div className={styles.tabsContainer}>
+        <div style={{ display: "flex" }}>
           {tabs.map((tab, index) => (
-            <Tab
+            <button
               key={index}
-              label={
-                <Badge
-                  color="success"
-                  badgeContent={tab.count}
-                  sx={{ mr: 1 }}
-                >
-                  {tab.label}
-                </Badge>
-              }
-            />
+              className={`${styles.tabButton} ${activeTab === index ? styles.tabButtonActive : ""}`}
+              onClick={() => setActiveTab(index)}
+            >
+              {tab.label}
+              {tab.count > 0 && <span className={styles.tabCount}>{tab.count}</span>}
+            </button>
           ))}
-        </Tabs>
-      </Paper>
+        </div>
+      </div>
 
-      {/* Scrollable content container */}
-      <Box
-        sx={{
-          maxHeight: "450px", // adjust as needed
-          overflowY: "auto",
-          pr: 1,
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            {renderContent()}
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+      <div className={styles.scrollContainer}>
+        {renderContent()}
+      </div>
+    </div>
   );
 };
 

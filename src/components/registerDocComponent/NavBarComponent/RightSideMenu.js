@@ -10,6 +10,7 @@ const Dropdown = ({
   onLogout,
   handleShowModel,
   handleShowLeaveReqestModel,
+  handleShowManageSlotsModel,
 }) => {
   console.log(user, "doctor name on right side menu");
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +22,7 @@ const Dropdown = ({
   const handleItemClick = async (item) => {
     console.log(`Clicked on ${item}`);
     if (item == "Profile") handleShowModel();
+    if (item == "Manage Slots") handleShowManageSlotsModel();
     if (item == "Leave Request") handleShowLeaveReqestModel();
     if (item == "Logout")
       try {
@@ -45,21 +47,21 @@ const Dropdown = ({
         <div className={styles["dropdown-menu"]}>
           <div
             className={styles["dropdown-item"]}
-            onClick={() => handleItemClick("item1")}
+            onClick={() => handleItemClick("Profile")}
           >
-            Item 1
+            Your Profile
+          </div>
+          <div
+            className={styles["dropdown-item"]}
+            onClick={() => handleItemClick("Manage Slots")}
+          >
+            Manage Slots
           </div>
           <div
             className={styles["dropdown-item"]}
             onClick={() => handleItemClick("Leave Request")}
           >
             Leave Request
-          </div>
-          <div
-            className={styles["dropdown-item"]}
-            onClick={() => handleItemClick("Profile")}
-          >
-            Your Profile
           </div>
           <div
             className={styles["dropdown-item"]}

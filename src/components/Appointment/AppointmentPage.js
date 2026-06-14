@@ -146,6 +146,7 @@ const AppointmentPage = () => {
     setSelectedDate,
     setServiceType,
     setServiceTypeId,
+    setConsultationPrice,
   };
 
   // All functions that use state, update to use appointmentState

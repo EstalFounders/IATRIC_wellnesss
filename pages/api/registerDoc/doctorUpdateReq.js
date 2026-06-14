@@ -19,16 +19,6 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Count existing requests
-      const totalRequests = await DoctorDetailsChangeReq.countDocuments();
-
-      // Update global count
-      await GlobalVar.findOneAndUpdate(
-        { name: "doctorUpdateRequestCount" },
-        { value: totalRequests },
-        { upsert: true, new: true }
-      );
-
       // Create new request
       const newRequest = new DoctorDetailsChangeReq({
         doctorId: id,

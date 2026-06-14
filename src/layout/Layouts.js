@@ -48,7 +48,7 @@ const Layouts = ({ children, header, footer }) => {
       case 9:
         return <RegisterDocLoginHeader />;
       default:
-        return <Header1 toggleMenu={() => openClick()} toggle={toggle} />;
+        return <Header1 />;
     }
   };
   const getFooter = () => {

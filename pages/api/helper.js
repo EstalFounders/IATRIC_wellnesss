@@ -26,7 +26,7 @@ import {
 export async function findAvailableDoctorForNow(
   selectedDate,
   genericConsultationType,
-  res
+  res,
 ) {
   await dbConnect();
 
@@ -46,13 +46,13 @@ export async function findAvailableDoctorForNow(
   // Step 1: Get all company doctors
   const companyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: DoctorType.Company,
+    doctorType: "Company",
   });
 
   // Step 2: Get all non-company doctors (excluding company ones)
   const nonCompanyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: { $ne: DoctorType.Company },
+    doctorType: "Individual",
   });
 
   let earliestSlotInfo = null;
@@ -62,7 +62,7 @@ export async function findAvailableDoctorForNow(
   async function findEarliestSlotForDoctors(doctors) {
     for (const doctor of doctors) {
       console.log(
-        `Checking available slots for doctor ${doctor._id} (${doctor.name})`
+        `Checking available slots for doctor ${doctor._id} (${doctor.name})`,
       );
       const availableSlots = await Slot.find({
         doctorId: doctor._id.toString(),
@@ -130,11 +130,16 @@ export async function findAvailableDoctorForNow(
   console.log("Overall Earliest Slot Info:", earliestSlotInfo);
   console.log("Next Slots (if not today):", nextSlots);
 
+  // If no slot was found at all, return immediately with a safe response
+  if (!earliestSlotInfo) {
+    return res.status(404).json({ message: "No slots found." });
+  }
+
   console.log(
     "Next slot is not for today, returning next available slots.",
     selectedDateObj.toDateString(),
     earliestSlotInfo,
-    earliestSlotInfo.slot.startTime.toDateString()
+    earliestSlotInfo.slot.startTime.toDateString(),
   );
 
   const earlietslotdate = earliestSlotInfo.slot.date;
@@ -150,7 +155,6 @@ export async function findAvailableDoctorForNow(
         nextSlots: nextSlots,
         status: SERVER_AVAILABLE_SLOTS_CODE,
       });
-      // Directly return the API result, preventing further processing
     }
   }
 
@@ -161,13 +165,13 @@ export async function findAvailableDoctorForNow(
     };
   }
 
-  res.status(404).json({ message: "No slots found." });
+  return res.status(404).json({ message: "No slots found." });
 }
 
 export async function findAvailableDoctorForSpecificTimeSlot(
   selectedDate,
   genericConsultationType,
-  slot
+  slot,
 ) {
   await dbConnect();
 
@@ -182,7 +186,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   async function findDoctorWithSlot(doctors) {
     for (const doctor of doctors) {
       console.log(
-        `Checking available slots for doctor ${doctor._id} (${doctor.name})`
+        `Checking available slots for doctor ${doctor._id} (${doctor.name})`,
       );
       const availableSlot = await Slot.findOne({
         doctorId: doctor._id,
@@ -200,7 +204,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   // Step 1: Find company doctors
   let companyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: DoctorType.Company,
+    doctorType: "Company",
   });
 
   let result = await findDoctorWithSlot(companyDoctors);
@@ -211,7 +215,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   // Step 2: If no company doctor is available, find non-company doctors
   let nonCompanyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: { $ne: DoctorType.Company },
+    doctorType: { $ne: "Individual" },
   });
 
   result = await findDoctorWithSlot(nonCompanyDoctors);
@@ -262,7 +266,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
 export const checkNbookSelectedDoctorForNow = async (
   selectedDate,
   doctorId,
-  res
+  res,
 ) => {
   await dbConnect();
 
@@ -302,7 +306,7 @@ export const checkNbookSelectedDoctorForNow = async (
     availableSlots.length === 3 &&
     availableSlots.every(
       (slot) =>
-        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString()
+        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString(),
     )
   ) {
     res.status(200).json({
@@ -366,45 +370,45 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   if (selectedSlot === null) {
     const now = new Date();
 
-    // Find the slot where current time is between start and end, and not booked
-    const currentSlot = await Slot.findOne({
+    // Find all future slots where startTime >= now, sorted chronologically
+    // Try slots in order: if the nearest is booked, move to the next one
+    const futureSlots = await Slot.find({
       doctorId,
       isBooked: false,
-      startTime: { $lte: now },
-      endTime: { $gte: now },
+      startTime: { $gte: now },
     }).sort({ startTime: 1 });
 
-    console.log(currentSlot, "current slot");
+    console.log(futureSlots, "future slots");
 
-    if (!currentSlot) {
-      throw new Error("No current slot found for this time.");
+    if (!futureSlots || futureSlots.length === 0) {
+      throw new Error("No future slots found for this time.");
     }
 
-    // Step 2: Find the next available slot after the current slot’s end time
-    const nextSlot = await Slot.findOneAndUpdate(
-      {
-        doctorId,
-        isBooked: false,
-        startTime: { $gt: currentSlot.endTime },
-      },
-      { isBooked: true },
-      { new: true }
-    );
-
-    console.log(nextSlot, "next slot");
-
-    if (!nextSlot) {
-      throw new Error("No next available slot found.");
+    // Book the first available future slot (sorted by startTime ascending)
+    let bookedSlot = null;
+    for (const futureSlot of futureSlots) {
+      const updatedSlot = await Slot.findOneAndUpdate(
+        { _id: futureSlot._id, doctorId, isBooked: false },
+        { isBooked: true },
+        { new: true },
+      );
+      if (updatedSlot) {
+        bookedSlot = updatedSlot;
+        break; // Successfully booked this slot
+      }
     }
 
-    selectedSlot = nextSlot;
-    // ._id;
+    if (!bookedSlot) {
+      throw new Error("No available future slots found. All slots are booked.");
+    }
+
+    selectedSlot = bookedSlot;
   } else {
     // Book the selected slot if it's not already booked
     const updatedSlot = await Slot.findOneAndUpdate(
       { _id: slot._id, doctorId, isBooked: false },
       { isBooked: true },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedSlot) {
@@ -448,20 +452,20 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     docName,
     name,
     consultationType,
-    contact_no
+    contact_no,
   );
   const reminderMessageBodyPatient = getReminderMessageBodyPatient(
     docName,
     name,
     formatTime(appointmentTime), // Pass formatted time
-    patientMeetingUrl
+    patientMeetingUrl,
   );
 
   const reminderMessageBodyDoctor = getReminderMessageBodyDoctor(
     docName,
     name,
     formatTime(appointmentTime), // Pass formatted time
-    doctorMeetingUrl
+    doctorMeetingUrl,
   );
 
   const patientMobileNo = appointment.patientMobNo?.toString() ?? "";
@@ -470,23 +474,23 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   console.log(
     formatPhoneNumber(doctorMobileNumber),
     doctorMobileNumber,
-    "line no 190"
+    "line no 190",
   );
   await sendWhatsAppConfirmation(
     formatPhoneNumber(patientMobileNo),
     confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE
+    WHATSAPP_CONFIRMATION_TEMPLATE,
   );
   await sendWhatsAppConfirmation(
     formatPhoneNumber(doctorMobileNumber),
     confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE
+    WHATSAPP_CONFIRMATION_TEMPLATE,
   );
 
   console.log(
     clientSideAppointmentTime == IS_NOW,
     clientSideAppointmentTime == IN_TWENTY_MINUTES_NOW,
-    "WhatsApp confirmation sent to patient and doctor successfully."
+    "WhatsApp confirmation sent to patient and doctor successfully.",
   );
 
   if (
@@ -498,12 +502,12 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     await sendWhatsAppConfirmation(
       formatPhoneNumber(patientMobileNo),
       reminderMessageBodyPatient,
-      WHATSAPP_REMINDER_TEMPLATE_PATIENT
+      WHATSAPP_REMINDER_TEMPLATE_PATIENT,
     );
     await sendWhatsAppConfirmation(
       formatPhoneNumber(doctorMobileNumber),
       reminderMessageBodyDoctor,
-      WHATSAPP_REMINDER_TEMPLATE_DOCTOR
+      WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
     );
   }
   return appointment._id;

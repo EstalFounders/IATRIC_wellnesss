@@ -9,16 +9,11 @@ import {
 } from "../../helper";
 import {
   DoctorType,
-  superAdminConsultationtype,
   userTypeConstant,
 } from "../../constant";
-import { useSelector } from "react-redux";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
-  const consultationTypeStore = useSelector(
-    (state) => state.otherDetailsSlice.consultationType
-  );
   const [editedDoctor, setEditedDoctor] = useState({ ...doctor });
   const [profilePicturePreview, setProfilePicturePreview] = useState(
     doctor.profilePictureUrl
@@ -31,13 +26,14 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   );
 
   const [selectedTypes, setSelectedTypes] = useState(
-    editedDoctor.consultationType || ""
+    Array.isArray(editedDoctor.consultationType) ? editedDoctor.consultationType : []
   );
-
-  console.log(selectedTypes, "selectedTypes");
 
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
+
+  const [showAddInput, setShowAddInput] = useState(false);
+  const [newTypeInput, setNewTypeInput] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,16 +100,22 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     handleClose();
   };
 
-  const handleCheckboxChange = (type) => {
-    let updatedTypes;
-    if (selectedTypes.includes(type)) {
-      updatedTypes = selectedTypes.filter((item) => item !== type); // Remove if already selected
-    } else {
-      updatedTypes = [...selectedTypes, type]; // Add if not selected
-    }
-
+  const handleRemoveType = (type) => {
+    const updatedTypes = selectedTypes.filter((item) => item !== type);
     setSelectedTypes(updatedTypes);
     setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+  };
+
+  const handleAddType = () => {
+    const trimmed = newTypeInput.trim();
+    if (!trimmed) return;
+    // Duplicate check (case-insensitive)
+    if (selectedTypes.some((t) => t.toLowerCase() === trimmed.toLowerCase())) return;
+    const updatedTypes = [...selectedTypes, trimmed];
+    setSelectedTypes(updatedTypes);
+    setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+    setNewTypeInput("");
+    setShowAddInput(false);
   };
 
   console.log(editedDoctor, "edited doctor");
@@ -227,19 +229,109 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Consultation Type</b>
                 </Form.Label>
-                <div>
-                  {consultationTypeStore.map((type) => (
-                    <Form.Check
-                      key={type._id} // Assuming each 'type' has a unique '_id' field
-                      type="checkbox"
-                      label={type.name} // Assuming 'name' is a property of each type
-                      value={type.name}
-                      checked={selectedTypes.includes(type.name)}
-                      onChange={() => handleCheckboxChange(type.name)}
-                      className="mb-2"
-                    />
-                  ))}
+                <div style={{ marginBottom: 8 }}>
+                  {selectedTypes.length === 0 ? (
+                    <span style={{ fontSize: "0.85rem", color: "#999" }}>
+                      No consultation types selected.
+                    </span>
+                  ) : (
+                    selectedTypes.map((type, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          background: "#e8f5e9",
+                          color: "#2e7d32",
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          fontSize: "0.85rem",
+                          margin: "2px 4px 2px 0",
+                        }}
+                      >
+                        {type}
+                        <FaTrash
+                          style={{
+                            cursor: "pointer",
+                            fontSize: "0.7rem",
+                            color: "#c62828",
+                          }}
+                          onClick={() => handleRemoveType(type)}
+                        />
+                      </span>
+                    ))
+                  )}
                 </div>
+                {showAddInput ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <input
+                      type="text"
+                      value={newTypeInput}
+                      onChange={(e) => setNewTypeInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddType(); } }}
+                      placeholder="Enter consultation type..."
+                      style={{
+                        padding: "6px 8px",
+                        borderRadius: "6px",
+                        border: "1px solid #ccc",
+                        fontSize: "0.85rem",
+                      }}
+                      autoFocus
+                    />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={handleAddType}
+                        style={{
+                          background: "#3b5f1d",
+                          color: "white",
+                          border: "none",
+                          padding: "6px 14px",
+                          borderRadius: "6px",
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={() => { setShowAddInput(false); setNewTypeInput(""); }}
+                        style={{
+                          background: "#f5f5f5",
+                          color: "#333",
+                          border: "1px solid #ccc",
+                          padding: "6px 14px",
+                          borderRadius: "6px",
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAddInput(true)}
+                    style={{
+                      background: "#3b5f1d",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: 28,
+                      height: 28,
+                      fontSize: "1.1rem",
+                      lineHeight: 1,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    title="Add consultation type"
+                  >
+                    +
+                  </button>
+                )}
               </Form.Group>
             </Col>
           </Row>

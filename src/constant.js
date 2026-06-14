@@ -149,8 +149,8 @@ export const superAdminConsultationtype = [
 ];
 
 export const DoctorType = {
-  Company: "Company",
-  Individual: "Indiividual",
+  company: "Company",
+  individual: "Individual",
 };
 
 export const serviceOffered = {

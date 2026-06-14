@@ -127,7 +127,15 @@ const AppointmentForm = ({
           <RadioGroup
             row
             value={appointmentState.consultationType}
-            onChange={handleConsultationChange}
+            onChange={(e) => {
+              handleConsultationChange(e);
+              const selectedOption = appointmentState.consultationOptions.find(
+                (opt) => opt.name === e.target.value
+              );
+              if (selectedOption && setter.setConsultationPrice) {
+                setter.setConsultationPrice(selectedOption.fee || "");
+              }
+            }}
             style={{ justifyContent: "center", marginBottom: "20px" }}
           >
             {consultationOptions.map((option) => (

@@ -101,7 +101,8 @@ const doctorSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  unavailableDates: { type: [String], default: [] }
 });
 
 // Check if the model already exists to prevent overwriting
