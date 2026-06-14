@@ -13,9 +13,11 @@ import DoctorModalComp from "../../components/superAdminComponent/DoctorModalCom
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
 import LeaveRequestModel from "../../components/registerDocComponent/model/LeaveRequestModel";
+import ManageSlotsModal from "../../components/registerDocComponent/model/ManageSlotsModal";
 
 const RegisterDocLoginHeader = () => {
   const [show, setShow] = useState(false);
+  const [manageSlotsModelShow, setManageSlotsModelShow] = useState(false);
   const [leaveRequestModelShow, setLeaveRequestModelShow] = useState(false);
   const [loader, setLoader] = useState(false);
   const DoctorInfo = JSON.parse(
@@ -46,9 +48,7 @@ const RegisterDocLoginHeader = () => {
 
         if (!arraysAreEqual) {
           hasChanges = true; // Mark changes found
-          updatedArray.forEach((value, index) => {
-            changedFields[`${key}[${index}]`] = value;
-          });
+          changedFields[key] = updatedArray;
         }
       } else {
         if (updatedDoctor[key] !== DoctorInfo.user[key]) {
@@ -100,6 +100,13 @@ const RegisterDocLoginHeader = () => {
   };
   const handleCloseLeaveReqestModel = () => {
     setLeaveRequestModelShow(false);
+  };
+
+  const handleShowManageSlotsModel = () => {
+    setManageSlotsModelShow(true);
+  };
+  const handleCloseManageSlotsModel = () => {
+    setManageSlotsModelShow(false);
   };
 
   // Function to update the doctor's active status on the backend
@@ -240,6 +247,7 @@ const RegisterDocLoginHeader = () => {
               onLogout={handleLogout}
               handleShowModel={handleShowModel}
               handleShowLeaveReqestModel={handleShowLeaveReqestModel}
+              handleShowManageSlotsModel={handleShowManageSlotsModel}
             />
           </div>
         )}
@@ -258,6 +266,13 @@ const RegisterDocLoginHeader = () => {
           show={leaveRequestModelShow}
           onClose={handleCloseLeaveReqestModel}
           onConfirm={handleLeaveRequestSubmit}
+        />
+      </div>
+      <div>
+        <ManageSlotsModal
+          show={manageSlotsModelShow}
+          onClose={handleCloseManageSlotsModel}
+          doctorId={DoctorInfo?.user?._id}
         />
       </div>
       <div>{loader ? <Preloader /> : ""}</div>

@@ -32,6 +32,9 @@ import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
 
+// Consultation types to look for in services data
+const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
+
 const AppointmentPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -66,8 +69,7 @@ const AppointmentPage = () => {
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
   const [serviceTypeId, setServiceTypeId] = useState();
-  const [consultationType, setConsultationType] = useState("Call");
-  const [consultationTypes, setConsultationTypes] = useState([]);
+  const [consultationType, setConsultationType] = useState("");
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
@@ -81,12 +83,31 @@ const AppointmentPage = () => {
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
-  const services = useState(
-    useSelector((state) => state.superAdminHomePage.serviceOffered)
-  );
-  const [serviceType, setServiceType] = useState(services[0]?.name);
+  const [serviceType, setServiceType] = useState("");
 
-  const dispAlltch = useDispatch();
+  // Get services from Redux (already fetched via getServiceOffered)
+  const services = useSelector(
+    (state) => state.superAdminHomePage.serviceOffered
+  );
+
+  // Derive consultation options from services filter for Audio/Video
+  const consultationOptions = (Array.isArray(services) ? services : [])
+    .filter((s) =>
+      CONSULTATION_SERVICE_NAMES.some(
+        (name) => s.name && s.name.toLowerCase().includes(name.toLowerCase())
+      )
+    )
+    .map((s) => ({ name: s.name, fee: s.fee }));
+
+  // Set initial consultation type based on available options
+  useEffect(() => {
+    if (consultationOptions.length > 0) {
+      if (!consultationType) {
+        setConsultationType(consultationOptions[0].name);
+        setConsultationPrice(consultationOptions[0].fee || "");
+      }
+    }
+  }, [consultationOptions]);
 
   // All state and setters/functions in one object
   const appointmentState = {
@@ -104,7 +125,7 @@ const AppointmentPage = () => {
     email,
     mobNo,
     consultationType,
-    consultationTypes,
+    consultationOptions,
     openSnackBar,
     snackBarMessage,
     severity,
@@ -125,6 +146,7 @@ const AppointmentPage = () => {
     setSelectedDate,
     setServiceType,
     setServiceTypeId,
+    setConsultationPrice,
   };
 
   // All functions that use state, update to use appointmentState
@@ -152,70 +174,19 @@ const AppointmentPage = () => {
       await getServiceOffered({ dispatch });
     };
     getServices();
-  }, [dispatch]); // Add dispatch as dependency
+  }, [dispatch]);
 
   useEffect(() => {
     const { serviceParam } = router.query;
     if (typeof serviceParam === "string") {
-      setServiceType(
-        services.map((service) => {
-          if (service.name.trim().includes(serviceParam.trim()))
-            return service.name;
-        })
+      const matched = services.find((service) =>
+        service.name?.trim().toLowerCase().includes(serviceParam.trim().toLowerCase())
       );
+      if (matched) {
+        setServiceType(matched.name);
+      }
     }
   }, [router.query]);
-
-  useEffect(() => {
-    const fetchConsultationFees = async () => {
-      const storedConsultations = sessionStorage.getItem(
-        sessionStorageName.ConsultationFee
-      );
-      let consultationFees;
-      if (storedConsultations && storedConsultations !== "null") {
-        consultationFees = JSON.parse(storedConsultations);
-        if (Array.isArray(consultationFees) && consultationFees.length > 0) {
-          setConsultationTypes(consultationFees);
-          setConsultationPrice(consultationFees[0].fee);
-        } else {
-          consultationFees = null;
-        }
-      }
-      if (!consultationFees) {
-        const response = await fetch(api.consiltationFee, {
-          method: "GET",
-          cache: "no-cache",
-        });
-        consultationFees = await response.json();
-        setConsultationTypes(consultationFees);
-        setConsultationPrice(consultationFees[0].fee);
-        sessionStorage.setItem(
-          sessionStorageName.ConsultationFee,
-          JSON.stringify(consultationFees)
-        );
-      }
-      processSavedLabel(consultationFees);
-    };
-
-    const processSavedLabel = (consultationFees) => {
-      const savedLabel = sessionStorage.getItem("selectedLabel");
-      if (
-        savedLabel &&
-        Array.isArray(consultationFees) &&
-        consultationFees.length > 0
-      ) {
-        const matchingConsultation = consultationFees.find(
-          (consultation) => consultation.name === savedLabel
-        );
-        if (matchingConsultation) {
-          setConsultationType(matchingConsultation.name);
-          setConsultationPrice(matchingConsultation.fee);
-        }
-      }
-    };
-
-    fetchConsultationFees();
-  }, []);
 
   useEffect(() => {
     if (appointmentState.selectedDoctorId && appointmentState.selectedDate) {
@@ -263,12 +234,12 @@ const AppointmentPage = () => {
 
   const handleConsultationChange = (event) => {
     const selectedType = event.target.value;
-    const matchingConsultation = consultationTypes.find(
-      (consultation) => consultation.name === selectedType
+    const matching = consultationOptions.find(
+      (opt) => opt.name === selectedType
     );
-    if (matchingConsultation) {
-      setConsultationType(matchingConsultation.name);
-      setConsultationPrice(matchingConsultation.fee);
+    if (matching) {
+      setConsultationType(matching.name);
+      setConsultationPrice(matching.fee || "");
     }
     filterDoctors(selectedType);
   };
@@ -388,7 +359,6 @@ const AppointmentPage = () => {
       const message = data.message;
       const nextSlots = data.nextSlots;
       const status = data.status;
-      // const status = message
       if (status === SERVER_AVAILABLE_SLOTS_CODE) {
         setOpenAvailableSlotsFromServer(true);
         setAvailableSlotsFromServer(nextSlots);
@@ -420,7 +390,6 @@ const AppointmentPage = () => {
 
   const whatsappConfrimation = () => {
     setOtpConfirmationPopup(false);
-    console.log("OTP confirmed, proceeding with booking");
     bookConsultation();
   };
 

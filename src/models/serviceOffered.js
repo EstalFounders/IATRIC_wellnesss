@@ -1,4 +1,3 @@
-import { name } from "@stream-io/video-react-sdk";
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
@@ -6,6 +5,9 @@ const serviceOfferedSchema = new Schema({
   name: {
     type: String,
     required: true,
+  },
+  fee: {
+    type: Number,
   },
   description: {
     type: String,
@@ -35,10 +37,19 @@ const serviceOfferedSchema = new Schema({
     type: Number,
     required: true,
   },
+  freight: {
+    type: Number,
+    default: 0,
+  },
   isActive: {
     type: Boolean,
     required: true,
     default: true,
+  },
+  categoryType: {
+    type: String,
+    enum: ["MAJOR", "SUB"],
+    default: "MAJOR",
   },
 });
 

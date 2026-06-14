@@ -116,23 +116,11 @@ export default async function handler(req, res) {
 
       // Determine current or specific time
       const now = new Date();
-      const genericConsultationType = consultationTypeMapping[consultationType];
+      const genericConsultationType = consultationType;
       const meetingId = uuidv4();
-      console.log("119");
 
       // Find available doctor if needed right now
-      console.log(
-        genericConsultationType,
-        "generic consultation type",
-        doctorId,
-        "doctor id",
-        clientSideAppointmentTime,
-        "appointment time",
-        IN_TWENTY_MINUTES_NOW,
-        "in twenty minutes now",
-        clientSideAppointmentTime == IS_NOW,
-        clientSideAppointmentTime === IN_TWENTY_MINUTES_NOW
-      );
+      
       if (doctorId && clientSideAppointmentTime == IS_NOW) {
         const result = await checkNbookSelectedDoctorForNow(
           selectedDate,
@@ -152,6 +140,15 @@ export default async function handler(req, res) {
           res
         );
         console.log(result, "result 97");
+
+        // Check if findAvailableDoctorForNow already sent a response
+        // (e.g. "next 3 available slots" or "no slots found")
+        if (!result || result.doctor === undefined || result.slot === undefined) {
+          // Response was already sent by findAvailableDoctorForNow (e.g. nextSlots response)
+          // The function returned early with res.status().json(), so just exit the handler
+          return;
+        }
+
         console.log(
           result.doctor._id.toString(),
           "result doctor id",
@@ -215,7 +212,7 @@ export default async function handler(req, res) {
       let result;
       // Handle consultation types
       switch (consultationType) {
-        case "Call":
+        case "Audio":
         case "Video":
           // Store appointment details
           result = await bookConsultation({ bookConsultationParams });

@@ -1,6 +1,6 @@
 import { Alert, Snackbar } from "@mui/material";
 import { useState } from "react";
-import { Button, Col, Row } from "react-bootstrap";
+import styles from "./NotificationSection.module.css";
 
 const DoctorUpdateReqCard = ({
   request,
@@ -10,100 +10,54 @@ const DoctorUpdateReqCard = ({
 }) => {
   const id = request._id;
   const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [snackBarMessage, setSnackBarMessage] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
   const [severity, setSeverity] = useState("info");
-  const [status,setStatus] = useState(request.status)
+  const [status, setStatus] = useState(request.status);
 
-  console.log(request,' request')
+  const handleApproveOrReject = (id, action) => {
+    if (action === "approve") {
+      handleDoctReqApproveOrReject(id, action);
+      setStatus("approved");
+      setSnackBarMessage("Approved");
+      setSeverity("success");
+      setOpenSnackBar(true);
+    } else {
+      handleDoctReqApproveOrReject(id, action);
+      setStatus("rejected");
+      setSnackBarMessage("Rejected");
+      setSeverity("error");
+      setOpenSnackBar(true);
+    }
+  };
 
-  const handleApproveOrReject =(id, action)=> {
-    // Simulating an API call
-      if (action === "approve") {
-        // Success case
-        // You can add any success-specific logic here
-        // For example, updating state or triggering a callback
-        handleDoctReqApproveOrReject(id,action)
-        setStatus('approved')
-        setSnackBarMessage("Approved") 
-        setOpenSnackBar(true)
-      } else {
-        // Handle other actions if needed
-        handleDoctReqApproveOrReject(id,action)
-        setStatus('reject')
-        setSnackBarMessage("reject") 
-        setOpenSnackBar(true)
-      }
-  }
+  const badgeClass =
+    status === "pending"
+      ? `${styles.cardBadge} ${styles.badgePending}`
+      : status === "approved"
+      ? `${styles.cardBadge} ${styles.badgeApproved}`
+      : `${styles.cardBadge} ${styles.badgeRejected}`;
 
   return (
-    <>
-      <div className="d-flex align-items-center">
-        <div>
-          <div className="mb-0 font-weight-bold">
-            <strong className="text-primary text-uppercase">
-              {request.name}
-            </strong>
-            <span
-              className={`badge text-white text-uppercase ml-2 ${
-                status === "pending"
-                  ? "bg-warning"
-                  : status === "approved"
-                  ? "bg-success"
-                  : "bg-danger"
-              } ms-2`}
-            >
-              {status}
-            </span>
-            <div>request to change :-</div>
-          </div>
-          <small>
-            <ul className="list-none">
-              {Object.keys(request.updatedFields).map((field) => (
-                <li key={field}>{field}</li>
-              ))}
-            </ul>
-          </small>
-        </div>
+    <div className={styles.card}>
+      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <span className={styles.cardName}>{request.name}</span>
+        <span className={badgeClass}>{status}</span>
       </div>
-
-      <div>
-        <Button
-          variant="outline-primary"
-          size="sm"
-          className="me-2 mr-1"
-          onClick={() => handleReview(index)}
-        >
-          Review
-        </Button>
-        <Button
-          variant="outline-success"
-          size="sm"
-          className="me-2 mr-1"
-          onClick={() => handleApproveOrReject(id, "approve")}
-        >
-          Approve
-        </Button>
-        <Button
-          variant="outline-danger"
-          size="sm"
-          onClick={() => handleApproveOrReject(id, "reject")}
-        >
-          Reject
-        </Button>
+      <div className={styles.cardSubtext}>Requested changes:</div>
+      <ul className={styles.cardFieldList}>
+        {Object.keys(request.updatedFields || {}).map((field) => (
+          <li key={field} className={styles.cardFieldItem}>{field}</li>
+        ))}
+      </ul>
+      <div className={styles.actionArea}>
+        <button className={styles.reviewBtn} onClick={handleReview}>Review</button>
+        <button className={styles.approveBtn} onClick={() => handleApproveOrReject(id, "approve")}>Approve</button>
+        <button className={styles.rejectBtn} onClick={() => handleApproveOrReject(id, "reject")}>Reject</button>
       </div>
-      <Snackbar
-        open={openSnackBar}
-        autoHideDuration={1000}
-        onClose={() => setOpenSnackBar(false)}
-      >
-        <Alert
-          severity={severity}
-          sx={{ width: "100%" }}
-        >
-          {snackBarMessage}
-        </Alert>
+      <Snackbar open={openSnackBar} autoHideDuration={1000} onClose={() => setOpenSnackBar(false)}>
+        <Alert severity={severity} sx={{ width: "100%" }}>{snackBarMessage}</Alert>
       </Snackbar>
-    </>
+    </div>
   );
 };
 

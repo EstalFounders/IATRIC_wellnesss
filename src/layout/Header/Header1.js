@@ -1,39 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import MobileMenu from "../MobileMenu";
-import { Col, Container, Row } from "react-bootstrap";
-import {
-  FaArrowDown,
-  FaAudible,
-  FaFacebook,
-  FaHome,
-  FaInstagram,
-  FaLinkedin,
-  FaMapMarkedAlt,
-  FaPhone,
-  FaPhoneAlt,
-} from "react-icons/fa";
-import { FaPhoneVolume } from "react-icons/fa6";
-
+import { IoMenu } from "react-icons/io5";
+import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkedAlt, FaPhoneVolume } from "react-icons/fa";
 import {
   address,
-  api,
   booking_btn_txt,
   color_schema,
   contact_no,
-  eventEmitter,
   facebook_page_url,
-  labtest_cart_details_local_info,
-  sessionStorageName,
 } from "../../constant";
-import PopupDialog from "../../components/Common/PopupDialog";
-import { dial, navigate, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
-import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 import { ConsultationButton } from "../../components/Common/commonUi";
-import { IoMdArrowDropdown } from "react-icons/io";
-import cartEventEmitter from "../../eventEmitter/CartEventEmitter";
 import { FaCartShopping } from "react-icons/fa6";
 import CartPanel from "../../components/labTestComponent/common/CartPanel";
 import MedicineCartPanel from "../../components/medicines/common/MedicineCartPanel";
@@ -42,450 +21,175 @@ import { getLabTestCartItems } from "../../components/labTestComponent/common/Co
 import { fetchConsultations } from "../../components/ApiService/UtilService";
 import { useDispatch, useSelector } from "react-redux";
 
-const Header1 = ({ toggleMenu, toggle, scrollToContact }) => {
+const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const isLabTestPage = router.pathname.includes("/labTest");
   const isMedicinePage = router.pathname.includes("/medicine");
 
-  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
-  const [isConsultationTypeOpen, setIsConsultationTypeOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const consultationTypes = useSelector(
-    (state) => state.otherConfigSlice.activeConsultation
+    (state) => state.otherConfigSlice.activeConsultation,
   );
   const hiddenRoutes = ["/appointment", "/some-other-route"];
-  const [labtesttab, setLabtestTab] = useState(false);
 
-  const [medicineCartItems, setMedicineCartItems] = useState(
-    getMedicineCartItems()
-  );
-  const [labTestCartItems, setLabTestCartItems] = useState(
-    getLabTestCartItems()
-  );
+  const [medicineCartItems, setMedicineCartItems] = useState(getMedicineCartItems());
+  const [labTestCartItems, setLabTestCartItems] = useState(getLabTestCartItems());
   const [cartItemCount, setCartItemCount] = useState(labTestCartItems.length);
-  const [medicineCartItemCount, setMedicineCartItemCount] = useState(
-    medicineCartItems.length
-  );
+  const [medicineCartItemCount, setMedicineCartItemCount] = useState(medicineCartItems.length);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isMedicinePanelOpen, setIsMedicinePanelOpen] = useState(false);
 
-  const handleDialDialogOpen = () => {
-    setIsDialDialogOpen(true);
-  };
-
-  const handleCloseDialDialog = () => {
-    setIsDialDialogOpen(false);
-  };
-
   const handleConsultationTypeOpenDialog = () => {
     router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
-    // setIsConsultationTypeOpen(true);
   };
 
-  const handleConsultationTypeCloseDialog = () => {
-    setIsConsultationTypeOpen(false);
-  };
-
-  const handleNavigate = (label) => {
-    sessionStorage.setItem("selectedLabel", label);
-    router.push("/appointment");
-  };
-
-  const togglePanel = () => {
-    setIsPanelOpen(!isPanelOpen);
-  };
-  const toggleMedicinePanel = () => {
-    setIsMedicinePanelOpen(!isMedicinePanelOpen);
-  };
-
-  const updateCartItemCount = (count) => {
-    setCartItemCount(count);
-  };
-  const updateMedicineCartItemCount = (count) => {
-    setMedicineCartItemCount(count);
-  };
+  const togglePanel = () => setMobileMenuOpen(!mobileMenuOpen);
+  const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
+  const updateCartItemCount = (count) => setCartItemCount(count);
+  const updateMedicineCartItemCount = (count) => setMedicineCartItemCount(count);
 
   useEffect(() => {
     if (!consultationTypes || consultationTypes.length === 0) {
-      const getConsultation = async () => {
-        await fetchConsultations(dispatch);
-      };
-      getConsultation();
+      fetchConsultations(dispatch);
     }
   }, []);
 
-  useEffect(() => {
-    console.log("cartItemCount changed:", cartItemCount);
-    if (cartItemCount > 0) {
-      setLabtestTab(true);
-      console.log("Labtest tab set to true (cart has items).");
-    } else {
-      setLabtestTab(false);
-      console.log("Labtest tab set to false (cart is empty).");
-    }
-  }, [cartItemCount]); //
-
-  // Helper function to map names to icon numbers
-
   return (
     <header id="header" className="header">
-      {/* MOBILE HEADER */}
+      {/* MOBILE HEADER — this div uses CSS class wsmobileheader which is hidden on desktop (>991px) via menu.css */}
       <div className="wsmobileheader clearfix">
-        <Link legacyBehavior href="#">
-          <a
-            id="wsnavtoggle"
-            onClick={() => toggleMenu()}
-            className="wsanimated-arrow"
-          >
-            <span />
-          </a>
-        </Link>
-        <span className="smllogo">
-          <img
-            src="images/logo.png"
-            width={180}
-            height={50}
-            alt="mobile-logo"
-          />
-        </span>
-        <Link legacyBehavior href="#">
-          <a
-            onClick={(e) => {
-              e.preventDefault();
-              handleDialDialogOpen();
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", gap: 10 }}>
+          <button
+            onClick={() => togglePanel()}
+            aria-label="Open menu"
+            style={{
+              background: "#3b5f1d",
+              border: "none",
+              borderRadius: 8,
+              width: 38,
+              height: 38,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
             }}
-            className="callusbtn"
           >
-            <FaPhone className="mx-1" />
-          </a>
-        </Link>
+            <IoMenu size={22} color="white" />
+          </button>
+
+          <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
+            <img src="images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+          </span>
+
+          <ConsultationButton onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
+            {booking_btn_txt}
+          </ConsultationButton>
+        </div>
       </div>
+
       {/* HEADER STRIP */}
-      <div
-        className="headtoppart clearfix"
-        style={{ backgroundColor: "#3b5f1d" }}
-      >
+      <div className="headtoppart clearfix" style={{ backgroundColor: "#3b5f1d" }}>
         <div className="headerwp clearfix">
-          {/* Address */}
           <div className="headertopleft">
             <div className="address clearfix">
               <span>
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    <FaMapMarkedAlt className="mx-1" />
-                    <b style={{ fontWeight: "bold", fontSize: 16 }}>
-                      {address}
-                    </b>
-                  </span>
+                <a href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003" target="_blank" rel="noopener noreferrer">
+                  <span><FaMapMarkedAlt className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{address}</b></span>
                 </a>
               </span>
-              <Link legacyBehavior href="/">
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDialDialogOpen();
-                  }}
-                  href={`tel:${contact_no}`}
-                  className="callusbtn"
-                  onMouseOver={(e) => {
-                    e.target.style.color = "#8e8333";
-                  }} // Change color on hover
-                  onMouseOut={(e) => {
-                    e.target.style.color = "#ffffff";
-                  }}
-                >
-                  <FaPhoneVolume className="mx-1" />
-                  <b style={{ fontWeight: "bold", fontSize: 16 }}>
-                    {contact_no}
-                  </b>
-                </a>
-              </Link>
+              <a href={`tel:${contact_no}`} className="callusbtn">
+                <FaPhoneVolume className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{contact_no}</b>
+              </a>
             </div>
-            {/* <PopupDialog
-              isOpen={isDialDialogOpen}
-              onClose={handleCloseDialDialog}
-              options={dialOptions}
-            /> */}
           </div>
-          {/* Social Links */}
           <div className="headertopright">
-            {/* <a className="googleicon" title="Google" href="#">
-              <i className="fab fa-google" />
-              <span className="mobiletext02">Google</span>
-            </a> */}
-            <a
-              className="linkedinicon"
-              title="Linkedin"
-              target="blank"
-              href="https://www.linkedin.com/in/iatrichealthcare/"
-            >
-              <FaLinkedin size={25} />
-              <span className="mobiletext02">Linkedin</span>
-            </a>
-            <a
-              className="instagramicon"
-              title="Instagram"
-              target="blank"
-              href="https://www.instagram.com/iatric.healthcare/"
-            >
-              <FaInstagram size={25} />
-              <span className="mobiletext02">Instagram</span>
-            </a>
-
-            {/* <a className="twittericon" title="Twitter" href="#">
-              <i className="fab fa-twitter" />
-              <span className="mobiletext02">Twitter</span>
-            </a> */}
-            <a
-              className="facebookicon"
-              title="Facebook"
-              target="blank"
-              href="https://www.facebook.com/iatrichealthcare"
-            >
-              <FaFacebook size={25} />
-              <span className="mobiletext02">Facebook</span>
-            </a>
+            <a className="linkedinicon" title="Linkedin" target="blank" href="https://www.linkedin.com/in/iatrichealthcare/"><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
+            <a className="instagramicon" title="Instagram" target="blank" href="https://www.instagram.com/iatric.healthcare/"><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
+            <a className="facebookicon" title="Facebook" target="blank" href={facebook_page_url}><FaFacebook size={25} /><span className="mobiletext02">Facebook</span></a>
           </div>
         </div>
       </div>
-      {/* END HEADER STRIP */}
-      {/* NAVIGATION MENU */}
+
+      {/* DESKTOP NAVIGATION */}
       <div className="wsmainfull menu clearfix">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between">
-            {/* Left: LOGO */}
             <div>
               <a href="#">
-                <Image
-                  src="/images/logo.png"
-                  width={180}
-                  height={60}
-                  alt="header-logo"
-                />
+                <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
               </a>
             </div>
-
-            {/* Center: MENU */}
             <nav className="wsmenu">
               <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
-                <li>
-                  <Link legacyBehavior href="/">
-                    <a className="nav-link">Home</a>
-                  </Link>
-                </li>
+                <li><Link legacyBehavior href="/"><a className="nav-link">Home</a></Link></li>
                 <li aria-haspopup="true">
-                  <a href="#">
-                    Pages <span className="wsarrow" />
-                  </a>
+                  <a href="#">Pages <span className="wsarrow" /></a>
                   <div className="wsmegamenu clearfix">
                     <div className="container">
                       <div className="row">
-                        {/* MEGAMENU LINKS */}
                         <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                           <li className="title">Standard Pages:</li>
-                          <li>
-                            <Link legacyBehavior href="/about-us">
-                              <a>About Us</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/about-us">
-                              <a>Mission / Plans</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/who-we-are">
-                              <a>Who We Are</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/all-services">
-                              <a>Our Services</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/service-1">
-                              <a>Contact Us</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/join-us">
-                              <a>Join Us</a>
-                            </Link>
-                          </li>
+                          <li><Link legacyBehavior href="/about-us"><a>About Us</a></Link></li>
+                          <li><Link legacyBehavior href="/who-we-are"><a>Who We Are</a></Link></li>
+                          <li><Link legacyBehavior href="/all-services"><a>Our Services</a></Link></li>
+                          <li><Link legacyBehavior href="/service-1"><a>Contact Us</a></Link></li>
+                          <li><Link legacyBehavior href="/join-us"><a>Join Us</a></Link></li>
                         </ul>
-                        {/* MEGAMENU LINKS */}
                         <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                           <li className="title">Medical Pages:</li>
-                          <li>
-                            <Link legacyBehavior href="/all-departments">
-                              <a>Our Departments</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/department-single">
-                              <a>Department Single</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/all-doctors">
-                              <a>Meet the Doctors</a>
-                            </Link>
-                          </li>
+                          <li><Link legacyBehavior href="/all-departments"><a>Our Departments</a></Link></li>
+                          <li><Link legacyBehavior href="/department-single"><a>Department Single</a></Link></li>
+                          <li><Link legacyBehavior href="/all-doctors"><a>Meet the Doctors</a></Link></li>
                         </ul>
-                        {/* MEGAMENU LINKS */}
                         <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                           <li className="title">Special Pages:</li>
-                          <li>
-                            <Link legacyBehavior href="/pricing-1">
-                              <a>Pricing Packages #1</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/pricing-2">
-                              <a>Pricing Packages #2</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/appointment">
-                              <a>Make an Appointment</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/faqs">
-                              <a>FAQs Page</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/terms">
-                              <a>Terms of Use</a>
-                            </Link>
-                          </li>
+                          <li><Link legacyBehavior href="/pricing-1"><a>Pricing Packages #1</a></Link></li>
+                          <li><Link legacyBehavior href="/pricing-2"><a>Pricing Packages #2</a></Link></li>
+                          <li><Link legacyBehavior href="/appointment"><a>Make an Appointment</a></Link></li>
+                          <li><Link legacyBehavior href="/faqs"><a>FAQs Page</a></Link></li>
                         </ul>
-                        {/* MEGAMENU LINKS */}
                         <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
                           <li className="title">Auxiliary Pages:</li>
-                          <li>
-                            <Link legacyBehavior href="/gallery">
-                              <a>Our Gallery</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/blog-listing">
-                              <a>Blog Listing Page</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/single-post">
-                              <a>Single Blog Post</a>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link legacyBehavior href="/contacts-2">
-                              <a>Contact Us #2</a>
-                            </Link>
-                          </li>
+                          <li><Link legacyBehavior href="/gallery"><a>Our Gallery</a></Link></li>
+                          <li><Link legacyBehavior href="/blog-listing"><a>Blog Listing Page</a></Link></li>
+                          <li><Link legacyBehavior href="/single-post"><a>Single Blog Post</a></Link></li>
+                          <li><Link legacyBehavior href="/contacts-2"><a>Contact Us #2</a></Link></li>
                         </ul>
                       </div>
-                      {/* End row */}
                     </div>
-                    {/* End container */}
                   </div>
-                  {/* End wsmegamenu */}
                 </li>
-                <li>
-                  <Link legacyBehavior href="/labTest/homepage">
-                    <a
-                      className="nav-link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Lab Test
-                    </a>
-                  </Link>
-                </li>
-                <li>
-                  <Link legacyBehavior href="/blog/homepage">
-                    <a className="nav-link" target="_blank">Blog</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link legacyBehavior href="/service-1">
-                    <a className="nav-link">Contact Us</a>
-                  </Link>
-                </li>
+                <li><Link legacyBehavior href="/labTest/homepage"><a className="nav-link" target="_blank" rel="noopener noreferrer">Lab Test</a></Link></li>
+                <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">Blog</a></Link></li>
+                <li><Link legacyBehavior href="/service-1"><a className="nav-link">Contact Us</a></Link></li>
               </ul>
             </nav>
-
-            {/* Right: Button + Cart Icons */}
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
-                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>
-                  {booking_btn_txt}
-                </ConsultationButton>
+                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
               )}
-
               {isLabTestPage && cartItemCount > 0 && (
-                <div
-                  className="position-relative"
-                  onClick={togglePanel}
-                  role="button"
-                >
+                <div className="position-relative" onClick={togglePanel} role="button">
                   <FaCartShopping size={20} color={color_schema.green} />
-                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                    {cartItemCount}
-                  </div>
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">{cartItemCount}</div>
                 </div>
               )}
-
               {isMedicinePage && medicineCartItemCount > 0 && (
-                <div
-                  className="position-relative"
-                  onClick={toggleMedicinePanel}
-                  role="button"
-                >
+                <div className="position-relative" onClick={toggleMedicinePanel} role="button">
                   <FaCartShopping size={20} color={color_schema.green} />
-                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                    {medicineCartItemCount}
-                  </div>
+                  <div className="cartItemCount position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">{medicineCartItemCount}</div>
                 </div>
               )}
             </div>
           </div>
         </div>
-
-        {/* Panels */}
-        {isLabTestPage && (
-          <CartPanel
-            isOpen={isPanelOpen}
-            togglePanel={togglePanel}
-            cartItem={labTestCartItems}
-            onUpdateCartItemCount={updateCartItemCount}
-          />
-        )}
-
-        {isMedicinePage && (
-          <MedicineCartPanel
-            isOpen={isMedicinePanelOpen}
-            togglePanel={toggleMedicinePanel}
-            cartItem={medicineCartItems}
-            onUpdateCartItemCount={updateMedicineCartItemCount}
-          />
-        )}
-
-        {/* <PopupDialog
-          isOpen={isConsultationTypeOpen}
-          onClose={handleConsultationTypeCloseDialog}
-          options={consultationTypes}
-        /> */}
+        {isLabTestPage && <CartPanel isOpen={isPanelOpen} togglePanel={togglePanel} cartItem={labTestCartItems} onUpdateCartItemCount={updateCartItemCount} />}
+        {isMedicinePage && <MedicineCartPanel isOpen={isMedicinePanelOpen} togglePanel={toggleMedicinePanel} cartItem={medicineCartItems} onUpdateCartItemCount={updateMedicineCartItemCount} />}
       </div>
 
-      <MobileMenu />
-      {/* END NAVIGATION MENU */}
+      {mobileMenuOpen && <MobileMenu  scrollToContact={scrollToContact} />}
     </header>
   );
 };

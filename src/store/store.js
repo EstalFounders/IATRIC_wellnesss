@@ -2,7 +2,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
 import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import appointmentReducer from "./slices/registerDoc/appointmentSlice";
 import notificationDataSlice from "./slices/notificationSectionApiData";
 import homepageSlice from "./slices/superAdmin/homepageSlice";
@@ -13,6 +13,22 @@ import userDetailsPageSlice from "./slices/authentication/userDetailsSlice";
 import medicineHomePageApiDataSlice from "./slices/medicine/MedicineHomePageApiData.js";
 import otherConfigSlice from "./slices/bookingWebsite/otherConfig.js";
 import UtilBlogDataSlice from "./slices/blog/utilBlogStore.js";
+
+const createNoopStorage = () => {
+  return {
+    getItem(_key) {
+      return Promise.resolve(null);
+    },
+    setItem(_key, value) {
+      return Promise.resolve(value);
+    },
+    removeItem(_key) {
+      return Promise.resolve();
+    },
+  };
+};
+
+const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
 
 const persistConfig = {
   key: "root",
