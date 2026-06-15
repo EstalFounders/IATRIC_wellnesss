@@ -1,0 +1,233 @@
+.container {
+  padding: 12px 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.headerTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.headerCount {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.queryItem {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #f0f0f0;
+  transition: box-shadow 0.2s;
+  overflow: hidden;
+}
+
+.queryItem:hover {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.queryMain {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.queryAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3b5f1d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.queryInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.queryName {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.queryMeta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #666;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+
+.queryMessage {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  line-height: 1.4;
+}
+
+.expandIcon {
+  color: #bbb;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.expandIconOpen {
+  transform: rotate(180deg);
+}
+
+.queryExpanded {
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 14px;
+  background: #fafafa;
+}
+
+.expandedField {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.expandedField strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.expandedActions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viewBtn {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.viewBtn:hover {
+  background: #c8e6c9;
+}
+
+.replyBtn {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.replyBtn:hover {
+  background: #bbdefb;
+}
+
+.assignBtn {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.assignBtn:hover {
+  background: #ffe0b2;
+}
+
+.closeBtn {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.closeBtn:hover {
+  background: #ffcdd2;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.pageBtn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageBtn:hover {
+  background: #f5f5f5;
+}
+
+.pageBtnActive {
+  background: #3b5f1d;
+  color: white;
+  border-color: #3b5f1d;
+}
+
+.pageInfo {
+  font-size: 0.78rem;
+  color: #999;
+  margin: 0 8px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+  font-size: 0.9rem;
+}

@@ -48,7 +48,7 @@ const DoctorCard = ({ doctor, index }) => {
         </div>
 
         <div className={`mt-4 ${styles["doctor-primary-info col"]}`}>
-          <h2 className={styles["new-doctor-name mt-4"]}>{doctor.name}</h2>
+          <h2 className={styles["new-doctor-name mt-4"]}>Dr {doctor.name}</h2>
           <p className={styles["doctor-text"]}>{doctor.speciality}</p>
           <p className={styles["doctor-text"]}>
             {doctor.workExperience} experience overall

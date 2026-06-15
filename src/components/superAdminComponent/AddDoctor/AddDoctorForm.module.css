@@ -33,7 +33,7 @@
 }
 
 .button {
-  background-color: #007bff;
+  background-color: #3b5f1d;
   color: #fff;
   padding: 10px 15px;
   border: none;
@@ -44,7 +44,7 @@
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background-color: #2d4a16;
 }
 .select {
   width: 100%;

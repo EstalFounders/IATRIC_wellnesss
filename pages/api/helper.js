@@ -454,17 +454,22 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     consultationType,
     contact_no,
   );
+  const formattedReminderDate = extractDate(appointmentTime);
+  const formattedReminderTime = formatTime(appointmentTime);
+
   const reminderMessageBodyPatient = getReminderMessageBodyPatient(
     docName,
     name,
-    formatTime(appointmentTime), // Pass formatted time
+    formattedReminderDate,
+    formattedReminderTime,
     patientMeetingUrl,
   );
 
   const reminderMessageBodyDoctor = getReminderMessageBodyDoctor(
     docName,
     name,
-    formatTime(appointmentTime), // Pass formatted time
+    formattedReminderDate,
+    formattedReminderTime,
     doctorMeetingUrl,
   );
 

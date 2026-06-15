@@ -1,6 +1,6 @@
 // src/utils/whatsappMessageBodies.js
 
-import { extractTime, formatData } from "../../../src/components/registerDocComponent/utils/helper";
+import { extractTime, formatData, extractDate } from "../../../src/components/registerDocComponent/utils/helper";
 
 // Assuming formatData and extractTime are available or passed in
 // If they are utilities from your project, you'd import them here:
@@ -21,8 +21,8 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
     // You would call formatData and extractTime here or ensure formatted values are passed
     // For simplicity, let's assume formatted values are passed for now,
     // or you'd import and use your date/time formatters here.
-    const formattedAppointmentDate = formatData(startTime)/* call formatData(startTime) */; // Implement or import
-    const formattedAppointmentTime = extractTime(startTime)/* call extractTime(startTime) */; // Implement or import
+    const formattedAppointmentDate = extractDate(startTime);
+    const formattedAppointmentTime = extractTime(startTime);
   
     // For this example, let's make them directly passed for clarity:
   
@@ -41,14 +41,16 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
    * Generates the message body for a patient's meeting reminder.
    * @param {string} doctorName - The doctor's name.
    * @param {string} patientName - The patient's name.
+   * @param {string} appointmentDate - The formatted appointment date (e.g., "15/06/2026").
    * @param {string} appointmentTime - The formatted appointment time (e.g., "10:30 AM").
    * @param {string} meetingUrl - The patient's meeting URL.
    * @returns {object} The patient reminder message body.
    */
-  export const getReminderMessageBodyPatient = (doctorName, patientName, appointmentTime, meetingUrl) => {
+  export const getReminderMessageBodyPatient = (doctorName, patientName, appointmentDate, appointmentTime, meetingUrl) => {
     return {
       doctor_name: doctorName,
       patient_name: patientName,
+      appointment_date: appointmentDate,
       appointment_time: appointmentTime,
       meeting_url: meetingUrl,
     };
@@ -58,14 +60,16 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
    * Generates the message body for a doctor's meeting reminder.
    * @param {string} doctorName - The doctor's name.
    * @param {string} patientName - The patient's name.
+   * @param {string} appointmentDate - The formatted appointment date (e.g., "15/06/2026").
    * @param {string} appointmentTime - The formatted appointment time (e.g., "10:30 AM").
    * @param {string} meetingUrl - The doctor's meeting URL.
    * @returns {object} The doctor reminder message body.
    */
-  export const getReminderMessageBodyDoctor = (doctorName, patientName, appointmentTime, meetingUrl) => {
+  export const getReminderMessageBodyDoctor = (doctorName, patientName, appointmentDate, appointmentTime, meetingUrl) => {
     return {
       doctor_name: doctorName,
       patient_name: patientName,
+      appointment_date: appointmentDate,
       appointment_time: appointmentTime,
       meeting_url: meetingUrl,
     };
