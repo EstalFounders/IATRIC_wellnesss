@@ -234,10 +234,10 @@ export default async function handler(req, res) {
       //   body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
       //   read: false,
       // });
-      // await sendAdminNotification({
-      //   title: "Consultation Booked",
-      //   body: `Patient ${name} has booked consultation`
-      // })
+      await sendAdminNotification({
+        title: "Consultation Booked",
+        body: `Patient ${name} has booked consultation`
+      })
       await session.commitTransaction();
       session.endSession();
       res.status(200).json({ message: "Consultation booked successfully" });

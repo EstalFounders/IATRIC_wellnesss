@@ -48,6 +48,7 @@ const AddDoctorForm = () => {
     serviceOffered: "",
     password: "",
     doctorType: DoctorType.INDIVIDUAL,
+    doctorShare: "",
     price: "",
     slotStartTime: "",
     slotEndTime: "",
@@ -55,11 +56,11 @@ const AddDoctorForm = () => {
   });
 
   const storedService = useSelector(
-    (state) => state.superAdminHomePage.serviceOffered
+    (state) => state.superAdminHomePage.serviceOffered,
   );
 
   const consultationTypeStore = useSelector(
-    (state) => state.otherDetailsSlice.consultationType
+    (state) => state.otherDetailsSlice.consultationType,
   );
 
   useEffect(() => {
@@ -207,6 +208,7 @@ const AddDoctorForm = () => {
     formData.append("slotStartTime", doctorDetails.slotStartTime);
     formData.append("slotEndTime", doctorDetails.slotEndTime);
     formData.append("doctorStamp", doctorStamp);
+    formData.append("doctorShare", doctorDetails.doctorShare);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
     });
@@ -324,58 +326,58 @@ const AddDoctorForm = () => {
           </label> */}
           <div className="font-weight-bold row ml-0">
             <div className="col-md-6">
-            <label>Select Consultation Type:</label>
-            <select
-              id="consultationType"
-              className={styles.input}
-              onChange={handleAddType}
-              value=""
-            >
-              <option value="" disabled>
-                Select options
-              </option>
-              {superAdminConsultationtype.map((option) => (
-                <option
-                  key={option.name}
-                  value={option.name}
-                  disabled={selectedTypes.includes(option.name)}
-                >
-                  {option.name}
+              <label>Select Consultation Type:</label>
+              <select
+                id="consultationType"
+                className={styles.input}
+                onChange={handleAddType}
+                value=""
+              >
+                <option value="" disabled>
+                  Select options
                 </option>
-              ))}
-            </select>
-
-            {/* Display selected options as "tags" */}
-            <div className={styles.tagsContainer}>
-              {selectedTypes.map((type) => (
-                <div key={type} className={styles.tag}>
-                  {type}
-                  <button
-                    type="button"
-                    className={styles.removeButton}
-                    onClick={() => handleRemoveType(type)}
+                {superAdminConsultationtype.map((option) => (
+                  <option
+                    key={option.name}
+                    value={option.name}
+                    disabled={selectedTypes.includes(option.name)}
                   >
-                    ✖
-                  </button>
-                </div>
-              ))}
-            </div>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
 
-            {/* Location input for specific consultation types */}
-            {(selectedTypes.includes("Off-line consultations") ||
-              selectedTypes.includes("Home visit")) && (
-              <div>
-                <label htmlFor="Location" className="ml-3">
-                  Location:
-                </label>
-                <input
-                  type="text"
-                  id="Location"
-                  className={styles.input}
-                  placeholder="Enter location"
-                />
+              {/* Display selected options as "tags" */}
+              <div className={styles.tagsContainer}>
+                {selectedTypes.map((type) => (
+                  <div key={type} className={styles.tag}>
+                    {type}
+                    <button
+                      type="button"
+                      className={styles.removeButton}
+                      onClick={() => handleRemoveType(type)}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                ))}
               </div>
-            )}
+
+              {/* Location input for specific consultation types */}
+              {(selectedTypes.includes("Off-line consultations") ||
+                selectedTypes.includes("Home visit")) && (
+                <div>
+                  <label htmlFor="Location" className="ml-3">
+                    Location:
+                  </label>
+                  <input
+                    type="text"
+                    id="Location"
+                    className={styles.input}
+                    placeholder="Enter location"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="font-weight-bold col-md-6">
@@ -466,8 +468,21 @@ const AddDoctorForm = () => {
                 />
               </label>
             </Col>
-
-            <Col className="ml-5">
+            <Col>
+              <label className={styles.label}>
+                <b>Doctor Share (%)</b>
+                <input
+                  type="number"
+                  name="doctorShare"
+                  value={doctorDetails.doctorShare}
+                  onChange={handleChange}
+                  className={styles.input}
+                  min="0"
+                  max="100"
+                />
+              </label>
+            </Col>
+            <Col>
               <label className={styles.label}>
                 <b>Doctor Type</b>
                 <select
