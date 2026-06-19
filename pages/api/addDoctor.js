@@ -19,6 +19,7 @@ import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
 import Slot from "../../src/models/slots";
+import { logErrorToGoogleSheet } from "./helper";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -173,6 +174,12 @@ export default async function handler(req, res) {
           // Assuming the rest of your code to handle the response and database operations
         } catch (error) {
           console.error("Error uploading files:", error);
+          await logErrorToGoogleSheet({
+            apiName: "addDoctor - POST/formUpload",
+            errorMessage: error.message || "File upload failed",
+            errorCode: "500",
+            stackTrace: error.stack,
+          });
           res
             .status(500)
             .json({ error: "An error occurred while uploading files." });
@@ -180,6 +187,12 @@ export default async function handler(req, res) {
       });
     } catch (error) {
       console.error("Error parsing form data:", error);
+      await logErrorToGoogleSheet({
+        apiName: "addDoctor - POST/formParse",
+        errorMessage: error.message || "Form parsing failed",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res
         .status(500)
         .json({ error: "An error occurred while parsing form data." });
@@ -192,6 +205,12 @@ export default async function handler(req, res) {
       res.status(200).json(doctors);
     } catch (err) {
       console.error("Error fetching doctor data in server:", err);
+      await logErrorToGoogleSheet({
+        apiName: "addDoctor - GET",
+        errorMessage: err.message || "Failed to fetch doctors",
+        errorCode: "500",
+        stackTrace: err.stack,
+      });
       res
         .status(500)
         .json({ error: "An error occurred while fetching doctor data." });
@@ -328,6 +347,13 @@ export default async function handler(req, res) {
       });
     } catch (error) {
       console.error("Error updating doctor:", error);
+      await logErrorToGoogleSheet({
+        apiName: "addDoctor - PUT",
+        errorMessage: error.message || "Update doctor failed",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id: req.query?.id },
+      });
       res
         .status(500)
         .json({ error: "An error occurred while updating doctor." });
@@ -386,6 +412,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Doctor deleted successfully" });
     } catch (error) {
       console.error(error);
+      await logErrorToGoogleSheet({
+        apiName: "addDoctor - DELETE",
+        errorMessage: error.message || "Delete doctor failed",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id: req.query?.id },
+      });
       return res.status(500).json({ message: "Internal server error" });
     }
   } else {

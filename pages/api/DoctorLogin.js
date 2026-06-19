@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -31,6 +32,13 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: doctorRes });
   } catch (error) {
     console.error(error);
+    await logErrorToGoogleSheet({
+      apiName: "DoctorLogin - POST",
+      errorMessage: error.message || "Doctor login failed",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { email },
+    });
     res.status(500).json({ message: "Internal server error" });
   }
 }

@@ -2,6 +2,7 @@
 // // pages/api/bookLabTest.js
 import { dbConnect } from "../../src/lib/db";
 import BookLabTest from "../../src/models/bookLabTestSchema";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -31,6 +32,13 @@ export default async function handler(req, res) {
       res.status(201).json({ success: true, booking: savedBooking });
     } catch (error) {
       console.error("Error creating booking:", error);
+      await logErrorToGoogleSheet({
+        apiName: "bookLabTest - POST",
+        errorMessage: error.message || "Booking creation failed",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { name, mobileNumber, paymentMethod, totalPrice },
+      });
       res.status(500).json({ error: "Server error. Please try again later." });
     }
   } else if (req.method === "GET") {
@@ -42,6 +50,12 @@ export default async function handler(req, res) {
       res.status(200).json({ labTests });
     } catch (error) {
       console.error(error);
+      await logErrorToGoogleSheet({
+        apiName: "bookLabTest - GET",
+        errorMessage: error.message || "Failed to fetch lab tests",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ error: "Unable to fetch Lab Test" });
     }
   } else if(req.method === "PUT") {
@@ -65,6 +79,13 @@ export default async function handler(req, res) {
       res.status(200).json({ message: "Status updated successfully" });
     } catch (error) {
       console.log(error, 'error in lab update')
+      await logErrorToGoogleSheet({
+        apiName: "bookLabTest - PUT",
+        errorMessage: error.message || "Lab test update failed",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { labTestId, selectedStatus },
+      });
       res.status(500).json({ message: "An error occurred", error });
     }
   } 

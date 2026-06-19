@@ -2,9 +2,10 @@ import { dbConnect } from "../../../src/lib/db";
 import Doctor from "../../../src/models/doctorModel";
 import GlobalVar from "../../../src/models/globalVarSchema";
 import LeaveRequestSchema from "../../../src/models/leaveRequest";
+import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
-  await dbConnect(); // Ensure the database connection
+  await dbConnect();
 
   if (req.method === "POST") {
     console.log(req.body, "body");
@@ -23,17 +24,14 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Count existing requests
       const totalRequests = await LeaveRequestSchema.countDocuments();
 
-      // Update global count
       await GlobalVar.findOneAndUpdate(
         { name: "doctorLeaveRequestCount" },
         { value: totalRequests },
         { upsert: true, new: true }
       );
 
-      // Create new request
       const newRequest = new LeaveRequestSchema({
         doctorId: id,
         name: name,
@@ -49,6 +47,13 @@ export default async function handler(req, res) {
         .json({ message: "Leave request submitted successfully." });
     } catch (error) {
       console.error("Error saving leave request:", error);
+      await logErrorToGoogleSheet({
+        apiName: "leaveRequest - POST",
+        errorMessage: error.message || "Failed to submit leave request",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id, name, formData },
+      });
       res.status(500).json({ error: "Failed to submit leave request." });
     }
   } else if (req.method == "GET") {
@@ -56,6 +61,12 @@ export default async function handler(req, res) {
       const requests = await LeaveRequestSchema.find();
       res.status(200).json(requests);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "leaveRequest - GET",
+        errorMessage: error.message || "Failed to fetch leave requests",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ error: "Failed to fetch pending requests." });
     }
   } else if (req.method == "PUT") {
@@ -71,7 +82,6 @@ export default async function handler(req, res) {
 
       if (action === "approve") {
         console.log(request, "82", request.updatedFields);
-        // Mark request as approved
         request.status = "approved";
         request.approvedAt = new Date();
 
@@ -80,7 +90,6 @@ export default async function handler(req, res) {
           .status(200)
           .json({ message: "Request approved and doctor profile updated." });
       } else if (action === "reject") {
-        // Mark request as rejected
         request.status = "rejected";
         request.rejectedAt = new Date()
         await request.save();
@@ -90,6 +99,13 @@ export default async function handler(req, res) {
         res.status(400).json({ error: "Invalid action." });
       }
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "leaveRequest - PUT",
+        errorMessage: error.message || "Failed to process leave request",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id, action },
+      });
       res.status(500).json({ error: "Failed to process update request." });
     }
   }

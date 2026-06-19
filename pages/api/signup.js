@@ -3,6 +3,7 @@
 import { hash } from "bcryptjs"
 import { dbConnect } from "../../src/lib/db";
 import User from "../../src/models/userModel";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   try {
@@ -45,6 +46,13 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.log(error, 'console in error');
+    await logErrorToGoogleSheet({
+      apiName: "signup",
+      errorMessage: error.message || "Signup failed",
+      errorCode: error.code || "500",
+      stackTrace: error.stack,
+      requestPayload: req.body?.body ? JSON.parse(req.body.body) : req.body,
+    });
     res.json({ error });
   }
 
