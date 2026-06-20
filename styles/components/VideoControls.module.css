@@ -1,0 +1,108 @@
+/* VideoControls.module.css */
+
+.controlsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.controlBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.controlBtn:hover {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.05);
+}
+
+.controlBtn:active {
+  transform: scale(0.95);
+}
+
+.controlBtnActive {
+  background: rgba(79, 172, 254, 0.3);
+  color: #4facfe;
+}
+
+.controlBtnOff {
+  background: rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+}
+
+.controlBtnEnd {
+  width: 52px;
+  height: 44px;
+  border-radius: 22px;
+  background: #ff4757;
+  color: #fff;
+  font-size: 16px;
+}
+
+.controlBtnEnd:hover {
+  background: #e8414f;
+  transform: scale(1.05);
+}
+
+.controlLabel {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  display: none;
+}
+
+.controlBtn:hover .controlLabel {
+  display: block;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 20;
+  display: none;
+}
+
+.controlBtn:hover .tooltip {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .controlsContainer {
+    gap: 8px;
+  }
+
+  .controlBtn {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+  }
+
+  .controlBtnEnd {
+    width: 46px;
+    height: 38px;
+  }
+}

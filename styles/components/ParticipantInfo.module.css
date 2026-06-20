@@ -1,0 +1,278 @@
+/* ParticipantInfo.module.css */
+
+.panelContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e3a;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.panelCloseBtn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+}
+
+.panelCloseBtn:hover {
+  color: #ffffff;
+}
+
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* User Cards */
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 16px;
+}
+
+.userAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.avatarDoctor {
+  background: rgba(79, 172, 254, 0.2);
+}
+
+.avatarPatient {
+  background: rgba(0, 242, 254, 0.2);
+}
+
+.userDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.userRole {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.userSpecialty {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.userStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.statusOnline {
+  background: #2ed573;
+}
+
+.statusAway {
+  background: #ffa502;
+}
+
+/* Section */
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Info Grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.infoItem {
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+.infoLabel {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.infoValue {
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Medical History */
+.medicalList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.medicalTag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Emergency Contact */
+.emergencyContact {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.15);
+}
+
+.emergencyLabel {
+  font-size: 11px;
+  color: #ff4757;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.emergencyName {
+  font-size: 13px;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.emergencyPhone {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* Appointment Info */
+.appointmentDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appointmentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+.appointmentIcon {
+  font-size: 16px;
+  width: 28px;
+  text-align: center;
+}
+
+.appointmentText {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+
+.appointmentValue {
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* Participants List */
+.participantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.participantItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+.participantDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.participantName {
+  flex: 1;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.participantRole {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+}
+
+.participantMicStatus {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+}

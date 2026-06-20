@@ -1,0 +1,575 @@
+/* Meeting.module.css - Main Meeting Layout */
+
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background-color: #1a1a2e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* ---- Connecting Screen ---- */
+.connectingScreen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #ffffff;
+}
+
+.connectingSpinner {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top-color: #4facfe;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.connectingTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.connectingSubtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ---- Error Screen ---- */
+.errorScreen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a2e;
+  color: #ffffff;
+  text-align: center;
+  padding: 40px;
+}
+
+.errorIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.errorTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ff6b6b;
+}
+
+.errorMessage {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.retryButton {
+  padding: 10px 24px;
+  background: #4facfe;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retryButton:hover {
+  background: #3d8bdb;
+}
+
+/* ---- Ended Call Screen ---- */
+.endedScreen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #ffffff;
+}
+
+.endedIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.endedTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.endedDuration {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 32px;
+}
+
+.endedActions {
+  display: flex;
+  gap: 16px;
+}
+
+.leaveButton {
+  padding: 12px 32px;
+  background: #4facfe;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.leaveButton:hover {
+  background: #3d8bdb;
+}
+
+/* ---- Main Layout ---- */
+.mainLayout {
+  display: flex;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- Video Area ---- */
+.videoArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: #0f0f23;
+}
+
+/* ---- Header ---- */
+.meetingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(26, 26, 46, 0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  z-index: 10;
+}
+
+.meetingInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meetingTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.meetingId {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  font-family: monospace;
+}
+
+.meetingTimer {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.recordingBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 71, 87, 0.2);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #ff4757;
+  font-weight: 500;
+}
+
+.recordingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4757;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---- Video Grid ---- */
+.videoGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.videoGridDual {
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.videoGridSingle {
+  grid-template-columns: 1fr;
+}
+
+.videoWrapper {
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+  color: rgba(255,255,255,0.3);
+}
+
+.videoPlaceholderAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.videoPlaceholderName {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+
+.videoPlaceholderRole {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+}
+
+.participantBadge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.participantMicOff {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,71,87,0.3);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-size: 12px;
+}
+
+.raisedHandIndicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 193, 7, 0.3);
+  border-radius: 50%;
+  font-size: 18px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+/* ---- Controls Bar ---- */
+.controlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 20px 36px 20px;
+  background: rgba(26, 26, 46, 0.95);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  z-index: 10;
+}
+
+.controlButton {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.controlButton:hover {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.05);
+}
+
+.controlButton:active {
+  transform: scale(0.95);
+}
+
+.controlButtonActive {
+  background: rgba(79, 172, 254, 0.3);
+  color: #4facfe;
+}
+
+.controlButtonActive:hover {
+  background: rgba(79, 172, 254, 0.4);
+}
+
+.controlButtonOff {
+  background: rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+}
+
+.controlButtonOff:hover {
+  background: rgba(255, 71, 87, 0.4);
+}
+
+.controlButtonEnd {
+  width: 52px;
+  height: 44px;
+  border-radius: 22px;
+  background: #ff4757;
+  color: #fff;
+  font-size: 16px;
+}
+
+.controlButtonEnd:hover {
+  background: #e8414f;
+  transform: scale(1.05);
+}
+
+.controlLabel {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #ffffff;
+  white-space: nowrap;
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 3px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.controlButton:hover .controlLabel {
+  display: block;
+}
+
+/* ---- Side Panel ---- */
+.sidePanel {
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e3a;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+.sidePanelClosed {
+  width: 0;
+  border-left: none;
+}
+
+.sidePanelTabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidePanelTab {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.sidePanelTab:hover {
+  color: rgba(255,255,255,0.8);
+}
+
+.sidePanelTabActive {
+  color: #4facfe;
+}
+
+.sidePanelTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: #4facfe;
+  border-radius: 2px;
+}
+
+.sidePanelTabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff4757;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.sidePanelContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* ---- Camera Toast Notification ---- */
+.cameraToast {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: cameraToastIn 0.3s ease-out;
+  pointer-events: none;
+}
+
+@keyframes cameraToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.cameraToastIcon {
+  font-size: 18px;
+}
+
+.cameraToastMessage {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .sidePanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    z-index: 100;
+    width: 100%;
+  }
+
+  .sidePanelClosed {
+    width: 0;
+  }
+
+  .controlsBar {
+    gap: 8px;
+    padding: 10px 12px 28px 12px;
+  }
+
+  .controlButton {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+  }
+
+  .videoGridDual {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 0.5fr;
+  }
+}
