@@ -1,18 +1,18 @@
 import { dbConnect } from "../../../src/lib/db";
 import Doctor from "../../../src/models/doctorModel";
+import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
-  await dbConnect(); // Ensure the database connection
+  await dbConnect();
 
   if (req.method === "POST") {
     const { doctorId, isActive } = req.body;
 
     try {
-      // Update the doctor's `isActive` status in the database
       const updatedDoctor = await Doctor.findByIdAndUpdate(
         doctorId,
         { isActive },
-        { new: true } // Return the updated document
+        { new: true }
       );
 
       if (!updatedDoctor) {
@@ -26,6 +26,13 @@ export default async function handler(req, res) {
       });
     } catch (error) {
       console.error("Error updating doctor status:", error.message);
+      await logErrorToGoogleSheet({
+        apiName: "updateDoctorStatus - POST",
+        errorMessage: error.message || "Failed to update doctor status",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { doctorId, isActive },
+      });
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   } else {

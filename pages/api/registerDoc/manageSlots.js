@@ -1,6 +1,7 @@
 import Slot from "../../../src/models/slots";
 import Doctor from "../../../src/models/doctorModel";
 import { dbConnect } from "../../../src/lib/db";
+import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -20,6 +21,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, isDateUnavailable });
     } catch (error) {
       console.error("Error fetching date status:", error);
+      await logErrorToGoogleSheet({
+        apiName: "manageSlots - GET",
+        errorMessage: error.message || "Failed to check date status",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { doctorId: req.query?.doctorId, date: req.query?.date },
+      });
       return res.status(500).json({ success: false, message: "Internal server error" });
     }
   }
@@ -50,12 +58,10 @@ export default async function handler(req, res) {
       if (date && typeof isDateUnavailable === "boolean") {
         let unavailableDates = doctor.unavailableDates || [];
         if (isDateUnavailable) {
-          // Add date if not already present
           if (!unavailableDates.includes(date)) {
             unavailableDates.push(date);
           }
         } else {
-          // Remove date if present
           unavailableDates = unavailableDates.filter((d) => d !== date);
         }
         await Doctor.findByIdAndUpdate(doctorId, {
@@ -66,6 +72,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "Slots updated successfully." });
     } catch (error) {
       console.error("Error managing slots:", error);
+      await logErrorToGoogleSheet({
+        apiName: "manageSlots - POST",
+        errorMessage: error.message || "Failed to manage slots",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { doctorId, date },
+      });
       return res.status(500).json({ success: false, message: "Internal server error" });
     }
   }

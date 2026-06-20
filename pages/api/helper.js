@@ -22,6 +22,10 @@ import {
   WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
 } from "./utils/constants";
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { JWT } from "google-auth-library";
+import path from "path";
+import fs from "fs";
 
 export async function findAvailableDoctorForNow(
   selectedDate,
@@ -516,4 +520,110 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     );
   }
   return appointment._id;
+};
+
+/**
+ * Reusable helper to log errors to Google Sheets.
+ * Uses the local serviceAccountKey.json file for authentication.
+ * Handles connection, row insertion, and error handling internally.
+ * Failure to log does not throw - logs to console and returns false.
+ *
+ * @param {Object} data - Error data object
+ * @param {string} data.apiName - Name of the API/endpoint where error occurred
+ * @param {string} data.errorMessage - Error message description
+ * @param {string} [data.errorCode] - Error code (HTTP status or custom code)
+ * @param {Object} [data.requestPayload] - Request payload (will be JSON stringified)
+ * @param {Object} [data.responsePayload] - Response payload (will be JSON stringified)
+ * @param {string} [data.stackTrace] - Error stack trace
+ * @param {string} [data.patientName] - Patient name (if applicable)
+ * @param {string} [data.mobileNumber] - Patient mobile number (if applicable)
+ * @param {string} [data.doctorName] - Doctor name (if applicable)
+ * @param {string} [data.consultationType] - Consultation type (if applicable)
+ * @param {string} [data.appointmentDate] - Appointment date (if applicable)
+ * @returns {Promise<boolean>} - true if logged successfully, false otherwise
+ */
+export const logErrorToGoogleSheet = async (data) => {
+  try {
+    const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
+    const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "ErrorLogs";
+
+    if (!SPREADSHEET_ID) {
+      console.error("logErrorToGoogleSheet: GOOGLE_SHEET_ID not configured");
+      return false;
+    }
+
+    // Load service account key from local JSON file
+    const serviceAccountPath = path.join(process.cwd(), "serviceAccountKey.json");
+    if (!fs.existsSync(serviceAccountPath)) {
+      console.error("logErrorToGoogleSheet: serviceAccountKey.json not found at", serviceAccountPath);
+      return false;
+    }
+
+    const serviceAccountKey = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+
+    // Initialize Google Auth using the service account key file
+    // The universe_domain from the key file (googleapis.com) is used as the auth scope
+    const serviceAccountAuth = new JWT({
+      email: serviceAccountKey.client_email,
+      key: serviceAccountKey.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
+
+    await doc.loadInfo();
+    let sheet = doc.sheetsByTitle[SHEET_NAME];
+
+    if (!sheet) {
+      sheet = await doc.addSheet({
+        title: SHEET_NAME,
+        headerValues: [
+          "Timestamp",
+          "Patient Name",
+          "Mobile Number",
+          "Doctor Name",
+          "Consultation Type",
+          "Appointment Date",
+          "API Endpoint",
+          "Error Code",
+          "Error Message",
+          "Request Payload",
+          "Response Payload",
+          "Stack Trace",
+          "Environment",
+        ],
+      });
+    }
+
+    await sheet.addRow({
+      Timestamp: new Date().toISOString(),
+      "Patient Name": data.patientName || "",
+      "Mobile Number": data.mobileNumber || "",
+      "Doctor Name": data.doctorName || "",
+      "Consultation Type": data.consultationType || "",
+      "Appointment Date": data.appointmentDate || "",
+      "API Endpoint": data.apiName || "",
+      "Error Code": data.errorCode || "",
+      "Error Message": data.errorMessage || "Unknown error",
+      "Request Payload": data.requestPayload
+        ? (typeof data.requestPayload === "string"
+            ? data.requestPayload
+            : JSON.stringify(data.requestPayload))
+        : "",
+      "Response Payload": data.responsePayload
+        ? (typeof data.responsePayload === "string"
+            ? data.responsePayload
+            : JSON.stringify(data.responsePayload))
+        : "",
+      "Stack Trace": data.stackTrace || "",
+      Environment: process.env.NODE_ENV || "development",
+    });
+
+    console.log("logErrorToGoogleSheet: Error logged successfully to Google Sheets");
+    return true;
+  } catch (error) {
+    console.error("logErrorToGoogleSheet: Failed to log error to Google Sheets:", error.message);
+    // Fail silently - logging failure should not crash the application or affect API response
+    return false;
+  }
 };

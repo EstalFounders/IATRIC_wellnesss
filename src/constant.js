@@ -54,6 +54,7 @@ export const api = {
   serviceSuggestion: "/api/helper/getServiceSuggestion",
   postArticle: "/api/superAdmin/postArticle",
   helperApi: "/api/helperApi",
+  consultationByMeetingId: "/api/getAppointmentId",
 };
 
 export const services = [

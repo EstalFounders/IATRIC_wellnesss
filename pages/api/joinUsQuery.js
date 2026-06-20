@@ -1,6 +1,7 @@
 import { dbConnect } from "../../src/lib/db";
 import JoinUsModel from "../../src/models/joinus";
 import Query from "../../src/models/query";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -10,6 +11,12 @@ export default async function handler(req, res) {
       const query = await JoinUsModel.find();
       res.status(200).json(query);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "joinUsQuery - GET",
+        errorMessage: error.message || "Failed to fetch join us queries",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ message: "Error fetching lab tests" });
     }
   }
@@ -55,6 +62,13 @@ export default async function handler(req, res) {
       res.status(201).json(savedQuery);
     } catch (error) {
       console.log(error, "error");
+      await logErrorToGoogleSheet({
+        apiName: "joinUsQuery - POST",
+        errorMessage: error.message || "Failed to create join us query",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: req.body,
+      });
       res
         .status(500)
         .json({ message: "Error creating category", error: error.message });

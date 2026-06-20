@@ -1,11 +1,12 @@
 import mongoose, { mongo } from "mongoose";
 import { dbConnect } from "../../src/lib/db";
 import LabTestPackages from "../../src/models/lab-test-packageSchema";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   await dbConnect();
   console.log(req.method, "req");
-  const { id } = req.query; // Destructure id from req.query
+  const { id } = req.query;
   console.log(id, "id on server");
 
   if (req.method === "GET") {
@@ -14,29 +15,32 @@ export default async function handler(req, res) {
 
       if (id) {
         console.log(id, "id on server 15");
-        // If an ID is provided in the query, find a specific package by its _id
         labTestsPackagesDetails = await LabTestPackages.find({
           category_id: id,
         });
 
-        // Optional: If you expect a single document and want to return 404 if not found
         if (!labTestsPackagesDetails) {
           return res
             .status(404)
             .json({ message: "Lab test package not found." });
         }
       } else {
-        // If no ID is provided, fetch all lab test packages
-        labTestsPackagesDetails = await LabTestPackages.find({}); // find({}) fetches all documents
+        labTestsPackagesDetails = await LabTestPackages.find({});
       }
 
       res.status(200).json(labTestsPackagesDetails);
     } catch (error) {
-      console.error("Error fetching lab tests:", error); // Log the actual error for debugging
-      // Provide a more specific error message if the ID format is invalid
+      console.error("Error fetching lab tests:", error);
       if (error.name === "CastError" && error.path === "_id") {
         res.status(400).json({ message: "Invalid ID format." });
       } else {
+        await logErrorToGoogleSheet({
+          apiName: "labtestPackagedetails - GET",
+          errorMessage: error.message || "Failed to fetch lab test packages",
+          errorCode: "500",
+          stackTrace: error.stack,
+          requestPayload: { id: req.query?.id },
+        });
         res.status(500).json({ message: "Error fetching lab tests." });
       }
     }
@@ -46,13 +50,12 @@ export default async function handler(req, res) {
     const { id } = req.query;
 
     try {
-      // Find the lab test by ID and update with the request body
       const updatedLabTest = await LabTestPackages.findByIdAndUpdate(
         id,
         req.body,
         {
-          new: true, // Return the updated document
-          runValidators: true, // Enforce schema validation
+          new: true,
+          runValidators: true,
         }
       );
 
@@ -64,6 +67,13 @@ export default async function handler(req, res) {
 
       res.status(200).json({ success: true, data: updatedLabTest });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagedetails - PUT",
+        errorMessage: error.message || "Failed to update lab test package",
+        errorCode: "400",
+        stackTrace: error.stack,
+        requestPayload: { id, ...req.body },
+      });
       res.status(400).json({ success: false, error: error.message });
     }
   }
@@ -110,6 +120,13 @@ export default async function handler(req, res) {
 
       res.status(201).json(savedTestDetails);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagedetails - POST",
+        errorMessage: error.message || "Failed to create lab test package",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: req.body,
+      });
       res
         .status(500)
         .json({ message: "Error saving test details", error: error.message });
@@ -125,6 +142,13 @@ export default async function handler(req, res) {
       }
       res.status(200).json({ message: "Test package deleted successfully" });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagedetails - DELETE",
+        errorMessage: error.message || "Failed to delete lab test package",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id },
+      });
       res.status(500).json({ error: "Failed to delete the test package" });
     }
   }

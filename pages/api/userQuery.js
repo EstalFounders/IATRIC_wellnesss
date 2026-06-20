@@ -3,6 +3,7 @@ import Query from "../../src/models/query";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { company_number, WHATSAPP_USER_QUERY_TEMPLATE } from "./utils/constants";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -12,6 +13,12 @@ export default async function handler(req, res) {
       const query = await Query.find();
       res.status(200).json(query);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "userQuery - GET",
+        errorMessage: error.message || "Failed to fetch user queries",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ message: "Error fetching lab tests" });
     }
   }
@@ -65,6 +72,13 @@ export default async function handler(req, res) {
       res.status(201).json(savedQuery);
     } catch (error) {
       console.log(error, "error");
+      await logErrorToGoogleSheet({
+        apiName: "userQuery - POST",
+        errorMessage: error.message || "Failed to create user query",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: req.body,
+      });
       res
         .status(500)
         .json({ message: "Error creating category", error: error.message });
