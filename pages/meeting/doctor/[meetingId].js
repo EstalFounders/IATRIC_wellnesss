@@ -46,8 +46,8 @@ export default function DoctorMeetingPage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-          color: "#ffffff",
+          background: "#f8faf5",
+          color: "#1a202c",
           fontFamily: "sans-serif",
         }}
       >
@@ -56,8 +56,8 @@ export default function DoctorMeetingPage() {
             width: 64,
             height: 64,
             borderRadius: "50%",
-            border: "4px solid rgba(255,255,255,0.1)",
-            borderTopColor: "#4facfe",
+            border: "4px solid rgba(59,95,29,0.1)",
+            borderTopColor: "#70b340",
             animation: "spin 1s linear infinite",
             marginBottom: 24,
           }}
@@ -65,7 +65,7 @@ export default function DoctorMeetingPage() {
         <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>
           Loading consultation details...
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>
+        <div style={{ fontSize: 14, color: "#4a5568" }}>
           Please wait while we fetch the patient appointment
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -83,8 +83,8 @@ export default function DoctorMeetingPage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          background: "#1a1a2e",
-          color: "#ffffff",
+          background: "#f8faf5",
+          color: "#1a202c",
           textAlign: "center",
           padding: 40,
           fontFamily: "sans-serif",
@@ -96,7 +96,7 @@ export default function DoctorMeetingPage() {
             fontSize: 20,
             fontWeight: 600,
             marginBottom: 8,
-            color: "#ff6b6b",
+            color: "#8e8333",
           }}
         >
           Failed to Load Consultation
@@ -104,7 +104,7 @@ export default function DoctorMeetingPage() {
         <div
           style={{
             fontSize: 14,
-            color: "rgba(255,255,255,0.6)",
+            color: "#4a5568",
             marginBottom: 24,
             maxWidth: 400,
           }}
@@ -115,7 +115,7 @@ export default function DoctorMeetingPage() {
           onClick={() => router.push("/")}
           style={{
             padding: "10px 24px",
-            background: "#4facfe",
+            background: "#3b5f1d",
             color: "#fff",
             border: "none",
             borderRadius: 8,

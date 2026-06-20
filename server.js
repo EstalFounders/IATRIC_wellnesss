@@ -88,8 +88,8 @@ app.prepare().then(() => {
     // ---- CHAT MESSAGE ----
     socket.on("send-message", ({ meetingId, message }) => {
       if (!meetingId || !message) return;
-      // Broadcast the message to everyone in the room including sender
-      io.to(meetingId).emit("receive-message", {
+      // Broadcast to everyone EXCEPT the sender (sender already added message locally)
+      socket.to(meetingId).emit("receive-message", {
         ...message,
         socketId: socket.id,
         role: socket.data.role,

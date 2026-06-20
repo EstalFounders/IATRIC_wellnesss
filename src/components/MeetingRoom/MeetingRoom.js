@@ -387,6 +387,9 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
 
     // ---- Receive chat message ----
     socket.on("receive-message", (data) => {
+      // Ignore messages from ourselves (safety net against server echo-back)
+      if (data.socketId === socket.id) return;
+      // Deduplicate: ignore if we already have a matching message from the same source
       const newMsg = {
         sender: data.role === "doctor" ? "Doctor" : "Patient",
         text: data.text,
@@ -394,7 +397,18 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
         type: data.type || "text",
         fromSocket: data.socketId,
       };
-      setMessages((prev) => [...prev, newMsg]);
+      setMessages((prev) => {
+        // Prevent duplicate: check if last message with same sender + text + socket already exists
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg &&
+            lastMsg.fromSocket === data.socketId &&
+            lastMsg.sender === newMsg.sender &&
+            lastMsg.text === newMsg.text &&
+            Math.abs(new Date(lastMsg.timestamp) - new Date(newMsg.timestamp)) < 500) {
+          return prev;
+        }
+        return [...prev, newMsg];
+      });
     });
 
     // ---- Remote typing ----
@@ -596,13 +610,21 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     };
   }, [meetingState, isAudioOnly]);
 
-  // ---- Re-assign stream to video element when toggling video on/off ----
+  // ---- Re-assign stream to local video element when toggling camera on/off ----
   // This ensures the newly mounted <video> element gets the stream after re-enabling camera
   useEffect(() => {
     if (isVideoOn && localVideoRef.current && localStreamRef.current) {
       localVideoRef.current.srcObject = localStreamRef.current;
     }
   }, [isVideoOn]);
+
+  // ---- Re-assign stream to remote video element when remote camera turns back on ----
+  // Remote video element remounts when the ternary switches from placeholder to <video>
+  useEffect(() => {
+    if (remoteVideoOn && remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteVideoOn, remoteStream]);
 
   // ---- Initiate WebRTC when both participants are connected ----
   useEffect(() => {
@@ -656,6 +678,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
 
     const videoTracks = localStreamRef.current.getVideoTracks();
     const socket = getSocket();
+    const pc = peerConnectionRef.current;
 
     if (isVideoOn) {
       // Turn OFF: stop video tracks entirely (like Zoom/Meet behavior)
@@ -669,13 +692,26 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
         socket.emit("camera-toggle", { meetingId: mid, isVideoOn: false, userId: userType });
       }
     } else {
-      // Turn ON: re-acquire camera
+      // Turn ON: re-acquire camera and send new track via WebRTC
       try {
         const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
         const newVideoTrack = newStream.getVideoTracks()[0];
         if (newVideoTrack) {
           localStreamRef.current.addTrack(newVideoTrack);
           setIsVideoOn(true);
+
+          // Replace the dead video track in the WebRTC peer connection with the new one
+          if (pc) {
+            const videoSender = pc.getSenders().find((s) => s.track && s.track.kind === "video");
+            if (videoSender) {
+              await videoSender.replaceTrack(newVideoTrack);
+              console.log("Replaced WebRTC video track with new camera feed");
+            } else {
+              // No existing video sender — add the track fresh
+              pc.addTrack(newVideoTrack, localStreamRef.current);
+            }
+          }
+
           // Small delay to ensure React has mounted the <video> element
           setTimeout(() => {
             if (localVideoRef.current && localStreamRef.current) {

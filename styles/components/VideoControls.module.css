@@ -15,8 +15,8 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  color: #ffffff;
+  background: rgba(59,95,29,0.06);
+  color: #4a5568;
   font-size: 18px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -24,7 +24,7 @@
 }
 
 .controlBtn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(59,95,29,0.1);
   transform: scale(1.05);
 }
 
@@ -33,26 +33,26 @@
 }
 
 .controlBtnActive {
-  background: rgba(79, 172, 254, 0.3);
-  color: #4facfe;
+  background: #dcecd0;
+  color: #3b5f1d;
 }
 
 .controlBtnOff {
-  background: rgba(255, 71, 87, 0.3);
-  color: #ff4757;
+  background: #f8f5eb;
+  color: #8e8333;
 }
 
 .controlBtnEnd {
   width: 52px;
   height: 44px;
   border-radius: 22px;
-  background: #ff4757;
+  background: linear-gradient(135deg, #c3af5b 0%, #8e8333 100%);
   color: #fff;
   font-size: 16px;
 }
 
 .controlBtnEnd:hover {
-  background: #e8414f;
+  background: #726829;
   transform: scale(1.05);
 }
 
@@ -62,7 +62,7 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
   white-space: nowrap;
   display: none;
 }
@@ -76,7 +76,7 @@
   bottom: -28px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
+  background: #1a202c;
   color: #fff;
   padding: 4px 8px;
   border-radius: 4px;

@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1e1e3a;
+  background: #ffffff;
 }
 
 .chatHeader {
@@ -12,26 +12,26 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid #dcecd0;
 }
 
 .chatTitle {
   font-size: 14px;
   font-weight: 600;
-  color: #ffffff;
+  color: #1a202c;
 }
 
 .chatCloseBtn {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
   cursor: pointer;
   font-size: 18px;
   padding: 4px;
 }
 
 .chatCloseBtn:hover {
-  color: #ffffff;
+  color: #4a5568;
 }
 
 .messagesContainer {
@@ -59,7 +59,7 @@
 
 .messageSender {
   font-size: 11px;
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
   margin-bottom: 4px;
   padding-left: 4px;
 }
@@ -74,21 +74,22 @@
 }
 
 .messageBubblePatient {
-  background: rgba(79, 172, 254, 0.15);
-  border: 1px solid rgba(79, 172, 254, 0.25);
-  color: #ffffff;
+  background: #dcecd0;
+  border: 1px solid #b8d9a0;
+  color: #2f4c17;
   border-bottom-left-radius: 4px;
 }
 
 .messageBubbleDoctor {
-  background: #4facfe;
-  color: #ffffff;
+  background: #f0ebd6;
+  border: 1px solid #e1d7ad;
+  color: #726829;
   border-bottom-right-radius: 4px;
 }
 
 .messageTimestamp {
   font-size: 10px;
-  color: rgba(255,255,255,0.3);
+  color: #94a3b8;
   margin-top: 4px;
   padding-left: 4px;
 }
@@ -101,7 +102,7 @@
 .typingIndicator {
   padding: 8px 16px;
   font-size: 12px;
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
   font-style: italic;
 }
 
@@ -115,7 +116,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.4);
+  background: #94a3b8;
   animation: typingBounce 1.4s ease-in-out infinite;
 }
 
@@ -137,28 +138,29 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.15);
+  border-top: 1px solid #dcecd0;
+  background: #f8faf5;
 }
 
 .chatInput {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid #dcecd0;
   border-radius: 20px;
-  background: rgba(255,255,255,0.06);
-  color: #ffffff;
+  background: #ffffff;
+  color: #1a202c;
   font-size: 13px;
   outline: none;
   transition: border-color 0.2s;
 }
 
 .chatInput:focus {
-  border-color: rgba(79, 172, 254, 0.5);
+  border-color: #70b340;
+  box-shadow: 0 0 0 2px rgba(112,179,64,0.15);
 }
 
 .chatInput::placeholder {
-  color: rgba(255,255,255,0.3);
+  color: #94a3b8;
 }
 
 .emojiBtn {
@@ -170,15 +172,15 @@
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
   cursor: pointer;
   font-size: 18px;
   transition: all 0.2s;
 }
 
 .emojiBtn:hover {
-  background: rgba(255,255,255,0.08);
-  color: #ffffff;
+  background: rgba(59,95,29,0.06);
+  color: #4a5568;
 }
 
 .sendBtn {
@@ -189,23 +191,25 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: #4facfe;
+  background: linear-gradient(135deg, #70b340 0%, #3b5f1d 100%);
   color: #ffffff;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(59,95,29,0.2);
 }
 
 .sendBtn:hover {
-  background: #3d8bdb;
+  background: #3b5f1d;
   transform: scale(1.05);
 }
 
 .sendBtn:disabled {
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.2);
+  background: #dcecd0;
+  color: #94a3b8;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .emojiPicker {
@@ -221,7 +225,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.2);
+  color: #94a3b8;
   padding: 40px;
   text-align: center;
 }
