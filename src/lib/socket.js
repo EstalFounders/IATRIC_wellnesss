@@ -9,8 +9,7 @@ let socket = null;
 export const getSocket = () => {
   if (!socket) {
     const serverUrl =
-      process.env.NEXT_PUBLIC_SOCKET_URL ||
-      (typeof window !== "undefined" ? window.location.origin : "");
+      process.env.NEXT_PUBLIC_SOCKET_URL || 'https://37.187.159.65:3000'; // Fallback to local server if env variable is not set
 
     socket = io(serverUrl, {
       transports: ["websocket", "polling"],
