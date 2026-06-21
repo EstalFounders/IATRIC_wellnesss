@@ -5,7 +5,13 @@ import styles from "../../../styles/Meeting.module.css";
 import chatStyles from "../../../styles/components/ChatPanel.module.css";
 import fileStyles from "../../../styles/components/FileShare.module.css";
 import infoStyles from "../../../styles/components/ParticipantInfo.module.css";
-import { getSocket } from "../../lib/socket";
+import {
+  ConsoleLogger,
+  DefaultDeviceController,
+  DefaultMeetingSession,
+  MeetingSessionConfiguration,
+  LogLevel,
+} from "amazon-chime-sdk-js";
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + " B";
@@ -55,24 +61,25 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
     onSendMessage(chatText);
     setChatText("");
     setIsTyping(false);
-    // Notify server typing stopped
-    const socket = getSocket();
     const mid = consultation?.meetingId || consultation?._id;
-    if (mid) socket.emit("typing", { meetingId: mid, isTyping: false });
+    if (mid && window.__ws) {
+      window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: false }));
+    }
   };
 
   const handleTextChange = (e) => {
     setChatText(e.target.value);
     setIsTyping(true);
-    // Emit typing event to server
-    const socket = getSocket();
     const mid = consultation?.meetingId || consultation?._id;
-    if (mid) socket.emit("typing", { meetingId: mid, isTyping: true });
-    // Clear typing after 2 seconds of inactivity
+    if (mid && window.__ws) {
+      window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: true }));
+    }
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      if (mid) socket.emit("typing", { meetingId: mid, isTyping: false });
+      if (mid && window.__ws) {
+        window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: false }));
+      }
     }, 2000);
   };
 
@@ -154,7 +161,6 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
                 <div ref={messagesEndRef} />
               </div>
             )}
-            {/* Remote typing indicator */}
             {remoteTyping && (
               <div className={chatStyles.typingIndicator}>
                 <span>{remoteTyping === "doctor" ? "Doctor" : "Patient"} is typing</span>
@@ -301,6 +307,13 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
   );
 };
 
+// ---------- Helper: send message via WebSocket ----------
+function wsSend(ws, data) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(data));
+  }
+}
+
 export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [meetingState, setMeetingState] = useState("connecting");
   const [isAudioOn, setIsAudioOn] = useState(true);
@@ -314,417 +327,347 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [files, setFiles] = useState([]);
   const [remoteTyping, setRemoteTyping] = useState(null);
   const [participantCount, setParticipantCount] = useState(0);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [isWebRTCConnected, setIsWebRTCConnected] = useState(false);
   const [remoteVideoOn, setRemoteVideoOn] = useState(true);
   const [remoteAudioOn, setRemoteAudioOn] = useState(true);
-  // Camera toggle toast notification
   const [cameraToast, setCameraToast] = useState(null);
   const cameraToastTimerRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const localStreamRef = useRef(null);
-  const peerConnectionRef = useRef(null);
-  const socketRef = useRef(null);
+  const wsRef = useRef(null);
+  const meetingSessionRef = useRef(null);
+  const chimeObserverRef = useRef(null);
+  const remoteTileIdRef = useRef(null);
+  const localTileIdRef = useRef(null);
+  const connectionIdRef = useRef(null);
+  const domainNameRef = useRef(null);
+  const stageRef = useRef(null);
   const { formattedTime } = useTimer(meetingState === "active");
 
   const isDoctor = userType === "doctor";
   const isAudioOnly = consultation?.consultationType === "Call";
   const mid = meetingId || consultation?.meetingId || consultation?._id;
 
-  // ---- Socket.io Connection ----
+  // ---- Helper to send messages through API Gateway backend ----
+  const sendWsMessage = useCallback((action, extra = {}) => {
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const payload = {
+      action,
+      connectionId: connectionIdRef.current,
+      meetingId: mid,
+      role: userType,
+      domainName: domainNameRef.current,
+      stage: stageRef.current,
+      ...extra,
+    };
+    ws.send(JSON.stringify(payload));
+  }, [mid, userType]);
+
+  // ---- Initialize Amazon Chime Session ----
   useEffect(() => {
     if (!mid) return;
 
-    const socket = getSocket();
-    socketRef.current = socket;
+    const initChime = async () => {
+      try {
+        const response = await fetch(`/api/chimeSession?meetingId=${mid}&userType=${userType}`);
+        if (!response.ok) throw new Error(`Chime session API error: ${response.status}`);
+        const chimeData = await response.json();
+        console.log("Chime session data received");
 
-    const handleConnect = () => {
-      console.log("Socket connected, joining room:", mid);
-      const userName = isDoctor
-        ? consultation?.doctorDetails?.name || "Doctor"
-        : consultation?.name || "Patient";
-      socket.emit("join-room", {
-        meetingId: mid,
-        role: userType,
-        userData: { name: userName, role: userType },
-      });
+        const configuration = new MeetingSessionConfiguration(chimeData.meeting, chimeData.attendee);
+        const logger = new ConsoleLogger("ChimeSDK", LogLevel.INFO);
+        const deviceController = new DefaultDeviceController(logger);
+        const session = new DefaultMeetingSession(configuration, logger, deviceController);
+        meetingSessionRef.current = session;
+        const audioVideo = session.audioVideo;
+
+        const observer = {
+          videoTileDidUpdate: (tileState) => {
+            if (!tileState.boundAttendeeId || tileState.isLocal) return;
+            console.log("Remote video tile updated:", tileState.tileId);
+            remoteTileIdRef.current = tileState.tileId;
+            if (remoteVideoRef.current) audioVideo.bindVideoElement(tileState.tileId, remoteVideoRef.current);
+            setRemoteVideoOn(true);
+          },
+          videoTileWasRemoved: (tileId) => {
+            console.log("Remote video tile removed:", tileId);
+            if (remoteTileIdRef.current === tileId) remoteTileIdRef.current = null;
+            setRemoteVideoOn(false);
+          },
+          audioVideoDidStart: () => { console.log("Chime started"); setMeetingState("active"); },
+          audioVideoDidStop: () => { console.log("Chime stopped"); setMeetingState("ended"); },
+          connectionDidBecomePoor: () => console.log("Chime connection poor"),
+          connectionDidRecover: () => console.log("Chime connection recovered"),
+        };
+        chimeObserverRef.current = observer;
+        audioVideo.addObserver(observer);
+        audioVideo.start();
+
+        if (!isAudioOnly) {
+          try {
+            await audioVideo.startLocalVideoTile();
+            setIsVideoOn(true);
+            if (localVideoRef.current) {
+              const localTile = audioVideo.getLocalVideoTile();
+              if (localTile) {
+                localTileIdRef.current = localTile.tileId;
+                audioVideo.bindVideoElement(localTile.tileId, localVideoRef.current);
+              }
+            }
+          } catch (err) {
+            console.warn("Could not start local video:", err);
+            setIsVideoOn(false);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to initialize Chime session:", err);
+        setMeetingState("ended");
+      }
     };
 
-    // If already connected, join immediately
-    if (socket.connected) {
-      handleConnect();
-    }
-
-    socket.on("connect", handleConnect);
-
-    // ---- Participant joined ----
-    socket.on("participant-joined", (data) => {
-      console.log("Participant joined:", data);
-      setParticipantCount(data.participants?.length || 1);
-      if (data.participants && data.participants.length >= 2) {
-        setMeetingState("active");
-      }
-    });
-
-    // ---- Room participants (initial list) ----
-    socket.on("room-participants", (data) => {
-      console.log("Room participants:", data);
-      setParticipantCount(data.participants?.length || 1);
-      if (data.participants && data.participants.length >= 2) {
-        setMeetingState("active");
-      } else {
-        // First participant - show waiting state briefly then active
-        setTimeout(() => setMeetingState("active"), 2000);
-      }
-    });
-
-    // ---- Meeting active (both joined) ----
-    socket.on("meeting-active", () => {
-      console.log("Meeting active - both participants joined");
-      setMeetingState("active");
-    });
-
-    // ---- Receive chat message ----
-    socket.on("receive-message", (data) => {
-      // Ignore messages from ourselves (safety net against server echo-back)
-      if (data.socketId === socket.id) return;
-      // Deduplicate: ignore if we already have a matching message from the same source
-      const newMsg = {
-        sender: data.role === "doctor" ? "Doctor" : "Patient",
-        text: data.text,
-        timestamp: data.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        type: data.type || "text",
-        fromSocket: data.socketId,
-      };
-      setMessages((prev) => {
-        // Prevent duplicate: check if last message with same sender + text + socket already exists
-        const lastMsg = prev[prev.length - 1];
-        if (lastMsg &&
-            lastMsg.fromSocket === data.socketId &&
-            lastMsg.sender === newMsg.sender &&
-            lastMsg.text === newMsg.text &&
-            Math.abs(new Date(lastMsg.timestamp) - new Date(newMsg.timestamp)) < 500) {
-          return prev;
-        }
-        return [...prev, newMsg];
-      });
-    });
-
-    // ---- Remote typing ----
-    socket.on("user-typing", (data) => {
-      if (data.isTyping) {
-        setRemoteTyping(data.role);
-      } else {
-        setRemoteTyping(null);
-      }
-    });
-
-    // ---- Receive file ----
-    socket.on("receive-file", (data) => {
-      const newFile = {
-        id: Date.now().toString(),
-        name: data.name,
-        size: data.size,
-        type: data.type,
-        url: data.url,
-        uploadDate: data.uploadDate || new Date().toISOString(),
-        uploadedBy: data.uploadedBy || data.role,
-      };
-      setFiles((prev) => [...prev, newFile]);
-    });
-
-    // ---- Participant left ----
-    socket.on("participant-left", (data) => {
-      console.log("Participant left:", data);
-      setParticipantCount(data.participants?.length || 0);
-    });
-
-    // ---- WebRTC: receive offer ----
-    socket.on("webrtc-offer", async ({ offer, from }) => {
-      if (from === socket.id) return; // ignore own messages
-      console.log("Received WebRTC offer");
-      try {
-        if (!localStreamRef.current) return;
-        const pc = createPeerConnection();
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        socket.emit("webrtc-answer", { meetingId: mid, answer });
-      } catch (err) {
-        console.error("Error handling WebRTC offer:", err);
-      }
-    });
-
-    // ---- WebRTC: receive answer ----
-    socket.on("webrtc-answer", async ({ answer, from }) => {
-      if (from === socket.id) return;
-      console.log("Received WebRTC answer");
-      try {
-        const pc = peerConnectionRef.current;
-        if (pc) {
-          await pc.setRemoteDescription(new RTCSessionDescription(answer));
-        }
-      } catch (err) {
-        console.error("Error handling WebRTC answer:", err);
-      }
-    });
-
-    // ---- WebRTC: receive ICE candidate ----
-    socket.on("webrtc-ice-candidate", async ({ candidate, from }) => {
-      if (from === socket.id) return;
-      try {
-        const pc = peerConnectionRef.current;
-        if (pc && candidate) {
-          await pc.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-      } catch (err) {
-        console.error("Error adding ICE candidate:", err);
-      }
-    });
-
-    // ---- Participant camera toggle notification ----
-    socket.on("participant-camera-toggle", (data) => {
-      console.log("Participant camera toggle:", data);
-      // Update the remote video state
-      setRemoteVideoOn(data.isVideoOn);
-      // Show a toast notification
-      const displayName = data.role === "doctor"
-        ? consultation?.doctorDetails?.name || "Doctor"
-        : consultation?.name || "Patient";
-      const message = data.isVideoOn
-        ? `${displayName} turned on camera`
-        : `${displayName} turned off camera`;
-      const icon = data.isVideoOn ? "📷" : "📷❌";
-      // Clear any existing toast timer
-      if (cameraToastTimerRef.current) {
-        clearTimeout(cameraToastTimerRef.current);
-      }
-      setCameraToast({ icon, message });
-      // Auto-dismiss after 3 seconds
-      cameraToastTimerRef.current = setTimeout(() => {
-        setCameraToast(null);
-      }, 3000);
-    });
+    initChime();
 
     return () => {
-      // Close peer connection
-      if (peerConnectionRef.current) {
-        peerConnectionRef.current.close();
-        peerConnectionRef.current = null;
+      const session = meetingSessionRef.current;
+      const observer = chimeObserverRef.current;
+      if (session) {
+        if (observer) session.audioVideo.removeObserver(observer);
+        session.audioVideo.stop();
+        meetingSessionRef.current = null;
       }
-      if (cameraToastTimerRef.current) {
-        clearTimeout(cameraToastTimerRef.current);
+    };
+  }, [mid, userType, isAudioOnly]);
+
+  // ---- WebSocket Connection (replaces Socket.io) ----
+  useEffect(() => {
+    if (!mid) return;
+
+    let ws = null;
+    let reconnectTimer = null;
+
+    const connectWs = async () => {
+      try {
+        // Fetch WebSocket URL from our API
+        const urlRes = await fetch(`/api/get-ws-url?meetingId=${mid}&role=${userType}`);
+        if (!urlRes.ok) throw new Error(`Failed to get WS URL: ${urlRes.status}`);
+        const { url } = await urlRes.json();
+        console.log("Connecting to WebSocket:", url);
+
+        ws = new WebSocket(url);
+        wsRef.current = ws;
+        window.__ws = ws;
+
+        ws.onopen = () => {
+          console.log("WebSocket connected");
+          // Extract domain/stage from URL for API Gateway Management API replies
+          const parsed = new URL(url);
+          domainNameRef.current = parsed.hostname;
+          stageRef.current = parsed.pathname.split("/")[1] || "production";
+
+          // Send connect action
+          const userName = isDoctor
+            ? consultation?.doctorDetails?.name || "Doctor"
+            : consultation?.name || "Patient";
+          wsSend(ws, {
+            action: "connect",
+            meetingId: mid,
+            role: userType,
+            userData: { name: userName, role: userType },
+          });
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            const { action, ...payload } = data;
+
+            // Store our connectionId from the server response
+            if (action === "room-participants" && payload.yourSocketId) {
+              connectionIdRef.current = payload.yourSocketId;
+            }
+
+            // ---- Dispatch actions to state handlers ----
+            switch (action) {
+              case "participant-joined":
+                console.log("Participant joined:", payload);
+                setParticipantCount(payload.participants?.length || 1);
+                if (payload.participants?.length >= 2) setMeetingState("active");
+                break;
+
+              case "room-participants":
+                console.log("Room participants:", payload);
+                setParticipantCount(payload.participants?.length || 1);
+                if (payload.participants?.length >= 2) {
+                  if (setMeetingState) setMeetingState("active");
+                } else {
+                  setTimeout(() => {
+                    if (ws && setMeetingState) setMeetingState("active");
+                  }, 2000);
+                }
+                break;
+
+              case "meeting-active":
+                console.log("Meeting active");
+                setMeetingState("active");
+                break;
+
+              case "receive-message":
+                setMessages((prev) => {
+                  if (payload.fromSocket && payload.fromSocket === connectionIdRef.current) return prev;
+                  const newMsg = {
+                    sender: payload.role === "doctor" ? "Doctor" : "Patient",
+                    text: payload.text,
+                    timestamp: payload.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                    type: payload.type || "text",
+                    fromSocket: payload.socketId,
+                  };
+                  const lastMsg = prev[prev.length - 1];
+                  if (lastMsg && lastMsg.fromSocket === payload.socketId && lastMsg.sender === newMsg.sender && lastMsg.text === newMsg.text && Math.abs(new Date(lastMsg.timestamp) - new Date(newMsg.timestamp)) < 500) return prev;
+                  return [...prev, newMsg];
+                });
+                break;
+
+              case "user-typing":
+                setRemoteTyping(payload.isTyping ? payload.role : null);
+                break;
+
+              case "receive-file":
+                setFiles((prev) => [...prev, {
+                  id: Date.now().toString(),
+                  name: payload.name,
+                  size: payload.size,
+                  type: payload.type,
+                  url: payload.url,
+                  uploadDate: payload.uploadDate || new Date().toISOString(),
+                  uploadedBy: payload.uploadedBy || payload.role,
+                }]);
+                break;
+
+              case "participant-left":
+                console.log("Participant left:", payload);
+                setParticipantCount(payload.participants?.length || 0);
+                break;
+
+              case "participant-media-change":
+                console.log("Media change:", payload);
+                if (payload.type === "video") setRemoteVideoOn(payload.value);
+                if (payload.type === "audio") setRemoteAudioOn(payload.value);
+                break;
+
+              case "participant-camera-toggle":
+                console.log("Camera toggle:", payload);
+                setRemoteVideoOn(payload.isVideoOn);
+                const displayName = payload.role === "doctor"
+                  ? consultation?.doctorDetails?.name || "Doctor"
+                  : consultation?.name || "Patient";
+                const msg = payload.isVideoOn ? `${displayName} turned on camera` : `${displayName} turned off camera`;
+                const icon = payload.isVideoOn ? "📷" : "📷❌";
+                if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
+                setCameraToast({ icon, message: msg });
+                cameraToastTimerRef.current = setTimeout(() => setCameraToast(null), 3000);
+                break;
+
+              default:
+                break;
+            }
+          } catch (err) {
+            console.error("Error parsing WS message:", err);
+          }
+        };
+
+        ws.onclose = () => {
+          console.log("WebSocket disconnected");
+          window.__ws = null;
+          // Auto-reconnect after 3 seconds
+          reconnectTimer = setTimeout(() => {
+            if (mid) connectWs();
+          }, 3000);
+        };
+
+        ws.onerror = (err) => {
+          console.error("WebSocket error:", err);
+        };
+
+      } catch (err) {
+        console.error("Failed to connect WebSocket:", err);
+        // Retry after 5 seconds
+        reconnectTimer = setTimeout(() => {
+          if (mid) connectWs();
+        }, 5000);
       }
-      socket.off("connect", handleConnect);
-      socket.off("participant-joined");
-      socket.off("room-participants");
-      socket.off("meeting-active");
-      socket.off("receive-message");
-      socket.off("user-typing");
-      socket.off("receive-file");
-      socket.off("participant-left");
-      socket.off("participant-media-change");
-      socket.off("participant-camera-toggle");
+    };
+
+    connectWs();
+
+    return () => {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
+      if (ws) {
+        // Send disconnect notification
+        if (ws.readyState === WebSocket.OPEN && connectionIdRef.current && domainNameRef.current) {
+          wsSend(ws, {
+            action: "disconnect",
+            connectionId: connectionIdRef.current,
+            meetingId: mid,
+            role: userType,
+            domainName: domainNameRef.current,
+            stage: stageRef.current,
+          });
+        }
+        ws.close();
+        wsRef.current = null;
+        window.__ws = null;
+      }
     };
   }, [mid, userType, isDoctor, consultation]);
 
-  // Cleanup socket on unmount
+  // ---- Re-assign remote video tile when remote camera turns back on ----
   useEffect(() => {
-    return () => {
-      const socket = socketRef.current;
-      if (socket && socket.connected) {
-        socket.emit("leave-room", { meetingId: mid });
-      }
-    };
-  }, [mid]);
-
-  // ---- Create RTCPeerConnection helper ----
-  const createPeerConnection = useCallback(() => {
-    // Close existing connection
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
+    const session = meetingSessionRef.current;
+    if (remoteVideoOn && remoteVideoRef.current && remoteTileIdRef.current && session) {
+      session.audioVideo.bindVideoElement(remoteTileIdRef.current, remoteVideoRef.current);
     }
+  }, [remoteVideoOn]);
 
-    const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-      ],
-    });
-
-    // Add local tracks
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach((track) => {
-        pc.addTrack(track, localStreamRef.current);
-      });
-    }
-
-    // Handle incoming remote stream
-    pc.ontrack = (event) => {
-      console.log("Received remote track:", event.streams[0]);
-      const [remoteStream] = event.streams;
-      setRemoteStream(remoteStream);
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = remoteStream;
-      }
-      setIsWebRTCConnected(true);
-    };
-
-    // Send ICE candidates to the other peer
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        const socket = getSocket();
-        socket.emit("webrtc-ice-candidate", {
-          meetingId: mid,
-          candidate: event.candidate,
-        });
-      }
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      console.log("ICE connection state:", pc.iceConnectionState);
-    };
-
-    peerConnectionRef.current = pc;
-    return pc;
-  }, [mid]);
-
-  // ---- Initialize local camera ----
-  useEffect(() => {
-    if (meetingState !== "active" || isAudioOnly) return;
-    const initCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localStreamRef.current = stream;
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-      } catch (err) {
-        setIsVideoOn(false);
-        setIsAudioOn(false);
-      }
-    };
-    initCamera();
-    return () => {
-      if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
-    };
-  }, [meetingState, isAudioOnly]);
-
-  // ---- Re-assign stream to local video element when toggling camera on/off ----
-  // This ensures the newly mounted <video> element gets the stream after re-enabling camera
-  useEffect(() => {
-    if (isVideoOn && localVideoRef.current && localStreamRef.current) {
-      localVideoRef.current.srcObject = localStreamRef.current;
-    }
-  }, [isVideoOn]);
-
-  // ---- Re-assign stream to remote video element when remote camera turns back on ----
-  // Remote video element remounts when the ternary switches from placeholder to <video>
-  useEffect(() => {
-    if (remoteVideoOn && remoteVideoRef.current && remoteStream) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [remoteVideoOn, remoteStream]);
-
-  // ---- Initiate WebRTC when both participants are connected ----
-  useEffect(() => {
-    if (participantCount < 2 || !localStreamRef.current || peerConnectionRef.current) return;
-
-    // Small delay to ensure camera is fully initialized
-    const timer = setTimeout(async () => {
-      try {
-        const pc = createPeerConnection();
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        const socket = getSocket();
-        socket.emit("webrtc-offer", { meetingId: mid, offer });
-        console.log("Sent WebRTC offer");
-      } catch (err) {
-        console.error("Error creating WebRTC offer:", err);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [participantCount, localStreamRef.current, createPeerConnection, mid]);
-
-  // ---- Control Handlers ----
-  const toggleMic = async () => {
-    if (localStreamRef.current) {
-      const audioTracks = localStreamRef.current.getAudioTracks();
-      if (audioTracks.length > 0) {
-        // Toggle enabled state of existing track
-        audioTracks.forEach((t) => (t.enabled = !t.enabled));
-        const isNowEnabled = audioTracks[0].enabled;
-        setIsAudioOn(isNowEnabled);
-        const socket = getSocket();
-        if (mid) socket.emit("media-state-change", { meetingId: mid, type: "audio", value: isNowEnabled });
-      } else {
-        // No audio track - try to re-acquire
-        try {
-          const newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          newStream.getAudioTracks().forEach((t) => localStreamRef.current.addTrack(t));
-          setIsAudioOn(true);
-          const socket = getSocket();
-          if (mid) socket.emit("media-state-change", { meetingId: mid, type: "audio", value: true });
-        } catch (err) {
-          console.error("Failed to re-acquire audio:", err);
-        }
-      }
-    }
+  // ---- Control Handlers (using Amazon Chime SDK + WebSocket notifications) ----
+  const toggleMic = () => {
+    const session = meetingSessionRef.current;
+    if (!session) return;
+    const audioVideo = session.audioVideo;
+    const muted = !audioVideo.realtimeIsMuted();
+    audioVideo.realtimeSetMuted(muted);
+    setIsAudioOn(!muted);
+    sendWsMessage("media-state-change", { type: "audio", value: !muted });
   };
 
   const toggleCamera = async () => {
-    if (!localStreamRef.current) return;
-
-    const videoTracks = localStreamRef.current.getVideoTracks();
-    const socket = getSocket();
-    const pc = peerConnectionRef.current;
+    const session = meetingSessionRef.current;
+    if (!session) return;
+    const audioVideo = session.audioVideo;
 
     if (isVideoOn) {
-      // Turn OFF: stop video tracks entirely (like Zoom/Meet behavior)
-      videoTracks.forEach((t) => {
-        t.stop();
-        localStreamRef.current.removeTrack(t);
-      });
-      setIsVideoOn(false);
-      if (mid) {
-        socket.emit("media-state-change", { meetingId: mid, type: "video", value: false });
-        socket.emit("camera-toggle", { meetingId: mid, isVideoOn: false, userId: userType });
+      audioVideo.stopLocalVideoTile();
+      if (localTileIdRef.current) {
+        audioVideo.unbindVideoElement(localTileIdRef.current);
+        localTileIdRef.current = null;
       }
+      setIsVideoOn(false);
+      sendWsMessage("media-state-change", { type: "video", value: false });
+      sendWsMessage("camera-toggle", { isVideoOn: false });
     } else {
-      // Turn ON: re-acquire camera and send new track via WebRTC
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const newVideoTrack = newStream.getVideoTracks()[0];
-        if (newVideoTrack) {
-          localStreamRef.current.addTrack(newVideoTrack);
-          setIsVideoOn(true);
-
-          // Replace the dead video track in the WebRTC peer connection with the new one
-          if (pc) {
-            const videoSender = pc.getSenders().find((s) => s.track && s.track.kind === "video");
-            if (videoSender) {
-              await videoSender.replaceTrack(newVideoTrack);
-              console.log("Replaced WebRTC video track with new camera feed");
-            } else {
-              // No existing video sender — add the track fresh
-              pc.addTrack(newVideoTrack, localStreamRef.current);
-            }
-          }
-
-          // Small delay to ensure React has mounted the <video> element
-          setTimeout(() => {
-            if (localVideoRef.current && localStreamRef.current) {
-              localVideoRef.current.srcObject = localStreamRef.current;
-            }
-          }, 50);
-          if (mid) {
-            socket.emit("media-state-change", { meetingId: mid, type: "video", value: true });
-            socket.emit("camera-toggle", { meetingId: mid, isVideoOn: true, userId: userType });
-          }
+        await audioVideo.startLocalVideoTile();
+        setIsVideoOn(true);
+        const localTile = audioVideo.getLocalVideoTile();
+        if (localTile && localVideoRef.current) {
+          const tileId = localTile.tileId;
+          localTileIdRef.current = tileId;
+          audioVideo.bindVideoElement(tileId, localVideoRef.current);
         }
+        sendWsMessage("media-state-change", { type: "video", value: true });
+        sendWsMessage("camera-toggle", { isVideoOn: true });
       } catch (err) {
-        console.error("Failed to re-acquire camera:", err);
+        console.error("Failed to start camera via Chime:", err);
       }
     }
   };
@@ -732,14 +675,14 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const toggleHandRaise = () => {
     setIsHandRaised((prev) => {
       const newVal = !prev;
-      const socket = getSocket();
-      if (mid) socket.emit("media-state-change", { meetingId: mid, type: "handRaise", value: newVal });
+      sendWsMessage("media-state-change", { type: "handRaise", value: newVal });
       return newVal;
     });
   };
 
   const endCall = () => {
-    if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
+    const session = meetingSessionRef.current;
+    if (session) session.audioVideo.stop();
     setMeetingState("ended");
   };
 
@@ -751,11 +694,8 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       type: "text",
     };
-    // Add locally
     setMessages((prev) => [...prev, messageData]);
-    // Send via socket
-    const socket = getSocket();
-    if (mid) socket.emit("send-message", { meetingId: mid, message: messageData });
+    sendWsMessage("send-message", { message: messageData });
   };
 
   // ---- File sharing ----
@@ -775,9 +715,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       };
       setFiles((prev) => [...prev, newFile]);
       setProgress((prev) => prev.filter((p) => p.name !== file.name));
-      // Share file via socket
-      const socket = getSocket();
-      if (mid) socket.emit("file-shared", { meetingId: mid, fileData: newFile });
+      sendWsMessage("file-shared", { fileData: newFile });
     };
     reader.readAsDataURL(file);
   };
@@ -800,7 +738,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
         <div className={styles.connectingScreen}>
           <div className={styles.connectingSpinner} />
           <div className={styles.connectingTitle}>Connecting to consultation...</div>
-          <div className={styles.connectingSubtitle}>Please wait while we establish a secure connection</div>
+          <div className={styles.connectingSubtitle}>Please wait while we establish a secure connection via Amazon Chime</div>
         </div>
       </div>
     );
@@ -850,20 +788,20 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
               </div>
               <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
                 <div className={styles.videoWrapper}>
-                  {isWebRTCConnected && remoteStream && remoteVideoOn ? (
-                    <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {remoteVideoOn ? (
+                    <video ref={remoteVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   ) : (
                     <div className={styles.videoPlaceholder}>
                       <div className={styles.videoPlaceholderAvatar}>{isDoctor ? "👤" : "👨‍⚕️"}</div>
                       <div className={styles.videoPlaceholderName}>{isDoctor ? patientName : doctorName}</div>
                       <div className={styles.videoPlaceholderRole}>{isDoctor ? "Patient" : `Doctor - ${doctorSpecialty}`}</div>
-                      {isWebRTCConnected && !remoteVideoOn && (
+                      {!remoteVideoOn && (
                         <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>📷 Camera Off</div>
                       )}
                     </div>
                   )}
                   <div className={styles.participantBadge}>
-                    <span>{remoteAudioOn ? "🔊" : "�"}</span>
+                    <span>{remoteAudioOn ? "🔊" : "🔇"}</span>
                     <span>{isDoctor ? patientName : doctorName}</span>
                   </div>
                 </div>
@@ -885,7 +823,6 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
             </>
           )}
 
-          {/* Camera toggle toast notification */}
           {cameraToast && (
             <div className={styles.cameraToast}>
               <span className={styles.cameraToastIcon}>{cameraToast.icon}</span>
