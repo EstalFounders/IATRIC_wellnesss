@@ -12,6 +12,9 @@ export const FASTSMS_API = {
   whatsapp: "https://www.fast2sms.com/dev/whatsapp",
 };
 
+export const CHANNEL_TYPE = "whatsapp";
+export const WHATSAPP_TYPE = "template";
+
 export const company_number = "7895959925"
 
 export const IS_NOW = "Now";
