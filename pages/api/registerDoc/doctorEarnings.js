@@ -1,10 +1,10 @@
 import { dbConnect } from "../../../src/lib/db";
 import Appointment from "../../../src/models/appointmentSchema";
+import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
   await dbConnect();
 
-  // Get doctorId from request query or body
   const { doctorId, timeframe } = req.query;
 
   if (!doctorId) {
@@ -27,34 +27,28 @@ export default async function handler(req, res) {
       startDate.setFullYear(startDate.getFullYear() - 1);
       break;
     default:
-      startDate.setMonth(startDate.getMonth() - 1); // Default to one month
+      startDate.setMonth(startDate.getMonth() - 1);
   }
 
   try {
-    // Fetch all appointments for the doctor (all-time)
     const allAppointments = await Appointment.find({ doctorId: doctorId });
 
-    // Fetch appointments within the selected timeframe
     const timeframeAppointments =
       timeframe == "today"
         ? await Appointment.find({
             doctorId: doctorId,
-            appointmentTime: startDate, // Filter by timeframe
+            appointmentTime: startDate,
           })
         : await Appointment.find({
             doctorId: doctorId,
-            appointmentTime: { $gte: startDate }, // Filter by timeframe
+            appointmentTime: { $gte: startDate },
           });
 
-    console.log(timeframeAppointments, "appointment", doctorId, startDate);
-
-    // Calculate total earnings for all-time
     const totalEarningsAllTime = allAppointments.reduce(
       (sum, a) => sum + a.consultationprice,
       0
     );
 
-    // Calculate total earnings for the selected timeframe
     const totalEarningsTimeframe = timeframeAppointments.reduce(
       (sum, a) => sum + a.consultationprice,
       0
@@ -64,10 +58,9 @@ export default async function handler(req, res) {
     const averagePerConsultation =
       totalConsultations > 0 ? totalEarningsTimeframe / totalConsultations : 0;
 
-    // Aggregate earnings by date within the timeframe
     const earningsSummary = {};
     timeframeAppointments.forEach((appointment) => {
-      const dateKey = appointment.appointmentTime.toISOString().split("T")[0]; // YYYY-MM-DD format
+      const dateKey = appointment.appointmentTime.toISOString().split("T")[0];
       if (!earningsSummary[dateKey]) {
         earningsSummary[dateKey] = { consultations: 0, earnings: 0 };
       }
@@ -75,7 +68,6 @@ export default async function handler(req, res) {
       earningsSummary[dateKey].earnings += appointment.consultationprice;
     });
 
-    // Convert object to sorted array for frontend
     const earningsArray = Object.entries(earningsSummary)
       .map(([date, data]) => ({
         date,
@@ -86,14 +78,21 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       doctorId,
-      totalEarningsAllTime, // Lifetime earnings
-      totalEarningsTimeframe, // Earnings within timeframe
+      totalEarningsAllTime,
+      totalEarningsTimeframe,
       totalConsultations,
       averagePerConsultation,
       earnings: earningsArray,
     });
   } catch (error) {
     console.error("Error fetching earnings:", error);
+    await logErrorToGoogleSheet({
+      apiName: "doctorEarnings",
+      errorMessage: error.message || "Failed to fetch earnings",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { doctorId, timeframe },
+    });
     res.status(500).json({ error: "Internal Server Error" });
   }
 }

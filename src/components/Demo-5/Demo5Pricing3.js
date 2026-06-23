@@ -85,9 +85,9 @@ const Demo5Pricing3 = () => {
                 width={600}
                 height={550}
                 className="img-fluid"
-                src="/images/image-04.png"
+                src="/images/image-04.jpeg"
                 alt="pricing-image"
-                style={{ borderRadius: "50%", objectFit: "cover" }}
+                style={{ borderRadius: "20%", objectFit: "cover" }}
               />
             </div>
           </div>

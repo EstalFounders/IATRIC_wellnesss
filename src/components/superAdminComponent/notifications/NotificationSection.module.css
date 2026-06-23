@@ -1,0 +1,274 @@
+.notificationContainer {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  min-height: 400px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.headerTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.headerCount {
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 12px;
+}
+
+.tabsContainer {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #444;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tabButton:hover {
+  color: #3b5f1d;
+  background: #f0f7ee;
+}
+
+.tabButtonActive {
+  color: #3b5f1d;
+  border-bottom-color: #3b5f1d;
+  background: #f5faf3;
+  font-weight: 600;
+}
+
+.tabCount {
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+.scrollContainer {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Shared card styles */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cardName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a3a0e;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.cardBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+.badgePending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badgeApproved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badgeRejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.cardSubtext {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.cardFieldList {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cardFieldItem {
+  background: #eaeaea;
+  color: #333;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.cardDetail {
+  font-size: 0.88rem;
+  color: #444;
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+
+.cardDetail strong {
+  color: #222;
+  font-weight: 600;
+}
+
+.actionArea {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.reviewBtn {
+  background: #3b5f1d;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.reviewBtn:hover {
+  background: #2d4a16;
+}
+
+.approveBtn {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #a5d6a7;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.approveBtn:hover {
+  background: #c3e6cb;
+}
+
+.rejectBtn {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #ef9a9a;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rejectBtn:hover {
+  background: #f1b0b7;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.emptyStateIcon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Consultation / Lab Test simple cards */
+.simpleCard {
+  background: white;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+}
+
+.simpleCardTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.simpleCardBody {
+  font-size: 0.85rem;
+  color: #555;
+}

@@ -22,11 +22,15 @@ import {
   WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
 } from "./utils/constants";
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { JWT } from "google-auth-library";
+import path from "path";
+import fs from "fs";
 
 export async function findAvailableDoctorForNow(
   selectedDate,
   genericConsultationType,
-  res
+  res,
 ) {
   await dbConnect();
 
@@ -46,13 +50,13 @@ export async function findAvailableDoctorForNow(
   // Step 1: Get all company doctors
   const companyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: DoctorType.Company,
+    doctorType: "Company",
   });
 
   // Step 2: Get all non-company doctors (excluding company ones)
   const nonCompanyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: { $ne: DoctorType.Company },
+    doctorType: "Individual",
   });
 
   let earliestSlotInfo = null;
@@ -62,7 +66,7 @@ export async function findAvailableDoctorForNow(
   async function findEarliestSlotForDoctors(doctors) {
     for (const doctor of doctors) {
       console.log(
-        `Checking available slots for doctor ${doctor._id} (${doctor.name})`
+        `Checking available slots for doctor ${doctor._id} (${doctor.name})`,
       );
       const availableSlots = await Slot.find({
         doctorId: doctor._id.toString(),
@@ -130,11 +134,16 @@ export async function findAvailableDoctorForNow(
   console.log("Overall Earliest Slot Info:", earliestSlotInfo);
   console.log("Next Slots (if not today):", nextSlots);
 
+  // If no slot was found at all, return immediately with a safe response
+  if (!earliestSlotInfo) {
+    return res.status(404).json({ message: "No slots found." });
+  }
+
   console.log(
     "Next slot is not for today, returning next available slots.",
     selectedDateObj.toDateString(),
     earliestSlotInfo,
-    earliestSlotInfo.slot.startTime.toDateString()
+    earliestSlotInfo.slot.startTime.toDateString(),
   );
 
   const earlietslotdate = earliestSlotInfo.slot.date;
@@ -150,7 +159,6 @@ export async function findAvailableDoctorForNow(
         nextSlots: nextSlots,
         status: SERVER_AVAILABLE_SLOTS_CODE,
       });
-      // Directly return the API result, preventing further processing
     }
   }
 
@@ -161,13 +169,13 @@ export async function findAvailableDoctorForNow(
     };
   }
 
-  res.status(404).json({ message: "No slots found." });
+  return res.status(404).json({ message: "No slots found." });
 }
 
 export async function findAvailableDoctorForSpecificTimeSlot(
   selectedDate,
   genericConsultationType,
-  slot
+  slot,
 ) {
   await dbConnect();
 
@@ -182,7 +190,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   async function findDoctorWithSlot(doctors) {
     for (const doctor of doctors) {
       console.log(
-        `Checking available slots for doctor ${doctor._id} (${doctor.name})`
+        `Checking available slots for doctor ${doctor._id} (${doctor.name})`,
       );
       const availableSlot = await Slot.findOne({
         doctorId: doctor._id,
@@ -200,7 +208,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   // Step 1: Find company doctors
   let companyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: DoctorType.Company,
+    doctorType: "Company",
   });
 
   let result = await findDoctorWithSlot(companyDoctors);
@@ -211,7 +219,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   // Step 2: If no company doctor is available, find non-company doctors
   let nonCompanyDoctors = await Doctor.find({
     consultationType: { $in: [genericConsultationType] },
-    doctorType: { $ne: DoctorType.Company },
+    doctorType: { $ne: "Individual" },
   });
 
   result = await findDoctorWithSlot(nonCompanyDoctors);
@@ -262,7 +270,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
 export const checkNbookSelectedDoctorForNow = async (
   selectedDate,
   doctorId,
-  res
+  res,
 ) => {
   await dbConnect();
 
@@ -302,7 +310,7 @@ export const checkNbookSelectedDoctorForNow = async (
     availableSlots.length === 3 &&
     availableSlots.every(
       (slot) =>
-        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString()
+        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString(),
     )
   ) {
     res.status(200).json({
@@ -366,45 +374,45 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   if (selectedSlot === null) {
     const now = new Date();
 
-    // Find the slot where current time is between start and end, and not booked
-    const currentSlot = await Slot.findOne({
+    // Find all future slots where startTime >= now, sorted chronologically
+    // Try slots in order: if the nearest is booked, move to the next one
+    const futureSlots = await Slot.find({
       doctorId,
       isBooked: false,
-      startTime: { $lte: now },
-      endTime: { $gte: now },
+      startTime: { $gte: now },
     }).sort({ startTime: 1 });
 
-    console.log(currentSlot, "current slot");
+    console.log(futureSlots, "future slots");
 
-    if (!currentSlot) {
-      throw new Error("No current slot found for this time.");
+    if (!futureSlots || futureSlots.length === 0) {
+      throw new Error("No future slots found for this time.");
     }
 
-    // Step 2: Find the next available slot after the current slot’s end time
-    const nextSlot = await Slot.findOneAndUpdate(
-      {
-        doctorId,
-        isBooked: false,
-        startTime: { $gt: currentSlot.endTime },
-      },
-      { isBooked: true },
-      { new: true }
-    );
-
-    console.log(nextSlot, "next slot");
-
-    if (!nextSlot) {
-      throw new Error("No next available slot found.");
+    // Book the first available future slot (sorted by startTime ascending)
+    let bookedSlot = null;
+    for (const futureSlot of futureSlots) {
+      const updatedSlot = await Slot.findOneAndUpdate(
+        { _id: futureSlot._id, doctorId, isBooked: false },
+        { isBooked: true },
+        { new: true },
+      );
+      if (updatedSlot) {
+        bookedSlot = updatedSlot;
+        break; // Successfully booked this slot
+      }
     }
 
-    selectedSlot = nextSlot;
-    // ._id;
+    if (!bookedSlot) {
+      throw new Error("No available future slots found. All slots are booked.");
+    }
+
+    selectedSlot = bookedSlot;
   } else {
     // Book the selected slot if it's not already booked
     const updatedSlot = await Slot.findOneAndUpdate(
       { _id: slot._id, doctorId, isBooked: false },
       { isBooked: true },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedSlot) {
@@ -448,20 +456,25 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     docName,
     name,
     consultationType,
-    contact_no
+    contact_no,
   );
+  const formattedReminderDate = extractDate(appointmentTime);
+  const formattedReminderTime = formatTime(appointmentTime);
+
   const reminderMessageBodyPatient = getReminderMessageBodyPatient(
     docName,
     name,
-    formatTime(appointmentTime), // Pass formatted time
-    patientMeetingUrl
+    formattedReminderDate,
+    formattedReminderTime,
+    patientMeetingUrl,
   );
 
   const reminderMessageBodyDoctor = getReminderMessageBodyDoctor(
     docName,
     name,
-    formatTime(appointmentTime), // Pass formatted time
-    doctorMeetingUrl
+    formattedReminderDate,
+    formattedReminderTime,
+    doctorMeetingUrl,
   );
 
   const patientMobileNo = appointment.patientMobNo?.toString() ?? "";
@@ -470,23 +483,23 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   console.log(
     formatPhoneNumber(doctorMobileNumber),
     doctorMobileNumber,
-    "line no 190"
+    "line no 190",
   );
   await sendWhatsAppConfirmation(
     formatPhoneNumber(patientMobileNo),
     confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE
+    WHATSAPP_CONFIRMATION_TEMPLATE,
   );
   await sendWhatsAppConfirmation(
     formatPhoneNumber(doctorMobileNumber),
     confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE
+    WHATSAPP_CONFIRMATION_TEMPLATE,
   );
 
   console.log(
     clientSideAppointmentTime == IS_NOW,
     clientSideAppointmentTime == IN_TWENTY_MINUTES_NOW,
-    "WhatsApp confirmation sent to patient and doctor successfully."
+    "WhatsApp confirmation sent to patient and doctor successfully.",
   );
 
   if (
@@ -498,13 +511,119 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     await sendWhatsAppConfirmation(
       formatPhoneNumber(patientMobileNo),
       reminderMessageBodyPatient,
-      WHATSAPP_REMINDER_TEMPLATE_PATIENT
+      WHATSAPP_REMINDER_TEMPLATE_PATIENT,
     );
     await sendWhatsAppConfirmation(
       formatPhoneNumber(doctorMobileNumber),
       reminderMessageBodyDoctor,
-      WHATSAPP_REMINDER_TEMPLATE_DOCTOR
+      WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
     );
   }
   return appointment._id;
+};
+
+/**
+ * Reusable helper to log errors to Google Sheets.
+ * Uses the local serviceAccountKey.json file for authentication.
+ * Handles connection, row insertion, and error handling internally.
+ * Failure to log does not throw - logs to console and returns false.
+ *
+ * @param {Object} data - Error data object
+ * @param {string} data.apiName - Name of the API/endpoint where error occurred
+ * @param {string} data.errorMessage - Error message description
+ * @param {string} [data.errorCode] - Error code (HTTP status or custom code)
+ * @param {Object} [data.requestPayload] - Request payload (will be JSON stringified)
+ * @param {Object} [data.responsePayload] - Response payload (will be JSON stringified)
+ * @param {string} [data.stackTrace] - Error stack trace
+ * @param {string} [data.patientName] - Patient name (if applicable)
+ * @param {string} [data.mobileNumber] - Patient mobile number (if applicable)
+ * @param {string} [data.doctorName] - Doctor name (if applicable)
+ * @param {string} [data.consultationType] - Consultation type (if applicable)
+ * @param {string} [data.appointmentDate] - Appointment date (if applicable)
+ * @returns {Promise<boolean>} - true if logged successfully, false otherwise
+ */
+export const logErrorToGoogleSheet = async (data) => {
+  try {
+    const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
+    const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "ErrorLogs";
+
+    if (!SPREADSHEET_ID) {
+      console.error("logErrorToGoogleSheet: GOOGLE_SHEET_ID not configured");
+      return false;
+    }
+
+    // Load service account key from local JSON file
+    const serviceAccountPath = path.join(process.cwd(), "serviceAccountKey.json");
+    if (!fs.existsSync(serviceAccountPath)) {
+      console.error("logErrorToGoogleSheet: serviceAccountKey.json not found at", serviceAccountPath);
+      return false;
+    }
+
+    const serviceAccountKey = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+
+    // Initialize Google Auth using the service account key file
+    // The universe_domain from the key file (googleapis.com) is used as the auth scope
+    const serviceAccountAuth = new JWT({
+      email: serviceAccountKey.client_email,
+      key: serviceAccountKey.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
+
+    await doc.loadInfo();
+    let sheet = doc.sheetsByTitle[SHEET_NAME];
+
+    if (!sheet) {
+      sheet = await doc.addSheet({
+        title: SHEET_NAME,
+        headerValues: [
+          "Timestamp",
+          "Patient Name",
+          "Mobile Number",
+          "Doctor Name",
+          "Consultation Type",
+          "Appointment Date",
+          "API Endpoint",
+          "Error Code",
+          "Error Message",
+          "Request Payload",
+          "Response Payload",
+          "Stack Trace",
+          "Environment",
+        ],
+      });
+    }
+
+    await sheet.addRow({
+      Timestamp: new Date().toISOString(),
+      "Patient Name": data.patientName || "",
+      "Mobile Number": data.mobileNumber || "",
+      "Doctor Name": data.doctorName || "",
+      "Consultation Type": data.consultationType || "",
+      "Appointment Date": data.appointmentDate || "",
+      "API Endpoint": data.apiName || "",
+      "Error Code": data.errorCode || "",
+      "Error Message": data.errorMessage || "Unknown error",
+      "Request Payload": data.requestPayload
+        ? (typeof data.requestPayload === "string"
+            ? data.requestPayload
+            : JSON.stringify(data.requestPayload))
+        : "",
+      "Response Payload": data.responsePayload
+        ? (typeof data.responsePayload === "string"
+            ? data.responsePayload
+            : JSON.stringify(data.responsePayload))
+        : "",
+      "Stack Trace": data.stackTrace || "",
+      Environment: process.env.NODE_ENV || "development",
+    });
+
+    console.log("logErrorToGoogleSheet: Error logged successfully to Google Sheets");
+    return true;
+  } catch (error) {
+    console.error("logErrorToGoogleSheet: Failed to log error to Google Sheets:", error.message);
+    // Fail silently - logging failure should not crash the application or affect API response
+    return false;
+  }
 };

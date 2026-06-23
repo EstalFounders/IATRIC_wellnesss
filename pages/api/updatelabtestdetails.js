@@ -2,6 +2,7 @@
 
 import { dbConnect } from "../../src/lib/db";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
+import { logErrorToGoogleSheet } from "./helper";
 
 
 export default async function handler(req, res) {
@@ -26,6 +27,13 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true, data: updatedTestDetails });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "updatelabtestdetails - POST",
+        errorMessage: error.message || "Failed to update lab test details",
+        errorCode: "400",
+        stackTrace: error.stack,
+        requestPayload: { id, ...req.body },
+      });
       return res.status(400).json({ success: false, message: 'Error updating test details', error });
     }
   } else {

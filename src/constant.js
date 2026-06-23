@@ -54,6 +54,7 @@ export const api = {
   serviceSuggestion: "/api/helper/getServiceSuggestion",
   postArticle: "/api/superAdmin/postArticle",
   helperApi: "/api/helperApi",
+  consultationByMeetingId: "/api/getAppointmentId",
 };
 
 export const services = [
@@ -142,20 +143,25 @@ export const roles = {
 };
 
 export const superAdminConsultationtype = [
-  { name: "Call" },
+  { name: "Audio" },
   { name: "Video" },
   { name: "Home visit" },
   { name: "Clinic" },
 ];
 
 export const DoctorType = {
-  Company: "Company",
-  Individual: "Indiividual",
+  company: "Company",
+  individual: "Individual",
 };
 
 export const serviceOffered = {
   consultation: "Consultation",
   labTest: "Labtest",
+};
+
+export const serviceCategoryType = {
+  MAJOR: "MAJOR",
+  SUB: "SUB",
 };
 
 export const CHOOSE_TIME = "ChooseTime";

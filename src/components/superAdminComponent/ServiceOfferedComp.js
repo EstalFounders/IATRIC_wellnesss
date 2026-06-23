@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import styles from "./css/ServiceOffered.module.css";
-import { MdDelete } from "react-icons/md";
-import { api, sessionStorageName } from "../../constant";
+import { MdDelete, MdEdit } from "react-icons/md";
+import { api, serviceCategoryType } from "../../constant";
 import { Button } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
-import { set } from "mongoose";
+import { useSelector } from "react-redux";
 
 const ServiceOfferedComp = () => {
   const [loader, setLoader] = useState(false);
   const [service, setService] = useState([]);
   const [editing, setEditing] = useState(null);
   const [editedService, setEditedService] = useState(null);
+  const [error, setError] = useState(null);
+  const [updateError, setUpdateError] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
+  const [filterCategory, setFilterCategory] = useState("");
   const [newService, setNewService] = useState({
     name: "",
     description: "",
@@ -23,13 +25,11 @@ const ServiceOfferedComp = () => {
     processingfee: "",
     freight: "",
     isActive: true,
+    categoryType: serviceCategoryType.MAJOR,
   });
-  const dispatch = useDispatch();
   const storedService = useSelector(
     (state) => state.superAdminHomePage.serviceOffered
-  )
-
-  console.log(storedService, "storedService");
+  );
 
   useEffect(() => {
     setService(storedService);
@@ -49,6 +49,7 @@ const ServiceOfferedComp = () => {
   };
 
   const handleUpdate = (id) => {
+    setUpdateError(null);
     fetch(`${api.serviceOffered}?id=${id}`, {
       method: "PUT",
       headers: {
@@ -56,24 +57,29 @@ const ServiceOfferedComp = () => {
       },
       body: JSON.stringify(editedService),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Failed to update consultation");
+          const errMsg = await response.text().catch(() => "");
+          throw new Error(errMsg || "Failed to update service");
         }
         return response.json();
       })
       .then((data) => {
-        console.log(data, "response 43");
         setService((prev) =>
           prev.map((item) => (item._id === id ? data : item))
         );
         setEditing(null);
         setEditedService(null);
+        setUpdateError(null);
       })
-      .catch((error) => console.error("Error updating consultation:", error));
+      .catch((err) => {
+        console.error("Error updating service:", err);
+        setUpdateError(err.message || "Failed to update service");
+      });
   };
 
   const handleAdd = () => {
+    setError(null);
     setLoader(true);
     fetch(api.serviceOffered, {
       method: "POST",
@@ -82,34 +88,46 @@ const ServiceOfferedComp = () => {
       },
       body: JSON.stringify(newService),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Failed to add service");
+          const errMsg = await response.text().catch(() => "");
+          throw new Error(errMsg || "Failed to add service");
         }
         return response.json();
       })
       .then((data) => {
         setService((prev) => [...prev, data]);
-        setNewService({ name: "", fee: "", isActive: true });
+        setNewService({ name: "", fee: "", isActive: true, categoryType: serviceCategoryType.MAJOR });
         setLoader(false);
+        setError(null);
       })
-      .catch((error) => console.error("Error adding service:", error));
+      .catch((err) => {
+        console.error("Error adding service:", err);
+        setLoader(false);
+        setError(err.message || "Failed to add service");
+      });
   };
 
   const handleDelete = (id) => {
+    setDeleteError(null);
     fetch(`${api.serviceOffered}?id=${id}`, {
       method: "DELETE",
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Failed to delete service");
+          const errMsg = await response.text().catch(() => "");
+          throw new Error(errMsg || "Failed to delete service");
         }
-        return response.text(); // You can use `.json()` if your backend returns a JSON response.
+        return response.text();
       })
       .then(() => {
         setService((prev) => prev.filter((item) => item._id !== id));
+        setDeleteError(null);
       })
-      .catch((error) => console.error("Error deleting service:", error));
+      .catch((err) => {
+        console.error("Error deleting service:", err);
+        setDeleteError(err.message || "Failed to delete service");
+      });
   };
 
   const handleChange = (e) => {
@@ -117,197 +135,303 @@ const ServiceOfferedComp = () => {
     setNewService({ ...newService, [name]: value });
   };
 
+  const filteredServices = filterCategory
+    ? service.filter((s) => s.categoryType === filterCategory)
+    : service;
+
+  const renderField = (label, value) => (
+    <div>
+      <div className={styles.fieldLabel}>{label}</div>
+      <div className={value ? styles.fieldValue : styles.fieldValueEmpty}>
+        {value || "—"}
+      </div>
+    </div>
+  );
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Service Offered</h1>
+
+      <div className={styles.filterBar}>
+        <span className={styles.filterLabel}>Filter by category:</span>
+        <select
+          className={styles.filterSelect}
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
+          <option value="">All Services</option>
+          <option value={serviceCategoryType.MAJOR}>Major Services</option>
+          <option value={serviceCategoryType.SUB}>Sub Services</option>
+        </select>
+      </div>
+
       <div className={styles.cardContainer}>
-        {service.map((service) => (
+        {filteredServices.length === 0 && (
+          <div className={styles.emptyState}>No services available</div>
+        )}
+
+        {filteredServices.map((service) => (
           <div key={service._id} className={styles.card}>
             {editing === service._id && editedService ? (
+              /* ---- EDIT MODE ---- */
               <div>
-                <input
-                  className={styles.input}
-                  type="text"
-                  placeholder="Name"
-                  value={editedService.name}
-                  onChange={(e) =>
-                    setEditedService({ ...editedService, name: e.target.value })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="Fee"
-                  value={editedService.fee}
-                  onChange={(e) =>
-                    setEditedService({ ...editedService, fee: e.target.value })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="text"
-                  placeholder="HSN Code"
-                  value={editedService.hsn_code}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      hsn_code: e.target.value,
-                    })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="HSN %"
-                  value={editedService.hsn_percentage}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      hsn_percentage: e.target.value,
-                    })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="Share"
-                  value={editedService.share}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      share: e.target.value,
-                    })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="GST"
-                  value={editedService.gst}
-                  onChange={(e) =>
-                    setEditedService({ ...editedService, gst: e.target.value })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="Platform Fee"
-                  value={editedService.platformfee}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      platformfee: e.target.value,
-                    })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="Processing Fee"
-                  value={editedService.processingfee}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      processing_fee: e.target.value,
-                    })
-                  }
-                />
-
-                <input
-                  className={styles.input}
-                  type="number"
-                  placeholder="Freight"
-                  value={editedService.freight}
-                  onChange={(e) =>
-                    setEditedService({
-                      ...editedService,
-                      freight: e.target.value,
-                    })
-                  }
-                />
-
-                <div
-                  className={styles.toggleSwitch}
-                  onClick={() =>
-                    setEditedService({
-                      ...editedService,
-                      isActive: !editedService.isActive,
-                    })
-                  }
-                  style={{
-                    backgroundColor: editedService.isActive ? "green" : "gray",
-                  }}
-                >
-                  <div
-                    className={styles.toggleKnob}
-                    style={{
-                      left: editedService.isActive ? "20px" : "2px",
-                    }}
-                  ></div>
+                <div className={styles.cardHeader}>
+                  <span className={styles.serviceName}>
+                    {service.name}
+                  </span>
                 </div>
-                <small className={styles.statusText}>
-                  {editedService.isActive ? "Active" : "Not Active"}
-                </small>
+                <div className={styles.editSection}>
+                  <div className={styles.editGrid}>
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Name</label>
+                      <input
+                        className={styles.input}
+                        type="text"
+                        placeholder="Name"
+                        value={editedService.name}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, name: e.target.value })
+                        }
+                      />
+                    </div>
 
-                <div className={styles.buttonGroup}>
-                  <Button
-                    className={styles.updateButton}
-                    onClick={() => handleUpdate(service._id)}
-                  >
-                    Update
-                  </Button>
-                  <button
-                    className={styles.discardButton}
-                    onClick={handleDiscard}
-                  >
-                    Discard
-                  </button>
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Fee</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="Fee"
+                        value={editedService.fee}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, fee: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>HSN Code</label>
+                      <input
+                        className={styles.input}
+                        type="text"
+                        placeholder="HSN Code"
+                        value={editedService.hsn_code}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, hsn_code: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>HSN %</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="HSN %"
+                        value={editedService.hsn_percentage}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, hsn_percentage: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Share</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="Share"
+                        value={editedService.share}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, share: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>GST</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="GST"
+                        value={editedService.gst}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, gst: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Platform Fee</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="Platform Fee"
+                        value={editedService.platformfee}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, platformfee: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Processing Fee</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="Processing Fee"
+                        value={editedService.processingfee}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, processing_fee: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Freight</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        placeholder="Freight"
+                        value={editedService.freight}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, freight: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroupFull}>
+                      <label className={styles.editLabel}>Category</label>
+                      <select
+                        className={styles.input}
+                        value={editedService.categoryType || serviceCategoryType.MAJOR}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, categoryType: e.target.value })
+                        }
+                      >
+                        <option value={serviceCategoryType.MAJOR}>Major</option>
+                        <option value={serviceCategoryType.SUB}>Sub</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.toggleRow}>
+                      <div
+                        className={styles.toggleSwitch}
+                        onClick={() =>
+                          setEditedService({
+                            ...editedService,
+                            isActive: !editedService.isActive,
+                          })
+                        }
+                        style={{
+                          backgroundColor: editedService.isActive ? "#22c55e" : "#9ca3af",
+                        }}
+                      >
+                        <div
+                          className={styles.toggleKnob}
+                          style={{
+                            left: editedService.isActive ? "23px" : "3px",
+                          }}
+                        ></div>
+                      </div>
+                      <span className={styles.toggleLabel}>
+                        {editedService.isActive ? "Active" : "Not Active"}
+                      </span>
+                    </div>
+
+                    {updateError && (
+                      <div className={styles.errorMessage}>
+                        ⚠ {updateError}
+                      </div>
+                    )}
+                    <div className={styles.buttonGroup}>
+                      <Button
+                        className={styles.updateButton}
+                        onClick={() => handleUpdate(service._id)}
+                      >
+                        Update
+                      </Button>
+                      <button
+                        className={styles.discardButton}
+                        onClick={handleDiscard}
+                      >
+                        Discard
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
+              /* ---- VIEW MODE ---- */
               <>
-                <div className={styles.consultationCard}>
-                  <div className={styles.infoSection}>
-                    <div className={styles.name}>{service.name}</div>
-                    <div>{service.fee}</div>
-                    <div
-                      className={styles.toggleSwitch}
-                      style={{
-                        backgroundColor: service.isActive ? "green" : "gray",
-                      }}
+                <div className={styles.cardHeader}>
+                  <span className={styles.serviceName}>
+                    {service.name}
+                    <span
+                      className={`${styles.categoryBadge} ${
+                        service.categoryType === serviceCategoryType.MAJOR
+                          ? styles.categoryBadgeMajor
+                          : styles.categoryBadgeSub
+                      }`}
                     >
-                      <div
-                        className={styles.toggleKnob}
-                        style={{
-                          left: service.isActive ? "20px" : "2px",
-                        }}
-                      />
-                    </div>
-                    <small className={styles.statusText}>
-                      {service.isActive ? "Active" : "Not Active"}
-                    </small>
+                      {service.categoryType || "MAJOR"}
+                    </span>
+                  </span>
+                  <span
+                    className={`${styles.statusBadge} ${
+                      service.isActive ? styles.statusBadgeActive : styles.statusBadgeInactive
+                    }`}
+                  >
+                    <span
+                      className={`${styles.statusDot} ${
+                        service.isActive ? styles.statusDotActive : styles.statusDotInactive
+                      }`}
+                    />
+                    {service.isActive ? "Active" : "Inactive"}
+                  </span>
+                </div>
+
+                <div className={styles.cardBody}>
+                  <div className={styles.fieldGrid}>
+                    {renderField("Fee", service.fee)}
+                    {renderField("HSN Code", service.hsn_code)}
+                    {renderField("HSN %", service.hsn_percentage)}
+                    {renderField("Share", service.share)}
+                    {renderField("GST", service.gst)}
+                    {renderField("Platform Fee", service.platformfee)}
+                    {renderField("Processing Fee", service.processingfee)}
+                    {renderField("Freight", service.freight)}
                   </div>
 
-                  <div className={styles.buttonGroup}>
-                    <Button
-                      className={styles.editButton}
-                      onClick={() => handleEdit(service._id)}
-                    >
-                      Edit
-                    </Button>
-                    <MdDelete
-                      size={22}
-                      className="ml-2"
-                      onClick={() => handleDelete(service._id)}
-                    />
-                  </div>
+                  {service.description && (
+                    <div className={styles.fieldDescription}>
+                      <div className={styles.fieldLabel}>Description</div>
+                      <div className={styles.fieldValue}>
+                        {service.description}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.cardActions}>
+                  {deleteError && (
+                    <div className={styles.errorMessageActions}>
+                      ⚠ {deleteError}
+                    </div>
+                  )}
+                  <Button
+                    className={styles.editButton}
+                    onClick={() => handleEdit(service._id)}
+                  >
+                    <MdEdit size={16} />
+                    Edit
+                  </Button>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleDelete(service._id)}
+                    title="Delete"
+                  >
+                    <MdDelete size={20} />
+                  </button>
                 </div>
               </>
             )}
@@ -315,9 +439,13 @@ const ServiceOfferedComp = () => {
         ))}
       </div>
 
-      <h2 className={styles.subtitle}>Add New Service</h2>
+      {/* ---- ADD NEW SERVICE ---- */}
+      <div className={styles.sectionHeader}>
+        <h2>Add New Service</h2>
+      </div>
+
       <div className={styles.form}>
-        <div className="d-flex flex-wrap gap-3 mb-3">
+        <div className={styles.formGrid}>
           <div className={styles.formGroup}>
             <label>Name</label>
             <input
@@ -425,15 +553,35 @@ const ServiceOfferedComp = () => {
               placeholder="Enter freight"
             />
           </div>
+
+          <div className={styles.formGroup}>
+            <label>Category</label>
+            <select
+              className={styles.input}
+              name="categoryType"
+              value={newService.categoryType}
+              onChange={handleChange}
+            >
+              <option value={serviceCategoryType.MAJOR}>Major</option>
+              <option value={serviceCategoryType.SUB}>Sub</option>
+            </select>
+          </div>
         </div>
 
-        {loader ? (
-          <div className={styles.loader}>Loading...</div>
-        ) : (
-          <Button className={styles.addButton} onClick={handleAdd}>
-            Add Service
-          </Button>
+        {error && (
+          <div className={styles.errorMessage} style={{ marginBottom: 12 }}>
+            ⚠ {error}
+          </div>
         )}
+        <div className={styles.formActions}>
+          {loader ? (
+            <div className={styles.loader}>Loading...</div>
+          ) : (
+            <Button className={styles.addButton} onClick={handleAdd}>
+              + Add Service
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import { dbConnect } from "../../src/lib/db";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
+import { logErrorToGoogleSheet } from "./helper";
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -8,6 +10,12 @@ export default async function handler(req, res) {
       const labTests = await LabTestDetails.find();
       res.status(200).json(labTests);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestDetails - GET",
+        errorMessage: error.message || "Failed to fetch lab tests",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ message: "Error fetching lab tests" });
     }
   }
@@ -16,13 +24,12 @@ export default async function handler(req, res) {
     const { id } = req.query;
 
     try {
-      // Find the lab test by ID and update with the request body
       const updatedLabTest = await LabTestDetails.findByIdAndUpdate(
         id,
         req.body,
         {
-          new: true, // Return the updated document
-          runValidators: true, // Enforce schema validation
+          new: true,
+          runValidators: true,
         }
       );
 
@@ -34,6 +41,13 @@ export default async function handler(req, res) {
 
       res.status(200).json({ success: true, data: updatedLabTest });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestDetails - PUT",
+        errorMessage: error.message || "Failed to update lab test",
+        errorCode: "400",
+        stackTrace: error.stack,
+        requestPayload: { id, ...req.body },
+      });
       res.status(400).json({ success: false, error: error.message });
     }
   }
@@ -63,6 +77,13 @@ export default async function handler(req, res) {
 
       res.status(201).json(savedCategory);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestDetails - POST",
+        errorMessage: error.message || "Failed to create lab test",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: req.body,
+      });
       res
         .status(500)
         .json({ message: "Error creating category", error: error.message });
@@ -84,6 +105,13 @@ export default async function handler(req, res) {
         .json({ message: "Item successfully deleted", deletedItem });
     } catch (error) {
       console.error("Delete error:", error);
+      await logErrorToGoogleSheet({
+        apiName: "labtestDetails - DELETE",
+        errorMessage: error.message || "Failed to delete lab test",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id },
+      });
       res.status(500).json({ message: "Internal Server Error" });
     }
   } else {

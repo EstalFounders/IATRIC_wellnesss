@@ -19,6 +19,7 @@ import mongoose from "mongoose";
 import { dbConnect } from "../../src/lib/db";
 import { WHATSAPP_PRESCRIPTION_TEMPLATE } from "./utils/constants";
 import { formatPhoneNumber } from "./utils/commonmethod";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -82,6 +83,13 @@ export default async function handler(req, res) {
       session.endSession();
     }
     console.error("Error:", error);
+    await logErrorToGoogleSheet({
+      apiName: "prescription - POST",
+      errorMessage: error.message || "Prescription upload failed",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { appointmentId: req.body?.appointmentId, name: req.body?.name },
+    });
     res.status(500).json({ error: "Internal Server Error", message: error.message });
   }
 }

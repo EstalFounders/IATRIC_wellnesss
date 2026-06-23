@@ -1,6 +1,6 @@
 import React from "react";
 import { formatData } from "../../utils/helper";
-import { appointment_status } from "../../../../constant";
+import { appointment_status, price_symbol } from "../../../../constant";
 import { Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 
@@ -68,7 +68,7 @@ const AppointmentsTable = ({ appointments, filterText }) => {
                   {appointment.consultationType}
                 </td>
                 <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                  ${appointment.consultationprice}
+                  {price_symbol}{appointment.consultationprice}
                 </td>
                 <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
                   {appointment.status === appointment_status.completed ? (

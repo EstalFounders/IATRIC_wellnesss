@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
-import { CHOOSE_TIME, IS_NOW } from "../../constant";
+import { CHOOSE_TIME, IS_NOW, price_symbol } from "../../constant";
 import { formatTime } from "../helper";
 
 const toLocalDateString = (date) => {
@@ -48,6 +48,8 @@ const AppointmentForm = ({
     appointmentState.selectedDate instanceof Date
       ? toLocalDateString(appointmentState.selectedDate)
       : today;
+
+  const consultationOptions = (appointmentState.consultationOptions || []);
 
   return (
     <div className="col-lg-8">
@@ -118,18 +120,48 @@ const AppointmentForm = ({
             />
           </div>
 
-          {/* Consultation Type */}
+          {/* Consultation Type - Dynamically from Services */}
           <Typography variant="h6" mt={3} className="text-center">
             Consultation Type
           </Typography>
           <RadioGroup
             row
             value={appointmentState.consultationType}
-            onChange={handleConsultationChange}
+            onChange={(e) => {
+              handleConsultationChange(e);
+              const selectedOption = appointmentState.consultationOptions.find(
+                (opt) => opt.name === e.target.value
+              );
+              if (selectedOption && setter.setConsultationPrice) {
+                setter.setConsultationPrice(selectedOption.fee || "");
+              }
+            }}
             style={{ justifyContent: "center", marginBottom: "20px" }}
           >
-            <FormControlLabel value="Call" control={<Radio />} label="Call" />
-            <FormControlLabel value="Video" control={<Radio />} label="Video" />
+            {consultationOptions.map((option) => (
+              <Box
+                key={option.name}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                mx={1}
+              >
+                <FormControlLabel
+                  value={option.name}
+                  control={<Radio />}
+                  label={option.name}
+                />
+                {appointmentState.consultationType === option.name && option.fee && (
+                  <Typography
+                    variant="body2"
+                    className={styles.priceText}
+                    // style={{ marginTop: 4 }}
+                  >
+                    {price_symbol} {option.fee}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </RadioGroup>
 
           {/* When */}

@@ -1,477 +1,143 @@
-import Link from "next/dist/client/link";
-import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/router";
 
-const MobileMenu = () => {
-  const [activeMenu, setActiveMenu] = useState("");
-  const activeMenuSet = (value) =>
-      setActiveMenu(activeMenu === value ? "" : value),
-    activeLi = (value) =>
-      value === activeMenu ? { display: "block" } : { display: "none" },
-    activeArrow = (value) => (value === activeMenu ? "ws-activearrow" : "");
+const MobileMenu = ({ isOpen, setIsOpen }) => {
+  const router = useRouter();
+
+  const menuItems = [
+    { label: "Home", href: "/", icon: "🏠" },
+    { label: "About Us", href: "/about-us", icon: "ℹ️" },
+    { label: "Services", href: "/all-services", icon: "🏥" },
+    { label: "Book Consultation", href: "/appointment", icon: "📅" },
+    { label: "Lab Tests", href: "/labTest/homepage", icon: "🧪" },
+    { label: "Medicines", href: "/medicine/homepage", icon: "💊" },
+    { label: "Blog", href: "/blog/homepage", icon: "📝" },
+    { label: "All Doctors", href: "/all-doctors", icon: "👨‍⚕️" },
+    { label: "Contact Us", href: "/contacts-2", icon: "☎️" },
+    { label: "Join Us", href: "/join-us", icon: "👥" },
+  ];
+
+  const handleNavigation = (href) => {
+    router.push(href);
+  };
+
+  const isActive = (href) =>
+    router.pathname === href || router.asPath === href;
+
   return (
     <div
-      className="wsmainfull menu clearfix cloned d-block d-lg-none"
+      className="d-block d-lg-none"
       style={{
         position: "fixed",
         top: 0,
-        marginTop: 0,
-        zIndex: 500,
-        display: "block",
         left: 0,
-        width: 731,
+        width: "100%",
+        height: "100vh",
+        zIndex: 400,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        display: isOpen ? "flex" : "none",
+        flexDirection: "column",
       }}
+      onClick={() => setIsOpen(false)}
     >
-      <div className="wsmainwp clearfix">
-        {/* LOGO IMAGE */}
-        {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80 pixels) */}
-        {/* <div className="desktoplogo">
-          <Image
-            src="/images/logo.png"
-            width={180}
-            height={40}
-            alt="header-logo"
-          />
-        </div> */}
-        {/* MAIN MENU */}
-        <nav className="wsmenu clearfix" style={{ height: 294 }}>
-          <div className="overlapblackbg" />
-          <ul className="wsmenu-list">
-            {/* DROPDOWN MENU */}
-            <li aria-haspopup="true">
-              {/* <span
-                className={`wsmenu-click ${activeArrow("home")}`}
-                onClick={() => activeMenuSet("home")}
-              >
-                <i className="wsmenu-arrow" />
-              </span> */}
-              <Link legacyBehavior href="/">
-                <a onClick={() => activeMenuSet("home")}>
-                  Home
-                  {/* <span className="wsarrow" /> */}
-                </a>
-              </Link>
-              <Link legacyBehavior href="/labTest/homepage">
-                <a onClick={() => activeMenuSet("labTest")}>
-                  LabTest
-                  {/* <span className="wsarrow" /> */}
-                </a>
-              </Link>
-              {/* <ul className="sub-menu" style={activeLi("home")}> */}
-              {/* <li aria-haspopup="true">
-                {/* <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-1">
-                    Home Concept #1
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-3">
-                    Home Concept #3
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-4">
-                    Home Concept #4
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-5">
-                    Home Concept #5
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-6">
-                    Home Concept #6
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-7">
-                    Home Concept #7
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-8">
-                    Home Concept #8
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-9">
-                    Home Concept #9
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-10">
-                    Home Concept #10
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-11">
-                    Home Concept #11
-                  </Link>
-                </li>
-                <li aria-haspopup="true">
-                  <Link legacyBehavior href="/demo-12">
-                    Home Concept #12
-                  </Link>
-                </li> */}
-              {/* </ul> */}
-            </li>{" "}
-            {/* END DROPDOWN MENU */}
-            {/* PAGES */}
-            <li aria-haspopup="true">
-              <span
-                className={`wsmenu-click ${activeArrow("Pages")}`}
-                onClick={() => activeMenuSet("Pages")}
-              >
-                <i className="wsmenu-arrow" />
-              </span>
-              <a href="#" onClick={() => activeMenuSet("Pages")}>
-                Pages <span className="wsarrow" />
-              </a>
-              <div
-                className="wsmegamenu clearfix pl-3"
-                style={activeLi("Pages")}
-              >
-                <div className="container">
-                  <div className="row">
-                    {/* MEGAMENU LINKS */}
-                    <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                      <li className="title">Standard Pages:</li>
-                      <li>
-                        <Link legacyBehavior href="/about-us">
-                          About Us Page
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/who-we-are">
-                          Who We Are
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/all-services">
-                          Our Services
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/service-1">
-                          Service Single #1
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/service-2">
-                          Service Single #2
-                        </Link>
-                      </li>
-                    </ul>
-                    {/* MEGAMENU LINKS */}
-                    <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                      <li className="title">Medical Pages:</li>
-                      <li>
-                        <Link legacyBehavior href="/all-departments">
-                          Our Departments
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/department-single">
-                          Department Single
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/all-doctors">
-                          Meet the Doctors
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/doctor-1">
-                          <a>{`Doctor's`} Profile #1</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/doctor-2">
-                          <a>{`Doctor's`} Profile #2</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/timetable">
-                          Doctors Timetable
-                        </Link>
-                      </li>
-                    </ul>
-                    {/* MEGAMENU LINKS */}
-                    <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                      <li className="title">Special Pages:</li>
-                      <li>
-                        <Link legacyBehavior href="/pricing-1">
-                          Pricing Packages #1
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/pricing-2">
-                          Pricing Packages #2
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/appointment">
-                          Make an Appointment
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/faqs">
-                          FAQs Page
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/terms">
-                          Terms of Use
-                        </Link>
-                      </li>
-                    </ul>
-                    {/* MEGAMENU LINKS */}
-                    <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                      <li className="title">Auxiliary Pages:</li>
-                      <li>
-                        <Link legacyBehavior href="/gallery">
-                          Our Gallery
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/blog-listing">
-                          Blog Listing Page
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/single-post">
-                          Single Blog Post
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/contacts-1">
-                          Contact Us #1
-                        </Link>
-                      </li>
-                      <li>
-                        <Link legacyBehavior href="/contacts-2">
-                          Contact Us #2
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>{" "}
-                  {/* End row */}
-                </div>{" "}
-                {/* End container */}
-              </div>{" "}
-              {/* End wsmegamenu */}
-            </li>{" "}
-            {/* END PAGES */}
-            {/* HALF MENU */}
-            <li aria-haspopup="true">
-              <span
-                className={`wsmenu-click ${activeArrow("Half Menu")}`}
-                onClick={() => activeMenuSet("Half Menu")}
-              >
-                <i className="wsmenu-arrow" />
-              </span>
-              <a href="#" onClick={() => activeMenuSet("Half Menu")}>
-                Half Menu <span className="wsarrow" />
-              </a>
-              <div
-                className="wsmegamenu clearfix pl-3 halfmenu"
-                style={activeLi("Half Menu")}
-              >
-                <div className="container-fluid">
-                  <div className="row">
-                    {/* Links */}
-                    <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                      <li className="title">For Patients:</li>
-                      <li>
-                        <a href="#">Meet The Doctors</a>
-                      </li>
-                      <li>
-                        <a href="#">Patient Info Sheets</a>
-                      </li>
-                      <li>
-                        <a href="#">Online Patients Portal</a>
-                      </li>
-                      <li>
-                        <a href="#">Patients Testimonials</a>
-                      </li>
-                      <li>
-                        <a href="#">Blog &amp; Latest News</a>
-                      </li>
-                    </ul>
-                    {/* Links */}
-                    <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                      <li className="title">Quick Links:</li>
-                      <li>
-                        <a href="#">Terms &amp; Privacy Policy</a>
-                      </li>
-                      <li>
-                        <a href="#">Donor Privacy Policy</a>
-                      </li>
-                      <li>
-                        <a href="#">Workers Compensation</a>
-                      </li>
-                      <li>
-                        <a href="#">Insurance Information</a>
-                      </li>
-                      <li>
-                        <a href="#">After Hours Care</a>
-                      </li>
-                    </ul>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "85%",
+          maxWidth: "320px",
+          height: "100vh",
+          backgroundColor: "#ffffff",
+          overflowY: "auto",
+          zIndex: 401,
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* CLOSE BUTTON */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "16px",
+            borderBottom: "1px solid #e0e0e0",
+          }}
+        >
+          <button
+            onClick={() => setIsOpen(false)}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: "24px",
+              cursor: "pointer",
+              color: "#3b5f1d",
+              fontWeight: "bold",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* MENU ITEMS */}
+        <nav style={{ flex: 1, padding: "16px 0" }}>
+          <ul
+            style={{
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {menuItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <li
+                  key={item.href}
+                  style={{
+                    borderBottom: "1px solid #f0f0f0",
+                  }}
+                >
+                  <div
+                    onClick={() => handleNavigation(item.href)}
+                    style={{
+                      display: "block",
+                      padding: "14px 16px",
+                      color: active ? "#3b5f1d" : "#333",
+                      textDecoration: "none",
+                      fontSize: "16px",
+                      fontWeight: active ? "700" : "500",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      borderLeft: active ? "4px solid #3b5f1d" : "4px solid transparent",
+                      backgroundColor: active ? "#f0f7ee" : "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.target.style.backgroundColor = "#f5f5f5";
+                        e.target.style.borderLeftColor = "#3b5f1d";
+                        e.target.style.paddingLeft = "20px";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.target.style.backgroundColor = "transparent";
+                        e.target.style.borderLeftColor = "transparent";
+                        e.target.style.paddingLeft = "16px";
+                      }
+                    }}
+                  >
+                    {item.icon} {item.label}
                   </div>
-                </div>
-              </div>
-            </li>{" "}
-            {/* END HALF MENU */}
-            {/* MEGAMENU */}
-            <li aria-haspopup="true">
-              <span
-                className={`wsmenu-click ${activeArrow("Mega Menu")}`}
-                onClick={() => activeMenuSet("Mega Menu")}
-              >
-                <i className="wsmenu-arrow" />
-              </span>
-              <a href="#" onClick={() => activeMenuSet("Mega Menu")}>
-                Mega Menu <span className="wsarrow" />
-              </a>
-              <div
-                className="wsmegamenu clearfix pl-3"
-                style={activeLi("Mega Menu")}
-              >
-                <div className="container">
-                  <div className="row">
-                    {/* MEGAMENU QUICK LINKS */}
-                    <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                      <li className="title">Quick Links:</li>
-                      <li>
-                        <a href="#">For Referring Doctors</a>
-                      </li>
-                      <li>
-                        <a href="#">Terms &amp; Privacy Policy</a>
-                      </li>
-                      <li>
-                        <a href="#">Donor Privacy Policy</a>
-                      </li>
-                      <li>
-                        <a href="#">Patient Info Sheets</a>
-                      </li>
-                      <li>
-                        <a href="#">Online Patients Portal</a>
-                      </li>
-                      <li>
-                        <a href="#">Insurance Information</a>
-                      </li>
-                      <li>
-                        <a href="#">Patients Testimonials</a>
-                      </li>
-                    </ul>
-                    {/* MEGAMENU FEATURED NEWS */}
-                    <div className="col-lg-5 col-md-12 col-xs-12">
-                      {/* Title */}
-                      <h3 className="title">Featured News:</h3>
-                      {/* Image */}
-                      <div className="fluid-width-video-wrapper">
-                        <img
-                          src="images/blog/featured-news.jpg"
-                          alt="featured-news"
-                        />
-                      </div>
-                      {/* Text */}
-                      <h5 className="h5-xs">
-                        <a href="#">5 Benefits of integrative medicine</a>
-                      </h5>
-                      <p className="wsmwnutxt">
-                        Porta semper lacus cursus, feugiat primis ultrice in
-                        ligula risus auctor tempus feugiat dolor impedit magna
-                        purus at pretium gravida donec
-                      </p>
-                    </div>{" "}
-                    {/* END MEGAMENU FEATURED NEWS */}
-                    {/* MEGAMENU LATEST NEWS */}
-                    <div className="col-lg-4 col-md-12 col-xs-12">
-                      {/* Title */}
-                      <h3 className="title">Latest News:</h3>
-                      {/* Latest News */}
-                      <ul className="latest-news">
-                        {/* Post #1 */}
-                        <li className="clearfix d-flex align-items-center">
-                          {/* Image */}
-                          <img
-                            className="img-fluid"
-                            src="images/blog/latest-post-1.jpg"
-                            alt="blog-post-preview"
-                          />
-                          {/* Text */}
-                          <div className="post-summary">
-                            <Link legacyBehavior href="/single-post">
-                              Etiam sapien risus ante auctor tempus accumsan an
-                              empor ...
-                            </Link>
-                            <p>43 Comments</p>
-                          </div>
-                        </li>
-                        {/* Post #2 */}
-                        <li className="clearfix d-flex align-items-center">
-                          {/* Image */}
-                          <img
-                            className="img-fluid"
-                            src="images/blog/latest-post-2.jpg"
-                            alt="blog-post-preview"
-                          />
-                          {/* Text */}
-                          <div className="post-summary">
-                            <Link legacyBehavior href="/single-post">
-                              Blandit tempor a sapien ipsum, porta risus auctor
-                              justo ...
-                            </Link>
-                            <p>38 Comments</p>
-                          </div>
-                        </li>
-                        {/* Post #3 */}
-                        <li className="clearfix d-flex align-items-center">
-                          {/* Image */}
-                          <img
-                            className="img-fluid"
-                            src="images/blog/latest-post-3.jpg"
-                            alt="blog-post-preview"
-                          />
-                          {/* Text */}
-                          <div className="post-summary">
-                            <Link legacyBehavior href="/single-post">
-                              Cursus risus auctor tempus risus laoreet turpis
-                              auctor varius ...
-                            </Link>
-                            <p>29 Comments</p>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>{" "}
-                    {/* END MEGAMENU LATEST NEWS */}
-                  </div>{" "}
-                  {/* End row */}
-                </div>{" "}
-                {/* End container */}
-              </div>{" "}
-              {/* End wsmegamenu */}
-            </li>{" "}
-            {/* END MEGAMENU */}
-            {/* SIMPLE NAVIGATION LINK */}
-            <li className="nl-simple" aria-haspopup="true">
-              <a href="#">Simple Link</a>
-            </li>
-            {/* NAVIGATION MENU BUTTON */}
-            <li className="nl-simple header-btn" aria-haspopup="true">
-              <Link legacyBehavior href="/appointment">
-                Make an Appointment
-              </Link>
-            </li>
+                </li>
+              );
+            })}
           </ul>
-        </nav>{" "}
-        {/* END MAIN MENU */}
+        </nav>
       </div>
     </div>
   );
 };
-
 
 export default MobileMenu;

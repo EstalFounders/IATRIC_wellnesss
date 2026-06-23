@@ -1,6 +1,7 @@
 import { dbConnect } from "../../src/lib/db";
 import LabTestDetails from "../../src/models/lab-test-detailsSchema";
 import LabTestPackagesCatgoryScehma from "../../src/models/lab-test-package-categorySchema";
+import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -11,6 +12,12 @@ export default async function handler(req, res) {
         await LabTestPackagesCatgoryScehma.find({});
       res.status(200).json(labTestsPackagesCategoryDetails);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagescategorydetails - GET",
+        errorMessage: error.message || "Failed to fetch lab test categories",
+        errorCode: "500",
+        stackTrace: error.stack,
+      });
       res.status(500).json({ message: "Error fetching lab tests" });
     }
   }
@@ -19,11 +26,10 @@ export default async function handler(req, res) {
     const { id } = req.query;
 
     try {
-      // Find the lab test by ID and update with the request body
       const updatedLabTest =
         await LabTestPackagesCatgoryScehma.findByIdAndUpdate(id, req.body, {
-          new: true, // Return the updated document
-          runValidators: true, // Enforce schema validation
+          new: true,
+          runValidators: true,
         });
 
       if (!updatedLabTest) {
@@ -34,6 +40,13 @@ export default async function handler(req, res) {
 
       res.status(200).json({ success: true, data: updatedLabTest });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagescategorydetails - PUT",
+        errorMessage: error.message || "Failed to update lab test category",
+        errorCode: "400",
+        stackTrace: error.stack,
+        requestPayload: { id, ...req.body },
+      });
       res.status(400).json({ success: false, error: error.message });
     }
   }
@@ -73,6 +86,13 @@ export default async function handler(req, res) {
 
       res.status(201).json(savedTestDetails);
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagescategorydetails - POST",
+        errorMessage: error.message || "Failed to create lab test category",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: req.body,
+      });
       res
         .status(500)
         .json({ message: "Error saving test details", error: error.message });
@@ -90,6 +110,13 @@ export default async function handler(req, res) {
       }
       res.status(200).json({ message: "Test package deleted successfully" });
     } catch (error) {
+      await logErrorToGoogleSheet({
+        apiName: "labtestPackagescategorydetails - DELETE",
+        errorMessage: error.message || "Failed to delete lab test category",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { id },
+      });
       res.status(500).json({ error: "Failed to delete the test package" });
     }
   }

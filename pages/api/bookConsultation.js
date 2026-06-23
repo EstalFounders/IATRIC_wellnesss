@@ -17,6 +17,7 @@ import {
   findAvailableDoctor,
   findAvailableDoctorForNow,
   findAvailableDoctorForSpecificTimeSlot,
+  logErrorToGoogleSheet,
 } from "./helper";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -45,7 +46,6 @@ export default async function handler(req, res) {
 
     try {
       await dbConnect();
-
       let appointments;
       if (doctorId) {
         appointments = await Appointment.find({ doctorId: doctorId });
@@ -55,7 +55,15 @@ export default async function handler(req, res) {
 
       res.status(200).json({ appointments });
     } catch (error) {
-      console.error(error);
+      console.error(error.status);
+      // Log error to Google Sheets
+      await logErrorToGoogleSheet({
+        apiName: "bookConsultation - GET",
+        errorMessage: error.message || "Unable to fetch appointments",
+        errorCode: error.status,
+        stackTrace: error.stack,
+        requestPayload: { doctorId: req.query?.doctorId },
+      });
       res.status(500).json({ error: "Unable to fetch appointments" });
     }
   }
@@ -70,17 +78,25 @@ export default async function handler(req, res) {
       appointmentId,
       "appointment id",
       selectedStatus,
-      "selected status"
+      "selected status",
     );
     try {
       const appointment = await Appointment.findByIdAndUpdate(
         { _id: appointmentId },
         { status: selectedStatus },
-        { new: true } // Return the updated document
+        { new: true }, // Return the updated document
       );
 
       res.status(200).json({ message: "Status updated successfully" });
     } catch (error) {
+      // Log error to Google Sheets
+      await logErrorToGoogleSheet({
+        apiName: "bookConsultation - PUT",
+        errorMessage: error.message || "An error occurred",
+        errorCode: "500",
+        stackTrace: error.stack,
+        requestPayload: { appointmentId, selectedStatus },
+      });
       res.status(500).json({ message: "An error occurred", error });
     }
   }
@@ -104,7 +120,7 @@ export default async function handler(req, res) {
 
     const clientSideAppointmentTime = appointmentTime;
 
-    try { 
+    try {
       console.log(req.body);
       session = await mongoose.startSession();
       session.startTransaction();
@@ -116,28 +132,16 @@ export default async function handler(req, res) {
 
       // Determine current or specific time
       const now = new Date();
-      const genericConsultationType = consultationTypeMapping[consultationType];
+      const genericConsultationType = consultationType;
       const meetingId = uuidv4();
-      console.log("119");
 
       // Find available doctor if needed right now
-      console.log(
-        genericConsultationType,
-        "generic consultation type",
-        doctorId,
-        "doctor id",
-        clientSideAppointmentTime,
-        "appointment time",
-        IN_TWENTY_MINUTES_NOW,
-        "in twenty minutes now",
-        clientSideAppointmentTime == IS_NOW,
-        clientSideAppointmentTime === IN_TWENTY_MINUTES_NOW
-      );
+
       if (doctorId && clientSideAppointmentTime == IS_NOW) {
         const result = await checkNbookSelectedDoctorForNow(
           selectedDate,
           doctorId,
-          res
+          res,
         );
         slot = result ? result.slot : "";
       }
@@ -149,14 +153,27 @@ export default async function handler(req, res) {
         const result = await findAvailableDoctorForNow(
           selectedDate,
           genericConsultationType,
-          res
+          res,
         );
         console.log(result, "result 97");
+
+        // Check if findAvailableDoctorForNow already sent a response
+        // (e.g. "next 3 available slots" or "no slots found")
+        if (
+          !result ||
+          result.doctor === undefined ||
+          result.slot === undefined
+        ) {
+          // Response was already sent by findAvailableDoctorForNow (e.g. nextSlots response)
+          // The function returned early with res.status().json(), so just exit the handler
+          return;
+        }
+
         console.log(
           result.doctor._id.toString(),
           "result doctor id",
           result.slot,
-          "result slots"
+          "result slots",
         );
         doctorId = result ? result.doctor._id.toString() : "";
         docName = result ? result.doctor.name : "";
@@ -172,7 +189,7 @@ export default async function handler(req, res) {
         const result = await findAvailableDoctorForSpecificTimeSlot(
           selectedDate,
           genericConsultationType,
-          selectedSlot
+          selectedSlot,
         );
         console.log(result, "result 111");
         docName = result.doctor.name;
@@ -215,7 +232,7 @@ export default async function handler(req, res) {
       let result;
       // Handle consultation types
       switch (consultationType) {
-        case "Call":
+        case "Audio":
         case "Video":
           // Store appointment details
           result = await bookConsultation({ bookConsultationParams });
@@ -237,10 +254,10 @@ export default async function handler(req, res) {
       //   body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
       //   read: false,
       // });
-      // await sendAdminNotification({
-      //   title: "Consultation Booked",
-      //   body: `Patient ${name} has booked consultation`
-      // })
+      await sendAdminNotification({
+        title: "Consultation Booked",
+        body: `Patient ${name} has booked consultation`,
+      });
       await session.commitTransaction();
       session.endSession();
       res.status(200).json({ message: "Consultation booked successfully" });
@@ -250,6 +267,33 @@ export default async function handler(req, res) {
         session.endSession();
       }
       console.error("Booking error:", error);
+      // Log error to Google Sheets with full context
+      await logErrorToGoogleSheet({
+        apiName: "bookConsultation - POST",
+        errorMessage: error.message || "Booking failed",
+        errorCode: error.code || "500",
+        stackTrace: error.stack,
+        patientName: name || "",
+        mobileNumber: patientMobNo || "",
+        doctorName: doctorName || "",
+        consultationType: consultationType || "",
+        appointmentDate: selectedDate || "",
+        requestPayload: {
+          selectedDoctorId,
+          appointmentTime,
+          selectedDate,
+          selectedSlot,
+          symptoms,
+          name,
+          doctorName,
+          patientMobNo,
+          consultationType,
+          consultationprice,
+        },
+        responsePayload: {
+          message: "All doctor are busy right now, No slot is available",
+        },
+      });
       res.status(200).json({
         message: "All doctor are busy right now, No slot is available",
       });

@@ -1,63 +1,66 @@
 import React from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
-import Image from "next/image";
+import styles from "./NotificationSection.module.css";
 
 const PreviewRequest = ({ request, handleDoctReqApproveOrReject, onClose }) => {
-  console.log(request, "request on 6");
+  const id = request._id;
 
   return (
-    <Container
-      className="mt-5 mb-2"
-      style={{ width: "1200px", marginLeft: "100px" }}
-    >
-      <Row className="align-items-center">
-        {/* Doctor Info */}
-        <Col md={8}>
-          <div className="h2 font-weight-bold">UPDATE REQUEST</div>
-          <h4 className="mt-4 text-primary text-uppercase">{request.name}</h4>
-          {/* <p className="text-muted">{doctorSpecialty}</p> */}
+    <div style={{ padding: 24, minWidth: 400 }}>
+      <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111", marginBottom: 4 }}>
+        UPDATE REQUEST
+      </div>
+      <div style={{ fontSize: "1rem", fontWeight: 700, color: "#1a3a0e", textTransform: "uppercase", marginBottom: 16 }}>
+        {request.name}
+      </div>
 
-          {/* Requested Updates */}
-          <div className="mt-4">
-            <h5>Requested Updates</h5>
-            <ul className="list-unstyled">
-              {Object.entries(request.updatedFields).map(
-                ([key, value], index) => (
-                  <li key={index} className="mb-3">
-                    <strong className="font-weight-bold">{key}:</strong> <span>{value}</span>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-        </Col>
+      <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#222", marginBottom: 8 }}>
+        Requested Updates
+      </div>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {Object.entries(request.updatedFields || {}).map(([key, value], index) => (
+          <li key={index} style={{ marginBottom: 8, fontSize: "0.85rem", color: "#444" }}>
+            <strong style={{ color: "#222", fontWeight: 600 }}>{key}:</strong>{" "}
+            <span>{value}</span>
+          </li>
+        ))}
+      </ul>
 
-        {/* Doctor Image */}
-        {/* <Col md={4} className="text-center">
-          <Image
-            src={doctorImage}
-            alt={doctorName}
-            width={200}
-            height={200}
-            className="rounded"
-          />
-        </Col> */}
-      </Row>
-
-      {/* Approve Button */}
-      <Row className="mt-4">
-        <Col className="text-left">
-          <Button variant="primary" onClick={handleDoctReqApproveOrReject}>
-            Approve
-          </Button>
-        </Col>
-        <Col className="text-right">
-          <Button variant="primary" onClick={onClose}>
-            Close
-          </Button>
-        </Col>
-      </Row>
-    </Container>
+      <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+        <button
+          className={styles.approveBtn}
+          onClick={() => {
+            handleDoctReqApproveOrReject(id, "approve");
+            onClose();
+          }}
+        >
+          Approve
+        </button>
+        <button
+          className={styles.rejectBtn}
+          onClick={() => {
+            handleDoctReqApproveOrReject(id, "reject");
+            onClose();
+          }}
+        >
+          Reject
+        </button>
+        <button
+          onClick={onClose}
+          style={{
+            background: "#f5f5f5",
+            color: "#333",
+            border: "1px solid #ccc",
+            padding: "8px 18px",
+            borderRadius: 8,
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Close
+        </button>
+      </div>
+    </div>
   );
 };
 

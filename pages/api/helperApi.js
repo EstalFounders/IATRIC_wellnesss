@@ -5,6 +5,7 @@ import ArticlePostCategory from "../../src/models/postArticleCategorySchema";
 import Prescription from "../../src/models/prescriptionSchema";
 import Appointment from "../../src/models/appointmentSchema";
 import mongoose from "mongoose"; 
+import { logErrorToGoogleSheet } from "./helper";
 
 
 // --- sub-handlers ---
@@ -16,6 +17,12 @@ async function fetchArticleCateogries(req, res) {
     res.status(200).json({ allPost });
   } catch (error) {
     console.error("Error listing medicine data:", error);
+    await logErrorToGoogleSheet({
+      apiName: "helperApi - fetchArticleCateogries",
+      errorMessage: error.message || "Failed to fetch article categories",
+      errorCode: "500",
+      stackTrace: error.stack,
+    });
     res.status(500).json({ error: "Internal server error" });
   }
 }
@@ -130,6 +137,13 @@ async function savePrescription(req, res) {
     res.status(200).json({ success: true, prescription });
   } catch (error) {
     console.error("Error saving prescription:", error);
+    await logErrorToGoogleSheet({
+      apiName: "helperApi - savePrescription",
+      errorMessage: error.message || "Failed to save prescription",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { appointmentId: req.body?.appointmentId, patientName: req.body?.patientName },
+    });
     res.status(500).json({ error: "Internal server error", message: error.message });
   }
 }
@@ -152,6 +166,13 @@ async function getPrescription(req, res) {
     res.status(200).json({ prescription });
   } catch (error) {
     console.error("Error fetching prescription:", error);
+    await logErrorToGoogleSheet({
+      apiName: "helperApi - getPrescription",
+      errorMessage: error.message || "Failed to get prescription",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { appointmentId: req.query?.appointmentId },
+    });
     res.status(500).json({ error: "Internal server error", message: error.message });
   }
 }

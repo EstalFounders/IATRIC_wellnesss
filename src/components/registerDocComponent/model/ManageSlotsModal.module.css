@@ -1,0 +1,217 @@
+.container {
+  padding: 8px;
+}
+
+.header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.datePickerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.datePickerLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+
+.datePickerInput {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  flex: 1;
+  max-width: 220px;
+}
+
+.slotsList {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.slotRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.slotRow:last-child {
+  border-bottom: none;
+}
+
+.slotTime {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.availableBadge {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.bookedBadge {
+  background: #ffebee;
+  color: #c62828;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.unavailableBadge {
+  background: #fff3e0;
+  color: #e65100;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.fullDayRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 6px 0;
+}
+
+.fullDayLabel {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.saveBtn {
+  background: #3b5f1d;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #2d4a16;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #e0e0e0;
+}
+
+.loadingText {
+  text-align: center;
+  padding: 40px 0;
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.emptyText {
+  text-align: center;
+  padding: 30px 0;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.errorText {
+  text-align: center;
+  padding: 12px;
+  color: #c62828;
+  background: #ffebee;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+
+.successText {
+  text-align: center;
+  padding: 12px;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #ccc;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.toggleSwitch input:checked + .slider {
+  background: #3b5f1d;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggleSwitch input:checked + .slider::before {
+  transform: translateX(16px);
+}
+
+.footerNote {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 10px;
+  text-align: center;
+}
