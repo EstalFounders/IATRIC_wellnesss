@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 
 module.exports = {
-  productionBrowserSourceMaps: true,
+  productionBrowserSourceMaps: false,
   experimental: {
+    serverSourceMaps: false,
     serverActions: {
       bodySizeLimit: "20mb",
     },
