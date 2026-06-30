@@ -2,7 +2,7 @@
   "name": "Healthpath",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS=--inspect=9229 next dev",
     "debug": "cross-env NODE_OPTIONS=\"--inspect=0.0.0.0:9229\" node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
