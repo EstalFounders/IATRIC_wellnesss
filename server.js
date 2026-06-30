@@ -3,6 +3,7 @@ const { parse } = require("url");
 const next = require("next");
 const { Server } = require("socket.io");
 const cron = require("node-cron");
+const http = require("http");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -211,10 +212,10 @@ app.prepare().then(() => {
     cron.schedule("0 0 * * *", async () => {
       console.log("[CRON] Starting daily slot generation...");
       try {
-        const { default: performScheduledTasks } = await import(
-          "./pages/api/lib/cron-jobs.js"
-        );
-        await performScheduledTasks();
+        await fetch(`http://${hostname}:${port}/api/lib/cron-jobs`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
         console.log("[CRON] Slot generation completed successfully.");
       } catch (err) {
         console.error("[CRON] Slot generation failed:", err);
@@ -227,19 +228,10 @@ app.prepare().then(() => {
     cron.schedule("0,20,40 9-23 * * *", async () => {
       console.log("[CRON] Starting consultation reminder check...");
       try {
-        const { default: sendReminder } = await import(
-          "./pages/api/lib/sendConsultationReminder.js"
-        );
-        // sendReminder is an API handler expecting (req, res).
-        // Provide mock objects since the handler doesn't read from req.
-        const mockReq = { method: "POST" };
-        const mockRes = {
-          status: (code) => ({
-            json: (data) =>
-              console.log(`[CRON] Reminder response [${code}]:`, data),
-          }),
-        };
-        await sendReminder(mockReq, mockRes);
+        await fetch(`http://${hostname}:${port}/api/lib/sendConsultationReminder`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
         console.log("[CRON] Consultation reminders processed successfully.");
       } catch (err) {
         console.error("[CRON] Consultation reminder failed:", err);
