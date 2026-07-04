@@ -2,6 +2,8 @@ const { createServer } = require("http");
 const { parse } = require("url");
 const next = require("next");
 const { Server } = require("socket.io");
+const cron = require("node-cron");
+const http = require("http");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -203,6 +205,38 @@ app.prepare().then(() => {
 
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
+
+    // ──────────────────────────────────────────────
+    // CRON JOB 1: Generate slots every day at midnight
+    // ──────────────────────────────────────────────
+    cron.schedule("0 0 * * *", async () => {
+      console.log("[CRON] Starting daily slot generation...");
+      try {
+        await fetch(`http://${hostname}:${port}/api/lib/cron-jobs`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        console.log("[CRON] Slot generation completed successfully.");
+      } catch (err) {
+        console.error("[CRON] Slot generation failed:", err);
+      }
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // CRON JOB 2: Consultation reminders every 20 min, 9 AM – 11:59 PM
+    // ─────────────────────────────────────────────────────────────
+    cron.schedule("0,20,40 9-23 * * *", async () => {
+      console.log("[CRON] Starting consultation reminder check...");
+      try {
+        await fetch(`http://${hostname}:${port}/api/lib/sendConsultationReminder`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        console.log("[CRON] Consultation reminders processed successfully.");
+      } catch (err) {
+        console.error("[CRON] Consultation reminder failed:", err);
+      }
+    });
   });
 });
 

@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Next.js: Browser UI",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
@@ -13,19 +13,7 @@
       "type": "node",
       "request": "attach",
       "port": 9229,
-      "address": "0.0.0.0",
-      "sourceMaps": true,
-      "skipFiles": ["<node_internals>/**"],
-      "restart": true,
-      "localRoot": "${workspaceFolder}",
-      "remoteRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Next.js: Router Worker (API 9230)",
-      "type": "node",
-      "request": "attach",
-      "port": 9230,
-      "address": "0.0.0.0",
+      "address": "localhost",
       "sourceMaps": true,
       "skipFiles": ["<node_internals>/**"],
       "restart": true,
@@ -38,8 +26,7 @@
       "name": "Next.js: Full-Stack (All)",
       "configurations": [
         "Next.js: Browser UI",
-        "Next.js: Server (main 9229)",
-        "Next.js: Router Worker (API 9230)"
+        "Next.js: Server (main 9229)"
       ]
     }
   ]
