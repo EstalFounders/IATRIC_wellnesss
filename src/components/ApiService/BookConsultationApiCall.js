@@ -35,6 +35,19 @@ export const bookConsultationApiCall = async ({
   }
 };
 
+export const getConsultationByMeetingId = async (meetingId) => {
+  try {
+    const response = await fetch(`${api.consultationByMeetingId}/${meetingId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch consultation: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch consultation by meetingId:", error);
+    throw error;
+  }
+};
+
 export const getServiceOffered = async ({ dispatch }) => {
   try {
     const response = await fetch(api.serviceOffered);
