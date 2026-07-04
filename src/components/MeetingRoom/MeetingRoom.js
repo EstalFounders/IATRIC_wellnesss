@@ -308,7 +308,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isHandRaised, setIsHandRaised] = useState(false);
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [sidePanelTab, setSidePanelTab] = useState("chat");
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
