@@ -308,7 +308,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isHandRaised, setIsHandRaised] = useState(false);
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [sidePanelTab, setSidePanelTab] = useState("chat");
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
@@ -329,8 +329,15 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const { formattedTime } = useTimer(meetingState === "active");
 
   const isDoctor = userType === "doctor";
-  const isAudioOnly = consultation?.consultationType === "Call";
+  const isAudioOnly = consultation?.consultationType === "Audio";
   const mid = meetingId || consultation?.meetingId || consultation?._id;
+
+  // For audio-only calls, disable video by default
+  useEffect(() => {
+    if (isAudioOnly) {
+      setIsVideoOn(false);
+    }
+  }, [isAudioOnly]);
 
   // ---- Socket.io Connection ----
   useEffect(() => {
@@ -593,12 +600,13 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
 
   // ---- Initialize local camera ----
   useEffect(() => {
-    if (meetingState !== "active" || isAudioOnly) return;
+    if (meetingState !== "active") return;
     const initCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const constraints = isAudioOnly ? { audio: true } : { video: true, audio: true };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         localStreamRef.current = stream;
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        if (!isAudioOnly && localVideoRef.current) localVideoRef.current.srcObject = stream;
       } catch (err) {
         setIsVideoOn(false);
         setIsAudioOn(false);
@@ -674,7 +682,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   };
 
   const toggleCamera = async () => {
-    if (!localStreamRef.current) return;
+    if (isAudioOnly || !localStreamRef.current) return;
 
     const videoTracks = localStreamRef.current.getVideoTracks();
     const socket = getSocket();
@@ -824,66 +832,68 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     <div className={styles.container}>
       <div className={styles.mainLayout}>
         <div className={styles.videoArea}>
-          {isAudioOnly ? (
-            <div className={styles.videoArea} style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", color: "#fff" }}>
-              <div style={{ width: 120, height: 120, borderRadius: "50%", background: "#1c1e21", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24, fontSize: 48 }}>🎧</div>
-              <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Audio Consultation</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>You are on an audio-only call with {isDoctor ? patientName : doctorName}</div>
-              {participantCount < 2 && (
-                <div style={{ fontSize: 13, color: "#ffa502", marginTop: 16 }}>⏳ Waiting for the other participant to join...</div>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className={styles.meetingHeader}>
-                <div className={styles.meetingInfo}>
-                  <div className={styles.meetingTitle}>Telemedicine Consultation</div>
-                  <div className={styles.meetingId}>ID: {meetingId}</div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <div style={{ fontSize: 12, color: participantCount >= 2 ? "#2ed573" : "#ffa502" }}>
-                    {participantCount >= 2 ? "🟢 Connected" : "🟡 Waiting..."}
-                  </div>
-                  <div className={styles.meetingTimer}>⏱️ {formattedTime}</div>
-                  {isRecording && <div className={styles.recordingBadge}><span className={styles.recordingDot} />Recording</div>}
-                </div>
+          <>
+            <div className={styles.meetingHeader}>
+              <div className={styles.meetingInfo}>
+                <div className={styles.meetingTitle}>{isAudioOnly ? "🎧 Audio Consultation" : "Telemedicine Consultation"}</div>
+                <div className={styles.meetingId}>ID: {meetingId}</div>
               </div>
-              <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
-                <div className={styles.videoWrapper}>
-                  {isWebRTCConnected && remoteStream && remoteVideoOn ? (
-                    <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ fontSize: 12, color: participantCount >= 2 ? "#2ed573" : "#ffa502" }}>
+                  {participantCount >= 2 ? "🟢 Connected" : "🟡 Waiting..."}
+                </div>
+                <div className={styles.meetingTimer}>⏱️ {formattedTime}</div>
+                {isRecording && !isAudioOnly && <div className={styles.recordingBadge}><span className={styles.recordingDot} />Recording</div>}
+              </div>
+            </div>
+            <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
+              <div className={styles.videoWrapper}>
+                {isAudioOnly ? (
+                  <>
                     <div className={styles.videoPlaceholder}>
                       <div className={styles.videoPlaceholderAvatar}>{isDoctor ? "👤" : "👨‍⚕️"}</div>
                       <div className={styles.videoPlaceholderName}>{isDoctor ? patientName : doctorName}</div>
                       <div className={styles.videoPlaceholderRole}>{isDoctor ? "Patient" : `Doctor - ${doctorSpecialty}`}</div>
-                      {isWebRTCConnected && !remoteVideoOn && (
-                        <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>📷 Camera Off</div>
-                      )}
+                      <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>🎧 Audio Only</div>
                     </div>
-                  )}
-                  <div className={styles.participantBadge}>
-                    <span>{remoteAudioOn ? "🔊" : "�"}</span>
-                    <span>{isDoctor ? patientName : doctorName}</span>
+                    <video ref={remoteVideoRef} autoPlay playsInline style={{ display: "none" }} />
+                  </>
+                ) : isWebRTCConnected && remoteStream && remoteVideoOn ? (
+                  <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.videoPlaceholderAvatar}>{isDoctor ? "👤" : "👨‍⚕️"}</div>
+                    <div className={styles.videoPlaceholderName}>{isDoctor ? patientName : doctorName}</div>
+                    <div className={styles.videoPlaceholderRole}>{isDoctor ? "Patient" : `Doctor - ${doctorSpecialty}`}</div>
+                    {isWebRTCConnected && !remoteVideoOn && (
+                      <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>📷 Camera Off</div>
+                    )}
                   </div>
-                </div>
-                <div className={styles.videoWrapper}>
-                  {isVideoOn ? (
-                    <video ref={localVideoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  ) : (
-                    <div className={styles.videoPlaceholder}>
-                      <div className={styles.videoPlaceholderAvatar}>👤</div>
-                      <div className={styles.videoPlaceholderName}>You</div>
-                      <div className={styles.videoPlaceholderRole}>{isDoctor ? "Doctor" : "Patient"}</div>
-                    </div>
-                  )}
-                  <div className={styles.participantBadge}><span>{isAudioOn ? "🔊" : "🔇"}</span><span>You</span></div>
-                  {!isAudioOn && <div className={styles.participantMicOff}>🔇</div>}
-                  {isHandRaised && <div className={styles.raisedHandIndicator}>✋</div>}
+                )}
+                <div className={styles.participantBadge}>
+                  <span>{remoteAudioOn ? "🔊" : "🔇"}</span>
+                  <span>{isDoctor ? patientName : doctorName}</span>
                 </div>
               </div>
-            </>
-          )}
+              <div className={styles.videoWrapper}>
+                {isVideoOn ? (
+                  <video ref={localVideoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.videoPlaceholderAvatar}>👤</div>
+                    <div className={styles.videoPlaceholderName}>You</div>
+                    <div className={styles.videoPlaceholderRole}>{isDoctor ? "Doctor" : "Patient"}</div>
+                    {isAudioOnly && (
+                      <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>🎧 Audio Only</div>
+                    )}
+                  </div>
+                )}
+                <div className={styles.participantBadge}><span>{isAudioOn ? "🔊" : "🔇"}</span><span>You</span></div>
+                {!isAudioOn && <div className={styles.participantMicOff}>🔇</div>}
+                {isHandRaised && <div className={styles.raisedHandIndicator}>✋</div>}
+              </div>
+            </div>
+          </>
 
           {/* Camera toggle toast notification */}
           {cameraToast && (
