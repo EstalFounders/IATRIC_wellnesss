@@ -5,11 +5,19 @@ import { v4 as uuidv4 } from "uuid";
 
 export const animation = () => {
   if (typeof window !== "undefined") {
-     window.WOW = require("wowjs");
+    try {
+      // Safely load and initialize WOW.js to prevent environment crashes
+      const WOWJS = require("wowjs");
+      new WOWJS.WOW({ live: false, mobile: true }).init();
+    } catch (error) {
+      console.error("Failed to initialize WOW.js animation:", error);
+    }
   }
-  new WOW.WOW({ live: false, mobile: true }).init();
 };
+
 export const stickyNav = () => {
+  if (typeof window === "undefined") return;
+  
   let offset = window.scrollY;
   const stickys = document.querySelectorAll(".header");
   for (let i = 0; i < stickys.length; i++) {
@@ -35,7 +43,7 @@ export const aTagClick = () => {
 };
 
 export const dataImage = () => {
-  let d = document.querySelectorAll("[data-bg");
+  let d = document.querySelectorAll("[data-bg]");
   for (let i = 0; i < d.length; i++) {
     const element = d[i];
     element.style.backgroundImage = `url(${element.getAttribute("data-bg")})`;
@@ -61,6 +69,7 @@ export const pagination = (listClass, sort, active) => {
     }
   }
 };
+
 export const getPagination = (totalNumber, sort) => {
   let arr = new Array(Math.ceil(totalNumber / sort))
     .fill()
