@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { IoMenu } from "react-icons/io5";
@@ -28,6 +28,7 @@ const Header1 = ({ scrollToContact }) => {
   const isMedicinePage = router.pathname.includes("/medicine");
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [comingSoonItems, setComingSoonItems] = useState(new Set());
   const consultationTypes = useSelector(
     (state) => state.otherConfigSlice.activeConsultation,
   );
@@ -44,9 +45,16 @@ const Header1 = ({ scrollToContact }) => {
     router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
   };
 
-  const togglePanel = () => setMobileMenuOpen(!mobileMenuOpen);
-  const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  
+  const handleComingSoonClick = useCallback((href) => {
+    setComingSoonItems((prev) => new Set(prev).add(href));
+  }, []);
+  
+  const isComingSoon = useCallback((href) => comingSoonItems.has(href), [comingSoonItems]);
+  
   const updateCartItemCount = (count) => setCartItemCount(count);
+  const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
   const updateMedicineCartItemCount = (count) => setMedicineCartItemCount(count);
 
   useEffect(() => {
@@ -61,7 +69,7 @@ const Header1 = ({ scrollToContact }) => {
       <div className="wsmobileheader clearfix">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", gap: 10 }}>
           <button
-            onClick={() => togglePanel()}
+            onClick={() => toggleMobileMenu()}
             aria-label="Open menu"
             style={{
               background: "#3b5f1d",
@@ -121,51 +129,49 @@ const Header1 = ({ scrollToContact }) => {
                 <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
               </a>
             </div>
-            <nav className="wsmenu">
-              <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
-                <li><Link legacyBehavior href="/"><a className="nav-link">Home</a></Link></li>
-                <li aria-haspopup="true">
-                  <a href="#">Pages <span className="wsarrow" /></a>
-                  <div className="wsmegamenu clearfix">
-                    <div className="container">
-                      <div className="row">
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Standard Pages:</li>
-                          <li><Link legacyBehavior href="/about-us"><a>About Us</a></Link></li>
-                          <li><Link legacyBehavior href="/who-we-are"><a>Who We Are</a></Link></li>
-                          <li><Link legacyBehavior href="/all-services"><a>Our Services</a></Link></li>
-                          <li><Link legacyBehavior href="/service-1"><a>Contact Us</a></Link></li>
-                          <li><Link legacyBehavior href="/join-us"><a>Join Us</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Medical Pages:</li>
-                          <li><Link legacyBehavior href="/all-departments"><a>Our Departments</a></Link></li>
-                          <li><Link legacyBehavior href="/department-single"><a>Department Single</a></Link></li>
-                          <li><Link legacyBehavior href="/all-doctors"><a>Meet the Doctors</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Special Pages:</li>
-                          <li><Link legacyBehavior href="/pricing-1"><a>Pricing Packages #1</a></Link></li>
-                          <li><Link legacyBehavior href="/pricing-2"><a>Pricing Packages #2</a></Link></li>
-                          <li><Link legacyBehavior href="/appointment"><a>Make an Appointment</a></Link></li>
-                          <li><Link legacyBehavior href="/faqs"><a>FAQs Page</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Auxiliary Pages:</li>
-                          <li><Link legacyBehavior href="/gallery"><a>Our Gallery</a></Link></li>
-                          <li><Link legacyBehavior href="/blog-listing"><a>Blog Listing Page</a></Link></li>
-                          <li><Link legacyBehavior href="/single-post"><a>Single Blog Post</a></Link></li>
-                          <li><Link legacyBehavior href="/contacts-2"><a>Contact Us #2</a></Link></li>
-                        </ul>
+              <nav className="wsmenu">
+                <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
+                  <li><Link legacyBehavior href="/"><a className="nav-link">Home</a></Link></li>
+                  <li aria-haspopup="true">
+                    <a href="#">Pages <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">Quick Links:</li>
+                            <li><Link legacyBehavior href="/about-us"><a>About Us</a></Link></li>
+                            <li><Link legacyBehavior href="/all-services"><a>Services</a></Link></li>
+                            <li><Link legacyBehavior href="/appointment"><a>Book Consultation</a></Link></li>
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>Quick Links:</li>
+                            <li>
+                              <span
+                                onClick={() => handleComingSoonClick("/medicine/homepage")}
+                                style={{ cursor: "pointer", display: "block", lineHeight: "18px", padding: "15px 0px", fontSize: "15px", fontWeight: 400, color: isComingSoon("/medicine/homepage") ? "#8e8333" : "#888" }}
+                              >
+                                {isComingSoon("/medicine/homepage") ? "Medicines - Coming Soon 🚧" : "Medicines"}
+                              </span>
+                            </li>
+                            <li><Link legacyBehavior href="/all-doctors"><a>All Doctors</a></Link></li>
+                            <li><Link legacyBehavior href="/join-us"><a>Join Us</a></Link></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-                <li><Link legacyBehavior href="/labTest/homepage"><a className="nav-link" target="_blank" rel="noopener noreferrer">Lab Test</a></Link></li>
-                <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">Blog</a></Link></li>
-                <li><Link legacyBehavior href="/service-1"><a className="nav-link">Contact Us</a></Link></li>
-              </ul>
-            </nav>
+                  </li>
+                  <li>
+                    <span
+                      onClick={() => handleComingSoonClick("/labTest/homepage")}
+                      style={{ cursor: "pointer", display: "block", padding: "10px 32px 10px 18px", lineHeight: "50px", textDecoration: "none", position: "relative", color: isComingSoon("/labTest/homepage") ? "#8e8333" : "#000", fontSize: "17px", fontWeight: 600 }}
+                    >
+                      {isComingSoon("/labTest/homepage") ? "Lab Test - Coming Soon 🚧" : "Lab Test"}
+                    </span>
+                  </li>
+                  <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">Blog</a></Link></li>
+                  <li><Link legacyBehavior href="/contacts-2"><a className="nav-link">Contact Us</a></Link></li>
+                </ul>
+              </nav>
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
                 <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
@@ -189,7 +195,7 @@ const Header1 = ({ scrollToContact }) => {
         {isMedicinePage && <MedicineCartPanel isOpen={isMedicinePanelOpen} togglePanel={toggleMedicinePanel} cartItem={medicineCartItems} onUpdateCartItemCount={updateMedicineCartItemCount} />}
       </div>
 
-      {mobileMenuOpen && <MobileMenu  scrollToContact={scrollToContact} />}
+      {mobileMenuOpen && <MobileMenu isOpen={mobileMenuOpen} setIsOpen={setMobileMenuOpen} />}
     </header>
   );
 };
