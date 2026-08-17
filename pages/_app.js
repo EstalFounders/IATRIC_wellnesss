@@ -16,13 +16,10 @@ function MyApp({ Component, pageProps, ...rest }) {
 
   useEffect(() => {
     animation();
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       setLoader(false);
     }, 1000);
-
-    // Clean up the timer if the component unmounts
-    return () => clearTimeout(timer);
-  }, []); // <-- Added empty dependency array so this runs ONLY ONCE on mount
+  });
 
   return (
     <Fragment>
@@ -39,15 +36,11 @@ function MyApp({ Component, pageProps, ...rest }) {
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
-      
-      {/* 
-        If Redux Persist is still loading/hydrating, we show the Preloader. 
-        Once both Persist is ready AND our 1-second timer finishes, your app displays.
-      */}
+      {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
-          <PersistGate loading={<Preloader />} persistor={persistor}>
-            {loader ? <Preloader /> : <Component {...props.pageProps} />}
+          <PersistGate loading={null} persistor={persistor}>
+            <Component {...props.pageProps} />
           </PersistGate>
         </Provider>
       </NoSsr>
@@ -55,4 +48,4 @@ function MyApp({ Component, pageProps, ...rest }) {
   );
 }
 
-export default wrapper.withRedux(MyApp);
+export default MyApp;

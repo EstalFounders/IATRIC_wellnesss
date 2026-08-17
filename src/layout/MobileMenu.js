@@ -1,7 +1,11 @@
 import { useRouter } from "next/router";
+import { useState } from "react";
+
+const COMING_SOON_ITEMS = ["/labTest/homepage", "/medicine/homepage"];
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
+  const [comingSoon, setComingSoon] = useState(new Set());
 
   const menuItems = [
     { label: "Home", href: "/", icon: "🏠" },
@@ -17,6 +21,10 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   ];
 
   const handleNavigation = (href) => {
+    if (COMING_SOON_ITEMS.includes(href)) {
+      setComingSoon((prev) => new Set(prev).add(href));
+      return;
+    }
     router.push(href);
   };
 
@@ -128,7 +136,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                       }
                     }}
                   >
-                    {item.icon} {item.label}
+                    {item.icon} {comingSoon.has(item.href) ? `${item.label} - Coming Soon 🚧` : item.label}
                   </div>
                 </li>
               );
