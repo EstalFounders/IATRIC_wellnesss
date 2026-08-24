@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "../../../styles/Meeting.module.css";
 import chatStyles from "../../../styles/components/ChatPanel.module.css";
 import fileStyles from "../../../styles/components/FileShare.module.css";
 import infoStyles from "../../../styles/components/ParticipantInfo.module.css";
-import {
-  ConsoleLogger,
-  DefaultDeviceController,
-  DefaultMeetingSession,
-  MeetingSessionConfiguration,
-  LogLevel,
-} from "amazon-chime-sdk-js";
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + " B";
@@ -307,13 +300,6 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
   );
 };
 
-// ---------- Helper: send message via WebSocket ----------
-function wsSend(ws, data) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(data));
-  }
-}
-
 export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [meetingState, setMeetingState] = useState("connecting");
   const [isAudioOn, setIsAudioOn] = useState(true);
@@ -333,356 +319,26 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const cameraToastTimerRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const wsRef = useRef(null);
-  const meetingSessionRef = useRef(null);
-  const chimeObserverRef = useRef(null);
-  const remoteTileIdRef = useRef(null);
-  const localTileIdRef = useRef(null);
-  const connectionIdRef = useRef(null);
-  const domainNameRef = useRef(null);
-  const stageRef = useRef(null);
   const { formattedTime } = useTimer(meetingState === "active");
 
   const isDoctor = userType === "doctor";
   const isAudioOnly = consultation?.consultationType === "Call";
   const mid = meetingId || consultation?.meetingId || consultation?._id;
 
-  // ---- Helper to send messages through API Gateway backend ----
-  const sendWsMessage = useCallback((action, extra = {}) => {
-    const ws = wsRef.current;
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    const payload = {
-      action,
-      connectionId: connectionIdRef.current,
-      meetingId: mid,
-      role: userType,
-      domainName: domainNameRef.current,
-      stage: stageRef.current,
-      ...extra,
-    };
-    ws.send(JSON.stringify(payload));
-  }, [mid, userType]);
-
-  // ---- Initialize Amazon Chime Session ----
-  useEffect(() => {
-    if (!mid) return;
-
-    const initChime = async () => {
-      try {
-        const response = await fetch(`/api/chimeSession?meetingId=${mid}&userType=${userType}`);
-        if (!response.ok) throw new Error(`Chime session API error: ${response.status}`);
-        const chimeData = await response.json();
-        console.log("Chime session data received");
-
-        const configuration = new MeetingSessionConfiguration(chimeData.meeting, chimeData.attendee);
-        const logger = new ConsoleLogger("ChimeSDK", LogLevel.INFO);
-        const deviceController = new DefaultDeviceController(logger);
-        const session = new DefaultMeetingSession(configuration, logger, deviceController);
-        meetingSessionRef.current = session;
-        const audioVideo = session.audioVideo;
-
-        const observer = {
-          videoTileDidUpdate: (tileState) => {
-            if (!tileState.boundAttendeeId || tileState.isLocal) return;
-            console.log("Remote video tile updated:", tileState.tileId);
-            remoteTileIdRef.current = tileState.tileId;
-            if (remoteVideoRef.current) audioVideo.bindVideoElement(tileState.tileId, remoteVideoRef.current);
-            setRemoteVideoOn(true);
-          },
-          videoTileWasRemoved: (tileId) => {
-            console.log("Remote video tile removed:", tileId);
-            if (remoteTileIdRef.current === tileId) remoteTileIdRef.current = null;
-            setRemoteVideoOn(false);
-          },
-          audioVideoDidStart: () => { console.log("Chime started"); setMeetingState("active"); },
-          audioVideoDidStop: () => { console.log("Chime stopped"); setMeetingState("ended"); },
-          connectionDidBecomePoor: () => console.log("Chime connection poor"),
-          connectionDidRecover: () => console.log("Chime connection recovered"),
-        };
-        chimeObserverRef.current = observer;
-        audioVideo.addObserver(observer);
-        audioVideo.start();
-
-        if (!isAudioOnly) {
-          try {
-            await audioVideo.startLocalVideoTile();
-            setIsVideoOn(true);
-            if (localVideoRef.current) {
-              const localTile = audioVideo.getLocalVideoTile();
-              if (localTile) {
-                localTileIdRef.current = localTile.tileId;
-                audioVideo.bindVideoElement(localTile.tileId, localVideoRef.current);
-              }
-            }
-          } catch (err) {
-            console.warn("Could not start local video:", err);
-            setIsVideoOn(false);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to initialize Chime session:", err);
-        setMeetingState("ended");
-      }
-    };
-
-    initChime();
-
-    return () => {
-      const session = meetingSessionRef.current;
-      const observer = chimeObserverRef.current;
-      if (session) {
-        if (observer) session.audioVideo.removeObserver(observer);
-        session.audioVideo.stop();
-        meetingSessionRef.current = null;
-      }
-    };
-  }, [mid, userType, isAudioOnly]);
-
-  // ---- WebSocket Connection (replaces Socket.io) ----
-  useEffect(() => {
-    if (!mid) return;
-
-    let ws = null;
-    let reconnectTimer = null;
-
-    const connectWs = async () => {
-      try {
-        // Fetch WebSocket URL from our API
-        const urlRes = await fetch(`/api/get-ws-url?meetingId=${mid}&role=${userType}`);
-        if (!urlRes.ok) throw new Error(`Failed to get WS URL: ${urlRes.status}`);
-        const { url } = await urlRes.json();
-        console.log("Connecting to WebSocket:", url);
-
-        ws = new WebSocket(url);
-        wsRef.current = ws;
-        window.__ws = ws;
-
-        ws.onopen = () => {
-          console.log("WebSocket connected");
-          // Extract domain/stage from URL for API Gateway Management API replies
-          const parsed = new URL(url);
-          domainNameRef.current = parsed.hostname;
-          stageRef.current = parsed.pathname.split("/")[1] || "production";
-
-          // Send connect action
-          const userName = isDoctor
-            ? consultation?.doctorDetails?.name || "Doctor"
-            : consultation?.name || "Patient";
-          wsSend(ws, {
-            action: "connect",
-            meetingId: mid,
-            role: userType,
-            userData: { name: userName, role: userType },
-          });
-        };
-
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            const { action, ...payload } = data;
-
-            // Store our connectionId from the server response
-            if (action === "room-participants" && payload.yourSocketId) {
-              connectionIdRef.current = payload.yourSocketId;
-            }
-
-            // ---- Dispatch actions to state handlers ----
-            switch (action) {
-              case "participant-joined":
-                console.log("Participant joined:", payload);
-                setParticipantCount(payload.participants?.length || 1);
-                if (payload.participants?.length >= 2) setMeetingState("active");
-                break;
-
-              case "room-participants":
-                console.log("Room participants:", payload);
-                setParticipantCount(payload.participants?.length || 1);
-                if (payload.participants?.length >= 2) {
-                  if (setMeetingState) setMeetingState("active");
-                } else {
-                  setTimeout(() => {
-                    if (ws && setMeetingState) setMeetingState("active");
-                  }, 2000);
-                }
-                break;
-
-              case "meeting-active":
-                console.log("Meeting active");
-                setMeetingState("active");
-                break;
-
-              case "receive-message":
-                setMessages((prev) => {
-                  if (payload.fromSocket && payload.fromSocket === connectionIdRef.current) return prev;
-                  const newMsg = {
-                    sender: payload.role === "doctor" ? "Doctor" : "Patient",
-                    text: payload.text,
-                    timestamp: payload.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                    type: payload.type || "text",
-                    fromSocket: payload.socketId,
-                  };
-                  const lastMsg = prev[prev.length - 1];
-                  if (lastMsg && lastMsg.fromSocket === payload.socketId && lastMsg.sender === newMsg.sender && lastMsg.text === newMsg.text && Math.abs(new Date(lastMsg.timestamp) - new Date(newMsg.timestamp)) < 500) return prev;
-                  return [...prev, newMsg];
-                });
-                break;
-
-              case "user-typing":
-                setRemoteTyping(payload.isTyping ? payload.role : null);
-                break;
-
-              case "receive-file":
-                setFiles((prev) => [...prev, {
-                  id: Date.now().toString(),
-                  name: payload.name,
-                  size: payload.size,
-                  type: payload.type,
-                  url: payload.url,
-                  uploadDate: payload.uploadDate || new Date().toISOString(),
-                  uploadedBy: payload.uploadedBy || payload.role,
-                }]);
-                break;
-
-              case "participant-left":
-                console.log("Participant left:", payload);
-                setParticipantCount(payload.participants?.length || 0);
-                break;
-
-              case "participant-media-change":
-                console.log("Media change:", payload);
-                if (payload.type === "video") setRemoteVideoOn(payload.value);
-                if (payload.type === "audio") setRemoteAudioOn(payload.value);
-                break;
-
-              case "participant-camera-toggle":
-                console.log("Camera toggle:", payload);
-                setRemoteVideoOn(payload.isVideoOn);
-                const displayName = payload.role === "doctor"
-                  ? consultation?.doctorDetails?.name || "Doctor"
-                  : consultation?.name || "Patient";
-                const msg = payload.isVideoOn ? `${displayName} turned on camera` : `${displayName} turned off camera`;
-                const icon = payload.isVideoOn ? "📷" : "📷❌";
-                if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
-                setCameraToast({ icon, message: msg });
-                cameraToastTimerRef.current = setTimeout(() => setCameraToast(null), 3000);
-                break;
-
-              default:
-                break;
-            }
-          } catch (err) {
-            console.error("Error parsing WS message:", err);
-          }
-        };
-
-        ws.onclose = () => {
-          console.log("WebSocket disconnected");
-          window.__ws = null;
-          // Auto-reconnect after 3 seconds
-          reconnectTimer = setTimeout(() => {
-            if (mid) connectWs();
-          }, 3000);
-        };
-
-        ws.onerror = (err) => {
-          console.error("WebSocket error:", err);
-        };
-
-      } catch (err) {
-        console.error("Failed to connect WebSocket:", err);
-        // Retry after 5 seconds
-        reconnectTimer = setTimeout(() => {
-          if (mid) connectWs();
-        }, 5000);
-      }
-    };
-
-    connectWs();
-
-    return () => {
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
-      if (ws) {
-        // Send disconnect notification
-        if (ws.readyState === WebSocket.OPEN && connectionIdRef.current && domainNameRef.current) {
-          wsSend(ws, {
-            action: "disconnect",
-            connectionId: connectionIdRef.current,
-            meetingId: mid,
-            role: userType,
-            domainName: domainNameRef.current,
-            stage: stageRef.current,
-          });
-        }
-        ws.close();
-        wsRef.current = null;
-        window.__ws = null;
-      }
-    };
-  }, [mid, userType, isDoctor, consultation]);
-
-  // ---- Re-assign remote video tile when remote camera turns back on ----
-  useEffect(() => {
-    const session = meetingSessionRef.current;
-    if (remoteVideoOn && remoteVideoRef.current && remoteTileIdRef.current && session) {
-      session.audioVideo.bindVideoElement(remoteTileIdRef.current, remoteVideoRef.current);
-    }
-  }, [remoteVideoOn]);
-
-  // ---- Control Handlers (using Amazon Chime SDK + WebSocket notifications) ----
+  // ---- Control Handlers ----
   const toggleMic = () => {
-    const session = meetingSessionRef.current;
-    if (!session) return;
-    const audioVideo = session.audioVideo;
-    const muted = !audioVideo.realtimeIsMuted();
-    audioVideo.realtimeSetMuted(muted);
-    setIsAudioOn(!muted);
-    sendWsMessage("media-state-change", { type: "audio", value: !muted });
+    setIsAudioOn((prev) => !prev);
   };
 
-  const toggleCamera = async () => {
-    const session = meetingSessionRef.current;
-    if (!session) return;
-    const audioVideo = session.audioVideo;
-
-    if (isVideoOn) {
-      audioVideo.stopLocalVideoTile();
-      if (localTileIdRef.current) {
-        audioVideo.unbindVideoElement(localTileIdRef.current);
-        localTileIdRef.current = null;
-      }
-      setIsVideoOn(false);
-      sendWsMessage("media-state-change", { type: "video", value: false });
-      sendWsMessage("camera-toggle", { isVideoOn: false });
-    } else {
-      try {
-        await audioVideo.startLocalVideoTile();
-        setIsVideoOn(true);
-        const localTile = audioVideo.getLocalVideoTile();
-        if (localTile && localVideoRef.current) {
-          const tileId = localTile.tileId;
-          localTileIdRef.current = tileId;
-          audioVideo.bindVideoElement(tileId, localVideoRef.current);
-        }
-        sendWsMessage("media-state-change", { type: "video", value: true });
-        sendWsMessage("camera-toggle", { isVideoOn: true });
-      } catch (err) {
-        console.error("Failed to start camera via Chime:", err);
-      }
-    }
+  const toggleCamera = () => {
+    setIsVideoOn((prev) => !prev);
   };
 
   const toggleHandRaise = () => {
-    setIsHandRaised((prev) => {
-      const newVal = !prev;
-      sendWsMessage("media-state-change", { type: "handRaise", value: newVal });
-      return newVal;
-    });
+    setIsHandRaised((prev) => !prev);
   };
 
   const endCall = () => {
-    const session = meetingSessionRef.current;
-    if (session) session.audioVideo.stop();
     setMeetingState("ended");
   };
 
@@ -695,7 +351,6 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       type: "text",
     };
     setMessages((prev) => [...prev, messageData]);
-    sendWsMessage("send-message", { message: messageData });
   };
 
   // ---- File sharing ----
@@ -715,7 +370,6 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       };
       setFiles((prev) => [...prev, newFile]);
       setProgress((prev) => prev.filter((p) => p.name !== file.name));
-      sendWsMessage("file-shared", { fileData: newFile });
     };
     reader.readAsDataURL(file);
   };
@@ -738,7 +392,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
         <div className={styles.connectingScreen}>
           <div className={styles.connectingSpinner} />
           <div className={styles.connectingTitle}>Connecting to consultation...</div>
-          <div className={styles.connectingSubtitle}>Please wait while we establish a secure connection via Amazon Chime</div>
+          <div className={styles.connectingSubtitle}>Please wait while we establish a secure connection</div>
         </div>
       </div>
     );
