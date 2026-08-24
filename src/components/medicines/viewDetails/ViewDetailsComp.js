@@ -12,12 +12,14 @@ import {
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import {
+  useAddToCart,
+} from "../common/CommonMethod";
+import {
   calculateParameters,
   formatPreparationRequired,
   getHealthCheckupData,
   MoreButton,
-  useAddToCart,
-} from "../common/CommonMethod";
+} from "../../labTestComponent/common/CommonMethod";
 import { Snackbar } from "@mui/material";
 import { price_symbol } from "../../../constant";
 import { useSelector } from "react-redux";

@@ -59,7 +59,7 @@ const DoctorsSection = () => {
         {/* ALL DOCTORS BUTTON */}
         <div className="row mt-4">
           <div className="col-md-12 text-center">
-            <div className="all-doctors mb-40 w-25 mr-auto ml-auto">
+            <div className="all-doctors mb-40 w-75 w-md-25 mr-auto ml-auto">
               <ConsultationButton path={"/all-doctors"}>
                 Meet the Doctors
               </ConsultationButton>

@@ -36,6 +36,9 @@ import FaqSection from "./common/FAQComponent";
 // Consultation types to look for in services data
 const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
 
+// Consultation types to look for in services data
+const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
+
 const AppointmentPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -70,6 +73,7 @@ const AppointmentPage = () => {
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
   const [serviceTypeId, setServiceTypeId] = useState();
+  const [consultationType, setConsultationType] = useState("");
   const [consultationType, setConsultationType] = useState("");
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
@@ -128,6 +132,7 @@ const AppointmentPage = () => {
     mobNo,
     consultationType,
     consultationOptions,
+    consultationOptions,
     openSnackBar,
     snackBarMessage,
     severity,
@@ -148,6 +153,7 @@ const AppointmentPage = () => {
     setSelectedDate,
     setServiceType,
     setServiceTypeId,
+    setConsultationPrice,
     setConsultationPrice,
   };
 
@@ -176,6 +182,7 @@ const AppointmentPage = () => {
       await getServiceOffered({ dispatch });
     };
     getServices();
+  }, [dispatch]);
   }, [dispatch]);
 
   useEffect(() => {
@@ -254,7 +261,12 @@ const AppointmentPage = () => {
     const selectedType = event.target.value;
     const matching = consultationOptions.find(
       (opt) => opt.name === selectedType
+    const matching = consultationOptions.find(
+      (opt) => opt.name === selectedType
     );
+    if (matching) {
+      setConsultationType(matching.name);
+      setConsultationPrice(matching.fee || "");
     if (matching) {
       setConsultationType(matching.name);
       setConsultationPrice(matching.fee || "");

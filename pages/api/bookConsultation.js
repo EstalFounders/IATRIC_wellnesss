@@ -1,16 +1,5 @@
-// import { immediateCall, scheduleCall, generateMeetingUrl, sendWhatsAppMessage } from '../../lib/twilio';
-import mongoose from "mongoose";
-import {
-  appointment_status,
-  consultationTypeMapping,
-  development_production_url,
-  contact_no,
-  IN_TWENTY_MINUTES_NOW,
-  CHOOSE_TIME,
-} from "../../src/constant";
 import { dbConnect } from "../../src/lib/db";
 import Appointment from "../../src/models/appointmentSchema";
-import Slot from "../../src/models/slots";
 import {
   bookConsultation,
   checkNbookSelectedDoctorForNow,
@@ -19,26 +8,6 @@ import {
   findAvailableDoctorForSpecificTimeSlot,
   logErrorToGoogleSheet,
 } from "./helper";
-import { v4 as uuidv4 } from "uuid";
-import {
-  extractTime,
-  formatData,
-} from "../../src/components/registerDocComponent/utils/helper";
-import { formatPhoneNumber } from "./utils/commonmethod";
-import { format } from "path";
-import {
-  IS_NOW,
-  WHATSAPP_CONFIRMATION_TEMPLATE,
-  WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
-  WHATSAPP_REMINDER_TEMPLATE_PATIENT,
-} from "./utils/constants";
-import {
-  getConfirmMessageBody,
-  getReminderMessageBodyDoctor,
-  getReminderMessageBodyPatient,
-} from "./utils/whatsappMessageBodies";
-import { sendAdminNotification } from "./lib/sendNotification";
-import Notification from "../../src/models/NotificationSchema";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
