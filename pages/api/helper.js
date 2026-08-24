@@ -458,75 +458,11 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
 
   console.log("start time 249", slot, "slot 249");
 
-  const confirmMessageBody = getConfirmMessageBody(
-    slot.startTime,
-    docName,
-    name,
-    consultationType,
-    contact_no,
-  );
-  const formattedReminderDate = extractDate(appointmentTime);
-  const formattedReminderTime = formatTime(appointmentTime);
-
-  const reminderMessageBodyPatient = getReminderMessageBodyPatient(
-    docName,
-    name,
-    formattedReminderDate,
-    formattedReminderTime,
-    patientMeetingUrl,
-  );
-
-  const reminderMessageBodyDoctor = getReminderMessageBodyDoctor(
-    docName,
-    name,
-    formattedReminderDate,
-    formattedReminderTime,
-    doctorMeetingUrl,
-  );
-
-  const patientMobileNo = appointment.patientMobNo?.toString() ?? "";
-  const doctorMobileNumber = doctorMobileNo?.toString() ?? "";
-
-  console.log(
-    formatPhoneNumber(doctorMobileNumber),
-    doctorMobileNumber,
-    "line no 190",
-  );
-  await sendWhatsAppConfirmation(
-    formatPhoneNumber(patientMobileNo),
-    confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE,
-  );
-  await sendWhatsAppConfirmation(
-    formatPhoneNumber(doctorMobileNumber),
-    confirmMessageBody,
-    WHATSAPP_CONFIRMATION_TEMPLATE,
-  );
-
-  console.log(
-    clientSideAppointmentTime == IS_NOW,
-    clientSideAppointmentTime == IN_TWENTY_MINUTES_NOW,
-    "WhatsApp confirmation sent to patient and doctor successfully.",
-  );
-
-  if (
-    clientSideAppointmentTime == IS_NOW ||
-    clientSideAppointmentTime == IN_TWENTY_MINUTES_NOW
-  ) {
-    // Handle immediate appointment
-    // await immediateCall(doctorId, patientMobNo, appointment._id);
-    await sendWhatsAppConfirmation(
-      formatPhoneNumber(patientMobileNo),
-      reminderMessageBodyPatient,
-      WHATSAPP_REMINDER_TEMPLATE_PATIENT,
-    );
-    await sendWhatsAppConfirmation(
-      formatPhoneNumber(doctorMobileNumber),
-      reminderMessageBodyDoctor,
-      WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
-    );
-  }
-  return appointment._id;
+  // WhatsApp confirmation is NOT sent here anymore.
+  // The appointment is created in a PAYMENT_PENDING state and the
+  // confirmation message is sent only after the payment has been
+  // verified by the backend (see paymentService.confirmAppointmentAfterPayment).
+  return appointment;
 };
 
 /**

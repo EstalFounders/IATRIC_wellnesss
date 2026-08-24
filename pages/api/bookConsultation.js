@@ -48,9 +48,11 @@ export default async function handler(req, res) {
       await dbConnect();
       let appointments;
       if (doctorId) {
-        appointments = await Appointment.find({ doctorId: doctorId });
+        appointments = await Appointment.find({ doctorId: doctorId }).populate(
+          "paymentId"
+        );
       } else {
-        appointments = await Appointment.find({});
+        appointments = await Appointment.find({}).populate("paymentId");
       }
 
       res.status(200).json({ appointments });
@@ -254,13 +256,22 @@ export default async function handler(req, res) {
       //   body: `Patient ${name} (ID: ${result._id}) booked a consultation.`,
       //   read: false,
       // });
-      await sendAdminNotification({
-        title: "Consultation Booked",
-        body: `Patient ${name} has booked consultation`,
-      });
+      try {
+        await sendAdminNotification({
+          title: "Consultation Booked",
+          body: `Patient ${name} has booked consultation`,
+        });
+      } catch (adminNotifErr) {
+        // Never let an admin notification failure break the booking response.
+        console.error("Admin FCM notification failed (non-fatal):", adminNotifErr.message);
+      }
       await session.commitTransaction();
       session.endSession();
-      res.status(200).json({ message: "Consultation booked successfully" });
+      res.status(200).json({
+        message: "Consultation booked successfully",
+        appointmentId: result?._id ? String(result._id) : undefined,
+        amount: result?.consultationprice,
+      });
     } catch (error) {
       if (session) {
         await session.abortTransaction();

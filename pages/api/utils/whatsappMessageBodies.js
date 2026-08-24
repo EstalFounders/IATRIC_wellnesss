@@ -18,18 +18,23 @@ import { extractTime, formatData, extractDate } from "../../../src/components/re
  * @returns {object} The confirmation message body.
  */
 export const getConfirmMessageBody = (startTime, docName, patientName, consultationType, contactNo) => {
-    // You would call formatData and extractTime here or ensure formatted values are passed
-    // For simplicity, let's assume formatted values are passed for now,
-    // or you'd import and use your date/time formatters here.
-    const formattedAppointmentDate = extractDate(startTime);
-    const formattedAppointmentTime = extractTime(startTime);
-  
-    // For this example, let's make them directly passed for clarity:
-  
-  
+    // Normalize the input so extractDate/extractTime never receive null/undefined
+    // or an unparseable value, which would otherwise produce "Invalid Date"
+    // and break the Fast2SMS template variable payload.
+    let formattedAppointmentDate = "-";
+    let formattedAppointmentTime = "-";
+
+    if (startTime) {
+      const parsed = new Date(startTime);
+      if (!Number.isNaN(parsed.getTime())) {
+        formattedAppointmentDate = extractDate(parsed);
+        formattedAppointmentTime = extractTime(parsed);
+      }
+    }
+
     return {
-      appointment_date: formattedAppointmentDate,  // Use actual formatted date
-      appointment_time: formattedAppointmentTime,  // Use actual formatted time
+      appointment_date: formattedAppointmentDate,
+      appointment_time: formattedAppointmentTime,
       doctor_name: docName,
       patient_name: patientName,
       consultation_type: consultationType,
