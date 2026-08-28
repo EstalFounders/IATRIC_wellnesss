@@ -46,7 +46,12 @@ const appointmentSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    default: appointment_status.open,
+    default: appointment_status.pending,
+  },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Payment",
+    default: null,
   },
   patientMeetingUrl: {
     type: String,

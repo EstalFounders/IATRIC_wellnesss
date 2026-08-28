@@ -1,7 +1,7 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MeetingRoom from "../../../src/components/MeetingRoom/MeetingRoom";
-import { getConsultationByMeetingId } from "../../../src/components/ApiService/BookConsultationApiCall";
+import { api } from "../../../src/constant";
 
 export default function PatientMeetingPage() {
   const router = useRouter();
@@ -11,13 +11,19 @@ export default function PatientMeetingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!meetingId) return;
 
     const fetchConsultation = async () => {
       try {
         setLoading(true);
-        const data = await getConsultationByMeetingId(meetingId);
+        const response = await fetch(
+          `${api.consultationByMeetingId}/${meetingId}`,
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch consultation: ${response.status}`);
+        }
+        const data = await response.json();
         setConsultation(data);
       } catch (err) {
         console.error("Error fetching consultation:", err);

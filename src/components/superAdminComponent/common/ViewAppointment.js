@@ -127,6 +127,42 @@ const ViewAppointmentDetailsComp = () => {
                 </td>
                 <td>{appointment.status}</td>
               </tr>
+              <tr>
+                <td>
+                  <b>Payment Status</b>
+                </td>
+                <td>{appointment.paymentId?.status || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Cashfree Order ID</b>
+                </td>
+                <td>{appointment.paymentId?.orderId || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Payment Method</b>
+                </td>
+                <td>{appointment.paymentId?.method || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Transaction ID</b>
+                </td>
+                <td>{appointment.paymentId?.transactionId || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Payment ID</b>
+                </td>
+                <td>{appointment.paymentId?.paymentId || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Refund Status</b>
+                </td>
+                <td>{appointment.paymentId?.refundId ? "REFUND_PENDING / REFUNDED" : "N/A"}</td>
+              </tr>
             </tbody>
           </Table>
         </Card.Body>

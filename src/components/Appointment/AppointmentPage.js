@@ -19,6 +19,7 @@ import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
+import PaymentModal from "./PaymentModal";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
@@ -84,6 +85,7 @@ const AppointmentPage = () => {
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
   const [serviceType, setServiceType] = useState("");
+  const [pendingPayment, setPendingPayment] = useState(null);
 
   // Get services from Redux (already fetched via getServiceOffered)
   const services = useSelector(
@@ -177,7 +179,7 @@ const AppointmentPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const { serviceParam } = router.query;
+    const { serviceParam, appointmentId: orderIdFromReturn } = router.query;
     if (typeof serviceParam === "string") {
       const matched = services.find((service) =>
         service.name?.trim().toLowerCase().includes(serviceParam.trim().toLowerCase())
@@ -185,6 +187,22 @@ const AppointmentPage = () => {
       if (matched) {
         setServiceType(matched.name);
       }
+    }
+    // Returned from Cashfree checkout (our server return_url appends the Cashfree order_id as ?appointmentId=<orderId>).
+    // Open the PaymentModal in verify-only mode so it auto-polls the backend status.
+    if (typeof orderIdFromReturn === "string" && orderIdFromReturn.trim()) {
+      setPendingPayment({
+        appointmentId: null,
+        amount: consultationprice,
+        consultationType,
+        autoVerifyOrderId: orderIdFromReturn,
+      });
+      // Clean the query param so refresh doesn't re-trigger
+      const cleanQuery = { ...router.query };
+      delete cleanQuery.appointmentId;
+      router.replace({ pathname: router.pathname, query: cleanQuery }, undefined, {
+        shallow: true,
+      });
     }
   }, [router.query]);
 
@@ -366,7 +384,13 @@ const AppointmentPage = () => {
         return;
       }
       if (response.ok) {
-        handleShowDialog(message.message);
+        // Payment gate: the appointment is PENDING until payment is
+        // verified by the backend. Open the payment modal.
+        setPendingPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          consultationType,
+        });
       } else {
         const errorData = await response.json();
         setSnackBarMessage(errorData.message || "Failed to book consultation.");
@@ -463,6 +487,26 @@ const AppointmentPage = () => {
               onConfirm={whatsappConfrimation}
             />
           </WhatsappConfirmationModel>
+
+          {pendingPayment && (
+            <AppointmentBookingModal
+              isOpen={!!pendingPayment}
+              onClose={() => setPendingPayment(null)}
+            >
+              <PaymentModal
+                appointmentId={pendingPayment.appointmentId}
+                amount={pendingPayment.amount}
+                consultationType={consultationType}
+                autoVerifyOrderId={pendingPayment.autoVerifyOrderId || null}
+                onPaymentDone={() => {
+                  setMessage("Your consultation has been confirmed.");
+                  setBookingResponse(true);
+                  setPendingPayment(null);
+                }}
+                onClose={() => setPendingPayment(null)}
+              />
+            </AppointmentBookingModal>
+          )}
         </div>
         {/* End row */}
       </div>

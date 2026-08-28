@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    const appointment = await Appointment.findOne({ meetingId: meetingId }).lean();
+    const appointment = await Appointment.find({ meetingId: meetingId }).lean();
 
     if (!appointment) {
       return res.status(404).json({ error: "Consultation not found" });
