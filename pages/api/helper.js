@@ -603,7 +603,7 @@ export async function handlePostConsultation(reqBody, res) {
 
   try {
     console.log(reqBody);
-    session = await mongoose.startSession();
+    session = await mongoose.connection.startSession();
     session.startTransaction();
     let docName = doctorName == "" ? null : doctorName;
     let doctorMobileNo = doctorMobileNumber == "" ? null : doctorMobileNumber;
@@ -744,7 +744,12 @@ export async function handlePostConsultation(reqBody, res) {
     }
     await session.commitTransaction();
     session.endSession();
-    res.status(200).json({ message: "Consultation booked successfully" });
+    res.status(200).json({
+      message: "Consultation booked successfully",
+      appointmentId: result?._id ? String(result._id) : undefined,
+      amount: result?.consultationprice,
+      consultationType,
+    });
   } catch (error) {
     if (session) {
       await session.abortTransaction();
