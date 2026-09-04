@@ -12,6 +12,8 @@ import {
   confirmAppointmentAfterPayment,
   releaseSlotForAppointment,
 } from "../../../src/lib/paymentService";
+import { rateLimit } from "../../../src/lib/rateLimiter";
+import { cacheGet, cacheSet } from "../../../src/lib/cache";
 import { logErrorToGoogleSheet } from "../helper";
 
 /**
@@ -48,6 +50,20 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Rate limit payment execution per appointment to prevent abuse
+    const payLimit = await rateLimit({
+      key: `rl:pay:${appointmentId}`,
+      limit: 10,
+      windowSeconds: 600,
+    });
+    if (!payLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many payment attempts. Please try again later.",
+        retryAfter: payLimit.retryAfter,
+      });
+    }
+
     await dbConnect();
 
     // 1. Load the appointment
@@ -57,10 +73,17 @@ export default async function handler(req, res) {
     }
 
     // 2. Always derive the amount from the database - never trust client amount
-    const service = await ServiceOffered.findOne({
-      name: { $regex: new RegExp(`^${consultationType}$`, "i") },
-      isActive: true,
-    });
+    const cacheKey = `service:fee:${(consultationType || "").toLowerCase()}`;
+    let service = await cacheGet(cacheKey);
+    if (!service) {
+      service = await ServiceOffered.findOne({
+        name: { $regex: new RegExp(`^${consultationType}$`, "i") },
+        isActive: true,
+      });
+      if (service) {
+        await cacheSet(cacheKey, service, 300); // 5-min TTL
+      }
+    }
 
     if (!service || !service.fee) {
       return res.status(400).json({
@@ -118,6 +141,8 @@ export default async function handler(req, res) {
 
       payment = await Payment.create({
         appointmentId: appointment._id,
+        appointmentTime: appointment.appointmentTime || null,
+        bookingMode: appointment.bookingMode || null,
         provider: "cashfree",
         orderId,
         paymentSessionId: cashfreeOrder.payment_session_id,
@@ -201,6 +226,8 @@ export default async function handler(req, res) {
       payment_id: payResponse?.payment_id || null,
       payment_method: payResponse?.payment_method || null,
       cf_order_id: payResponse?.cf_order_id || null,
+      appointmentTime: payment.appointmentTime || null,
+      bookingMode: payment.bookingMode || null,
     });
   } catch (error) {
     console.error("payment/pay error:", error.message);

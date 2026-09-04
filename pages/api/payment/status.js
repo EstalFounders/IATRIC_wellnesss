@@ -32,6 +32,13 @@ export default async function handler(req, res) {
       : null;
 
     if (payment.status === payment_status.PAID) {
+      // Payment is already PAID — ensure the appointment confirmation
+      // (status -> CONFIRMED + WhatsApp) is fully completed/healed.
+      // This is a no-op if the whole job is already done (idempotent),
+      // but re-runs the confirmation flow if it was only partially completed
+      // (e.g. a crash mid-way or a manually-marked-PAID payment for testing).
+      await confirmAppointmentAfterPayment({ paymentId: payment._id });
+
       return res.status(200).json({
         success: true,
         status: payment_status.PAID,

@@ -4,6 +4,7 @@ import {
   logErrorToGoogleSheet,
   handlePostConsultation,
 } from "./helper";
+import { rateLimit } from "../../src/lib/rateLimiter";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -67,6 +68,34 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    // Rate limit booking creation per IP + per mobile to prevent spam/slot lockouts
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+    const mobileUsed = req.body?.patientMobNo || "unknown";
+
+    const bookingLimit = await rateLimit({
+      key: `rl:book:ip:${ip}`,
+      limit: 10,
+      windowSeconds: 600,
+    });
+    if (!bookingLimit.allowed) {
+      return res.status(429).json({
+        message: "Too many booking attempts. Please try again later.",
+        retryAfter: bookingLimit.retryAfter,
+      });
+    }
+
+    const mobileLimit = await rateLimit({
+      key: `rl:book:mobile:${mobileUsed}`,
+      limit: 10,
+      windowSeconds: 600,
+    });
+    if (!mobileLimit.allowed) {
+      return res.status(429).json({
+        message: "Too many booking attempts from this number. Please try again later.",
+        retryAfter: mobileLimit.retryAfter,
+      });
+    }
+
     await handlePostConsultation(req.body, res);
   }
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import styles from "../../../styles/Meeting.module.css";
 import chatStyles from "../../../styles/components/ChatPanel.module.css";
 import fileStyles from "../../../styles/components/FileShare.module.css";
 import infoStyles from "../../../styles/components/ParticipantInfo.module.css";
+import { getSocket } from "../../lib/socket";
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + " B";
@@ -54,25 +55,24 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
     onSendMessage(chatText);
     setChatText("");
     setIsTyping(false);
+    // Notify server typing stopped
+    const socket = getSocket();
     const mid = consultation?.meetingId || consultation?._id;
-    if (mid && window.__ws) {
-      window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: false }));
-    }
+    if (mid) socket.emit("typing", { meetingId: mid, isTyping: false });
   };
 
   const handleTextChange = (e) => {
     setChatText(e.target.value);
     setIsTyping(true);
+    // Emit typing event to server
+    const socket = getSocket();
     const mid = consultation?.meetingId || consultation?._id;
-    if (mid && window.__ws) {
-      window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: true }));
-    }
+    if (mid) socket.emit("typing", { meetingId: mid, isTyping: true });
+    // Clear typing after 2 seconds of inactivity
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      if (mid && window.__ws) {
-        window.__ws.send(JSON.stringify({ action: "typing", meetingId: mid, isTyping: false }));
-      }
+      if (mid) socket.emit("typing", { meetingId: mid, isTyping: false });
     }, 2000);
   };
 
@@ -154,6 +154,7 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
                 <div ref={messagesEndRef} />
               </div>
             )}
+            {/* Remote typing indicator */}
             {remoteTyping && (
               <div className={chatStyles.typingIndicator}>
                 <span>{remoteTyping === "doctor" ? "Doctor" : "Patient"} is typing</span>
@@ -254,7 +255,10 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
                 <div className={infoStyles.userDetails}>
                   <div className={infoStyles.userName}>{patientName}</div>
                   <div className={infoStyles.userRole}>Patient</div>
-                  <div className={infoStyles.userSpecialty}>Mobile: {patientMobNo}</div>
+                  {/* Hide the patient's mobile number from the doctor's view */}
+                  {!isDoctor && (
+                    <div className={infoStyles.userSpecialty}>Mobile: {patientMobNo}</div>
+                  )}
                   <div className={infoStyles.userStatus}>
                     <span className={`${infoStyles.statusDot} ${infoStyles.statusOnline}`} /> Online
                   </div>
@@ -313,32 +317,561 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [files, setFiles] = useState([]);
   const [remoteTyping, setRemoteTyping] = useState(null);
   const [participantCount, setParticipantCount] = useState(0);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [isWebRTCConnected, setIsWebRTCConnected] = useState(false);
   const [remoteVideoOn, setRemoteVideoOn] = useState(true);
   const [remoteAudioOn, setRemoteAudioOn] = useState(true);
+  // True once local camera/mic media is acquired so the WebRTC offer effect
+  // can reliably re-run (refs alone never trigger a React re-render).
+  const [localMediaReady, setLocalMediaReady] = useState(false);
+  // Our own socket id (for deterministic initiator).
+  const [mySocketId, setMySocketId] = useState(null);
+  // The other participant's socket id (peer) for glare-free handshake.
+  const [peerSocketId, setPeerSocketId] = useState(null);
+  // Camera toggle toast notification
   const [cameraToast, setCameraToast] = useState(null);
   const cameraToastTimerRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  // Plays the remote participant's audio during audio-only consultations.
+  // The audio-only screen has no <video> element, so without this hidden
+  // <audio> element neither participant could hear the other.
+  const remoteAudioRef = useRef(null);
+  const localStreamRef = useRef(null);
+  const peerConnectionRef = useRef(null);
+  const socketRef = useRef(null);
   const { formattedTime } = useTimer(meetingState === "active");
 
   const isDoctor = userType === "doctor";
-  const isAudioOnly = consultation?.consultationType === "Call";
+  // "Audio" is the canonical booking type; "Call" is the legacy label used by
+  // the previously committed code. Both mean an audio-only consultation.
+  const isAudioOnly =
+    consultation?.consultationType === "Audio" ||
+    consultation?.consultationType === "Call";
   const mid = meetingId || consultation?.meetingId || consultation?._id;
 
+  // ---- Socket.io Connection ----
+  useEffect(() => {
+    if (!mid) return;
+
+    const socket = getSocket();
+    socketRef.current = socket;
+    setMySocketId(socket.id);
+
+    const handleConnect = () => {
+      console.log("Socket connected, joining room:", mid);
+      setMySocketId(socket.id);
+      const userName = isDoctor
+        ? consultation?.doctorDetails?.name || "Doctor"
+        : consultation?.name || "Patient";
+      socket.emit("join-room", {
+        meetingId: mid,
+        role: userType,
+        userData: { name: userName, role: userType },
+      });
+    };
+
+    // If already connected, join immediately
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    socket.on("connect", handleConnect);
+
+    // ---- Room members: identifiers for the deterministic handshake ----
+    const extractPeers = (participants) => {
+      if (!participants || participants.length < 2) {
+        setPeerSocketId(null);
+        return;
+      }
+      const other = participants.find((p) => p.socketId !== socket.id);
+      setPeerSocketId(other?.socketId || null);
+    };
+
+    // ---- Participant joined ----
+    socket.on("participant-joined", (data) => {
+      console.log("Participant joined:", data);
+      setParticipantCount(data.participants?.length || 1);
+      extractPeers(data.participants);
+      if (data.participants && data.participants.length >= 2) {
+        setMeetingState("active");
+      }
+    });
+
+    // ---- Room participants (initial list) ----
+    socket.on("room-participants", (data) => {
+      console.log("Room participants:", data);
+      setParticipantCount(data.participants?.length || 1);
+      extractPeers(data.participants);
+      if (data.participants && data.participants.length >= 2) {
+        setMeetingState("active");
+      } else {
+        // First participant - show waiting state briefly then active
+        setTimeout(() => setMeetingState("active"), 2000);
+      }
+    });
+
+    // ---- Meeting active (both joined) ----
+    socket.on("meeting-active", () => {
+      console.log("Meeting active - both participants joined");
+      setMeetingState("active");
+    });
+
+    // ---- Receive chat message ----
+    socket.on("receive-message", (data) => {
+      // Ignore messages from ourselves (safety net against server echo-back)
+      if (data.socketId === socket.id) return;
+      // Deduplicate: ignore if we already have a matching message from the same source
+      const newMsg = {
+        sender: data.role === "doctor" ? "Doctor" : "Patient",
+        text: data.text,
+        timestamp: data.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        type: data.type || "text",
+        fromSocket: data.socketId,
+      };
+      setMessages((prev) => {
+        // Prevent duplicate: check if last message with same sender + text + socket already exists
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg &&
+            lastMsg.fromSocket === data.socketId &&
+            lastMsg.sender === newMsg.sender &&
+            lastMsg.text === newMsg.text &&
+            Math.abs(new Date(lastMsg.timestamp) - new Date(newMsg.timestamp)) < 500) {
+          return prev;
+        }
+        return [...prev, newMsg];
+      });
+    });
+
+    // ---- Remote typing ----
+    socket.on("user-typing", (data) => {
+      if (data.isTyping) {
+        setRemoteTyping(data.role);
+      } else {
+        setRemoteTyping(null);
+      }
+    });
+
+    // ---- Receive file ----
+    socket.on("receive-file", (data) => {
+      const newFile = {
+        id: Date.now().toString(),
+        name: data.name,
+        size: data.size,
+        type: data.type,
+        url: data.url,
+        uploadDate: data.uploadDate || new Date().toISOString(),
+        uploadedBy: data.uploadedBy || data.role,
+      };
+      setFiles((prev) => [...prev, newFile]);
+    });
+
+    // ---- Participant left ----
+    socket.on("participant-left", (data) => {
+      console.log("Participant left:", data);
+      const newCount = data.participants?.length || 0;
+      setParticipantCount(newCount);
+      extractPeers(data.participants);
+
+      // If we dropped below 2 participants, tear down the stale peer
+      // connection so a fresh WebRTC handshake happens when the other
+      // participant rejoins the room.
+      if (newCount < 2 && peerConnectionRef.current) {
+        try {
+          peerConnectionRef.current.close();
+        } catch {}
+        peerConnectionRef.current = null;
+        setIsWebRTCConnected(false);
+        setRemoteStream(null);
+      }
+    });
+
+    // ---- WebRTC: receive offer ----
+    socket.on("webrtc-offer", async ({ offer, from }) => {
+      if (from === socket.id) return; // ignore own messages
+      console.log("Received WebRTC offer");
+      try {
+        // Wait (up to ~5s) for this side's local camera/mic to become ready
+        // before answering. Without this, a slow audio-only ("Call") user
+        // would never connect and the two parties could not talk.
+        for (let i = 0; i < 20 && !localStreamRef.current; i++) {
+          await new Promise((r) => setTimeout(r, 250));
+        }
+        if (!localStreamRef.current) return;
+        const pc = createPeerConnection();
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit("webrtc-answer", { meetingId: mid, answer });
+      } catch (err) {
+        console.error("Error handling WebRTC offer:", err);
+      }
+    });
+
+    // ---- WebRTC: receive answer ----
+    socket.on("webrtc-answer", async ({ answer, from }) => {
+      if (from === socket.id) return;
+      console.log("Received WebRTC answer");
+      try {
+        const pc = peerConnectionRef.current;
+        if (pc) {
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      } catch (err) {
+        console.error("Error handling WebRTC answer:", err);
+      }
+    });
+
+    // ---- WebRTC: receive ICE candidate ----
+    socket.on("webrtc-ice-candidate", async ({ candidate, from }) => {
+      if (from === socket.id) return;
+      try {
+        const pc = peerConnectionRef.current;
+        if (pc && candidate) {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      } catch (err) {
+        console.error("Error adding ICE candidate:", err);
+      }
+    });
+
+    // ---- Participant camera toggle notification ----
+    socket.on("participant-camera-toggle", (data) => {
+      console.log("Participant camera toggle:", data);
+      // Update the remote video state
+      setRemoteVideoOn(data.isVideoOn);
+      // Blank the remote <video> element immediately when their camera turns off
+      if (!data.isVideoOn && remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = null;
+      }
+      // Show a toast notification
+      const displayName = data.role === "doctor"
+        ? consultation?.doctorDetails?.name || "Doctor"
+        : consultation?.name || "Patient";
+      const message = data.isVideoOn
+        ? `${displayName} turned on camera`
+        : `${displayName} turned off camera`;
+      const icon = data.isVideoOn ? "📷" : "📷❌";
+      // Clear any existing toast timer
+      if (cameraToastTimerRef.current) {
+        clearTimeout(cameraToastTimerRef.current);
+      }
+      setCameraToast({ icon, message });
+      // Auto-dismiss after 3 seconds
+      cameraToastTimerRef.current = setTimeout(() => {
+        setCameraToast(null);
+      }, 3000);
+    });
+
+    return () => {
+      // Close peer connection
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+        peerConnectionRef.current = null;
+      }
+      if (cameraToastTimerRef.current) {
+        clearTimeout(cameraToastTimerRef.current);
+      }
+      socket.off("connect", handleConnect);
+      socket.off("participant-joined");
+      socket.off("room-participants");
+      socket.off("meeting-active");
+      socket.off("receive-message");
+      socket.off("user-typing");
+      socket.off("receive-file");
+      socket.off("participant-left");
+      socket.off("participant-media-change");
+      socket.off("participant-camera-toggle");
+    };
+  }, [mid, userType, isDoctor, consultation]);
+
+  // Cleanup socket on unmount
+  useEffect(() => {
+    return () => {
+      const socket = socketRef.current;
+      if (socket && socket.connected) {
+        socket.emit("leave-room", { meetingId: mid });
+      }
+    };
+  }, [mid]);
+
+  // ---- Create RTCPeerConnection helper ----
+  const createPeerConnection = useCallback(() => {
+    // Close existing connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+
+    const pc = new RTCPeerConnection({
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+      ],
+    });
+
+    // Add local tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        pc.addTrack(track, localStreamRef.current);
+      });
+    }
+
+    // Handle incoming remote stream
+    pc.ontrack = (event) => {
+      console.log("Received remote track:", event.streams[0]);
+      const [remoteStream] = event.streams;
+      setRemoteStream(remoteStream);
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = remoteStream;
+      }
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = remoteStream;
+        remoteAudioRef.current.play().catch(() => {});
+      }
+      setIsWebRTCConnected(true);
+
+      // Keep remote camera/mic UI state in sync with the actual incoming tracks
+      const videoTrack = remoteStream?.getVideoTracks?.()[0];
+      const audioTrack = remoteStream?.getAudioTracks?.()[0];
+      if (videoTrack) {
+        setRemoteVideoOn(videoTrack.readyState === "live" && !videoTrack.muted);
+        videoTrack.addEventListener("ended", () => setRemoteVideoOn(false));
+        videoTrack.addEventListener("mute", () => setRemoteVideoOn(false));
+        videoTrack.addEventListener("unmute", () => setRemoteVideoOn(true));
+      }
+      if (audioTrack) {
+        setRemoteAudioOn(audioTrack.readyState === "live" && !audioTrack.muted);
+        audioTrack.addEventListener("mute", () => setRemoteAudioOn(false));
+        audioTrack.addEventListener("unmute", () => setRemoteAudioOn(true));
+      }
+    };
+
+    // Send ICE candidates to the other peer
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        const socket = getSocket();
+        socket.emit("webrtc-ice-candidate", {
+          meetingId: mid,
+          candidate: event.candidate,
+        });
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE connection state:", pc.iceConnectionState);
+    };
+
+    peerConnectionRef.current = pc;
+    return pc;
+  }, [mid]);
+
+  // ---- Initialize local camera/mic ----
+  // Video consultations request camera + mic.
+  // Call / audio-only consultations request audio only (no camera)
+  // so doctor & patient can still talk to each other in the same room.
+  useEffect(() => {
+    if (meetingState !== "active") return;
+    const initMedia = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(
+          isAudioOnly ? { video: false, audio: true } : { video: true, audio: true }
+        );
+        localStreamRef.current = stream;
+        if (isAudioOnly) {
+          setIsVideoOn(false);
+        }
+        if (!isAudioOnly && localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
+        setIsAudioOn(true);
+        setLocalMediaReady(true);
+      } catch (err) {
+        console.error("getUserMedia error:", err);
+        setIsVideoOn(false);
+        setIsAudioOn(false);
+        setLocalMediaReady(false);
+      }
+    };
+    initMedia();
+    return () => {
+      setLocalMediaReady(false);
+      if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
+    };
+  }, [meetingState, isAudioOnly]);
+
+  // ---- Re-assign stream to local video element when toggling camera on/off ----
+  // This ensures the newly mounted <video> element gets the stream after re-enabling camera
+  useEffect(() => {
+    if (isVideoOn && localVideoRef.current && localStreamRef.current) {
+      localVideoRef.current.srcObject = localStreamRef.current;
+    }
+  }, [isVideoOn]);
+
+  // ---- Re-assign stream to remote video element when remote camera turns back on ----
+  // Remote video element remounts when the ternary switches from placeholder to <video>
+  useEffect(() => {
+    if (remoteVideoOn && remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteVideoOn, remoteStream]);
+
+  // ---- Re-assign stream to remote audio element when audio-only call connects ----
+  // The audio-only screen renders a hidden <audio> element instead of a
+  // <video>, so this effect attaches the remote stream there (and replays it
+  // whenever the stream arrives or the element remounts).
+  useEffect(() => {
+    if (isAudioOnly && remoteAudioRef.current && remoteStream) {
+      remoteAudioRef.current.srcObject = remoteStream;
+      remoteAudioRef.current.play().catch((err) => {
+        console.error("Remote audio playback failed:", err);
+      });
+    }
+  }, [isAudioOnly, remoteStream]);
+
+  // ---- Initiate WebRTC (glare-free) when both participants + media are ready ----
+  // Uses state (localMediaReady / mySocketId / peerSocketId) so React re-runs
+  // this whenever media becomes ready or the peer joins the room, instead of
+  // relying on a ref that never triggers a re-render.
+  useEffect(() => {
+    if (participantCount < 2 || !localMediaReady || !mySocketId || !peerSocketId) return;
+    if (peerConnectionRef.current || isWebRTCConnected) return;
+
+    // Deterministic initiator: only the participant with the smaller socket id
+    // creates the offer. Exactly one offer is produced; the other answers.
+    if (String(mySocketId) >= String(peerSocketId)) {
+      console.log("Other peer will initiate the WebRTC offer.");
+      return;
+    }
+
+    console.log("I initiate the WebRTC offer (smaller socket id)");
+    const timer = setTimeout(async () => {
+      // Small settle time for tracks to attach to the stream.
+      await new Promise((r) => setTimeout(r, 500));
+      if (peerConnectionRef.current || !localStreamRef.current) return;
+      try {
+        const pc = createPeerConnection();
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        const socket = getSocket();
+        socket.emit("webrtc-offer", { meetingId: mid, offer });
+        console.log("Sent WebRTC offer (initiator)");
+      } catch (err) {
+        console.error("Error creating WebRTC offer:", err);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [participantCount, localMediaReady, mySocketId, peerSocketId, createPeerConnection, mid, isWebRTCConnected]);
+
   // ---- Control Handlers ----
-  const toggleMic = () => {
-    setIsAudioOn((prev) => !prev);
+  const toggleMic = async () => {
+    if (localStreamRef.current) {
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      if (audioTracks.length > 0) {
+        // Toggle enabled state of existing track
+        audioTracks.forEach((t) => (t.enabled = !t.enabled));
+        const isNowEnabled = audioTracks[0].enabled;
+        setIsAudioOn(isNowEnabled);
+        const socket = getSocket();
+        if (mid) socket.emit("media-state-change", { meetingId: mid, type: "audio", value: isNowEnabled });
+      } else {
+        // No audio track - try to re-acquire
+        try {
+          const newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          newStream.getAudioTracks().forEach((t) => localStreamRef.current.addTrack(t));
+          setIsAudioOn(true);
+          const socket = getSocket();
+          if (mid) socket.emit("media-state-change", { meetingId: mid, type: "audio", value: true });
+        } catch (err) {
+          console.error("Failed to re-acquire audio:", err);
+        }
+      }
+    }
   };
 
-  const toggleCamera = () => {
-    setIsVideoOn((prev) => !prev);
+  const toggleCamera = async () => {
+    // Camera is not available for audio-only (Call) consultations
+    if (isAudioOnly) return;
+    if (!localStreamRef.current) return;
+
+    const videoTracks = localStreamRef.current.getVideoTracks();
+    const socket = getSocket();
+    const pc = peerConnectionRef.current;
+
+    if (isVideoOn) {
+      // Turn OFF: stop video tracks entirely (like Zoom/Meet behavior).
+      // Remove tracks from the local stream and, importantly, replace the
+      // outgoing WebRTC video track with null so the remote peer actually
+      // stops receiving video (not just a UI placeholder).
+      videoTracks.forEach((t) => {
+        t.stop();
+        localStreamRef.current.removeTrack(t);
+      });
+      setIsVideoOn(false);
+
+      if (pc) {
+        const videoSender = pc.getSenders().find((s) => s.track && s.track.kind === "video");
+        if (videoSender) {
+          videoSender
+            .replaceTrack(null)
+            .catch((err) => console.error("replaceTrack(null) failed:", err));
+        }
+      }
+
+      if (mid) {
+        socket.emit("media-state-change", { meetingId: mid, type: "video", value: false });
+        socket.emit("camera-toggle", { meetingId: mid, isVideoOn: false, userId: userType });
+      }
+    } else {
+      // Turn ON: re-acquire camera and send new track via WebRTC
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const newVideoTrack = newStream.getVideoTracks()[0];
+        if (newVideoTrack) {
+          localStreamRef.current.addTrack(newVideoTrack);
+          setIsVideoOn(true);
+
+          // Replace the dead video track in the WebRTC peer connection with the new one
+          if (pc) {
+            const videoSender = pc.getSenders().find((s) => s.track && s.track.kind === "video");
+            if (videoSender) {
+              await videoSender.replaceTrack(newVideoTrack);
+              console.log("Replaced WebRTC video track with new camera feed");
+            } else {
+              // No existing video sender — add the track fresh
+              pc.addTrack(newVideoTrack, localStreamRef.current);
+            }
+          }
+
+          // Small delay to ensure React has mounted the <video> element
+          setTimeout(() => {
+            if (localVideoRef.current && localStreamRef.current) {
+              localVideoRef.current.srcObject = localStreamRef.current;
+            }
+          }, 50);
+          if (mid) {
+            socket.emit("media-state-change", { meetingId: mid, type: "video", value: true });
+            socket.emit("camera-toggle", { meetingId: mid, isVideoOn: true, userId: userType });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to re-acquire camera:", err);
+      }
+    }
   };
 
   const toggleHandRaise = () => {
-    setIsHandRaised((prev) => !prev);
+    setIsHandRaised((prev) => {
+      const newVal = !prev;
+      const socket = getSocket();
+      if (mid) socket.emit("media-state-change", { meetingId: mid, type: "handRaise", value: newVal });
+      return newVal;
+    });
   };
 
   const endCall = () => {
+    if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
     setMeetingState("ended");
   };
 
@@ -350,7 +883,11 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       type: "text",
     };
+    // Add locally
     setMessages((prev) => [...prev, messageData]);
+    // Send via socket
+    const socket = getSocket();
+    if (mid) socket.emit("send-message", { meetingId: mid, message: messageData });
   };
 
   // ---- File sharing ----
@@ -370,6 +907,9 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       };
       setFiles((prev) => [...prev, newFile]);
       setProgress((prev) => prev.filter((p) => p.name !== file.name));
+      // Share file via socket
+      const socket = getSocket();
+      if (mid) socket.emit("file-shared", { meetingId: mid, fileData: newFile });
     };
     reader.readAsDataURL(file);
   };
@@ -417,14 +957,58 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       <div className={styles.mainLayout}>
         <div className={styles.videoArea}>
           {isAudioOnly ? (
-            <div className={styles.videoArea} style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", color: "#fff" }}>
-              <div style={{ width: 120, height: 120, borderRadius: "50%", background: "#1c1e21", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24, fontSize: 48 }}>🎧</div>
-              <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Audio Consultation</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>You are on an audio-only call with {isDoctor ? patientName : doctorName}</div>
-              {participantCount < 2 && (
-                <div style={{ fontSize: 13, color: "#ffa502", marginTop: 16 }}>⏳ Waiting for the other participant to join...</div>
-              )}
-            </div>
+            <>
+              <div className={styles.meetingHeader}>
+                <div className={styles.meetingInfo}>
+                  <div className={styles.meetingTitle}>🎧 Audio Consultation</div>
+                  <div className={styles.meetingId}>ID: {meetingId}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <div style={{ fontSize: 12, color: participantCount >= 2 ? "#2ed573" : "#ffa502" }}>
+                    {participantCount >= 2 ? "🟢 Connected" : "🟡 Waiting..."}
+                  </div>
+                  <div className={styles.meetingTimer}>⏱️ {formattedTime}</div>
+                  {isRecording && <div className={styles.recordingBadge}><span className={styles.recordingDot} />Recording</div>}
+                </div>
+              </div>
+              {/* Hidden element required to play back the remote participant's
+                  microphone during audio-only consultations. */}
+              <audio ref={remoteAudioRef} autoPlay playsInline style={{ display: "none" }} />
+              <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
+                <div className={styles.videoWrapper}>
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.videoPlaceholderAvatar}>{isDoctor ? "👤" : "👨‍⚕️"}</div>
+                    <div className={styles.videoPlaceholderName}>{isDoctor ? patientName : doctorName}</div>
+                    <div className={styles.videoPlaceholderRole}>{isDoctor ? "Patient" : `Doctor - ${doctorSpecialty}`}</div>
+                    <div className={styles.videoPlaceholderRole} style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
+                      {participantCount >= 2 ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 999, background: "rgba(46,213,115,0.15)", color: "#2ed573", fontSize: 12, fontWeight: 600 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#2ed573" }} /> Connected
+                        </span>
+                      ) : (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 999, background: "rgba(255,165,2,0.15)", color: "#ffa502", fontSize: 12, fontWeight: 600 }}>
+                          ⏳ Waiting for the other participant to join...
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={styles.participantBadge}>
+                    <span>{remoteAudioOn ? "🔊" : "🔇"}</span>
+                    <span>{isDoctor ? patientName : doctorName}</span>
+                  </div>
+                </div>
+                <div className={styles.videoWrapper}>
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.videoPlaceholderAvatar}>👤</div>
+                    <div className={styles.videoPlaceholderName}>You</div>
+                    <div className={styles.videoPlaceholderRole}>{isDoctor ? "Doctor" : "Patient"}</div>
+                  </div>
+                  <div className={styles.participantBadge}><span>{isAudioOn ? "🔊" : "🔇"}</span><span>You</span></div>
+                  {!isAudioOn && <div className={styles.participantMicOff}>🔇</div>}
+                  {isHandRaised && <div className={styles.raisedHandIndicator}>✋</div>}
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div className={styles.meetingHeader}>
@@ -442,14 +1026,14 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
               </div>
               <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
                 <div className={styles.videoWrapper}>
-                  {remoteVideoOn ? (
-                    <video ref={remoteVideoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {isWebRTCConnected && remoteStream && remoteVideoOn ? (
+                    <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   ) : (
                     <div className={styles.videoPlaceholder}>
                       <div className={styles.videoPlaceholderAvatar}>{isDoctor ? "👤" : "👨‍⚕️"}</div>
                       <div className={styles.videoPlaceholderName}>{isDoctor ? patientName : doctorName}</div>
                       <div className={styles.videoPlaceholderRole}>{isDoctor ? "Patient" : `Doctor - ${doctorSpecialty}`}</div>
-                      {!remoteVideoOn && (
+                      {isWebRTCConnected && !remoteVideoOn && (
                         <div style={{ marginTop: 8, fontSize: 12, color: "#ffa502" }}>📷 Camera Off</div>
                       )}
                     </div>
@@ -477,6 +1061,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
             </>
           )}
 
+          {/* Camera toggle toast notification */}
           {cameraToast && (
             <div className={styles.cameraToast}>
               <span className={styles.cameraToastIcon}>{cameraToast.icon}</span>
@@ -494,7 +1079,12 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
               </svg>
               <span className={styles.controlLabel}>{isAudioOn ? "Mute" : "Unmute"}</span>
             </button>
-            <button className={`${styles.controlButton} ${!isVideoOn ? styles.controlButtonOff : ""}`} onClick={toggleCamera} title={isVideoOn ? "Camera Off" : "Camera On"}>
+            <button
+              className={`${styles.controlButton} ${!isVideoOn ? styles.controlButtonOff : ""} ${isAudioOnly ? styles.controlButtonDisabled : ""}`}
+              onClick={toggleCamera}
+              disabled={isAudioOnly}
+              title={isAudioOnly ? "Camera unavailable in audio consultation" : isVideoOn ? "Camera Off" : "Camera On"}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 {isVideoOn ? (
                   <><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></>

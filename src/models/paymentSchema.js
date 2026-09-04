@@ -8,6 +8,19 @@ const paymentSchema = new mongoose.Schema(
       ref: "Appointment",
       required: true,
     },
+    // Scheduled slot start time snapshot from the appointment at
+    // payment-creation time (audit value - reflects what was paid for).
+    appointmentTime: {
+      type: Date,
+      default: null,
+    },
+    // Literal booking mode bridged from the appointment at payment-creation
+    // time: "Now" | "in_twenty_minutes_now" | "ChooseTime".
+    // Used by paymentService.isNowAppointment to detect "Now"-type bookings.
+    bookingMode: {
+      type: String,
+      default: null,
+    },
     provider: {
       type: String,
       default: "cashfree",

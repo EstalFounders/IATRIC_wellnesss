@@ -1,6 +1,7 @@
 import { dbConnect } from '../../../src/lib/db';
 import ConsultationFee from '../../../src/models/consultationFeeSchema';
 import ServiceOffered from '../../../src/models/serviceOffered';
+import { cacheDelFees } from '../../../src/lib/cache';
 import { logErrorToGoogleSheet } from '../helper';
 
 export default async function handler(req, res) {
@@ -28,6 +29,8 @@ export default async function handler(req, res) {
     try {
       const newService = new ServiceOffered(req.body);
       await newService.save();
+      // Fees may have changed - invalidate cached consultation fees
+      await cacheDelFees();
       res.status(201).json(newService);
     } catch (error) {
       console.error('Error creating service:', error);
@@ -44,6 +47,8 @@ export default async function handler(req, res) {
     const { id } = req.query;
     try {
       const updatedService = await ServiceOffered.findByIdAndUpdate(id, req.body, { new: true });
+      // Fees may have changed - invalidate cached consultation fees
+      await cacheDelFees();
       res.status(200).json(updatedService);
     } catch (error) {
       await logErrorToGoogleSheet({
@@ -59,6 +64,8 @@ export default async function handler(req, res) {
     const { id } = req.query;
     try {
       await ServiceOffered.findByIdAndDelete(id);
+      // Fees may have changed - invalidate cached consultation fees
+      await cacheDelFees();
       res.status(200).json({ message: 'Service deleted successfully' });
     } catch (error) {
       await logErrorToGoogleSheet({
