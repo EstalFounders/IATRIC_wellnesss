@@ -339,6 +339,11 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const remoteAudioRef = useRef(null);
   const localStreamRef = useRef(null);
   const peerConnectionRef = useRef(null);
+  // ICE candidates that arrive before the remote SDP description is applied
+  // get buffered here and flushed right after setRemoteDescription(). Without
+  // this, trickle candidates are dropped with InvalidStateError and media
+  // (audio) can never establish.
+  const pendingIceCandidatesRef = useRef([]);
   const socketRef = useRef(null);
   const { formattedTime } = useTimer(meetingState === "active");
 
@@ -386,6 +391,22 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       }
       const other = participants.find((p) => p.socketId !== socket.id);
       setPeerSocketId(other?.socketId || null);
+    };
+
+    // Apply any ICE candidates that arrived before the remote description was
+    // set (Trickle-ICE race) now that the SDP is in place.
+    const flushPendingIceCandidates = async (pc) => {
+      const pending = pendingIceCandidatesRef.current;
+      if (!pc || !pc.remoteDescription || pending.length === 0) return;
+      pendingIceCandidatesRef.current = [];
+      console.log(`[WebRTC-DIAG] Flushing ${pending.length} buffered ICE candidate(s)`);
+      for (const cand of pending) {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(cand));
+        } catch (err) {
+          console.error("[WebRTC-DIAG] Buffered ICE candidate failed:", err);
+        }
+      }
     };
 
     // ---- Participant joined ----
@@ -486,20 +507,41 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       }
     });
 
-    // ---- WebRTC: receive offer ----
+    // ---- WebRTC: receive offer (I am the ANSWERER) ----
     socket.on("webrtc-offer", async ({ offer, from }) => {
       if (from === socket.id) return; // ignore own messages
-      console.log("Received WebRTC offer");
+      console.log("Received WebRTC offer (I am the ANSWERER)", {
+        myRole: userType,
+        peerRole: from,
+      });
       try {
         // Wait (up to ~5s) for this side's local camera/mic to become ready
         // before answering. Without this, a slow audio-only ("Call") user
         // would never connect and the two parties could not talk.
+        let waitedMs = 0;
         for (let i = 0; i < 20 && !localStreamRef.current; i++) {
           await new Promise((r) => setTimeout(r, 250));
+          waitedMs += 250;
         }
-        if (!localStreamRef.current) return;
+        if (!localStreamRef.current) {
+          // DIAGNOSTIC: this silent bail is a top suspect for one-way audio
+          // (no answer is ever sent back to the offerer).
+          console.error(
+            `[WebRTC-DIAG] ANSWERER BAILED: no local media after ${waitedMs}ms — ` +
+              "no answer sent, offerer will not receive our audio/media.",
+          );
+          return;
+        }
+        const localAudio = localStreamRef.current.getAudioTracks();
+        const localVideo = localStreamRef.current.getVideoTracks();
+        console.log("[WebRTC-DIAG] Answerer media state before answer", {
+          audioTracks: localAudio.length,
+          videoTracks: localVideo.length,
+          audioEnabled: localAudio[0]?.enabled,
+        });
         const pc = createPeerConnection();
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        await flushPendingIceCandidates(pc);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         socket.emit("webrtc-answer", { meetingId: mid, answer });
@@ -508,14 +550,18 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       }
     });
 
-    // ---- WebRTC: receive answer ----
+    // ---- WebRTC: receive answer (I am the OFFERER) ----
     socket.on("webrtc-answer", async ({ answer, from }) => {
       if (from === socket.id) return;
-      console.log("Received WebRTC answer");
+      console.log("Received WebRTC answer (I am the OFFERER)", {
+        myRole: userType,
+        peerRole: from,
+      });
       try {
         const pc = peerConnectionRef.current;
         if (pc) {
           await pc.setRemoteDescription(new RTCSessionDescription(answer));
+          await flushPendingIceCandidates(pc);
         }
       } catch (err) {
         console.error("Error handling WebRTC answer:", err);
@@ -523,15 +569,33 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     });
 
     // ---- WebRTC: receive ICE candidate ----
+    // Trickle-ICE race guard: candidates can arrive before the remote SDP
+    // description is set (InvalidStateError). Buffer them and flush once the
+    // offer/answer has been applied above.
     socket.on("webrtc-ice-candidate", async ({ candidate, from }) => {
       if (from === socket.id) return;
       try {
         const pc = peerConnectionRef.current;
-        if (pc && candidate) {
-          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        if (!pc || !candidate) return;
+        if (!pc.remoteDescription) {
+          pendingIceCandidatesRef.current.push(candidate);
+          console.log(
+            `[WebRTC-DIAG] Buffered ICE candidate (remote SDP not set yet). Total buffered: ${pendingIceCandidatesRef.current.length}`,
+          );
+          return;
         }
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
       } catch (err) {
-        console.error("Error adding ICE candidate:", err);
+        // In case of a race already past the guard, buffer instead of dropping.
+        if (err?.name === "InvalidStateError" || pc?.remoteDescription === null) {
+          pendingIceCandidatesRef.current.push(candidate);
+          console.warn(
+            "[WebRTC-DIAG] addIceCandidate failed early - buffered instead of dropped",
+            err.message,
+          );
+        } else {
+          console.error("Error adding ICE candidate:", err);
+        }
       }
     });
 
@@ -619,7 +683,13 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
 
     // Handle incoming remote stream
     pc.ontrack = (event) => {
-      console.log("Received remote track:", event.streams[0]);
+      const incomingStream = event.streams[0];
+      console.log("[WebRTC-DIAG] ontrack fired", {
+        hasRemoteStream: !!incomingStream,
+        audioTrackCount: incomingStream?.getAudioTracks?.().length || 0,
+        videoTrackCount: incomingStream?.getVideoTracks?.().length || 0,
+        myRole: isDoctor ? "doctor" : "patient",
+      });
       const [remoteStream] = event.streams;
       setRemoteStream(remoteStream);
       if (remoteVideoRef.current) {
@@ -660,11 +730,22 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
 
     pc.oniceconnectionstatechange = () => {
       console.log("ICE connection state:", pc.iceConnectionState);
+      // DIAGNOSTIC: when we reach "connected", report which local tracks our
+      // peer connection is actually sending (kind + live state).
+      if (pc.iceConnectionState === "connected") {
+        const senders = pc.getSenders().map((s) => ({
+          kind: s.track?.kind || "null",
+          label: s.track?.label || "",
+          state: s.track?.readyState || "none",
+          muted: s.track?.muted ?? "?",
+        }));
+        console.log("[WebRTC-DIAG] Connected. Local senders:", senders);
+      }
     };
 
     peerConnectionRef.current = pc;
     return pc;
-  }, [mid]);
+  }, [mid, isDoctor]);
 
   // ---- Initialize local camera/mic ----
   // Video consultations request camera + mic.
@@ -744,12 +825,21 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       return;
     }
 
-    console.log("I initiate the WebRTC offer (smaller socket id)");
+    console.log("I initiate the WebRTC offer (smaller socket id)", {
+      myRole: userType,
+    });
     const timer = setTimeout(async () => {
       // Small settle time for tracks to attach to the stream.
       await new Promise((r) => setTimeout(r, 500));
       if (peerConnectionRef.current || !localStreamRef.current) return;
       try {
+        const localAudio = localStreamRef.current.getAudioTracks();
+        const localVideo = localStreamRef.current.getVideoTracks();
+        console.log("[WebRTC-DIAG] Offerer media state before offer", {
+          audioTracks: localAudio.length,
+          videoTracks: localVideo.length,
+          audioEnabled: localAudio[0]?.enabled,
+        });
         const pc = createPeerConnection();
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
