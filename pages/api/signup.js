@@ -4,9 +4,24 @@ import { hash } from "bcryptjs"
 import { dbConnect } from "../../src/lib/db";
 import User from "../../src/models/userModel";
 import { logErrorToGoogleSheet } from "./helper";
+import { rateLimit } from "../../src/lib/rateLimiter";
 
 export default async function handler(req, res) {
   try {
+
+    // Rate limit signups per IP to prevent abuse
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+    const signupLimit = await rateLimit({
+      key: `rl:signup:ip:${ip}`,
+      limit: 20,
+      windowSeconds: 600,
+    });
+    if (!signupLimit.allowed) {
+      return res.status(429).json({
+        error: "Too many signup attempts. Please try again later.",
+        retryAfter: signupLimit.retryAfter,
+      });
+    }
 
     const parsedJsonRequest = JSON.parse(req.body.body)
 

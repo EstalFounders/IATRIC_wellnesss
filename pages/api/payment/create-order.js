@@ -8,6 +8,8 @@ import {
   getCashfreeOrderStatus,
   getCashfreeCheckoutUrl,
 } from "../../../src/lib/cashfree";
+import { rateLimit } from "../../../src/lib/rateLimiter";
+import { cacheGet, cacheSet } from "../../../src/lib/cache";
 import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
@@ -25,6 +27,20 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Rate limit order creation per appointment to prevent order spam
+    const orderLimit = await rateLimit({
+      key: `rl:create-order:${appointmentId}`,
+      limit: 5,
+      windowSeconds: 600,
+    });
+    if (!orderLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many payment attempts. Please try again later.",
+        retryAfter: orderLimit.retryAfter,
+      });
+    }
+
     await dbConnect();
 
     // 1. Load the appointment
@@ -34,10 +50,17 @@ export default async function handler(req, res) {
     }
 
     // 2. Always derive the amount from the database - never trust client amount
-    const service = await ServiceOffered.findOne({
-      name: { $regex: new RegExp(`^${consultationType}$`, "i") },
-      isActive: true,
-    });
+    const cacheKey = `service:fee:${(consultationType || "").toLowerCase()}`;
+    let service = await cacheGet(cacheKey);
+    if (!service) {
+      service = await ServiceOffered.findOne({
+        name: { $regex: new RegExp(`^${consultationType}$`, "i") },
+        isActive: true,
+      });
+      if (service) {
+        await cacheSet(cacheKey, service, 300); // 5-min TTL
+      }
+    }
 
     if (!service || !service.fee) {
       return res.status(400).json({
@@ -98,6 +121,13 @@ export default async function handler(req, res) {
       }
 
       payment.paymentSessionId = freshCashfreeOrder.payment_session_id;
+      // Ensure the bridged fields are present even for re-used payments
+      if (!payment.appointmentTime && appointment.appointmentTime) {
+        payment.appointmentTime = appointment.appointmentTime;
+      }
+      if (!payment.bookingMode && appointment.bookingMode) {
+        payment.bookingMode = appointment.bookingMode;
+      }
       await payment.save();
 
       return res.status(200).json({
@@ -151,6 +181,8 @@ export default async function handler(req, res) {
     // 6. Create / update our Payment record
     payment = await Payment.create({
       appointmentId: appointment._id,
+      appointmentTime: appointment.appointmentTime || null,
+      bookingMode: appointment.bookingMode || null,
       provider: "cashfree",
       orderId,
       paymentSessionId: cashfreeOrder.payment_session_id,

@@ -374,6 +374,7 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     docName,
     doctorMobileNo,
     clientSideAppointmentTime,
+    bookingMode,
   } = bookConsultationParams;
 
   console.log(slot, "slot", doctorId, "doctor id");
@@ -451,6 +452,7 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     consultationType,
     consultationprice,
     appointmentTime,
+    bookingMode: bookingMode || clientSideAppointmentTime || null,
     patientMeetingUrl: ensureHttps(patientMeetingUrl),
     doctorMeetingUrl: ensureHttps(doctorMeetingUrl),
     prescriptionUrl,
@@ -705,6 +707,7 @@ export async function handlePostConsultation(reqBody, res) {
       doctorMobileNo: doctorMobileNo,
       doctorId: doctorId,
       clientSideAppointmentTime: clientSideAppointmentTime,
+      bookingMode: clientSideAppointmentTime,
     };
 
     console.log(meetingId, "meeting id");

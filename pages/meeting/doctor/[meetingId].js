@@ -5,8 +5,8 @@ import { api } from "../../../src/constant";
 
 export default function DoctorMeetingPage() {
   const router = useRouter();
-  const pathSegments = window.location.pathname.split("/");
-  const meetingId = pathSegments[pathSegments.length - 1];
+  // SSR-safe: use router.query instead of window.location.split (undefined on server)
+  const { meetingId } = router.query;
   const [consultation, setConsultation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

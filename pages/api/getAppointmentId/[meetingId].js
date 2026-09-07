@@ -12,7 +12,12 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    const appointment = await Appointment.find({ meetingId: meetingId }).lean();
+    // Use findOne (not find) - find returns an array, and spreading an array
+    // gives BSON fields you cannot use (e.g. appointment.doctorId would be
+    // undefined) which broke the patient/doctor meeting page data.
+    const appointment = await Appointment.findOne({
+      meetingId: meetingId,
+    }).lean();
 
     if (!appointment) {
       return res.status(404).json({ error: "Consultation not found" });

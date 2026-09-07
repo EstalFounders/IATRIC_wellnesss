@@ -20,10 +20,17 @@ export default async function handler(req, res) {
     const now = new Date();
     const twentyMinutesFromNow = new Date(now.getTime() + 20 * 60 * 1000);
 
-    // 1. Get upcoming appointments within 20 minutes
+    // 1. Get upcoming appointments within 20 minutes.
+    //    Match both OPEN (booking created, payment pending) and CONFIRMED
+    //    (payment verified) statuses so paid appointments also get reminders.
     const upcomingAppointments = await Appointment.find({
       appointmentTime: { $gte: now, $lte: twentyMinutesFromNow },
-      status: new RegExp(appointment_status.open, "i"), // 'i' flag for case-insensitive
+      status: {
+        $in: [
+          new RegExp(appointment_status.open, "i"), // 'i' flag for case-insensitive
+          new RegExp(appointment_status.confirmed, "i"),
+        ],
+      },
     });
 
     console.log("Upcoming Appointments:", upcomingAppointments);

@@ -112,11 +112,32 @@ const PaymentModal = ({
       // paymentState("verifying") here - verification happens on return.
     } catch (err) {
       console.error("Payment init error:", err);
-      setInitError(
-        err?.message
-          ? `Unable to initialize payment. ${err.message}`
-          : "Unable to initialize payment. Please try again."
-      );
+
+      // --- Session expiry handling ---
+      // Cashfree's payment_session_id has a limited TTL (typically ~15 min).
+      // When it expires, checkout() rejects/errors. We cannot extend it, but we
+      // can generate a FRESH session (same orderId - create-order is idempotent)
+      // and let the user re-open checkout with one click.
+      const msg = (err?.message || "").toLowerCase();
+      const sessionExpired =
+        msg.includes("expired") ||
+        msg.includes("session") ||
+        msg.includes("timeout") ||
+        msg.includes("invalid payment session");
+      if (sessionExpired) {
+        // Allow a fresh session to be created on next Pay click
+        initializedRef.current = false;
+        setPaymentState("idle");
+        setInitError(
+          "Your payment session has expired. Please click Pay again to refresh the session and complete your payment."
+        );
+      } else {
+        setInitError(
+          err?.message
+            ? `Unable to initialize payment. ${err.message}`
+            : "Unable to initialize payment. Please try again."
+        );
+      }
       setIsInitializing(false);
     }
   };
@@ -238,10 +259,16 @@ const PaymentModal = ({
       {paymentState === "idle" && (
         <Box mt={3}>
           <Typography variant="body1" mb={2} style={{ maxWidth: 420, margin: "0 auto" }}>
-            Pay securely to confirm your consultation booking.
+            {initError
+              ? initError
+              : "Pay securely to confirm your consultation booking."}
           </Typography>
           <ConsultationButton onClick={handlePay} disabled={isInitializing}>
-            {isInitializing ? "Loading..." : `Pay ${price_symbol}${amount || 0}`}
+            {isInitializing
+              ? "Loading..."
+              : initError
+              ? "Refresh & Pay Again"
+              : `Pay ${price_symbol}${amount || 0}`}
           </ConsultationButton>
           {initError && (
             <Typography variant="body2" color="error" mt={2}>

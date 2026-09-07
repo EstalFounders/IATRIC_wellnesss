@@ -3,6 +3,7 @@ import Query from "../../src/models/query";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { company_number, WHATSAPP_USER_QUERY_TEMPLATE } from "./utils/constants";
+import { rateLimit } from "../../src/lib/rateLimiter";
 import { logErrorToGoogleSheet } from "./helper";
 
 export default async function handler(req, res) {
@@ -47,6 +48,20 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
+      // Rate limit user queries per IP to prevent spam
+      const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+      const queryLimit = await rateLimit({
+        key: `rl:userquery:ip:${ip}`,
+        limit: 10,
+        windowSeconds: 600,
+      });
+      if (!queryLimit.allowed) {
+        return res.status(429).json({
+          message: "Too many queries. Please try again later.",
+          retryAfter: queryLimit.retryAfter,
+        });
+      }
+
       const payload = req.body;
 
       console.log(payload, "payload");

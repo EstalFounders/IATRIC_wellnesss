@@ -399,6 +399,21 @@
   background: #f0ebd6;
 }
 
+.controlButtonDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #eef1ee;
+  color: #94a3b8;
+}
+
+.controlButtonDisabled:hover {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #eef1ee;
+  color: #94a3b8;
+  transform: none;
+}
+
 .controlButtonEnd {
   width: 52px;
   height: 44px;
