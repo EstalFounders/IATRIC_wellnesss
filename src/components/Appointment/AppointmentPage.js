@@ -66,6 +66,7 @@ const AppointmentPage = () => {
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [symptoms, setSymptoms] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
@@ -123,6 +124,7 @@ const AppointmentPage = () => {
     filteredDoctors,
     selectedSlot,
     symptoms,
+    agreedToTerms,
     name,
     email,
     mobNo,
@@ -142,6 +144,7 @@ const AppointmentPage = () => {
 
   const setter = {
     setSymptoms,
+    setAgreedToTerms,
     setName,
     setEmail,
     setMobNo,
@@ -344,6 +347,13 @@ const AppointmentPage = () => {
     }
     if (timeSelection === CHOOSE_TIME && !selectedSlot) {
       setSnackBarMessage("Please select a time slot.");
+      handleOpenSnackBar();
+      return;
+    }
+    if (!agreedToTerms) {
+      setSnackBarMessage(
+        "Please read and accept the Terms & Conditions to continue."
+      );
       handleOpenSnackBar();
       return;
     }

@@ -69,8 +69,8 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_PATIENT_ID,
         variables_values: [
-          capitalize(body.doctor_name),
           capitalize(body.patient_name),
+          `Dr. ${capitalize(body.doctor_name)}`,
           body.appointment_date,
           body.appointment_time,
           body.meeting_url || "",  // plain app URL — no special chars, no encoding needed
@@ -81,8 +81,8 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_DOCTOR_ID,
         variables_values: [
+          `Dr. ${capitalize(body.doctor_name)}`,
           capitalize(body.patient_name),
-          capitalize(body.doctor_name),
           body.appointment_date,
           body.appointment_time,
           body.meeting_url || "",  // plain app URL — no special chars, no encoding needed
