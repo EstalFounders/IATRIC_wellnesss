@@ -276,6 +276,17 @@ app.prepare().then(() => {
         console.error("[CRON] Consultation reminder failed:", err);
       }
     });
+
+    // LOG MONITOR: import PM2 logs into MongoDB when enabled
+    if (process.env.LOG_MONITOR_ENABLED === "true") {
+      fetch(`http://${hostname}:${port}/api/logs/monitor`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-log-boot": "1" },
+      })
+        .then((r) => r.json())
+        .then((j) => console.log("[log-monitor] boot start:", JSON.stringify(j)))
+        .catch((e) => console.error("[log-monitor] boot start failed:", e.message));
+    }
   });
 });
 

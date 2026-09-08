@@ -81,4 +81,10 @@ export const SidebarData = [
     icon: <TbFileInvoice />,
     cName: "nav-text",
   },
+  {
+    title: "LOGS",
+    path: "/superAdmin/logs",
+    icon: <FaIcons.FaListAlt />,
+    cName: "nav-text",
+  },
 ];
