@@ -4,15 +4,32 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Checkbox,
+  IconButton,
+  Tooltip,
   Typography,
   Box,
   Snackbar,
   Alert,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
 import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
 import { CHOOSE_TIME, IS_NOW, price_symbol } from "../../constant";
 import { formatTime } from "../helper";
+
+// Common complaints offered as quick-select radio options on the form.
+const COMMON_DISEASES = [
+  "Fever",
+  "Cough & Cold",
+  "Headache",
+  "Stomach Ache / Digestion Issue",
+  "Skin Problem / Rashes",
+  "Body Pain / Weakness",
+];
+
+// Value used for the "Other" radio option (reveals the free-text description box).
+const SYMPTOM_OTHER = "__other__";
 
 const toLocalDateString = (date) => {
   const d = new Date(date);
@@ -28,10 +45,22 @@ const AppointmentForm = ({
   handleSlotSelection,
   handleConsultationChange,
 }) => {
-  const [descriptionOptions] = useState([]);
+  const [selectedSymptom, setSelectedSymptom] = useState("");
 
   const handleDescriptionChange = (e) => {
     setter.setSymptoms(e.target.value);
+  };
+
+  const handleSymptomSelection = (e) => {
+    const value = e.target.value;
+    setSelectedSymptom(value);
+    if (value === SYMPTOM_OTHER) {
+      // "Other" selected - clear saved symptom until the patient types one.
+      setter.setSymptoms("");
+    } else {
+      // A common disease was selected - store it as the appointment symptom.
+      setter.setSymptoms(value);
+    }
   };
 
   const handleDateChange = (e) => {
@@ -71,7 +100,33 @@ const AppointmentForm = ({
             />
           </div>
 
-          {/* Symptoms */}
+          {/* Reason for consultation (common diseases + Other) */}
+          <Typography variant="h6" mt={2} className="text-center">
+            Reason for Consultation
+          </Typography>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <RadioGroup
+              className="w-50"
+              value={selectedSymptom}
+              onChange={handleSymptomSelection}
+            >
+            {COMMON_DISEASES.map((disease) => (
+              <FormControlLabel
+                key={disease}
+                value={disease}
+                control={<Radio />}
+                label={disease}
+              />
+            ))}
+            <FormControlLabel
+              value={SYMPTOM_OTHER}
+              control={<Radio />}
+              label="Other"
+            />
+            </RadioGroup>
+          </div>
+
+          {selectedSymptom === SYMPTOM_OTHER && (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <TextField
               className="w-50"
@@ -84,26 +139,6 @@ const AppointmentForm = ({
               onChange={handleDescriptionChange}
             />
           </div>
-
-          {descriptionOptions.length > 0 && (
-            <>
-              <Typography variant="subtitle1" mt={2}>
-                Select Closest Match:
-              </Typography>
-              <RadioGroup
-                value={appointmentState.selectedSymptom || ""}
-                onChange={(e) => setter.setSelectedSymptom?.(e.target.value)}
-              >
-                {descriptionOptions.map((option, idx) => (
-                  <FormControlLabel
-                    key={idx}
-                    value={option}
-                    control={<Radio />}
-                    label={option}
-                  />
-                ))}
-              </RadioGroup>
-            </>
           )}
 
           {/* Mobile Number */}
@@ -250,6 +285,32 @@ const AppointmentForm = ({
               {appointmentState.snackBarMessage}
             </Alert>
           </Snackbar>
+
+          {/* Terms & Conditions */}
+          <Box mt={3} mb={1} display="flex" alignItems="center" justifyContent="center">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!appointmentState.agreedToTerms}
+                  onChange={(e) =>
+                    setter.setAgreedToTerms ? setter.setAgreedToTerms(e.target.checked) : null
+                  }
+                  color="primary"
+                  size="small"
+                />
+              }
+              label="I have read and agree to the Terms & Conditions"
+            />
+            <Tooltip title="View Terms & Conditions">
+              <IconButton
+                size="small"
+                aria-label="View Terms & Conditions"
+                onClick={() => window.open("/terms-of-service", "_blank")}
+              >
+                <Visibility fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
 
           {/* Submit */}
           <Box mt={4} mb={4} display="flex" justifyContent="center">
