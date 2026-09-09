@@ -25,6 +25,8 @@ AppLogSchema.index({ type: 1, timestamp: -1 });
 AppLogSchema.index({ source: 1, timestamp: -1 });
 AppLogSchema.index({ uid: 1 }, { unique: true, sparse: true });
 
+export { AppLogSchema };
+
 const modelName = "AppLog";
 if (mongoose.models[modelName]) {
   mongoose.deleteModel(modelName);

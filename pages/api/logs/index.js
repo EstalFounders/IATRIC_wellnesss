@@ -1,5 +1,4 @@
-import { dbConnect } from "../../../src/lib/db";
-import AppLog from "../../../src/models/appLogSchema";
+import { getAppLogModel } from "../../../src/lib/logDb";
 import { requireAuth } from "../../../src/lib/requireLogAuth";
 import { logErrorToGoogleSheet } from "../helper";
 
@@ -31,6 +30,7 @@ export default async function handler(req, res) {
   }
   try {
     const q = req.query;
+    const AppLog = await getAppLogModel();
     const filter = {};
     const start = toDate(q.start);
     const end = toDate(q.end);
@@ -43,8 +43,18 @@ export default async function handler(req, res) {
     if (start || end) filter.timestamp = range;
     if (q.level && LEVELS.includes(String(q.level))) filter.level = q.level;
     if (q.type && TYPES.includes(String(q.type))) filter.type = q.type;
-    const source = String(q.source || "").trim();
-    if (source) filter.source = { $regex: escapeRegExp(source), $options: "i" };
+    const sourcesRaw = String(q.sources || "").trim();
+    if (sourcesRaw) {
+      const sourcesList = sourcesRaw
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean)
+        .slice(0, 50);
+      if (sourcesList.length) filter.source = { $in: sourcesList };
+    } else {
+      const source = String(q.source || "").trim();
+      if (source) filter.source = { $regex: escapeRegExp(source), $options: "i" };
+    }
     const search = String(q.search || "").trim();
     if (search) {
       const rx = { $regex: escapeRegExp(search), $options: "i" };

@@ -2,8 +2,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import os from "os";
-import { dbConnect } from "./db";
-import AppLog from "../models/appLogSchema";
+import { getAppLogModel } from "./logDb";
 import logBus from "./logBus";
 import { buildLogEntry, splitLines } from "./logParser";
 
@@ -12,6 +11,10 @@ const ENABLED = process.env.LOG_MONITOR_ENABLED === "true";
 const INITIAL_LIMIT = parseInt(process.env.LOG_INITIAL_IMPORT_LIMIT || "500", 10) || 500;
 const SCAN_INTERVAL_MS = parseInt(process.env.LOG_SCAN_INTERVAL_MS || "10000", 10) || 10000;
 const SELF_MARKER = "[log-monitor]";
+// Optional comma-separated exact process names to watch (e.g. "HealthPath").
+const ALLOWED_SOURCES = new Set(
+  String(process.env.LOG_SOURCES || "").split(",").map((s) => s.trim()).filter(Boolean)
+);
 
 let started = false;
 let dirWatcher = null;
@@ -21,13 +24,25 @@ let totalInserted = 0;
 let lastScanMs = 0;
 const files = new Map(); // filePath -> { pos, remainder, imported }
 
+let AppLogModel = null;
+async function logModel() {
+  if (!AppLogModel) AppLogModel = await getAppLogModel();
+  return AppLogModel;
+}
+
 // Find all PM2 output/error log files inside the configured directory.
 async function listLogFiles() {
   try {
     const entries = await fsp.readdir(LOG_DIR);
     return entries
       .filter((n) => /-(out|error)\.log$/.test(n))
-      .map((n) => path.join(LOG_DIR, n));
+      .map((n) => path.join(LOG_DIR, n))
+      .filter((p) => {
+        const info = fileInfo(p);
+        if (!info) return false;
+        if (ALLOWED_SOURCES.size === 0) return true;
+        return ALLOWED_SOURCES.has(info.source);
+      });
   } catch {
     return []; // directory missing / unreadable - handled gracefully
   }
@@ -91,14 +106,15 @@ async function importLines(rawLines, source, type) {
   }
   if (!docs.length) return 0;
   // Dedupe against existing records (unique uid) so restarts/overlap are safe.
-  const seen = await AppLog.find({ uid: { $in: docs.map((d) => d.uid) } },
+  const M = await logModel();
+  const seen = await M.find({ uid: { $in: docs.map((d) => d.uid) } },
     { uid: 1 }).lean();
   const skip = new Set(seen.map((s) => s.uid));
   let inserted = 0;
   for (const doc of docs) {
     if (skip.has(doc.uid)) continue;
     try {
-      const created = await AppLog.create(doc);
+      const created = await M.create(doc);
       inserted += 1;
       logBus.emit("log", toSse(created));
     } catch (err) {
@@ -153,7 +169,7 @@ async function scan() {
   if (scanQueued) return;
   scanQueued = true;
   try {
-    await dbConnect();
+    await logModel();
     const filesNow = await listLogFiles();
     const seen = new Set(filesNow);
     for (const file of filesNow) {
