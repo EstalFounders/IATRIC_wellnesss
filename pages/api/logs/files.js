@@ -1,5 +1,5 @@
-import { getAppLogModel } from "../../../src/lib/logDb";
 import { requireAuth } from "../../../src/lib/requireLogAuth";
+import { listFiles } from "../../../src/lib/pm2LogFileReader";
 
 export default async function handler(req, res) {
   const user = await requireAuth(req, res);
@@ -8,16 +8,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, message: "Method Not Allowed" });
   }
   try {
-    const AppLog = await getAppLogModel();
-    const agg = await AppLog.aggregate([
-      { $group: { _id: "$source", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 200 },
-    ]);
-    const data = agg.map((d) => ({ source: d._id, count: d.count }));
+    const data = await listFiles();
     return res.status(200).json({ success: true, data });
   } catch (err) {
-    console.error("[logs] sources error", err.message);
+    console.error("[logs] files error", err.message);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 }

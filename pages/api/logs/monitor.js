@@ -1,5 +1,5 @@
 import { requireAuth, isLoopback } from "../../../src/lib/requireLogAuth";
-import { startLogMonitor, getLogMonitorStatus } from "../../../src/lib/pm2LogMonitor";
+import { startFileWatcher, getReaderStatus } from "../../../src/lib/pm2LogFileReader";
 
 export default async function handler(req, res) {
   // server.js calls this on boot from localhost to avoid an auth dependency.
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       const user = await requireAuth(req, res);
       if (!user) return;
     }
-    const status = await startLogMonitor();
+    const status = await startFileWatcher();
     const safe = { ...status };
     delete safe.dir;
     return res.status(200).json({ success: true, ...safe });
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     const user = await requireAuth(req, res);
     if (!user) return;
-    const st = getLogMonitorStatus();
+    const st = getReaderStatus();
     delete st.dir;
     return res.status(200).json({ success: true, ...st });
   }
