@@ -4,27 +4,19 @@ import {
   Button,
   TextField,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Typography,
   Snackbar,
   Alert,
-  Checkbox,
-  IconButton,
-  Pagination,
 } from "@mui/material";
-import { MdDelete } from "react-icons/md";
 
 const LEVELS = ["", "debug", "info", "warn", "error", "fatal"];
 const TYPES = ["", "out", "error"];
+const PAGE_SIZE = 100;
 const ENV_TABS = [
   { key: "all", label: "All" },
   { key: "production", label: "Production" },
   { key: "staging", label: "Staging" },
 ];
-const PAGE_SIZE = 50;
 
 function fmtDate(value) {
   if (!value) return "-";
@@ -53,17 +45,24 @@ function toIso(localValue) {
   return Number.isNaN(d.getTime()) ? "" : d.toISOString();
 }
 
+function resolveSources(fileList, tab, singleSource) {
+  if (singleSource) return [singleSource];
+  if (tab === "production" || tab === "staging") {
+    const isStage = tab === "staging";
+    return (fileList || []).filter((s) =>
+      isStage ? /staging/i.test(s) : !/staging/i.test(s)
+    );
+  }
+  return [];
+}
+
 const LogDashboardComp = () => {
   const [rows, setRows] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [live, setLive] = useState(false);
-  const [selected, setSelected] = useState([]);
   const [envTab, setEnvTab] = useState("all");
-  const [sourceOptions, setSourceOptions] = useState([]);
-
+  const [fileSources, setFileSources] = useState([]);
   const [filters, setFilters] = useState({
     start: "",
     end: "",
@@ -72,53 +71,47 @@ const LogDashboardComp = () => {
     type: "",
     search: "",
   });
-  const [confirm, setConfirm] = useState(null); // {mode:'single'|'bulk'|'range', id?, range?}
   const [snack, setSnack] = useState({ open: false, msg: "", severity: "success" });
+
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
-  const pageRef = useRef(page);
-  pageRef.current = page;
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
   const envTabRef = useRef(envTab);
   envTabRef.current = envTab;
-  const srcOptsRef = useRef(sourceOptions);
-  srcOptsRef.current = sourceOptions;
+  const filesRef = useRef(fileSources);
+  filesRef.current = fileSources;
+  const offsetRef = useRef(0);
+  offsetRef.current = rows.length;
 
-  const hasActiveFilters = () =>
-    envTabRef.current !== "all" ||
-    Object.values(filtersRef.current).some((v) => String(v || "").trim() !== "");
-  const fetchLogs = useCallback(async (targetPage) => {
+
+  const load = useCallback(async (reset) => {
     setLoading(true);
     try {
-      const p = new URLSearchParams();
       const f = filtersRef.current;
-      p.set("page", String(targetPage || 1));
+      const p = new URLSearchParams();
+      p.set("offset", String(reset ? 0 : rowsRef.current.length));
       p.set("pageSize", String(PAGE_SIZE));
       if (f.level) p.set("level", f.level);
       if (f.type) p.set("type", f.type);
-      if (f.source) p.set("source", f.source);
       if (f.search) p.set("search", f.search);
+      const eff = resolveSources(
+        filesRef.current,
+        envTabRef.current,
+        String(filtersRef.current.source || "").trim(),
+      );
+      if (eff.length) p.set("sources", eff.join(","));
+      else if (envTabRef.current !== "all") p.set("sources", "__none__");
       const startIso = toIso(f.start);
       const endIso = toIso(f.end);
       if (startIso) p.set("start", startIso);
       if (endIso) p.set("end", endIso);
-      const tab = envTabRef.current;
-      if (tab === "production" || tab === "staging") {
-        const isStage = tab === "staging";
-        const list = (srcOptsRef.current || [])
-          .filter((s) =>
-            isStage ? /staging/i.test(s.source) : !/staging/i.test(s.source)
-          )
-          .map((s) => s.source);
-        p.set("sources", list.length ? list.join(",") : "__none__");
-      }
-      const res = await fetch(`/api/logs?${p.toString()}`);
+      const res = await fetch(`/api/logs/entries?${p.toString()}`);
       const json = await res.json();
       if (json.success) {
-        setRows(json.data || []);
-        setTotal(json.total || 0);
-        setPage(json.page || 1);
-        setTotalPages(json.totalPages || 0);
-        setSelected([]);
+        const incoming = json.data || [];
+        setRows((prev) => (reset ? incoming : [...prev, ...incoming]));
+        setHasMore(!!json.hasMore);
       } else {
         setSnack({ open: true, msg: json.message || "Failed to load logs", severity: "error" });
       }
@@ -130,40 +123,29 @@ const LogDashboardComp = () => {
   }, []);
 
   useEffect(() => {
-    fetchLogs(1);
+    load(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    fetch("/api/logs/sources")
+    fetch("/api/logs/files")
       .then((r) => r.json())
       .then((j) => {
-        if (j && j.success) setSourceOptions(j.data || []);
+        if (j && j.success) {
+          const seen = [];
+          (j.data || []).forEach((f) => {
+            if (!seen.includes(f.source)) seen.push(f.source);
+          });
+          setFileSources(seen);
+        }
       })
       .catch(() => {});
   }, []);
 
-  const handlePageChange = (event, value) => {
-    fetchLogs(value);
-  };
-
-  const setFilter = (key, value) =>
-    setFilters((prev) => ({ ...prev, [key]: value }));
-
-  const applyFilters = () => {
-    fetchLogs(1);
-  };
-
-  const clearFilters = () => {
-    setFilters({ start: "", end: "", level: "", source: "", type: "", search: "" });
-    setEnvTab("all");
-    fetchLogs(1);
-  };
-
   useEffect(() => {
     const es = new EventSource("/api/logs/stream");
     es.onopen = () => setLive(true);
-    es.onerror = () => setLive(false); // browser auto-reconnects
+    es.onerror = () => setLive(false);
     es.addEventListener("connected", () => setLive(true));
     es.addEventListener("log", (event) => {
       let doc;
@@ -172,74 +154,43 @@ const LogDashboardComp = () => {
       } catch (err) {
         return;
       }
-      if (!hasActiveFilters() && pageRef.current === 1) {
-        setRows((prev) => [doc, ...prev].slice(0, PAGE_SIZE));
-        setTotal((prev) => prev + 1);
-        setTotalPages((prev) => Math.ceil((prev * PAGE_SIZE + 1) / PAGE_SIZE));
+      const filtersActive =
+        envTabRef.current !== "all" ||
+        Object.values(filtersRef.current).some(
+          (v) => String(v || "").trim() !== ""
+        );
+      if (!filtersActive && rowsRef.current.length <= PAGE_SIZE) {
+        const row = { ...doc, id: Date.now() + "-" + Math.random() };
+        setRows((prev) => [row, ...prev].slice(0, PAGE_SIZE));
       }
     });
     return () => es.close();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const doDelete = async () => {
-    if (!confirm) return;
-    const c = confirm;
-    setConfirm(null);
-    try {
-      let res;
-      if (c.mode === "single") {
-        res = await fetch(`/api/logs/${c.id}`, { method: "DELETE" });
-      } else if (c.mode === "bulk") {
-        res = await fetch("/api/logs/bulk", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: selected }),
-        });
-      } else if (c.mode === "range") {
-        res = await fetch("/api/logs/range", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(c.range),
-        });
-      }
-      const json = await res.json();
-      const ok = json && json.success;
-      setSnack({
-        open: true,
-        msg: ok ? `Deleted ${json.deletedCount || 0} log(s)` : (json && json.message) || "Delete failed",
-        severity: ok ? "success" : "error",
-      });
-      if (ok) fetchLogs(pageRef.current);
-    } catch (err) {
-      setSnack({ open: true, msg: "Error deleting logs", severity: "error" });
-    }
+  const loadOlder = () => load(false);
+
+  const setFilter = (key, value) =>
+    setFilters((prev) => ({ ...prev, [key]: value }));
+
+  const switchEnv = (key) => {
+    setEnvTab(key);
+    setFilter("source", "");
+    load(true);
   };
 
-  const toggleRow = (id) =>
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+  const applyFilters = () => load(true);
 
-  const toggleAll = () =>
-    setSelected((prev) =>
-      prev.length === rows.length ? [] : rows.map((r) => r.id)
-    );
-
-  const askRangeDelete = () => {
-    const startIso = toIso(filters.start);
-    const endIso = toIso(filters.end);
-    if (!startIso || !endIso) {
-      setSnack({ open: true, msg: "Set both start and end date to delete a range", severity: "warning" });
-      return;
-    }
-    setConfirm({ mode: "range", range: { start: startIso, end: endIso } });
+  const clearFilters = () => {
+    setEnvTab("all");
+    setFilters({ start: "", end: "", level: "", source: "", type: "", search: "" });
+    load(true);
   };
 
   return (
     <div className="container py-4">
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap">
-        <Typography variant="h5">Log Dashboard</Typography>
+        <Typography variant="h5">Log Dashboard (live from PM2 files)</Typography>
         <Box display="flex" alignItems="center" gap={1}>
           <span
             style={{
@@ -261,10 +212,7 @@ const LogDashboardComp = () => {
             key={t.key}
             size="small"
             variant={envTab === t.key ? "contained" : "outlined"}
-            onClick={() => {
-              setEnvTab(t.key);
-              fetchLogs(1);
-            }}
+            onClick={() => switchEnv(t.key)}
           >
             {t.label}
           </Button>
@@ -295,60 +243,35 @@ const LogDashboardComp = () => {
             <MenuItem key={t} value={t}>{t || "All types"}</MenuItem>
           ))}
         </TextField>
-        <TextField size="small" label="Process" value={filters.source}
-          onChange={(e) => setFilter("source", e.target.value)} style={{ minWidth: 140 }} />
+        <TextField select size="small" label="Process" value={filters.source}
+          onChange={(e) => setFilter("source", e.target.value)} style={{ minWidth: 150 }}>
+          <MenuItem value="">All processes</MenuItem>
+          {fileSources.map((s) => (
+            <MenuItem key={s} value={s}>{s}</MenuItem>
+          ))}
+        </TextField>
         <TextField size="small" label="Search message" value={filters.search}
           onChange={(e) => setFilter("search", e.target.value)} style={{ minWidth: 180 }} />
         <Button variant="contained" size="small" onClick={applyFilters}>Search</Button>
         <Button variant="outlined" size="small" onClick={clearFilters}>Clear</Button>
       </Box>
-      <Box mb={2} display="flex" alignItems="center" gap={1} flexWrap="wrap">
-        <Typography variant="body2" color="textSecondary">
-          {total} total · {selected.length} selected
-        </Typography>
-        <Button
-          variant="contained"
-          color="error"
-          size="small"
-          disabled={!selected.length}
-          onClick={() => setConfirm({ mode: "bulk" })}
-        >
-          Delete Selected
-        </Button>
-        <Button variant="outlined" color="error" size="small" onClick={askRangeDelete}>
-          Delete by Date Range
-        </Button>
-      </Box>
+      <Typography variant="caption" color="textSecondary">
+        Date filtering is approximate (file modification time is used when a line has no timestamp).
+      </Typography>
       <div style={{ overflowX: "auto" }}>
         <table className="table table-sm table-striped align-middle">
           <thead className="table-light">
             <tr>
-              <th style={{ width: 36 }}>
-                <Checkbox
-                  size="small"
-                  indeterminate={selected.length > 0 && selected.length < rows.length}
-                  checked={rows.length > 0 && selected.length === rows.length}
-                  onChange={toggleAll}
-                />
-              </th>
               <th>Timestamp</th>
               <th>Level</th>
               <th>Process</th>
               <th>Type</th>
               <th>Message</th>
-              <th style={{ width: 70 }} />
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Checkbox
-                    size="small"
-                    checked={selected.includes(row.id)}
-                    onChange={() => toggleRow(row.id)}
-                  />
-                </td>
                 <td style={{ whiteSpace: "nowrap" }}>{fmtDate(row.timestamp)}</td>
                 <td>
                   <span
@@ -365,21 +288,12 @@ const LogDashboardComp = () => {
                 </td>
                 <td style={{ whiteSpace: "nowrap" }}>{row.source}</td>
                 <td>{row.type}</td>
-                <td title={row.message}>{truncate(row.message, 120)}</td>
-                <td>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => setConfirm({ mode: "single", id: row.id })}
-                  >
-                    <MdDelete />
-                  </IconButton>
-                </td>
+                <td title={row.message}>{truncate(row.message, 160)}</td>
               </tr>
             ))}
             {!rows.length && !loading && (
               <tr>
-                <td colSpan={7} className="text-center text-muted py-4">
+                <td colSpan={5} className="text-center text-muted py-4">
                   No logs found.
                 </td>
               </tr>
@@ -392,31 +306,13 @@ const LogDashboardComp = () => {
           Loading…
         </Typography>
       )}
-      {totalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={2}>
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-          />
+      {hasMore && !loading && (
+        <Box display="flex" justifyContent="center" mt={2} mb={2}>
+          <Button variant="outlined" size="small" onClick={loadOlder}>
+            Load older logs
+          </Button>
         </Box>
       )}
-      <Dialog open={!!confirm} onClose={() => setConfirm(null)} maxWidth="xs">
-        <DialogTitle>Delete logs</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            Are you sure? This permanently deletes the selected logs from MongoDB.
-            The underlying PM2 log files are not touched.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirm(null)}>Cancel</Button>
-          <Button color="error" variant="contained" onClick={doDelete}>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Snackbar open={snack.open} autoHideDuration={4000}
         onClose={() => setSnack((s) => ({ ...s, open: false }))}>
         <Alert severity={snack.severity}
