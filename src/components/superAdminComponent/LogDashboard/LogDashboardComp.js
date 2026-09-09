@@ -19,6 +19,11 @@ import { MdDelete } from "react-icons/md";
 
 const LEVELS = ["", "debug", "info", "warn", "error", "fatal"];
 const TYPES = ["", "out", "error"];
+const ENV_TABS = [
+  { key: "all", label: "All" },
+  { key: "production", label: "Production" },
+  { key: "staging", label: "Staging" },
+];
 const PAGE_SIZE = 50;
 
 function fmtDate(value) {
@@ -56,6 +61,8 @@ const LogDashboardComp = () => {
   const [loading, setLoading] = useState(false);
   const [live, setLive] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [envTab, setEnvTab] = useState("all");
+  const [sourceOptions, setSourceOptions] = useState([]);
 
   const [filters, setFilters] = useState({
     start: "",
@@ -71,8 +78,13 @@ const LogDashboardComp = () => {
   filtersRef.current = filters;
   const pageRef = useRef(page);
   pageRef.current = page;
+  const envTabRef = useRef(envTab);
+  envTabRef.current = envTab;
+  const srcOptsRef = useRef(sourceOptions);
+  srcOptsRef.current = sourceOptions;
 
   const hasActiveFilters = () =>
+    envTabRef.current !== "all" ||
     Object.values(filtersRef.current).some((v) => String(v || "").trim() !== "");
   const fetchLogs = useCallback(async (targetPage) => {
     setLoading(true);
@@ -89,6 +101,16 @@ const LogDashboardComp = () => {
       const endIso = toIso(f.end);
       if (startIso) p.set("start", startIso);
       if (endIso) p.set("end", endIso);
+      const tab = envTabRef.current;
+      if (tab === "production" || tab === "staging") {
+        const isStage = tab === "staging";
+        const list = (srcOptsRef.current || [])
+          .filter((s) =>
+            isStage ? /staging/i.test(s.source) : !/staging/i.test(s.source)
+          )
+          .map((s) => s.source);
+        p.set("sources", list.length ? list.join(",") : "__none__");
+      }
       const res = await fetch(`/api/logs?${p.toString()}`);
       const json = await res.json();
       if (json.success) {
@@ -112,6 +134,15 @@ const LogDashboardComp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    fetch("/api/logs/sources")
+      .then((r) => r.json())
+      .then((j) => {
+        if (j && j.success) setSourceOptions(j.data || []);
+      })
+      .catch(() => {});
+  }, []);
+
   const handlePageChange = (event, value) => {
     fetchLogs(value);
   };
@@ -125,6 +156,7 @@ const LogDashboardComp = () => {
 
   const clearFilters = () => {
     setFilters({ start: "", end: "", level: "", source: "", type: "", search: "" });
+    setEnvTab("all");
     fetchLogs(1);
   };
 
@@ -223,6 +255,21 @@ const LogDashboardComp = () => {
           </Typography>
         </Box>
       </div>
+      <Box mb={2} display="flex" gap={1}>
+        {ENV_TABS.map((t) => (
+          <Button
+            key={t.key}
+            size="small"
+            variant={envTab === t.key ? "contained" : "outlined"}
+            onClick={() => {
+              setEnvTab(t.key);
+              fetchLogs(1);
+            }}
+          >
+            {t.label}
+          </Button>
+        ))}
+      </Box>
       <Box mb={2} style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
         <input
           type="datetime-local"

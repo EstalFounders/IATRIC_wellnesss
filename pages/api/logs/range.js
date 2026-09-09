@@ -1,5 +1,4 @@
-import { dbConnect } from "../../../src/lib/db";
-import AppLog from "../../../src/models/appLogSchema";
+import { getAppLogModel } from "../../../src/lib/logDb";
 import { requireAuth } from "../../../src/lib/requireLogAuth";
 import { logErrorToGoogleSheet } from "../helper";
 
@@ -19,6 +18,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: "start must be <= end" });
   }
   try {
+    const AppLog = await getAppLogModel();
     const result = await AppLog.deleteMany({ timestamp: { $gte: start, $lte: end } });
     return res.status(200).json({ success: true, deletedCount: result.deletedCount });
   } catch (err) {

@@ -1,5 +1,4 @@
-import { dbConnect } from "../../../src/lib/db";
-import AppLog from "../../../src/models/appLogSchema";
+import { getAppLogModel } from "../../../src/lib/logDb";
 import { requireAuth } from "../../../src/lib/requireLogAuth";
 import mongoose from "mongoose";
 import { logErrorToGoogleSheet } from "../helper";
@@ -17,6 +16,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, deletedCount: 0 });
   }
   try {
+    const AppLog = await getAppLogModel();
     const result = await AppLog.deleteMany({ _id: { $in: valid } });
     return res.status(200).json({ success: true, deletedCount: result.deletedCount });
   } catch (err) {
