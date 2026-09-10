@@ -7,7 +7,7 @@ import { parseTimestamp, detectLevel, splitLines } from "./logParser";
 
 const LOG_DIR = process.env.PM2_LOG_PATH || path.join(os.homedir(), ".pm2", "logs");
 const ENABLED = process.env.LOG_MONITOR_ENABLED === "true";
-const TAIL_LIMIT = parseInt(process.env.LOG_FILE_TAIL_LIMIT || "2000", 10) || 2000;
+const TAIL_LIMIT = parseInt(process.env.LOG_FILE_TAIL_LIMIT || "5000", 10) || 5000;
 const SCAN_MS = parseInt(process.env.LOG_SCAN_INTERVAL_MS || "10000", 10) || 10000;
 const SELF_MARKER = "[log-monitor]";
 const ALLOWED_SOURCES = new Set(
@@ -69,7 +69,8 @@ async function readTail(file, limit) {
     }
     const lines = buf.split("\n");
     lines.pop();
-    return newlines >= limit ? lines.slice(-limit) : lines;
+    const truncated = newlines >= limit;
+    return { lines: truncated ? lines.slice(-limit) : lines, truncated };
   } finally {
     await fh.close();
   }
@@ -113,8 +114,8 @@ export async function queryEntries(opts) {
     search = "",
     startMs = 0,
     endMs = 0,
-    offset = 0,
-    limit = 100,
+    page = 1,
+    pageSize = 100,
   } = opts;
   const all = [];
   const files = (await listFilePaths()).filter((f) => {
@@ -125,25 +126,33 @@ export async function queryEntries(opts) {
     return true;
   });
   const searchLower = search.toLowerCase();
+  let windowTruncated = false;
   for (const file of files) {
     const info = fileInfo(file);
     const st = await statOrNull(file);
     if (!st) continue;
-    const lines = await readTail(file, TAIL_LIMIT);
+    // Whole file is older than the requested start - skip reading it.
+    if (startMs && st.mtimeMs < startMs) continue;
+    const { lines, truncated } = await readTail(file, TAIL_LIMIT);
+    if (truncated) windowTruncated = true;
     for (const raw of lines) {
+      const text = String(raw == null ? "" : raw).trim();
+      if (!text) continue;
       const entry = makeEntry(raw, info.source, info.type, st.mtimeMs);
       if (!entry) continue;
       if (level && entry.level !== level) continue;
-      if (searchLower && entry.message.toLowerCase().indexOf(searchLower) === -1) continue;
+      if (searchLower && text.toLowerCase().indexOf(searchLower) === -1) continue;
       if (startMs && entry.timestamp.getTime() < startMs) continue;
       if (endMs && entry.timestamp.getTime() > endMs) continue;
       all.push(entry);
     }
   }
   all.sort((a, b) => b.timestamp - a.timestamp || a.source.localeCompare(b.source));
-  const start = Math.max(0, offset);
-  const page = all.slice(start, start + limit);
-  const data = page.map((e, i) => ({
+  const total = all.length;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const start = Math.max(0, (page - 1) * pageSize);
+  const pageRows = all.slice(start, start + pageSize);
+  const data = pageRows.map((e, i) => ({
     id: e.source + "|" + e.type + "|" + (start + i),
     timestamp: e.timestamp.toISOString(),
     level: e.level,
@@ -151,7 +160,7 @@ export async function queryEntries(opts) {
     type: e.type,
     message: e.message,
   }));
-  return { data, hasMore: start + limit < all.length };
+  return { data, total, page, pageSize, totalPages, windowTruncated };
 }
 
 async function readAppended(file, pos) {
