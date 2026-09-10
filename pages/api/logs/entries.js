@@ -19,8 +19,8 @@ export default async function handler(req, res) {
       .slice(0, 50);
     const type = TYPES.includes(String(q.type || "")) ? String(q.type) : "";
     const level = LEVELS.includes(String(q.level || "")) ? String(q.level) : "";
-    const offset = Math.max(0, parseInt(q.offset || "0", 10) || 0);
-    const limit = Math.min(200, Math.max(1, parseInt(q.pageSize || "100", 10) || 100));
+    const page = Math.max(1, parseInt(q.page || "1", 10) || 1);
+    const pageSize = Math.min(200, Math.max(1, parseInt(q.pageSize || "100", 10) || 100));
     let startMs = 0;
     let endMs = 0;
     if (q.start) {
@@ -38,8 +38,8 @@ export default async function handler(req, res) {
       search: String(q.search || ""),
       startMs,
       endMs,
-      offset,
-      limit,
+      page,
+      pageSize,
     });
     return res.status(200).json({ success: true, ...result });
   } catch (err) {
