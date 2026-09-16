@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { ConsultationButton } from "../Common/commonUi";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Demo5About6 = () => {
+  const { t } = useLanguage();
   return (
     <section id="about-6" className="about-section division mt-5">
       <div className="container">
@@ -13,24 +15,20 @@ const Demo5About6 = () => {
             <div className="txt-block pc-30">
               {/* Section ID */}
               <span className="section-id blue-color">
-                <h4>Best Practices</h4>
+                <h4>{t("about6.tag")}</h4>
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
-                Clinic with Innovative Approach to Treatment
+                {t("about6.title")}
               </h3>
               {/* CONTENT BOX #1 */}
               <div className="h5 box-list grey-color">
-                Skip the long wait times and crowded waiting rooms. Access
-                professional healthcare consultations from the comfort of your
-                home, office, or anywhere with an internet connection. Our
-                flexible scheduling options allow you to fit healthcare into
-                your busy life, at your own pace.
+                {t("about6.text")}
               </div>
               {/* Button */}
               <div className="w-50 mr-auto mt-5">
                 <ConsultationButton path={"/all-doctors"}>
-                  Meet the Doctors
+                  {t("about6.cta")}
                 </ConsultationButton>
               </div>
             </div>

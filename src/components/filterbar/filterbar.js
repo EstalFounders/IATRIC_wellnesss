@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Dropdown from "./filterDropdown";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const FilterBar = ({ selectFilter }) => {
+  const { t } = useLanguage();
   const updateSelectedOption = (option) => {
     selectFilter(option);
   };
@@ -12,38 +14,38 @@ const FilterBar = ({ selectFilter }) => {
         {/* Search Input */}
         <input
           type="text"
-          placeholder="Search by Doctor Name"
+          placeholder={t("doctors.searchPlaceholder")}
           id="searchInput"
           className="filter-input mr-4 rounded p-1"
         />
         <Dropdown
-          label="Sort"
-          options={["Experience: High to low", "Earliest Availability"]}
+          label={t("doctors.filterSort")}
+          options={[t("doctors.optExperience"), t("doctors.optEarliest")]}
           selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Speciality"
+          label={t("doctors.filterSpeciality")}
           options={["Option 1", "Option 2", "Option 3"]}
           selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Location"
+          label={t("doctors.filterLocation")}
           options={["Option 1", "Option 2", "Option 3"]}
           selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Availability"
-          options={["Today"]}
+          label={t("doctors.filterAvailability")}
+          options={[t("doctors.optToday")]}
           selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Consultation Type"
-          options={["In Clinic", "Video Consultation"]}
+          label={t("doctors.filterConsultationType")}
+          options={[t("doctors.optInClinic"), t("doctors.optVideo")]}
           selectFilter={updateSelectedOption}
         />
         <Dropdown
-          label="Gender"
-          options={["Female", "Male"]}
+          label={t("doctors.filterGender")}
+          options={[t("doctors.optFemale"), t("doctors.optMale")]}
           selectFilter={updateSelectedOption}
         />
       </div>

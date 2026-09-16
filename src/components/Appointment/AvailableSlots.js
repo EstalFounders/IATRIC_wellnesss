@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { formatData } from "../registerDocComponent/utils/helper";
 import { extractDate, formatTime } from "../helper";
 
 const AvailableSlots = ({ slots, selectSlot, onBookSlot, message }) => {
     const [loader, setLoader] = useState(false)
+    const { t } = useLanguage();
 
     const bookSlot = () => {
         onBookSlot()
@@ -18,7 +20,7 @@ const AvailableSlots = ({ slots, selectSlot, onBookSlot, message }) => {
               <div className="card shadow-lg border-0">
                 <div className="card-body">
                   <div className="card-text text-secondary">
-                    <strong>Date:</strong> {extractDate(slot.startTime)}
+                    <strong>{t("avs.date")}</strong> {extractDate(slot.startTime)}
                   </div>
                   <div
                     className="card-text d-flex justify-content-between align-items-center"
@@ -40,7 +42,7 @@ const AvailableSlots = ({ slots, selectSlot, onBookSlot, message }) => {
                     }}
                     onClick={() => handleSlotSelection(slot)}
                   >
-                    <span style={{ fontWeight: "bold" }}>Time:</span>{" "}
+                    <span style={{ fontWeight: "bold" }}>{t("avs.time")}</span>{" "}
                     {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                   </div>
                   <div className="d-flex justify-content-between">
@@ -48,13 +50,13 @@ const AvailableSlots = ({ slots, selectSlot, onBookSlot, message }) => {
                       className="btn btn-success"
                       onClick={bookSlot}
                     >
-                      Book
+                      {t("avs.book")}
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={() => selectSlot(slot)}
                     >
-                      Select
+                      {t("avs.select")}
                     </button>
                   </div>
                 </div>

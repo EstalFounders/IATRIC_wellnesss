@@ -14,6 +14,7 @@ import { IoMdCall } from "react-icons/io";
 import { BiSolidClinic } from "react-icons/bi";
 import { useRouter } from "next/router";
 import { color_schema } from "../../constant";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const StyledDialog = styled(Dialog)`
   min-width: 300px;
@@ -28,6 +29,7 @@ const StyledListItem = styled(ListItem)`
 const PopupDialog = ({ isOpen, onClose, options }) => {
   const router = useRouter();
   const theme = useTheme();
+  const { t } = useLanguage();
   const numberToIcon = {
     0: FiPhoneCall, 
     1: FaWhatsapp,
@@ -47,7 +49,7 @@ const PopupDialog = ({ isOpen, onClose, options }) => {
     <ThemeProvider theme={theme}>
       <StyledDialog open={isOpen} onClose={onClose}>
         <DialogTitle className="bg-green-gradient text-white">
-          <b>Choose an option</b>
+          <b>{t("popup.choose")}</b>
         </DialogTitle>
         <List>
           {options

@@ -1,17 +1,19 @@
 import React, { useRef } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { healthConcerns } from "../../../data/HealthConcern";
 import { HorizontalScrollContainer } from "../labTestComponent/common/HorizontalContainer";
 import { ConsultationButton } from "../Common/commonUi";
 import { booking_btn_txt } from "../../constant";
 
 const CommonHealthConcerns = () => {
+  const { t } = useLanguage();
   return (
     <div className="container py-5">
       <h3 className="h3-md text-dark text-center">
-        Common Health Concerns
+        {t("chc.title")}
       </h3>
       <div className="text-muted text-center text-md-start mb-4">
-        Consult a doctor online for any health issue
+        {t("chc.sub")}
       </div>
       <div className="row">
         <HorizontalScrollContainer>

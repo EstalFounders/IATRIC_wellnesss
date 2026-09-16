@@ -1,6 +1,9 @@
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { richText } from "../../i18n/richText";
 
 const WhoWeAreInfo1 = () => {
+  const { t } = useLanguage();
   return (
     <section id="info-1" className="wide-60 info-section division">
       <div className="container">
@@ -26,34 +29,18 @@ const WhoWeAreInfo1 = () => {
             >
               {/* Section ID */}
               <span className="section-id blue-color">
-                <h5>Welcome to HealthPath</h5>
+                <h5>{t("about.video.welcome")}</h5>
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
-                Who We Are: Your Pan-India Healthcare Partner
+                {t("about.video.title")}
               </h3>
               {/* Text */}
-              <p className="h5 box-list grey-color">
-                At Health Path, we understand that managing your family&apos;s health
-                can be a challenge in today&apos;s fast-paced world. That&apos;s why we&apos;ve
-                built a comprehensive healthcare network designed to be your
-                trusted partner across <b>all of India.</b> Our dedicated team
-                of
-                <b>qualified doctors</b> and healthcare professionals is
-                committed to making health a priority for you and your loved
-                ones, no matter where you are or how busy your schedule.
-              </p>
+              <p className="h5 box-list grey-color">{richText(t("about.video.p1"))}</p>
               <h4 className="h3-md steelblue-color">
-                Healthcare, Anywhere, Anytime
+                {t("about.video.h2")}
               </h4>
-              <p className="h5 box-list grey-color">
-                Gone are the days of hassle and long waits. With Health Path,
-                expert <b>medical consultation</b> is just a <b>call away</b>. We provide
-                <b>all-India healthcare consultations,</b> bringing quality medical
-                advice directly to you, whenever you need it. Our goal is to
-                simplify your healthcare journey, ensuring you get the care you
-                need without disrupting your hectic life.
-              </p>
+              <p className="h5 box-list grey-color">{richText(t("about.video.p2"))}</p>
               {/* End Options List */}
             </div>
           </div>

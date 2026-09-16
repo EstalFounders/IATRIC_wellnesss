@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import { ConsultationButton } from "../Common/commonUi";
+import { useLanguage } from "../../i18n/LanguageContext";
 import styles from "./css/appointmentPage.module.css";
 import { CHOOSE_TIME, IS_NOW, price_symbol } from "../../constant";
 import { formatTime } from "../helper";
@@ -46,6 +47,7 @@ const AppointmentForm = ({
   handleConsultationChange,
 }) => {
   const [selectedSymptom, setSelectedSymptom] = useState("");
+  const { t } = useLanguage();
 
   const handleDescriptionChange = (e) => {
     setter.setSymptoms(e.target.value);
@@ -84,7 +86,7 @@ const AppointmentForm = ({
     <div className="col-lg-8">
       <div className="txt-block pr-30">
         <Typography variant="h4" className={styles.makeAppointmentText}>
-          Make Appointment
+          {t("af.title")}
         </Typography>
 
         <form onSubmit={(e) => e.preventDefault()} className="appointment-form">
@@ -92,7 +94,7 @@ const AppointmentForm = ({
           <div style={{ display: "flex", justifyContent: "center" }}>
             <TextField
               className="w-50"
-              label="Name"
+              label={t("af.name")}
               variant="outlined"
               margin="normal"
               value={appointmentState.name}
@@ -102,7 +104,7 @@ const AppointmentForm = ({
 
           {/* Reason for consultation (common diseases + Other) */}
           <Typography variant="h6" mt={2} className="text-center">
-            Reason for Consultation
+            {t("af.reason")}
           </Typography>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <RadioGroup
@@ -121,7 +123,7 @@ const AppointmentForm = ({
             <FormControlLabel
               value={SYMPTOM_OTHER}
               control={<Radio />}
-              label="Other"
+              label={t("af.other")}
             />
             </RadioGroup>
           </div>
@@ -132,7 +134,7 @@ const AppointmentForm = ({
               className="w-50"
               multiline
               rows={1}
-              label="Describe your symptoms..."
+              label={t("af.symptoms")}
               variant="outlined"
               margin="normal"
               value={appointmentState.symptoms}
@@ -145,7 +147,7 @@ const AppointmentForm = ({
           <div style={{ display: "flex", justifyContent: "center" }}>
             <TextField
               className="w-50"
-              label="Mobile Number"
+              label={t("af.mobile")}
               variant="outlined"
               type="tel"
               margin="normal"
@@ -157,7 +159,7 @@ const AppointmentForm = ({
 
           {/* Consultation Type - Dynamically from Services */}
           <Typography variant="h6" mt={3} className="text-center">
-            Consultation Type
+            {t("af.consultType")}
           </Typography>
           <RadioGroup
             row
@@ -201,7 +203,7 @@ const AppointmentForm = ({
 
           {/* When */}
           <Typography variant="h6" mt={2} className="text-center">
-            When?
+            {t("af.when")}
           </Typography>
           <RadioGroup
             row
@@ -209,11 +211,11 @@ const AppointmentForm = ({
             onChange={handleTimeSelection}
             style={{ justifyContent: "center", marginBottom: "12px" }}
           >
-            <FormControlLabel value={IS_NOW} control={<Radio />} label="Now" />
+            <FormControlLabel value={IS_NOW} control={<Radio />} label={t("af.now")} />
             <FormControlLabel
               value={CHOOSE_TIME}
               control={<Radio />}
-              label="Choose Time"
+              label={t("af.chooseTime")}
             />
           </RadioGroup>
 
@@ -254,7 +256,7 @@ const AppointmentForm = ({
                     }}
                   >
                     <option value="" disabled>
-                      Select a time slot
+                      {t("af.selectSlot")}
                     </option>
                     {futureSlots.map((slot) => (
                       <option key={slot._id} value={slot._id}>
@@ -264,7 +266,7 @@ const AppointmentForm = ({
                   </select>
                 ) : (
                   <Typography variant="body2" color="textSecondary">
-                    No slots available for the selected date.
+                    {t("af.noSlots")}
                   </Typography>
                 );
               })()}
@@ -299,12 +301,12 @@ const AppointmentForm = ({
                   size="small"
                 />
               }
-              label="I have read and agree to the Terms & Conditions"
+              label={t("af.terms")}
             />
-            <Tooltip title="View Terms & Conditions">
+            <Tooltip title={t("af.viewTerms")}>
               <IconButton
                 size="small"
-                aria-label="View Terms & Conditions"
+                aria-label={t("af.viewTerms")}
                 onClick={() => window.open("/terms-of-service", "_blank")}
               >
                 <Visibility fontSize="small" />
@@ -315,7 +317,7 @@ const AppointmentForm = ({
           {/* Submit */}
           <Box mt={4} mb={4} display="flex" justifyContent="center">
             <ConsultationButton onClick={sendWhatsAppConfirmation}>
-              {appointmentState.isLoading ? "Loading..." : "Consult"}
+              {appointmentState.isLoading ? t("af.loading") : t("af.consult")}
             </ConsultationButton>
           </Box>
         </form>

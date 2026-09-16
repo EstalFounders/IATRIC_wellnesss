@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { api } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   // Refs and state for OTP input
@@ -12,6 +13,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   const [generatedOtp, setGeneratedOtp] = useState(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState("");
+  const { t } = useLanguage();
 
   // Generate OTP and send on load
   useEffect(() => {
@@ -96,14 +98,14 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   const handleSubmit = () => {
     const enteredCode = otp.join("");
     if (enteredCode.length !== 6) {
-      alert("Please enter all 6 digits.");
+      alert(t("otp.errDigits"));
       return; 
     }
     if (enteredCode === "000000" || enteredCode === generatedOtp) {
       console.log("OTP verified successfully:", enteredCode);
       onConfirm(); // Proceed
     } else {
-      alert("Invalid OTP entered.");
+      alert(t("otp.errInvalid"));
     }
   };
 
@@ -125,13 +127,12 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
         {/* Header */}
         <div className="text-center text-primary mb-2 h1 font-bold">
           <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
-            Verification Code
+            {t("otp.title")}
           </span>
         </div>
         <div className="text-sm text-center text-gray-600 mb-3">
           <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
-            We have sent you a code on your WhatsApp. Please check and enter it
-            below.
+            {t("otp.subtitle")}
           </span>
         </div>
 
@@ -160,7 +161,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
         {/* Resend */}
         <div className="text-center text-sm text-gray-500 mb-4">
           <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
-            Didn’t receive the code?{" "}
+            {t("otp.noCode")}{" "}
           </span>
           <button
             className={`font-semibold ${
@@ -180,7 +181,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
               transition: "background-color 0.3s ease",
             }}
           >
-            Resend{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
+            {t("otp.resend")}{resendCooldown > 0 ? ` (${resendCooldown}s)` : ""}
           </button>
         </div>
         {error && (
@@ -201,7 +202,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
         {/* Submit */}
         <div className="text-center w-50 ml-auto mr-auto mb-3">
           <ConsultationButton onClick={handleSubmit} className="mb-4">
-            Verify
+            {t("otp.verify")}
           </ConsultationButton>
         </div>
       </div>

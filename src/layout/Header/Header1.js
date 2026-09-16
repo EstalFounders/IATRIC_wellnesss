@@ -20,10 +20,12 @@ import { getMedicineCartItems } from "../../components/medicines/common/CommonMe
 import { getLabTestCartItems } from "../../components/labTestComponent/common/CommonMethod";
 import { fetchConsultations } from "../../components/ApiService/UtilService";
 import { useDispatch, useSelector } from "react-redux";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useLanguage();
   const isLabTestPage = router.pathname.includes("/labTest");
   const isMedicinePage = router.pathname.includes("/medicine");
 
@@ -70,7 +72,7 @@ const Header1 = ({ scrollToContact }) => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", gap: 10 }}>
           <button
             onClick={() => toggleMobileMenu()}
-            aria-label="Open menu"
+            aria-label={t("nav.openMenu")}
             style={{
               background: "#3b5f1d",
               border: "none",
@@ -92,7 +94,7 @@ const Header1 = ({ scrollToContact }) => {
           </span>
 
           <ConsultationButton onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
-            {booking_btn_txt}
+            {t("common.bookNow")}
           </ConsultationButton>
         </div>
       </div>
@@ -104,7 +106,7 @@ const Header1 = ({ scrollToContact }) => {
             <div className="address clearfix">
               <span>
                 <a href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003" target="_blank" rel="noopener noreferrer">
-                  <span><FaMapMarkedAlt className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{address}</b></span>
+                  <span><FaMapMarkedAlt className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{t("footer.address", address)}</b></span>
                 </a>
               </span>
               <a href={`tel:${contact_no}`} className="callusbtn">
@@ -131,30 +133,30 @@ const Header1 = ({ scrollToContact }) => {
             </div>
               <nav className="wsmenu">
                 <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
-                  <li><Link legacyBehavior href="/"><a className="nav-link">Home</a></Link></li>
+                  <li><Link legacyBehavior href="/"><a className="nav-link">{t("nav.home")}</a></Link></li>
                   <li aria-haspopup="true">
-                    <a href="#">Pages <span className="wsarrow" /></a>
+                    <a href="#">{t("nav.pages")} <span className="wsarrow" /></a>
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title">Quick Links:</li>
-                            <li><Link legacyBehavior href="/about-us"><a>About Us</a></Link></li>
-                            <li><Link legacyBehavior href="/all-services"><a>Services</a></Link></li>
-                            <li><Link legacyBehavior href="/appointment"><a>Book Consultation</a></Link></li>
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            <li><Link legacyBehavior href="/about-us"><a>{t("nav.aboutUs")}</a></Link></li>
+                            <li><Link legacyBehavior href="/all-services"><a>{t("nav.services")}</a></Link></li>
+                            <li><Link legacyBehavior href="/appointment"><a>{t("nav.bookConsultation")}</a></Link></li>
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title" style={{ visibility: "hidden" }}>Quick Links:</li>
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
                             <li>
                               <span
                                 onClick={() => handleComingSoonClick("/medicine/homepage")}
                                 style={{ cursor: "pointer", display: "block", lineHeight: "18px", padding: "15px 0px", fontSize: "15px", fontWeight: 400, color: isComingSoon("/medicine/homepage") ? "#8e8333" : "#888" }}
                               >
-                                {isComingSoon("/medicine/homepage") ? "Medicines - Coming Soon 🚧" : "Medicines"}
+                                {isComingSoon("/medicine/homepage") ? t("nav.medicinesSoon") : t("nav.medicines")}
                               </span>
                             </li>
-                            <li><Link legacyBehavior href="/all-doctors"><a>All Doctors</a></Link></li>
-                            <li><Link legacyBehavior href="/join-us"><a>Join Us</a></Link></li>
+                            <li><Link legacyBehavior href="/all-doctors"><a>{t("nav.allDoctors")}</a></Link></li>
+                            <li><Link legacyBehavior href="/join-us"><a>{t("nav.joinUs")}</a></Link></li>
                           </ul>
                         </div>
                       </div>
@@ -165,16 +167,16 @@ const Header1 = ({ scrollToContact }) => {
                       onClick={() => handleComingSoonClick("/labTest/homepage")}
                       style={{ cursor: "pointer", display: "block", padding: "10px 32px 10px 18px", lineHeight: "50px", textDecoration: "none", position: "relative", color: isComingSoon("/labTest/homepage") ? "#8e8333" : "#000", fontSize: "17px", fontWeight: 600 }}
                     >
-                      {isComingSoon("/labTest/homepage") ? "Lab Test - Coming Soon 🚧" : "Lab Test"}
+                      {isComingSoon("/labTest/homepage") ? t("nav.labTestSoon") : t("nav.labTest")}
                     </span>
                   </li>
-                  <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">Blog</a></Link></li>
-                  <li><Link legacyBehavior href="/contacts-2"><a className="nav-link">Contact Us</a></Link></li>
+                  <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">{t("nav.blog")}</a></Link></li>
+                  <li><Link legacyBehavior href="/contacts-2"><a className="nav-link">{t("nav.contactUs")}</a></Link></li>
                 </ul>
               </nav>
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
-                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
+                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{t("common.bookNow")}</ConsultationButton>
               )}
               {isLabTestPage && cartItemCount > 0 && (
                 <div className="position-relative" onClick={togglePanel} role="button">

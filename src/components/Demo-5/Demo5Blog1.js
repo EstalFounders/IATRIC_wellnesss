@@ -1,7 +1,10 @@
 import Link from "next/link";
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { richText } from "../../i18n/richText";
 
 const Demo5Blog1 = () => {
+  const { t } = useLanguage();
   return (
     <section id="blog-1" className="wide-60 blog-section division">
       <div className="container h5 box-list grey-color">
@@ -9,15 +12,15 @@ const Demo5Blog1 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             <span className="section-id blue-color">
-              <h4>Your Hub for Health & Wellness Insights</h4>
+              <h4>{t("blog1.title")}</h4>
             </span>
             {/* Title 	*/}
             <h3 className="h3-md text-dark">
-              Our Stories, Tips &amp; Latest News
+              {t("blog1.heading")}
             </h3>
             {/* Text */}
             <div>
-              Welcome to Healthpath&apos;s dynamic content hub! This is where we share <strong>compelling patient success stories</strong>, provide <strong>actionable health tips</strong>, and keep you informed with the <strong>latest healthcare news and updates</strong>. We&apos;re dedicated to empowering you with valuable information to support your well-being journey.
+              {richText(t("blog1.intro"))}
             </div>
           </div>
         </div>
@@ -39,7 +42,7 @@ const Demo5Blog1 = () => {
                 {/* Post Title */}
                 <h5 className="h5-sm steelblue-color">
                   <Link legacyBehavior href="/single-post">
-                    <a>5 Benefits Of Integrative Medicine</a>
+                    <a>{t("blog1.post1")}</a>
                   </Link>
                 </h5>
                 {/* Post Data */}
@@ -73,7 +76,7 @@ const Demo5Blog1 = () => {
                 {/* Post Title */}
                 <h5 className="h5-sm steelblue-color">
                   <Link legacyBehavior href="/single-post">
-                    <a>Your Health Is In Your Hands</a>
+                    <a>{t("blog1.post2")}</a>
                   </Link>
                 </h5>
                 {/* Post Data */}
@@ -107,7 +110,7 @@ const Demo5Blog1 = () => {
                 {/* Post Title */}
                 <h5 className="h5-sm steelblue-color">
                   <Link legacyBehavior href="/single-post">
-                    <a>How Weather Impacts Your Health</a>
+                    <a>{t("blog1.post3")}</a>
                   </Link>
                 </h5>
                 {/* Post Data */}

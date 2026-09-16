@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { load } from "@cashfreepayments/cashfree-js";
 import { Typography, Box, CircularProgress } from "@mui/material";
 import { ConsultationButton } from "../Common/commonUi";
@@ -35,6 +36,7 @@ const PaymentModal = ({
   autoVerifyOrderId = null,
 }) => {
   const [isInitializing, setIsInitializing] = useState(false);
+  const { t } = useLanguage();
   const [initError, setInitError] = useState("");
   const [paymentState, setPaymentState] = useState("idle"); // idle | processing | verifying | success | failed | pending
   const [resultMessage, setResultMessage] = useState("");
@@ -68,14 +70,14 @@ const PaymentModal = ({
       const data = await res.json();
 
       if (!data.success) {
-        setInitError(data.message || "Unable to initialize payment. Please try again.");
+        setInitError(data.message || t("pm.initError"));
         setIsInitializing(false);
         return;
       }
 
       if (data.alreadyPaid) {
         setPaymentState("success");
-        setResultMessage("Payment successful. Your consultation has been confirmed.");
+        setResultMessage(t("pm.success"));
         if (onPaymentDone) onPaymentDone();
         return;
       }
@@ -129,7 +131,7 @@ const PaymentModal = ({
         initializedRef.current = false;
         setPaymentState("idle");
         setInitError(
-          "Your payment session has expired. Please click Pay again to refresh the session and complete your payment."
+          t("pm.expired")
         );
       } else {
         setInitError(
@@ -155,20 +157,20 @@ const PaymentModal = ({
 
         if (data.success && data.status === "PAID") {
           setPaymentState("success");
-          setResultMessage("Payment successful. Your consultation has been confirmed.");
+          setResultMessage(t("pm.success"));
           if (onPaymentDone) onPaymentDone();
           return;
         }
         if (data.status === "FAILED") {
           setPaymentState("failed");
-          setResultMessage("Payment failed. Your appointment has not been confirmed.");
+          setResultMessage(t("pm.failed"));
           setIsInitializing(false);
           initializedRef.current = false;
           return;
         }
         if (data.status === "CANCELLED") {
           setPaymentState("failed");
-          setResultMessage("Payment was cancelled. Please try again.");
+          setResultMessage(t("pm.cancelled"));
           setIsInitializing(false);
           initializedRef.current = false;
           return;
@@ -189,7 +191,7 @@ const PaymentModal = ({
         if (attempts >= maxAttempts) {
           setPaymentState("pending");
           setResultMessage(
-            "Unable to reach the payment status service. Please check again or retry payment."
+            t("pm.statusError")
           );
           setIsInitializing(false);
           return;
@@ -222,7 +224,7 @@ const PaymentModal = ({
           </Typography>
           <Box mt={2}>
             <ConsultationButton onClick={handlePay} disabled={isInitializing}>
-              Try Payment Again
+              {t("pm.tryAgain")}
             </ConsultationButton>
           </Box>
         </Box>
@@ -238,10 +240,10 @@ const PaymentModal = ({
               onClick={() => verifyPayment(currentOrderId)}
               disabled={isInitializing}
             >
-              Check Payment Status
+              {t("pm.checkStatus")}
             </ConsultationButton>
             <ConsultationButton onClick={handlePay} disabled={isInitializing}>
-              Try Payment Again
+              {t("pm.tryAgain")}
             </ConsultationButton>
           </Box>
         </Box>
@@ -251,7 +253,7 @@ const PaymentModal = ({
         <Box mt={3}>
           <CircularProgress />
           <Typography variant="body1" mt={2}>
-            Payment is being verified. Please wait...
+            {t("pm.verifying")}
           </Typography>
         </Box>
       )}
@@ -261,11 +263,11 @@ const PaymentModal = ({
           <Typography variant="body1" mb={2} style={{ maxWidth: 420, margin: "0 auto" }}>
             {initError
               ? initError
-              : "Pay securely to confirm your consultation booking."}
+              : t("pm.payTitle")}
           </Typography>
           <ConsultationButton onClick={handlePay} disabled={isInitializing}>
             {isInitializing
-              ? "Loading..."
+              ? t("af.loading")
               : initError
               ? "Refresh & Pay Again"
               : `Pay ${price_symbol}${amount || 0}`}

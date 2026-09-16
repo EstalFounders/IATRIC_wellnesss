@@ -8,9 +8,12 @@ import CircleLoader from "../circleLoader";
 import { ConsultationButton } from "../Common/commonUi";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { richText } from "../../i18n/richText";
 
 const Demo5Contacts1 = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,15 +48,15 @@ const Demo5Contacts1 = () => {
   };
 
   const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+    { label: t("contacts1.dial"), action: dial },
+    { label: t("contacts1.whatsapp"), action: openSupportWhatsAppWeb },
   ];
 
   const saveQuery = async (e) => {
     setLoading(true);
     if (!isMobileValid(formData.mobile_number)) {
       setIsSuccess(false);
-      setError("Please enter a valid mobile number");
+      setError(t("contacts1.errMobile"));
       return;
     }
 
@@ -68,7 +71,7 @@ const Demo5Contacts1 = () => {
     if (res.ok) {
       setIsSuccess(true);
       setLoading(false);
-      setError("Query saved successfully");
+      setError(t("contacts1.okSaved"));
       setFormData({
         name: "",
         email: "",
@@ -78,7 +81,7 @@ const Demo5Contacts1 = () => {
         message: "",
       });
     } else {
-      setError("Failed to save query. Please try again later.");
+      setError(t("contacts1.errFailed"));
     }
   };
 
@@ -93,34 +96,15 @@ const Demo5Contacts1 = () => {
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
             <h3 className="h3-md text-dark">
-              Need Help? We&apos;re Here to Talk
+              {t("contacts1.title1")}
             </h3>
-            <h3 className="h3-md text-dark">Contact Healthpath Today</h3>
+            <h3 className="h3-md text-dark">{t("contacts1.title2")}</h3>
             {/* Text */}
             <div>
-              Feeling unsure about your health or in need of expert guidance? At
-              Healthpath, we&apos;re always here to listen and provide the
-              support you need. Don&apos;t hesitate to{" "}
-              <strong>
-                reach out with any questions, concerns, or simply to discuss
-                your healthcare goals
-              </strong>
-              .
+              {richText(t("contacts1.p1"))}
             </div>
             <div>
-              We&apos;re dedicated to offering{" "}
-              <strong>personalized support</strong> and helping you confidently
-              navigate your wellness journey. Whether you need an{" "}
-              <strong>online consultation</strong>, have a question about our
-              telemedicine services, or want to learn more about{" "}
-              <strong>accessing expert medical care</strong> from home, our team
-              is ready to assist. <strong>Contact Healthpath today</strong> and
-              let us be your partner in health. Feeling unsure or in need of
-              guidance? At Healthpath, we&apos;re here to listen. Don&apos;t
-              hesitate to reach out with any questions, concerns, or simply to
-              discuss your healthcare goals. We&apos;re dedicated to providing
-              personalized support and helping you navigate your wellness
-              journey.
+              {richText(t("contacts1.p2"))}
             </div>
           </div>
         </div>
@@ -129,9 +113,9 @@ const Demo5Contacts1 = () => {
           <div className="col-md-5 col-lg-4">
             {/* General Information */}
             <div className="contact-box mb-40">
-              <h2 className="text-dark">Contact Us</h2>
+              <h2 className="text-dark">{t("contacts1.contactUs")}</h2>
               <hr />
-              <h5>Sector 57, Gurgaon Haryana-122003</h5>
+              <h5>{t("contacts1.address")}</h5>
               <h5>
                 <FaPhoneAlt />{" "}
                 <Link legacyBehavior href="#">
@@ -174,9 +158,9 @@ const Demo5Contacts1 = () => {
             </div>
             {/* Working Hours */}
             <div className="contact-box mb-40">
-              <h2 className="text-dark">Working Hours</h2>
+              <h2 className="text-dark">{t("contacts1.hoursTitle")}</h2>
               <hr />
-              <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
+              <h5>{t("contacts1.hours")}</h5>
             </div>
           </div>
           {/* END CONTACTS INFO */}
@@ -198,7 +182,7 @@ const Demo5Contacts1 = () => {
                       type="text"
                       name="name"
                       className="form-control name"
-                      placeholder="Your Name*"
+                      placeholder={t("contacts1.phName")}
                       required="required"
                       value={formData.name}
                       onChange={handleInputChange}
@@ -216,7 +200,7 @@ const Demo5Contacts1 = () => {
                       className="form-control phone"
                       type="tel"
                       name="mobile_number"
-                      placeholder="Your Phone Number"
+                      placeholder={t("contacts1.phPhone")}
                       required="required"
                       value={formData.mobile_number}
                       onChange={handleInputChange}
@@ -253,7 +237,7 @@ const Demo5Contacts1 = () => {
                       className="form-control message"
                       name="message"
                       rows={8}
-                      placeholder="Your Message ..."
+                      placeholder={t("contacts1.phMessage")}
                       required="required"
                       data-error="Enter no more than (10) characters."
                       value={formData.message}
@@ -267,7 +251,7 @@ const Demo5Contacts1 = () => {
                 {/* Button */}
                 <div className="col-md-12 mt-15 form-btn d-flex d-inline-flex">
                   <ConsultationButton onClick={saveQuery}>
-                  Talk to Us
+                  {t("contacts1.submit")}
                   </ConsultationButton>
                   {loading ? (
                     <div className="mt-3 ml-5">

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { color_schema } from "../../constant";
 import {
   CorporateHealthcareIcon,
@@ -16,6 +17,7 @@ const Demo5Services1 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const marqueeRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -26,6 +28,7 @@ const Demo5Services1 = () => {
   const features = [
     {
       title: "Doctor Consultation",
+      titleKey: "demo5.services.doctorConsultation",
       service: "consultation",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
@@ -34,6 +37,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Nursing Care",
+      titleKey: "demo5.services.nursingCare",
       service: "nursing-services",
       description:
         "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
@@ -42,6 +46,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Home Care",
+      titleKey: "demo5.services.homeCare",
       service: "nursing-services",
       description:
         "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
@@ -50,6 +55,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Blood Test & Diagnostics",
+      titleKey: "demo5.services.bloodTest",
       service: "lab-test",
       description:
         "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
@@ -58,6 +64,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Community Care",
+      titleKey: "demo5.services.communityCare",
       service: "community-care",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
@@ -66,6 +73,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Corporate Healthcare",
+      titleKey: "demo5.services.corporate",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <CorporateHealthcareIcon size={70} />,
@@ -73,6 +81,7 @@ const Demo5Services1 = () => {
     },
     {
       title: "Physiotherapy",
+      titleKey: "demo5.services.physiotherapy",
       description:
         "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
       icon: <PhysiotherapyIcon size={70} />,
@@ -137,7 +146,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold h1 text-uppercase">SERVICES</div>
+            <div className="font-weight-bold h1 text-uppercase">{t("demo5.services.heading")}</div>
           </div>
         </div>
 
@@ -167,7 +176,7 @@ const Demo5Services1 = () => {
                     <div className="service-nav-link-dept">
                       <div className="service-icon-dept">{item.icon}</div>
                       <div className="service-title-dept font-weight-bold">
-                        {item.title}
+                        {t(item.titleKey)}
                       </div>
                     </div>
                   </div>

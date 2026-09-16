@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../../../i18n/LanguageContext";
 import {
   TouchApp,
   ChatBubbleOutline,
@@ -9,18 +10,22 @@ const steps = [
   {
     icon: <TouchApp fontSize="large" />,
     label: "Select a speciality or symptom",
+    labelKey: "hiw.step1",
   },
   {
     icon: <ChatBubbleOutline fontSize="large" />,
     label: "Audio/ video call with a verified doctor",
+    labelKey: "hiw.step2",
   },
   {
     icon: <LocalPharmacy fontSize="large" />,
     label: "Get a digital prescription & a free follow-up",
+    labelKey: "hiw.step3",
   },
 ];
 
 const HowItWorks = () => {
+  const { t } = useLanguage();
   return (
     <div className="container my-5">
       <div className="position-relative">
@@ -35,7 +40,7 @@ const HowItWorks = () => {
             fontWeight: 600,
           }}
         >
-          How It Works
+          {t("hiw.title")}
         </h3>
 
         <div className="row flex-column flex-md-row justify-content-between align-items-center position-relative">
@@ -69,7 +74,7 @@ const HowItWorks = () => {
                 >
                   {step.icon}
                 </div>
-                <div style={{ fontWeight: 500 }}>{step.label}</div>
+                <div style={{ fontWeight: 500 }}>{t(step.labelKey)}</div>
               </div>
             </React.Fragment>
           ))}

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useLanguage } from "../../i18n/LanguageContext";
 import {
   FaStethoscope,
   FaTooth,
@@ -35,6 +36,7 @@ const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const marqueeRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -228,7 +230,7 @@ const Demo5Services2 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold h1 text-uppercase">Our Speciality</div>
+            <div className="font-weight-bold h1 text-uppercase">{t("demo5.services2.heading")}</div>
           </div>
         </div>
         <div className="row">
@@ -259,7 +261,9 @@ const Demo5Services2 = () => {
                     >
                       <div className="service-nav-link">
                         <div className="service-icon">{renderIcon(index)}</div>
-                        <div className="service-title font-weight-bold">{service}</div>
+                        <div className="service-title font-weight-bold">
+                          {t(`service.${service}`, service)}
+                        </div>
                       </div>
                     </div>
                   );

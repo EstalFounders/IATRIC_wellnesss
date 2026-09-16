@@ -1,7 +1,9 @@
 import Link from "next/link";
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Contacts02 = () => {
+  const { t } = useLanguage();
   return (
     <section id="contacts-2" className="wide-60 contacts-section division">
       <div className="container">
@@ -10,16 +12,10 @@ const Contacts02 = () => {
           <div className="col-lg-7">
             {/* Title*/}
             <h4 className="h4-md steelblue-color">
-              Have a Question? We Review and Accept Patients Requests on 24/7
-              Basis.
+              {t("contacts2.title")}
             </h4>
             {/* Text*/}
-            <p className="contact-notice">
-              Give us a call or send an email. If you are traveling to our
-              clinic for an appointment, confirm the correct street address with
-              your appointment staff ahead of time to avoid frustration. For
-              more help with specific addresses see below.
-            </p>
+            <p className="contact-notice">{t("contacts2.notice")}</p>
             <div className="row">
               {/* CITY CONTACT DATA */}
               <div className="col-md-6">
@@ -28,9 +24,9 @@ const Contacts02 = () => {
                   <h5 className="h5-sm steelblue-color">Sydney</h5>
                   <p>121 King Street, Melbourne,</p>
                   <p>Victoria 3000 Australia</p>
-                  <p>Phone: 1-(800)-569-7890</p>
+                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
                   <p>
-                    Email:
+                    {t("contacts2.emailLabel")}
                     <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
@@ -49,9 +45,9 @@ const Contacts02 = () => {
                   <h5 className="h5-sm steelblue-color">Melbourne</h5>
                   <p>121 King Street, Melbourne,</p>
                   <p>Victoria 3000 Australia</p>
-                  <p>Phone: 1-(800)-569-7890</p>
+                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
                   <p>
-                    Email:
+                    {t("contacts2.emailLabel")}
                     <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
@@ -70,9 +66,9 @@ const Contacts02 = () => {
                   <h5 className="h5-sm steelblue-color">Brisbane</h5>
                   <p>121 King Street, Melbourne,</p>
                   <p>Victoria 3000 Australia</p>
-                  <p>Phone: 1-(800)-569-7890</p>
+                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
                   <p>
-                    Email:
+                    {t("contacts2.emailLabel")}
                     <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
@@ -91,9 +87,9 @@ const Contacts02 = () => {
                   <h5 className="h5-sm steelblue-color">Adelaide</h5>
                   <p>121 King Street, Melbourne,</p>
                   <p>Victoria 3000 Australia</p>
-                  <p>Phone: 1-(800)-569-7890</p>
+                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
                   <p>
-                    Email:
+                    {t("contacts2.emailLabel")}
                     <Link legacyBehavior href="#">
                       <a
                         href="mailto:yourdomain@mail.com"
@@ -122,7 +118,7 @@ const Contacts02 = () => {
                     type="text"
                     name="name"
                     className="form-control name"
-                    placeholder="Enter Your Name*"
+                    placeholder={t("contacts2.phName")}
                     required
                   />
                 </div>
@@ -131,7 +127,7 @@ const Contacts02 = () => {
                     type="text"
                     name="email"
                     className="form-control email"
-                    placeholder="Enter Your Email*"
+                    placeholder={t("contacts2.phEmail")}
                     required
                   />
                 </div>
@@ -140,7 +136,7 @@ const Contacts02 = () => {
                     type="tel"
                     name="phone"
                     className="form-control phone"
-                    placeholder="Enter Your Phone Number*"
+                    placeholder={t("contacts2.phPhone")}
                     required
                   />
                 </div>
@@ -152,10 +148,10 @@ const Contacts02 = () => {
                     className="custom-select patient"
                     required
                   >
-                    <option>Have You Visited Us Before?*</option>
-                    <option>New Patient</option>
-                    <option>Returning Patient</option>
-                    <option>Other</option>
+                    <option>{t("contacts2.optVisited")}</option>
+                    <option>{t("contacts2.optNew")}</option>
+                    <option>{t("contacts2.optReturning")}</option>
+                    <option>{t("contacts2.optOther")}</option>
                   </select>
                 </div>
                 <div id="input-subject" className="col-md-12">
@@ -163,7 +159,7 @@ const Contacts02 = () => {
                     type="text"
                     name="subject"
                     className="form-control subject"
-                    placeholder="Subject*"
+                    placeholder={t("contacts2.phSubject")}
                     required
                   />
                 </div>
@@ -172,7 +168,7 @@ const Contacts02 = () => {
                     className="form-control message"
                     name="message"
                     rows={6}
-                    placeholder="Your Message ..."
+                    placeholder={t("contacts2.phMessage")}
                     required
                     defaultValue=""
                   />
@@ -183,7 +179,7 @@ const Contacts02 = () => {
                     type="submit"
                     className="btn btn-blue blue-hover submit"
                   >
-                    Send Your Message
+                    {t("contacts2.submit")}
                   </button>
                 </div>
                 {/* Contact Form Message */}

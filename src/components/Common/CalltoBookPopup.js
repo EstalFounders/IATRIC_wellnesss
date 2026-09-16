@@ -8,18 +8,20 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ConsultationButton } from "./commonUi";
 import { color_schema } from "../../constant";
 import { isMobileValid } from "../../helper";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
   const [mobNo, setMobNo] = useState("");
   const [response, setResponse] = useState("");
+  const { t } = useLanguage();
 
   const handleSubmit = () => {
     if (!mobNo.trim()) {
-      setResponse("Please enter a mobile number");
+      setResponse(t("ctb.errEmpty"));
       return;
     }
     if (!isMobileValid(mobNo)) {
-      setResponse("Please enter a valid 10-digit mobile number");
+      setResponse(t("ctb.errInvalid"));
       return;
     }
     setResponse("");
@@ -55,7 +57,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
         className="bg-green-gradient text-center text-white relative"
         style={{ position: "relative", paddingRight: "3rem" }}
       >
-        <b>Connect with HealthPath team</b>
+        <b>{t("ctb.title")}</b>
         {/* Close Button */}
         <IconButton
           aria-label="close"
@@ -77,7 +79,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
           className="text-muted text-center mb-4"
           style={{ fontSize: "1rem", lineHeight: "1.5" }}
         >
-          Enter your mobile number, and our team will call you back shortly.
+          {t("ctb.body")}
         </p>
 
         <input
@@ -87,7 +89,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
             border: `2px solid ${color_schema.green}`,
             transition: "all 0.3s ease",
           }}
-          placeholder="Enter your 10 digit mobile number"
+          placeholder={t("ctb.placeholder")}
           value={mobNo}
           onChange={(e) => setMobNo(e.target.value)}
         />
@@ -113,7 +115,7 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
           }}
           onClick={handleSubmit}
         >
-          Book a call back
+          {t("ctb.submit")}
         </ConsultationButton>
       </DialogActions>
     </Dialog>
