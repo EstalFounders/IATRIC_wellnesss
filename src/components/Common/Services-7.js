@@ -44,9 +44,7 @@ const Services7 = () => {
                         <h5 className="h5-sm steelblue-color">
                           {t("s7.title1")}
                         </h5>
-                        <p className="p-sm">
-                          {richText(t("s7.p1"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p1"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -67,9 +65,7 @@ const Services7 = () => {
                           {t("s7.title2")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          {richText(t("s7.p2"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p2"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -90,9 +86,7 @@ const Services7 = () => {
                           {t("s7.title3")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          {richText(t("s7.p3"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p3"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -113,9 +107,7 @@ const Services7 = () => {
                           {t("s7.title4")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          {richText(t("s7.p4"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p4"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -136,9 +128,7 @@ const Services7 = () => {
                           {t("s7.title5")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          {richText(t("s7.p5"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p5"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -159,9 +149,7 @@ const Services7 = () => {
                           {t("s7.title6")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          {richText(t("s7.p5"))}
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p5"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -178,13 +166,9 @@ const Services7 = () => {
               data-wow-delay="0.6s"
             >
               {/* Title */}
-              <h4 className="h4-xs">
-                {t("s7.h4")}
-              </h4>
+              <h4 className="h4-xs">{t("s7.h4")}</h4>
               {/* Text */}
-              <p className="p-md">
-                {t("s7.p")}
-              </p>
+              <p className="p-md">{t("s7.p")}</p>
               {/* Table */}
               <table className="table">
                 <tbody>
@@ -216,18 +200,22 @@ const Services7 = () => {
                     e.preventDefault();
                     handleDialDialogOpen();
                   }}
-                  onMouseOver={(e) => {
-                    e.target.style.color = "#ffffff";
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.textDecoration = "underline";
                   }}
-                  onMouseOut={(e) => {
-                    e.target.style.color = "#000000";
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.textDecoration = "none";
                   }}
                   style={{
                     backgroundColor: "transparent",
                     border: "none",
                     cursor: "pointer",
+                    color: "#ffffff",
                     padding: "0",
                     marginTop: "20px",
+                    transition: "transform 0.2s ease",
                   }}
                 >
                   {t("s7.callLabel")}{" "}
@@ -236,7 +224,7 @@ const Services7 = () => {
                     style={{
                       fontFamily: "bold",
                       textDecoration: "none",
-                      color: "#000000",
+                      color: "#ffffff",
                     }}
                   >
                     {contact_no}

@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Nav, Tab } from "react-bootstrap";
-import { AllServiceTab } from "../../../data/services";
+import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "../Common/commonUi";
+import { VscCircleSmallFilledCompact } from "react-icons/vsc";
 
 const AllServicesTabs2 = () => {
-  const [services] = useState(AllServiceTab);
+  const [services] = useState(servicesData);
   return (
     <section id="tabs-2" className="wide-100 tabs-section division">
       <div className="container">
@@ -34,7 +35,7 @@ const AllServicesTabs2 = () => {
                       key={service.key}
                     >
                       <Nav.Link eventKey={service.key} href={`#${service.key}`}>
-                        {service.title}
+                        {service.name}
                       </Nav.Link>
                     </Nav.Item>
                   ))}
@@ -54,7 +55,7 @@ const AllServicesTabs2 = () => {
                     key={service.key}
                   >
                     {/* Title */}
-                    <h3 className="h3-md text-dark">{service.title}</h3>
+                    <h3 className="h3-md text-dark">{service.name}</h3>
                     {/* Text */}
                     <div>{service.content[0]}</div>
                     {/* Image */}
@@ -84,7 +85,7 @@ const AllServicesTabs2 = () => {
                               return (
                                 <div className="box-list" key={idx}>
                                   <div className="box-list-icon blue-color">
-                                    <i className="fas fa-angle-double-right" />
+                                    <VscCircleSmallFilledCompact />
                                   </div>
                                   <div>{service.options[idx]}</div>
                                 </div>

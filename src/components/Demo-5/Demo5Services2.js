@@ -16,7 +16,7 @@ import { BsLungsFill } from "react-icons/bs";
 import { BiInjection } from "react-icons/bi";
 import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
-import { color_schema, services } from "../../constant";
+import { color_schema, speciality } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
 import {
   CardiologyIcon,
@@ -67,7 +67,7 @@ const Demo5Services2 = () => {
     };
   }, []);
 
-  const combinedServices = [...services, ...services];
+  const combinedServices = [...speciality, ...speciality];
 
   // Mouse Events
   const handleMouseDown = (e) => {
@@ -93,12 +93,12 @@ const Demo5Services2 = () => {
   };
 
   const handleClick = (index) => {
-    const serviceName = services[index % services.length];
+    const serviceName = speciality[index % speciality.length];
     handleServiceClick(serviceName, index, router);
   };
 
   const renderIcon = (index) => {
-    const actualIndex = index % services.length;
+    const actualIndex = index % speciality.length;
 
     switch (actualIndex) {
       case 0:
@@ -249,7 +249,7 @@ const Demo5Services2 = () => {
             >
               <div className={`services-track ${isPaused ? "paused" : ""}`}>
                 {combinedServices.map((service, index) => {
-                  const actualIndex = index % services.length;
+                  const actualIndex = index % speciality.length;
 
                   return (
                     <div

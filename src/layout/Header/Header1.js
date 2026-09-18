@@ -9,6 +9,9 @@ import {
   color_schema,
   contact_no,
   facebook_page_url,
+  instagram_page_url,
+  Linkdn_url,
+  speciality,
 } from "../../constant";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -21,6 +24,8 @@ import { getLabTestCartItems } from "../../components/labTestComponent/common/Co
 import { fetchConsultations } from "../../components/ApiService/UtilService";
 import { useDispatch, useSelector } from "react-redux";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { handleServiceClick } from "../../components/Common/commonMethod";
+import { demo5ServiceHighlights } from "../../../data/services";
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
@@ -115,8 +120,8 @@ const Header1 = ({ scrollToContact }) => {
             </div>
           </div>
           <div className="headertopright">
-            <a className="linkedinicon" title="Linkedin" target="blank" href="https://www.linkedin.com/in/iatrichealthcare/"><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
-            <a className="instagramicon" title="Instagram" target="blank" href="https://www.instagram.com/iatric.healthcare/"><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
+            <a className="linkedinicon" title="Linkedin" target="blank" href={Linkdn_url}><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
+            <a className="instagramicon" title="Instagram" target="blank" href={instagram_page_url}><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
             <a className="facebookicon" title="Facebook" target="blank" href={facebook_page_url}><FaFacebook size={25} /><span className="mobiletext02">Facebook</span></a>
           </div>
         </div>
@@ -134,6 +139,80 @@ const Header1 = ({ scrollToContact }) => {
               <nav className="wsmenu">
                 <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
                   <li><Link legacyBehavior href="/"><a className="nav-link">{t("nav.home")}</a></Link></li>
+                  {/* OUR SPECIALITY */}
+                  <li aria-haspopup="true">
+                    <a href="#">{t("nav.ourSpeciality")} <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            {speciality.slice(0, 6).map((name, index) => (
+                              <li key={name}>
+                                <a
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleServiceClick(name, index, router);
+                                  }}
+                                >
+                                  {name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
+                            {speciality.slice(6).map((name, index) => (
+                              <li key={name}>
+                                <a
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleServiceClick(name, index + 6, router);
+                                  }}
+                                >
+                                  {name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  {/* END OUR SPECIALITY */}
+                  {/* SERVICES */}
+                  <li aria-haspopup="true">
+                    <a href="#">{t("nav.servicesMenu")} <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            {demo5ServiceHighlights.slice(0, 4).map((service) => (
+                              <li key={service.title}>
+                                <Link legacyBehavior href={`/service-details/?Service=${service.service}`}>
+                                  <a>{service.title}</a>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
+                            {demo5ServiceHighlights.slice(4).map((service) => (
+                              <li key={service.title}>
+                                <Link legacyBehavior href={`/service-details/?Service=${service.service}`}>
+                                  <a>{service.title}</a>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  {/* END SERVICES */}
                   <li aria-haspopup="true">
                     <a href="#">{t("nav.pages")} <span className="wsarrow" /></a>
                     <div className="wsmegamenu clearfix">
@@ -162,15 +241,6 @@ const Header1 = ({ scrollToContact }) => {
                       </div>
                     </div>
                   </li>
-                  <li>
-                    <span
-                      onClick={() => handleComingSoonClick("/labTest/homepage")}
-                      style={{ cursor: "pointer", display: "block", padding: "10px 32px 10px 18px", lineHeight: "50px", textDecoration: "none", position: "relative", color: isComingSoon("/labTest/homepage") ? "#8e8333" : "#000", fontSize: "17px", fontWeight: 600 }}
-                    >
-                      {isComingSoon("/labTest/homepage") ? t("nav.labTestSoon") : t("nav.labTest")}
-                    </span>
-                  </li>
-                  <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">{t("nav.blog")}</a></Link></li>
                   <li><Link legacyBehavior href="/contacts-2"><a className="nav-link">{t("nav.contactUs")}</a></Link></li>
                 </ul>
               </nav>

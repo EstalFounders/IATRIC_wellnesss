@@ -57,7 +57,7 @@ export const api = {
   consultationByMeetingId: "/api/getAppointmentId",
 };
 
-export const services = [
+export const speciality = [
   "General Physician",
   "Pediatrics",
   "Cardiology",
@@ -181,8 +181,11 @@ export const IS_NOW = "Now";
 
 export const address = "Sector 57 , Gurgaon, Haryana-122003";
 export const facebook_page_url =
-  "https://www.facebook.com/share/12GvMifXjiF/?mibextid=wwXIfr";
-
+  "https://www.facebook.com/profile.php?id=61575112443781";
+export const instagram_page_url =
+  "https://www.instagram.com/healthpath.pvt/";
+export const Linkdn_url =
+  "https://www.linkedin.com/in/iatrichealthcare/";
 export const color_schema = {
   green: "#3b5f1d",
   yellow: "#8e8333",

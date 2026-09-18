@@ -1,17 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { color_schema } from "../../constant";
-import {
-  CorporateHealthcareIcon,
-  GeneralPhysician,
-  HealthCampIcon,
-  HomeCareIcon,
-  LabInvestigation,
-  NursingCare,
-  NursingCareIcon,
-  PhysiotherapyIcon,
-} from "../../../public/svgIcon/all-department-svg-icon";
+import { demo5ServiceHighlights } from "../../../data/services";
 
 const Demo5Services1 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -24,73 +14,11 @@ const Demo5Services1 = () => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // ✅ Duplicate your `features[]` array locally
-  const features = [
-    {
-      title: "Doctor Consultation",
-      titleKey: "demo5.services.doctorConsultation",
-      service: "consultation",
-      description:
-        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
-      icon: <GeneralPhysician size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Nursing Care",
-      titleKey: "demo5.services.nursingCare",
-      service: "nursing-services",
-      description:
-        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
-      icon: <NursingCareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Home Care",
-      titleKey: "demo5.services.homeCare",
-      service: "nursing-services",
-      description:
-        "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
-      icon: <HomeCareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Blood Test & Diagnostics",
-      titleKey: "demo5.services.bloodTest",
-      service: "lab-test",
-      description:
-        "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
-      icon: <LabInvestigation size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Community Care",
-      titleKey: "demo5.services.communityCare",
-      service: "community-care",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <HealthCampIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Corporate Healthcare",
-      titleKey: "demo5.services.corporate",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthcareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Physiotherapy",
-      titleKey: "demo5.services.physiotherapy",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <PhysiotherapyIcon size={70} />,
-      btntext: "View Details",
-    },
+  // Service highlights are sourced from the shared data module (data/services.js).
+  const combinedFeatures = [
+    ...demo5ServiceHighlights,
+    ...demo5ServiceHighlights,
   ];
-
-  // ✅ Duplicate for infinite scroll
-  const combinedFeatures = [...features, ...features];
 
   // ✅ Touch support
   useEffect(() => {

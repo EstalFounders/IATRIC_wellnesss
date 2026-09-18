@@ -49,10 +49,21 @@ const AboutUsInfo4 = () => {
                   {richText(t("about4.p3"))}
                 </p>
               </div>
-              <div className="mt-2 d-flex justify-content-center mt-5 mb-4">
-                <div className="w-25">
+              <div className="mt-2 d-flex justify-content-center mt-5 mb-4 px-3">
+                <div className="w-100" style={{ maxWidth: "280px", minWidth: 0 }}>
                   <ConsultationButton path={"/appointment"}>
-                    {t("about5.cta")}
+                    <span
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        whiteSpace: "normal",
+                        overflowWrap: "anywhere",
+                        wordBreak: "break-word",
+                        textAlign: "center",
+                      }}
+                    >
+                      {t("about5.cta")}
+                    </span>
                   </ConsultationButton>
                 </div>
               </div>
