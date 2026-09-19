@@ -1,7 +1,10 @@
-import Link from "next/dist/client/link";
-const PageBanner = ({ pageTitle, motherTitle, url }) => {
+import Link from "next/link";
+import { useLanguage } from "../i18n/LanguageContext";
+
+const PageBanner = ({ pageTitle, motherTitle, url, compact }) => {
+  const { t } = useLanguage();
   return (
-    <div id="breadcrumb" className="division">
+    <div id="breadcrumb" className={`division${compact ? " breadcrumb-compact" : ""}`}>
       <div className="container">
         <div className="row">
           <div className="col">
@@ -11,13 +14,13 @@ const PageBanner = ({ pageTitle, motherTitle, url }) => {
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
                     <Link legacyBehavior href="/">
-                      Home
+                      {t("breadcrumb.home")}
                     </Link>
                   </li>
                   {motherTitle && (
                     <li className="breadcrumb-item">
                       <Link legacyBehavior href={`/${url}`}>
-                        {motherTitle}
+                        {t(`banner.mother.${motherTitle}`, motherTitle)}
                       </Link>
                     </li>
                   )}
@@ -25,7 +28,7 @@ const PageBanner = ({ pageTitle, motherTitle, url }) => {
                     className="breadcrumb-item active text-uppercase"
                     aria-current="page"
                   >
-                    {pageTitle}
+                    {t(`banner.${pageTitle}`, pageTitle)}
                   </li>
                 </ol>
               </nav>

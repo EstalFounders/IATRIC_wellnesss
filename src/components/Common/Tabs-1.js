@@ -13,6 +13,7 @@ import { handleServiceClick } from "./commonMethod";
 import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
 import CalltoBookPopup from "./CalltoBookPopup";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const ServicesTabs = () => {
   const [services] = useState(servicesData);
@@ -20,6 +21,7 @@ const ServicesTabs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
   const router = useRouter();
+  const { t } = useLanguage();
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
   const totalPages = Math.ceil(services.length / servicesPerPage);
@@ -101,7 +103,7 @@ const ServicesTabs = () => {
                 }`}
                 onClick={() => handleTabClick(service.id)}
               >
-                {service.name}
+                {t(`service.${service.name}`, service.name)}
               </div>
             ))}
           </div>
@@ -152,7 +154,7 @@ const ServicesTabs = () => {
                     className="section-subheading blue-color mb-3"
                     style={{ fontSize: "1.8rem", fontWeight: "600" }}
                   >
-                    {service.subheading}
+                    {t(`subheading.${service.name}`, service.subheading)}
                   </h4>
 
                   {/* Heading */}
@@ -169,7 +171,7 @@ const ServicesTabs = () => {
                     }
                     style={{ fontWeight: "700" }}
                   >
-                    {service.name}
+                    {t(`service.${service.name}`, service.name)}
                   </h3>
 
                   {/* Description */}
@@ -177,7 +179,9 @@ const ServicesTabs = () => {
                     className="service-description h5 box-list grey-color mb-4"
                     style={{ lineHeight: "1.6" }}
                   >
-                    {boldKeywords(service.description, [
+                    {boldKeywords(
+                      t(`tabdesc.${service.name}`, service.description),
+                      [
                       "General Physician",
                       "trusted care",
                       "Pediatrics",

@@ -1,5 +1,5 @@
 import { pipeline } from "@xenova/transformers";
-import { services } from "../../../src/constant"; // adjust path as needed
+import { speciality } from "../../../src/constant"; // adjust path as needed
 
 let embedder;
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       normalize: true,
     });
     const serviceEmbeddings = await Promise.all(
-      services.map(async (s) => {
+      speciality.map(async (s) => {
         const [embed] = await embedder(s, { pooling: "mean", normalize: true });
         return { service: s, embedding: embed };
       })

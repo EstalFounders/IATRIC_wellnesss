@@ -1,7 +1,9 @@
 import Image from "next/image";
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Demo5Pricing3 = () => {
+  const { t } = useLanguage();
   return (
     <section id="pricing-3" className="wide-60 pricing-section division">
       <div className="container">
@@ -14,62 +16,55 @@ const Demo5Pricing3 = () => {
                 className="blue-color"
                 style={{ fontSize: "1.8rem", fontWeight: "600" }}
               >
-                Healthpath pricing
+                {t("demo5.pricing.tag")}
               </span>
               {/* Title */}
               <h3 className="h3-md steelblue-color">
-                Invest in Your Health, Affordably
+                {t("demo5.pricing.title")}
               </h3>
               {/* Text */}
               <p class="h5 box-list grey-color">
-                At Healthpath, we believe{" "}
-                <strong>high-quality healthcare</strong> should be accessible
-                and <strong>affordable</strong> for everyone. Discover how
-                Healthpath makes{" "}
-                <strong>affordable healthcare accessible</strong> by all in
-                reality. We&apos;re committed to providing{" "}
-                <strong>value-driven medical care</strong> that empowers you to
-                take control of your health journey, affordably.
+                {t("demo5.pricing.desc")}
               </p>
               <p class="h5 box-list grey-color">
-                Explore our plans and find the perfect fit for your needs today.
+                {t("demo5.pricing.explore")}
               </p>
               <div className="pricing-table mb-40 h5 box-list grey-color">
                 <table className="table table-hover">
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">Service</th>
-                      <th scope="col">Price</th>
+                      <th scope="col">{t("demo5.pricing.service")}</th>
+                      <th scope="col">{t("demo5.pricing.price")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th scope="row">1</th>
-                      <td>X-Ray</td>
+                      <td>{t("demo5.pricing.xray")}</td>
                       <td>
-                        <span className="text-muted">Coming Soon</span>
+                        <span className="text-muted">{t("common.comingSoon")}</span>
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">2</th>
-                      <td>Magnetic Resonance Imaging</td>
+                      <td>{t("demo5.pricing.mri")}</td>
                       <td>
-                        <span className="text-muted">Coming Soon</span>
+                        <span className="text-muted">{t("common.comingSoon")}</span>
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">3</th>
-                      <td>Computer Tomography</td>
+                      <td>{t("demo5.pricing.ct")}</td>
                       <td>
-                        <span className="text-muted">Coming Soon</span>
+                        <span className="text-muted">{t("common.comingSoon")}</span>
                       </td>
                     </tr>
                     <tr className="last-tr">
                       <th scope="row">4</th>
-                      <td>Laboratory Tests</td>
+                      <td>{t("demo5.pricing.lab")}</td>
                       <td>
-                        <span className="text-muted">Coming Soon</span>
+                        <span className="text-muted">{t("common.comingSoon")}</span>
                       </td>
                     </tr>
                   </tbody>

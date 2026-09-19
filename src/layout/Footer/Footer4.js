@@ -9,6 +9,7 @@ import {
   FaPhoneAlt,
 } from "react-icons/fa";
 import { address, contact_no, email, facebook_page_url } from "../../constant";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
 import { useRouter } from "next/router";
@@ -17,6 +18,7 @@ import { FaPhoneVolume } from "react-icons/fa6";
 
 const Footer4 = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
   const handleDialDialogOpen = () => {
     setIsDialDialogOpen(true);
@@ -26,8 +28,8 @@ const Footer4 = () => {
   };
 
   const dialOptions = [
-    { label: "Dial", action: dial,icon: 0 },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb,icon: 1 },
+    { label: t("footer.dial"), action: dial,icon: 0 },
+    { label: t("footer.whatsapp"), action: openSupportWhatsAppWeb,icon: 1 },
   ];
 
   const handleEmail = () => {
@@ -56,13 +58,13 @@ const Footer4 = () => {
                 className="p-sm mt-20"
                 style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
               >
-                Unlocking your well-being
+                {t("footer.tagline1")}
               </div>
               <div
                 className="p-sm mb-4"
                 style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
               >
-                one step at a time.
+                {t("footer.tagline2")}
               </div>
               {/* Social Icons */}
               <div className="footer-socials-links mt-10">
@@ -115,16 +117,16 @@ const Footer4 = () => {
             <div className="footer-box mb-40">
               {/* Title */}
               <div className="h5-xs font-weight-bold text-white mb-4">
-                <u>Working Hours</u>
+                <u>{t("footer.workingHours")}</u>
               </div>
               {/* Working Hours */}
               <div
                 className="p-sm text-nowrap"
                 style={{ fontWeight: "bold", fontSize: 20, color: "white" }}
               >
-                <span>Monday - Sunday </span>
+                <span>{t("footer.days")} </span>
                 <br />
-                <span>8:00 AM - 8:00 PM</span>
+                <span>{t("footer.hours")}</span>
               </div>
             </div>
           </div>
@@ -136,12 +138,12 @@ const Footer4 = () => {
             >
               {/* Title */}
               <div className="h5-xs font-weight-bold text-white mb-4">
-                <u>Reach us</u>
+                <u>{t("footer.reachUs")}</u>
               </div>
               {/* Address */}
               <span className="d-flex flex-row">
                 <FaMapMarkedAlt size={30} />
-                <b className="ml-2">{address}</b>
+                <b className="ml-2">{t("footer.address", address)}</b>
               </span>
               {/* Email */}
               <div className="foo-email mt-20 d-flex flex-row mb-4">
@@ -189,7 +191,7 @@ const Footer4 = () => {
                 <span className="text-dark">
                   TTANSHE HEALTHPATH PRIVATE LIMITED
                 </span>
-                . All Rights Reserved
+                . {t("footer.rights")}
               </p>
             </div>
           </div>

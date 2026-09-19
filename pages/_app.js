@@ -8,6 +8,8 @@ import { wrapper } from "../src/store/store";
 import { persistStore } from "redux-persist";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { LanguageProvider } from "../src/i18n/LanguageContext";
+import LanguageToggle from "../src/components/Common/LanguageToggle";
 
 function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
@@ -40,7 +42,10 @@ function MyApp({ Component, pageProps, ...rest }) {
       <NoSsr>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <Component {...props.pageProps} />
+            <LanguageProvider>
+              <Component {...props.pageProps} />
+              <LanguageToggle />
+            </LanguageProvider>
           </PersistGate>
         </Provider>
       </NoSsr>

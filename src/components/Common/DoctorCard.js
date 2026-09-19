@@ -5,10 +5,13 @@ import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { ConsultationButton } from "./commonUi";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { fmt } from "../../i18n/format";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useLanguage();
   const handleViewProfile = (doctor) => {
     console.log("Doctor ID in handleview profile:", doctor);
     const { doctorSignatureUrl, doctorStampUrl, ...filteredDoctor } = doctor;
@@ -43,39 +46,43 @@ const DoctorCard = ({ doctor, index }) => {
               textDecoration: "underline",
             }}
           >
-            View Profile
+            {t("doctor.viewProfile")}
           </div>
         </div>
 
         <div className={`mt-4 ${styles["doctor-primary-info col"]}`}>
-          <h2 className={styles["new-doctor-name mt-4"]}>Dr {doctor.name}</h2>
+          <h2 className={styles["new-doctor-name mt-4"]}>
+            {t("doctor.namePrefix")} {doctor.name}
+          </h2>
           <p className={styles["doctor-text"]}>{doctor.speciality}</p>
           <p className={styles["doctor-text"]}>
-            {doctor.workExperience} experience overall
+            {fmt(t("doctor.experience"), { exp: doctor.workExperience })}
           </p>
           <p className={styles["doctor-text"]}>
             <span className={styles["location-highlight"]}>
               {/* {doctor.location} */}
             </span>{" "}
           </p>
-          <p className={styles["doctor-text"]}>₹{doctor.price} fee</p>
+          <p className={styles["doctor-text"]}>
+            {fmt(t("doctor.fee"), { price: doctor.price })}
+          </p>
           <div className={styles["patient-stories"]}>
             <div className={styles["thumbs-up-container"]}>
               <span className={styles["percentage"]}>96%</span>
               <a href="#reviews" className={styles["patient-stories-link"]}>
-                {doctor.reviews} Patient Stories
+                {fmt(t("doctor.patientStories"), { n: doctor.reviews })}
               </a>
             </div>
 
             <div className={styles["availability-info"]}>
-              <span className={styles["calendar-icon"]}>📅</span> Available
-              Today
+              <span className={styles["calendar-icon"]}>📅</span>{" "}
+              {t("doctor.availableToday")}
             </div>
           </div>
         </div>
         <div className={`${styles["doctor-booking-section"]} text-center`}>
           <div className="mr-auto ml-auto mt-3 mb-3">
-            <ConsultationButton>Book Consultation</ConsultationButton>
+            <ConsultationButton>{t("doctor.bookConsultation")}</ConsultationButton>
           </div>
         </div>
       </div>

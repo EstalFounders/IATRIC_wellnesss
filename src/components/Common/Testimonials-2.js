@@ -1,8 +1,10 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { testimonial2Props } from "../../sliderProps";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Testimonials2 = () => {
+  const { t } = useLanguage();
   return (
     <section
       id="reviews-2"
@@ -13,13 +15,9 @@ const Testimonials2 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md steelblue-color">What Our Patients Say</h3>
+            <h3 className="h3-md steelblue-color">{t("demo2.reviews.title")}</h3>
             {/* Text */}
-            <p>
-              Aliquam a augue suscipit, luctus neque purus ipsum neque dolor
-              primis libero at tempus, blandit posuere ligula varius congue
-              cursus porta feugiat
-            </p>
+            <p>{t("testimonials2.intro")}</p>
           </div>
         </div>
         {/* END SECTION TITLE */}

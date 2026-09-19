@@ -1,6 +1,6 @@
 // pages/api/recommendServices.js
 import OpenAI from "openai";
-import { services } from "../../../src/constant";
+import { speciality } from "../../../src/constant";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 function mapServices(aiResponse) {
   // Logic to map AI response to available services
   const recommended = [];
-  services.forEach((service) => {
+  speciality.forEach((service) => {
     if (aiResponse.toLowerCase().includes(service.toLowerCase())) {
       recommended.push(service);
     }

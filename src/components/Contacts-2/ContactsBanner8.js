@@ -1,6 +1,8 @@
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const ContactsBanner8 = () => {
+    const { t } = useLanguage();
     return (
         <section id="banner-8" className="bg-fixed banner-section division">
             <div className="container white-color">
@@ -12,10 +14,10 @@ const ContactsBanner8 = () => {
                             <span className="flaticon-072-hospital-5" />
                             {/* Title  */}
                             <h3 className="h3-sm">
-                                Take the First Step to Help
+                                {t("contacts8.title")}
                             </h3>
                             <h4 className="h4-lg">
-                                Call MedService Clinic Now
+                                {t("contacts8.cta")}
                             </h4>
                             <h2 className="h2-lg">1-800-123-4560</h2>
                         </div>
