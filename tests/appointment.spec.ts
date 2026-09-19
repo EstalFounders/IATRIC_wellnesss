@@ -54,13 +54,15 @@ async function fillAppointmentForm(page: Page) {
   const form = page.locator('form.appointment-form');
 
   await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
-  await page.getByRole('radio', { name: TEST_SYMPTOM }).check();
+  // Bootstrap ToggleButton clips its native input (pointer-events:none), so the
+  // visible chip/segment label is the real click target — click it like a user.
+  await page.locator(`label[id="symptom-${TEST_SYMPTOM}"]`).click();
   await page.getByLabel('Mobile Number', { exact: true }).fill(TEST_MOBILE);
   // Consultation type/service is fed from the live ServiceOffered collection.
-  await page.getByRole('radio', { name: CONSULTATION_TYPE }).check();
+  await page.locator(`label[id="consultation-${CONSULTATION_TYPE}"]`).click();
 
   // Time: "Choose Time" -> date picker + slot dropdown (locally generated slots)
-  await page.getByRole('radio', { name: 'Choose Time' }).check();
+  await page.locator('label[id="when-later"]').click();
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -70,7 +72,7 @@ async function fillAppointmentForm(page: Page) {
   )}-${String(tomorrow.getDate()).padStart(2, '0')}`;
   await form.locator('input[type="date"]').fill(tomorrowStr);
 
-  const slotSelect = form.locator('select');
+  const slotSelect = form.locator('select[name="slot"]');
   await expect(slotSelect).toBeVisible();
   await slotSelect.selectOption({ index: 1 }); // index 0 is the disabled placeholder
 
@@ -213,7 +215,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
 
     // ── 4. Book / Book Appointment ──────────────────────────────────
     const consultButton = form.locator('.consultation-btn');
-    await expect(consultButton).toHaveText(/Consult/);
+    await expect(consultButton).toHaveText(/consult/i);
     await consultButton.click();
 
     // ── 5./11. WhatsApp confirmation API triggered with the right payload ──

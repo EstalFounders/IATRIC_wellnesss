@@ -428,13 +428,14 @@ const AppointmentPage = () => {
   };
 
   return (
-    <div id="" className="wide-60">
+    <div id="" className={`wide-60 ${styles.appointmentWrap}`}>
       <div className="container-fluid">
         <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
           <AppointmentForm
             appointmentState={appointmentState}
             setter={setter}
+            doctors={doctors}
             handleDoctorChoiceChange={handleDoctorChoiceChange}
             handleDoctorSelection={handleDoctorSelection}
             handleTimeSelection={handleTimeSelection}

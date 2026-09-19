@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { useLanguage } from "../i18n/LanguageContext";
 
-const PageBanner = ({ pageTitle, motherTitle, url }) => {
+const PageBanner = ({ pageTitle, motherTitle, url, compact }) => {
   const { t } = useLanguage();
   return (
-    <div id="breadcrumb" className="division">
+    <div id="breadcrumb" className={`division${compact ? " breadcrumb-compact" : ""}`}>
       <div className="container">
         <div className="row">
           <div className="col">

@@ -1,25 +1,26 @@
 import React, { useState } from "react";
 import {
-  TextField,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Checkbox,
-  IconButton,
-  Tooltip,
-  Typography,
-  Box,
-  Snackbar,
+  Card,
+  Form,
+  Row,
+  Col,
+  InputGroup,
+  ToggleButtonGroup,
+  ToggleButton,
   Alert,
-} from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import { ConsultationButton } from "../Common/commonUi";
+} from "react-bootstrap";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
-import { CHOOSE_TIME, IS_NOW, price_symbol } from "../../constant";
+import {
+  CHOOSE_TIME,
+  IS_NOW,
+  price_symbol,
+  speciality as SPECIALTIES,
+} from "../../constant";
 import { formatTime } from "../helper";
 
-// Common complaints offered as quick-select radio options on the form.
+// Common complaints offered as quick-select pills on the form.
 const COMMON_DISEASES = [
   "Fever",
   "Cough & Cold",
@@ -29,8 +30,19 @@ const COMMON_DISEASES = [
   "Body Pain / Weakness",
 ];
 
-// Value used for the "Other" radio option (reveals the free-text description box).
+// Value used for the "Other" pill (reveals the free-text description box).
 const SYMPTOM_OTHER = "__other__";
+
+// Value the parent's handleDoctorChoiceChange expects for "no specific doctor".
+const DOCTOR_CHOICE_ANY = "any";
+
+// MUI-free severity -> react-bootstrap Alert variant.
+const ALERT_VARIANTS = {
+  success: "success",
+  error: "danger",
+  warning: "warning",
+  info: "info",
+};
 
 const toLocalDateString = (date) => {
   const d = new Date(date);
@@ -40,6 +52,9 @@ const toLocalDateString = (date) => {
 const AppointmentForm = ({
   appointmentState,
   setter,
+  doctors,
+  handleDoctorChoiceChange,
+  handleDoctorSelection,
   handleCloseSnackBar,
   sendWhatsAppConfirmation,
   handleTimeSelection,
@@ -47,27 +62,41 @@ const AppointmentForm = ({
   handleConsultationChange,
 }) => {
   const [selectedSymptom, setSelectedSymptom] = useState("");
+  const [specialityFilter, setSpecialityFilter] = useState("");
   const { t } = useLanguage();
 
-  const handleDescriptionChange = (e) => {
-    setter.setSymptoms(e.target.value);
-  };
+  const handleDescriptionChange = (e) => setter.setSymptoms(e.target.value);
 
-  const handleSymptomSelection = (e) => {
-    const value = e.target.value;
+  // ToggleButtonGroup hands us the value directly (not an event).
+  const handleSymptomSelection = (value) => {
     setSelectedSymptom(value);
-    if (value === SYMPTOM_OTHER) {
-      // "Other" selected - clear saved symptom until the patient types one.
-      setter.setSymptoms("");
-    } else {
-      // A common disease was selected - store it as the appointment symptom.
-      setter.setSymptoms(value);
-    }
+    setter.setSymptoms(value === SYMPTOM_OTHER ? "" : value);
   };
 
   const handleDateChange = (e) => {
     const [year, month, day] = e.target.value.split("-");
     setter.setSelectedDate(new Date(year, month - 1, day));
+  };
+
+  // Reuse the parent's event-based handlers with the toggle value.
+  const handleConsultationTypeChange = (value) =>
+    handleConsultationChange({ target: { value } });
+
+  const handleWhenChange = (value) =>
+    handleTimeSelection({ target: { value } });
+
+  const handleSpecialityChange = (e) => {
+    setSpecialityFilter(e.target.value);
+    // Reuse the parent's handler to fall back to "Any Doctor".
+    handleDoctorChoiceChange({ target: { value: DOCTOR_CHOICE_ANY } });
+  };
+
+  const handleDoctorChange = (e) => {
+    if (e.target.value === DOCTOR_CHOICE_ANY) {
+      handleDoctorChoiceChange(e);
+    } else {
+      handleDoctorSelection(e);
+    }
   };
 
   const today = toLocalDateString(new Date());
@@ -80,249 +109,413 @@ const AppointmentForm = ({
       ? toLocalDateString(appointmentState.selectedDate)
       : today;
 
-  const consultationOptions = (appointmentState.consultationOptions || []);
+  const consultationOptions = appointmentState.consultationOptions || [];
+
+  // Doctor list supplied by the parent (already fetched from /api/addDoctor).
+  const doctorOptions = Array.isArray(doctors) ? doctors : [];
+  const scopedDoctors = appointmentState.filteredDoctors?.length
+    ? appointmentState.filteredDoctors
+    : doctorOptions;
+
+  // SPECIALTIES (src/constant.js) drives the dropdown. Any extra speciality found
+  // on the doctor records is appended so filtering can never hide a bookable doctor.
+  const specialityOptions = [
+    ...new Set([
+      ...SPECIALTIES,
+      ...doctorOptions.map((doctor) => doctor.speciality).filter(Boolean),
+    ]),
+  ];
+
+  // Doctor list narrowed by the selected speciality.
+  const visibleDoctors = specialityFilter
+    ? scopedDoctors.filter((doctor) => doctor.speciality === specialityFilter)
+    : scopedDoctors;
+
+  const futureSlots = (appointmentState.locallyCreatedSlots || []).filter(
+    (slot) => new Date(slot.startTime) > new Date()
+  );
+  const slotValue = appointmentState.selectedSlot?._id || "";
 
   return (
-    <div className="col-lg-8">
-      <div className="txt-block pr-30">
-        <Typography variant="h4" className={styles.makeAppointmentText}>
+    <Card
+      className="border-0 mx-auto"
+      style={{
+        maxWidth: 780,
+        width: "100%",
+        borderRadius: 14,
+        boxShadow: "0 6px 24px rgba(15, 23, 42, 0.08)",
+      }}
+    >
+      <Card.Body className="p-2" style={{ fontSize: "0.9375rem" }}>
+        <h4
+          className="text-center mb-2"
+          style={{ fontWeight: 600, color: "#0f172a" }}
+        >
           {t("af.title")}
-        </Typography>
+        </h4>
 
-        <form onSubmit={(e) => e.preventDefault()} className="appointment-form">
-          {/* Name */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <TextField
-              className="w-50"
-              label={t("af.name")}
-              variant="outlined"
-              margin="normal"
-              value={appointmentState.name}
-              onChange={(e) => setter.setName(e.target.value)}
-            />
-          </div>
-
-          {/* Reason for consultation (common diseases + Other) */}
-          <Typography variant="h6" mt={2} className="text-center">
-            {t("af.reason")}
-          </Typography>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <RadioGroup
-              className="w-50"
-              value={selectedSymptom}
-              onChange={handleSymptomSelection}
-            >
-            {COMMON_DISEASES.map((disease) => (
-              <FormControlLabel
-                key={disease}
-                value={disease}
-                control={<Radio />}
-                label={disease}
-              />
-            ))}
-            <FormControlLabel
-              value={SYMPTOM_OTHER}
-              control={<Radio />}
-              label={t("af.other")}
-            />
-            </RadioGroup>
-          </div>
-
-          {selectedSymptom === SYMPTOM_OTHER && (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <TextField
-              className="w-50"
-              multiline
-              rows={1}
-              label={t("af.symptoms")}
-              variant="outlined"
-              margin="normal"
-              value={appointmentState.symptoms}
-              onChange={handleDescriptionChange}
-            />
-          </div>
-          )}
-
-          {/* Mobile Number */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <TextField
-              className="w-50"
-              label={t("af.mobile")}
-              variant="outlined"
-              type="tel"
-              margin="normal"
-              inputProps={{ minLength: 10, maxLength: 10 }}
-              value={appointmentState.mobNo}
-              onChange={(e) => setter.setMobNo(e.target.value)}
-            />
-          </div>
-
-          {/* Consultation Type - Dynamically from Services */}
-          <Typography variant="h6" mt={3} className="text-center">
-            {t("af.consultType")}
-          </Typography>
-          <RadioGroup
-            row
-            value={appointmentState.consultationType}
-            onChange={(e) => {
-              handleConsultationChange(e);
-              const selectedOption = appointmentState.consultationOptions.find(
-                (opt) => opt.name === e.target.value
-              );
-              if (selectedOption && setter.setConsultationPrice) {
-                setter.setConsultationPrice(selectedOption.fee || "");
-              }
-            }}
-            style={{ justifyContent: "center", marginBottom: "20px" }}
-          >
-            {consultationOptions.map((option) => (
-              <Box
-                key={option.name}
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                mx={1}
+        <Form
+          className={`appointment-form ${styles.form}`}
+          onSubmit={(e) => e.preventDefault()}
+        >
+          {/* Two columns keep the whole form within a single screen */}
+          <Row>
+            {/* LEFT — patient details + reason */}
+            <Col xs={12} md={6} className="mb-2 mb-md-0">
+              <Form.Group
+                className={`mb-2 ${styles.field}`}
+                controlId="af-name"
               >
-                <FormControlLabel
-                  value={option.name}
-                  control={<Radio />}
-                  label={option.name}
+                <Form.Label className={styles.label}>{t("af.name")}</Form.Label>
+                <Form.Control
+                  size="sm"
+                  type="text"
+                  placeholder={t("af.name")}
+                  value={appointmentState.name}
+                  onChange={(e) => setter.setName(e.target.value)}
                 />
-                {appointmentState.consultationType === option.name && option.fee && (
-                  <Typography
-                    variant="body2"
-                    className={styles.priceText}
-                    // style={{ marginTop: 4 }}
+              </Form.Group>
+
+              <Form.Group
+                className={`mb-2 ${styles.field}`}
+                controlId="af-mobile"
+              >
+                <Form.Label className={styles.label}>{t("af.mobile")}</Form.Label>
+                <InputGroup size="sm">
+                  {/* BS4 only applies its -sm metrics to a prefix wrapped in
+                      .input-group-prepend, otherwise +91 stays taller than the input. */}
+                  <InputGroup.Prepend>
+                    <InputGroup.Text
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "#3b5f1d",
+                        background: "#f7f8ee",
+                        borderColor: "#e2e8f0",
+                      }}
+                    >
+                      +91
+                    </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <Form.Control
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    placeholder={t("af.mobile")}
+                    value={appointmentState.mobNo}
+                    onChange={(e) => setter.setMobNo(e.target.value)}
+                  />
+                </InputGroup>
+              </Form.Group>
+
+              {/* Email — optional, no validation required to book */}
+              <Form.Group
+                className={`mb-2 ${styles.field}`}
+                controlId="af-email"
+              >
+                <Form.Label className={styles.label}>{t("af.email")}</Form.Label>
+                <Form.Control
+                  size="sm"
+                  type="email"
+                  placeholder={t("af.emailPlaceholder")}
+                  value={appointmentState.email}
+                  onChange={(e) => setter.setEmail(e.target.value)}
+                />
+              </Form.Group>
+
+              {/* Reason for Consultation — minimalist outline pills */}
+              <Form.Group className="mb-2">
+                <Form.Label className={`d-block ${styles.label}`}>
+                  {t("af.reason")}
+                </Form.Label>
+                {/* Scrollable option list — keeps the form compact */}
+                <div className={styles.optionArea}>
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="symptom"
+                    value={selectedSymptom}
+                    onChange={handleSymptomSelection}
+                    className={styles.pillStack}
                   >
-                    {price_symbol} {option.fee}
-                  </Typography>
-                )}
-              </Box>
-            ))}
-          </RadioGroup>
-
-          {/* When */}
-          <Typography variant="h6" mt={2} className="text-center">
-            {t("af.when")}
-          </Typography>
-          <RadioGroup
-            row
-            value={appointmentState.timeSelection}
-            onChange={handleTimeSelection}
-            style={{ justifyContent: "center", marginBottom: "12px" }}
-          >
-            <FormControlLabel value={IS_NOW} control={<Radio />} label={t("af.now")} />
-            <FormControlLabel
-              value={CHOOSE_TIME}
-              control={<Radio />}
-              label={t("af.chooseTime")}
-            />
-          </RadioGroup>
-
-          {/* Date + slot picker */}
-          {appointmentState.timeSelection === CHOOSE_TIME && (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              gap={2}
-              mb={2}
-            >
-              <input
-                type="date"
-                className={styles.input}
-                style={{ width: "50%" }}
-                min={today}
-                max={maxDateStr}
-                value={selectedDateStr}
-                onChange={handleDateChange}
-              />
-
-              {(() => {
-                const now = new Date();
-                const futureSlots = (appointmentState.locallyCreatedSlots || []).filter(
-                  (slot) => new Date(slot.startTime) > now
-                );
-                return futureSlots.length > 0 ? (
-                  <select
-                    className={styles.input}
-                    style={{ width: "50%" }}
-                    value={appointmentState.selectedSlot?._id || ""}
-                    onChange={(e) => {
-                      const slot = futureSlots.find(
-                        (s) => s._id === e.target.value
-                      );
-                      if (slot) handleSlotSelection(slot);
-                    }}
-                  >
-                    <option value="" disabled>
-                      {t("af.selectSlot")}
-                    </option>
-                    {futureSlots.map((slot) => (
-                      <option key={slot._id} value={slot._id}>
-                        {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-                      </option>
+                    {COMMON_DISEASES.map((disease) => (
+                      <ToggleButton
+                        key={disease}
+                        id={`symptom-${disease}`}
+                        value={disease}
+                        size="sm"
+                        variant="outline-secondary"
+                        className={`${styles.pill} ${
+                          selectedSymptom === disease ? styles.pillOn : ""
+                        }`}
+                      >
+                        {disease}
+                      </ToggleButton>
                     ))}
-                  </select>
-                ) : (
-                  <Typography variant="body2" color="textSecondary">
-                    {t("af.noSlots")}
-                  </Typography>
-                );
-              })()}
-            </Box>
-          )}
+                    <ToggleButton
+                      id="symptom-other"
+                      value={SYMPTOM_OTHER}
+                      size="sm"
+                      variant="outline-secondary"
+                      className={`${styles.pill} ${
+                        selectedSymptom === SYMPTOM_OTHER ? styles.pillOn : ""
+                      }`}
+                    >
+                      {t("af.other")}
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </div>
 
-          {/* Snackbar */}
-          <Snackbar
-            open={appointmentState.openSnackBar}
-            autoHideDuration={6000}
-            onClose={handleCloseSnackBar}
-          >
+                {selectedSymptom === SYMPTOM_OTHER && (
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    size="sm"
+                    className="mt-2"
+                    placeholder={t("af.symptoms")}
+                    style={{ fontSize: "0.9375rem" }}
+                    value={appointmentState.symptoms}
+                    onChange={handleDescriptionChange}
+                  />
+                )}
+              </Form.Group>
+            </Col>
+
+            {/* RIGHT — consultation, timing, doctor */}
+            <Col xs={12} md={6}>
+              {/* Consultation Type — subtle outline tiles */}
+              <Form.Group className="mb-2">
+                <Form.Label className={`d-block ${styles.label}`}>
+                  {t("af.consultType")}
+                </Form.Label>
+                <ToggleButtonGroup
+                  type="radio"
+                  name="consultationType"
+                  value={appointmentState.consultationType}
+                  onChange={handleConsultationTypeChange}
+                  className="w-100"
+                >
+                  {consultationOptions.map((option) => (
+                    <ToggleButton
+                      key={option.name}
+                      id={`consultation-${option.name}`}
+                      value={option.name}
+                      size="sm"
+                      variant="outline-secondary"
+                      className={`flex-fill ${styles.seg} ${
+                        appointmentState.consultationType === option.name
+                          ? styles.segOn
+                          : ""
+                      }`}
+                    >
+                      {option.name}
+                      {option.fee ? ` · ${price_symbol}${option.fee}` : ""}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Form.Group>
+
+              {/* Timing — subtle outline tiles, date/slot underneath */}
+              <Form.Group className="mb-2">
+                <Form.Label className={`d-block ${styles.label}`}>
+                  {t("af.when")}
+                </Form.Label>
+                <ToggleButtonGroup
+                  type="radio"
+                  name="when"
+                  value={appointmentState.timeSelection}
+                  onChange={handleWhenChange}
+                  className="w-100"
+                >
+                  <ToggleButton
+                    id="when-now"
+                    value={IS_NOW}
+                    size="sm"
+                    variant="outline-secondary"
+                    className={`flex-fill ${styles.seg} ${
+                      appointmentState.timeSelection === IS_NOW
+                        ? styles.segOn
+                        : ""
+                    }`}
+                  >
+                    {t("af.now")}
+                  </ToggleButton>
+                  <ToggleButton
+                    id="when-later"
+                    value={CHOOSE_TIME}
+                    size="sm"
+                    variant="outline-secondary"
+                    className={`flex-fill ${styles.seg} ${
+                      appointmentState.timeSelection === CHOOSE_TIME
+                        ? styles.segOn
+                        : ""
+                    }`}
+                  >
+                    {t("af.chooseTime")}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+
+                {appointmentState.timeSelection === CHOOSE_TIME && (
+                  <Row className="mt-2">
+                    <Col
+                      xs={12}
+                      sm={6}
+                      className={`mb-2 mb-sm-0 ${styles.field}`}
+                    >
+                      <Form.Control
+                        size="sm"
+                        type="date"
+                        min={today}
+                        max={maxDateStr}
+                        value={selectedDateStr}
+                        onChange={handleDateChange}
+                      />
+                    </Col>
+                    <Col xs={12} sm={6} className={styles.field}>
+                      {futureSlots.length > 0 ? (
+                        <Form.Control
+                          as="select"
+                          size="sm"
+                          name="slot"
+                          value={slotValue}
+                          onChange={(e) => {
+                            const slot = futureSlots.find(
+                              (s) => s._id === e.target.value
+                            );
+                            if (slot) handleSlotSelection(slot);
+                          }}
+                        >
+                          <option value="" disabled>
+                            {t("af.selectSlot")}
+                          </option>
+                          {futureSlots.map((slot) => (
+                            <option key={slot._id} value={slot._id}>
+                              {formatTime(slot.startTime)} –{" "}
+                              {formatTime(slot.endTime)}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      ) : (
+                        <small
+                          className="text-muted"
+                          style={{ fontSize: "0.875rem" }}
+                        >
+                          {t("af.noSlots")}
+                        </small>
+                      )}
+                    </Col>
+                  </Row>
+                )}
+              </Form.Group>
+
+              {/* Speciality & Doctor — 2-column grid, compact dropdowns */}
+              <Row className="mb-2">
+                <Col md={6} className={`mb-2 mb-md-0 ${styles.field}`}>
+                  <Form.Group controlId="af-speciality">
+                    <Form.Label className={styles.label}>
+                      {t("af.speciality")}
+                    </Form.Label>
+                    <Form.Control
+                      as="select"
+                      size="sm"
+                      value={specialityFilter}
+                      onChange={handleSpecialityChange}
+                    >
+                      <option value="">{t("af.allSpecialities")}</option>
+                      {specialityOptions.map((speciality) => (
+                        <option key={speciality} value={speciality}>
+                          {speciality}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+                <Col md={6} className={styles.field}>
+                  <Form.Group controlId="af-doctor">
+                    <Form.Label className={styles.label}>
+                      {t("af.doctor")}
+                    </Form.Label>
+                    <Form.Control
+                      as="select"
+                      size="sm"
+                      value={
+                        appointmentState.selectedDoctorId || DOCTOR_CHOICE_ANY
+                      }
+                      onChange={handleDoctorChange}
+                    >
+                      <option value={DOCTOR_CHOICE_ANY}>
+                        {t("af.anyDoctor")}
+                      </option>
+                      {visibleDoctors.map((doctor) => (
+                        <option key={doctor._id} value={doctor._id}>
+                          {doctor.name}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+            </Col>
+          </Row>
+
+          {/* Agreement — directly above the submit button */}
+          <Form.Group className="mb-2 text-center">
+            <Form.Check
+              type="checkbox"
+              id="af-terms"
+              checked={!!appointmentState.agreedToTerms}
+              onChange={(e) =>
+                setter.setAgreedToTerms
+                  ? setter.setAgreedToTerms(e.target.checked)
+                  : null
+              }
+              style={{ fontSize: "0.875rem", paddingLeft: 0 }}
+              label={
+                <span style={{ color: "#475569" }}>
+                  {t("af.terms")}{" "}
+                  <a
+                    href="/terms-of-service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={t("af.viewTerms")}
+                    style={{ color: "#3b5f1d", fontWeight: 600 }}
+                  >
+                    ↗
+                  </a>
+                </span>
+              }
+            />
+          </Form.Group>
+
+          {/* Action */}
+          <div className={styles.ctaWrap}>
+            <ConsultationButton
+              // ConsultationButton has no `disabled` prop, so keep the
+              // double-submit guard while the booking request is in flight.
+              onClick={() =>
+                appointmentState.isLoading ? null : sendWhatsAppConfirmation()
+              }
+            >
+              {appointmentState.isLoading
+                ? t("af.loading")
+                : t("af.bookConsultation")}
+            </ConsultationButton>
+          </div>
+
+          {appointmentState.openSnackBar && (
             <Alert
+              variant={ALERT_VARIANTS[appointmentState.severity] || "info"}
+              dismissible
               onClose={handleCloseSnackBar}
-              severity={appointmentState.severity}
-              sx={{ width: "100%" }}
+              className="mt-2 mb-0"
+              style={{ fontSize: "0.875rem" }}
             >
               {appointmentState.snackBarMessage}
             </Alert>
-          </Snackbar>
-
-          {/* Terms & Conditions */}
-          <Box mt={3} mb={1} display="flex" alignItems="center" justifyContent="center">
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={!!appointmentState.agreedToTerms}
-                  onChange={(e) =>
-                    setter.setAgreedToTerms ? setter.setAgreedToTerms(e.target.checked) : null
-                  }
-                  color="primary"
-                  size="small"
-                />
-              }
-              label={t("af.terms")}
-            />
-            <Tooltip title={t("af.viewTerms")}>
-              <IconButton
-                size="small"
-                aria-label={t("af.viewTerms")}
-                onClick={() => window.open("/terms-of-service", "_blank")}
-              >
-                <Visibility fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          {/* Submit */}
-          <Box mt={4} mb={4} display="flex" justifyContent="center">
-            <ConsultationButton onClick={sendWhatsAppConfirmation}>
-              {appointmentState.isLoading ? t("af.loading") : t("af.consult")}
-            </ConsultationButton>
-          </Box>
-        </form>
-      </div>
-    </div>
+          )}
+        </Form>
+      </Card.Body>
+    </Card>
   );
 };
 

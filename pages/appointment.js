@@ -5,7 +5,7 @@ import PageBanner from "../src/layout/PageBanner";
 const Appointment = () => {
   return (
     <Layouts>
-      <PageBanner pageTitle="Appointment" />
+      <PageBanner pageTitle="Appointment" compact />
       <AppointmentPage />
     </Layouts>
   );

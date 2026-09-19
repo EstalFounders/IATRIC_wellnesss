@@ -34,7 +34,7 @@ color: #939393;
     border: 1px solid #DBE7FF;
     border-radius: 5px;
     box-sizing: border-box;
-    margin-top: 2%;
+    /* margin-top: 2%; */
   }
   
   
@@ -103,3 +103,225 @@ line-height: 30px;
   .select-service-dropdown {
     
   }
+
+/* ------------------------------------------------------------------ */
+/* Appointment form — compact, outline-first (no heavy solid fills)     */
+/* ------------------------------------------------------------------ */
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #334155;
+  margin-bottom: 0.15rem;
+}
+
+/* The site stylesheet forces `.appointment-form .form-control{height:54px;
+   font-size:16px;line-height:1;padding:4px 15px}` and lets the +91 prefix grow
+   freely, so both sides of the mobile group are normalised to one compact height. */
+.field :global(.form-control) {
+  height: 34px !important;
+  min-height: 0 !important;
+  padding: 0 0.6rem !important;
+  margin-bottom: 0 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  border-color: #e2e8f0;
+}
+
+.field :global(.input-group-prepend) {
+  height: 34px !important;
+  min-height: 0 !important;
+}
+
+.field :global(.input-group-prepend) :global(.input-group-text) {
+  height: 34px !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 0.6rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+}
+
+.field :global(.form-control:focus) {
+  border-color: #3b5f1d;
+  box-shadow: 0 0 0 0.12rem rgba(59, 95, 29, 0.14);
+}
+
+/* Reason for Consultation — outline pills */
+.pill {
+  border-radius: 999px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  padding: 0.2rem 0.65rem !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  margin: 0 0.3rem 0.3rem 0 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* NOTE: the site stylesheet's `.demo .btn:hover { color:#fff !important }`
+   (specificity 0,3,0) outranks a plain class, so the brand hover/selected
+   states below are intentionally over-specific to keep contrast readable. */
+.pill.pill.pill:hover:not(.pillOn) {
+  border-color: #3b5f1d !important;
+  background-color: #ffffff !important;
+  color: #3b5f1d !important;
+}
+
+.pillOn.pillOn.pillOn,
+.pillOn.pillOn.pillOn:hover {
+  border-color: #3b5f1d !important;
+  background-color: #f7f8ee !important;
+  color: #3b5f1d !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 0 2px rgba(59, 95, 29, 0.12) !important;
+}
+
+/* Consultation type / Timing — subtle outline tiles */
+.seg {
+  border-radius: 10px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  padding: 0.3rem 0.5rem !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.seg.seg.seg:hover:not(.segOn) {
+  border-color: #3b5f1d !important;
+  background-color: #ffffff !important;
+  color: #3b5f1d !important;
+}
+
+.segOn.segOn.segOn,
+.segOn.segOn.segOn:hover {
+  border-color: #3b5f1d !important;
+  background-color: #f7f8ee !important;
+  color: #3b5f1d !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 0 2px rgba(142, 131, 51, 0.18) !important;
+}
+
+/* Sleek CTA */
+.cta {
+  border: 0 !important;
+  border-radius: 10px !important;
+  padding: 0.55rem 1rem !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  color: #ffffff !important;
+  background-color: #3b5f1d !important;
+  background-image: none !important;
+  box-shadow: 0 2px 10px rgba(59, 95, 29, 0.25) !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cta:hover:not(:disabled) {
+  background-color: #2e4a17 !important;
+  box-shadow: 0 0 0 3px rgba(142, 131, 51, 0.28),
+    0 4px 14px rgba(59, 95, 29, 0.28) !important;
+  transform: translateY(-1px);
+}
+
+.cta:focus,
+.cta:focus-visible {
+  box-shadow: 0 0 0 3px rgba(142, 131, 51, 0.35) !important;
+}
+
+/* Scrollable option list (Reason for Consultation) */
+.optionArea {
+  max-height: 88px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.4rem 0.4rem 0.05rem 0.4rem;
+  background-color: #ffffff;
+  scrollbar-width: thin;
+}
+
+/* Pills become full-width list rows inside the scroll area */
+.pillStack {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100%;
+}
+
+.pillStack :global(.btn) {
+  text-align: left !important;
+  margin: 0 0 0.3rem 0 !important;
+}
+
+/* Keep the chips compact regardless of the template's oversized button metrics.
+   `position: relative` also keeps the (clipped) native radio inside its pill,
+   which is what makes the chip a reliable click target. */
+.pill.pill {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0.25rem 0.65rem !important;
+  line-height: 1.35 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+.seg.seg {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0.3rem 0.5rem !important;
+  line-height: 1.35 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Appointment page chrome + compact CTA                               */
+/* ------------------------------------------------------------------ */
+
+/* The template ships a global `.form-group { padding-bottom: 10% }`
+   (public/css/style.css:5249) which adds ~76px of dead space under every group
+   of this form. Reset it for this form only (`.form` = local class on <Form>). */
+.form :global(.form-group) {
+  padding-bottom: 0 !important;
+}
+
+/* The page wrapper ships with `.wide-60{padding-top:100px}`; the header is only
+   sticky after scrolling (src/utils.js), so a compact top padding is safe and
+   lets the whole form sit within one screen. */
+.appointmentWrap {
+  padding-top: 16px !important;
+  padding-bottom: 24px !important;
+}
+
+/* ConsultationButton's shared `.consultation-btn` is a 24px/font CTA; inside this
+   form it stays small and is centred in its wrapper (it has no className prop of
+   its own, hence the descendant override). */
+.ctaWrap {
+  text-align: center;
+}
+
+.ctaWrap :global(.consultation-btn) {
+  display: inline-block;
+  width: auto;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 9px 22px;
+  border-radius: 8px;
+  box-shadow: none;
+  margin-top: 2px;
+}
+
