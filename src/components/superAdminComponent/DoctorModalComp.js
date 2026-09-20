@@ -2,15 +2,19 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, ModalBody, Row, Col } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import {
   convertDateIntoTime,
   convertTimeIntoDate,
   isMobileValid,
 } from "../../helper";
 import {
+  api,
   DoctorType,
+  superAdminConsultationtype,
   userTypeConstant,
 } from "../../constant";
+import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -29,11 +33,30 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     Array.isArray(editedDoctor.consultationType) ? editedDoctor.consultationType : []
   );
 
+  const [selectedServices, setSelectedServices] = useState(
+    Array.isArray(editedDoctor.serviceOffered) ? editedDoctor.serviceOffered : []
+  );
+
+  const dispatch = useDispatch();
+  const storedService = useSelector(
+    (state) => state.superAdminHomePage.serviceOffered
+  );
+
+  useEffect(() => {
+    if (!storedService || storedService.length === 0) {
+      fetch(api.serviceOffered)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) dispatch(setServiceOffered(data));
+        })
+        .catch((err) => console.error("Failed to fetch services:", err));
+    }
+  }, [dispatch, storedService]);
+
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
 
   const [showAddInput, setShowAddInput] = useState(false);
-  const [newTypeInput, setNewTypeInput] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,16 +129,32 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
   };
 
-  const handleAddType = () => {
-    const trimmed = newTypeInput.trim();
+  // Consultation type - picked from the fixed list (Audio, Video, Home visit, Clinic)
+  const handleAddType = (value) => {
+    const trimmed = String(value || "").trim();
     if (!trimmed) return;
     // Duplicate check (case-insensitive)
     if (selectedTypes.some((t) => t.toLowerCase() === trimmed.toLowerCase())) return;
     const updatedTypes = [...selectedTypes, trimmed];
     setSelectedTypes(updatedTypes);
     setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
-    setNewTypeInput("");
     setShowAddInput(false);
+  };
+
+  // Services offered - same add/remove tag pattern
+  const handleAddService = (value) => {
+    const trimmed = String(value || "").trim();
+    if (!trimmed) return;
+    if (selectedServices.includes(trimmed)) return;
+    const updatedServices = [...selectedServices, trimmed];
+    setSelectedServices(updatedServices);
+    setEditedDoctor({ ...editedDoctor, serviceOffered: updatedServices });
+  };
+
+  const handleRemoveService = (service) => {
+    const updatedServices = selectedServices.filter((item) => item !== service);
+    setSelectedServices(updatedServices);
+    setEditedDoctor({ ...editedDoctor, serviceOffered: updatedServices });
   };
 
   console.log(editedDoctor, "edited doctor");
@@ -265,37 +304,35 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 </div>
                 {showAddInput ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <input
-                      type="text"
-                      value={newTypeInput}
-                      onChange={(e) => setNewTypeInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddType(); } }}
-                      placeholder="Enter consultation type..."
+                    <select
+                      value=""
+                      onChange={(e) => handleAddType(e.target.value)}
                       style={{
                         padding: "6px 8px",
                         borderRadius: "6px",
                         border: "1px solid #ccc",
                         fontSize: "0.85rem",
+                        background: "#fff",
+                        cursor: "pointer",
                       }}
                       autoFocus
-                    />
+                    >
+                      <option value="" disabled>
+                        Select consultation type
+                      </option>
+                      {superAdminConsultationtype.map((option) => (
+                        <option
+                          key={option.name}
+                          value={option.name}
+                          disabled={selectedTypes.includes(option.name)}
+                        >
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
                     <div style={{ display: "flex", gap: 8 }}>
                       <button
-                        onClick={handleAddType}
-                        style={{
-                          background: "#3b5f1d",
-                          color: "white",
-                          border: "none",
-                          padding: "6px 14px",
-                          borderRadius: "6px",
-                          fontSize: "0.85rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Add
-                      </button>
-                      <button
-                        onClick={() => { setShowAddInput(false); setNewTypeInput(""); }}
+                        onClick={() => setShowAddInput(false)}
                         style={{
                           background: "#f5f5f5",
                           color: "#333",
@@ -332,6 +369,72 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                     +
                   </button>
                 )}
+              </Form.Group>
+              <Form.Group controlId="serviceOffered" className="mb-3">
+                <Form.Label>
+                  <b>Services Offered</b>
+                </Form.Label>
+                <div style={{ marginBottom: 8 }}>
+                  {selectedServices.length === 0 ? (
+                    <span style={{ fontSize: "0.85rem", color: "#999" }}>
+                      No services selected.
+                    </span>
+                  ) : (
+                    selectedServices.map((service, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          background: "#e8f5e9",
+                          color: "#2e7d32",
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          fontSize: "0.85rem",
+                          margin: "2px 4px 2px 0",
+                        }}
+                      >
+                        {service}
+                        <FaTrash
+                          style={{
+                            cursor: "pointer",
+                            fontSize: "0.7rem",
+                            color: "#c62828",
+                          }}
+                          onClick={() => handleRemoveService(service)}
+                        />
+                      </span>
+                    ))
+                  )}
+                </div>
+                <select
+                  value=""
+                  onChange={(e) => handleAddService(e.target.value)}
+                  style={{
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                    fontSize: "0.85rem",
+                    background: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="" disabled>
+                    Select service
+                  </option>
+                  {(storedService || [])
+                    .filter((option) => option.isActive !== false)
+                    .map((option) => (
+                      <option
+                        key={option._id || option.name}
+                        value={option.name}
+                        disabled={selectedServices.includes(option.name)}
+                      >
+                        {option.name}
+                      </option>
+                    ))}
+                </select>
               </Form.Group>
             </Col>
           </Row>
@@ -381,11 +484,11 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   <option value="" disabled>
                     Select an option
                   </option>
-                  <option value={DoctorType.Company}>
-                    {DoctorType.Company}
+                  <option value={DoctorType.company}>
+                    {DoctorType.company}
                   </option>
-                  <option value={DoctorType.Individual}>
-                    {DoctorType.Individual}
+                  <option value={DoctorType.individual}>
+                    {DoctorType.individual}
                   </option>
                 </select>
               </Form.Group>

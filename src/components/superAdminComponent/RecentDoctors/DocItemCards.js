@@ -64,6 +64,10 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
     formData.append("educationTraining", updatedDoctor.educationTraining);
     formData.append("workExperience", updatedDoctor.workExperience);
     formData.append("consultationType", updatedDoctor.consultationType);
+    formData.append(
+      "serviceOffered",
+      (updatedDoctor.serviceOffered || []).join(",")
+    );
     formData.append("location", updatedDoctor.location);
     formData.append("profilePicture", updatedDoctor.profilePictureUrl);
     formData.append("doctorType", updatedDoctor.doctorType);

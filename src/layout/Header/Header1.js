@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { IoMenu } from "react-icons/io5";
@@ -11,7 +11,6 @@ import {
   facebook_page_url,
   instagram_page_url,
   Linkdn_url,
-  speciality,
 } from "../../constant";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -26,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { handleServiceClick } from "../../components/Common/commonMethod";
 import { demo5ServiceHighlights } from "../../../data/services";
+import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
@@ -38,6 +38,14 @@ const Header1 = ({ scrollToContact }) => {
   const [comingSoonItems, setComingSoonItems] = useState(new Set());
   const consultationTypes = useSelector(
     (state) => state.otherConfigSlice.activeConsultation,
+  );
+  // Single source of truth: globalData slice (falls back to the static list).
+  const { specialityNames, services: globalServices } = useGlobalData();
+  // Services mega-menu: DB decides which services exist, static list supplies
+  // titles/slugs/icons where names match.
+  const navServices = useMemo(
+    () => mergeServiceLists(globalServices, demo5ServiceHighlights),
+    [globalServices]
   );
   const hiddenRoutes = ["/appointment", "/some-other-route"];
 
@@ -147,7 +155,7 @@ const Header1 = ({ scrollToContact }) => {
                         <div className="row">
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title">{t("footer.quickLinks")}:</li>
-                            {speciality.slice(0, 6).map((name, index) => (
+                            {specialityNames.slice(0, 6).map((name, index) => (
                               <li key={name}>
                                 <a
                                   href="#"
@@ -163,7 +171,7 @@ const Header1 = ({ scrollToContact }) => {
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            {speciality.slice(6).map((name, index) => (
+                            {specialityNames.slice(6).map((name, index) => (
                               <li key={name}>
                                 <a
                                   href="#"
@@ -190,9 +198,9 @@ const Header1 = ({ scrollToContact }) => {
                         <div className="row">
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title">{t("footer.quickLinks")}:</li>
-                            {demo5ServiceHighlights.slice(0, 4).map((service) => (
+                            {navServices.slice(0, 4).map((service) => (
                               <li key={service.title}>
-                                <Link legacyBehavior href={`/service-details/?Service=${service.service}`}>
+                                <Link legacyBehavior href={`/service-details/?Service=${service.service || slugifyService(service.name)}`}>
                                   <a>{service.title}</a>
                                 </Link>
                               </li>
@@ -200,9 +208,9 @@ const Header1 = ({ scrollToContact }) => {
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            {demo5ServiceHighlights.slice(4).map((service) => (
+                            {navServices.slice(4).map((service) => (
                               <li key={service.title}>
-                                <Link legacyBehavior href={`/service-details/?Service=${service.service}`}>
+                                <Link legacyBehavior href={`/service-details/?Service=${service.service || slugifyService(service.name)}`}>
                                   <a>{service.title}</a>
                                 </Link>
                               </li>
@@ -221,7 +229,6 @@ const Header1 = ({ scrollToContact }) => {
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title">{t("footer.quickLinks")}:</li>
                             <li><Link legacyBehavior href="/about-us"><a>{t("nav.aboutUs")}</a></Link></li>
-                            <li><Link legacyBehavior href="/all-services"><a>{t("nav.services")}</a></Link></li>
                             <li><Link legacyBehavior href="/appointment"><a>{t("nav.bookConsultation")}</a></Link></li>
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">

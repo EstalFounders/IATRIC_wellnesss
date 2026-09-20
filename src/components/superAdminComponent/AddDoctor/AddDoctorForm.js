@@ -47,7 +47,7 @@ const AddDoctorForm = () => {
     consultationType: "",
     serviceOffered: "",
     password: "",
-    doctorType: DoctorType.INDIVIDUAL,
+    doctorType: DoctorType.individual,
     doctorShare: "",
     price: "",
     slotStartTime: "",
@@ -491,11 +491,11 @@ const AddDoctorForm = () => {
                   onChange={handleChange}
                   className={styles.select}
                 >
-                  <option value={DoctorType.Individual}>
-                    {DoctorType.Individual}
+                  <option value={DoctorType.individual}>
+                    {DoctorType.individual}
                   </option>
-                  <option value={DoctorType.Company}>
-                    {DoctorType.Company}
+                  <option value={DoctorType.company}>
+                    {DoctorType.company}
                   </option>
                 </select>
               </label>

@@ -35,9 +35,7 @@ const AboutUsInfo4 = () => {
                 {/* Title */}
 
                 {/* Title */}
-                <h3 className="h3-md steelblue-color">
-                  {t("about4.title1")}
-                </h3>
+                <h3 className="h3-md steelblue-color">{t("about4.title1")}</h3>
                 {/* Text */}
                 <p className="h5 box-list grey-color">
                   {richText(t("about4.p1"))}
@@ -50,12 +48,16 @@ const AboutUsInfo4 = () => {
                 </p>
               </div>
               <div className="mt-2 d-flex justify-content-center mt-5 mb-4 px-3">
-                <div className="w-100" style={{ maxWidth: "280px", minWidth: 0 }}>
+                <div
+                  className="w-100"
+                  style={{ maxWidth: "280px", minWidth: 0 }}
+                >
                   <ConsultationButton path={"/appointment"}>
                     <span
                       style={{
                         display: "block",
                         width: "100%",
+                        color: "#fff",
                         whiteSpace: "normal",
                         overflowWrap: "anywhere",
                         wordBreak: "break-word",
@@ -85,9 +87,7 @@ const AboutUsInfo4 = () => {
                 </span>
 
                 {/* Title */}
-                <h3 className="h3-md steelblue-color">
-                  {t("about4.title2")}
-                </h3>
+                <h3 className="h3-md steelblue-color">{t("about4.title2")}</h3>
                 {/* Text */}
                 <p className="h5 box-list grey-color">
                   {richText(t("about4.p4"))}
@@ -96,8 +96,7 @@ const AboutUsInfo4 = () => {
                 <div className="row h5 box-list grey-color mt-4">
                   <div className="col-md-6">
                     <p className="h6" style={{ color: "#3b5f1d" }}>
-                      <FaAngleDoubleRight />{" "}
-                      <b>{t("about4.secA")}</b>
+                      <FaAngleDoubleRight /> <b>{t("about4.secA")}</b>
                       <ul
                         style={{ listStyleType: "disc", paddingLeft: "20px" }}
                         className="mt-3"
@@ -136,8 +135,7 @@ const AboutUsInfo4 = () => {
                   </div>
                   <div className="col-md-6">
                     <p className="h6" style={{ color: "#3b5f1d" }}>
-                      <FaAngleDoubleRight />{" "}
-                      <b>{t("about4.secC")}</b>
+                      <FaAngleDoubleRight /> <b>{t("about4.secC")}</b>
                       <ul
                         style={{ listStyleType: "disc", paddingLeft: "20px" }}
                         className="mt-3"
@@ -155,8 +153,7 @@ const AboutUsInfo4 = () => {
                       </ul>
                     </p>
                     <p className="h6 h-50" style={{ color: "#3b5f1d" }}>
-                      <FaAngleDoubleRight />{" "}
-                      <b>{t("about4.secD")}</b>{" "}
+                      <FaAngleDoubleRight /> <b>{t("about4.secD")}</b>{" "}
                       <ul
                         style={{ listStyleType: "disc", paddingLeft: "20px" }}
                         className="mt-3"

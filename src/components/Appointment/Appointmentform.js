@@ -16,8 +16,9 @@ import {
   CHOOSE_TIME,
   IS_NOW,
   price_symbol,
-  speciality as SPECIALTIES,
+  superAdminConsultationtype,
 } from "../../constant";
+import { useGlobalData } from "../../customUtils/useGlobalData";
 import { formatTime } from "../helper";
 
 // Common complaints offered as quick-select pills on the form.
@@ -44,6 +45,43 @@ const ALERT_VARIANTS = {
   info: "info",
 };
 
+// --- Speciality <-> doctor matching ------------------------------------------
+// Doctor docs carry no `speciality` field: the specialities a doctor covers live in
+// `serviceOffered` (legacy `speciality` is still honoured when present).
+const CONSULTATION_TYPES = superAdminConsultationtype.map((type) =>
+  String(type.name || "").trim().toLowerCase()
+);
+
+const normalizeValue = (value) => String(value || "").trim().toLowerCase();
+
+const slugifyValue = (value) =>
+  normalizeValue(value)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const doctorServiceNames = (doctor) =>
+  [
+    doctor?.speciality,
+    ...(Array.isArray(doctor?.serviceOffered) ? doctor.serviceOffered : []),
+  ].filter(Boolean);
+
+// Tolerant match: equal, slug-equal, or partial either way - so "Gynaecology &
+// Obstetrics" also matches a doctor tagged "gynecology & obs".
+const matchesSpeciality = (doctor, filter) => {
+  const target = normalizeValue(filter);
+  if (!target) return true;
+
+  return doctorServiceNames(doctor).some((name) => {
+    const value = normalizeValue(name);
+    return (
+      value === target ||
+      slugifyValue(name) === slugifyValue(filter) ||
+      value.includes(target) ||
+      target.includes(value)
+    );
+  });
+};
+
 const toLocalDateString = (date) => {
   const d = new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -64,7 +102,8 @@ const AppointmentForm = ({
   const [selectedSymptom, setSelectedSymptom] = useState("");
   const [specialityFilter, setSpecialityFilter] = useState("");
   const { t } = useLanguage();
-
+  // Single source of truth for the speciality list (globalData slice -> SUB items).
+  const { specialityNames } = useGlobalData();
   const handleDescriptionChange = (e) => setter.setSymptoms(e.target.value);
 
   // ToggleButtonGroup hands us the value directly (not an event).
@@ -117,18 +156,18 @@ const AppointmentForm = ({
     ? appointmentState.filteredDoctors
     : doctorOptions;
 
-  // SPECIALTIES (src/constant.js) drives the dropdown. Any extra speciality found
-  // on the doctor records is appended so filtering can never hide a bookable doctor.
+  // Speciality list: globalData slice (serviceOffered SUB items) first, then any
+  // service found on doctor records, minus consultation types (Audio/Video/...).
   const specialityOptions = [
     ...new Set([
-      ...SPECIALTIES,
-      ...doctorOptions.map((doctor) => doctor.speciality).filter(Boolean),
+      ...specialityNames,
+      ...doctorOptions.flatMap((doctor) => doctorServiceNames(doctor)),
     ]),
-  ];
+  ].filter((name) => !CONSULTATION_TYPES.includes(normalizeValue(name)));
 
-  // Doctor list narrowed by the selected speciality.
+  // Doctor list narrowed by the selected speciality (match on the doctor's services).
   const visibleDoctors = specialityFilter
-    ? scopedDoctors.filter((doctor) => doctor.speciality === specialityFilter)
+    ? scopedDoctors.filter((doctor) => matchesSpeciality(doctor, specialityFilter))
     : scopedDoctors;
 
   const futureSlots = (appointmentState.locallyCreatedSlots || []).filter(

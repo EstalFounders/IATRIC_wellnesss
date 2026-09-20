@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useSelector } from "react-redux";
@@ -14,9 +14,28 @@ import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
 import CalltoBookPopup from "./CalltoBookPopup";
 import { useLanguage } from "../../i18n/LanguageContext";
+import {
+  mergeServiceLists,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
+
+// Fallback artwork for items that exist in the DB but not in the static list yet.
+const DEFAULT_SERVICE_IMAGE = "/images/general_physicians.jpg";
 
 const ServicesTabs = () => {
-  const [services] = useState(servicesData);
+  // Single source of truth: globalData slice speciality list; the static servicesData
+  // list supplies image/subheading/description assets keyed by name.
+  const { speciality } = useGlobalData();
+  const services = useMemo(
+    () =>
+      mergeServiceLists(speciality, servicesData, "name").map((item) => ({
+        ...item,
+        id: item.id ?? slugifyService(item.name),
+        image: item.image || DEFAULT_SERVICE_IMAGE,
+      })),
+    [speciality]
+  );
   const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
@@ -59,6 +78,14 @@ const ServicesTabs = () => {
 
   const canGoNext = currentPage < totalPages;
   const canGoPrev = currentPage > 1;
+
+  // Keep the active tab valid when the slice replaces the static list (DB-only
+  // items carry slug ids, matched static items keep their numeric id).
+  useEffect(() => {
+    if (services.length && !services.some((service) => service.id === activeTab)) {
+      setActiveTab(services[0].id);
+    }
+  }, [services, activeTab]);
 
   const handleTabClick = (id) => {
     setActiveTab(id);

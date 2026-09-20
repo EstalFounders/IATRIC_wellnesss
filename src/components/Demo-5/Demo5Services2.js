@@ -16,7 +16,8 @@ import { BsLungsFill } from "react-icons/bs";
 import { BiInjection } from "react-icons/bi";
 import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
-import { color_schema, speciality } from "../../constant";
+import { color_schema } from "../../constant";
+import { useGlobalData } from "../../customUtils/useGlobalData";
 import { handleServiceClick } from "../Common/commonMethod";
 import {
   CardiologyIcon,
@@ -32,6 +33,38 @@ import {
   PulmonologyIcon,
 } from "../../../public/svgIcon/all-department-svg-icon";
 
+// Name -> icon map so reordering or adding specialities in the DB can never
+// shift the wrong icon onto a card (previously index-based).
+const ICON_BY_NAME = {
+  "general physician": GeneralPhysician,
+  pediatrics: PediatricsIcon,
+  cardiology: CardiologyIcon,
+  dermatologist: DermatologistIcon,
+  dermatology: DermatologistIcon,
+  orthopaedics: OrthopaedicsIcon,
+  "gynaecology & obstetrics": GynaecologyIcon,
+  gynecology: GynaecologyIcon,
+  ophthalmology: OphthalmologyIcon,
+  pulmonology: PulmonologyIcon,
+  psychiatrist: Psychiatrist,
+  psychiatry: Psychiatrist,
+  dentistry: Dentistry,
+  physiotherapy: PhysiotherapyIcon,
+  // service-type names (used if a MAJOR item is ever rendered here)
+  labtest: GiErlenmeyer,
+  "lab investigation": GiErlenmeyer,
+  "nursing care": FaUserNurse,
+  "nursing-services": FaUserNurse,
+  "home care": RiTeamFill,
+  "medicine delivery": GiMedicines,
+  "corporate healthcare": RiTeamFill,
+  healthcamp: FaStethoscope,
+  audio: FaStethoscope,
+  video: FaStethoscope,
+  vaccination: BiInjection,
+  injection: BiInjection,
+};
+
 const Demo5Services2 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -42,6 +75,8 @@ const Demo5Services2 = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  // Single source of truth: globalData slice (serviceOffered SUB items).
+  const { specialityNames } = useGlobalData();
 
   useEffect(() => {
     const el = marqueeRef.current;
@@ -67,7 +102,7 @@ const Demo5Services2 = () => {
     };
   }, []);
 
-  const combinedServices = [...speciality, ...speciality];
+  const combinedServices = [...specialityNames, ...specialityNames];
 
   // Mouse Events
   const handleMouseDown = (e) => {
@@ -93,136 +128,19 @@ const Demo5Services2 = () => {
   };
 
   const handleClick = (index) => {
-    const serviceName = speciality[index % speciality.length];
+    if (!specialityNames.length) return;
+    const serviceName = specialityNames[index % specialityNames.length];
     handleServiceClick(serviceName, index, router);
   };
 
-  const renderIcon = (index) => {
-    const actualIndex = index % speciality.length;
-
-    switch (actualIndex) {
-      case 0:
-        return (
-          <GeneralPhysician
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 1:
-        return (
-          <PediatricsIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 2:
-        return (
-          <CardiologyIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 3:
-        return (
-          <DermatologistIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 4:
-        return (
-          <OrthopaedicsIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 5:
-        return (
-          <GynaecologyIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 6:
-        return (
-          <OphthalmologyIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 7:
-        return (
-          <PulmonologyIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 8:
-        return (
-          <Psychiatrist
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 9:
-        return (
-          <Dentistry
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 10:
-        return (
-          <PhysiotherapyIcon
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 11:
-        return (
-          <BiInjection
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 12:
-        return (
-          <FaUserNurse
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 13:
-        return (
-          <GiMedicines
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 14:
-        return (
-          <GiErlenmeyer
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 15:
-        return (
-          <FaStethoscope
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      case 16:
-        return (
-          <RiTeamFill
-            size={80}
-            color={hoveredIndex === index ? "#fafafa" : color_schema.green}
-          />
-        );
-      default:
-        return null;
-    }
+  const renderIcon = (name, index) => {
+    const Icon = ICON_BY_NAME[String(name || "").toLowerCase()] || FaStethoscope;
+    return (
+      <Icon
+        size={80}
+        color={hoveredIndex === index ? "#fafafa" : color_schema.green}
+      />
+    );
   };
 
   return (
@@ -249,7 +167,9 @@ const Demo5Services2 = () => {
             >
               <div className={`services-track ${isPaused ? "paused" : ""}`}>
                 {combinedServices.map((service, index) => {
-                  const actualIndex = index % speciality.length;
+                  const actualIndex = specialityNames.length
+                    ? index % specialityNames.length
+                    : 0;
 
                   return (
                     <div
@@ -260,7 +180,9 @@ const Demo5Services2 = () => {
                       onMouseLeave={() => setHoveredIndex(null)}
                     >
                       <div className="service-nav-link">
-                        <div className="service-icon">{renderIcon(index)}</div>
+                        <div className="service-icon">
+                          {renderIcon(service, index)}
+                        </div>
                         <div className="service-title font-weight-bold">
                           {t(`service.${service}`, service)}
                         </div>

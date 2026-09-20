@@ -1,5 +1,6 @@
 import { api } from "../../constant";
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
+import { setServiceOfferedData } from "../../store/slices/bookingWebsite/globalDataSlice";
 
 export const bookConsultationApiCall = async ({
   consultationData,
@@ -56,6 +57,7 @@ export const getServiceOffered = async ({ dispatch }) => {
     }
     const data = await response.json();
     dispatch(setServiceOffered(data));
+    dispatch(setServiceOfferedData(data));
   } catch (error) {
     console.error("Failed to fetch doctors:", error);
   }

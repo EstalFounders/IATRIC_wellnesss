@@ -1,13 +1,31 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { servicesData } from "../../../data/services";
+import {
+  mergeServiceLists,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
 
 const DepartmentPage = ({ serviceName, id }) => {
-  const [serviceInfo] = useState(servicesData);
+  // Single source of truth: globalData slice speciality list (falls back to the
+  // static servicesData list), matched by name/slug first, static id second.
+  const { speciality } = useGlobalData();
+  const serviceInfo = useMemo(
+    () => mergeServiceLists(speciality, servicesData, "name"),
+    [speciality]
+  );
 
   const departmentDetails = serviceInfo.find((service) => {
-    // Use String() to ensure both sides of the comparison are strings for strict equality
-    return String(service.id) === id;
+    const target = String(serviceName || "").toLowerCase();
+    const sameName = String(service.name || "").toLowerCase() === target;
+    const sameSlug =
+      slugifyService(service.name) === slugifyService(serviceName);
+    const sameId =
+      id !== undefined &&
+      service.id !== undefined &&
+      String(service.id) === String(id);
+    return sameName || sameSlug || sameId;
   });
 
   if (!departmentDetails) {
