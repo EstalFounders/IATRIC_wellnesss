@@ -4,6 +4,7 @@ import { api } from "../../constant";
 import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { setActiveConsultation } from "../../store/slices/bookingWebsite/otherConfig";
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
+import { setServiceOfferedData } from "../../store/slices/bookingWebsite/globalDataSlice";
 import { getIconByName } from "../Common/commonMethod";
 
 export const fetchBasicConfiguration = async (dispatch) => {
@@ -21,9 +22,25 @@ export const fetchBasicConfiguration = async (dispatch) => {
     const serviceOfferd = serviceOfferedData;
     dispatch(setAllDoctors(doctor));
     dispatch(setServiceOffered(serviceOfferd));
+    // Website-wide single source of truth (MAJOR -> services, SUB -> speciality)
+    dispatch(setServiceOfferedData(serviceOfferd));
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
+  }
+};
+
+// Fetches only the serviceOffered list and feeds the website-wide globalData slice.
+export const fetchGlobalData = async (dispatch) => {
+  try {
+    const response = await fetch(api.serviceOffered);
+    if (!response.ok) throw new Error("Failed to fetch serviceOffered");
+
+    const data = await response.json();
+    dispatch(setServiceOfferedData(data));
+    return data;
+  } catch (error) {
+    console.error("Error fetching serviceOffered:", error);
   }
 };
 

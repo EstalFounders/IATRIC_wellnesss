@@ -1,15 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { HorizontalScrollContainer } from "../Common/HorizontalContainer";
 import { callToBook, color_schema } from "../../constant";
 import { handleServiceClick } from "../Common/commonMethod";
 import { useRouter } from "next/router";
 import { AllDepartmentService } from "../../../data/services";
+import { GeneralPhysician } from "../../../public/svgIcon/all-department-svg-icon";
 import { ConsultationButton } from "../Common/commonUi";
+import { mergeServiceLists, useGlobalData } from "../../customUtils/useGlobalData";
 
 const AllDepartmentServices7 = () => {
-  const [services] = useState(AllDepartmentService);
+  // Single source of truth: globalData slice speciality list; icon/description
+  // presentation comes from the static list, keyed by name.
+  const { speciality } = useGlobalData();
+  const services = useMemo(
+    () => mergeServiceLists(speciality, AllDepartmentService),
+    [speciality]
+  );
 
   const router = useRouter();
   const handleClickService = (serviceName, index) => {
@@ -61,7 +69,7 @@ const AllDepartmentServices7 = () => {
                           // backgroundColor: `${color_schema.yellow}`,
                         }}
                       >
-                        {service.icon}
+                        {service.icon || <GeneralPhysician />}
                       </div>
 
                       {/* Text content with hover-only effect */}

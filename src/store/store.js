@@ -13,6 +13,7 @@ import userDetailsPageSlice from "./slices/authentication/userDetailsSlice";
 import medicineHomePageApiDataSlice from "./slices/medicine/MedicineHomePageApiData.js";
 import otherConfigSlice from "./slices/bookingWebsite/otherConfig.js";
 import UtilBlogDataSlice from "./slices/blog/utilBlogStore.js";
+import globalDataSlice from "./slices/bookingWebsite/globalDataSlice";
 
 const createNoopStorage = () => {
   return {
@@ -61,6 +62,7 @@ const medicineDetailsSlice = persistReducer(
 
 const otherConfig = persistReducer(persistConfig, otherConfigSlice);
 const utilBlogStore = persistReducer(persistConfig, UtilBlogDataSlice);
+const globalData = persistReducer(persistConfig, globalDataSlice);
 
 export const makeStore = () =>
   configureStore({
@@ -75,6 +77,7 @@ export const makeStore = () =>
       otherDetailsSlice: superAdminOtherDetailsReducer,
       otherConfigSlice: otherConfig,
       utilBlogStoreSlice: utilBlogStore,
+      globalData: globalData,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

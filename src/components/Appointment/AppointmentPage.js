@@ -88,10 +88,9 @@ const AppointmentPage = () => {
   const [serviceType, setServiceType] = useState("");
   const [pendingPayment, setPendingPayment] = useState(null);
 
-  // Get services from Redux (already fetched via getServiceOffered)
-  const services = useSelector(
-    (state) => state.superAdminHomePage.serviceOffered
-  );
+  // Services come from the globalData slice (single source of truth, serviceOffered
+  // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
+  const services = useSelector((state) => state.globalData?.services || []);
 
   // Derive consultation options from services filter for Audio/Video
   const consultationOptions = (Array.isArray(services) ? services : [])
