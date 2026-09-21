@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getToken, onMessage } from "../../../../lib/firebase";
-import { messaging } from "../../../../lib/firebase"; // Adjust the import to match your Firebase setup
+import {
+  getToken,
+  onMessage,
+  getMessagingIfSupported,
+} from "../../../../lib/firebase";
 import {
   Dialog,
   DialogTitle,
@@ -13,11 +16,17 @@ import { vapidKey } from "../../../constant";
 
 const vapidKeyImported = vapidKey; // Replace with your actual Firebase VAPID key
 
-const NotificationHandler = (onNotification) => {
+const NotificationHandler = ({ onNotification }) => {
   const [permission, setPermission] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    // The Notification API does not exist in some mobile browsers (e.g. iOS Safari tabs).
+    if (typeof window === "undefined" || typeof Notification === "undefined") {
+      console.warn("[NotificationHandler] Notifications are not supported here.");
+      return undefined;
+    }
+
     const checkNotificationPermission = async () => {
       const currentPermission = Notification.permission;
       setPermission(currentPermission);
@@ -40,7 +49,15 @@ const NotificationHandler = (onNotification) => {
 
     const getFCMToken = async () => {
       try {
-        const token = await getToken(messaging, { vapidKeyImported });
+        const messaging = await getMessagingIfSupported();
+        if (!messaging) {
+          console.warn(
+            "[NotificationHandler] Firebase Messaging is not supported in this browser."
+          );
+          return;
+        }
+
+        const token = await getToken(messaging, { vapidKey: vapidKeyImported });
         console.log("FCM Token:", token);
         // Save token to your backend or database if needed
       } catch (error) {
@@ -50,16 +67,33 @@ const NotificationHandler = (onNotification) => {
 
     checkNotificationPermission();
 
-    // Listen for foreground messages
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Message received in foreground:", payload);
-      if (onNotification) {
-        onNotification(payload.notification);
-      }
-      alert(payload.notification.title + ": " + payload.notification.body);
-    });
+    // Listen for foreground messages - skipped when web push is unsupported.
+    let unsubscribe;
+    let cancelled = false;
 
-    return () => unsubscribe();
+    (async () => {
+      const messaging = await getMessagingIfSupported();
+      if (!messaging || cancelled) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        console.log("Message received in foreground:", payload);
+        const notification = payload?.notification || {};
+        const data = payload?.data || {};
+        if (onNotification) {
+          onNotification(notification);
+        }
+        alert(
+          `${notification.title || data.title || "Notification"}: ${
+            notification.body || data.body || ""
+          }`
+        );
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
   }, [onNotification]);
 
   return (
