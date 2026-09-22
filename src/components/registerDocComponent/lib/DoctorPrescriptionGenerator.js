@@ -1,5 +1,5 @@
 // DocPrescriptionGeneratePdf.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Button } from "react-bootstrap";
@@ -9,18 +9,93 @@ import Image from "next/image";
 import { capitalize, formatData } from "../utils/helper";
 import CircleLoader from "../../circleLoader";
 import { sendPrescriptionToFirebase } from "../../../utils";
-import { stampDataUrl } from "./DoctorStampGenerator";
+import { stampDataUrl, drawStampOnPdf } from "./DoctorStampGenerator";
 import { AiOutlineGlobal } from "react-icons/ai";
 import { MdEmail, MdPhone } from "react-icons/md";
 
-const PDF_WIDTH = 720;
+const PDF_WIDTH = 720; // design width of #pdfContainer (px)
+const A4_WIDTH_MM = 210; // A4 width in mm - used to map DOM rects into PDF units
+
+// Where the stamp/signature go if a DOM rect can't be measured for any reason.
+const STAMP_FALLBACK_MM = { x: 150, y: 248, w: 45, h: 27 };
+const SIGNATURE_FALLBACK_MM = { x: 150, y: 222, w: 42, h: 25 };
+
+// Map an element's on-screen box to millimetres relative to the print container.
+const getMmRect = (node, container) => {
+  if (!node || !container) return null;
+  const c = container.getBoundingClientRect();
+  const r = node.getBoundingClientRect();
+  if (!c.width || !r.width || !r.height) return null;
+  const scale = A4_WIDTH_MM / c.width;
+  return {
+    x: (r.left - c.left) * scale,
+    y: (r.top - c.top) * scale,
+    w: r.width * scale,
+    h: r.height * scale,
+  };
+};
+
+// Never capture before images finish loading - on mobile a slow blob would come out blank.
+const waitForImages = async (root) => {
+  if (!root) return;
+  const images = Array.from(root.querySelectorAll("img"));
+  await Promise.all(
+    images.map((img) =>
+      img.decode
+        ? img.decode().catch(() => {})
+        : Promise.resolve()
+    )
+  );
+};
+
+// Turn a signature scan into a PNG with the white paper knocked out, so the PDF looks
+// the same as the preview's `mix-blend-mode: multiply` on every PDF viewer.
+const urlToTransparentPngDataUrl = (url) =>
+  new Promise((resolve) => {
+    if (!url || typeof document === "undefined") return resolve(null);
+    const image = new window.Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < data.data.length; i += 4) {
+          const luminance =
+            (data.data[i] + data.data[i + 1] + data.data[i + 2]) / 3;
+          if (luminance > 235) {
+            data.data[i + 3] = 0; // pure paper -> fully transparent
+          } else if (luminance > 200) {
+            data.data[i + 3] = Math.round(
+              data.data[i + 3] * (1 - (luminance - 200) / 35)
+            );
+          }
+        }
+        ctx.putImageData(data, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } catch (error) {
+        console.warn("Signature transparency pass failed:", error);
+        resolve(null);
+      }
+    };
+    image.onerror = () => resolve(null);
+    image.src = url;
+  });
 
 const DocPrescriptionGeneratePdf = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [signNstampLoader, setSignNstampLoader] = useState(false);
   const [signatureUrl, setSignatureUrl] = useState(null);
+  const [signaturePng, setSignaturePng] = useState(null);
   const [stampUrl, setStampUrl] = useState(null);
   const [previewScale, setPreviewScale] = useState(1);
+
+  // DOM anchors used to place the vector stamp / transparent signature in the PDF.
+  const stampRef = useRef(null);
+  const signatureRef = useRef(null);
 
   useEffect(() => {
     const updateScale = () => {
@@ -43,7 +118,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           );
           if (response.ok) {
             const blob = await response.blob();
-            setter(URL.createObjectURL(blob));
+            await setter(URL.createObjectURL(blob));
           }
         } catch (error) {
           console.error(`Error fetching image:`, error);
@@ -55,8 +130,12 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       }
     };
 
-    if (data.doctorSignatureUrl)
-      fetchImage(data.doctorSignatureUrl, setSignatureUrl);
+    if (data.doctorSignatureUrl) {
+      fetchImage(data.doctorSignatureUrl, async (url) => {
+        setSignatureUrl(url);
+        setSignaturePng(await urlToTransparentPngDataUrl(url));
+      });
+    }
 
     const dynamicStampUrl = stampDataUrl({
       name: data.doctorName,
@@ -75,25 +154,53 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     const element = document.getElementById("pdfContainer");
     const originalTransform = element.style.transform;
     element.style.transform = "none";
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: "#ffffff",
-      windowWidth: PDF_WIDTH,
-      scrollY: -window.scrollY,
+
+    // Wait for every image so a slow-loading signature/stamp is never captured blank.
+    await waitForImages(element);
+
+    // Rect measurement happens with the mobile preview transform removed, so the
+    // millimetre mapping matches the captured (untransformed) layout exactly.
+    const stampRect = getMmRect(stampRef.current, element);
+    const signatureRect = getMmRect(signatureRef.current, element);
+
+    // Hide the DOM copies: the PDF gets a crisp vector stamp + pre-multiplied
+    // signature instead (html2canvas clips/mis-sizes <img> SVGs and ignores
+    // mix-blend-mode, which is what made the stamp look cut off).
+    const hidden = [];
+    [stampRef.current, signatureRef.current].forEach((node) => {
+      if (node) {
+        hidden.push([node, node.style.visibility]);
+        node.style.visibility = "hidden";
+      }
     });
-    element.style.transform = originalTransform;
-    return canvas;
+
+    let canvas;
+    try {
+      canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: PDF_WIDTH,
+        scrollY: -window.scrollY,
+      });
+    } finally {
+      hidden.forEach(([node, previous]) => {
+        node.style.visibility = previous;
+      });
+      element.style.transform = originalTransform;
+    }
+
+    return { canvas, stampRect, signatureRect };
   };
 
-  const canvasToSinglePagePDF = (canvas) => {
+  const canvasToSinglePagePDF = (canvas, rects = {}) => {
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
-    const pdfWidth = 210;
+    const pdfWidth = A4_WIDTH_MM;
     const pageHeight = 297;
     const imgHeight = (canvas.height * pdfWidth) / canvas.width;
     const finalHeight = imgHeight > pageHeight ? pageHeight : imgHeight;
@@ -105,6 +212,29 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       pdfWidth,
       finalHeight,
     );
+
+    // ── Stamp: drawn as real PDF vectors, positioned from the DOM rect ──────────
+    // Immune to the raster-capture sizing/clipping that hit the SVG <img>.
+    const stampBox = rects.stampRect || STAMP_FALLBACK_MM;
+    drawStampOnPdf(
+      doc,
+      {
+        name: data.doctorName,
+        degree: data.doctorDegree,
+        dmcNo: data.doctorRegNo || "101542",
+      },
+      stampBox.x,
+      stampBox.y,
+      stampBox.w,
+      stampBox.h,
+    );
+
+    // ── Signature: PNG with the white paper already knocked out ────────────────
+    if (signaturePng) {
+      const sigBox = rects.signatureRect || SIGNATURE_FALLBACK_MM;
+      doc.addImage(signaturePng, "PNG", sigBox.x, sigBox.y, sigBox.w, sigBox.h);
+    }
+
     return doc;
   };
 
@@ -115,8 +245,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     }
     setLoading(true);
     try {
-      const canvas = await generateCanvas();
-      const doc = canvasToSinglePagePDF(canvas);
+      const { canvas, stampRect, signatureRect } = await generateCanvas();
+      const doc = canvasToSinglePagePDF(canvas, { stampRect, signatureRect });
       const blob = doc.output("blob");
 
       const blobUrl = URL.createObjectURL(blob);
@@ -153,8 +283,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
   const handleCreatePDF = async () => {
     setLoading(true);
     try {
-      const canvas = await generateCanvas();
-      const doc = canvasToSinglePagePDF(canvas);
+      const { canvas, stampRect, signatureRect } = await generateCanvas();
+      const doc = canvasToSinglePagePDF(canvas, { stampRect, signatureRect });
       const blob = doc.output("blob");
 
       const prescriptionUrl = await sendPrescriptionToFirebase(blob, {
@@ -534,22 +664,26 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               >
                 {signNstampLoader && <CircleLoader />}
                 {signatureUrl && (
-                  <Image
-                    src={signatureUrl}
-                    alt="Doctor Signature"
-                    width={100}
-                    height={65}
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <div ref={signatureRef} style={{ lineHeight: 0 }}>
+                    <Image
+                      src={signatureUrl}
+                      alt="Doctor Signature"
+                      width={100}
+                      height={65}
+                      style={{ mixBlendMode: "multiply" }}
+                    />
+                  </div>
                 )}
                 {stampUrl && (
-                  <Image
-                    src={stampUrl}
-                    alt="Doctor Stamp"
-                    width={100}
-                    height={65}
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <div ref={stampRef} style={{ lineHeight: 0 }}>
+                    <Image
+                      src={stampUrl}
+                      alt="Doctor Stamp"
+                      width={100}
+                      height={65}
+                      style={{ mixBlendMode: "multiply" }}
+                    />
+                  </div>
                 )}
               </div>
             </div>

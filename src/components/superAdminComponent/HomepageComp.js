@@ -27,7 +27,7 @@ import {
 import { calculateTotalIncome } from "./utility/helper";
 import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
-import { messaging } from "../../../lib/firebase";
+import { getMessagingIfSupported } from "../../../lib/firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import NotificationHandler from "./common/NotificationHandler";
 
@@ -76,11 +76,30 @@ export default function HomepageComp() {
   }, []); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
-    // Listen to foreground messages
-    onMessage(messaging, (payload) => {
-      console.log("Message received in foreground:", payload);
-      alert(payload.notification.title + ": " + payload.notification.body);
-    });
+    let unsubscribe;
+    let cancelled = false;
+
+    // Foreground messages - skipped entirely when web push is unsupported (mobile).
+    (async () => {
+      const messaging = await getMessagingIfSupported();
+      if (!messaging || cancelled) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        console.log("Message received in foreground:", payload);
+        const notification = payload?.notification || {};
+        const data = payload?.data || {};
+        alert(
+          `${notification.title || data.title || "Notification"}: ${
+            notification.body || data.body || ""
+          }`
+        );
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -130,15 +149,29 @@ export default function HomepageComp() {
 
   const requestNotificationPermission = async () => {
     try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        const token = await getToken(messaging, {
-          vapidKey: vapidKey,
-        });
-        console.log("FCM Token:", token);
-      } else {
-        console.warn("Permission denied");
+      if (typeof window === "undefined" || typeof Notification === "undefined") {
+        console.warn("Notifications are not supported in this browser.");
+        return;
       }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        console.warn("Permission denied");
+        return;
+      }
+
+      const messaging = await getMessagingIfSupported();
+      if (!messaging) {
+        console.warn(
+          "Firebase Messaging is not supported here (e.g. iOS Safari) - skipping FCM token."
+        );
+        return;
+      }
+
+      const token = await getToken(messaging, {
+        vapidKey: vapidKey,
+      });
+      console.log("FCM Token:", token);
     } catch (error) {
       console.error("Error getting FCM token:", error);
     }
