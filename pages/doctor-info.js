@@ -1,5 +1,5 @@
 import Doctor1Details from "../src/components/Doctor-1/Doctor1Details";
-import Doctor1Reviews2 from "../src/components/Doctor-1/Doctor1Reviews2";
+import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import Layouts from "../src/layout/Layouts";
 
 const Doctor1 = () => {
@@ -7,7 +7,7 @@ const Doctor1 = () => {
     <Layouts>
       
       <Doctor1Details />
-      <Doctor1Reviews2 />
+      <Demo2Reviews2 />
     </Layouts>
   );
 };

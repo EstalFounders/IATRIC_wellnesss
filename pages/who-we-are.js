@@ -4,7 +4,7 @@ import WhoWeAreAbout5 from "../src/components/Who-we-are/WhoWeAreAbout5";
 import WhoWeAreDoctors1 from "../src/components/Who-we-are/WhoWeAreDoctors1";
 import WhoWeAreInfo1 from "../src/components/Who-we-are/WhoWeAreInfo1";
 import WhoWeAreInfo9 from "../src/components/Who-we-are/WhoWeAreInfo9";
-import WhoWeAreReviews2 from "../src/components/Who-we-are/WhoWeAreReviews2";
+import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import Layouts from "../src/layout/Layouts";
 import PageBanner from "../src/layout/PageBanner";
 
@@ -35,7 +35,7 @@ const WhoWeAre = () => {
       {/* END TABS-1 */}
       {/* TESTIMONIALS-2
 			============================================= */}
-      <WhoWeAreReviews2 />
+      <Demo2Reviews2 />
       {/* END TESTIMONIALS-2 */}
       {/* DOCTORS-1
 			============================================= */}

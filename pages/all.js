@@ -36,8 +36,7 @@ import AllInfo9 from "../src/components/All/AllInfo9";
 import AllPricing1 from "../src/components/All/AllPricing1";
 import AllPricing2 from "../src/components/All/AllPricing2";
 import AllPricing3 from "../src/components/All/AllPricing3";
-import AllReviews1 from "../src/components/All/AllReviews1";
-import AllReviews2 from "../src/components/All/AllReviews2";
+import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import AllServices1 from "../src/components/All/AllServices1";
 import AllServices2 from "../src/components/All/AllServices2";
 import AllServices3 from "../src/components/All/AllServices3";
@@ -227,12 +226,8 @@ const All = () => {
       {/* END BRANDS-1 */}
       {/* TESTIMONIALS-1
 			============================================= */}
-      <AllReviews1 />
+      <Demo2Reviews2 />
       {/* END TESTIMONIALS-1 */}
-      {/* TESTIMONIALS-2
-			============================================= */}
-      <AllReviews2 />
-      {/* END TESTIMONIALS-2 */}
       {/* BANNER-1
 			============================================= */}
       <AllBrands1 />
