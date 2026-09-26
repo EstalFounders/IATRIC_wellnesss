@@ -13,7 +13,6 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     { label: "Book Consultation", href: "/appointment", icon: "📅" },
     { label: "Lab Tests", href: "/labTest/homepage", icon: "🧪" },
     { label: "Medicines", href: "/medicine/homepage", icon: "💊" },
-    { label: "Blog", href: "/blog/homepage", icon: "📝" },
     { label: "All Doctors", href: "/all-doctors", icon: "👨‍⚕️" },
     { label: "Contact Us", href: "/contacts-2", icon: "☎️" },
     { label: "Join Us", href: "/join-us", icon: "👥" },

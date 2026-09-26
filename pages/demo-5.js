@@ -1,3 +1,9 @@
+import { getSeoStaticProps } from "../src/api/marketing/helpers/seoServer";
+
+// Marketing panel SEO: tags are part of the built HTML (60s refresh).
+export const getStaticProps = () => getSeoStaticProps("/demo-5");
+
+
 import { useEffect, useState } from "react";
 import About5 from "../src/components/Common/About-5";
 import Banner5 from "../src/components/Common/Banner-5";
@@ -22,6 +28,7 @@ import AnimatedSection from "../public/animation/animationSection/AnimatedSectio
 import HowItWorks from "../src/components/Appointment/common/HowItsWorks";
 import BenefitSection from "../src/components/Appointment/common/BenefitsSection";
 import FaqSection from "../src/components/Appointment/common/FAQComponent";
+import CommonHealthConcerns from "../src/components/Appointment/CommonHealthConcern";
 
 const Demo5 = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -34,6 +41,9 @@ const Demo5 = () => {
         {/* Wrap each component with AnimatedSection */}
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5About2 />
+        </AnimatedSection>
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <CommonHealthConcerns />
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
@@ -61,7 +71,8 @@ const Demo5 = () => {
         </AnimatedSection> */}
 
         <AnimatedSection animation="fadeInUp" delay={0.2}>
-          <Statistic1 />
+          
+          <Demo5Blog1 />
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
@@ -81,7 +92,7 @@ const Demo5 = () => {
         </AnimatedSection>
 
         {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
-          <Demo5Blog1 />
+          <Statistic1 />
         </AnimatedSection> */}
 
         {/* <AnimatedSection animation="fadeInUp" delay={0.2}>

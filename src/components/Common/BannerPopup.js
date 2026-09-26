@@ -3,30 +3,79 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { Modal } from "react-bootstrap";
 import { POPUP_FALLBACK_IMAGE, popupBanner } from "../../../data/popupBanner";
+import { api } from "../../constant";
+import {
+  getBannerImageUrl,
+  withCacheBuster,
+} from "../../services/firebaseStorage";
 import { useLanguage } from "../../i18n/LanguageContext";
 
 // Shown once per browser session (survives reloads, resets with a new tab/session).
 const SESSION_KEY = "popup_banner_shown";
 const SHOW_DELAY_MS = 800;
 
-// Single banner image: an empty `url`, or an image that fails to load, renders the
-// local POPUP_FALLBACK_IMAGE instead.
+/**
+ * Homepage popup.
+ *
+ * The image comes from the marketing panel (marketingPanel.home.bannerPopup via
+ * /api/marketing/banner/metadata) and falls back to the static values in
+ * data/popupBanner.js. When neither is configured the popup is not shown at all.
+ * An empty/failing image URL renders POPUP_FALLBACK_IMAGE.
+ */
 const BannerPopup = () => {
   const router = useRouter();
   const { t } = useLanguage();
   const [show, setShow] = useState(false);
   const [broken, setBroken] = useState(false);
-
-  const banner = popupBanner || {};
+  const [managedBanner, setManagedBanner] = useState(null);
+  const [resolved, setResolved] = useState(false);
 
   useEffect(() => {
+    let alive = true;
+
+    const loadBanner = async () => {
+      try {
+        const response = await fetch(api.marketingBannerMetadata, {
+          cache: "no-store",
+        });
+        const data = await response.json();
+
+        if (data?.found && data.banner?.url) {
+          if (alive) setManagedBanner(data.banner);
+          return; // panel record wins
+        }
+      } catch (error) {
+        // offline or blocked - fall through to Firebase Storage below
+      }
+
+      // Fallback: the fixed banner path in Firebase Storage (metadata/img.png).
+      const directUrl = await getBannerImageUrl();
+      if (alive && directUrl) {
+        setManagedBanner({ url: directUrl, alt: "HealthPath", href: "" });
+      }
+    };
+
+    loadBanner().finally(() => {
+      if (alive) setResolved(true);
+    });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const banner = managedBanner || (popupBanner?.url ? popupBanner : null);
+
+  useEffect(() => {
+    if (!resolved || !banner?.url) return undefined;
+
     let alreadyShown = false;
     try {
       alreadyShown = window.sessionStorage.getItem(SESSION_KEY) === "1";
     } catch (err) {
       alreadyShown = false; // storage blocked (private mode) - still show once
     }
-    if (alreadyShown) return;
+    if (alreadyShown) return undefined;
 
     // Only opened after mount so SSR/first paint match the client markup.
     const timer = setTimeout(() => {
@@ -39,7 +88,10 @@ const BannerPopup = () => {
     }, SHOW_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [resolved, banner?.url]);
+
+  // Nothing configured in the panel (and no static URL) -> no popup.
+  if (!banner?.url) return null;
 
   const handleClose = () => setShow(false);
 
@@ -95,7 +147,11 @@ const BannerPopup = () => {
           style={{ cursor: banner.href ? "pointer" : "default" }}
         >
           <Image
-            src={broken || !banner.url ? POPUP_FALLBACK_IMAGE : banner.url}
+            src={
+              broken || !banner.url
+                ? POPUP_FALLBACK_IMAGE
+                : withCacheBuster(banner.url, banner.lastUpdated)
+            }
             alt={banner.alt || t("popup.bannerAlt", "HealthPath")}
             width={1200}
             height={630}

@@ -1,5 +1,8 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { invoice_img_path, prescription_img_path } from "./constant";
+import {
+  invoice_img_path,
+  prescription_img_path,
+} from "./constant";
 import { storage } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -78,7 +81,6 @@ export const getPagination = (totalNumber, sort) => {
 };
 
 export const sendPrescriptionToFirebase = async (file, details) => {
-  console.log(details.patientName, "details");
   const storageRef = ref(
     storage,
     `${prescription_img_path}/patient=${details.patientName},doctor=${

@@ -13,6 +13,7 @@ export const development_production_url =
   process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
+export const marketing_info_local_storage = "marketing_info";
 export const medicine_cart_details_local_info = "medicineCartItems";
 export const labtest_cart_details_local_info = "labTestcartItems";
 export const single_call = "single_call";
@@ -55,6 +56,16 @@ export const api = {
   postArticle: "/api/superAdmin/postArticle",
   helperApi: "/api/helperApi",
   consultationByMeetingId: "/api/getAppointmentId",
+  marketingLogin: "/api/marketing/auth/login",
+  marketingLogout: "/api/marketing/auth/logout",
+  marketingSession: "/api/marketing/auth/session",
+  marketingModules: "/api/marketing/modules",
+  marketingSeo: "/api/marketing/seo",
+  marketingSeoMetadata: "/api/marketing/seo/metadata",
+  marketingBlog: "/api/marketing/blog",
+  marketingBlogPublic: "/api/marketing/blog/public",
+  marketingBanner: "/api/marketing/banner",
+  marketingBannerMetadata: "/api/marketing/banner/metadata",
 };
 
 export const speciality = [

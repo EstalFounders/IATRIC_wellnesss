@@ -318,7 +318,6 @@ function LabTesLandingPageHeader() {
               Home
             </div>
             <div className={styles.mobileNavLink}>Services</div>
-            <div className={styles.mobileNavLink}>Blog</div>
             <div className={styles.mobileNavLink}>About</div>
           </div>
         )}

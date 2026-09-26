@@ -269,16 +269,6 @@ const AllHeader = () => {
                           </Link>
                         </li>
                         <li>
-                          <Link legacyBehavior href="/blog-listing">
-                            <a>Blog Listing Page</a>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link legacyBehavior href="/single-post">
-                            <a>Single Blog Post</a>
-                          </Link>
-                        </li>
-                        <li>
                           <Link legacyBehavior href="/contacts-1">
                             <a>Contact Us #1</a>
                           </Link>
@@ -319,9 +309,6 @@ const AllHeader = () => {
                         </li>
                         <li>
                           <a href="#">Patients Testimonials</a>
-                        </li>
-                        <li>
-                          <a href="#">Blog &amp; Latest News</a>
                         </li>
                       </ul>
                       {/* Links */}

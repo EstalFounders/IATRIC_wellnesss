@@ -254,12 +254,12 @@ export const BackButton = (Router) => {
 };
 
 export const handleViewCateogory = (categoryDetails, dispatch,router) => {
-  console.log(router, "router in common method",dispatch, categoryDetails);
   dispatch(setViewCategory(categoryDetails));
-  router.push("/blog/categorysingle");
+  // The blog is managed from the marketing panel; its section lives on /demo-5.
+  router.push("/demo-5#blog-1");
 };
 
 export const handleViewArticle = (categoryDetails, dispatch,router) => {
   dispatch(setViewArticle(categoryDetails));
-  router.push("/blog/blogpost");
+  router.push("/demo-5#blog-1");
 };

@@ -133,7 +133,7 @@ const Demo2Blog1 = () => {
               className="all-posts-btn mb-40 wow fadeInUp"
               data-wow-delay="1s"
             >
-              <Link legacyBehavior href="/blog-listing">
+              <Link legacyBehavior href="/blog">
                 <a className="btn btn-blue blue-hover">Read More Posts</a>
               </Link>
             </div>
