@@ -1,0 +1,41 @@
+# deps & build outputs
+node_modules/
+**/node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# lockfiles, reports, logs
+package-lock.json
+playwright-report/
+test-results/
+*.log
+
+# heavy static assets (~226 MB in public/) - @mention a file if you need to work on it
+public/images/
+public/demo/
+public/fonts/
+public/svgIcon/
+public/*.mp4
+
+# binary media by extension
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.mp4
+*.woff
+*.woff2
+*.ttf
+*.otf
+
+# data dumps & secrets
+*.csv
+*.xlsx
+*.sqlite
+*.parquet
+.env
+.env.*
