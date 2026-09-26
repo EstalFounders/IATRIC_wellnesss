@@ -329,7 +329,7 @@ const HomeInnerPage = () => {
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
-                        <Link legacyBehavior href="/blog-listing">
+                        <Link legacyBehavior href="/blog">
                           <a className="btn" target="_blank">
                             Launch Demo
                           </a>

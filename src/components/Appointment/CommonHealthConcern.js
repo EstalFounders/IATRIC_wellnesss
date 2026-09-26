@@ -32,7 +32,9 @@ const CommonHealthConcerns = () => {
               <div className="card-body">
                 <h5 className="card-title fw-bold">{item.title}</h5>
                 <p className="card-text text-muted">&#8377; {item.price}</p>
-                <ConsultationButton>{booking_btn_txt}</ConsultationButton>
+                <ConsultationButton path="/appointment">
+                  {booking_btn_txt}
+                </ConsultationButton>
               </div>
             </div>
           ))}

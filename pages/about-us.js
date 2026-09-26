@@ -1,3 +1,9 @@
+import { getSeoStaticProps } from "../src/api/marketing/helpers/seoServer";
+
+// Marketing panel SEO: tags are part of the built HTML (60s refresh).
+export const getStaticProps = () => getSeoStaticProps("/about-us");
+
+
 import AboutUsInfo4 from "../src/components/About-us/AboutUsInfo4";
 import AboutUsVideo2 from "../src/components/About-us/AboutUsVideo2";
 import Banner5 from "../src/components/Common/Banner-5";

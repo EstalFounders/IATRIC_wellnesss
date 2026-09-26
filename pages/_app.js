@@ -10,6 +10,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { LanguageProvider } from "../src/i18n/LanguageContext";
 import LanguageToggle from "../src/components/Common/LanguageToggle";
+import SeoMetadata from "../src/marketing/components/SeoMetadata";
 
 function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
@@ -38,12 +39,15 @@ function MyApp({ Component, pageProps, ...rest }) {
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
+      {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
+      <SeoMetadata metadata={pageProps?.seoMetadata} />
       {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <LanguageProvider>
               <Component {...props.pageProps} />
+              <SeoMetadata metadata={pageProps?.seoMetadata} />
               <LanguageToggle />
             </LanguageProvider>
           </PersistGate>

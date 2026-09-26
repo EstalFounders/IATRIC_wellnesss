@@ -444,11 +444,6 @@ const AppointmentPage = () => {
             handleCloseSnackBar={handleCloseSnackBar}
           />
 
-          {/* common health concern treatment */}
-          <div className="w-75 w-md-100">
-            <CommonHealthConcerns />
-          </div>
-
           <div>
             <Demo5Doctors1 />
           </div>
