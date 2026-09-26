@@ -2,14 +2,15 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import { testimonial2Props } from "../../sliderProps";
 import { Autoplay } from "swiper";
-import { getInitials } from "../Common/commonMethod";
 import { testimonials } from "../../../data/services";
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
 import { color_schema } from "../../constant";
 
 const Testimonials = testimonials;
 
-const avatarColors = ["#8e8333", "#3b5f1d"];
+// Avatars are local files (public/image/review); this one is used when a review
+// has no image of its own.
+const DEFAULT_REVIEW_AVATAR = "/image/review/avatar-default.png";
 
 const ReviewSlider = () => {
   return (
@@ -48,16 +49,6 @@ const ReviewSlider = () => {
             height: 70px;
             border-radius: 50%;
             object-fit: cover;
-          }
-          .initials-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 600;
           }
         `}</style>
         <Swiper
@@ -103,25 +94,13 @@ const ReviewSlider = () => {
 
                 {/* Avatar */}
                 <div className="testimonial-avatar mb-3">
-                  {t.image ? (
-                    <Image
-                      width={70}
-                      height={70}
-                      src={t.image}
-                      alt={`${t.name}-avatar`}
-                      className="testimonial-avatar"
-                    />
-                  ) : (
-                    <div
-                      className="initials-avatar mx-auto"
-                      style={{
-                        backgroundColor: avatarColors[i % 2],
-                        color: "#fff",
-                      }}
-                    >
-                      {getInitials(t.name)}
-                    </div>
-                  )}
+                  <Image
+                    width={70}
+                    height={70}
+                    src={t.image || DEFAULT_REVIEW_AVATAR}
+                    alt={`${t.name}-avatar`}
+                    className="testimonial-avatar"
+                  />
                 </div>
 
                 {/* Text */}
