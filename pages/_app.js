@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps, ...rest }) {
 
   useEffect(() => {
     animation();
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setLoader(false);
     }, 1000);
   });
