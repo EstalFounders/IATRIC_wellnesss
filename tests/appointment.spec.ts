@@ -82,7 +82,10 @@ async function fillAppointmentForm(page: Page) {
 }
 
 async function enterOtp(page: Page, code: string) {
-  const boxes = page.locator('input[inputmode="numeric"]');
+  // The appointment form's Mobile Number field is also inputmode="numeric" and
+  // stays in the DOM behind the popup, so scope to the 6 single-character OTP
+  // boxes instead of every numeric input on the page.
+  const boxes = page.locator('input[inputmode="numeric"][maxlength="1"]');
   await expect(boxes).toHaveCount(6);
   for (let i = 0; i < code.length; i += 1) {
     await boxes.nth(i).fill(code[i]);
