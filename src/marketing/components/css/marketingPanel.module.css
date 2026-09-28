@@ -228,6 +228,23 @@
 }
 
 
+.coverEmpty {
+  width: 100%;
+  max-width: 420px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+  margin-bottom: 12px;
+  border: 2px dashed #cdd5c4;
+  border-radius: 10px;
+  background: #fafbf8;
+  color: #8a9184;
+  font-size: 0.85rem;
+}
+
 .checkingWrap {
   min-height: 100vh;
   display: flex;

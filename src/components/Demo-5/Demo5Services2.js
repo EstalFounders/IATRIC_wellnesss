@@ -18,6 +18,7 @@ import { TbPhysotherapist } from "react-icons/tb";
 import { RiTeamFill } from "react-icons/ri";
 import { color_schema } from "../../constant";
 import { useGlobalData } from "../../customUtils/useGlobalData";
+import { getServiceDescription } from "../../customUtils/serviceLinks";
 import { handleServiceClick } from "../Common/commonMethod";
 import {
   CardiologyIcon,
@@ -75,8 +76,9 @@ const Demo5Services2 = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  // Single source of truth: globalData slice (serviceOffered SUB items).
-  const { specialityNames } = useGlobalData();
+  // Single source of truth: globalData slice (serviceOffered SUB items). The whole
+  // objects (not just the names) so each card can render its own description.
+  const { speciality } = useGlobalData();
 
   useEffect(() => {
     const el = marqueeRef.current;
@@ -102,7 +104,7 @@ const Demo5Services2 = () => {
     };
   }, []);
 
-  const combinedServices = [...specialityNames, ...specialityNames];
+  const combinedServices = [...speciality, ...speciality];
 
   // Mouse Events
   const handleMouseDown = (e) => {
@@ -127,10 +129,9 @@ const Demo5Services2 = () => {
     marqueeRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  const handleClick = (index) => {
-    if (!specialityNames.length) return;
-    const serviceName = specialityNames[index % specialityNames.length];
-    handleServiceClick(serviceName, index, router);
+  const handleClick = (item, index) => {
+    if (!item?.name) return;
+    handleServiceClick(item.name, index, router);
   };
 
   const renderIcon = (name, index) => {
@@ -166,30 +167,27 @@ const Demo5Services2 = () => {
               onMouseMove={handleMouseMove}
             >
               <div className={`services-track ${isPaused ? "paused" : ""}`}>
-                {combinedServices.map((service, index) => {
-                  const actualIndex = specialityNames.length
-                    ? index % specialityNames.length
-                    : 0;
-
-                  return (
-                    <div
-                      className="service-card"
-                      key={index}
-                      onClick={() => handleClick(actualIndex)}
-                      onMouseEnter={() => setHoveredIndex(index)}
-                      onMouseLeave={() => setHoveredIndex(null)}
-                    >
-                      <div className="service-nav-link">
-                        <div className="service-icon">
-                          {renderIcon(service, index)}
-                        </div>
-                        <div className="service-title font-weight-bold">
-                          {t(`service.${service}`, service)}
-                        </div>
+                {combinedServices.map((item, index) => (
+                  <div
+                    className="service-card"
+                    key={index}
+                    onClick={() => handleClick(item, index)}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  >
+                    <div className="service-nav-link">
+                      <div className="service-icon">
+                        {renderIcon(item.name, index)}
+                      </div>
+                      <div className="service-title font-weight-bold">
+                        {t(`service.${item.name}`, item.name)}
+                      </div>
+                      <div className="service-card-desc">
+                        {item.description || getServiceDescription(item.name)}
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           </section>

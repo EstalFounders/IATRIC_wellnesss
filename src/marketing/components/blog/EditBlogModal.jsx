@@ -2,12 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button, Form, Modal } from "react-bootstrap";
 import { api } from "../../../constant";
-import { POPUP_FALLBACK_IMAGE } from "../../../../data/popupBanner";
 import { uploadBlogCover } from "../../../services/firebaseStorage";
 import { BLOG_LIMITS, slugify } from "../../../api/marketing/utils/blogPayload";
 import styles from "../css/marketingPanel.module.css";
-
-const IMAGE_PLACEHOLDER = POPUP_FALLBACK_IMAGE;
 
 const emptyForm = () => ({
   title: "",
@@ -198,14 +195,24 @@ const EditBlogModal = ({ show, post, onHide, onSaved }) => {
 
           <Form.Group className="mb-3" controlId="blog-cover-url">
             <Form.Label className={styles.fieldLabel}>Cover image</Form.Label>
-            <Image
-              src={form.coverImage || IMAGE_PLACEHOLDER}
-              alt="Cover preview"
-              width={420}
-              height={208}
-              className={styles.previewImg}
-              unoptimized
-            />
+
+            {/* Preview only exists once an image was uploaded/pasted. */}
+            {form.coverImage ? (
+              <Image
+                src={form.coverImage}
+                alt="Cover preview"
+                width={420}
+                height={208}
+                className={styles.previewImg}
+                unoptimized
+              />
+            ) : (
+              <div className={styles.coverEmpty}>
+                No cover image selected — the preview appears here after you upload a
+                file or paste a URL.
+              </div>
+            )}
+
             <Form.Control
               type="file"
               accept="image/png,image/jpeg,image/*"

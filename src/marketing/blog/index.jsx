@@ -168,7 +168,7 @@ const BlogManagementView = () => {
                       {post.excerpt ? `${post.excerpt.slice(0, 60)}…` : "—"}
                     </div>
                   </td>
-                  <td className={styles.tableUrl}>/blog/{post.slug}</td>
+                  <td className={styles.tableUrl}>/our-blog/{post.slug}</td>
                   <td>{post.author}</td>
                   <td>{formatDate(post.publishedAt)}</td>
                   <td>

@@ -4,6 +4,7 @@ import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { serviceDetailsPath } from "../../customUtils/serviceLinks";
 import {
   CorporateHealthcareIcon,
   GeneralPhysician,
@@ -149,8 +150,7 @@ const DiscoverMoreComp = () => {
                 <ConsultationButton
                   path={"/discover-more"}
                   onClick={() =>
-                    item.service &&
-                    router.push(`/service-details/?Service=${item.service}`)
+                    item.service && router.push(serviceDetailsPath(item))
                   }
                 >
                   {item.btntext}

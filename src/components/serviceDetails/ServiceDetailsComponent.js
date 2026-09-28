@@ -14,6 +14,11 @@ import IconRenderer from "./IconRenderer"; // adjust path as needed
 import { callToBook, color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
+import {
+  getServiceDescription,
+  resolveServiceKey,
+  resolveServiceName,
+} from "../../customUtils/serviceLinks";
 
 const serviceDetails = {
   consultation: {
@@ -174,15 +179,14 @@ const serviceDetails = {
 
 const ServiceDetail = () => {
   const router = useRouter();
-  const { Service } = router.query;
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
-  const normalizedParam = (Service || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-");
+  // Display name for the heading (clean name, never a raw slug/id) and the key
+  // for the rich content blocks in `serviceDetails`.
+  const serviceName = resolveServiceName(router.query);
+  const serviceKey = resolveServiceKey(router.query);
 
-  const medical_service = serviceDetails[normalizedParam];
+  const medical_service = serviceDetails[serviceKey];
 
   const handleOpenCalltoBookDialog = (serviceName) => {
     setIsCalltoBookDialog(true);
@@ -197,12 +201,35 @@ const ServiceDetail = () => {
   };
 
   if (!medical_service) {
+    // No dedicated content block for this service: show the clean service name
+    // and a booking CTA instead of a dead end.
+    const fallbackTitle = serviceName
+      ? `${serviceName} | HealthPath`
+      : "Our Services | HealthPath";
+
     return (
       <Container maxWidth="md" sx={{ py: 6 }}>
-        <Typography variant="h4" color="error" gutterBottom>
-          Service Not Found
+        <Head>
+          <title>{fallbackTitle}</title>
+          <meta
+            name="description"
+            content={
+              serviceName
+                ? `Book ${serviceName} services with HealthPath - online consultation, home visits and clinic care.`
+                : "Explore the services offered by HealthPath and book a consultation."
+            }
+          />
+        </Head>
+
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          {serviceName || "Our Services"}
         </Typography>
-        <Typography>Please go back and select a valid service.</Typography>
+        <Typography variant="subtitle1" color="text.secondary" paragraph>
+          {getServiceDescription(serviceName) ||
+            "Choose how you would like to consult and our team will confirm the next available slot."}
+        </Typography>
+
+        <ConsultationButton path={"/appointment"}>{callToBook}</ConsultationButton>
       </Container>
     );
   }
@@ -216,10 +243,10 @@ const ServiceDetail = () => {
 
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
-          {medical_service.seoTitle}
+          {serviceName || medical_service.seoTitle}
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" paragraph>
-          {medical_service.seoDescription}
+          {getServiceDescription(serviceName) || medical_service.seoDescription}
         </Typography>
 
         <Grid container spacing={4} sx={{ mt: 2 }}>

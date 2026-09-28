@@ -8,6 +8,10 @@ import {
   useGlobalData,
 } from "../../customUtils/useGlobalData";
 import {
+  getServiceDescription,
+  serviceDetailsPath,
+} from "../../customUtils/serviceLinks";
+import {
   CardiologyIcon,
   CorporateHealthcareIcon,
   Dentistry,
@@ -128,10 +132,8 @@ const Demo5Services1 = () => {
   };
 
   const handleClick = (item) => {
-    const slug = item.service || slugifyService(item.name);
-    if (slug) {
-      router.push(`/service-details/?Service=${slug}`);
-    }
+    // Clean URL: the service name is what the details page displays.
+    router.push(serviceDetailsPath(item));
   };
 
   return (
@@ -172,6 +174,10 @@ const Demo5Services1 = () => {
                       </div>
                       <div className="service-title-dept font-weight-bold">
                         {t(item.titleKey, item.title)}
+                      </div>
+                      <div className="service-card-desc">
+                        {item.description ||
+                          getServiceDescription(item.name || item.title)}
                       </div>
                     </div>
                   </div>

@@ -1,15 +1,20 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useGlobalData } from "../customUtils/useGlobalData";
+import { serviceDetailsPath } from "../customUtils/serviceLinks";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage", "/medicine/homepage"];
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
+  const { services } = useGlobalData();
+  const [servicesOpen, setServicesOpen] = useState(false);
 
   const menuItems = [
     { label: "Home", href: "/", icon: "🏠" },
     { label: "About Us", href: "/about-us", icon: "ℹ️" },
-    { label: "Services", href: "/all-services", icon: "🏥" },
+    // "Services" expands in place instead of navigating (see the accordion below).
+    { label: "Services", href: "/all-services", icon: "🏥", expandable: true },
     { label: "Book Consultation", href: "/appointment", icon: "📅" },
     { label: "Lab Tests", href: "/labTest/homepage", icon: "🧪" },
     { label: "Medicines", href: "/medicine/homepage", icon: "💊" },
@@ -18,14 +23,40 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     { label: "Join Us", href: "/join-us", icon: "👥" },
   ];
 
+  // Services shown inside the drawer (DB list when available, static fallback
+  // otherwise), each with a clean name-only URL.
+  const serviceItems = (services || [])
+    .map((service) => ({
+      key: service.service || service.name,
+      label: service.title || service.name,
+      href: serviceDetailsPath(service),
+    }))
+    .filter((service) => service.label)
+    .slice(0, 12);
+
   const comingSoon = new Set(COMING_SOON_ITEMS);
+
+  const closeMenu = () => setIsOpen(false);
 
   const handleNavigation = (href) => {
     router.push(href);
+    closeMenu();
   };
 
-  const isActive = (href) =>
-    router.pathname === href || router.asPath === href;
+  const isActive = (href) => router.pathname === href || router.asPath === href;
+
+  const rowStyle = (active) => ({
+    display: "block",
+    padding: "14px 16px",
+    color: active ? "#3b5f1d" : "#333",
+    textDecoration: "none",
+    fontSize: "16px",
+    fontWeight: active ? "700" : "500",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    borderLeft: active ? "4px solid #3b5f1d" : "4px solid transparent",
+    backgroundColor: active ? "#f0f7ee" : "transparent",
+  });
 
   return (
     <div
@@ -41,7 +72,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
         display: isOpen ? "flex" : "none",
         flexDirection: "column",
       }}
-      onClick={() => setIsOpen(false)}
+      onClick={closeMenu}
     >
       <div
         style={{
@@ -69,7 +100,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           }}
         >
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={closeMenu}
             style={{
               background: "none",
               border: "none",
@@ -83,7 +114,6 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           </button>
         </div>
 
-        {/* MENU ITEMS */}
         <nav style={{ flex: 1, padding: "16px 0" }}>
           <ul
             style={{
@@ -96,27 +126,101 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           >
             {menuItems.map((item) => {
               const active = isActive(item.href);
+
+              if (item.expandable) {
+                return (
+                  <li key={item.href} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                    {/* Tap toggles the nested list - it never navigates or closes. */}
+                    <div
+                      role="button"
+                      aria-expanded={servicesOpen}
+                      aria-label="Toggle the services list"
+                      onClick={() => setServicesOpen((previous) => !previous)}
+                      style={{
+                        ...rowStyle(active),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        {item.icon} {item.label}
+                      </span>
+                      <span
+                        style={{
+                          transition: "transform 0.3s ease",
+                          transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          fontSize: "12px",
+                          color: "#3b5f1d",
+                        }}
+                      >
+                        ▼
+                      </span>
+                    </div>
+
+                    {/* Nested services (smooth accordion) */}
+                    <div
+                      style={{
+                        maxHeight: servicesOpen
+                          ? `${serviceItems.length * 46 + 108}px`
+                          : 0,
+                        overflow: "hidden",
+                        transition: "max-height 0.35s ease",
+                        backgroundColor: "#fafbf8",
+                      }}
+                    >
+                      <div
+                        onClick={() => setServicesOpen(false)}
+                        style={{
+                          padding: "12px 16px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#3b5f1d",
+                          cursor: "pointer",
+                          borderBottom: "1px solid #eef0ea",
+                        }}
+                      >
+                        ← Back to main menu
+                      </div>
+
+                      {serviceItems.map((service) => (
+                        <div
+                          key={service.key}
+                          onClick={() => handleNavigation(service.href)}
+                          style={{
+                            padding: "12px 16px 12px 30px",
+                            fontSize: "15px",
+                            color: "#333",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #f4f5f2",
+                          }}
+                        >
+                          {service.label}
+                        </div>
+                      ))}
+
+                      <div
+                        onClick={() => handleNavigation("/all-services")}
+                        style={{
+                          padding: "12px 16px 12px 30px",
+                          fontSize: "15px",
+                          fontWeight: "700",
+                          color: "#3b5f1d",
+                          cursor: "pointer",
+                        }}
+                      >
+                        All Services →
+                      </div>
+                    </div>
+                  </li>
+                );
+              }
+
               return (
-                <li
-                  key={item.href}
-                  style={{
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
+                <li key={item.href} style={{ borderBottom: "1px solid #f0f0f0" }}>
                   <div
                     onClick={() => handleNavigation(item.href)}
-                    style={{
-                      display: "block",
-                      padding: "14px 16px",
-                      color: active ? "#3b5f1d" : "#333",
-                      textDecoration: "none",
-                      fontSize: "16px",
-                      fontWeight: active ? "700" : "500",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      borderLeft: active ? "4px solid #3b5f1d" : "4px solid transparent",
-                      backgroundColor: active ? "#f0f7ee" : "transparent",
-                    }}
+                    style={rowStyle(active)}
                     onMouseEnter={(e) => {
                       if (!active) {
                         e.target.style.backgroundColor = "#f5f5f5";
