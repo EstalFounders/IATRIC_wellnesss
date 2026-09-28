@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../../../i18n/LanguageContext";
 import {
   TouchApp,
   ChatBubbleOutline,
@@ -9,18 +10,22 @@ const steps = [
   {
     icon: <TouchApp fontSize="large" />,
     label: "Select a speciality or symptom",
+    labelKey: "hiw.step1",
   },
   {
     icon: <ChatBubbleOutline fontSize="large" />,
     label: "Audio/ video call with a verified doctor",
+    labelKey: "hiw.step2",
   },
   {
     icon: <LocalPharmacy fontSize="large" />,
     label: "Get a digital prescription & a free follow-up",
+    labelKey: "hiw.step3",
   },
 ];
 
 const HowItWorks = () => {
+  const { t } = useLanguage();
   return (
     <div className="container my-5">
       <div className="position-relative">
@@ -35,34 +40,48 @@ const HowItWorks = () => {
             fontWeight: 600,
           }}
         >
-          How It Works
+          {t("hiw.title")}
         </h3>
 
-        <div className="row d-flex justify-content-between align-items-center position-relative ml-5">
+        <div className="row flex-column flex-md-row justify-content-between align-items-center position-relative">
           {steps.map((step, index) => (
-            <div
-              key={index}
-              className="text-center flex-fill mt-5"
-              style={{ zIndex: 2 }}
-            >
+            <React.Fragment key={index}>
+              {/* Vertical connector on mobile between steps */}
+              {index > 0 && (
+                <div
+                  className="d-md-none"
+                  style={{
+                    width: "2px",
+                    height: "30px",
+                    backgroundColor: "#3b5f1d",
+                    margin: "0 auto",
+                    zIndex: 2,
+                  }}
+                ></div>
+              )}
               <div
-                className="rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  backgroundColor: "#e6f4ea",
-                  color: "#3b5f1d",
-                }}
+                className="text-center flex-fill mt-5"
+                style={{ zIndex: 2 }}
               >
-                {step.icon}
+                <div
+                  className="rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    backgroundColor: "#e6f4ea",
+                    color: "#3b5f1d",
+                  }}
+                >
+                  {step.icon}
+                </div>
+                <div style={{ fontWeight: 500 }}>{t(step.labelKey)}</div>
               </div>
-              <div style={{ fontWeight: 500 }}>{step.label}</div>
-            </div>
+            </React.Fragment>
           ))}
 
-          {/* Dotted connecting line */}
+          {/* Horizontal connecting line - desktop only */}
           <div
-            className="position-absolute top-50 start-0 w-100"
+            className="d-none d-md-block position-absolute top-50 start-0 w-100"
             style={{
               borderTop: "2px solid #3b5f1d",
               zIndex: 1,

@@ -1,12 +1,10 @@
 export const handleServiceClick = (serviceName, id, router) => {
-  router.push(
-    `/department-single?serviceName=${serviceName
-      .toLowerCase()
-      .replace(/\s+/g, "-")}&id=${id}`
-  );
-  // setShowDoctor(true);
-  // ${serviceName.toLowerCase().replace(/\s+/g, '-')}
-  // Add your logic here for handling the service click
+  // Clean routing: only the service name is passed (no raw index/id), and the
+  // department page prettifies it for display.
+  const cleanName = String(serviceName || "").trim();
+  if (!cleanName) return;
+
+  router.push(`/department-single?serviceName=${encodeURIComponent(cleanName)}`);
 };
 
 export const getIconByName = (name) => {

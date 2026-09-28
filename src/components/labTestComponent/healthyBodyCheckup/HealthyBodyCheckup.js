@@ -5,7 +5,6 @@ import HealthCheckupCard from "../common/HealthCheckupCard";
 import HealthyBodyCard from "../common/HealthyBodyCard";
 import { HiArrowCircleRight } from "react-icons/hi";
 import Demo2Reviews2 from "../../Demo-2/Demo2Reviews2";
-import LabTestimonial from "../LabTestimonial/LabTestimonial";
 import { MoreButton } from "../common/CommonMethod";
 
 const healthCheckupData = [
@@ -77,7 +76,6 @@ const HealthyBodyCheckup = () => {
           <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
             <MoreButton />
           </Row>
-          <LabTestimonial />
         </div>
       </Container>
     </>

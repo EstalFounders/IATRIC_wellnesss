@@ -3,34 +3,34 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { FaHospital, FaUserCheck, FaClock } from "react-icons/fa";
 import { MdAccessAlarms } from "react-icons/md";
 import { useRouter } from "next/router";
+import { useLanguage } from "../../../i18n/LanguageContext";
 
 const benefits = [
   {
     icon: <FaHospital size={48} color="#3b5f1d" />,
-    title: "Anywhere Anytime",
-    description:
-      "Connect with healthcare specialists from the comfort of your time schedule.",
+    titleKey: "demo5.benefits.anywhere",
+    descKey: "demo5.benefits.anywhereDesc",
   },
   {
     icon: <FaUserCheck size={48} color="#3b5f1d" />,
-    title: "Verified Doctors",
-    description:
-      "All our doctors are verified and experienced for quality patient care.",
+    titleKey: "demo5.benefits.verified",
+    descKey: "demo5.benefits.verifiedDesc",
   },
   {
     icon: <FaClock size={48} color="#3b5f1d" />,
-    title: "24/7 Availability",
-    description: "Book appointments anytime, including nights and weekends.",
+    titleKey: "demo5.benefits.availability",
+    descKey: "demo5.benefits.availabilityDesc",
   },
   {
     icon: <MdAccessAlarms size={48} color="#3b5f1d" />,
-    title: "Easy Acccesible",
-    description: "To Book. Simply click BOOK NOW or call at 7895959925.",
+    titleKey: "demo5.benefits.accessible",
+    descKey: "demo5.benefits.accessibleDesc",
   },
 ];
 
 const BenefitSection = () => {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleBenefitClick = () => {
     router.push("/appointment");
@@ -39,7 +39,7 @@ const BenefitSection = () => {
   return (
     <div className="">
       <Container className="py-5">
-        <h2 className="text-center mb-4">Why Choose Us?</h2>
+        <h2 className="text-center mb-4">{t("demo5.benefits.heading")}</h2>
         <Row className="justify-content-center">
           {benefits.map((benefit, index) => (
             <Col key={index} xs={12} sm={6} md={3} className="mb-4">
@@ -50,9 +50,9 @@ const BenefitSection = () => {
               >
                 <Card.Body className="text-center">
                   <div className="mb-3">{benefit.icon}</div>
-                  <Card.Title>{benefit.title}</Card.Title>
+                  <Card.Title>{t(benefit.titleKey)}</Card.Title>
                   <Card.Text className="text-secondary">
-                    {benefit.description}
+                    {t(benefit.descKey)}
                   </Card.Text>
                 </Card.Body>
               </Card>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { IoMenu } from "react-icons/io5";
@@ -9,6 +9,8 @@ import {
   color_schema,
   contact_no,
   facebook_page_url,
+  instagram_page_url,
+  Linkdn_url,
 } from "../../constant";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -20,16 +22,31 @@ import { getMedicineCartItems } from "../../components/medicines/common/CommonMe
 import { getLabTestCartItems } from "../../components/labTestComponent/common/CommonMethod";
 import { fetchConsultations } from "../../components/ApiService/UtilService";
 import { useDispatch, useSelector } from "react-redux";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { handleServiceClick } from "../../components/Common/commonMethod";
+import { demo5ServiceHighlights } from "../../../data/services";
+import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
+import { serviceDetailsPath } from "../../customUtils/serviceLinks";
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useLanguage();
   const isLabTestPage = router.pathname.includes("/labTest");
   const isMedicinePage = router.pathname.includes("/medicine");
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [comingSoonItems, setComingSoonItems] = useState(new Set());
   const consultationTypes = useSelector(
     (state) => state.otherConfigSlice.activeConsultation,
+  );
+  // Single source of truth: globalData slice (falls back to the static list).
+  const { specialityNames, services: globalServices } = useGlobalData();
+  // Services mega-menu: DB decides which services exist, static list supplies
+  // titles/slugs/icons where names match.
+  const navServices = useMemo(
+    () => mergeServiceLists(globalServices, demo5ServiceHighlights),
+    [globalServices]
   );
   const hiddenRoutes = ["/appointment", "/some-other-route"];
 
@@ -44,9 +61,16 @@ const Header1 = ({ scrollToContact }) => {
     router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
   };
 
-  const togglePanel = () => setMobileMenuOpen(!mobileMenuOpen);
-  const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  
+  const handleComingSoonClick = useCallback((href) => {
+    setComingSoonItems((prev) => new Set(prev).add(href));
+  }, []);
+  
+  const isComingSoon = useCallback((href) => comingSoonItems.has(href), [comingSoonItems]);
+  
   const updateCartItemCount = (count) => setCartItemCount(count);
+  const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
   const updateMedicineCartItemCount = (count) => setMedicineCartItemCount(count);
 
   useEffect(() => {
@@ -61,8 +85,8 @@ const Header1 = ({ scrollToContact }) => {
       <div className="wsmobileheader clearfix">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", gap: 10 }}>
           <button
-            onClick={() => togglePanel()}
-            aria-label="Open menu"
+            onClick={() => toggleMobileMenu()}
+            aria-label={t("nav.openMenu")}
             style={{
               background: "#3b5f1d",
               border: "none",
@@ -80,10 +104,10 @@ const Header1 = ({ scrollToContact }) => {
           </button>
 
           <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
-            <img src="images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+            <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
           </span>
 
-          <ConsultationButton onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
+          <ConsultationButton variant="book-now" onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
             {booking_btn_txt}
           </ConsultationButton>
         </div>
@@ -96,7 +120,7 @@ const Header1 = ({ scrollToContact }) => {
             <div className="address clearfix">
               <span>
                 <a href="https://www.google.com/maps/search/?api=1&query=Sector%2057%20Gurgaon%20Haryana%20122003" target="_blank" rel="noopener noreferrer">
-                  <span><FaMapMarkedAlt className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{address}</b></span>
+                  <span><FaMapMarkedAlt className="mx-1" /><b style={{ fontWeight: "bold", fontSize: 16 }}>{t("footer.address", address)}</b></span>
                 </a>
               </span>
               <a href={`tel:${contact_no}`} className="callusbtn">
@@ -105,8 +129,8 @@ const Header1 = ({ scrollToContact }) => {
             </div>
           </div>
           <div className="headertopright">
-            <a className="linkedinicon" title="Linkedin" target="blank" href="https://www.linkedin.com/in/iatrichealthcare/"><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
-            <a className="instagramicon" title="Instagram" target="blank" href="https://www.instagram.com/iatric.healthcare/"><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
+            <a className="linkedinicon" title="Linkedin" target="blank" href={Linkdn_url}><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
+            <a className="instagramicon" title="Instagram" target="blank" href={instagram_page_url}><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
             <a className="facebookicon" title="Facebook" target="blank" href={facebook_page_url}><FaFacebook size={25} /><span className="mobiletext02">Facebook</span></a>
           </div>
         </div>
@@ -121,54 +145,116 @@ const Header1 = ({ scrollToContact }) => {
                 <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
               </a>
             </div>
-            <nav className="wsmenu">
-              <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
-                <li><Link legacyBehavior href="/"><a className="nav-link">Home</a></Link></li>
-                <li aria-haspopup="true">
-                  <a href="#">Pages <span className="wsarrow" /></a>
-                  <div className="wsmegamenu clearfix">
-                    <div className="container">
-                      <div className="row">
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Standard Pages:</li>
-                          <li><Link legacyBehavior href="/about-us"><a>About Us</a></Link></li>
-                          <li><Link legacyBehavior href="/who-we-are"><a>Who We Are</a></Link></li>
-                          <li><Link legacyBehavior href="/all-services"><a>Our Services</a></Link></li>
-                          <li><Link legacyBehavior href="/service-1"><a>Contact Us</a></Link></li>
-                          <li><Link legacyBehavior href="/join-us"><a>Join Us</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Medical Pages:</li>
-                          <li><Link legacyBehavior href="/all-departments"><a>Our Departments</a></Link></li>
-                          <li><Link legacyBehavior href="/department-single"><a>Department Single</a></Link></li>
-                          <li><Link legacyBehavior href="/all-doctors"><a>Meet the Doctors</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Special Pages:</li>
-                          <li><Link legacyBehavior href="/pricing-1"><a>Pricing Packages #1</a></Link></li>
-                          <li><Link legacyBehavior href="/pricing-2"><a>Pricing Packages #2</a></Link></li>
-                          <li><Link legacyBehavior href="/appointment"><a>Make an Appointment</a></Link></li>
-                          <li><Link legacyBehavior href="/faqs"><a>FAQs Page</a></Link></li>
-                        </ul>
-                        <ul className="col-lg-3 col-md-12 col-xs-12 link-list">
-                          <li className="title">Auxiliary Pages:</li>
-                          <li><Link legacyBehavior href="/gallery"><a>Our Gallery</a></Link></li>
-                          <li><Link legacyBehavior href="/blog-listing"><a>Blog Listing Page</a></Link></li>
-                          <li><Link legacyBehavior href="/single-post"><a>Single Blog Post</a></Link></li>
-                          <li><Link legacyBehavior href="/contacts-2"><a>Contact Us #2</a></Link></li>
-                        </ul>
+              <nav className="wsmenu">
+                <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">
+                  <li><Link legacyBehavior href="/"><a className="nav-link">{t("nav.home")}</a></Link></li>
+                  {/* OUR SPECIALITY */}
+                  <li aria-haspopup="true">
+                    <a href="#">{t("nav.ourSpeciality")} <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            {specialityNames.slice(0, 6).map((name, index) => (
+                              <li key={name}>
+                                <a
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleServiceClick(name, index, router);
+                                  }}
+                                >
+                                  {name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
+                            {specialityNames.slice(6).map((name, index) => (
+                              <li key={name}>
+                                <a
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleServiceClick(name, index + 6, router);
+                                  }}
+                                >
+                                  {name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-                <li><Link legacyBehavior href="/labTest/homepage"><a className="nav-link" target="_blank" rel="noopener noreferrer">Lab Test</a></Link></li>
-                <li><Link legacyBehavior href="/blog/homepage"><a className="nav-link" target="_blank">Blog</a></Link></li>
-                <li><Link legacyBehavior href="/service-1"><a className="nav-link">Contact Us</a></Link></li>
-              </ul>
-            </nav>
+                  </li>
+                  {/* END OUR SPECIALITY */}
+                  {/* SERVICES */}
+                  <li aria-haspopup="true">
+                    <a href="#">{t("nav.servicesMenu")} <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            {navServices.slice(0, 4).map((service) => (
+                              <li key={service.title}>
+                                <Link legacyBehavior href={serviceDetailsPath(service)}>
+                                  <a>{service.title}</a>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
+                            {navServices.slice(4).map((service) => (
+                              <li key={service.title}>
+                                <Link legacyBehavior href={serviceDetailsPath(service)}>
+                                  <a>{service.title}</a>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  {/* END SERVICES */}
+                  <li aria-haspopup="true">
+                    <a href="#">{t("nav.pages")} <span className="wsarrow" /></a>
+                    <div className="wsmegamenu clearfix">
+                      <div className="container">
+                        <div className="row">
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title">{t("footer.quickLinks")}:</li>
+                            <li><Link legacyBehavior href="/about-us"><a>{t("nav.aboutUs")}</a></Link></li>
+                            <li><Link legacyBehavior href="/appointment"><a>{t("nav.bookConsultation")}</a></Link></li>
+                          </ul>
+                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
+                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
+                            <li>
+                              <span
+                                onClick={() => handleComingSoonClick("/medicine/homepage")}
+                                style={{ cursor: "pointer", display: "block", lineHeight: "18px", padding: "15px 0px", fontSize: "15px", fontWeight: 400, color: isComingSoon("/medicine/homepage") ? "#8e8333" : "#888" }}
+                              >
+                                {isComingSoon("/medicine/homepage") ? t("nav.medicinesSoon") : t("nav.medicines")}
+                              </span>
+                            </li>
+                            <li><Link legacyBehavior href="/all-doctors"><a>{t("nav.allDoctors")}</a></Link></li>
+                            <li><Link legacyBehavior href="/join-us"><a>{t("nav.joinUs")}</a></Link></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li><Link legacyBehavior href="/contacts-2"><a className="nav-link">{t("nav.contactUs")}</a></Link></li>
+                </ul>
+              </nav>
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
-                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
+                <ConsultationButton variant="book-now" onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
               )}
               {isLabTestPage && cartItemCount > 0 && (
                 <div className="position-relative" onClick={togglePanel} role="button">
@@ -189,7 +275,7 @@ const Header1 = ({ scrollToContact }) => {
         {isMedicinePage && <MedicineCartPanel isOpen={isMedicinePanelOpen} togglePanel={toggleMedicinePanel} cartItem={medicineCartItems} onUpdateCartItemCount={updateMedicineCartItemCount} />}
       </div>
 
-      {mobileMenuOpen && <MobileMenu  scrollToContact={scrollToContact} />}
+      {mobileMenuOpen && <MobileMenu isOpen={mobileMenuOpen} setIsOpen={setMobileMenuOpen} />}
     </header>
   );
 };

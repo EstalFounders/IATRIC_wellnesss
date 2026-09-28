@@ -43,10 +43,23 @@ const appointmentSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  // Literal booking mode from the frontend:
+  // "Now" | "in_twenty_minutes_now" | "ChooseTime"
+  // This is the bridge value copied onto Payment at payment-creation time
+  // so paymentService can detect "Now"-type appointments reliably.
+  bookingMode: {
+    type: String,
+    default: null,
+  },
   status: {
     type: String,
     required: true,
-    default: appointment_status.open,
+    default: appointment_status.pending,
+  },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Payment",
+    default: null,
   },
   patientMeetingUrl: {
     type: String,

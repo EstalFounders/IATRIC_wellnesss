@@ -10,9 +10,10 @@ export const contact_no = "+91 78959 59925";
 export const email = "customercare@healthpath.co.in";
 export const countryCode = "+91";
 export const development_production_url =
-  "staging.healthpath.co.in";
+  process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";
 export const doctor_info_local_storage = "doctor_info";
 export const super_admin_info_local_sotrage = "super_admin_info";
+export const marketing_info_local_storage = "marketing_info";
 export const medicine_cart_details_local_info = "medicineCartItems";
 export const labtest_cart_details_local_info = "labTestcartItems";
 export const single_call = "single_call";
@@ -24,6 +25,7 @@ export const booking_btn_txt = "Book Now";
 
 export const api = {
   addDoctor: "/api/addDoctor",
+  uploadDoctorAvatar: "/api/doctor/upload-avatar",
   doctorLogin: "/api/doctorLogin",
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
   getAllMedicine: "/api/medicineInfo",
@@ -55,9 +57,19 @@ export const api = {
   postArticle: "/api/superAdmin/postArticle",
   helperApi: "/api/helperApi",
   consultationByMeetingId: "/api/getAppointmentId",
+  marketingLogin: "/api/marketing/auth/login",
+  marketingLogout: "/api/marketing/auth/logout",
+  marketingSession: "/api/marketing/auth/session",
+  marketingModules: "/api/marketing/modules",
+  marketingSeo: "/api/marketing/seo",
+  marketingSeoMetadata: "/api/marketing/seo/metadata",
+  marketingBlog: "/api/marketing/blog",
+  marketingBlogPublic: "/api/marketing/blog/public",
+  marketingBanner: "/api/marketing/banner",
+  marketingBannerMetadata: "/api/marketing/banner/metadata",
 };
 
-export const services = [
+export const speciality = [
   "General Physician",
   "Pediatrics",
   "Cardiology",
@@ -118,6 +130,18 @@ export const labTest_payment_status = {
   UNPAID: "unpaid",
 };
 
+export const payment_status = {
+  INITIATED: "INITIATED",
+  PAYMENT_PENDING: "PAYMENT_PENDING",
+  PAID: "PAID",
+  FAILED: "FAILED",
+  CANCELLED: "CANCELLED",
+  REFUND_PENDING: "REFUND_PENDING",
+  REFUNDED: "REFUNDED",
+};
+
+export const payment = "payment";
+
 export const consultation = "Consultation";
 
 export const sessionStorageName = {
@@ -169,8 +193,11 @@ export const IS_NOW = "Now";
 
 export const address = "Sector 57 , Gurgaon, Haryana-122003";
 export const facebook_page_url =
-  "https://www.facebook.com/share/12GvMifXjiF/?mibextid=wwXIfr";
-
+  "https://www.facebook.com/profile.php?id=61575112443781";
+export const instagram_page_url =
+  "https://www.instagram.com/healthpath.pvt/";
+export const Linkdn_url =
+  "https://www.linkedin.com/in/iatrichealthcare/";
 export const color_schema = {
   green: "#3b5f1d",
   yellow: "#8e8333",

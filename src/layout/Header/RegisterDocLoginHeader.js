@@ -15,11 +15,36 @@ import Preloader from "../../components/Preloader";
 import LeaveRequestModel from "../../components/registerDocComponent/model/LeaveRequestModel";
 import ManageSlotsModal from "../../components/registerDocComponent/model/ManageSlotsModal";
 
+/**
+ * Upload a photo picked in the Doctor Panel and return its Firebase URL.
+ * The URL is what goes into the approval request - passing the File itself would
+ * serialise to "{}" in the JSON body and the new photo would be lost.
+ * See pages/api/doctor/upload-avatar.js.
+ */
+const uploadDoctorAvatarWeb = async (file, doctorId) => {
+  const formData = new FormData();
+  formData.append("profilePicture", file, file.name || "doctor-photo.jpg");
+  if (doctorId) formData.append("doctorId", doctorId);
+
+  const response = await fetch(api.uploadDoctorAvatar, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "photo upload failed");
+  }
+
+  return data.url;
+};
+
 const RegisterDocLoginHeader = () => {
   const [show, setShow] = useState(false);
   const [manageSlotsModelShow, setManageSlotsModelShow] = useState(false);
   const [leaveRequestModelShow, setLeaveRequestModelShow] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const DoctorInfo = JSON.parse(
     sessionStorage.getItem(doctor_info_local_storage)
   );
@@ -34,8 +59,21 @@ const RegisterDocLoginHeader = () => {
 
     let changedFields = {};
     let hasChanges = false; // Flag to track changes
+    let pendingPhoto = null; // File picked in the modal - uploaded before saving
 
     Object.keys(updatedDoctor).forEach((key) => {
+      // A new photo arrives as a File, which cannot travel in this JSON request
+      // (it would serialise to "{}"). Upload it first and send its URL instead.
+      if (
+        key === "profilePictureUrl" &&
+        typeof File !== "undefined" &&
+        updatedDoctor[key] instanceof File
+      ) {
+        pendingPhoto = updatedDoctor[key];
+        hasChanges = true;
+        return;
+      }
+
       if (Array.isArray(updatedDoctor[key])) {
         const updatedArray = updatedDoctor[key];
         const originalArray = DoctorInfo.user[key] || [];
@@ -63,6 +101,30 @@ const RegisterDocLoginHeader = () => {
       window.alert("You have changed nothing");
       setLoader(false);
       return; // Stops further execution
+    }
+
+    // New photo: upload it first so the approval request carries a real URL.
+    if (pendingPhoto) {
+      try {
+        setUploadStatus("Uploading your profile photo...");
+        changedFields.profilePictureUrl = await uploadDoctorAvatarWeb(
+          pendingPhoto,
+          updatedDoctor._id
+        );
+      } catch (error) {
+        // The photo failed but the rest of the profile changes still go through.
+        window.alert(
+          `Your new photo could not be uploaded (${error.message}). The rest of your profile changes will still be submitted.`
+        );
+      } finally {
+        setUploadStatus("");
+      }
+    }
+
+    // Only the photo changed and it failed - there is nothing left to submit.
+    if (!Object.keys(changedFields).length) {
+      setLoader(false);
+      return;
     }
 
     try {
@@ -275,7 +337,37 @@ const RegisterDocLoginHeader = () => {
           doctorId={DoctorInfo?.user?._id}
         />
       </div>
-      <div>{loader ? <Preloader /> : ""}</div>
+      <div>
+        {loader ? (
+          <div>
+            <Preloader />
+            {uploadStatus && (
+              <div
+                role="status"
+                style={{
+                  position: "fixed",
+                  bottom: "28px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  zIndex: 1080,
+                  maxWidth: "90vw",
+                  textAlign: "center",
+                  background: "#3b5f1d",
+                  color: "#ffffff",
+                  padding: "12px 20px",
+                  borderRadius: "10px",
+                  boxShadow: "0 6px 18px rgba(0, 0, 0, 0.25)",
+                  fontSize: "14px",
+                }}
+              >
+                {uploadStatus}
+              </div>
+            )}
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
     </Row>
   );
 };

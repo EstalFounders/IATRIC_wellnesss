@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
 import WhatsappConfirmationModel from "../Appointment/modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Demo5About2 = () => {
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
@@ -19,6 +20,7 @@ const Demo5About2 = () => {
   const [severity, setSeverity] = useState("success");
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [otpMobNo, setOtpMobNo] = useState("");
+  const { t } = useLanguage();
 
   const handleCalltoBookPopupSubmit = async (mobNo) => {
     setIsCalltoBookDialog(false);
@@ -29,10 +31,10 @@ const Demo5About2 = () => {
         body: JSON.stringify({ mobile_number: Number(mobNo) }),
       });
       if (!res.ok) throw new Error("Request failed");
-      setResponse("We have received your query, we'll get back to you soon");
+      setResponse(t("demo5.about.queryOk"));
       setSeverity("success");
     } catch {
-      setResponse("Something went wrong. Please try again.");
+      setResponse(t("common.errorTryAgain"));
       setSeverity("error");
     }
     setOpenSnackBar(true);
@@ -84,36 +86,36 @@ const consultationTypes = useSelector(
           {/* Content Boxes */}
           <div className="abox-2-holder py-2">
             <div className="text-center mb-5">
-              <h1 className="steelblue-color">Welcome to Healthpath</h1>
+              <h1 className="steelblue-color">{t("demo5.about.welcome")}</h1>
               <div className="h5 mx-auto steelblue-color w-100">
-                At Healthpath, we are committed to provide expert medical care.{" "}
-                <br /> We offer all time seamless doctor consultation, nursing
-                care, home care, lab test diagnostics and coporate healthcare
+                {t("demo5.about.intro1")}{" "}
+                <br /> {t("demo5.about.intro2")}
                 <br />
                 <div
                   className="font-weight-bold h4 mt-2"
                   style={{ color: "#3b5f1d" }}
                 >
-                  Book Online With Our Experienced Team
+                  {t("demo5.about.bookOnline")}
                 </div>
               </div>
               <p className="mt-3 h3">
-                <strong>Monday – Sunday | 8:00 AM - 8:00 PM</strong>
+                <strong>{t("demo5.about.hours")}</strong>
               </p>
 
               {/* Buttons */}
               <div className="mt-4 d-flex justify-content-center flex-wrap gap-3">
                 <div>
                   <ConsultationButton
+                    variant="book-now"
                     onClick={handleConsultationTypeOpenDialog}
                   >
-                    <div className="">Book Now</div>
+                    <div className="">{t("common.bookNow")}</div>
                   </ConsultationButton>
                 </div>
                 <div className="ml-3">
                   <ConsultationButton onClick={handleOpenCalltoBookDialog}>
                     {/* <FaPhoneAlt className="mr-2" /> */}
-                    {callToBook}
+                    {t("common.getCallback")}
                   </ConsultationButton>
                 </div>
                 <hr className="w-75" />
@@ -121,15 +123,13 @@ const consultationTypes = useSelector(
                   <div className="col-md-8 mb-4">
                     <div className="h-100 p-4 text-center">
                       <h2 className="steelblue-color mb-3">
-                        Our Doctors Panel
+                        {t("demo5.about.doctorsPanel")}
                       </h2>
                       <div className="h5 steelblue-color mx-auto w-100 pb-10">
-                        Browse through our panel of experienced and certified
-                        doctors. Available for online and offline consultations
-                        across India.
+                        {t("demo5.about.doctorsText")}
                       </div>
                       <ConsultationButton path="/all-doctors">
-                        View Doctors
+                        {t("demo5.about.viewDoctors")}
                       </ConsultationButton>
                     </div>
                   </div>

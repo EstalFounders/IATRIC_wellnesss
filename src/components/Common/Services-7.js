@@ -4,8 +4,11 @@ import PopupDialog from "./PopupDialog";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import { Button } from "react-bootstrap";
 import { contact_no } from "../../constant";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { richText } from "../../i18n/richText";
 
 const Services7 = () => {
+  const { t } = useLanguage();
   const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
 
   const handleDialDialogOpen = () => {
@@ -17,8 +20,8 @@ const Services7 = () => {
   };
 
   const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+    { label: t("contacts1.dial"), action: dial },
+    { label: t("contacts1.whatsapp"), action: openSupportWhatsAppWeb },
   ];
 
   return (
@@ -39,18 +42,9 @@ const Services7 = () => {
                       <span className="flaticon-137-doctor blue-color" />
                       <div className="sbox-7-txt">
                         <h5 className="h5-sm steelblue-color">
-                          Top Level Doctors
+                          {t("s7.title1")}
                         </h5>
-                        <p className="p-sm">
-                          Access <b>India&apos;s leading medical experts</b> from
-                          anywhere. Our highly qualified and experienced doctors
-                          provide
-                          <b> exceptional, personalized care.</b> Trust
-                          Healthpath for
-                          <b> top-tier medical consultations</b> and your best
-                          health outcomes. Experience healthcare delivered by
-                          the best.
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p1"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -68,17 +62,10 @@ const Services7 = () => {
                       <div className="sbox-7-txt">
                         {/* Title */}
                         <h5 className="h5-sm steelblue-color">
-                          Modern Equipment
+                          {t("s7.title2")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          At Healthpath, your health is supported by the{" "}
-                          <b>latest medical technology.</b> We utilize{" "}
-                          <b>state-of-the-art equipment</b> for precise
-                          diagnostics and effective treatments. This commitment
-                          ensures <b>accurate results and superior care,</b>{" "}
-                          empowering your journey to wellness.
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p2"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -96,19 +83,10 @@ const Services7 = () => {
                       <div className="sbox-7-txt">
                         {/* Title */}
                         <h5 className="h5-sm steelblue-color">
-                          Qualified Facilities
+                          {t("s7.title3")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          Healthpath connects you with{" "}
-                          <b>top-tier medical facilities</b> across India. We
-                          ensure access to{" "}
-                          <b>modern infrastructure and advanced technology.</b>{" "}
-                          Experience
-                          <b>safe, comfortable environments</b> for all your
-                          treatment needs. Trust Healthpath for{" "}
-                          <b>high-quality, accessible care.</b>
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p3"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -126,17 +104,10 @@ const Services7 = () => {
                       <div className="sbox-7-txt">
                         {/* Title */}
                         <h5 className="h5-sm steelblue-color">
-                          Professional Services
+                          {t("s7.title4")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          Experience expert medical care tailored to your needs.
-                          <b>Our highly qualified doctors and nurses</b> provide
-                          comprehensive support,{" "}
-                          <b>ensuring your well-being.</b> Trust Healthpath for
-                          reliable, high-quality healthcare
-                          <b>services across India.</b>
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p4"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -154,19 +125,10 @@ const Services7 = () => {
                       <div className="sbox-7-txt">
                         {/* Title */}
                         <h5 className="h5-sm steelblue-color">
-                          Medical Counseling
+                          {t("s7.title5")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          <b>
-                            Immediate medical assistance is just a call away.
-                          </b>
-                          Healthpath provides rapid, reliable emergency support
-                          for urgent medical needs. Our expert team ensures
-                          prompt attention and care, wherever you are. Trust
-                          Healthpath for swift and efficient emergency
-                          healthcare when it matters most.
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p5"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -184,19 +146,10 @@ const Services7 = () => {
                       <div className="sbox-7-txt">
                         {/* Title */}
                         <h5 className="h5-sm steelblue-color">
-                          Emergency Help
+                          {t("s7.title6")}
                         </h5>
                         {/* Text */}
-                        <p className="p-sm">
-                          <b>
-                            Immediate medical assistance is just a call away.
-                          </b>
-                          Healthpath provides rapid, reliable emergency support
-                          for urgent medical needs. Our expert team ensures
-                          prompt attention and care, wherever you are. Trust
-                          Healthpath for swift and efficient emergency
-                          healthcare when it matters most.
-                        </p>
+                        <p className="p-sm">{richText(t("s7.p5"))}</p>
                       </div>
                     </a>
                   </Link>
@@ -213,37 +166,26 @@ const Services7 = () => {
               data-wow-delay="0.6s"
             >
               {/* Title */}
-              <h4 className="h4-xs">
-                Healthpath: Your Convenient Path to healthier life , Open Daily
-              </h4>
+              <h4 className="h4-xs">{t("s7.h4")}</h4>
               {/* Text */}
-              <p className="p-md">
-                Don&apos;t let a busy schedule or long distances prevent you from
-                receiving the medical attention you deserve. At Healthpath, we
-                make prioritizing your health simple and accessible. Our doors
-                are open seven days a week, from 8:00 AM to 8:00 PM (Monday –
-                Sunday), ensuring you can access expert medical care when it&apos;s
-                most convenient for you. Contact Healthpath today and experience
-                a clinic with a truly innovative approach to treatment, designed
-                around your life. Start your journey to a healthier you with us!
-              </p>
+              <p className="p-md">{t("s7.p")}</p>
               {/* Table */}
               <table className="table">
                 <tbody>
                   <tr>
-                    <td>Mon – Fri</td>
+                    <td>{t("s7.day1")}</td>
                     <td> - </td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">{t("s7.time")}</td>
                   </tr>
                   <tr>
-                    <td>Saturday</td>
+                    <td>{t("s7.day2")}</td>
                     <td>-</td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">{t("s7.time")}</td>
                   </tr>
                   <tr>
-                    <td>Sunday</td>
+                    <td>{t("s7.day3")}</td>
                     <td>-</td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">{t("s7.time")}</td>
                   </tr>
                 </tbody>
               </table>
@@ -251,35 +193,38 @@ const Services7 = () => {
               {/* <h5 className="h5-sm">Need a personal health plan?</h5> */}
               {/* Text */}
               <p className="h5 box-list">
-                Contact Healthpath today and experience a clinic with a truly
-                innovative approach to treatment.
+                {t("s7.contactCta")}
                 <br />
                 <Button
                   onClick={(e) => {
                     e.preventDefault();
                     handleDialDialogOpen();
                   }}
-                  onMouseOver={(e) => {
-                    e.target.style.color = "#ffffff";
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.textDecoration = "underline";
                   }}
-                  onMouseOut={(e) => {
-                    e.target.style.color = "#000000";
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.textDecoration = "none";
                   }}
                   style={{
                     backgroundColor: "transparent",
                     border: "none",
                     cursor: "pointer",
+                    color: "#ffffff",
                     padding: "0",
                     marginTop: "20px",
+                    transition: "transform 0.2s ease",
                   }}
                 >
-                  Call/WhatsApp -{" "}
+                  {t("s7.callLabel")}{" "}
                   <a
                     href={`tel:${contact_no}`}
                     style={{
                       fontFamily: "bold",
                       textDecoration: "none",
-                      color: "#000000",
+                      color: "#ffffff",
                     }}
                   >
                     {contact_no}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import AboutUsInfo4 from "../src/components/About-us/AboutUsInfo4";
 import AboutUsVideo2 from "../src/components/About-us/AboutUsVideo2";
 import Banner5 from "../src/components/Common/Banner-5";
@@ -8,17 +7,20 @@ import DiscoverMoreComp from "../src/components/discover-more/DiscoverMore";
 import ServiceDetailsComp from "../src/components/serviceDetails/ServiceDetailsComponent";
 import Layouts from "../src/layout/Layouts";
 import PageBanner from "../src/layout/PageBanner";
+import { resolveServiceName } from "../src/customUtils/serviceLinks";
 import { useRouter } from "next/router";
 
 const AboutUs = () => {
   const router = useRouter();
-  const { Service } = router.query;
+  // Breadcrumb shows the clean service name (never a raw slug/id).
+  const serviceName = resolveServiceName(router.query) || "Our Services";
+
   return (
     <Layouts>
       <PageBanner
-        pageTitle={Service}
+        pageTitle={serviceName}
         motherTitle={"discover-more"}
-        url={`discover-more/`}
+        url={"discover-more"}
       />
       <ServiceDetailsComp />
       {/* <AboutUsInfo4 /> */}

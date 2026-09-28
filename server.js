@@ -5,6 +5,44 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const http = require("http");
 
+// Redis-backed Socket.IO adapter (optional).
+// Only enabled when REDIS_URL is set - enables scaling across multiple
+// Node instances/processes. Falls back to in-memory adapter otherwise.
+let redisAdapter = null;
+const REDIS_URL = process.env.REDIS_URL;
+if (REDIS_URL) {
+  try {
+    const { createAdapter } = require("@socket.io/redis-adapter");
+    const { createClient } = require("redis");
+
+    const pubClient = createClient({ url: REDIS_URL });
+    const subClient = pubClient.duplicate();
+
+    pubClient.on("error", (err) =>
+      console.error("[Redis] Socket.IO pub client error:", err.message),
+    );
+    subClient.on("error", (err) =>
+      console.error("[Redis] Socket.IO sub client error:", err.message),
+    );
+
+    Promise.all([pubClient.connect(), subClient.connect()])
+      .then(() => {
+        console.log("[Redis] Socket.IO Redis adapter connected");
+      })
+      .catch((err) => {
+        console.error("[Redis] Socket.IO Redis adapter connect failed:", err.message);
+      });
+
+    redisAdapter = createAdapter(pubClient, subClient);
+  } catch (err) {
+    console.error(
+      "[Redis] Failed to initialize Socket.IO Redis adapter (falling back to in-memory):",
+      err.message,
+    );
+    redisAdapter = null;
+  }
+}
+
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -26,6 +64,7 @@ app.prepare().then(() => {
       origin: "*",
       methods: ["GET", "POST"],
     },
+    ...(redisAdapter ? { adapter: redisAdapter } : {}),
   });
 
   io.on("connection", (socket) => {
@@ -237,6 +276,17 @@ app.prepare().then(() => {
         console.error("[CRON] Consultation reminder failed:", err);
       }
     });
+
+    // LOG MONITOR: import PM2 logs into MongoDB when enabled
+    if (process.env.LOG_MONITOR_ENABLED === "true") {
+      fetch(`http://${hostname}:${port}/api/logs/monitor`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-log-boot": "1" },
+      })
+        .then((r) => r.json())
+        .then((j) => console.log("[log-monitor] boot start:", JSON.stringify(j)))
+        .catch((e) => console.error("[log-monitor] boot start failed:", e.message));
+    }
   });
 });
 

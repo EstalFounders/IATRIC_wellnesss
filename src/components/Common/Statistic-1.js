@@ -1,7 +1,9 @@
 import React from "react";
 import Counter from "../Counter";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Statistic1 = () => {
+  const { t } = useLanguage();
   return (
     <div id="statistic-1" className="bg-scroll statistic-section division">
       <div className="container">
@@ -16,7 +18,7 @@ const Statistic1 = () => {
               <h5 className="statistic-number text-white">
                 9, <Counter end={632} />
               </h5>
-              <h4 className="txt-400 text-white">Happy Patients</h4>
+              <h4 className="txt-400 text-white">{t("demo5.stat.happyPatients")}</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #2 */}
@@ -28,7 +30,7 @@ const Statistic1 = () => {
               <h5 className="statistic-number text-white">
                 <Counter end={178} />
               </h5>
-              <h4 className="txt-400 text-white">Qualified Doctors</h4>
+              <h4 className="txt-400 text-white">{t("demo5.stat.qualifiedDoctors")}</h4>
             </div>
           </div>
           {/* STATISTIC BLOCK #3 */}

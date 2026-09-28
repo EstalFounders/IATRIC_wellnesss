@@ -5,9 +5,11 @@ import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { fetchBasicConfiguration } from "../ApiService/UtilService";
 import { useDispatch } from "react-redux";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Demo5Hero5 = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const Demo5Hero5 = () => {
               className="hero-5-strip bg-blue white-color"
               style={{ backgroundColor: `${color_schema.green}` }}
             >
-              <div className="h2 m-0 font-weight-bold">HealthPath Provides</div>
+              <div className="h2 m-0 font-weight-bold">{t("demo5.hero.provides")}</div>
             </div>
             <div className="hero-txt">
               {/* Title */}
@@ -32,10 +34,10 @@ const Demo5Hero5 = () => {
                 className="steelblue-color"
                 style={{ color: `${color_schema.yellow}` }}
               >
-                <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>Best Quality</div>
+                <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>{t("demo5.hero.bestQuality")}</div>
               </h4>
               <h3 className="steelblue-color">
-                Medical treatment for you and your family
+                {t("demo5.hero.title")}
               </h3>
               {/* CONTENT BOX #1 */}
               <div className="box-list grey-color">
@@ -43,15 +45,15 @@ const Demo5Hero5 = () => {
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
                 <div className="h5 mx-auto steelblue-color">
-                  Get optimal health ,{" "}
+                  {t("demo5.hero.optimal")} ,{" "}
                   <strong style={{ color: `${color_schema.green}` }}>
-                    ANYTIME , ANYWHERE !
+                    {t("demo5.hero.anytime")}
                   </strong>{" "}
                   <br />
                   <br />
-                  <b style={{color: '#3b5f1d'}}>One-stop care:</b> Consult top doctors online, visit our clinic,
-                  or get home visits & lab tests. Our pharmacy & rehab experts
-                  support your journey to a healthier you.
+                  <b style={{ color: "#3b5f1d" }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
+
+
                 </div>
               </div>
               {/* CONTENT BOX #3 */}
@@ -67,10 +69,12 @@ const Demo5Hero5 = () => {
                   healthcare journey. */}
                 </p>
               </div>
-              {/* Button */}
-              <div className="w-50">
+              {/* Button - full width on phones, capped so it stays a normal
+                  button size on desktop (was a fixed 50% wrapper, which clipped
+                  the label on small screens). */}
+              <div className="hero-cta" style={{ width: "100%", maxWidth: "320px" }}>
                 <ConsultationButton path={"/discover-more"}>
-                  Discover More
+                  {t("common.discoverMore")}
                 </ConsultationButton>
               </div>
             </div>

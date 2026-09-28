@@ -19,6 +19,7 @@ import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
+import PaymentModal from "./PaymentModal";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
 import { fetchDoctors } from "../ApiService/ConsultationApiService";
@@ -65,6 +66,7 @@ const AppointmentPage = () => {
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [symptoms, setSymptoms] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
@@ -84,11 +86,11 @@ const AppointmentPage = () => {
   const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
   const [serviceType, setServiceType] = useState("");
+  const [pendingPayment, setPendingPayment] = useState(null);
 
-  // Get services from Redux (already fetched via getServiceOffered)
-  const services = useSelector(
-    (state) => state.superAdminHomePage.serviceOffered
-  );
+  // Services come from the globalData slice (single source of truth, serviceOffered
+  // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
+  const services = useSelector((state) => state.globalData?.services || []);
 
   // Derive consultation options from services filter for Audio/Video
   const consultationOptions = (Array.isArray(services) ? services : [])
@@ -121,6 +123,7 @@ const AppointmentPage = () => {
     filteredDoctors,
     selectedSlot,
     symptoms,
+    agreedToTerms,
     name,
     email,
     mobNo,
@@ -140,6 +143,7 @@ const AppointmentPage = () => {
 
   const setter = {
     setSymptoms,
+    setAgreedToTerms,
     setName,
     setEmail,
     setMobNo,
@@ -177,7 +181,7 @@ const AppointmentPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const { serviceParam } = router.query;
+    const { serviceParam, appointmentId: orderIdFromReturn } = router.query;
     if (typeof serviceParam === "string") {
       const matched = services.find((service) =>
         service.name?.trim().toLowerCase().includes(serviceParam.trim().toLowerCase())
@@ -185,6 +189,22 @@ const AppointmentPage = () => {
       if (matched) {
         setServiceType(matched.name);
       }
+    }
+    // Returned from Cashfree checkout (our server return_url appends the Cashfree order_id as ?appointmentId=<orderId>).
+    // Open the PaymentModal in verify-only mode so it auto-polls the backend status.
+    if (typeof orderIdFromReturn === "string" && orderIdFromReturn.trim()) {
+      setPendingPayment({
+        appointmentId: null,
+        amount: consultationprice,
+        consultationType,
+        autoVerifyOrderId: orderIdFromReturn,
+      });
+      // Clean the query param so refresh doesn't re-trigger
+      const cleanQuery = { ...router.query };
+      delete cleanQuery.appointmentId;
+      router.replace({ pathname: router.pathname, query: cleanQuery }, undefined, {
+        shallow: true,
+      });
     }
   }, [router.query]);
 
@@ -329,6 +349,13 @@ const AppointmentPage = () => {
       handleOpenSnackBar();
       return;
     }
+    if (!agreedToTerms) {
+      setSnackBarMessage(
+        "Please read and accept the Terms & Conditions to continue."
+      );
+      handleOpenSnackBar();
+      return;
+    }
     setOtpConfirmationPopup(true);
     setAvailableSlotsFromServer(true);
   };
@@ -366,7 +393,13 @@ const AppointmentPage = () => {
         return;
       }
       if (response.ok) {
-        handleShowDialog(message.message);
+        // Payment gate: the appointment is PENDING until payment is
+        // verified by the backend. Open the payment modal.
+        setPendingPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          consultationType,
+        });
       } else {
         const errorData = await response.json();
         setSnackBarMessage(errorData.message || "Failed to book consultation.");
@@ -394,13 +427,14 @@ const AppointmentPage = () => {
   };
 
   return (
-    <div id="" className="wide-60">
+    <div id="" className={`wide-60 ${styles.appointmentWrap}`}>
       <div className="container-fluid">
         <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
           <AppointmentForm
             appointmentState={appointmentState}
             setter={setter}
+            doctors={doctors}
             handleDoctorChoiceChange={handleDoctorChoiceChange}
             handleDoctorSelection={handleDoctorSelection}
             handleTimeSelection={handleTimeSelection}
@@ -409,11 +443,6 @@ const AppointmentPage = () => {
             sendWhatsAppConfirmation={sendWhatsAppConfirmation}
             handleCloseSnackBar={handleCloseSnackBar}
           />
-
-          {/* common health concern treatment */}
-          <div className="w-75 w-md-100">
-            <CommonHealthConcerns />
-          </div>
 
           <div>
             <Demo5Doctors1 />
@@ -463,6 +492,26 @@ const AppointmentPage = () => {
               onConfirm={whatsappConfrimation}
             />
           </WhatsappConfirmationModel>
+
+          {pendingPayment && (
+            <AppointmentBookingModal
+              isOpen={!!pendingPayment}
+              onClose={() => setPendingPayment(null)}
+            >
+              <PaymentModal
+                appointmentId={pendingPayment.appointmentId}
+                amount={pendingPayment.amount}
+                consultationType={consultationType}
+                autoVerifyOrderId={pendingPayment.autoVerifyOrderId || null}
+                onPaymentDone={() => {
+                  setMessage("Your consultation has been confirmed.");
+                  setBookingResponse(true);
+                  setPendingPayment(null);
+                }}
+                onClose={() => setPendingPayment(null)}
+              />
+            </AppointmentBookingModal>
+          )}
         </div>
         {/* End row */}
       </div>

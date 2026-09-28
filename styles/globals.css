@@ -71,3 +71,10 @@ img.mfp-img {
 .blue-color {
   color: #8e8333 !important;
 }
+
+/* Compact breadcrumb variant — used on /appointment so the whole booking form
+   fits inside one screen without scrolling. */
+#breadcrumb.breadcrumb-compact .breadcrumb-holder {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}

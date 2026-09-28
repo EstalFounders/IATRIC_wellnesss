@@ -1,0 +1,256 @@
+/* Marketing panel styles (scoped CSS module, same approach as other panels). */
+.page {
+  min-height: 100vh;
+  background: #f6f7f4;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  background: #3b5f1d;
+  color: #ffffff;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.user {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #22310f;
+  margin-bottom: 4px;
+}
+
+.pageSubtitle {
+  color: #5b6455;
+  font-size: 0.92rem;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e3e6dd;
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.cardTitle {
+  font-size: 1.03rem;
+  font-weight: 700;
+  color: #22310f;
+  margin: 0;
+}
+
+.summary {
+  color: #5b6455;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef3e6;
+  color: #3b5f1d;
+  white-space: nowrap;
+}
+
+.badgeMuted {
+  background: #f1f1f1;
+  color: #6b6b6b;
+}
+
+.fieldRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.fieldLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #4a5344;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.muted {
+  color: #8a9184;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.notice {
+  background: #fff8e1;
+  border: 1px solid #f0e0a8;
+  color: #6d5a12;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  margin-top: 12px;
+}
+
+.error {
+  color: #b3261e;
+  font-size: 0.85rem;
+  margin: 0 0 10px 0;
+}
+
+.loginWrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f7f4;
+  padding: 24px;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #e3e6dd;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.previewImg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #e3e6dd;
+  margin-bottom: 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.clickable:hover,
+.clickable:focus-visible {
+  box-shadow: 0 6px 18px rgba(59, 95, 29, 0.14);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.clickableHint {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #3b5f1d;
+}
+
+
+.counter {
+  font-size: 0.72rem;
+  color: #8a9184;
+}
+
+.counterWarn {
+  color: #b3261e;
+}
+
+.tableUrl {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #22310f;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+.coverEmpty {
+  width: 100%;
+  max-width: 420px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+  margin-bottom: 12px;
+  border: 2px dashed #cdd5c4;
+  border-radius: 10px;
+  background: #fafbf8;
+  color: #8a9184;
+  font-size: 0.85rem;
+}
+
+.checkingWrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f7f4;
+  color: #5b6455;
+  font-size: 0.95rem;
+}

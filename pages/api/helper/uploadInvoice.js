@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   let session; // Declare session variable
   try {
     // Start a Mongoose session for the transaction
-    session = await mongoose.startSession();
+    session = await mongoose.connection.startSession();
     session.startTransaction();
     const body = req.body;
     const invoiceNumber = body.data.invoiceNumber;

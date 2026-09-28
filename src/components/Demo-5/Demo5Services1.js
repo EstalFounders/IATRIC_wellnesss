@@ -1,87 +1,92 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { color_schema } from "../../constant";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { demo5ServiceHighlights } from "../../../data/services";
 import {
+  mergeServiceLists,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
+import {
+  getServiceDescription,
+  serviceDetailsPath,
+} from "../../customUtils/serviceLinks";
+import {
+  CardiologyIcon,
   CorporateHealthcareIcon,
+  Dentistry,
+  DermatologistIcon,
   GeneralPhysician,
+  GynaecologyIcon,
   HealthCampIcon,
   HomeCareIcon,
   LabInvestigation,
-  NursingCare,
+  MedicineDelivery,
   NursingCareIcon,
+  OphthalmologyIcon,
+  OrthopaedicsIcon,
+  PediatricsIcon,
   PhysiotherapyIcon,
+  Psychiatrist,
+  PulmonologyIcon,
 } from "../../../public/svgIcon/all-department-svg-icon";
+
+// Name -> icon map: the DB decides which services exist, so every card needs an
+// icon even when the static highlights list has no matching entry.
+const ICON_BY_NAME = {
+  // specialities
+  "general physician": GeneralPhysician,
+  pediatrics: PediatricsIcon,
+  cardiology: CardiologyIcon,
+  dermatologist: DermatologistIcon,
+  dermatology: DermatologistIcon,
+  orthopaedics: OrthopaedicsIcon,
+  "gynaecology & obstetrics": GynaecologyIcon,
+  gynecology: GynaecologyIcon,
+  ophthalmology: OphthalmologyIcon,
+  pulmonology: PulmonologyIcon,
+  psychiatrist: Psychiatrist,
+  psychiatry: Psychiatrist,
+  dentistry: Dentistry,
+  physiotherapy: PhysiotherapyIcon,
+  // services (serviceOffered MAJOR items)
+  labtest: LabInvestigation,
+  "lab investigation": LabInvestigation,
+  "nursing care": NursingCareIcon,
+  "home care": HomeCareIcon,
+  "medicine delivery": MedicineDelivery,
+  "corporate healthcare": CorporateHealthcareIcon,
+  healthcamp: HealthCampIcon,
+  audio: GeneralPhysician,
+  video: GeneralPhysician,
+};
+
+// Falls back to the doctor-consultation icon so no card is ever icon-less.
+const renderServiceIcon = (name) =>
+  React.createElement(
+    ICON_BY_NAME[String(name || "").toLowerCase()] || GeneralPhysician,
+    { size: 70 }
+  );
 
 const Demo5Services1 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const marqueeRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // ✅ Duplicate your `features[]` array locally
-  const features = [
-    {
-      title: "Doctor Consultation",
-      service: "consultation",
-      description:
-        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
-      icon: <GeneralPhysician size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Nursing Care",
-      service: "nursing-services",
-      description:
-        "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
-      icon: <NursingCareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Home Care",
-      service: "nursing-services",
-      description:
-        "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
-      icon: <HomeCareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Blood Test & Diagnostics",
-      service: "lab-test",
-      description:
-        "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
-      icon: <LabInvestigation size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Community Care",
-      service: "community-care",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <HealthCampIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Corporate Healthcare",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <CorporateHealthcareIcon size={70} />,
-      btntext: "View Details",
-    },
-    {
-      title: "Physiotherapy",
-      description:
-        "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
-      icon: <PhysiotherapyIcon size={70} />,
-      btntext: "View Details",
-    },
-  ];
-
-  // ✅ Duplicate for infinite scroll
-  const combinedFeatures = [...features, ...features];
+  // Single source of truth: globalData slice services list (falls back to the
+  // static highlights when the API has not answered), assets merged by name.
+  const { services } = useGlobalData();
+  const highlights = useMemo(
+    () => mergeServiceLists(services, demo5ServiceHighlights),
+    [services]
+  );
+  const combinedFeatures = [...highlights, ...highlights];
 
   // ✅ Touch support
   useEffect(() => {
@@ -127,9 +132,8 @@ const Demo5Services1 = () => {
   };
 
   const handleClick = (item) => {
-    if (item.service) {
-      router.push(`/service-details/?Service=${item.service}`);
-    }
+    // Clean URL: the service name is what the details page displays.
+    router.push(serviceDetailsPath(item));
   };
 
   return (
@@ -137,7 +141,7 @@ const Demo5Services1 = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold h1 text-uppercase">SERVICES</div>
+            <div className="font-weight-bold h1 text-uppercase">{t("demo5.services.heading")}</div>
           </div>
         </div>
 
@@ -165,9 +169,15 @@ const Demo5Services1 = () => {
                     onMouseLeave={() => setHoveredIndex(null)}
                   >
                     <div className="service-nav-link-dept">
-                      <div className="service-icon-dept">{item.icon}</div>
+                      <div className="service-icon-dept">
+                        {item.icon || renderServiceIcon(item.name)}
+                      </div>
                       <div className="service-title-dept font-weight-bold">
-                        {item.title}
+                        {t(item.titleKey, item.title)}
+                      </div>
+                      <div className="service-card-desc">
+                        {item.description ||
+                          getServiceDescription(item.name || item.title)}
                       </div>
                     </div>
                   </div>

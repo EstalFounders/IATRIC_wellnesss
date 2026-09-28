@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Popup from "../Popup";
 import Image from "next/image";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const Demo2Gallery1 = () => {
   const [image, setImage] = useState(false);
   const [src, setSrc] = useState(false);
+  const { t } = useLanguage();
   const onClick = (src) => {
     setImage(true);
     setSrc(src);
@@ -17,26 +19,27 @@ const Demo2Gallery1 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title 	*/}
-            <h3 className="h3-md text-dark">Your Partner in Health</h3>
+            <h3 className="h3-md text-dark">{t("demo2.gallery.title")}</h3>
             {/* Text */}
             <div>
-              At Healthpath, we&apos;re more than just a{" "}
-              <strong>healthcare provider</strong>; we&apos;re truly{" "}
-              <strong>your partner in health</strong>.
+              {t("demo2.gallery.p1a")}{" "}
+              <strong>{t("demo2.gallery.p1b")}</strong>
+              {t("demo2.gallery.p1c")}{" "}
+              <strong>{t("demo2.gallery.p1d")}</strong>.
               <br />
-              We walk alongside you on your entire{" "}
-              <strong>wellness journey</strong>, committed to helping you
-              achieve your personal health goals.We offer{" "}
-              <strong>personalized care</strong>, dedicated support, and
-              essential resources every step of the way.
+              {t("demo2.gallery.p2a")}{" "}
+              <strong>{t("demo2.gallery.p2b")}</strong>
+              {t("demo2.gallery.p2c")}{" "}
+              <strong>{t("demo2.gallery.p2d")}</strong>
+              {t("demo2.gallery.p2e")}
               <br />
               <div className="mt-3">
-              With Healthpath, you gain a trusted ally focused on your{" "}
-              <strong>long-term well-being</strong>, ensuring you receive the{" "}
-              <strong>comprehensive care</strong> and guidance you need to
-              thrive. Choose Healthpath for a collaborative approach to your
-              health, where your success is our shared mission.
-              </div>  
+                {t("demo2.gallery.p3a")}{" "}
+                <strong>{t("demo2.gallery.p3b")}</strong>{" "}
+                {t("demo2.gallery.p3c")}{" "}
+                <strong>{t("demo2.gallery.p3d")}</strong>{" "}
+                {t("demo2.gallery.p3e")}
+              </div>
             </div>
           </div>
         </div>

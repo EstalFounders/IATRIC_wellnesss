@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useSelector } from "react-redux";
@@ -13,13 +13,34 @@ import { handleServiceClick } from "./commonMethod";
 import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
 import CalltoBookPopup from "./CalltoBookPopup";
+import { useLanguage } from "../../i18n/LanguageContext";
+import {
+  mergeServiceLists,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
+
+// Fallback artwork for items that exist in the DB but not in the static list yet.
+const DEFAULT_SERVICE_IMAGE = "/images/general_physicians.jpg";
 
 const ServicesTabs = () => {
-  const [services] = useState(servicesData);
+  // Single source of truth: globalData slice speciality list; the static servicesData
+  // list supplies image/subheading/description assets keyed by name.
+  const { speciality } = useGlobalData();
+  const services = useMemo(
+    () =>
+      mergeServiceLists(speciality, servicesData, "name").map((item) => ({
+        ...item,
+        id: item.id ?? slugifyService(item.name),
+        image: item.image || DEFAULT_SERVICE_IMAGE,
+      })),
+    [speciality]
+  );
   const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
   const router = useRouter();
+  const { t } = useLanguage();
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
   const totalPages = Math.ceil(services.length / servicesPerPage);
@@ -57,6 +78,14 @@ const ServicesTabs = () => {
 
   const canGoNext = currentPage < totalPages;
   const canGoPrev = currentPage > 1;
+
+  // Keep the active tab valid when the slice replaces the static list (DB-only
+  // items carry slug ids, matched static items keep their numeric id).
+  useEffect(() => {
+    if (services.length && !services.some((service) => service.id === activeTab)) {
+      setActiveTab(services[0].id);
+    }
+  }, [services, activeTab]);
 
   const handleTabClick = (id) => {
     setActiveTab(id);
@@ -101,7 +130,7 @@ const ServicesTabs = () => {
                 }`}
                 onClick={() => handleTabClick(service.id)}
               >
-                {service.name}
+                {t(`service.${service.name}`, service.name)}
               </div>
             ))}
           </div>
@@ -152,7 +181,7 @@ const ServicesTabs = () => {
                     className="section-subheading blue-color mb-3"
                     style={{ fontSize: "1.8rem", fontWeight: "600" }}
                   >
-                    {service.subheading}
+                    {t(`subheading.${service.name}`, service.subheading)}
                   </h4>
 
                   {/* Heading */}
@@ -169,7 +198,7 @@ const ServicesTabs = () => {
                     }
                     style={{ fontWeight: "700" }}
                   >
-                    {service.name}
+                    {t(`service.${service.name}`, service.name)}
                   </h3>
 
                   {/* Description */}
@@ -177,7 +206,9 @@ const ServicesTabs = () => {
                     className="service-description h5 box-list grey-color mb-4"
                     style={{ lineHeight: "1.6" }}
                   >
-                    {boldKeywords(service.description, [
+                    {boldKeywords(
+                      t(`tabdesc.${service.name}`, service.description),
+                      [
                       "General Physician",
                       "trusted care",
                       "Pediatrics",
@@ -229,6 +260,7 @@ const ServicesTabs = () => {
                   <div className="mt-4 w-100">
                     <div className="w-50 mx-auto mx-lg-0">
                       <ConsultationButton
+                        variant={"book-now"}
                         path={"/appointment"}
                         onClick={() =>
                           handleOpenCalltoBookDialog(

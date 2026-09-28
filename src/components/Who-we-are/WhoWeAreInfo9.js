@@ -37,7 +37,7 @@ const WhoWeAreInfo9 = () => {
                 Don&apos;t let a busy schedule or long distances prevent you from
                 receiving the medical attention you deserve. At Healthpath, we
                 make prioritizing your health simple and accessible. Our doors
-                are open seven days a week, from 8:00 AM to 8:00 PM (Monday –
+                are open seven days a week, from 7:00 AM to 8:00 PM (Monday –
                 Sunday), ensuring you can access expert medical care when it&apos;s
                 most convenient for you. Contact Healthpath today and experience
                 a clinic with a truly innovative approach to treatment, designed
@@ -49,17 +49,17 @@ const WhoWeAreInfo9 = () => {
                   <tr>
                     <td>Mon – Fri</td>
                     <td> - </td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">7:00 AM - 8:00 PM</td>
                   </tr>
                   <tr>
                     <td>Saturday</td>
                     <td>-</td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">7:00 AM - 8:00 PM</td>
                   </tr>
                   <tr>
                     <td>Sunday</td>
                     <td>-</td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
+                    <td className="text-right">7:00 AM - 8:00 PM</td>
                   </tr>
                 </tbody>
               </table>

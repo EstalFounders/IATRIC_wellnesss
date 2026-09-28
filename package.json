@@ -6,11 +6,16 @@
     "debug": "cross-env NODE_OPTIONS=\"--inspect=0.0.0.0:9229\" node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "lint": "next lint"
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "lint": "next lint",
+    "tasks:process": "node scripts/runSheetTasks.js",
+    "tasks:process:dry": "node scripts/runSheetTasks.js --dry-run --limit=10"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",
-    "@aws-sdk/client-chime-sdk-meetings": "^3.1072.0",
+    "@cashfreepayments/cashfree-js": "^1.0.7",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.9",
@@ -19,8 +24,6 @@
     "@socket.io/redis-adapter": "^8.3.0",
     "@socket.io/sticky": "^1.0.4",
     "@xenova/transformers": "^2.17.2",
-    "amazon-chime-sdk-component-library-react": "^3.12.0",
-    "amazon-chime-sdk-js": "^3.31.0",
     "axios": "^1.18.0",
     "bcryptjs": "^2.4.3",
     "firebase": "^10.8.0",
@@ -67,6 +70,7 @@
     "wowjs": "^1.1.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "cross-env": "^10.1.0",

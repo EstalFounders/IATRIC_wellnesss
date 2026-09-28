@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper imports
 import { formatData } from "../../registerDocComponent/utils/helper";
-import { appointment_status, payment, showUpdate } from "../../../constant";
+import { appointment_status, payment, price_symbol, showUpdate } from "../../../constant";
 import { useRouter } from "next/router";
 
 const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
@@ -50,6 +50,9 @@ const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
       <Col>{formatData(data.appointmentTime)}</Col>
       <Col>{data.symptoms}</Col>
       <Col>{data.patientMobNo}</Col>
+      <Col>{data.paymentId?.status || "N/A"}</Col>
+      <Col>{data.paymentId?.orderId || "N/A"}</Col>
+      <Col>{data.paymentId?.amount ? `${price_symbol}${data.paymentId.amount}` : "N/A"}</Col>
       <Col>
         <div
           className={`font-weight-bold mb-2 ${

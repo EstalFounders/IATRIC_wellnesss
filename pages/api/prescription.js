@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    session = await mongoose.startSession();
+    session = await mongoose.connection.startSession();
     session.startTransaction();
 
     // Destructure explicit fields from req.body to safely use as lookups or fallbacks

@@ -8,6 +8,9 @@ import { wrapper } from "../src/store/store";
 import { persistStore } from "redux-persist";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { LanguageProvider } from "../src/i18n/LanguageContext";
+import LanguageToggle from "../src/components/Common/LanguageToggle";
+import SeoMetadata from "../src/marketing/components/SeoMetadata";
 
 function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
@@ -19,10 +22,7 @@ function MyApp({ Component, pageProps, ...rest }) {
     const timer = setTimeout(() => {
       setLoader(false);
     }, 1000);
-
-    // Clean up the timer if the component unmounts
-    return () => clearTimeout(timer);
-  }, []); // <-- Added empty dependency array so this runs ONLY ONCE on mount
+  });
 
   return (
     <Fragment>
@@ -39,15 +39,17 @@ function MyApp({ Component, pageProps, ...rest }) {
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
       </Head>
-      
-      {/* 
-        If Redux Persist is still loading/hydrating, we show the Preloader. 
-        Once both Persist is ready AND our 1-second timer finishes, your app displays.
-      */}
+      {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
+      <SeoMetadata metadata={pageProps?.seoMetadata} />
+      {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
-          <PersistGate loading={<Preloader />} persistor={persistor}>
-            {loader ? <Preloader /> : <Component {...props.pageProps} />}
+          <PersistGate loading={null} persistor={persistor}>
+            <LanguageProvider>
+              <Component {...props.pageProps} />
+              <SeoMetadata metadata={pageProps?.seoMetadata} />
+              <LanguageToggle />
+            </LanguageProvider>
           </PersistGate>
         </Provider>
       </NoSsr>
@@ -55,4 +57,4 @@ function MyApp({ Component, pageProps, ...rest }) {
   );
 }
 
-export default wrapper.withRedux(MyApp);
+export default MyApp;

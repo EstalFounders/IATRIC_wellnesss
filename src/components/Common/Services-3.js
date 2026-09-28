@@ -1,7 +1,7 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { service3Props } from "../../sliderProps";
-import { services } from "../../constant";
+import { speciality } from "../../constant";
 
 const Services3 = () => {
   return (
@@ -40,7 +40,7 @@ const Services3 = () => {
                   <span className="flaticon-083-stethoscope" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[0]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[0]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -55,7 +55,7 @@ const Services3 = () => {
                   <span className="flaticon-047-head" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[1]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[1]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -70,7 +70,7 @@ const Services3 = () => {
                   <span className="flaticon-015-blood-donation-1" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[2]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[2]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -85,7 +85,7 @@ const Services3 = () => {
                   <span className="flaticon-048-lungs" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[3]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[3]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -100,7 +100,7 @@ const Services3 = () => {
                   <span className="flaticon-060-cardiogram-4" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[4]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[4]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -115,7 +115,7 @@ const Services3 = () => {
                   <span className="flaticon-031-scanner" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[5]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[5]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -130,7 +130,7 @@ const Services3 = () => {
                   <span className="flaticon-076-microscope" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[6]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[6]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -145,7 +145,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[7]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[7]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -160,7 +160,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[8]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[8]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -175,7 +175,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[9]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[9]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -190,7 +190,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[10]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[10]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -205,7 +205,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[11]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[11]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -220,7 +220,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[12]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[12]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -235,7 +235,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[13]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[13]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -250,7 +250,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[14]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[14]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -265,7 +265,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[15]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[15]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula
@@ -280,7 +280,7 @@ const Services3 = () => {
                   <span className="flaticon-068-ambulance-3" />
                 </div>
                 {/* Title */}
-                <h5 className="h5-xs steelblue-color">{services[1]}</h5>
+                <h5 className="h5-xs steelblue-color">{speciality[1]}</h5>
                 {/* Text */}
                 <p>
                   Porta semper lacus cursus, feugiat primis ultrice in ligula

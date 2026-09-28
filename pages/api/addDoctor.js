@@ -338,6 +338,14 @@ export default async function handler(req, res) {
                 .map((type) => type.trim())
             : [], // Convert to array & trim spaces
         };
+
+        // Services offered - only touch it when the client sends the field
+        if (stringFields.serviceOffered !== undefined) {
+          updateData.serviceOffered = stringFields.serviceOffered
+            .split(",")
+            .map((service) => service.trim())
+            .filter(Boolean); // Convert to array & trim spaces
+        }
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,
         });

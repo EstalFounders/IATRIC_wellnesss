@@ -7,9 +7,8 @@ const SinglePost = () => {
     <Layouts>
       <PageBanner
         pageTitle="5 Benefits of ..."
-        url="blog-listing"
-        motherTitle="Our Blog
-"
+        url="blog"
+        motherTitle="Our Blog"
       />
       <SinglePostBlogPage />
     </Layouts>

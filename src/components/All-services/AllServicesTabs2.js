@@ -1,16 +1,38 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { Nav, Tab } from "react-bootstrap";
-import { AllServiceTab } from "../../../data/services";
+import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "../Common/commonUi";
+import { VscCircleSmallFilledCompact } from "react-icons/vsc";
+import {
+  mergeServiceLists,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
+
+// Fallback artwork for items that exist in the DB but not in the static list yet.
+const DEFAULT_SERVICE_IMAGE = "/images/general_physicians.jpg";
 
 const AllServicesTabs2 = () => {
-  const [services] = useState(AllServiceTab);
+  // Single source of truth: globalData slice speciality list (falls back to the
+  // static servicesData list until the API has answered).
+  const { speciality } = useGlobalData();
+  const services = useMemo(
+    () =>
+      mergeServiceLists(speciality, servicesData, "name").map((item) => ({
+        ...item,
+        key: item.key || slugifyService(item.name),
+        content: item.content || [item.description || "", ""],
+        options: item.options || [],
+        image: item.image || DEFAULT_SERVICE_IMAGE,
+      })),
+    [speciality]
+  );
   return (
     <section id="tabs-2" className="wide-100 tabs-section division">
       <div className="container">
-        <Tab.Container defaultActiveKey={services[0].key}>
+        <Tab.Container defaultActiveKey={services[0]?.key}>
           <div className="row">
             {/* TABS NAVIGATION */}
             <div className="col-lg-4">
@@ -34,7 +56,7 @@ const AllServicesTabs2 = () => {
                       key={service.key}
                     >
                       <Nav.Link eventKey={service.key} href={`#${service.key}`}>
-                        {service.title}
+                        {service.name}
                       </Nav.Link>
                     </Nav.Item>
                   ))}
@@ -54,7 +76,7 @@ const AllServicesTabs2 = () => {
                     key={service.key}
                   >
                     {/* Title */}
-                    <h3 className="h3-md text-dark">{service.title}</h3>
+                    <h3 className="h3-md text-dark">{service.name}</h3>
                     {/* Text */}
                     <div>{service.content[0]}</div>
                     {/* Image */}
@@ -84,7 +106,7 @@ const AllServicesTabs2 = () => {
                               return (
                                 <div className="box-list" key={idx}>
                                   <div className="box-list-icon blue-color">
-                                    <i className="fas fa-angle-double-right" />
+                                    <VscCircleSmallFilledCompact />
                                   </div>
                                   <div>{service.options[idx]}</div>
                                 </div>

@@ -200,20 +200,31 @@ export async function updateInvoiceNumberInDatabase(item, invoiceId) {
 }
 
 export const formatPhoneNumber = (phoneNumberString) => {
-  if (typeof phoneNumberString !== "string") return null;
-  console.log(phoneNumberString, "last 10 digits 200");
+  // Normalize numbers (e.g. 9876543210, +91 9876543210, 919876543210)
+  let digits;
+  if (typeof phoneNumberString === "string") {
+    digits = phoneNumberString.replace(/\D/g, "");
+  } else if (typeof phoneNumberString === "number") {
+    digits = String(phoneNumberString).replace(/\D/g, "");
+  } else {
+    return null;
+  }
 
-  // Remove all non-digit characters
-  let digits = phoneNumberString.replace(/\D/g, "");
-  console.log(digits, "last 10 digits 203");
+  // If it already includes the 91 country code and is 12 digits, keep it
+  if (digits.length === 12 && digits.startsWith("91")) {
+    return digits;
+  }
+
+  // Strip a leading 0 (local formatting like 09876543210)
+  if (digits.length === 11 && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
   // Keep only the last 10 digits (assumed to be the actual mobile number)
   const last10Digits = digits.slice(-10);
 
-  console.log(last10Digits, "last 10 digits 207");
   // Ensure it's 10 digits
   if (last10Digits.length !== 10) return null;
-
-  console.log(last10Digits, "last 10 digits 211");
 
   // Prefix with country code
   return `91${last10Digits}`;

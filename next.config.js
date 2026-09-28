@@ -17,5 +17,24 @@ module.exports = {
         pathname: "**",
       },
     ],
+    // Optimised images are cached for a year. Safe because every banner/blog URL is
+    // versioned (`&v=<lastUpdated>` via withCacheBuster), so a replaced image is a
+    // new URL and a new cache entry - repeat visits render the popup from cache.
+    minimumCacheTTL: 60 * 60 * 24 * 365,
+  },
+  // The public blog moved to /our-blog; keep old /blog links working.
+  async redirects() {
+    return [
+      {
+        source: "/blog",
+        destination: "/our-blog",
+        permanent: true,
+      },
+      {
+        source: "/blog/:slug",
+        destination: "/our-blog/:slug",
+        permanent: true,
+      },
+    ];
   },
 };
