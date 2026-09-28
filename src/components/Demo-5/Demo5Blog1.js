@@ -4,7 +4,7 @@ import { api } from "../../constant";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { richText } from "../../i18n/richText";
 
-const DEFAULT_COVER = "images/blog/post-1-img.jpg";
+const DEFAULT_COVER = "/images/blog/post-1-img.jpg";
 const PUBLIC_LIMIT = 3;
 
 const formatDate = (value) => {
@@ -153,7 +153,7 @@ const Demo5Blog1 = () => {
                   key={post._id || post.slug}
                   post={post}
                   title={post.title}
-                  href={`/blog/${post.slug}`}
+                  href={`/our-blog/${post.slug}`}
                   cover={post.coverImage}
                   date={formatDate(post.publishedAt)}
                   author={post.author || "Marketing Team"}

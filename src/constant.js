@@ -25,6 +25,7 @@ export const booking_btn_txt = "Book Now";
 
 export const api = {
   addDoctor: "/api/addDoctor",
+  uploadDoctorAvatar: "/api/doctor/upload-avatar",
   doctorLogin: "/api/doctorLogin",
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
   getAllMedicine: "/api/medicineInfo",

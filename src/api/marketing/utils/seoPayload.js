@@ -19,7 +19,7 @@ export const MARKETING_PAGES = {
   doctors: { label: "All Doctors", path: "/all-doctors" },
   contact: { label: "Contact Us", path: "/contacts-1" },
   appointment: { label: "Book Appointment", path: "/appointment" },
-  blog: { label: "Our Blog", path: "/blog" },
+  blog: { label: "Our Blog", path: "/our-blog" },
   demo5: { label: "Demo 5 Landing", path: "/demo-5" },
   faqs: { label: "FAQs", path: "/faqs" },
   pricing: { label: "Pricing", path: "/pricing-1" },

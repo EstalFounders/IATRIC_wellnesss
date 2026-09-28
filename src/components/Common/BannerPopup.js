@@ -13,25 +13,41 @@ import { useLanguage } from "../../i18n/LanguageContext";
 // Shown once per browser session (survives reloads, resets with a new tab/session).
 const SESSION_KEY = "popup_banner_shown";
 const SHOW_DELAY_MS = 800;
+// Identical for the warm-up copy and the modal copy so both resolve to the same
+// /_next/image URL: one network request, cached for the modal to reuse.
+const POPUP_SIZES = "(max-width: 768px) 100vw, 800px";
 
 /**
  * Homepage popup.
  *
- * The image comes from the marketing panel (marketingPanel.home.bannerPopup via
- * /api/marketing/banner/metadata) and falls back to the static values in
- * data/popupBanner.js. When neither is configured the popup is not shown at all.
- * An empty/failing image URL renders POPUP_FALLBACK_IMAGE.
+ * The image comes from `initialBanner` (the marketing panel banner, read server-side
+ * in pages/index.js via getStaticProps), then /api/marketing/banner/metadata, then
+ * Firebase Storage, then the static values in data/popupBanner.js. When nothing is
+ * configured the popup is not shown at all. An empty/failing URL renders
+ * POPUP_FALLBACK_IMAGE.
+ *
+ * Performance: as soon as we know the popup will be shown, the image is rendered
+ * off-screen with `priority`, so the browser downloads the exact optimised URL the
+ * modal needs while the show delay runs. The modal then paints from cache instead of
+ * starting a download when it opens.
  */
-const BannerPopup = () => {
+const BannerPopup = ({ initialBanner = null }) => {
   const router = useRouter();
   const { t } = useLanguage();
   const [show, setShow] = useState(false);
   const [broken, setBroken] = useState(false);
-  const [managedBanner, setManagedBanner] = useState(null);
+  const [managedBanner, setManagedBanner] = useState(initialBanner);
   const [resolved, setResolved] = useState(false);
+  const [warmUp, setWarmUp] = useState(false);
 
   useEffect(() => {
     let alive = true;
+
+    // The banner URL is already in the page HTML - no request needed.
+    if (initialBanner?.url) {
+      setResolved(true);
+      return undefined;
+    }
 
     const loadBanner = async () => {
       try {
@@ -62,9 +78,27 @@ const BannerPopup = () => {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [initialBanner]);
 
   const banner = managedBanner || (popupBanner?.url ? popupBanner : null);
+  const imageSrc =
+    broken || !banner?.url
+      ? POPUP_FALLBACK_IMAGE
+      : withCacheBuster(banner.url, banner.lastUpdated);
+
+  // Warm the image up before the modal opens. Skipped when this session already saw
+  // the popup, so repeat visits download nothing.
+  useEffect(() => {
+    if (!banner?.url || warmUp) return;
+
+    try {
+      if (window.sessionStorage.getItem(SESSION_KEY) === "1") return;
+    } catch (err) {
+      // storage blocked (private mode) - the popup still shows once, so warm it up
+    }
+
+    setWarmUp(true);
+  }, [banner?.url, warmUp]);
 
   useEffect(() => {
     if (!resolved || !banner?.url) return undefined;
@@ -107,16 +141,46 @@ const BannerPopup = () => {
   };
 
   return (
-    // backdrop="static" + keyboard={false}: clicking outside or pressing ESC keeps
-    // the popup open - it closes only via the × button.
-    <Modal
-      show={show}
-      onHide={handleClose}
-      centered
-      size="lg"
-      backdrop="static"
-      keyboard={false}
-    >
+    <>
+      {/* Off-screen warm-up copy of the banner. `priority` makes Next emit the
+          <link rel="preload" as="image"> hint and fetches it immediately, so opening
+          the popup paints from cache instead of waiting for the download. */}
+      {warmUp && !show && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: "-10000px",
+            top: 0,
+            width: "1px",
+            height: "1px",
+            overflow: "hidden",
+            opacity: 0,
+            pointerEvents: "none",
+          }}
+        >
+          <Image
+            src={imageSrc}
+            alt=""
+            width={1200}
+            height={630}
+            sizes={POPUP_SIZES}
+            priority
+            onError={() => setBroken(true)}
+          />
+        </div>
+      )}
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        centered
+        size="lg"
+        backdrop="static"
+        keyboard={false}
+      >
+      {/* backdrop="static" + keyboard={false}: clicking outside or pressing ESC keeps
+          the popup open - it closes only via the × button. */}
       <Modal.Body className="p-0 position-relative">
         <button
           type="button"
@@ -147,21 +211,19 @@ const BannerPopup = () => {
           style={{ cursor: banner.href ? "pointer" : "default" }}
         >
           <Image
-            src={
-              broken || !banner.url
-                ? POPUP_FALLBACK_IMAGE
-                : withCacheBuster(banner.url, banner.lastUpdated)
-            }
+            src={imageSrc}
             alt={banner.alt || t("popup.bannerAlt", "HealthPath")}
             width={1200}
             height={630}
-            sizes="(max-width: 768px) 100vw, 800px"
+            sizes={POPUP_SIZES}
+            priority
             style={{ width: "100%", height: "auto", display: "block" }}
             onError={() => setBroken(true)}
           />
         </div>
       </Modal.Body>
     </Modal>
+    </>
   );
 };
 

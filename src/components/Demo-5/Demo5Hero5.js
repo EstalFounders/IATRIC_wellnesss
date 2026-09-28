@@ -69,8 +69,10 @@ const Demo5Hero5 = () => {
                   healthcare journey. */}
                 </p>
               </div>
-              {/* Button */}
-              <div className="w-50">
+              {/* Button - full width on phones, capped so it stays a normal
+                  button size on desktop (was a fixed 50% wrapper, which clipped
+                  the label on small screens). */}
+              <div className="hero-cta" style={{ width: "100%", maxWidth: "320px" }}>
                 <ConsultationButton path={"/discover-more"}>
                   {t("common.discoverMore")}
                 </ConsultationButton>

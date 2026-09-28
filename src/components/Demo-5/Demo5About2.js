@@ -106,6 +106,7 @@ const consultationTypes = useSelector(
               <div className="mt-4 d-flex justify-content-center flex-wrap gap-3">
                 <div>
                   <ConsultationButton
+                    variant="book-now"
                     onClick={handleConsultationTypeOpenDialog}
                   >
                     <div className="">{t("common.bookNow")}</div>

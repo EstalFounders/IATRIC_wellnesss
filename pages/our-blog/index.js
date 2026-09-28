@@ -2,7 +2,7 @@ import { getSeoStaticProps } from "../../src/api/marketing/helpers/seoServer";
 
 // Marketing panel SEO: the tags are written into the built HTML and refresh at
 // most every 60s; saving in the panel also triggers an on-demand rebuild.
-export const getStaticProps = () => getSeoStaticProps("/blog");
+export const getStaticProps = () => getSeoStaticProps("/our-blog");
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import Layouts from "../../src/layout/Layouts";
 import PageBanner from "../../src/layout/PageBanner";
 import { api } from "../../src/constant";
 
-const DEFAULT_COVER = "images/blog/post-1-img.jpg";
+const DEFAULT_COVER = "/images/blog/post-1-img.jpg";
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -48,7 +48,7 @@ const BlogCard = ({ post }) => {
         {/* BLOG POST TEXT */}
         <div className="blog-post-txt">
           <h5 className="h5-sm steelblue-color">
-            <Link legacyBehavior href={`/blog/${post.slug}`}>
+            <Link legacyBehavior href={`/our-blog/${post.slug}`}>
               <a>{post.title}</a>
             </Link>
           </h5>
@@ -64,7 +64,7 @@ const BlogCard = ({ post }) => {
                 String(post.content || "").length > 150 ? "..." : ""
               }`}
           </p>
-          <Link legacyBehavior href={`/blog/${post.slug}`}>
+          <Link legacyBehavior href={`/our-blog/${post.slug}`}>
             <a className="btn btn-sm btn-outline-secondary">Read more</a>
           </Link>
         </div>
@@ -75,7 +75,7 @@ const BlogCard = ({ post }) => {
 
 /**
  * "Our Blog" - lists every published post managed in the marketing panel.
- * This is the breadcrumb target used by the blog detail pages (/blog/<slug>).
+ * This is the breadcrumb target used by the blog detail pages (/our-blog/<slug>).
  */
 const OurBlogPage = () => {
   const [state, setState] = useState({ loading: true, posts: [], error: "" });

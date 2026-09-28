@@ -26,6 +26,7 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { handleServiceClick } from "../../components/Common/commonMethod";
 import { demo5ServiceHighlights } from "../../../data/services";
 import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
+import { serviceDetailsPath } from "../../customUtils/serviceLinks";
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
@@ -103,11 +104,11 @@ const Header1 = ({ scrollToContact }) => {
           </button>
 
           <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
-            <img src="images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+            <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
           </span>
 
-          <ConsultationButton onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
-            {t("common.bookNow")}
+          <ConsultationButton variant="book-now" onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
+            {booking_btn_txt}
           </ConsultationButton>
         </div>
       </div>
@@ -200,7 +201,7 @@ const Header1 = ({ scrollToContact }) => {
                             <li className="title">{t("footer.quickLinks")}:</li>
                             {navServices.slice(0, 4).map((service) => (
                               <li key={service.title}>
-                                <Link legacyBehavior href={`/service-details/?Service=${service.service || slugifyService(service.name)}`}>
+                                <Link legacyBehavior href={serviceDetailsPath(service)}>
                                   <a>{service.title}</a>
                                 </Link>
                               </li>
@@ -210,7 +211,7 @@ const Header1 = ({ scrollToContact }) => {
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
                             {navServices.slice(4).map((service) => (
                               <li key={service.title}>
-                                <Link legacyBehavior href={`/service-details/?Service=${service.service || slugifyService(service.name)}`}>
+                                <Link legacyBehavior href={serviceDetailsPath(service)}>
                                   <a>{service.title}</a>
                                 </Link>
                               </li>
@@ -253,7 +254,7 @@ const Header1 = ({ scrollToContact }) => {
               </nav>
             <div className="d-flex align-items-center gap-3">
               {!hiddenRoutes.includes(router.pathname) && (
-                <ConsultationButton onClick={handleConsultationTypeOpenDialog}>{t("common.bookNow")}</ConsultationButton>
+                <ConsultationButton variant="book-now" onClick={handleConsultationTypeOpenDialog}>{booking_btn_txt}</ConsultationButton>
               )}
               {isLabTestPage && cartItemCount > 0 && (
                 <div className="position-relative" onClick={togglePanel} role="button">

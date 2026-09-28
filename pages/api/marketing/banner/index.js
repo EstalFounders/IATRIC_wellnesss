@@ -53,6 +53,14 @@ export default requireMarketingAuth(async (req, res) => {
     const doc = await saveBannerConfig(values, author);
     const banner = doc?.bannerPopup || { ...values, lastUpdated: new Date() };
 
+    // The homepage renders the banner URL from getStaticProps, so rebuild it now
+    // instead of waiting up to 60s for the ISR window.
+    try {
+      await res.revalidate("/");
+    } catch (error) {
+      console.log(`[marketing] banner revalidate skipped: ${error.message}`);
+    }
+
     return res.status(200).json({
       ok: true,
       banner,

@@ -5,6 +5,9 @@ import Layouts from "../../src/layout/Layouts";
 import PageBanner from "../../src/layout/PageBanner";
 import { api } from "../../src/constant";
 
+// Shown when a post has no cover image, or the stored URL fails to load.
+const DEFAULT_COVER = "/images/blog/post-1-img.jpg";
+
 const formatDate = (value) => {
   if (!value) return "";
 
@@ -27,11 +30,13 @@ const BlogPostPage = () => {
   const router = useRouter();
   const slug = router.query?.slug;
   const [state, setState] = useState({ loading: true, post: null });
+  const [coverFailed, setCoverFailed] = useState(false);
 
   useEffect(() => {
     if (!slug) return undefined;
 
     let alive = true;
+    setCoverFailed(false);
 
     const loadPost = async () => {
       try {
@@ -64,7 +69,7 @@ const BlogPostPage = () => {
     <Layouts>
       <PageBanner
         pageTitle={post?.title || "Our Blog"}
-        url="blog"
+        url="our-blog"
         motherTitle="Our Blog"
       />
 
@@ -81,7 +86,7 @@ const BlogPostPage = () => {
                 <p>
                   It may have been unpublished or the link is incorrect.
                 </p>
-                <Link legacyBehavior href="/demo-5#blog-1">
+                <Link legacyBehavior href="/our-blog">
                   <a className="btn btn-md btn-primary">
                     Back to the blog
                   </a>
@@ -93,13 +98,14 @@ const BlogPostPage = () => {
           {!loading && post && (
             <div className="row">
               <div className="col-lg-8 offset-lg-2">
-                {post.coverImage && (
-                  <img
-                    className="img-fluid mb-4"
-                    src={post.coverImage}
-                    alt={post.title}
-                  />
-                )}
+                {/* Cover image from the marketing panel (falls back to a local
+                    placeholder when the post has none or the URL fails). */}
+                <img
+                  className="img-fluid mb-4"
+                  src={coverFailed || !post.coverImage ? DEFAULT_COVER : post.coverImage}
+                  alt={post.title}
+                  onError={() => setCoverFailed(true)}
+                />
 
                 <h1 className="h1-lg text-dark">{post.title}</h1>
 
@@ -119,7 +125,7 @@ const BlogPostPage = () => {
                   <p key={index}>{paragraph}</p>
                 ))}
 
-                <Link legacyBehavior href="/demo-5#blog-1">
+                <Link legacyBehavior href="/our-blog">
                   <a className="btn btn-sm btn-outline-secondary mt-4">
                     ← All posts
                   </a>

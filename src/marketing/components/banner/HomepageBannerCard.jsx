@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Badge, Button } from "react-bootstrap";
 import { api } from "../../../constant";
 import { POPUP_FALLBACK_IMAGE } from "../../../../data/popupBanner";
-import { BANNER_STORAGE_PATH, withCacheBuster } from "../../../services/firebaseStorage";
+import { BANNER_STORAGE_PATH, applyBannerCacheMetadata, getBannerImageUrl, withCacheBuster } from "../../../services/firebaseStorage";
 import styles from "../css/marketingPanel.module.css";
 import EditBannerModal from "./EditBannerModal";
 
@@ -25,9 +25,18 @@ const HomepageBannerCard = ({ moduleInfo }) => {
     banner: null,
     liveNow: false,
   });
+  const [storageImage, setStorageImage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [broken, setBroken] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    []
+  );
 
   const loadBanner = useCallback(async () => {
     try {
@@ -47,6 +56,19 @@ const HomepageBannerCard = ({ moduleInfo }) => {
         liveNow: Boolean(data.liveNow),
       });
       setBroken(false);
+
+      // No URL saved in the panel yet? Show the image that actually sits at the
+      // fixed Firebase path (metadata/img.png) instead of a generic placeholder.
+      if (!data.banner?.bannerUrl) {
+        const directUrl = await getBannerImageUrl();
+        if (mountedRef.current) setStorageImage(directUrl || "");
+      } else if (mountedRef.current) {
+        setStorageImage("");
+      }
+
+      // Older uploads were stored with `no-cache`; give the existing object the same
+      // long-lived headers the next upload would set (best effort, panel only).
+      applyBannerCacheMetadata();
     } catch (error) {
       setState({
         loading: false,
@@ -63,17 +85,26 @@ const HomepageBannerCard = ({ moduleInfo }) => {
 
   const { banner, liveNow, loading, error } = state;
 
+  // The current banner: the URL saved in the panel, else the image stored at
+  // metadata/img.png in Firebase, else the local placeholder (only if broken).
+  const currentImage = banner?.bannerUrl
+    ? withCacheBuster(banner.bannerUrl, banner.lastUpdated)
+    : storageImage;
+
   const statusLabel = !banner?.bannerUrl
-    ? "Not set"
+    ? storageImage
+      ? "In Storage"
+      : "Not set"
     : liveNow
     ? "Active"
     : "Paused";
 
-  const statusVariant = liveNow ? "success" : banner?.bannerUrl ? "secondary" : "warning";
-  const previewSrc =
-    broken || !banner?.bannerUrl
-      ? POPUP_FALLBACK_IMAGE
-      : withCacheBuster(banner.bannerUrl, banner.lastUpdated);
+  const statusVariant = liveNow
+    ? "success"
+    : banner?.bannerUrl || storageImage
+    ? "secondary"
+    : "warning";
+  const previewSrc = broken || !currentImage ? POPUP_FALLBACK_IMAGE : currentImage;
 
   return (
     <section className={styles.card}>
@@ -119,7 +150,7 @@ const HomepageBannerCard = ({ moduleInfo }) => {
           }}
           style={{ backgroundColor: "#3b5f1d", border: "none" }}
         >
-          {banner?.bannerUrl ? "Edit Banner" : "Upload New Image"}
+          {banner?.bannerUrl || storageImage ? "Edit Banner" : "Upload New Image"}
         </Button>
       </div>
 

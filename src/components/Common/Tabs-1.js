@@ -260,6 +260,7 @@ const ServicesTabs = () => {
                   <div className="mt-4 w-100">
                     <div className="w-50 mx-auto mx-lg-0">
                       <ConsultationButton
+                        variant={"book-now"}
                         path={"/appointment"}
                         onClick={() =>
                           handleOpenCalltoBookDialog(

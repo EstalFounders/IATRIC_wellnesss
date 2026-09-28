@@ -9,7 +9,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tasks:process": "node scripts/runSheetTasks.js",
+    "tasks:process:dry": "node scripts/runSheetTasks.js --dry-run --limit=10"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",

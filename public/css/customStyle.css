@@ -28,7 +28,12 @@
 
 .consultation-btn {
   padding: 8px 16px;
-  font-size: 24px;
+  /* Scales with the viewport instead of a fixed 24px, so the label always fits
+     the (often half-width) wrapper on phones. Caps at the original 24px. */
+  font-size: clamp(16px, 1.6vw + 9px, 24px);
+  line-height: 1.25;
+  max-width: 100%;
+  box-sizing: border-box;
   background-color: #3b5f1d; /* company green */
   color: #ffffff;
   border: 1px solid #3b5f1d;
@@ -45,6 +50,43 @@
   background-color: #2e4a17; /* slightly darker company green */
   border-color: #2e4a17;
   color: #ffffff;
+}
+
+/* Subtle attention pulse for the primary "Book Now" CTA only. Applied by
+   <ConsultationButton variant="book-now" | isBlinking>; every other button keeps
+   its original styling. The ring uses the company green (59, 95, 29 = #3b5f1d). */
+@keyframes consultationBtnPulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(59, 95, 29, 0.5);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(59, 95, 29, 0);
+    opacity: 0.92;
+  }
+}
+
+.consultation-btn--book-now {
+  animation: consultationBtnPulse 2.4s ease-in-out infinite;
+}
+
+/* Accessibility: keep the button, drop the motion. */
+@media (prefers-reduced-motion: reduce) {
+  .consultation-btn--book-now {
+    animation: none;
+  }
+}
+
+/* Phones: allow a narrow button to wrap its label rather than spill outside. */
+@media (max-width: 575.98px) {
+  .consultation-btn {
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
 }
 
 .navbar-option {
@@ -240,6 +282,26 @@
 
 .service-nav-link-dept:hover .service-title-dept {
   color: white;
+}
+
+/* Short service description shown inside the marquee service cards.
+   Clamped so a longer DB description can never break the fixed card height. */
+.service-card-desc {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+  color: #6c757d;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.service-nav-link:hover .service-card-desc,
+.service-nav-link-dept:hover .service-card-desc {
+  color: #ffffff;
 } 
 
 /* Animations */

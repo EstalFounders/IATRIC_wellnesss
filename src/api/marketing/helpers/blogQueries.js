@@ -2,6 +2,7 @@
 // "blog" document (a panel-internal identifier - it is not one of the SEO
 // targets in MARKETING_PAGES).
 import MarketingPanel from "../../../models/marketingPanelSchema";
+import { normalizeCoverImage } from "../utils/blogPayload";
 
 const BLOG_IDENTIFIER = "blog";
 
@@ -11,7 +12,7 @@ const toPost = (post) => ({
   slug: post.slug,
   excerpt: post.excerpt || "",
   content: post.content || "",
-  coverImage: post.coverImage || "",
+  coverImage: normalizeCoverImage(post.coverImage),
   author: post.author || "Marketing Team",
   isPublished: post.isPublished !== false,
   publishedAt: post.publishedAt || null,

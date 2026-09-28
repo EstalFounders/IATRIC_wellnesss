@@ -19,7 +19,16 @@ export const getBannerConfig = async () => {
     pageIdentifier: HOME_IDENTIFIER,
   }).lean();
 
-  return { ...BANNER_DEFAULTS, ...(doc?.bannerPopup || {}) };
+  const stored = doc?.bannerPopup || {};
+
+  return {
+    ...BANNER_DEFAULTS,
+    ...stored,
+    // Accept the keys used by the earlier implementation so existing documents
+    // keep working (imageUrl/alt vs bannerUrl/altText).
+    bannerUrl: stored.bannerUrl || stored.imageUrl || BANNER_DEFAULTS.bannerUrl,
+    altText: stored.altText || stored.alt || BANNER_DEFAULTS.altText,
+  };
 };
 
 /** True when the homepage should render the banner right now. */
