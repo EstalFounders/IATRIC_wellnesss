@@ -1,10 +1,27 @@
 export const company_registrated_name = "Ttanshe health path pvt.ltd";
-export const certificate_img_path = "images/doctorCertificate/";
-export const profilePicture_img_path = "images/doctorPicture/";
-export const doctorStamp_img_path = "images/doctorStamp/";
-export const doctorSignature_img_path = "images/doctorSignature/";
-export const prescription_img_path = "images/prescription/";
-export const invoice_img_path = "images/invoice/";
+
+// Firebase Storage roots are environment scoped. NEXT_PUBLIC_* is required because
+// src/utils.js uploads prescriptions/invoices from the browser too, and the value is
+// baked into both bundles at build time.
+//   staging (default) : images/…, metadata/…
+//   production        : set NEXT_PUBLIC_IMAGES_FOLDER=production_img and
+//                       NEXT_PUBLIC_METADATA_FOLDER=production_img in .env.production.local
+//                       (gitignored) on the production VPS only, then rebuild.
+const trimSlashes = (value) => String(value || "").replace(/^\/+/, "").replace(/\/+$/, "");
+const IMAGES_ROOT = trimSlashes(process.env.NEXT_PUBLIC_IMAGES_FOLDER) || "images";
+const METADATA_ROOT = trimSlashes(process.env.NEXT_PUBLIC_METADATA_FOLDER) || "metadata";
+
+export const certificate_img_path = `${IMAGES_ROOT}/doctorCertificate/`;
+export const profilePicture_img_path = `${IMAGES_ROOT}/doctorPicture/`;
+export const doctorStamp_img_path = `${IMAGES_ROOT}/doctorStamp/`;
+export const doctorSignature_img_path = `${IMAGES_ROOT}/doctorSignature/`;
+export const prescription_img_path = `${IMAGES_ROOT}/prescription/`;
+export const invoice_img_path = `${IMAGES_ROOT}/invoice/`;
+
+// Marketing panel media (homepage banner object + blog covers).
+export const banner_img_path = `${METADATA_ROOT}/img.png`;
+export const blog_img_folder = `${METADATA_ROOT}/blogImg`;
+
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
 export const contact_no = "+91 78959 59925";
 export const email = "customercare@healthpath.co.in";

@@ -7,15 +7,18 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { storage } from "../../lib/firebase";
+import { banner_img_path, blog_img_folder } from "../constant";
 
 /**
  * Fixed banner location: every upload overwrites this one object, so the
- * homepage always points at the same path.
+ * homepage always points at the same path. The folder segment comes from
+ * NEXT_PUBLIC_METADATA_FOLDER (src/constant.js), so the production and staging
+ * environments can keep their media apart.
  */
-export const BANNER_STORAGE_PATH = "metadata/img.png";
+export const BANNER_STORAGE_PATH = banner_img_path;
 
 /** Blog cover images live here; each upload gets a unique name (no overwrites). */
-export const BLOG_IMAGE_FOLDER = "metadata/blogImg";
+export const BLOG_IMAGE_FOLDER = blog_img_folder;
 
 /**
  * Browsers/CSS never request the banner twice for the same URL, so it can be cached
