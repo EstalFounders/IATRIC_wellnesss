@@ -43,11 +43,37 @@ jobs:
 
     steps:
       - name: Target
+        env:
+          VPS_HOST_VAL: ${{ secrets.VPS_HOST }}
+          VPS_USER_VAL: ${{ secrets.VPS_USER }}
+          SSH_KEY_STATUS: ${{ secrets.VPS_SSH_KEY != '' && 'present' || 'MISSING' }}
+          EXPECTED_HOST: "37.187.159.65"
+          EXPECTED_PORT: "20008"
+          EXPECTED_USER: "root"
+          # public host key of the VPS: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+          EXPECTED_HOST_KEY_FP: "SHA256:CYF6DA+2Rrs8+AgaEMDSaXajzuNWgkmQOaZqsShDwZQ"
         run: |
           echo "branch : $BRANCH"
           echo "path   : $DEPLOY_PATH"
           echo "pm2    : $PM2_APP"
           echo "health : ${HEALTH_URL:-<not configured - post-deploy check will be skipped>}"
+          echo
+          echo "--- connection secrets (GitHub masks the values, so only safe comparisons are printed) ---"
+          echo "VPS_SSH_KEY secret       : $SSH_KEY_STATUS"
+          if [ "$VPS_HOST_VAL" = "$EXPECTED_HOST" ]; then echo "VPS_HOST matches VPS IP  : yes"; else echo "VPS_HOST matches VPS IP  : NO (length ${#VPS_HOST_VAL}, expected ${#EXPECTED_HOST})"; fi
+          if [ "$VPS_PORT" = "$EXPECTED_PORT" ]; then echo "VPS_PORT matches         : yes"; else echo "VPS_PORT matches         : NO (length ${#VPS_PORT}, expected ${#EXPECTED_PORT} - is the secret missing?)"; fi
+          if [ "$VPS_USER_VAL" = "$EXPECTED_USER" ]; then echo "VPS_USER matches         : yes"; else echo "VPS_USER matches         : NO (length ${#VPS_USER_VAL})"; fi
+          case "$VPS_HOST_VAL" in *[!0-9.]*|"") echo "VPS_HOST format          : hostname / invalid (not a plain IPv4)";; *) echo "VPS_HOST format          : IPv4 literal";; esac
+          resolved="$(getent hosts "$VPS_HOST_VAL" 2>/dev/null | awk '{print $1}' | head -1 || true)"
+          if [ "$resolved" = "$EXPECTED_HOST" ]; then echo "VPS_HOST resolves to VPS : yes"; else echo "VPS_HOST resolves to VPS : NO"; fi
+          echo
+          echo "--- reachability from the runner ---"
+          nc -vz -w 5 "$VPS_HOST_VAL" "$VPS_PORT" 2>&1 | tail -1 || true
+          echo
+          echo "--- host key of whatever answers on port $VPS_PORT (public info, never secret) ---"
+          fp="$(ssh-keyscan -p "$VPS_PORT" -T 6 "$VPS_HOST_VAL" 2>/dev/null | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' | tr '\n' ' ' || true)"
+          echo "host key fingerprint     : ${fp:-none (nothing answered)}"
+          case "$fp" in *"$EXPECTED_HOST_KEY_FP"*) echo "=> this IS the expected VPS";; *) echo "=> WARNING: NOT the expected VPS host key ($EXPECTED_HOST_KEY_FP) - the connection is going to a different machine";; esac
 
       - name: Prepare SSH key
         run: |
@@ -58,7 +84,7 @@ jobs:
       - name: Deploy over SSH
         run: |
           set -o pipefail
-          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" \
+          ssh -v -i ~/.ssh/deploy_key -p "$VPS_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
             "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
