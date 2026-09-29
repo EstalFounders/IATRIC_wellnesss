@@ -76,10 +76,16 @@ jobs:
           case "$fp" in *"$EXPECTED_HOST_KEY_FP"*) echo "=> this IS the expected VPS";; *) echo "=> WARNING: NOT the expected VPS host key ($EXPECTED_HOST_KEY_FP) - the connection is going to a different machine";; esac
 
       - name: Prepare SSH key
+        env:
+          EXPECTED_KEY_FP: "SHA256:ArQpDmmGUwpqai5wWq14+O4Kfg6DhCjJBpUMxIlBfCI"
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          echo "secret size: $(wc -c < ~/.ssh/deploy_key) bytes, $(wc -l < ~/.ssh/deploy_key) lines (correct Ed25519 key pasted with newlines: 411 bytes / 7 lines)"
+          fp="$(ssh-keygen -lf ~/.ssh/deploy_key 2>/dev/null | awk '{print $2}' || true)"
+          echo "fingerprint inside VPS_SSH_KEY : ${fp:-unreadable - the paste is mangled or empty}"
+          if [ "$fp" = "$EXPECTED_KEY_FP" ]; then echo "=> the secret holds the correct key (the one authorized on the VPS)"; else echo "=> FIX: re-copy ~/.ssh/iatric_deploy into VPS_SSH_KEY (expected $EXPECTED_KEY_FP)"; fi
 
       - name: Deploy over SSH
         run: |
