@@ -52,29 +52,74 @@
   color: #ffffff;
 }
 
-/* Subtle attention pulse for the primary "Book Now" CTA only. Applied by
-   <ConsultationButton variant="book-now" | isBlinking>; every other button keeps
-   its original styling. The ring uses the company green (59, 95, 29 = #3b5f1d). */
-@keyframes consultationBtnPulse {
+/* Attention variant for the primary "Book Now" CTA only. Applied by
+   <ConsultationButton variant="book-now" | isBlinking>; every other button keeps its
+   original styling. Two coordinated effects keep it eye-catching but tasteful:
+   a warm gold halo that breathes outwards, and a soft light sheen that sweeps across
+   the pill. Only box-shadow / filter / transform / opacity animate, so nothing
+   reflows and the button never moves or resizes.
+   Gold accent = #8e8333 (the site's second brand colour), green = #3b5f1d. */
+@keyframes consultationBtnHalo {
   0%,
   100% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(59, 95, 29, 0.5);
-    opacity: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(142, 131, 51, 0.55);
+    filter: brightness(1);
   }
   50% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(59, 95, 29, 0);
-    opacity: 0.92;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 0 10px rgba(142, 131, 51, 0);
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes consultationBtnSheen {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.5;
+  }
+  38%,
+  100% {
+    transform: translateX(140%) skewX(-18deg);
+    opacity: 0;
   }
 }
 
 .consultation-btn--book-now {
-  animation: consultationBtnPulse 2.4s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  animation: consultationBtnHalo 2.8s ease-in-out infinite;
+}
+
+/* The sheen is a decorative overlay: it must never intercept the button's click. */
+.consultation-btn--book-now::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-140%) skewX(-18deg);
+  animation: consultationBtnSheen 4.2s ease-in-out infinite;
 }
 
 /* Accessibility: keep the button, drop the motion. */
 @media (prefers-reduced-motion: reduce) {
   .consultation-btn--book-now {
     animation: none;
+  }
+
+  .consultation-btn--book-now::after {
+    animation: none;
+    display: none;
   }
 }
 
