@@ -33,6 +33,9 @@ jobs:
     name: Deploy ${{ github.ref_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # The VPS uses this read-only token for its git fetch (private repo), so keep it minimal.
+    permissions:
+      contents: read
 
     env:
       DEPLOY_PATH: ${{ github.ref_name == 'main' && '/var/www/IATRIC_wellnesss' || '/var/www/IATRIC_wellnesss_staging' }}
@@ -93,13 +96,24 @@ jobs:
           ssh -v -i ~/.ssh/deploy_key -p "$VPS_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
+            "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL' '${{ secrets.GITHUB_TOKEN }}'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
           set -euo pipefail
 
           DEPLOY_PATH="$1"
           PM2_APP="$2"
           BRANCH="$3"
           HEALTH_URL="${4:-}"
+          GH_TOKEN="${5:-}"
+
+          # Private repo: the workflow passes a read-only token, applied inline with -c so it is
+          # never written into .git/config. Falls back to plain git when no token is supplied.
+          git_net() {
+            if [ -n "$GH_TOKEN" ]; then
+              git -c "url.https://x-access-token:${GH_TOKEN}@github.com/.insteadOf=https://github.com/" "$@"
+            else
+              git "$@"
+            fi
+          }
 
           cd "$DEPLOY_PATH" || { echo "✗ $DEPLOY_PATH not found"; exit 1; }
           git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "✗ $DEPLOY_PATH is not a git checkout"; exit 1; }
@@ -150,7 +164,12 @@ jobs:
 
           # 1) sync the tracked tree to the pushed branch (untracked files such as
           #    .env.production.local or uploads are deliberately left untouched)
-          git fetch --prune origin
+          if ! git_net ls-remote --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "!! cannot read origin/$BRANCH - the repo is private, so the VPS needs credentials"
+            echo "   (this workflow passes a read-only GITHUB_TOKEN for exactly this fetch)"
+            false
+          fi
+          git_net fetch --prune origin
           echo "--- VPS-local commits that will be discarded (expected: none) ---"
           git log --oneline "origin/$BRANCH..HEAD" || true
           git checkout "$BRANCH"
