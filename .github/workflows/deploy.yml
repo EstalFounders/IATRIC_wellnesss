@@ -20,6 +20,10 @@ name: Deploy
 on:
   push:
     branches: [main, staging]
+    # Doc-only pushes should not cost a full npm ci + build on the VPS.
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   # Allow a manual re-deploy from the Actions tab.
   workflow_dispatch:
 
