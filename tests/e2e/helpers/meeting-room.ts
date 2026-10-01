@@ -71,6 +71,7 @@ export interface MediaRequest {
 }
 
 /**
+<<<<<<< HEAD
  * `true` when the browser cannot provide Playwright's fake camera/microphone, so
  * the helper has to build a synthetic MediaStream in the page instead:
  *  - Firefox: `getUserMedia` never settles with Playwright's build;
@@ -87,6 +88,8 @@ export function needsSyntheticMedia(browserName: string): boolean {
 }
 
 /**
+=======
+>>>>>>> 006e060fc11fb9850164619398317b27dbb6b331
  * Instruments `navigator.mediaDevices.getUserMedia` before the app boots:
  *
  *  - every call is recorded in `window.__mediaRequests`, which lets a test prove
