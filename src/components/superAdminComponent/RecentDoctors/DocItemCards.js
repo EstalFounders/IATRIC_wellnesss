@@ -8,6 +8,8 @@ import Preloader from "../../Preloader";
 import { MdDelete } from "react-icons/md";
 import ConfirmModal from "../model/ConfirmModel";
 import { useSelector } from "react-redux";
+import { formatWorkDaysLabel } from "../../../customUtils/workDays";
+import { appendEducationTraining } from "../../../customUtils/educationTraining";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -61,7 +63,9 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
     formData.append("language", updatedDoctor.language);
     formData.append("workDays", updatedDoctor.workDays);
     formData.append("overview", updatedDoctor.overview);
-    formData.append("educationTraining", updatedDoctor.educationTraining);
+    // One field per entry; blank rows are dropped and a blank field clears the
+    // list on the API side.
+    appendEducationTraining(formData, updatedDoctor.educationTraining);
     formData.append("workExperience", updatedDoctor.workExperience);
     formData.append("consultationType", updatedDoctor.consultationType);
     formData.append(
@@ -112,7 +116,7 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
         <Col>{doctor.name}</Col>
         <Col>{doctor.expertise}</Col>
         <Col>{doctor.degree}</Col>
-        <Col>{doctor.workDays}</Col>
+        <Col>{formatWorkDaysLabel(doctor.workDays) || doctor.workDays}</Col>
         <Col>{formatDate(doctor.joiningDate)}</Col>
         <Col>
           <FaEdit onClick={handleEdit} style={{ cursor: "pointer" }} />

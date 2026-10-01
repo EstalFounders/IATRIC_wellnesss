@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getConfiguredAppUrl } from "./appOrigin";
 
 const isProductionEnv = () => {
   return (
@@ -42,8 +43,24 @@ export function getCashfreeConfig() {
 export async function createCashfreeOrder({ orderId, amount, customerDetails }) {
   const { clientId, clientSecret } = getCashfreeConfig();
 
-  const baseUrl = process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "localhost:3000";
-  const appBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  // Public host used in the return/notify URLs below - these are where Cashfree
+  // sends the patient after paying, so a localhost fallback would strand them.
+  // Resolution order: dedicated env -> configured public app URL -> dev only.
+  const appHost = (
+    process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL ||
+    getConfiguredAppUrl().replace(/^https?:\/\//, "") ||
+    (process.env.NODE_ENV === "production" ? "" : "localhost:3000")
+  )
+    .trim()
+    .replace(/^\/+|\/+$/g, "");
+
+  if (!appHost) {
+    throw new Error(
+      "Public app URL is not configured: set NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL (or NEXTAUTH_URL) so payment redirects stay on this domain"
+    );
+  }
+
+  const appBase = `${appHost}/`;
 
   const body = {
     order_id: orderId,

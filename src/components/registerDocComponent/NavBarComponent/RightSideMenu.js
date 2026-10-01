@@ -4,6 +4,7 @@ import { FiCircle } from "react-icons/fi";
 import styles from "./RightSideMenu.module.css";
 import { FaAngleDown } from "react-icons/fa";
 import { signOut } from "next-auth/react";
+import { doctor_info_local_storage, single_call } from "../../../constant";
 
 const Dropdown = ({
   user,
@@ -26,11 +27,15 @@ const Dropdown = ({
     if (item == "Leave Request") handleShowLeaveReqestModel();
     if (item == "Logout")
       try {
-        await signOut({
-          callbackUrl: "/registerDoc/login",
-          redirect: true,
-        });
-        // Additional logic after successful sign-out
+        // `redirect: false` stops next-auth from sending the browser to the
+        // absolute callbackUrl it builds server-side (a stale NEXTAUTH_URL
+        // used to make that http://localhost:3000/registerDoc/login).
+        await signOut({ redirect: false });
+        sessionStorage.removeItem(doctor_info_local_storage);
+        sessionStorage.removeItem(single_call);
+        // Always a *relative* path: the browser resolves it against the domain
+        // that is actually serving the panel.
+        window.location.replace("/registerDoc/login");
       } catch (error) {
         console.error("Error during sign-out:", error);
       }

@@ -11,7 +11,9 @@
     "test:e2e:report": "playwright show-report",
     "lint": "next lint",
     "tasks:process": "node scripts/runSheetTasks.js",
-    "tasks:process:dry": "node scripts/runSheetTasks.js --dry-run --limit=10"
+    "tasks:process:dry": "node scripts/runSheetTasks.js --dry-run --limit=10",
+    "db:clean-education": "node scripts/cleanDoctorEducation.js",
+    "db:clean-education:apply": "node scripts/cleanDoctorEducation.js --apply"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",
