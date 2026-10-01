@@ -6,6 +6,7 @@ import User from "../../../src/models/userModel";
 import Doctor from "../../../src/models/doctorModel";
 import {
   getRequestOrigin,
+  getSameSiteOrigin,
   isTrustedRedirectUrl,
   toRelativePath,
 } from "../../../src/lib/appOrigin";
@@ -107,24 +108,32 @@ const options = {
  * instead of only the configured `NEXTAUTH_URL`.
  *
  * Replaces next-auth's default redirect callback, which returns
- * `${origin-from-NEXTAUTH_URL}${relativePath}` - an *absolute* URL. When
- * NEXTAUTH_URL is stale (it was `http://localhost:3000` in .env.production)
- * both login and logout sent the browser to localhost. Here same-site targets
- * stay relative (the browser resolves them against the domain actually serving
- * the panel), absolute URLs are only honoured when they point at this
- * deployment, and there is no hardcoded fallback.
+ * `${origin-from-NEXTAUTH_URL}${relativePath}`. When NEXTAUTH_URL is stale (it
+ * was `http://localhost:3000` in .env.production) both login and logout sent the
+ * browser to localhost. Here the origin comes from the live request
+ * (`x-forwarded-host` / `Host`, see src/lib/appOrigin.js) with the configured
+ * URL as fallback, same-site targets are re-anchored to it, absolute URLs are
+ * only honoured when they point at this deployment, and there is no hardcoded
+ * fallback.
+ *
+ * The result must stay an ABSOLUTE URL: next-auth's own client parses it with
+ * `new URL(data.url)` for credentials sign-in (`next-auth/react/index.js`), so a
+ * relative path throws `Failed to construct 'URL': Invalid URL` in the browser.
+ * `baseUrl` is next-auth's detected origin, used only as a last resort.
  */
 const buildOptions = (requestOrigin) => ({
   ...options,
   callbacks: {
     ...options.callbacks,
-    redirect: ({ url }) => {
+    redirect: ({ url, baseUrl }) => {
+      const origin = getSameSiteOrigin({ requestOrigin, fallbackOrigin: baseUrl });
+
       const relative = toRelativePath(url, { requestOrigin });
-      if (relative) return relative;
+      if (relative) return `${origin}${relative}`;
 
       if (isTrustedRedirectUrl(url, { requestOrigin })) return url;
 
-      return "/";
+      return `${origin}/`;
     },
   },
 });

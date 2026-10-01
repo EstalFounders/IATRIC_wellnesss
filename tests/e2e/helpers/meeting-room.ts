@@ -71,7 +71,6 @@ export interface MediaRequest {
 }
 
 /**
-<<<<<<< HEAD
  * `true` when the browser cannot provide Playwright's fake camera/microphone, so
  * the helper has to build a synthetic MediaStream in the page instead:
  *  - Firefox: `getUserMedia` never settles with Playwright's build;

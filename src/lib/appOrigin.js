@@ -12,8 +12,10 @@
 // Rules enforced here:
 //  1. No host is ever hardcoded - the request headers win, then the configured
 //     public URL environment variables.
-//  2. Same-site redirects are returned as *relative* paths, so the browser
-//     resolves them against the domain the user is really on.
+//  2. Same-site redirects are re-anchored to the origin of the live request and
+//     stay *absolute* URLs - next-auth's own client parses the value with
+//     `new URL()` for credentials sign-in, so a relative path throws
+//     "Failed to construct 'URL': Invalid URL" in the browser.
 //  3. Absolute URLs are only honoured when they point at this deployment.
 
 /** Hostnames that mean "this machine", never a public deployment. */
@@ -75,6 +77,32 @@ export const isLocalhostUrl = (value = "") => {
   } catch (error) {
     return false;
   }
+};
+
+/** True when two URLs share the same host (scheme/port-agnostic comparison base). */
+const hasSameHost = (a, b) => {
+  try {
+    return new URL(a).host === new URL(b).host;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * Absolute origin that redirect URLs must be built with.
+ *
+ * Request headers win over the configured env values, so a stale `NEXTAUTH_URL`
+ * can never reach the browser. When both point at the same host the *configured*
+ * URL wins, so a proxy that does not send `x-forwarded-proto` cannot downgrade
+ * https -> http. `fallbackOrigin` is next-auth's own detected origin, used only
+ * when neither the request nor the environment names a usable origin.
+ */
+export const getSameSiteOrigin = ({ requestOrigin, fallbackOrigin } = {}) => {
+  const fromRequest = asOrigin(requestOrigin);
+  const configured = asOrigin(getConfiguredAppUrl());
+
+  if (configured && hasSameHost(configured, fromRequest)) return configured;
+  return fromRequest || configured || asOrigin(fallbackOrigin) || "";
 };
 
 /** Origins this deployment may legitimately redirect to. */

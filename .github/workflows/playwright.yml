@@ -1,9 +1,15 @@
 name: Playwright Tests
+# `staging` is a deploy target too (see deploy.yml -> PM2 HealthPath-Staging), so a
+# merge / push into it must run the E2E suite as well, not just main:
+#   - `push`         -> catches direct pushes AND the merge commit of a merged PR
+#   - `pull_request` -> catches the PR itself, before it is merged
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, staging ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, staging ]
+  # Allow a manual run from the Actions tab (same as the deploy workflow).
+  workflow_dispatch:
 jobs:
   test:
     timeout-minutes: 60
