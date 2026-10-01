@@ -14,8 +14,10 @@ const doctorSchema = new Schema({
   },
   gender: {
     type: String,
-    required: true,
-    unique: true,
+    // Optional on the super-admin "Add Doctor" form. NOTE: `unique` was removed
+    // on purpose — a unique index on gender made it impossible to register a
+    // second doctor of the same gender.
+    required: false,
   },
   mobileNumber: {
     type: Number,
@@ -61,27 +63,30 @@ const doctorSchema = new Schema({
   },
   educationTraining: {
     type: String,
-    required: [true, "Education and training are required"],
+    // Optional on the super-admin "Add Doctor" form.
+    required: false,
   },
   password: {
     type: String,
-    required: true
+    // Optional on the super-admin "Add Doctor" form. A doctor created without a
+    // password simply cannot log in until one is set.
+    required: false,
   },
   profilePictureUrl: {
     type: String,
-    required: [true, "Doctor picture is required"],
+    required: false,
   },
   diplomasCertificatesUrls: {
     type: Array,
-    required: [true, "Doctor certificate is required"],
+    required: false,
   },
   doctorStampUrl: {
     type: String,
-    required: [true, "Doctor stamp is required"],
+    required: false,
   },
   doctorSignatureUrl: {
     type: String,
-    required: [true, "Doctor signature is required"],
+    required: false,
   },
   doctorType: {
     type: String,
@@ -89,7 +94,8 @@ const doctorSchema = new Schema({
   },
   price: {
     type: Number,
-    required: [true, "Doctor type is required"],
+    // Optional on the super-admin "Add Doctor" form.
+    required: false,
   },
   slotStartTime: {
     type: Date,

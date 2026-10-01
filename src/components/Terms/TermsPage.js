@@ -1,86 +1,162 @@
-import Link from "next/link";
 import React from "react";
+import { address, contact_no, email } from "../../constant";
+
+const website_url = "https://www.healthpath.co.in";
 
 const TermsPage = () => (
   <div className="container py-5" style={{ maxWidth: 800, margin: "0 auto" }}>
-    <h1 className="mb-4">Terms of Service</h1>
+    <h1 className="mb-4">Terms &amp; Conditions</h1>
     <p>
-      <strong>Last Updated:</strong> November 4, 2025
+      These terms explain how HealthPath&apos;s WhatsApp-based doctor
+      consultation service works and what responsibilities apply when you use
+      it.
     </p>
-    <h2>Agreement to Terms</h2>
     <p>
-      By accessing or using our website and medical services
-      (&quot;Service&quot;), you agree to be bound by these Terms of Service. If
-      you do not accept all the terms, please do not use the Service.
+      <strong>Effective date:</strong> May 9, 2026
     </p>
-    <h2>Use of Our Services</h2>
+    <p>
+      This page is intended to provide clear service terms. It does not replace
+      medical advice from a qualified doctor or legal advice from a qualified
+      professional.
+    </p>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>
+      By accessing or using HealthPath&apos;s website, WhatsApp consultation
+      flow, or related services, you agree to these Terms &amp; Conditions. If
+      you do not agree, please do not use our services.
+    </p>
+    <p>
+      These terms apply to patients, caregivers, visitors, and anyone who
+      contacts HealthPath for healthcare guidance, consultation booking,
+      support, or information.
+    </p>
+
+    <h2>2. Healthcare Services</h2>
+    <p>
+      HealthPath connects users with verified medical professionals for online
+      consultations through WhatsApp and related communication channels. The
+      consultation may include medical advice, prescriptions where clinically
+      appropriate, follow-up guidance, or referral suggestions.
+    </p>
+    <p>
+      HealthPath is not an emergency medical service. If you are experiencing
+      chest pain, severe breathing difficulty, loss of consciousness, seizures,
+      uncontrolled bleeding, stroke symptoms, poisoning, or any life-threatening
+      condition, call 112 or visit the nearest emergency facility immediately.
+    </p>
+
+    <h2>3. User Responsibilities</h2>
+    <p>
+      You agree to provide accurate, complete, and current information about
+      your symptoms, medical history, allergies, medications, reports, and any
+      other details requested by the doctor.
+    </p>
+    <p>
+      You are responsible for following the doctor&apos;s advice, seeking
+      in-person care when recommended, and asking questions if any instruction
+      is unclear. Do not share false, misleading, offensive, or unlawful content
+      through our services.
+    </p>
+
+    <h2>4. Consultations and Prescriptions</h2>
+    <p>
+      Doctors use their independent clinical judgment during consultations. A
+      prescription, medicine recommendation, diagnosis, or referral is not
+      guaranteed and will only be provided when the doctor considers it
+      appropriate.
+    </p>
+    <p>
+      Online consultation has limitations because the doctor may not be able to
+      physically examine you. The doctor may advise diagnostic tests, in-person
+      evaluation, specialist care, or emergency care when needed.
+    </p>
+
+    <h2>5. Fees, Payments, and Refunds</h2>
+    <p>
+      Consultation fees are displayed before payment wherever applicable. You
+      agree to pay the listed fee and any applicable taxes or payment gateway
+      charges before receiving the paid service.
+    </p>
+    <p>
+      Refunds may be considered if a paid consultation could not be delivered
+      due to a service-side issue. Refund decisions are reviewed case by case
+      and may require verification of payment and consultation records.
+    </p>
+
+    <h2>6. Platform Availability</h2>
+    <p>
+      We aim to keep HealthPath available and responsive, but we do not
+      guarantee uninterrupted access. Service may be affected by maintenance,
+      internet issues, WhatsApp availability, doctor availability, third-party
+      systems, or events beyond our control.
+    </p>
+
+    <h2>7. Intellectual Property</h2>
+    <p>
+      The HealthPath name, website design, text, graphics, branding, and service
+      materials are owned by or licensed to HealthPath. You may not copy,
+      reproduce, modify, distribute, or commercially exploit them without
+      written permission.
+    </p>
+
+    <h2>8. Limitation of Liability</h2>
+    <p>
+      To the fullest extent permitted by law, HealthPath is not liable for
+      indirect, incidental, special, consequential, or punitive damages arising
+      from use of the service. Nothing in these terms limits liability that
+      cannot be excluded under applicable law.
+    </p>
+    <p>
+      Medical outcomes depend on many factors including the accuracy of
+      information provided, the nature of the condition, timely follow-up, and
+      in-person care where required.
+    </p>
+
+    <h2>9. Changes to These Terms</h2>
+    <p>
+      We may update these Terms &amp; Conditions from time to time. The updated
+      version will be posted on this page with a revised effective date.
+      Continued use of our services means you accept the updated terms.
+    </p>
+
+    <h2>10. Contact</h2>
+    <p>
+      If you have any questions about these Terms &amp; Conditions, please
+      contact us:
+    </p>
     <ul>
       <li>
-        Our services are intended for individuals who are at least 18 years old.
-        By using our Service, you represent that you satisfy this age
-        requirement and have the legal capacity to enter into this agreement.
+        Phone / WhatsApp:{" "}
+        <a
+          href={`tel:${contact_no}`}
+          style={{ color: "#3b5f1d", fontWeight: 700 }}
+        >
+          {contact_no}
+        </a>
       </li>
       <li>
-        You agree to provide accurate and complete information when registering
-        or booking services with us.
+        Email:{" "}
+        <a
+          href={`mailto:${email}`}
+          style={{ color: "#3b5f1d", fontWeight: 700 }}
+        >
+          {email}
+        </a>
       </li>
       <li>
-        You may not use the Service for any unlawful or unauthorized purpose.
+        Website:{" "}
+        <a
+          href={website_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#3b5f1d", fontWeight: 700 }}
+        >
+          www.healthpath.co.in
+        </a>
       </li>
+      <li>Address: {address}</li>
     </ul>
-    <h2>Medical Information Disclaimer</h2>
-    <p>
-      Information provided on the website is for informational purposes only and
-      is not a substitute for professional medical advice, diagnosis, or
-      treatment. You should consult your healthcare provider before making any
-      medical decisions.
-    </p>
-    <h2>Privacy Policy</h2>
-    <p>
-      Your use of our Service is also governed by our{" "}
-      <Link href="/privacy-policy">Privacy Policy</Link>, which explains how we
-      collect, use, and protect your personal data.
-    </p>
-    <h2>Intellectual Property</h2>
-    <ul>
-      <li>
-        All content, trademarks, logos, and intellectual property displayed on
-        the website are owned by our company or its licensors.
-      </li>
-      <li>
-        You may not reproduce, distribute, or otherwise use the content unless
-        expressly authorized by us.
-      </li>
-    </ul>
-    <h2>Third-Party Links</h2>
-    <p>
-      Our website may contain links to third-party websites. We are not
-      responsible for the content or privacy practices of those sites.
-    </p>
-    <h2>Limitation of Liability</h2>
-    <ul>
-      <li>
-        We do not guarantee the accuracy, completeness, or usefulness of any
-        information on the Service.
-      </li>
-      <li>
-        To the maximum extent permitted by law, our company shall not be liable
-        for any errors, omissions, or damages arising from your use of the
-        Service.
-      </li>
-    </ul>
-    <h2>Modifications to Terms</h2>
-    <p>
-      We reserve the right to update these Terms at any time. Changes will be
-      posted on this page, with the effective date noted at the top. Continued
-      use of the Service indicates acceptance of the revised Terms.
-    </p>
-    <h2>Contact Us</h2>
-    <p>
-      If you have any questions about these Terms, please email us at{" "}
-      <a href="mailto:support@yourwebsite.com">customercare@healthpath.co.in</a>
-      .
-    </p>
   </div>
 );
 

@@ -1,6 +1,42 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
+ * Fake media devices (used by the meeting-room suite, which needs a camera +
+ * microphone that do not exist on the machine running the tests). Every project
+ * gets the platform-specific way of providing synthetic devices, while
+ * `use.permissions` pre-grants the camera/microphone prompt for all browsers:
+ *   Chromium -> command line flags
+ *   WebKit   -> the same fake-device flags (honoured by Playwright's WebKit build)
+ *   Firefox  -> prefs instead of flags
+ */
+const CHROMIUM_FAKE_MEDIA = {
+  args: [
+    '--use-fake-ui-for-media-stream',
+    '--use-fake-device-for-media-stream',
+    '--autoplay-policy=no-user-gesture-required',
+  ],
+};
+
+const WEBKIT_FAKE_MEDIA = {
+  args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+};
+
+const FIREFOX_FAKE_MEDIA = {
+  firefoxUserPrefs: {
+    'media.navigator.streams.fake': true,
+    'media.navigator.permission.disabled': true,
+  },
+};
+
+/**
+ * Camera/microphone are pre-granted so no test ever sees a permission prompt.
+ * NOTE: Playwright only accepts the `camera` / `microphone` permission names on
+ * Chromium and WebKit - Firefox throws `Unknown permission: camera`, which is why
+ * the Firefox project relies on the prefs above instead.
+ */
+const MEDIA_PERMISSIONS: Array<'camera' | 'microphone'> = ['camera', 'microphone'];
+
+/**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
@@ -37,43 +73,92 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* The same appointment suite runs on every desktop + mobile + tablet device below. */
+  /* Every suite runs on all desktop + mobile + tablet devices below. */
   projects: [
+    /* -------- Desktop (Chrome 1280x720 + 1920x1080, Firefox, Safari) -------- */
     {
       name: 'Desktop Chrome',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...CHROMIUM_FAKE_MEDIA },
+      },
+    },
+
+    {
+      name: 'Desktop Chrome FullHD',
+      use: {
+        ...devices['Desktop Chrome'],
+        // 1920x1080 desktop. `viewport` must come after the device spread.
+        viewport: { width: 1920, height: 1080 },
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...CHROMIUM_FAKE_MEDIA },
+      },
     },
 
     {
       name: 'Desktop Firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        ...FIREFOX_FAKE_MEDIA,
+      },
     },
 
     {
       name: 'Desktop WebKit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...WEBKIT_FAKE_MEDIA },
+      },
     },
 
-    /* Mobile viewports */
+    /* -------- Mobile viewports -------- */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      use: {
+        ...devices['Pixel 5'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...CHROMIUM_FAKE_MEDIA },
+      },
     },
 
     {
       name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      use: {
+        ...devices['iPhone 14'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...WEBKIT_FAKE_MEDIA },
+      },
     },
 
-    /* Tablet viewports (portrait + landscape) */
+    /* -------- Tablet viewports (portrait + landscape) -------- */
     {
       name: 'Tablet Chrome',
-      use: { ...devices['Galaxy Tab S9'] },
+      use: {
+        ...devices['Galaxy Tab S9'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...CHROMIUM_FAKE_MEDIA },
+      },
     },
 
     {
       name: 'Tablet Safari',
-      use: { ...devices['iPad Mini landscape'] },
+      use: {
+        // iPad Mini portrait (~768x1024)
+        ...devices['iPad Mini'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...WEBKIT_FAKE_MEDIA },
+      },
+    },
+
+    {
+      name: 'Tablet Safari Landscape',
+      use: {
+        ...devices['iPad Mini landscape'],
+        permissions: MEDIA_PERMISSIONS,
+        launchOptions: { ...WEBKIT_FAKE_MEDIA },
+      },
     },
   ],
 

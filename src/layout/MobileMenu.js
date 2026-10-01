@@ -21,6 +21,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     { label: "All Doctors", href: "/all-doctors", icon: "👨‍⚕️" },
     { label: "Contact Us", href: "/contacts-2", icon: "☎️" },
     { label: "Join Us", href: "/join-us", icon: "👥" },
+    { label: "Privacy Policy", href: "/privacy-policy", icon: "🔒" },
   ];
 
   // Services shown inside the drawer (DB list when available, static fallback
