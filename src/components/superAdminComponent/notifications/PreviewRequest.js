@@ -20,7 +20,7 @@ const PreviewRequest = ({ request, handleDoctReqApproveOrReject, onClose }) => {
         {Object.entries(request.updatedFields || {}).map(([key, value], index) => (
           <li key={index} style={{ marginBottom: 8, fontSize: "0.85rem", color: "#444" }}>
             <strong style={{ color: "#222", fontWeight: 600 }}>{key}:</strong>{" "}
-            <span>{value}</span>
+            <span>{Array.isArray(value) ? value.join(", ") : value}</span>
           </li>
         ))}
       </ul>

@@ -3,6 +3,8 @@ import Link from "next/link";
 import React from "react";
 import { useSelector } from "react-redux";
 
+import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
+
 const Doctor1Details = () => {
   const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo);
   const {
@@ -116,8 +118,8 @@ const Doctor1Details = () => {
                 <p>DOCTOR BIO</p>
                 {/* Title */}
                 <h5 className="h5-md blue-color">Education + Trainings</h5>
-                {/* Text */}
-                <p>{educationTraining}</p>
+                {/* Text - `educationTraining` is an array of entries */}
+                <p>{formatEducationTrainingLabel(educationTraining)}</p>
 
                 {/* CERTIFICATES */}
                 <div className="certificates">

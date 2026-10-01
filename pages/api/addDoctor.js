@@ -15,6 +15,7 @@ import {
 } from "firebase/storage";
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
+import { parseEducationTraining } from "../../src/customUtils/educationTraining";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
@@ -148,6 +149,10 @@ export default async function handler(req, res) {
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
             ...stringFields,
+            // Repeatable field: `fields.educationTraining` is one entry per
+            // appended form field, so it must not be taken from the
+            // comma-joined `stringFields` spread.
+            educationTraining: parseEducationTraining(fields.educationTraining),
             password: fields.password?.[0] || "",
             profilePictureUrl,
             diplomasCertificatesUrls,
@@ -345,6 +350,16 @@ export default async function handler(req, res) {
             .split(",")
             .map((service) => service.trim())
             .filter(Boolean); // Convert to array & trim spaces
+        }
+
+        // Education + training - repeatable field, so it also comes straight
+        // from the raw multiparty values. Only touched when the client sends it:
+        // a present-but-blank field clears the list, an absent one keeps the
+        // stored value (the doctor-panel approval PUT never sends this field).
+        if (fields.educationTraining !== undefined) {
+          updateData.educationTraining = parseEducationTraining(
+            fields.educationTraining
+          );
         }
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,
