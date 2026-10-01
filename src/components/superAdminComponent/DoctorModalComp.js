@@ -15,6 +15,10 @@ import {
   userTypeConstant,
 } from "../../constant";
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
+import WorkDaysPicker from "../Common/WorkDaysPicker";
+import EducationTrainingInput from "../Common/EducationTrainingInput";
+import { formatWorkDays, parseWorkDays } from "../../customUtils/workDays";
+import { parseEducationTraining } from "../../customUtils/educationTraining";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -35,6 +39,23 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
 
   const [selectedServices, setSelectedServices] = useState(
     Array.isArray(editedDoctor.serviceOffered) ? editedDoctor.serviceOffered : []
+  );
+
+  // Day chips. The array drives the picker, while `editedDoctor.workDays` stays
+  // a comma-joined string: the doctor document stores a String and the approval
+  // flow (`RegisterDocLoginHeader` -> `doctorUpdateReq`) compares strings.
+  // A legacy value ("mon-sunday") is parsed here and only rewritten on a click.
+  const [selectedWorkDays, setSelectedWorkDays] = useState(
+    parseWorkDays(doctor.workDays)
+  );
+  const [workDaysError, setWorkDaysError] = useState("");
+
+  // Draft rows for the repeatable education/training inputs. `editedDoctor`
+  // keeps the stored value untouched until a row is actually edited, so an
+  // untouched legacy string still reports "no change" in the doctor-panel
+  // approval diff (see RegisterDocLoginHeader).
+  const [educationItems, setEducationItems] = useState(
+    parseEducationTraining(doctor.educationTraining)
   );
 
   const dispatch = useDispatch();
@@ -115,6 +136,10 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
 
   const handleSave = () => {
     console.log(editedDoctor, "edited doctor");
+    if (selectedWorkDays.length === 0) {
+      setWorkDaysError("Please select at least one workday");
+      return;
+    }
     if (!isMobileValid(editedDoctor.mobileNumber)) {
       alert("Please enter a valid mobile number");
       return;
@@ -155,6 +180,25 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     const updatedServices = selectedServices.filter((item) => item !== service);
     setSelectedServices(updatedServices);
     setEditedDoctor({ ...editedDoctor, serviceOffered: updatedServices });
+  };
+
+  // Work days - the picker returns an ordered array, the payload keeps the
+  // comma-joined string the API and the approval diffing already use.
+  const handleWorkDaysChange = (days) => {
+    setSelectedWorkDays(days);
+    setEditedDoctor({ ...editedDoctor, workDays: formatWorkDays(days) });
+    if (days.length > 0) setWorkDaysError("");
+  };
+
+  // Education + training - the rows are stored as an array of trimmed strings
+  // (doctor schema is `[String]`), which is also what the doctor-panel diff and
+  // the approval PUT expect.
+  const handleEducationTrainingChange = (items) => {
+    setEducationItems(items);
+    setEditedDoctor({
+      ...editedDoctor,
+      educationTraining: parseEducationTraining(items),
+    });
   };
 
   console.log(editedDoctor, "edited doctor");
@@ -233,11 +277,10 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Work Days</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="workDays"
-                  value={editedDoctor.workDays}
-                  onChange={handleChange}
+                <WorkDaysPicker
+                  value={selectedWorkDays}
+                  onChange={handleWorkDaysChange}
+                  error={workDaysError}
                 />
               </Form.Group>
               <Form.Group controlId="overview" className="mb-3">
@@ -458,11 +501,9 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Education Training</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="educationTraining"
-                  value={editedDoctor.educationTraining}
-                  onChange={handleChange}
+                <EducationTrainingInput
+                  value={educationItems}
+                  onChange={handleEducationTrainingChange}
                 />
               </Form.Group>
             </Col>

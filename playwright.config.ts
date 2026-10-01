@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  * gets the platform-specific way of providing synthetic devices, while
  * `use.permissions` pre-grants the camera/microphone prompt for all browsers:
  *   Chromium -> command line flags
- *   WebKit   -> the same fake-device flags (honoured by Playwright's WebKit build)
+ *   WebKit   -> fake-device flags, but *only* on macOS (see WEBKIT_FAKE_MEDIA)
  *   Firefox  -> prefs instead of flags
  */
 const CHROMIUM_FAKE_MEDIA = {
@@ -17,9 +17,23 @@ const CHROMIUM_FAKE_MEDIA = {
   ],
 };
 
-const WEBKIT_FAKE_MEDIA = {
-  args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
-};
+/**
+ * `--use-fake-*` are Chromium flags. Playwright's macOS WebKit build tolerates
+ * them, but the Linux shell (`webkit-<build>/pw_run.sh`) fails the launch with
+ *
+ *   [err] Cannot parse arguments: Unknown option --use-fake-device-for-media-stream
+ *   -> Error: browserType.launch: Target page, context or browser has been closed
+ *
+ * which killed *every* test of the four WebKit projects on GitHub Actions, so on
+ * Linux the WebKit projects pass no launch args at all and get their camera/mic
+ * from the in-page synthetic stream in `tests/e2e/helpers/meeting-room.ts`
+ * (`needsSyntheticMedia()`). The permissions in `use.permissions` are granted
+ * through the protocol on WebKit, so `--use-fake-ui-*` adds nothing anyway.
+ */
+const WEBKIT_FAKE_MEDIA =
+  process.platform === 'darwin'
+    ? { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] }
+    : {};
 
 const FIREFOX_FAKE_MEDIA = {
   firefoxUserPrefs: {

@@ -207,10 +207,19 @@ const RegisterDocLoginHeader = () => {
   const handleLogout = async () => {
     setDoctorStatus(false); // Set to false in UI
     await updateDoctorStatus(false); // Update the backend
-    await signOut();
+    try {
+      // `redirect: false` keeps the browser away from the absolute callbackUrl
+      // next-auth builds server-side (a stale NEXTAUTH_URL used to make that
+      // http://localhost:3000/...).
+      await signOut({ redirect: false });
+    } catch (error) {
+      console.error("Error during sign-out:", error);
+    }
     // Perform logout actions (e.g., clearing session, redirecting)
     sessionStorage.removeItem(doctor_info_local_storage);
     sessionStorage.removeItem(single_call);
+    // Relative target: resolved by the browser against the real domain.
+    window.location.replace("/registerDoc/login");
   };
 
   const handleLeaveRequestSubmit = async (formData) => {

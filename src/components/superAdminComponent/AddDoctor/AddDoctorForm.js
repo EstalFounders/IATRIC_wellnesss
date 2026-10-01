@@ -11,6 +11,9 @@ import {
   superAdminConsultationtype,
 } from "../../../constant.js";
 import TimePicker from "react-time-picker";
+import WorkDaysPicker from "../../Common/WorkDaysPicker.js";
+import EducationTrainingInput from "../../Common/EducationTrainingInput.js";
+import { appendEducationTraining } from "../../../customUtils/educationTraining.js";
 import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +26,13 @@ import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlic
  * certificates / stamp / signature, slot times) is optional for now.
  * `consultationType` and `serviceOffered` cannot use HTML `required` because
  * their visible <select> always keeps `value=""`, so they are validated through
- * `selectedTypes` / `selectedService` in `handleSubmit` instead.
+ * `selectedTypes` / `selectedService` in `handleSubmit` instead. `workDays` uses
+ * the <WorkDaysPicker /> chips; its state is an array of day names that is kept
+ * in `doctorDetails.workDays` as a comma-joined string (the doctor schema stores
+ * a String and `pages/api/addDoctor.js` forwards it verbatim). `educationTraining`
+ * uses the same "draft rows live in their own state" pattern as
+ * <EducationTrainingInput />: the rows are held in `educationItems`, blank rows
+ * are dropped on submit and every remaining entry becomes its own FormData field.
  */
 const MANDATORY_TEXT_FIELDS = [
   ["name", "Name"],
@@ -33,7 +42,7 @@ const MANDATORY_TEXT_FIELDS = [
   ["degree", "Degree"],
   ["language", "Language"],
   ["workExperience", "Work Experience"],
-  ["workDays", "Works Days"],
+  ["workDays", "Work Days"],
   ["overview", "Overview"],
 ];
 
@@ -50,6 +59,13 @@ const AddDoctorForm = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedService, setSelectedService] = useState([]);
+  // Array of canonical day names; mirrored into doctorDetails.workDays as a
+  // comma-joined string, which is what the API stores.
+  const [selectedWorkDays, setSelectedWorkDays] = useState([]);
+  const [workDaysError, setWorkDaysError] = useState("");
+  // Draft rows for the repeatable education/training inputs; blank rows are
+  // filtered out on submit by `appendEducationTraining`.
+  const [educationItems, setEducationItems] = useState([""]);
   const dispatch = useDispatch();
 
   const [doctorDetails, setDoctorDetails] = useState({
@@ -63,7 +79,6 @@ const AddDoctorForm = () => {
     overview: "",
     location: "None",
     workExperience: "",
-    educationTraining: "",
     consultationType: "",
     serviceOffered: "",
     password: "",
@@ -156,6 +171,16 @@ const AddDoctorForm = () => {
     setDoctorDetails({ ...doctorDetails, location: e.target.value });
   };
 
+  // <WorkDaysPicker /> already returns a Monday -> Sunday ordered array.
+  const handleWorkDaysChange = (days) => {
+    setSelectedWorkDays(days);
+    setDoctorDetails((prevDetails) => ({
+      ...prevDetails,
+      workDays: days.join(","),
+    }));
+    if (days.length > 0) setWorkDaysError("");
+  };
+
   const handleShowDialog = (msg) => {
     setMessage(msg);
     setShowDialog(true);
@@ -209,6 +234,11 @@ const AddDoctorForm = () => {
     setLoader(true);
     e.preventDefault();
 
+    // The day picker keeps its own array state; the inline message under the
+    // chips is set here so it appears together with the missing-field dialog.
+    const hasWorkDays = selectedWorkDays.length > 0;
+    setWorkDaysError(hasWorkDays ? "" : "Please select at least one workday");
+
     const missingFields = MANDATORY_TEXT_FIELDS.filter(
       ([key]) => !String(doctorDetails[key] ?? "").trim(),
     ).map(([, label]) => label);
@@ -250,7 +280,8 @@ const AddDoctorForm = () => {
     formData.append("language", doctorDetails.language);
     formData.append("workDays", doctorDetails.workDays);
     formData.append("overview", doctorDetails.overview);
-    formData.append("educationTraining", doctorDetails.educationTraining);
+    // One field per entry; a blank field clears the list on the API side.
+    appendEducationTraining(formData, educationItems);
     formData.append("workExperience", doctorDetails.workExperience);
     // Comma-joined, `pages/api/addDoctor.js` splits these back into arrays.
     formData.append("consultationType", selectedTypes.join(","));
@@ -478,17 +509,14 @@ const AddDoctorForm = () => {
             </div>
           </div>
 
-          <label className={styles.label}>
-            <b>Works Days:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="workDays"
-              value={doctorDetails.workDays}
-              onChange={handleChange}
-              required
+          <div className={styles.label}>
+            <b>Work Days:</b>
+            <WorkDaysPicker
+              value={selectedWorkDays}
+              onChange={handleWorkDaysChange}
+              error={workDaysError}
             />
-          </label>
+          </div>
 
           <label className={styles.label}>
             <b>Overview:</b>
@@ -501,15 +529,13 @@ const AddDoctorForm = () => {
             />
           </label>
 
-          <label className={styles.label}>
+          <div className={styles.label}>
             <b>Education + Training:</b>
-            <textarea
-              className={styles.textarea}
-              name="educationTraining"
-              value={doctorDetails.educationTraining}
-              onChange={handleChange}
+            <EducationTrainingInput
+              value={educationItems}
+              onChange={setEducationItems}
             />
-          </label>
+          </div>
           <Row>
             <Col>
               <label className={styles.label}>

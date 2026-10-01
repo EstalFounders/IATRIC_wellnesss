@@ -71,6 +71,25 @@ export interface MediaRequest {
 }
 
 /**
+<<<<<<< HEAD
+ * `true` when the browser cannot provide Playwright's fake camera/microphone, so
+ * the helper has to build a synthetic MediaStream in the page instead:
+ *  - Firefox: `getUserMedia` never settles with Playwright's build;
+ *  - WebKit on Linux: the fake-device flags abort the launch on the CI runner.
+ * `E2E_SYNTHETIC_MEDIA=1` forces the synthetic path locally (lets the WebKit
+ * projects be validated on macOS with exactly the CI code path).
+ */
+export function needsSyntheticMedia(browserName: string): boolean {
+  return (
+    process.env.E2E_SYNTHETIC_MEDIA === '1' ||
+    browserName === 'firefox' ||
+    (browserName === 'webkit' && process.platform === 'linux')
+  );
+}
+
+/**
+=======
+>>>>>>> 006e060fc11fb9850164619398317b27dbb6b331
  * Instruments `navigator.mediaDevices.getUserMedia` before the app boots:
  *
  *  - every call is recorded in `window.__mediaRequests`, which lets a test prove
@@ -82,6 +101,10 @@ export interface MediaRequest {
  *  - Firefox gets a synthetic MediaStream instead, because Playwright's Firefox
  *    build never settles `getUserMedia` (verified: it hangs with every
  *    `firefoxUserPrefs` combination, both headless and headed);
+ *  - WebKit on Linux gets a synthetic MediaStream too, because Playwright's Linux
+ *    WebKit shell rejects `--use-fake-device-for-media-stream` and would abort the
+ *    launch (see `WEBKIT_FAKE_MEDIA` in `playwright.config.ts`) - so no fake
+ *    devices are available there;
  *  - WebKit re-installs its own mock `getUserMedia` *after* document-start
  *    scripts, which would silently drop the patch (verified with
  *    `window.__mediaInstrumented` + `String(getUserMedia)`), hence the short
@@ -184,7 +207,7 @@ export async function installMeetingMedia(page: Page, browserName: string) {
         if (++ticks >= 150) clearInterval(guard);
       }, 100);
     },
-    { synthetic: browserName === 'firefox' }
+    { synthetic: needsSyntheticMedia(browserName) }
   );
 }
 

@@ -62,8 +62,11 @@ const doctorSchema = new Schema({
     required: false,
   },
   educationTraining: {
-    type: String,
-    // Optional on the super-admin "Add Doctor" form.
+    // Repeatable ("MBBS - Johns Hopkins University"). Optional on the
+    // super-admin "Add Doctor" form; stored as an array of trimmed strings so
+    // one doctor can carry several degrees/trainings.
+    type: [String],
+    default: [],
     required: false,
   },
   password: {

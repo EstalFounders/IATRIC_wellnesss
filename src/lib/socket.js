@@ -9,7 +9,10 @@ let socket = null;
 export const getSocket = () => {
   if (!socket) {
     const serverUrl =
-      process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'; // Fallback to local server if env variable is not set
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
+      // Fall back to the origin that served the page (socket.io uses
+      // window.location when no URL is given) - never a hardcoded localhost.
+      (typeof window !== "undefined" ? window.location.origin : undefined);
 
     socket = io(serverUrl, {
       transports: ["websocket", "polling"],

@@ -19,20 +19,20 @@ const RightSideMenu = () => {
 
   const handleItemClick = async (item) => {
       console.log(`Clicked on ${item}`);
-      if(item == 'logout') 
+      if (item !== "logout") return;
       try {
-          await signOut(
-            {
-              callbackUrl: "/superAdmin/onload",
-              redirect: true,
-            }
-          );
-          // Additional logic after successful sign-out
-          // router.push("/superAdmin/onload"); // Redirect to the login screen
-        } catch (error) {
+          // `redirect: false` stops next-auth from sending the browser to the
+          // absolute callbackUrl it builds server-side (a stale NEXTAUTH_URL
+          // used to make that http://localhost:3000/superAdmin/onload).
+          await signOut({ redirect: false });
+          sessionStorage.removeItem(super_admin_info_local_sotrage);
+          // Always a *relative* path: the browser resolves it against the
+          // domain that is actually serving the panel.
+          window.location.replace("/superAdmin/onload");
+      } catch (error) {
           console.error("Error during sign-out:", error);
-        }
-    };
+      }
+  };
 
 
   return (
