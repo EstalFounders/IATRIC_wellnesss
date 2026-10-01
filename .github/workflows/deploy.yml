@@ -1,0 +1,241 @@
+# Deploy to the VPS on every push to main / staging.
+#
+#   main    -> /var/www/IATRIC_wellnesss          PM2: HealthPath
+#   staging -> /var/www/IATRIC_wellnesss_staging  PM2: HealthPath-Staging
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   VPS_HOST       VPS IP / hostname
+#   VPS_USER       ssh user that owns the app directories
+#   VPS_SSH_KEY    private key (PEM) for that user
+# Optional:
+#   VPS_PORT                ssh port (default 22)
+#   VPS_HEALTH_URL_MAIN     e.g. http://127.0.0.1:3000/   (adds a post-deploy check)
+#   VPS_HEALTH_URL_STAGING  e.g. http://127.0.0.1:3001/
+#
+# Rollback: the previous commit is remembered and the previous `.next` build is kept
+# as `.next.prev`. If npm ci, the build, the PM2 reload or the health check fails, the
+# old commit + build are restored and PM2 is reloaded again.
+name: Deploy
+
+on:
+  push:
+    branches: [main, staging]
+    # Doc-only pushes should not cost a full npm ci + build on the VPS.
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  # Allow a manual re-deploy from the Actions tab.
+  workflow_dispatch:
+
+# One deploy per branch at a time, and never cancel one that is already running.
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # The VPS uses this read-only token for its git fetch (private repo), so keep it minimal.
+    permissions:
+      contents: read
+
+    env:
+      DEPLOY_PATH: ${{ github.ref_name == 'main' && '/var/www/IATRIC_wellnesss' || '/var/www/IATRIC_wellnesss_staging' }}
+      PM2_APP: ${{ github.ref_name == 'main' && 'HealthPath' || 'HealthPath-Staging' }}
+      BRANCH: ${{ github.ref_name }}
+      HEALTH_URL: ${{ github.ref_name == 'main' && secrets.VPS_HEALTH_URL_MAIN || secrets.VPS_HEALTH_URL_STAGING }}
+      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+
+    steps:
+      - name: Target
+        env:
+          VPS_HOST_VAL: ${{ secrets.VPS_HOST }}
+          VPS_USER_VAL: ${{ secrets.VPS_USER }}
+          SSH_KEY_STATUS: ${{ secrets.VPS_SSH_KEY != '' && 'present' || 'MISSING' }}
+          EXPECTED_HOST: "37.187.159.65"
+          EXPECTED_PORT: "20008"
+          EXPECTED_USER: "root"
+          # public host key of the VPS: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+          EXPECTED_HOST_KEY_FP: "SHA256:CYF6DA+2Rrs8+AgaEMDSaXajzuNWgkmQOaZqsShDwZQ"
+        run: |
+          echo "branch : $BRANCH"
+          echo "path   : $DEPLOY_PATH"
+          echo "pm2    : $PM2_APP"
+          echo "health : ${HEALTH_URL:-<not configured - post-deploy check will be skipped>}"
+          echo
+          echo "--- connection secrets (GitHub masks the values, so only safe comparisons are printed) ---"
+          echo "VPS_SSH_KEY secret       : $SSH_KEY_STATUS"
+          if [ "$VPS_HOST_VAL" = "$EXPECTED_HOST" ]; then echo "VPS_HOST matches VPS IP  : yes"; else echo "VPS_HOST matches VPS IP  : NO (length ${#VPS_HOST_VAL}, expected ${#EXPECTED_HOST})"; fi
+          if [ "$VPS_PORT" = "$EXPECTED_PORT" ]; then echo "VPS_PORT matches         : yes"; else echo "VPS_PORT matches         : NO (length ${#VPS_PORT}, expected ${#EXPECTED_PORT} - is the secret missing?)"; fi
+          if [ "$VPS_USER_VAL" = "$EXPECTED_USER" ]; then echo "VPS_USER matches         : yes"; else echo "VPS_USER matches         : NO (length ${#VPS_USER_VAL})"; fi
+          case "$VPS_HOST_VAL" in *[!0-9.]*|"") echo "VPS_HOST format          : hostname / invalid (not a plain IPv4)";; *) echo "VPS_HOST format          : IPv4 literal";; esac
+          resolved="$(getent hosts "$VPS_HOST_VAL" 2>/dev/null | awk '{print $1}' | head -1 || true)"
+          if [ "$resolved" = "$EXPECTED_HOST" ]; then echo "VPS_HOST resolves to VPS : yes"; else echo "VPS_HOST resolves to VPS : NO"; fi
+          echo
+          echo "--- reachability from the runner ---"
+          nc -vz -w 5 "$VPS_HOST_VAL" "$VPS_PORT" 2>&1 | tail -1 || true
+          echo
+          echo "--- host key of whatever answers on port $VPS_PORT (public info, never secret) ---"
+          fp="$(ssh-keyscan -p "$VPS_PORT" -T 6 "$VPS_HOST_VAL" 2>/dev/null | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' | tr '\n' ' ' || true)"
+          echo "host key fingerprint     : ${fp:-none (nothing answered)}"
+          case "$fp" in *"$EXPECTED_HOST_KEY_FP"*) echo "=> this IS the expected VPS";; *) echo "=> WARNING: NOT the expected VPS host key ($EXPECTED_HOST_KEY_FP) - the connection is going to a different machine";; esac
+
+      - name: Prepare SSH key
+        env:
+          EXPECTED_KEY_FP: "SHA256:ArQpDmmGUwpqai5wWq14+O4Kfg6DhCjJBpUMxIlBfCI"
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "secret size: $(wc -c < ~/.ssh/deploy_key) bytes, $(wc -l < ~/.ssh/deploy_key) lines (correct Ed25519 key pasted with newlines: 411 bytes / 7 lines)"
+          fp="$(ssh-keygen -lf ~/.ssh/deploy_key 2>/dev/null | awk '{print $2}' || true)"
+          echo "fingerprint inside VPS_SSH_KEY : ${fp:-unreadable - the paste is mangled or empty}"
+          if [ "$fp" = "$EXPECTED_KEY_FP" ]; then echo "=> the secret holds the correct key (the one authorized on the VPS)"; else echo "=> FIX: re-copy ~/.ssh/iatric_deploy into VPS_SSH_KEY (expected $EXPECTED_KEY_FP)"; fi
+
+      - name: Deploy over SSH
+        run: |
+          set -o pipefail
+          ssh -v -i ~/.ssh/deploy_key -p "$VPS_PORT" \
+            -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL' '${{ secrets.GITHUB_TOKEN }}'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
+          set -euo pipefail
+
+          DEPLOY_PATH="$1"
+          PM2_APP="$2"
+          BRANCH="$3"
+          HEALTH_URL="${4:-}"
+          GH_TOKEN="${5:-}"
+
+          # Private repo: the workflow passes a read-only token, applied inline with -c so it is
+          # never written into .git/config. Falls back to plain git when no token is supplied.
+          git_net() {
+            if [ -n "$GH_TOKEN" ]; then
+              git -c "url.https://x-access-token:${GH_TOKEN}@github.com/.insteadOf=https://github.com/" "$@"
+            else
+              git "$@"
+            fi
+          }
+
+          cd "$DEPLOY_PATH" || { echo "✗ $DEPLOY_PATH not found"; exit 1; }
+          git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "✗ $DEPLOY_PATH is not a git checkout"; exit 1; }
+
+          # Non-interactive ssh does NOT source .bashrc/.nvm, so fail fast and clearly
+          # instead of tripping the rollback further down.
+          missing=""
+          for bin in git node npm pm2 curl; do
+            command -v "$bin" >/dev/null 2>&1 || missing="$missing $bin"
+          done
+          if [ -n "$missing" ]; then
+            echo "✗ not found in PATH for non-interactive ssh:$missing"
+            echo "  PATH=$PATH"
+            exit 1
+          fi
+
+          echo "→ host $(hostname) | dir $(pwd) | branch $BRANCH | pm2 $PM2_APP"
+          echo "  node $(node -v 2>/dev/null) | npm $(npm -v 2>/dev/null) | pm2 $(pm2 -v 2>/dev/null)"
+
+          PREVIOUS_COMMIT="$(git rev-parse HEAD)"
+          echo "  previous commit: $PREVIOUS_COMMIT"
+
+          if ! pm2 describe "$PM2_APP" >/dev/null 2>&1; then
+            echo "✗ pm2 process '$PM2_APP' does not exist - start it once manually, then re-run"
+            exit 1
+          fi
+
+          if [ -n "$HEALTH_URL" ] && ! printf '%s' "$HEALTH_URL" | grep -Eq '^https?://'; then
+            echo "✗ health URL must start with http:// or https://"
+            exit 1
+          fi
+
+          rollback() {
+            trap - ERR
+            echo
+            echo "✗ DEPLOY FAILED - rolling back to $PREVIOUS_COMMIT"
+            git reset --hard "$PREVIOUS_COMMIT" || true
+            if [ -d .next.prev ]; then
+              rm -rf .next
+              mv .next.prev .next
+              echo "✓ previous .next build restored"
+            fi
+            npm ci --no-audit --no-fund || true
+            pm2 reload "$PM2_APP" --update-env || pm2 restart "$PM2_APP" --update-env || true
+            echo "✗ deploy aborted - $PM2_APP is running the previous commit"
+          }
+          trap rollback ERR
+
+          # 1) sync the tracked tree to the pushed branch (untracked files such as
+          #    .env.production.local or uploads are deliberately left untouched)
+          if ! git_net ls-remote --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "!! cannot read origin/$BRANCH - the repo is private, so the VPS needs credentials"
+            echo "   (this workflow passes a read-only GITHUB_TOKEN for exactly this fetch)"
+            false
+          fi
+          git_net fetch --prune origin
+          echo "--- VPS-local commits that will be discarded (expected: none) ---"
+          git log --oneline "origin/$BRANCH..HEAD" || true
+          git checkout "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+          echo "  deploying: $(git log -1 --oneline)"
+
+          # 2) dependencies straight from the lockfile (fails loudly on drift)
+          npm ci --no-audit --no-fund
+
+          # 3) fresh build, keeping the previous artifacts for the rollback
+          rm -rf .next.prev
+          if [ -d .next ]; then mv .next .next.prev; fi
+          npm run build
+
+          # 4) restart under PM2
+          if pm2 reload "$PM2_APP" --update-env; then :; else pm2 restart "$PM2_APP" --update-env; fi
+          pm2 save
+          pm2 describe "$PM2_APP" | grep -E 'status|uptime|restarts' || true
+
+          # 5) post-deploy health check (only when a URL is configured)
+          if [ -z "$HEALTH_URL" ]; then
+            echo "⚠ VPS_HEALTH_URL_* is not configured - skipping the post-deploy check"
+          else
+            for attempt in $(seq 1 10); do
+              code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$HEALTH_URL" || true)"
+              if [ "$code" = "200" ]; then
+                echo "✓ health check OK ($HEALTH_URL -> $code)"
+                break
+              fi
+              echo "… attempt $attempt/10: $HEALTH_URL -> $code"
+              sleep 3
+              if [ "$attempt" = "10" ]; then
+                echo "✗ health check failed - rolling back"
+                false
+              fi
+            done
+          fi
+
+          rm -rf .next.prev
+          trap - ERR
+          echo "✓ deploy finished: $(git rev-parse --short HEAD) on $BRANCH"
+          REMOTE
+
+      - name: Deploy log
+        if: always()
+        run: |
+          if [ -f /tmp/deploy.log ]; then
+            {
+              echo "## Deploy for branch $BRANCH"
+              echo
+              echo "| target | value |"
+              echo "| --- | --- |"
+              echo "| path | $DEPLOY_PATH |"
+              echo "| pm2 process | $PM2_APP |"
+              echo "| commit | ${{ github.sha }} |"
+              echo
+              echo '```'
+              tail -c 4000 /tmp/deploy.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "--- last 30 deploy log lines ---"
+            tail -30 /tmp/deploy.log
+          else
+            echo "no deploy log captured"
+          fi

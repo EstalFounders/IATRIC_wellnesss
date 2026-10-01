@@ -118,23 +118,6 @@ const consultationTypes = useSelector(
                     {t("common.getCallback")}
                   </ConsultationButton>
                 </div>
-                <hr className="w-75" />
-                <div className="row d-flex justify-content-center align-items-center">
-                  <div className="col-md-8 mb-4">
-                    <div className="h-100 p-4 text-center">
-                      <h2 className="steelblue-color mb-3">
-                        {t("demo5.about.doctorsPanel")}
-                      </h2>
-                      <div className="h5 steelblue-color mx-auto w-100 pb-10">
-                        {t("demo5.about.doctorsText")}
-                      </div>
-                      <ConsultationButton path="/all-doctors">
-                        {t("demo5.about.viewDoctors")}
-                      </ConsultationButton>
-                    </div>
-                  </div>
-                </div>
-                {/* End row */}
                 <PopupDialog
                   isOpen={isConsultationTypeOpen}
                   onClose={handleConsultationTypeCloseDialog}
