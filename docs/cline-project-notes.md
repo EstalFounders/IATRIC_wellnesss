@@ -157,3 +157,9 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - At ≤768px the side panel is a full-screen overlay that covers the control bar: close the panel before clicking control-bar buttons (`openMeeting` already closes it once).
 - Full run: `npx playwright test tests/e2e/meeting-url.spec.ts` → 72 tests (8 × 9 projects: Desktop Chrome / Chrome FullHD / Firefox / WebKit, Mobile Chrome / Safari, Tablet Chrome / Safari / Safari Landscape), ~1.6 min.
 
+## E2E — appointment suite (Playwright)
+- `tests/appointment.spec.ts` walks `/appointment` end to end (form → mocked WhatsApp OTP → stubbed sandbox Cashfree checkout → `/payment/thankyou` → confirmation modal, plus the `?appointmentId=` return path); 9 tests (1 × 9 projects).
+- First-paint trap (fixed): the whole app body renders **client-side** — `pages/_app.js` wraps it in `<NoSsr>` + redux-persist `<PersistGate loading={null}>` — so a cold document paints nothing at all (no header, no footer, not even the dark `Preloader` overlay) until the dev bundle has run. A full matrix run (81 tests, 9 projects, one dev server) pushed that past the config `expect.timeout = 15_000` and Mobile Safari failed `getByRole('heading', { name: 'Make Appointment' })` on a blank white page. The spec now asserts the first element of every freshly loaded document with `PAGE_READY_TIMEOUT = 60_000` (same idea as `openMeeting()` in `tests/e2e/helpers/meeting-room.ts`, which uses `timeout: 30_000` after `page.goto`). This is a test-budget fix, not an app bug — the page boots in seconds when the dev server is not saturated.
+- Full matrix: `npx playwright test tests/appointment.spec.ts tests/e2e/meeting-url.spec.ts` → 81 tests (9 × 9 projects), ~3.1 min, all green.
+- `npx next lint` / `tsc` do not cover `tests/` (`tsconfig.json` excludes it), so a spec change is validated by running the suite.
+

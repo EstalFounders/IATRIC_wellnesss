@@ -43,6 +43,18 @@ const APPOINTMENT_ID = 'e2e_appointment_0001';
  */
 const REJECTED_TEST_OTP = '111000';
 
+/**
+ * First-paint budget for a cold page load. The whole app body is rendered on the client
+ * (pages/_app.js wraps the tree in <NoSsr> + redux-persist <PersistGate loading={null}>),
+ * so nothing paints - not even the Preloader overlay - until the dev bundle has loaded and
+ * the store has rehydrated. This suite runs 9 device projects in parallel against a single
+ * Next dev server, which can push that well past the config default (expect.timeout = 15s);
+ * it showed up as a blank white page on Mobile Safari at the first assertion after
+ * page.goto('/appointment'). Only the first assertion of a freshly loaded document needs
+ * this budget - everything after it runs against an already-booted app.
+ */
+const PAGE_READY_TIMEOUT = 60_000;
+
 const WHATSAPP_CONFIRMATION_API = /\/api\/helper\/whatsappConfirmationApi$/;
 const BOOK_CONSULTATION_API = /\/api\/bookConsultation\/?(\?|$)/;
 const CREATE_ORDER_API = /\/api\/payment\/create-order$/;
@@ -209,7 +221,10 @@ test.describe('Appointment booking (sandbox payment)', () => {
 
     // ── 1. Open the Appointment page ────────────────────────────────
     await page.goto('/appointment');
-    await expect(page.getByRole('heading', { name: 'Make Appointment' })).toBeVisible();
+    // First paint is client-only (see PAGE_READY_TIMEOUT): budget for the dev bundle.
+    await expect(page.getByRole('heading', { name: 'Make Appointment' })).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
 
     // ── 2./3. Fill the form and select consultation type, date + slot ──
     const form = await fillAppointmentForm(page);
@@ -271,7 +286,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
     // ── 9./10. Payment verified + confirmation state ────────────────
     // Wait for the app's real success state first, then assert the order details.
     await expect(page.getByRole('heading', { name: 'Payment Successful!' })).toBeVisible({
-      timeout: 60_000,
+      timeout: PAGE_READY_TIMEOUT,
     });
     await expect(
       page.getByText('Your payment was successful and your consultation has been confirmed.')
@@ -291,7 +306,10 @@ test.describe('Appointment booking (sandbox payment)', () => {
     const statusCallsBeforeReturn = statusCalls.length;
     const returnPage = await context.newPage();
     await returnPage.goto(`/appointment?appointmentId=${ORDER_ID}`);
-    await expect(returnPage.getByText('Thank you!')).toBeVisible();
+    // Fresh document => fresh client-side boot, so it gets the same first-paint budget.
+    await expect(returnPage.getByText('Thank you!')).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
     await expect(
       returnPage.getByText('Your consultation has been confirmed.').first()
     ).toBeVisible();
