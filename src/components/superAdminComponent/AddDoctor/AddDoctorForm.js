@@ -17,6 +17,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { setConsultationType } from "../../../store/slices/superAdmin/otherDetailsSlice.js";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
 
+/**
+ * Fields that MUST be filled to register a doctor. Everything else on this form
+ * (gender, education + training, price, doctor share, passwords, picture /
+ * certificates / stamp / signature, slot times) is optional for now.
+ * `consultationType` and `serviceOffered` cannot use HTML `required` because
+ * their visible <select> always keeps `value=""`, so they are validated through
+ * `selectedTypes` / `selectedService` in `handleSubmit` instead.
+ */
+const MANDATORY_TEXT_FIELDS = [
+  ["name", "Name"],
+  ["email", "Email"],
+  ["mobileNumber", "Mobile Number"],
+  ["expertise", "Area of Expertise"],
+  ["degree", "Degree"],
+  ["language", "Language"],
+  ["workExperience", "Work Experience"],
+  ["workDays", "Works Days"],
+  ["overview", "Overview"],
+];
+
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
   const [profilePicture, setprofilePicture] = useState("");
@@ -94,7 +114,13 @@ const AddDoctorForm = () => {
 
   // Remove option from array when "tag" is clicked
   const handleRemoveType = (type) => {
-    setSelectedTypes(selectedTypes.filter((item) => item !== type));
+    const updatedTypes = selectedTypes.filter((item) => item !== type);
+    setSelectedTypes(updatedTypes);
+    // Keep doctorDetails in sync, otherwise the removed tag is still submitted.
+    setDoctorDetails((prevDetails) => ({
+      ...prevDetails,
+      consultationType: updatedTypes,
+    }));
   };
 
   const handleAddService = (e) => {
@@ -117,7 +143,13 @@ const AddDoctorForm = () => {
 
   // Remove option from array when "tag" is clicked
   const handleRemoveService = (type) => {
-    setSelectedService(selectedService.filter((item) => item !== type));
+    const updatedService = selectedService.filter((item) => item !== type);
+    setSelectedService(updatedService);
+    // Keep doctorDetails in sync, otherwise the removed tag is still submitted.
+    setDoctorDetails((prevDetails) => ({
+      ...prevDetails,
+      serviceOffered: updatedService,
+    }));
   };
 
   const handleLocationTextChange = (e) => {
@@ -177,7 +209,29 @@ const AddDoctorForm = () => {
     setLoader(true);
     e.preventDefault();
 
-    if (doctorDetails.password != cpassword) {
+    const missingFields = MANDATORY_TEXT_FIELDS.filter(
+      ([key]) => !String(doctorDetails[key] ?? "").trim(),
+    ).map(([, label]) => label);
+
+    if (selectedTypes.length === 0) {
+      missingFields.push("Select Consultation Type");
+    }
+    if (selectedService.length === 0) {
+      missingFields.push("Select Services Offered");
+    }
+
+    if (missingFields.length > 0) {
+      setLoader(false);
+      return handleShowDialog(
+        `Please fill the mandatory field(s): ${missingFields.join(", ")}`,
+      );
+    }
+
+    // Passwords are optional; they only have to match when one of them is filled.
+    if (
+      (doctorDetails.password || cpassword) &&
+      doctorDetails.password !== cpassword
+    ) {
       setLoader(false);
       return handleShowDialog("Password is not matching");
     }
@@ -198,7 +252,9 @@ const AddDoctorForm = () => {
     formData.append("overview", doctorDetails.overview);
     formData.append("educationTraining", doctorDetails.educationTraining);
     formData.append("workExperience", doctorDetails.workExperience);
-    formData.append("consultationType", doctorDetails.consultationType);
+    // Comma-joined, `pages/api/addDoctor.js` splits these back into arrays.
+    formData.append("consultationType", selectedTypes.join(","));
+    formData.append("serviceOffered", selectedService.join(","));
     formData.append("password", doctorDetails.password);
     formData.append("digitalSignature", doctorSignature);
     formData.append("location", doctorDetails.location);
@@ -452,7 +508,6 @@ const AddDoctorForm = () => {
               name="educationTraining"
               value={doctorDetails.educationTraining}
               onChange={handleChange}
-              required
             />
           </label>
           <Row>
@@ -544,7 +599,6 @@ const AddDoctorForm = () => {
                   name="password"
                   value={doctorDetails.password || ""}
                   onChange={handleChange}
-                  required
                 />
               </label>
             </Col>
@@ -558,7 +612,6 @@ const AddDoctorForm = () => {
                   name="confirm_password"
                   value={cpassword || ""}
                   onChange={(e) => setCPassword(e.target.value)}
-                  required
                 />
               </label>
             </Col>
@@ -622,7 +675,6 @@ const AddDoctorForm = () => {
                 name="gender"
                 value="male"
                 onChange={handleChange}
-                required
               />
             </label>
           </Col>
@@ -636,7 +688,6 @@ const AddDoctorForm = () => {
                 name="gender"
                 value="female"
                 onChange={handleChange}
-                required
               />
             </label>
           </Col>

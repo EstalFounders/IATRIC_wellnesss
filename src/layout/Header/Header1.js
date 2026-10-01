@@ -231,6 +231,7 @@ const Header1 = ({ scrollToContact }) => {
                             <li className="title">{t("footer.quickLinks")}:</li>
                             <li><Link legacyBehavior href="/about-us"><a>{t("nav.aboutUs")}</a></Link></li>
                             <li><Link legacyBehavior href="/appointment"><a>{t("nav.bookConsultation")}</a></Link></li>
+                            <li><Link legacyBehavior href="/privacy-policy"><a>{t("footer.privacy")}</a></Link></li>
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>

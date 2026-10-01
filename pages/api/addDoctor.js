@@ -148,7 +148,7 @@ export default async function handler(req, res) {
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
             ...stringFields,
-            password: fields.password[0],
+            password: fields.password?.[0] || "",
             profilePictureUrl,
             diplomasCertificatesUrls,
             doctorStampUrl,
