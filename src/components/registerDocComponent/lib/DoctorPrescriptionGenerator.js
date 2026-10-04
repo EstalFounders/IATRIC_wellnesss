@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Button } from "react-bootstrap";
-import { api, style_schema } from "../../../constant";
+import { api, style_schema, color_schema } from "../../../constant";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { capitalize, formatData } from "../utils/helper";
@@ -326,7 +326,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
 
   const BORDER = "1px solid #aaa";
   const BOLD_BORDER = "2px solid #555";
-  const GREEN = "#3b5f1d";
+  const GREEN = color_schema.green;
 
   return (
     <div
@@ -756,7 +756,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         <Button
           onClick={handleCreatePDF}
           disabled={loading}
-          style={{ backgroundColor: "#8e8333", border: "none" }}
+          style={{ backgroundColor: color_schema.yellow, border: "none" }}
         >
           <strong>{loading ? "Sending..." : "Send PDF"}</strong>
         </Button>
@@ -770,7 +770,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         <Button
           onClick={signPrescription}
           disabled={loading || signNstampLoader}
-          style={{ backgroundColor: "#8e8333", border: "none" }}
+          style={{ backgroundColor: color_schema.yellow, border: "none" }}
         >
           <strong>{signNstampLoader ? "Signing..." : "Sign PDF"}</strong>
         </Button>

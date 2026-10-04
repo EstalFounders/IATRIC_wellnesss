@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { api, contact_no, email } from "../../constant";
+import { api, contact_no, email, color_schema } from "../../constant";
 import PopupDialog from "../Common/PopupDialog";
 import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
 import { useRouter } from "next/router";
@@ -125,7 +125,7 @@ const Demo5Contacts1 = () => {
                       handleDialDialogOpen();
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.color = "#3b5f1d";
+                      e.target.style.color = color_schema.green;
                     }} // Change color on hover
                     onMouseOut={(e) => {
                       e.target.style.color = "#000000";
@@ -145,7 +145,7 @@ const Demo5Contacts1 = () => {
                       e.preventDefault();
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.color = "#3b5f1d";
+                      e.target.style.color = color_schema.green;
                     }} // Change color on hover
                     onMouseOut={(e) => {
                       e.target.style.color = "#000000";

@@ -1,8 +1,13 @@
+import Image from "next/image";
 import React from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { richText } from "../../i18n/richText";
 
-const WhoWeAreInfo1 = () => {
+// One ordered list, so the 1-2-3 numbering comes from the markup instead of
+// being typed into every translated string.
+const STEPS = ["about.video.step1", "about.video.step2", "about.video.step3"];
+
+const AboutUsVideo2 = () => {
   const { t } = useLanguage();
   return (
     <section id="info-1" className="wide-60 info-section division">
@@ -14,10 +19,13 @@ const WhoWeAreInfo1 = () => {
               className="info-1-img text-center mb-40 wow fadeInUp"
               data-wow-delay="0.6s"
             >
-              <img
+              <Image
                 className="img-fluid"
-                src="images/image-11.png"
-                alt="info-image"
+                src="/images/image-11.png"
+                width={800}
+                height={640}
+                sizes="(max-width: 991px) 100vw, 50vw"
+                alt="HealthPath doctor consulting a patient over a video call"
               />
             </div>
           </div>
@@ -27,21 +35,23 @@ const WhoWeAreInfo1 = () => {
               className="txt-block pc-30 mb-40 wow fadeInUp"
               data-wow-delay="0.4s"
             >
-              {/* Section ID */}
-              <span className="section-id blue-color">
-                <h5>{t("about.video.welcome")}</h5>
-              </span>
+              {/* Section ID - an eyebrow, not a heading */}
+              <p className="h5 about-eyebrow">{t("about.video.welcome")}</p>
               {/* Title */}
-              <h3 className="h3-md steelblue-color">
+              <h2 className="h3-md steelblue-color">
                 {t("about.video.title")}
-              </h3>
+              </h2>
               {/* Text */}
-              <p className="h5 box-list grey-color">{richText(t("about.video.p1"))}</p>
-              <h4 className="h3-md steelblue-color">
-                {t("about.video.h2")}
-              </h4>
-              <p className="h5 box-list grey-color">{richText(t("about.video.p2"))}</p>
-              {/* End Options List */}
+              <ol
+                className="h5 box-list grey-color"
+                style={{ listStyleType: "decimal", paddingLeft: "22px" }}
+              >
+                {STEPS.map((key) => (
+                  <li className="mb-3" key={key}>
+                    {richText(t(key))}
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
           {/* END TEXT BLOCK */}
@@ -53,4 +63,4 @@ const WhoWeAreInfo1 = () => {
   );
 };
 
-export default WhoWeAreInfo1;
+export default AboutUsVideo2;

@@ -28,14 +28,26 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Area of expertise is required"],
   },
-  degree: {
-    type: String,
-    required: [true, "Degree is required"],
-  },
+  // NOTE: the old `degree` field was removed from the doctor module. It is
+  // intentionally absent from this schema so mongoose strips it from every
+  // create/update payload; `scripts/removeDoctorDegree.js` unsets it on the
+  // documents that still carry it.
   language: {
-    type: String,
-    required: [true, "Language is required"],
-    trim: true,
+    // Repeatable ("English", "Hindi"). Stored as an array of trimmed strings so
+    // one doctor can list several languages; helpers live in
+    // `src/customUtils/languages.js`. Legacy documents hold a single
+    // comma/slash separated String and are upgraded by
+    // `scripts/cleanDoctorLanguages.js`. Mongoose casts such a String to a
+    // one-element array on read, so old documents keep working meanwhile.
+    type: [String],
+    default: [],
+    // `required` is a no-op on a mongoose 8 array path (an empty array counts as
+    // present), so the old "Language is required" rule is kept as a validator
+    // instead. Blank entries are dropped by `parseLanguages` before this runs.
+    validate: {
+      validator: (values) => Array.isArray(values) && values.length > 0,
+      message: "Language is required",
+    },
   },
   workDays: {
     type: String,

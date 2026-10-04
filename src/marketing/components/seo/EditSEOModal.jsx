@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, color_schema } from "../../../constant";
 import {
   identifierToPath,
   MARKETING_PAGES,
@@ -199,7 +199,7 @@ const EditSEOModal = ({ show, entry, onHide, onSaved }) => {
             size="sm"
             type="submit"
             disabled={saving}
-            style={{ backgroundColor: "#3b5f1d", border: "none" }}
+            style={{ backgroundColor: color_schema.green, border: "none" }}
           >
             {saving ? "Saving…" : "Save entry"}
           </Button>

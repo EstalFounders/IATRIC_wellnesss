@@ -104,10 +104,6 @@ export function needsSyntheticMedia(browserName: string): boolean {
  *    WebKit shell rejects `--use-fake-device-for-media-stream` and would abort the
  *    launch (see `WEBKIT_FAKE_MEDIA` in `playwright.config.ts`) - so no fake
  *    devices are available there;
- *  - WebKit on Linux gets a synthetic MediaStream too, because Playwright's Linux
- *    WebKit shell rejects `--use-fake-device-for-media-stream` and would abort the
- *    launch (see `WEBKIT_FAKE_MEDIA` in `playwright.config.ts`) - so no fake
- *    devices are available there;
  *  - WebKit re-installs its own mock `getUserMedia` *after* document-start
  *    scripts, which would silently drop the patch (verified with
  *    `window.__mediaInstrumented` + `String(getUserMedia)`), hence the short
@@ -210,7 +206,6 @@ export async function installMeetingMedia(page: Page, browserName: string) {
         if (++ticks >= 150) clearInterval(guard);
       }, 100);
     },
-    { synthetic: needsSyntheticMedia(browserName) }
     { synthetic: needsSyntheticMedia(browserName) }
   );
 }

@@ -33,7 +33,7 @@
 }
 
 .button {
-  background-color: #3b5f1d;
+  background-color: var(--color-primary);
   color: #fff;
   padding: 10px 15px;
   border: none;

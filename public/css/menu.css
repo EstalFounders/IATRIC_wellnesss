@@ -177,7 +177,7 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li:hover>a {
-    color: #8e8333;
+    color: var(--color-secondary);
 }
 
 .wsmenu>.wsmenu-list>li>a {
@@ -199,7 +199,7 @@ video {
 /* Header Button */
 .header-button span,
 .wsmenu>.wsmenu-list>li.header-btn a {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
     color: #fff !important;
     line-height: 30px;
     margin-top: 15px;
@@ -448,7 +448,7 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li>ul.sub-menu>li>a:hover {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
     color: #fff;
     padding: 8px 15px 8px 23px;
 }
@@ -500,7 +500,7 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li>ul.sub-menu>li>ul.sub-menu>li>a:hover {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
     color: #fff;
     padding: 8px 15px 8px 23px;
 }
@@ -551,7 +551,7 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li>ul.sub-menu>li>ul.sub-menu>li>ul.sub-menu>li>a:hover {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
     color: #fff;
     padding: 8px 15px 8px 23px;
 }
@@ -669,7 +669,7 @@ video {
 }
 
 .wsmenu>.wsmenu-list>li>.wsmegamenu .link-list li a:hover {
-    color: #8e8333;
+    color: var(--color-secondary);
     padding: 15px 0 15px 10px;
 }
 

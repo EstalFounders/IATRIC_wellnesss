@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ItemCard from "./LabTestEarnItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../../helper";
+import { color_schema } from "../../../../constant";
 
 const LabTestEarningList = ({ source, data, appointments }) => {
   console.log(data, "lab test data on earning list");
@@ -32,22 +33,22 @@ const LabTestEarningList = ({ source, data, appointments }) => {
           }}
           className="mt-4"
         >
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col md={3} style={{ color: "#8e8333" }}>
+          <Col md={3} style={{ color: color_schema.yellow }}>
             <b>Test Booked</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Booked</b>
           </Col>
-          <Col md={2} className="ml-4" style={{ color: "#8e8333" }}>
+          <Col md={2} className="ml-4" style={{ color: color_schema.yellow }}>
             <b>Price</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Mobile Number</b>
           </Col>
-          {/* <Col md={2} style={{ color: "#8e8333" }}>
+          {/* <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Status</b>
           </Col> */}
         </Row>

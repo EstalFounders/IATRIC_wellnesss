@@ -2,8 +2,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useGlobalData } from "../customUtils/useGlobalData";
 import { serviceDetailsPath } from "../customUtils/serviceLinks";
+import { color_schema } from "../constant";
 
-const COMING_SOON_ITEMS = ["/labTest/homepage", "/medicine/homepage"];
+const COMING_SOON_ITEMS = ["/labTest/homepage"];
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     { label: "Services", href: "/all-services", icon: "🏥", expandable: true },
     { label: "Book Consultation", href: "/appointment", icon: "📅" },
     { label: "Lab Tests", href: "/labTest/homepage", icon: "🧪" },
-    { label: "Medicines", href: "/medicine/homepage", icon: "💊" },
+    { label: "FAQ", href: "/faqs", icon: "❓" },
     { label: "All Doctors", href: "/all-doctors", icon: "👨‍⚕️" },
     { label: "Contact Us", href: "/contacts-2", icon: "☎️" },
     { label: "Join Us", href: "/join-us", icon: "👥" },
@@ -49,13 +50,13 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   const rowStyle = (active) => ({
     display: "block",
     padding: "14px 16px",
-    color: active ? "#3b5f1d" : "#333",
+    color: active ? color_schema.green : "#333",
     textDecoration: "none",
     fontSize: "16px",
     fontWeight: active ? "700" : "500",
     cursor: "pointer",
     transition: "all 0.3s ease",
-    borderLeft: active ? "4px solid #3b5f1d" : "4px solid transparent",
+    borderLeft: active ? `4px solid ${color_schema.green}` : "4px solid transparent",
     backgroundColor: active ? "#f0f7ee" : "transparent",
   });
 
@@ -107,7 +108,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
               border: "none",
               fontSize: "24px",
               cursor: "pointer",
-              color: "#3b5f1d",
+              color: color_schema.green,
               fontWeight: "bold",
             }}
           >
@@ -152,7 +153,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                           transition: "transform 0.3s ease",
                           transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)",
                           fontSize: "12px",
-                          color: "#3b5f1d",
+                          color: color_schema.green,
                         }}
                       >
                         ▼
@@ -176,7 +177,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                           padding: "12px 16px",
                           fontSize: "14px",
                           fontWeight: "600",
-                          color: "#3b5f1d",
+                          color: color_schema.green,
                           cursor: "pointer",
                           borderBottom: "1px solid #eef0ea",
                         }}
@@ -206,7 +207,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                           padding: "12px 16px 12px 30px",
                           fontSize: "15px",
                           fontWeight: "700",
-                          color: "#3b5f1d",
+                          color: color_schema.green,
                           cursor: "pointer",
                         }}
                       >
@@ -225,7 +226,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                     onMouseEnter={(e) => {
                       if (!active) {
                         e.target.style.backgroundColor = "#f5f5f5";
-                        e.target.style.borderLeftColor = "#3b5f1d";
+                        e.target.style.borderLeftColor = color_schema.green;
                         e.target.style.paddingLeft = "20px";
                       }
                     }}

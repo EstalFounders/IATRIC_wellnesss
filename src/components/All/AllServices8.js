@@ -28,39 +28,19 @@ const AllServices8 = () => {
               <table className="table">
                 <tbody>
                   <tr>
-                    <td>Monday</td>
+                    <td>Mon – Fri</td>
                     <td> - </td>
-                    <td className="text-right">8:00 AM - 6:00 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Tuesday</td>
-                    <td> - </td>
-                    <td className="text-right">8:00 AM - 7:30 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Wednesday</td>
-                    <td> - </td>
-                    <td className="text-right">8:00 AM - 7:30 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Thursday</td>
-                    <td> - </td>
-                    <td className="text-right">8:00 AM - 8:00 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Friday</td>
-                    <td> - </td>
-                    <td className="text-right">8:00 AM - 6:00 PM</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                   <tr>
                     <td>Saturday</td>
                     <td>-</td>
-                    <td className="text-right">10:00 AM - 5:30 PM</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                   <tr className="last-tr">
                     <td>Sunday</td>
                     <td>-</td>
-                    <td className="text-right">Closed</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                 </tbody>
               </table>

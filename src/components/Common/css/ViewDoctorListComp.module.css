@@ -109,7 +109,7 @@
   
   .location-highlight {
     font-weight: 600;
-    color: #3b5f1d;
+    color: var(--color-primary);
   }
   
   .patient-stories {
@@ -129,7 +129,7 @@
   
   .patient-stories-link {
     font-size: 0.9rem;
-    color: #3b5f1d;
+    color: var(--color-primary);
     text-decoration: underline;
     cursor: pointer;
   }
@@ -159,17 +159,17 @@
   }
   
   .new-book-btn.primary {
-    background-color: #3b5f1d;
+    background-color: var(--color-primary);
     color: white;
   }
   
   .new-book-btn.primary:hover {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
   }
   
   .new-book-btn.secondary {
     background-color: #eaf4ff;
-    color: #3b5f1d;
+    color: var(--color-primary);
   }
   
   .new-book-btn.secondary:hover {

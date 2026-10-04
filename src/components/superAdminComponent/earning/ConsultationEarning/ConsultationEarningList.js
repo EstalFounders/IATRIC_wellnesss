@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ItemCard from "./ConsultationEarnItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../../helper";
+import { color_schema } from "../../../../constant";
 
 const ConsultationEarningList = ({ source, data, appointments }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,19 +32,19 @@ const ConsultationEarningList = ({ source, data, appointments }) => {
           }}
           className="mt-4"
         >
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Booking Type</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Appointment Time</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Earning</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Mobile Number</b>
           </Col>
         </Row>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form } from "react-bootstrap";
-import { api } from "../../constant";
+import { api, color_schema } from "../../constant";
 import styles from "./css/CustomerQueryComp.module.css";
 
 const ITEMS_PER_PAGE = 10;
@@ -213,7 +213,7 @@ const CustomerQueryComp = () => {
           </div>
           <div
             className="py-2 px-3 rounded font-weight-bold"
-            style={{ cursor: "pointer", background: "#3b5f1d", color: "#fff" }}
+            style={{ cursor: "pointer", background: color_schema.green, color: "#fff" }}
           >
             Send Reply
           </div>

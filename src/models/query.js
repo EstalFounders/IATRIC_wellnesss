@@ -9,9 +9,12 @@ const querySchema = new Schema(
     email: {
       type: String,
     },
+    // Deliberately optional: the contacts page collects a single
+    // "phone or email" value and POST /api/userQuery splits it into either
+    // `email` or `mobile_number`, so neither of them can be required any more
+    // (older callers such as Demo5About2 still send `mobile_number` alone).
     mobile_number: {
       type: Number,
-      required: true,
     },
     visited_before: {
       type: String,

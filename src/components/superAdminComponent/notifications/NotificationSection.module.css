@@ -52,13 +52,13 @@
 }
 
 .tabButton:hover {
-  color: #3b5f1d;
+  color: var(--color-primary);
   background: #f0f7ee;
 }
 
 .tabButtonActive {
-  color: #3b5f1d;
-  border-bottom-color: #3b5f1d;
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
   background: #f5faf3;
   font-weight: 600;
 }
@@ -184,7 +184,7 @@
 }
 
 .reviewBtn {
-  background: #3b5f1d;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 8px 20px;

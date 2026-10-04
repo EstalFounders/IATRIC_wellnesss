@@ -16,6 +16,12 @@ const Demo5Hero5 = () => {
     fetchBasicConfiguration(dispatch);
   }, []);
 
+  // Same entry point as the header "Book Now": the consultation flow with the
+  // service preselected, so the user lands straight on the booking form.
+  const handleBookNowClick = () => {
+    router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
+  };
+
   return (
     <section id="hero-5" className="bg-fixed hero-section division">
       <div className="container">
@@ -51,7 +57,7 @@ const Demo5Hero5 = () => {
                   </strong>{" "}
                   <br />
                   <br />
-                  <b style={{ color: "#3b5f1d" }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
+                  <b style={{ color: color_schema.green }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
 
 
                 </div>
@@ -69,11 +75,20 @@ const Demo5Hero5 = () => {
                   healthcare journey. */}
                 </p>
               </div>
-              {/* Button - full width on phones, capped so it stays a normal
-                  button size on desktop (was a fixed 50% wrapper, which clipped
-                  the label on small screens). */}
-              <div className="hero-cta" style={{ width: "100%", maxWidth: "320px" }}>
-                <ConsultationButton path={"/discover-more"}>
+              {/* CTA pair - primary "Book Now" (solid, attention pulse) next to
+                  the secondary "Discover More" (ghost/outline). `.hero-cta`
+                  (customStyle.css) is a wrapping flex row with a 12px gap: the two
+                  buttons sit side by side on desktop and stack full-width on
+                  phones. It used to be a single button in a fixed 50%/320px
+                  wrapper, which clipped the label on small screens. */}
+              <div className="hero-cta">
+                <ConsultationButton
+                  variant="book-now"
+                  onClick={handleBookNowClick}
+                >
+                  {t("common.bookNow")}
+                </ConsultationButton>
+                <ConsultationButton variant="outline" path={"/discover-more"}>
                   {t("common.discoverMore")}
                 </ConsultationButton>
               </div>

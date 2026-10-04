@@ -1,6 +1,9 @@
 import { servicesData } from "../../data/services";
 import { slugifyService } from "./useGlobalData";
 import SERVICE_DESCRIPTIONS from "../../data/serviceDescriptions.json";
+// Shared with data/faqs.js so a service resolves to the same topic key on the
+// service page, the department page and the FAQ page.
+import { canonicalServiceKey } from "./serviceKeys";
 
 // Static presentation list (name + optional `service` key that maps to the
 // rich content in ServiceDetailsComponent).
@@ -20,17 +23,6 @@ const safeDecode = (value) => {
 };
 
 const matchKey = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-
-// Canonical form used to look up the short service descriptions: lower-cased, with
-// the UK/US spelling variants collapsed so the static "gynecology & obs" finds the
-// same entry as the DB's "Gynaecology & Obstetrics".
-const canonicalServiceKey = (value) =>
-  String(value || "")
-    .toLowerCase()
-    .replace(/gynecology/g, "gynaecology")
-    .replace(/orthopedics/g, "orthopaedics")
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]/g, "");
 
 const DESCRIPTION_INDEX = Object.keys(SERVICE_DESCRIPTIONS || {}).reduce(
   (index, key) => {

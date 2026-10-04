@@ -273,24 +273,19 @@ const Service2Page = () => {
               <table className="table">
                 <tbody>
                   <tr>
-                    <td>Mon – Wed</td>
+                    <td>Mon – Fri</td>
                     <td> - </td>
-                    <td className="text-right">9:00 AM - 7:00 PM</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                   <tr>
-                    <td>Thursday</td>
-                    <td> - </td>
-                    <td className="text-right">9:00 AM - 6:30 PM</td>
-                  </tr>
-                  <tr>
-                    <td>Friday</td>
-                    <td> - </td>
-                    <td className="text-right">9:00 AM - 6:00 PM</td>
+                    <td>Saturday</td>
+                    <td>-</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                   <tr className="last-tr">
-                    <td>Sun - Sun</td>
+                    <td>Sunday</td>
                     <td>-</td>
-                    <td className="text-right">CLOSED</td>
+                    <td className="text-right">7:00 AM - 10:00 PM</td>
                   </tr>
                 </tbody>
               </table>

@@ -1,19 +1,22 @@
-import React, { useState } from "react";
-import Popup from "../Popup";
+import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useLanguage } from "../../i18n/LanguageContext";
 
+// Every photo in this gallery is an entry point into the booking flow, so a click
+// anywhere on a tile navigates there.
+//
+// NOTE: the path this section was specified with, `/bookappointment`, does not
+// exist in this app (the only booking route is `/appointment`). We therefore point
+// at the exact URL the header "Book Now" button opens - the consultation flow with
+// the service preselected. When the dedicated `/bookappointment` page/route lands,
+// this single constant is the only line that has to change.
+export const BOOK_APPOINTMENT_PATH = "/appointment?service=Book_Consultation";
+
 const Demo2Gallery1 = () => {
-  const [image, setImage] = useState(false);
-  const [src, setSrc] = useState(false);
   const { t } = useLanguage();
-  const onClick = (src) => {
-    setImage(true);
-    setSrc(src);
-  };
   return (
     <div id="gallery-1" className="gallery-section division wide-100">
-      {image && <Popup content={{ src, name: "image" }} close={setImage} />}
       {/* SECTION TITLE */}
       <div className="container h5 box-list grey-color">
         <div className="row">
@@ -44,7 +47,10 @@ const Demo2Gallery1 = () => {
           </div>
         </div>
       </div>
-      {/* GALLERY IMAGES */}
+      {/* GALLERY IMAGES - one link per tile. The magnifier stays as the hover /
+          focus affordance; its ::after stretches the hit area over the whole photo
+          (see customStyle.css), so a click anywhere on the image routes to the
+          booking page. */}
       <div className="row gallery-items-list">
         {/* IMAGE #1 */}
         <div className="col-md-6 col-lg-3 gallery-item">
@@ -60,13 +66,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-1.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -84,13 +90,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-2.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -108,13 +114,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-3.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -132,13 +138,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-4.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -156,13 +162,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-5.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -180,13 +186,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-6.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -204,13 +210,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-7.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>
@@ -228,13 +234,13 @@ const Demo2Gallery1 = () => {
             <div className="item-overlay" />
             {/* Image Zoom */}
             <div className="image-zoom">
-              <a
+              <Link
                 className="image-link"
-                href="#"
-                onClick={() => onClick("images/gallery/image-8.jpg")}
+                href={BOOK_APPOINTMENT_PATH}
+                aria-label={t("common.bookNow")}
               >
-                <i className="fas fa-search-plus" />
-              </a>
+                <i className="fas fa-search-plus" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ItemCard from "./DoctorEarningItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../../helper";
+import { color_schema } from "../../../../constant";
 
 const DoctorEarningList = ({ source, doctors, appointments }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,22 +32,22 @@ const DoctorEarningList = ({ source, doctors, appointments }) => {
           }}
           className="mt-4"
         >
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Consultation Type</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Joining Date</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Total Earning</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Mobile Number</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Bookings</b>
           </Col>
         </Row>

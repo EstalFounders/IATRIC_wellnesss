@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Table } from "react-bootstrap";
-import { api } from "../../constant";
+import { api, color_schema } from "../../constant";
 import {
   identifierToPath,
   MARKETING_PAGES,
@@ -134,7 +134,7 @@ const SeoManagementView = () => {
         <Button
           size="sm"
           onClick={openCreate}
-          style={{ backgroundColor: "#3b5f1d", border: "none" }}
+          style={{ backgroundColor: color_schema.green, border: "none" }}
         >
           Add SEO entry
         </Button>

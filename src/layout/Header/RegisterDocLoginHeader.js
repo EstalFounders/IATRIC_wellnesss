@@ -3,12 +3,7 @@ import { Col, Row } from "react-bootstrap";
 import Image from "next/image";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
-import {
-  doctor_info_local_storage,
-  api,
-  single_call,
-  userTypeConstant,
-} from "../../constant";
+import { doctor_info_local_storage, api, single_call, userTypeConstant, color_schema } from "../../constant";
 import DoctorModalComp from "../../components/superAdminComponent/DoctorModalComp";
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
@@ -361,7 +356,7 @@ const RegisterDocLoginHeader = () => {
                   zIndex: 1080,
                   maxWidth: "90vw",
                   textAlign: "center",
-                  background: "#3b5f1d",
+                  background: color_schema.green,
                   color: "#ffffff",
                   padding: "12px 20px",
                   borderRadius: "10px",

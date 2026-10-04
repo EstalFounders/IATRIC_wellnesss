@@ -12,8 +12,8 @@
   padding: 5px 10px;
   font-size: 14px;
   background-color: white;
-  color: #3b5f1d;
-  border: 1px solid #3b5f1d;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
@@ -22,7 +22,7 @@
 }
 
 .labtest-btn:hover {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   color: white;
 }
 
@@ -34,9 +34,9 @@
   line-height: 1.25;
   max-width: 100%;
   box-sizing: border-box;
-  background-color: #3b5f1d; /* company green */
+  background-color: var(--color-primary); /* company green */
   color: #ffffff;
-  border: 1px solid #3b5f1d;
+  border: 1px solid var(--color-primary);
   border-radius: 8px;
   cursor: pointer;
   text-align: center;
@@ -52,29 +52,166 @@
   color: #ffffff;
 }
 
-/* Subtle attention pulse for the primary "Book Now" CTA only. Applied by
+/* Attention pulse for the primary "Book Now" CTA only. Applied by
    <ConsultationButton variant="book-now" | isBlinking>; every other button keeps
-   its original styling. The ring uses the company green (59, 95, 29 = #3b5f1d). */
+   its original styling. Company green = 59, 95, 29 (#3b5f1d), gold = #8e8333.
+
+   Three layers keep it eye-catching but not cheap:
+   - `consultationBtnPulse` (box-shadow only): a ring that expands outwards and
+     fades, plus a soft halo that brightens and dies. The label itself never
+     changes opacity - fading the text is what makes a blinking button look
+     spammy and hurts legibility.
+   - `consultationBtnBlink`: the surface itself strobes between the brand green
+     and a lighter green (hard 50/50 square wave) with a brighter keyline - this
+     is the "blink". Only the fill/border change, never the label, so the text
+     stays fully readable in every phase.
+   - `consultationBtnZoom`: the button itself grows and shrinks (`scale`) so it
+     "pops" in size, from small to large. It uses the standalone `scale`
+     property instead of `transform`, which leaves `translate` free for the
+     hover lift - the two then compose instead of overriding each other. */
 @keyframes consultationBtnPulse {
-  0%,
-  100% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(59, 95, 29, 0.5);
-    opacity: 1;
+  0% {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 0 0 0 rgba(59, 95, 29, 0.55),
+      0 0 10px 2px rgba(59, 95, 29, 0.4);
   }
-  50% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(59, 95, 29, 0);
-    opacity: 0.92;
+  70% {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 0 0 9px rgba(59, 95, 29, 0),
+      0 0 18px 8px rgba(59, 95, 29, 0);
+  }
+  100% {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 0 0 0 rgba(59, 95, 29, 0),
+      0 0 10px 2px rgba(59, 95, 29, 0);
+  }
+}
+
+@keyframes consultationBtnBlink {
+  /* Hard 50/50 square wave = a real blink, not a slow fade. A 1.2s cycle is
+     0.83 flashes/second, i.e. inside the WCAG 2.3.1 limit (max 3 per second).
+     Both phases keep the white label readable (#3b5f1d = 7.2:1, #4a7c22 =
+     4.98:1); the brighter keyline is what makes the "pop" obvious. */
+  0%,
+  49.99% {
+    background-color: var(--color-primary); /* company green */
+    border-color: var(--color-primary);
+  }
+  50%,
+  100% {
+    background-color: #4a7c22; /* lighter green flash */
+    border-color: #6fbf35;
+  }
+}
+
+@keyframes consultationBtnZoom {
+  /* Zoom in / zoom out: small -> large -> small, in step with the 2.2s glow so
+     the button growing and the ring expanding read as one "heartbeat".
+     A short hold at each end (18%/40%/60%/82%) matters for two reasons: the
+     button is not permanently in motion, and an always-moving element fails
+     Playwright's "element is stable" actionability check - without the holds,
+     every hover/click on the CTA in the e2e suite would time out. */
+  0%,
+  18% {
+    scale: var(--cta-zoom-min, 0.78); /* rest: small */
+  }
+  40%,
+  60% {
+    scale: var(--cta-zoom-max, 1.22); /* peak: large */
+  }
+  82%,
+  100% {
+    scale: var(--cta-zoom-min, 0.78); /* back to rest */
   }
 }
 
 .consultation-btn--book-now {
-  animation: consultationBtnPulse 2.4s ease-in-out infinite;
+  /* Zoom range: how small it rests and how large it grows. Defaults are a strong
+     but still readable pulse (0.78 -> 1.22 = a 56% size swing; the 16px label
+     stays >= 12px and 7:1 contrast at the small end). For a dramatic
+     "grows out of nowhere" CTA set --cta-zoom-min: 0.6; --cta-zoom-max: 1.35.
+     Anything past ~1.4 in the header reaches the neighbouring nav item
+     (the zoomed button paints on top thanks to z-index below).
+     Override per placement, e.g. `header .consultation-btn--book-now {
+     --cta-zoom-max: 1.25 }`. */
+  --cta-zoom-min: 0.78;
+  --cta-zoom-max: 1.22;
+
+  position: relative;
+  z-index: 1; /* the zoomed button paints above its neighbours */
+  translate: 0 0;
+  scale: var(--cta-zoom-min); /* start size; the zoom animation takes over */
+  /* Three independent clocks: glow 2.2s, blink 1.2s, zoom 2.2s. */
+  animation: consultationBtnPulse 2.2s ease-out infinite,
+    consultationBtnBlink 1.2s linear infinite,
+    consultationBtnZoom 2.2s ease-in-out infinite;
+  /* translate/filter are transitioned here (this replaces the base transition).
+     The animations own background/border/box-shadow/scale, so hover feedback
+     uses the lift + brightness + a faster clock instead of colours - it can
+     never fight them. */
+  transition: translate 0.18s ease, filter 0.2s ease;
 }
 
-/* Accessibility: keep the button, drop the motion. */
+/* Hover: the glow, blink and zoom all run ~2x faster, the button lifts and
+   brightens, so the feedback is immediate and obviously interactive.
+   brightness() works in every blink phase, unlike a background-color change
+   (the animation owns that while it runs). */
+.consultation-btn--book-now:hover {
+  filter: brightness(1.12) saturate(1.05);
+  translate: 0 -2px; /* `translate`, so it composes with the `scale` zoom */
+  animation-duration: 1.1s;
+}
+
+/* Press feedback (also cancels the hover lift). */
+.consultation-btn--book-now:active {
+  filter: brightness(0.92);
+  translate: 0 0;
+}
+
+/* Keyboard users: a visible focus ring, since the pulse is decorative only. */
+.consultation-btn--book-now:focus-visible {
+  outline: 3px solid var(--color-secondary); /* company gold */
+  outline-offset: 3px;
+}
+
+/* Accessibility: no motion at all, and a static high-contrast treatment
+   (near-black green + solid white keyline, ~13:1 contrast with the white
+   label) instead of the coloured halo. */
 @media (prefers-reduced-motion: reduce) {
   .consultation-btn--book-now {
     animation: none;
+    transition: none;
+    translate: none;
+    scale: none; /* back to 100%: the zoom's start size must not leak in here */
+    filter: none;
+  }
+
+  .consultation-btn--book-now {
+    background-color: #1f3708;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(31, 55, 8, 0.35);
+  }
+
+  .consultation-btn--book-now:hover {
+    background-color: #16280a;
+    border-color: #ffffff;
+    translate: none;
+    filter: none;
+  }
+
+  .consultation-btn--book-now:active {
+    background-color: #16280a;
+    translate: none;
+    filter: none;
+  }
+
+  .consultation-btn--book-now:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 3px;
   }
 }
 
@@ -101,7 +238,7 @@
   transition: background-color 0.3s ease;
 }
 .navbar-option:hover {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
@@ -125,12 +262,12 @@
   color: #495057;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-bottom: 3px solid #8e8333;
+  border-bottom: 3px solid var(--color-secondary);
 }
 
 .service-tab:hover {
   transform: translateY(-3px) scale(1.02);
-  background: #8e8333;
+  background: var(--color-secondary);
   color: #ffffff;
   box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
   border-color: rgba(40, 167, 69, 0.1);
@@ -224,7 +361,7 @@
 }
 
 .service-nav-link:hover {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   transform: translateY(-6px) scale(1.03);
 }
 
@@ -244,7 +381,7 @@
 }
 
 .service-nav-link-dept:hover {
-  background-color: #3b5f1d;
+  background-color: var(--color-primary);
   transform: translateY(-6px) scale(1.03);
 }
 
@@ -255,14 +392,14 @@
 .service-title {
   font-size: 21px;
   text-align: center;
-  color: #3b5f1d;
+  color: var(--color-primary);
   transition: color 0.3s ease;
 }
 
 .service-title-dept {
   font-size: 21px;
   text-align: center;
-  color: #8e8333;
+  color: var(--color-secondary);
   transition: color 0.3s ease;
 }
 
@@ -272,7 +409,7 @@
 
 
 .service-icon-dept svg {
-  color: #8e8333; /* yellow default */
+  color: var(--color-secondary); /* yellow default */
   transition: color 0.3s ease;
 }
 
@@ -390,7 +527,7 @@
 }
 
 .on-hover-blue:hover {
-  color: #8e8333;
+  color: var(--color-secondary);
   font-weight: bold;
 }
 .labtest-searchIcon {
@@ -399,15 +536,15 @@
   height: 58px;
   padding: 17.5px 17px 16.5px 15px;
   gap: 10px;
-  border: 1px solid #3b5f1d;
+  border: 1px solid var(--color-primary);
   border-radius: 0px 8px 8px 0px;
 }
 .bg-green-gradient {
-  background: linear-gradient(to top, #3b5f1d, #2d4c30);
+  background: linear-gradient(to top, var(--color-primary), #2d4c30);
 }
 
 .bg-yellow-gradient {
-  background: linear-gradient(to top, #8e8333, #4f4b30);
+  background: linear-gradient(to top, var(--color-secondary), #4f4b30);
 }
 
 .most-booked-checkup-style {
@@ -420,7 +557,7 @@
   /* background: linear-gradient(to bottom left, #3b5f1d, #334b1f);  */
   /* background: linear-gradient(to top, #3b5f1d, #334b1f);  */
   /* background: linear-gradient(to right, #3b5f1d, #334b1f);  */
-  background: linear-gradient(to top right, #3b5f1d, #8e8333);
+  background: linear-gradient(to top right, var(--color-primary), var(--color-secondary));
 }
 
 /* Ensure the icon itself has a transition */
@@ -472,7 +609,7 @@
 }
 
 .scroll-btn:hover {
-  background: #8e8333;
+  background: var(--color-secondary);
 }
 
 .scroll-btn.left {
@@ -500,7 +637,7 @@
 }
 
 .scroll-btn:hover {
-  background: #8e8333;
+  background: var(--color-secondary);
 }
 
 .scroll-btn.left {
@@ -528,7 +665,7 @@
 }
 
 .scroll-btn:hover {
-  background: #8e8333;
+  background: var(--color-secondary);
 }
 
 .scroll-btn.left {
@@ -560,7 +697,7 @@
 
 .image:hover {
   transform: perspective(1000px) rotateX(2deg) rotateY(0deg) scale(1.05);
-  box-shadow: 0 5px 5px #3b5f1d, inset 0 1px 4px #3b5f1d;
+  box-shadow: 0 5px 5px var(--color-primary), inset 0 1px 4px var(--color-primary);
 }
 
 @media (max-width: 991px) {
@@ -601,11 +738,11 @@
       background: repeating-linear-gradient(
         to right,
         transparent 0 19%,
-        #8e8333 20% 21%,
+        var(--color-secondary) 20% 21%,
         transparent 22% 29%,
-        #8e8333 30% 31%,
+        var(--color-secondary) 30% 31%,
         transparent 32% 49%,
-        #8e8333 50% 51%,
+        var(--color-secondary) 50% 51%,
         transparent 52% 100%
       );
       animation: scroll 2s linear infinite;
@@ -634,7 +771,7 @@
 }
 
 .latest-article-category-badge {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   color: white;
   padding: 4px 10px;
   border-radius: 20px;
@@ -645,7 +782,7 @@
 }
 
 .newsletter-section {
-background: linear-gradient(to top, #8e8333, #4f4b30);  
+background: linear-gradient(to top, var(--color-secondary), #4f4b30);  
   border-radius: 20px;
   margin-left: 1%;
   margin-right: 1%;
@@ -666,7 +803,7 @@ background: linear-gradient(to top, #8e8333, #4f4b30);
 }
 
 .newsletter-section .form-control:focus {
-  border-color: #8e8333;
+  border-color: var(--color-secondary);
   box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
 }
 
@@ -678,6 +815,401 @@ background: linear-gradient(to top, #8e8333, #4f4b30);
 .newsletter-section .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+
+
+/* ---------------------------------------------------------------------------
+   HERO CTA PAIR - primary "Book Now" + secondary "Discover More".
+
+   Wrapping flex row: both CTAs share one line when there is room and stack
+   full-width on phones. Bootstrap here is 4.1.2, which has no `gap-*` utility,
+   so the spacing lives in CSS instead of an inline style.
+   --------------------------------------------------------------------------- */
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+/* Secondary (ghost) CTA: transparent surface with the brand-green keyline and
+   label - the solid green "Book Now" stays the obvious primary action. Hover and
+   keyboard focus fill the surface in (same green, swapped). No drop shadow: the
+   shadow on the solid button is what makes it read as raised. */
+.consultation-btn--outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  box-shadow: none;
+}
+
+.consultation-btn--outline:hover,
+.consultation-btn--outline:focus-visible {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(59, 95, 29, 0.35);
+}
+
+/* Keyboard users get the same visible ring as the pulsing CTA. */
+.consultation-btn--outline:focus-visible {
+  outline: 3px solid var(--color-secondary); /* company gold */
+  outline-offset: 3px;
+}
+
+/* Phones: one full-width CTA per row, so neither label is squeezed. */
+@media (max-width: 575.98px) {
+  .hero-cta > .consultation-btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   DEMO-2 GALLERY (#gallery-1) - the whole tile is one link.
+
+   Every photo routes to the booking flow, so the anchor that used to be nothing
+   but a 54px zoom icon is now the link itself: it is absolutely positioned over
+   the tile (a real box, so the WHOLE photo is clickable - a stretched
+   pseudo-element only hit-tests where its own box is), and the magnifier moved
+   onto the inner <i> as the hover / focus affordance.
+   --------------------------------------------------------------------------- */
+#gallery-1 .gallery-item .image-zoom {
+  top: 0;
+  height: 100%;
+  transform: none; /* the anchor below centres itself; no translateY(-50%) needed */
+}
+
+#gallery-1 .gallery-item .image-zoom a.image-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1; /* the tile-sized link must stay hit-testable at rest */
+  transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2; /* above .item-overlay, so every click lands on the link */
+}
+
+/* The magnifier: hidden at rest, revealed on hover / keyboard focus exactly like
+   every other gallery in the app (.image-zoom a in style.css). */
+#gallery-1 .gallery-item .image-zoom a.image-link i {
+  width: 54px;
+  height: 54px;
+  font-size: 24px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 450ms ease-in-out, transform 450ms ease-in-out;
+}
+
+#gallery-1 .gallery-item:hover .image-zoom a.image-link i,
+#gallery-1 .gallery-item .image-zoom a.image-link:focus-visible i {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Keyboard users: the link *is* the tile now, so the ring is drawn inside it. */
+#gallery-1 .gallery-item .image-zoom a.image-link:focus-visible {
+  outline: 3px solid var(--color-secondary); /* company gold */
+  outline-offset: -3px;
+}
+
+#gallery-1 .gallery-item .hover-overlay {
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+   CONTACTS-2 (#contacts-2) - left-aligned page heading + stacked CTA column.
+
+   "Contact Us" anchors the page on the left and the two calls to action sit
+   directly beneath it, one per row: the solid green "Book Now" stays the primary
+   action and the outlined "Work With Us" (-> /join-us) reads as the quiet
+   secondary. `align-items: flex-start` keeps both buttons on the heading's edge
+   at every breakpoint and lets each label keep its natural width
+   (`.consultation-btn` owns its own clamp font-size and `white-space: nowrap`).
+   --------------------------------------------------------------------------- */
+#contacts-2 .contacts2-heading {
+  margin-bottom: 0;
+}
+
+#contacts-2 .contacts2-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 25px;
+  /* Breathing room before the contact boxes / contact form row. */
+  margin-bottom: 45px;
+}
+
+@media (max-width: 991.98px) {
+  #contacts-2 .contacts2-actions {
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+}
+
+/* The pulsing CTA zooms around its own centre by default. In this column it grows
+   from its left edge instead, so the two CTAs stay flush with each other and with
+   the heading while "Book Now" breathes - no wobble out of the column. */
+#contacts-2 .contacts2-actions > .consultation-btn--book-now {
+  transform-origin: left center;
+}
+
+/* Contact details column: mirrors the footer's "Reach us" / working hours /
+   social links, but in the light section the footer's white-on-dark icons are
+   useless, so the icons take the company gold and the links the site's blue. */
+#contacts-2 .contacts2-info-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  color: #747373;
+}
+
+#contacts-2 .contacts2-info-line svg {
+  flex: 0 0 auto;
+  /* Keeps the 20px icon on the text's first line box: the readability pass
+     lifted `.contact-box p` to 18px / line-height 1.6, so the old 3px rode too
+     high. */
+  margin-top: 6px;
+  color: var(--color-secondary); /* company gold */
+}
+
+#contacts-2 .contacts2-socials {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+}
+
+#contacts-2 .contacts2-socials a {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+#contacts-2 .contacts2-socials a:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+/* Confirmation / validation line under the (now 3-field) form. */
+#contacts-2 .contacts2-form-status {
+  margin-top: 15px;
+  min-height: 22px;
+  font-size: 1.125rem; /* 18px */
+}
+
+/* ---------------------------------------------------------------------------
+   Readability pass: the copy above sat on the template's base sizes, which read
+   small once the section got the footer's content (16px notice, 15.6px contact
+   boxes, 15px inputs). Everything below is scoped to #contacts-2 and only ever
+   grows the text. The template already scales `.contact-box p` and
+   `.contact-form .form-control` UP on phones (1.05/1.133rem and 1.133/1.266rem),
+   so the bumps are re-stated inside those same breakpoints instead of being
+   overridden by a smaller desktop value.
+   --------------------------------------------------------------------------- */
+#contacts-2 p.contact-notice {
+  font-size: 1.25rem; /* 20px, was 16px */
+  line-height: 1.7;
+}
+
+#contacts-2 .contact-box p {
+  font-size: 1.125rem; /* 18px, was 15.6px */
+  line-height: 1.6;
+}
+
+#contacts-2 .contact-form .form-control {
+  font-size: 1.0625rem; /* 17px, was 15px */
+}
+
+/* Tablets (768 - 991.99px): `.contact-box p` was 1.05rem and the inputs 15px. */
+@media (min-width: 768px) and (max-width: 991.99px) {
+  #contacts-2 .contact-box p {
+    font-size: 1.1875rem; /* 19px, was 16.8px */
+  }
+
+  #contacts-2 .contact-form .form-control {
+    font-size: 1.125rem; /* 18px, was 15px */
+  }
+}
+
+/* Phones in landscape / small tablets (576 - 767.99px, still a 16px root):
+   `.contact-box p` and the inputs were 1.133rem here. */
+@media (min-width: 576px) and (max-width: 767.99px) {
+  #contacts-2 .contact-box p {
+    font-size: 1.25rem; /* 20px, was 18.13px */
+  }
+
+  #contacts-2 .contact-form .form-control {
+    font-size: 1.25rem; /* 20px, was 18.13px */
+  }
+}
+
+/* Phones (<= 575.99px): the template drops the root font-size to 14px here
+   (`responsive.css`), so the rem values have to climb to keep reading bigger
+   than the 1.1075 / 1.133 / 1.266rem they replace. */
+@media (max-width: 575.99px) {
+  #contacts-2 p.contact-notice {
+    font-size: 1.375rem; /* 19.25px, was 15.5px */
+  }
+
+  #contacts-2 .contact-box p {
+    font-size: 1.4375rem; /* 20.1px, was 15.9px */
+  }
+
+  #contacts-2 .contact-form .form-control {
+    font-size: 1.4375rem; /* 20.1px, was 17.7px */
+  }
+
+  #contacts-2 .contacts2-form-status {
+    font-size: 1.3125rem; /* 18.4px, was 14px */
+  }
+}
+/* ---------------------------------------------------------------------------
+   CONTACTS-2 (`/contacts-2`) banner CTA (`ContactsBanner8`).
+   The artwork behind this banner is bright (white coats, pale sky), so its
+   white typography disappeared into it. The section gets a darkening veil:
+   `position: relative; z-index: 1` makes the section its own stacking context,
+   which lets the negative z-index `::before` paint ABOVE the section's own
+   background image while still staying behind the text (a plain `::before`
+   would sit on top of the copy).
+   `#banner-8` is shared with `/all-sections` (`AllBanner8`) and demo-2
+   (`Demo2Banner8`), so the veil is keyed off the `contacts8-banner` class that
+   only `ContactsBanner8` carries — those pages keep the untouched artwork.
+   --------------------------------------------------------------------------- */
+#banner-8.contacts8-banner {
+  position: relative;
+  z-index: 1;
+}
+
+#banner-8.contacts8-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(3, 24, 15, 0.68); /* deep green-black veil */
+  z-index: -1;
+}
+
+/* Phones: the doctors fill more of the frame behind the copy, so the veil
+   deepens slightly to keep the same contrast. */
+@media (max-width: 575.99px) {
+  #banner-8.contacts8-banner::before {
+    background: rgba(3, 24, 15, 0.78);
+  }
+}
+
+/* Brand symbol above the CTA copy. The template's `flaticon-072-hospital-5`
+   glyph was swapped for the HealthPath lockup (`public/images/invoicelogo.png`,
+   420x594 with alpha). That artwork is dark green + gold, which sinks into the
+   dark veil above, so it is knocked out to solid white via `brightness(0)
+   invert(1)` — the same white as the headline and the `#banner-8 h3:after`
+   divider already on this section. `height` + `width: auto` keeps the ratio
+   and lets the intrinsic 110x156 be scaled down without blurring. */
+#banner-8.contacts8-banner .contacts8-symbol {
+  display: block;
+  width: auto;
+  height: 150px;
+  margin: 0 auto 6px;
+  filter: brightness(0) invert(1);
+}
+
+@media (max-width: 575.99px) {
+  #banner-8.contacts8-banner .contacts8-symbol {
+    height: 118px;
+  }
+}
+
+/* About page eyebrow labels (`AboutUsInfo4`, `AboutUsVideo2`). The template
+   nested an <h4>/<h5> inside `span.section-id`, which puts a heading above the
+   page H1 and is invalid nesting. A <p> carrying the same `.h4`/`.h5` size class
+   keeps the exact look (dark, uppercase, 28px below) without adding a heading to
+   the document outline. `.txt-block` is part of the selector because the
+   `.box-list p` rule in style.css (same specificity, earlier file) otherwise
+   wins with its 8px margin. */
+.txt-block p.about-eyebrow {
+  display: block;
+  margin-bottom: 28px;
+  color: #222;
+  font-weight: 700;
+  letter-spacing: -0.25px;
+  text-transform: uppercase;
+  overflow: visible;
+}
+
+/* Internal links worded in the About copy ("Explore our services" / "Meet our
+   doctors"). Plain text links rather than buttons, so they read as part of the
+   paragraph flow. */
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-top: 22px;
+}
+
+.about-links a {
+  color: var(--color-primary); /* company green */
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.about-links a:hover,
+.about-links a:focus-visible {
+  color: var(--color-secondary); /* company gold */
+}
+
+/* The template sizes headings with element-qualified classes (`h3.h3-md` in
+   style.css is 42px), which stop matching when the same visual size is used on
+   the page's H1 and the section H2. These two rules restore the 42px size and
+   the 30px gap that `.txt-block h3.h3-md` set, so the new heading levels render
+   exactly like the old markup did. */
+h1.h3-md,
+h2.h3-md {
+  font-size: 2.625rem;
+}
+
+.txt-block h1.h3-md,
+.txt-block h2.h3-md {
+  margin-bottom: 30px;
+}
+
+/* `steelblue-color` in style.css is scoped to `h2`-`h6` (plus descendants), so
+   the H1/H2 need it spelled out to keep the template's dark-teal heading colour
+   instead of falling back to the near-black element colour. */
+h1.steelblue-color,
+h2.steelblue-color {
+  color: #004861;
+}
+
+/* `p.p-sm` (0.95rem) in style.css is element-qualified, so the same size is
+   re-declared for the list items that replaced the old `<li><p class="p-sm">`
+   markup. */
+li.p-sm {
+  font-size: 0.95rem;
 }
 
 

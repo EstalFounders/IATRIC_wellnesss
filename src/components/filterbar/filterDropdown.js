@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { color_schema } from "../../constant";
 
 const Dropdown = ({ label, options, selectFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,7 +46,7 @@ const Dropdown = ({ label, options, selectFilter }) => {
 
         .dropdown-toggle {
           background-color: #f0f0f0;
-          color: #3b5f1d;
+          color: ${color_schema.green};
           border: none;
           padding: 10px 20px;
           cursor: pointer;
@@ -53,7 +54,7 @@ const Dropdown = ({ label, options, selectFilter }) => {
         }
 
         .dropdown-toggle:hover {
-          background-color: #3b5f1d;
+          background-color: ${color_schema.green};
           color: #ffffff;
         }
 

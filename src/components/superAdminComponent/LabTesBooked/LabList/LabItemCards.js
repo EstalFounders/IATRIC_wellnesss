@@ -60,7 +60,6 @@ const ItemCards = ({
 
   //   formData.append("name", updatedDoctor.name);
   //   formData.append("expertise", updatedDoctor.expertise);
-  //   formData.append("degree", updatedDoctor.degree);
   //   formData.append("language", updatedDoctor.language);
   //   formData.append("workDays", updatedDoctor.workDays);
   //   formData.append("overview", updatedDoctor.overview);

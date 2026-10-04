@@ -66,8 +66,7 @@ const Header5 = ({ toggleMenu }) => {
                   <div className="header-widget icon-xs">
                     <span className="flaticon-092-clock blue-color" />
                     <div className="header-widget-txt">
-                      <p className="txt-400">Mon – Fri : - 8:00 AM - 8:00 PM</p>
-                      <p className="lightgrey-color">Sat - Sun : - Closed</p>
+                      <p className="txt-400">Mon – Sun : - 7:00 AM - 10:00 PM</p>
                     </div>
                   </div>
                 </div>

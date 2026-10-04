@@ -51,7 +51,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #3b5f1d;
+  background: var(--color-primary);
   color: white;
   display: flex;
   align-items: center;
@@ -207,9 +207,9 @@
 }
 
 .pageBtnActive {
-  background: #3b5f1d;
+  background: var(--color-primary);
   color: white;
-  border-color: #3b5f1d;
+  border-color: var(--color-primary);
 }
 
 .pageInfo {

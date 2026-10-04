@@ -18,17 +18,30 @@ const AllServicesTabs2 = () => {
   // Single source of truth: globalData slice speciality list (falls back to the
   // static servicesData list until the API has answered).
   const { speciality } = useGlobalData();
-  const services = useMemo(
-    () =>
-      mergeServiceLists(speciality, servicesData, "name").map((item) => ({
-        ...item,
-        key: item.key || slugifyService(item.name),
-        content: item.content || [item.description || "", ""],
-        options: item.options || [],
-        image: item.image || DEFAULT_SERVICE_IMAGE,
-      })),
-    [speciality]
-  );
+  const services = useMemo(() => {
+    const merged = mergeServiceLists(speciality, servicesData, "name");
+    // Static services that ship their own detail page (the `service` key maps to a
+    // ServiceDetailsComponent block) are always listed, even when the API's
+    // speciality list does not carry them yet.
+    const missing = servicesData.filter(
+      (item) =>
+        item.service &&
+        !merged.some(
+          (service) =>
+            String(service.name || "").toLowerCase() ===
+            String(item.name || "").toLowerCase()
+        )
+    );
+
+    return [...merged, ...missing].map((item) => ({
+      ...item,
+      key: item.key || slugifyService(item.name),
+      content: item.content || [item.description || "", ""],
+      options: item.options || [],
+      image: item.image || DEFAULT_SERVICE_IMAGE,
+    }));
+  }, [speciality]);
+
   return (
     <section id="tabs-2" className="wide-100 tabs-section division">
       <div className="container">
@@ -121,8 +134,12 @@ const AllServicesTabs2 = () => {
                     {/* Button */}
                     <div className="mt-5 d-flex justify-content-center">
                       <div className="w-50">
-                        <ConsultationButton path={"/appointment"}>
-                          Book Consultation
+                        {/* Services with their own detail page (e.g. Corporate
+                            Healthcare) link there; everything else keeps booking. */}
+                        <ConsultationButton
+                          path={service.detailsLink || "/appointment"}
+                        >
+                          {service.detailsLink ? "View Details" : "Book Consultation"}
                         </ConsultationButton>
                       </div>
                     </div>

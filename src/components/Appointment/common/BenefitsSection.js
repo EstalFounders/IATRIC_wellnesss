@@ -4,25 +4,26 @@ import { FaHospital, FaUserCheck, FaClock } from "react-icons/fa";
 import { MdAccessAlarms } from "react-icons/md";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../../i18n/LanguageContext";
+import { color_schema } from "../../../constant";
 
 const benefits = [
   {
-    icon: <FaHospital size={48} color="#3b5f1d" />,
+    icon: <FaHospital size={48} color={color_schema.green} />,
     titleKey: "demo5.benefits.anywhere",
     descKey: "demo5.benefits.anywhereDesc",
   },
   {
-    icon: <FaUserCheck size={48} color="#3b5f1d" />,
+    icon: <FaUserCheck size={48} color={color_schema.green} />,
     titleKey: "demo5.benefits.verified",
     descKey: "demo5.benefits.verifiedDesc",
   },
   {
-    icon: <FaClock size={48} color="#3b5f1d" />,
+    icon: <FaClock size={48} color={color_schema.green} />,
     titleKey: "demo5.benefits.availability",
     descKey: "demo5.benefits.availabilityDesc",
   },
   {
-    icon: <MdAccessAlarms size={48} color="#3b5f1d" />,
+    icon: <MdAccessAlarms size={48} color={color_schema.green} />,
     titleKey: "demo5.benefits.accessible",
     descKey: "demo5.benefits.accessibleDesc",
   },

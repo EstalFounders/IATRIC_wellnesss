@@ -11,7 +11,8 @@ import MostPopularCheckup from "./mostPopularCheckup/MostPopularCheckup";
 import VitalOrganCheckup from "./vitalOrganCheckUp/VitalOrganCheckup";
 import HealthyBodyCheckup from "./healthyBodyCheckup/HealthyBodyCheckup";
 import Footer4 from "../../layout/Footer/Footer4";
-import FAQ from "./faqs/FAQ";
+import FaqSection from "../Common/FaqSection";
+import { getFaqsForTopic } from "../../../data/faqs";
 import { storeLabTestCategory } from "./common/CommonMethod";
 import { useEffect, useState } from "react";
 import { eventEmitter } from "../../constant";
@@ -23,6 +24,9 @@ import AnimatedSection from "../../../public/animation/animationSection/Animated
 
 export default function HomepageComp() {
   const router = useRouter();
+
+  // FAQs for lab tests only - the group data/faqs.js defines for this topic.
+  const labFaqs = getFaqsForTopic("lab-test");
 
   const handleLocationClick = () => {
     // Your location click handler logic
@@ -68,7 +72,16 @@ export default function HomepageComp() {
           <AnimatedSection animation="fadeInUp" delay={0.1}>
             <Row>
               <Col>
-                <FAQ />
+                {/* Same lab-test answers as the matching block on /faqs, from
+                    data/faqs.js - the old Orange Health Labs copy is gone. */}
+                {labFaqs ? (
+                  <FaqSection
+                    items={labFaqs.items}
+                    title="Frequently Asked Questions"
+                    headingId="faq-lab-test"
+                    seeAllHref={`/faqs#${labFaqs.anchor}`}
+                  />
+                ) : null}
               </Col>
             </Row>
           </AnimatedSection>

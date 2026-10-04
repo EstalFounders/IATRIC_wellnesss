@@ -1,5 +1,5 @@
 import React from "react";
-import { contact_no, email } from "../../constant";
+import { contact_no, email, color_schema } from "../../constant";
 
 const PrivacyPolicy = () => (
   <div className="container py-5" style={{ maxWidth: 800, margin: "0 auto" }}>
@@ -118,11 +118,11 @@ const PrivacyPolicy = () => (
     <h2>11. Contact</h2>
     <p>
       For privacy questions or requests, contact us at{" "}
-      <a href={`mailto:${email}`} style={{ color: "#3b5f1d", fontWeight: 700 }}>
+      <a href={`mailto:${email}`} style={{ color: color_schema.green, fontWeight: 700 }}>
         {email}
       </a>{" "}
       or through WhatsApp at{" "}
-      <a href={`tel:${contact_no}`} style={{ color: "#3b5f1d", fontWeight: 700 }}>
+      <a href={`tel:${contact_no}`} style={{ color: color_schema.green, fontWeight: 700 }}>
         {contact_no}
       </a>
       .

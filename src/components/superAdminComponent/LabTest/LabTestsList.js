@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ItemCard from "./LabTestItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../helper";
+import { color_schema } from "../../../constant";
 
 const LabTestList = ({ data, onStatusChanged, onUpdateStatus }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,22 +31,22 @@ const LabTestList = ({ data, onStatusChanged, onUpdateStatus }) => {
           }}
           className="mt-4"
         >
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Payment Status</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Booking Time</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Price</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Mobile Number</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Booking Status</b>
           </Col>
         </Row>

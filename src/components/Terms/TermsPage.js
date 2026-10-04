@@ -1,5 +1,5 @@
 import React from "react";
-import { address, contact_no, email } from "../../constant";
+import { address, contact_no, email, color_schema } from "../../constant";
 
 const website_url = "https://www.healthpath.co.in";
 
@@ -130,7 +130,7 @@ const TermsPage = () => (
         Phone / WhatsApp:{" "}
         <a
           href={`tel:${contact_no}`}
-          style={{ color: "#3b5f1d", fontWeight: 700 }}
+          style={{ color: color_schema.green, fontWeight: 700 }}
         >
           {contact_no}
         </a>
@@ -139,7 +139,7 @@ const TermsPage = () => (
         Email:{" "}
         <a
           href={`mailto:${email}`}
-          style={{ color: "#3b5f1d", fontWeight: 700 }}
+          style={{ color: color_schema.green, fontWeight: 700 }}
         >
           {email}
         </a>
@@ -150,7 +150,7 @@ const TermsPage = () => (
           href={website_url}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "#3b5f1d", fontWeight: 700 }}
+          style={{ color: color_schema.green, fontWeight: 700 }}
         >
           www.healthpath.co.in
         </a>

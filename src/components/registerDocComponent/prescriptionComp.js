@@ -7,11 +7,7 @@ import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import {
-  api,
-  appointment_status,
-  doctor_info_local_storage,
-} from "../../constant";
+import { api, appointment_status, doctor_info_local_storage, color_schema } from "../../constant";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
 import { useSelector } from "react-redux";
@@ -428,7 +424,7 @@ const PrescriptionComp = () => {
       }}
     >
       <h1
-        style={{ marginBottom: "30px", color: "#3b5f1d" }}
+        style={{ marginBottom: "30px", color: color_schema.green }}
         className="text-center"
       >
         <b>

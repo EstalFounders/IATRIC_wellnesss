@@ -4,12 +4,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
+import { formatLanguagesLabel } from "../../customUtils/languages";
 
 const Doctor1Details = () => {
   const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo);
   const {
     name,
-    degree,
     expertise,
     educationTraining,
     diplomasCertificatesUrls,
@@ -35,9 +35,7 @@ const Doctor1Details = () => {
               <div className="doctor-data white-color">
                 {/* Name */}
                 <h2 className="h2-xs">Dr. {name}</h2>
-                <h5 className="h5-md">
-                  {degree} | {expertise}
-                </h5>
+                <h5 className="h5-md">{expertise}</h5>
               </div>
             </div>
           </div>
@@ -67,10 +65,6 @@ const Doctor1Details = () => {
                   <table className="table table-striped">
                     <tbody>
                       <tr>
-                        <td>Degrees</td>
-                        <td>{degree}</td>
-                      </tr>
-                      <tr>
                         <td>Areas of Expertise</td>
                         <td>
                           {serviceOffered.map((service, index) => (
@@ -83,7 +77,7 @@ const Doctor1Details = () => {
                       </tr>
                       <tr>
                         <td>Language(s)</td>
-                        <td>English / Spanish / German</td>
+                        <td>{formatLanguagesLabel(language)}</td>
                       </tr>
                       <tr className="last-tr">
                         <td>Work Days</td>

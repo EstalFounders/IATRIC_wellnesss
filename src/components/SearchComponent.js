@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { Padding } from "@mui/icons-material";
 import { useEffect, useRef } from "react";
+import { color_schema } from "../constant";
 
 const SearchDropdown = ({
   results,
@@ -77,7 +78,7 @@ const SearchDropdown = ({
             </div>
             <div
               className="small mb-2"
-              style={{ fontSize: "0.85rem", fontColor: "#8e8333" }}
+              style={{ fontSize: "0.85rem", fontColor: color_schema.yellow }}
             >
               {result.item.category}
             </div>

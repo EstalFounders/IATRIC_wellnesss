@@ -1,118 +1,233 @@
-import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkedAlt } from "react-icons/fa";
+import { FaPhoneVolume } from "react-icons/fa6";
+import { MdEmail } from "react-icons/md";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { ConsultationButton } from "../Common/commonUi";
+import PopupDialog from "../Common/PopupDialog";
+import CircleLoader from "../circleLoader";
+import {
+  Linkdn_url,
+  address,
+  api,
+  booking_btn_txt,
+  contact_no,
+  email,
+  facebook_page_url,
+  instagram_page_url,
+} from "../../constant";
+import { dial, isMobileValid, openSupportWhatsAppWeb } from "../../helper";
+
+// Same rule the API uses to decide whether the single "phone or email" input
+// holds an email address or a phone number.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// The contact details mirror `src/layout/Footer/Footer4.js` (links + labels);
+// only the icon colours differ, because this section sits on a light background
+// while the footer is white-on-dark.
+const SOCIAL_LINKS = [
+  {
+    title: "Facebook",
+    href: facebook_page_url,
+    Icon: FaFacebook,
+    color: "#1877f2",
+  },
+  {
+    title: "Instagram",
+    href: instagram_page_url,
+    Icon: FaInstagram,
+    color: "#e1306c",
+  },
+  { title: "Linkedin", href: Linkdn_url, Icon: FaLinkedin, color: "#0a66c2" },
+];
+
+const EMPTY_FORM = { name: "", contact: "", message: "" };
 
 const Contacts02 = () => {
   const { t } = useLanguage();
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ ok: false, text: "" });
+  const [isDialDialogOpen, setIsDialDialogOpen] = useState(false);
+
+  // Same two options the footer offers for the phone number.
+  const dialOptions = [
+    { label: t("footer.dial"), action: dial, icon: 0 },
+    { label: t("footer.whatsapp"), action: openSupportWhatsAppWeb, icon: 1 },
+  ];
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  /**
+   * The form collects exactly three compulsory fields (name, phone-or-email,
+   * message). The `required` attributes cover the empty case for the browser and
+   * the checks below re-assert it, then the single contact value is split into
+   * `email` or `mobile_number` - the shape `POST /api/userQuery` expects.
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const name = formData.name.trim();
+    const contact = formData.contact.trim();
+    const message = formData.message.trim();
+
+    if (!name || !contact || !message) {
+      setStatus({ ok: false, text: t("contacts2.errRequired") });
+      return;
+    }
+
+    const isEmail = EMAIL_REGEX.test(contact);
+    const mobileDigits = contact.replace(/\D/g, "").slice(-10);
+
+    if (!isEmail && !isMobileValid(mobileDigits)) {
+      setStatus({ ok: false, text: t("contacts2.errContact") });
+      return;
+    }
+
+    const payload = { name, message };
+    if (isEmail) {
+      payload.email = contact.toLowerCase();
+    } else {
+      payload.mobile_number = Number(mobileDigits);
+    }
+
+    setLoading(true);
+    setStatus({ ok: false, text: "" });
+
+    try {
+      const res = await fetch(api.userQuery, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Request failed");
+
+      setStatus({ ok: true, text: t("contacts2.okSaved") });
+      setFormData(EMPTY_FORM);
+    } catch {
+      setStatus({ ok: false, text: t("contacts2.errFailed") });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section id="contacts-2" className="wide-60 contacts-section division">
       <div className="container">
+        {/* PAGE HEADING + CALLS TO ACTION */}
+        <div className="contacts2-header">
+          <h2 className="h2-xl steelblue-color contacts2-heading">
+            {t("contacts2.heading", "Contact Us")}
+          </h2>
+          {/* Vertical CTA column: primary booking + secondary careers */}
+          <div className="contacts2-actions">
+            <ConsultationButton variant="book-now" path="/appointment">
+              {booking_btn_txt}
+            </ConsultationButton>
+            <ConsultationButton variant="outline" path="/join-us">
+              {t("contacts2.workWithUs", "Work With Us")}
+            </ConsultationButton>
+          </div>
+        </div>
+
         <div className="row">
-          {/* CONTACTS INFO */}
+          {/* CONTACT DETAILS (footer content: reach us + hours + socials) */}
           <div className="col-lg-7">
-            {/* Title*/}
+            {/* Headline + description */}
             <h4 className="h4-md steelblue-color">
-              {t("contacts2.title")}
+              {t(
+                "contacts2.title",
+                "Have a Question? We Review and Accept Patients Requests on 24/7 Basis."
+              )}
             </h4>
-            {/* Text*/}
             <p className="contact-notice">{t("contacts2.notice")}</p>
             <div className="row">
-              {/* CITY CONTACT DATA */}
+              {/* REACH US */}
               <div className="col-md-6">
                 <div className="contact-box mb-40">
-                  {/* City */}
-                  <h5 className="h5-sm steelblue-color">Sydney</h5>
-                  <p>121 King Street, Melbourne,</p>
-                  <p>Victoria 3000 Australia</p>
-                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
-                  <p>
-                    {t("contacts2.emailLabel")}
-                    <Link legacyBehavior href="#">
-                      <a
-                        href="mailto:yourdomain@mail.com"
-                        className="blue-color"
-                      >
-                        hello@yourdomain.com
-                      </a>
-                    </Link>
+                  <h5 className="h5-sm steelblue-color">
+                    {t("footer.reachUs")}
+                  </h5>
+                  {/* Address */}
+                  <p className="contacts2-info-line">
+                    <FaMapMarkedAlt size={20} />
+                    <span>{t("footer.address", address)}</span>
+                  </p>
+                  {/* Email */}
+                  <p className="contacts2-info-line">
+                    <MdEmail size={20} />
+                    <a href={`mailto:${email}`} className="blue-color">
+                      {email}
+                    </a>
+                  </p>
+                  {/* Phone -> dial / whatsapp, exactly like Footer4 */}
+                  <p className="contacts2-info-line">
+                    <FaPhoneVolume size={20} />
+                    <a
+                      href={`tel:${contact_no.replace(/\s/g, "")}`}
+                      className="blue-color"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsDialDialogOpen(true);
+                      }}
+                    >
+                      {contact_no}
+                    </a>
                   </p>
                 </div>
               </div>
-              {/* CITY CONTACT DATA */}
+              {/* WORKING HOURS + SOCIALS */}
               <div className="col-md-6">
                 <div className="contact-box mb-40">
-                  {/* City */}
-                  <h5 className="h5-sm steelblue-color">Melbourne</h5>
-                  <p>121 King Street, Melbourne,</p>
-                  <p>Victoria 3000 Australia</p>
-                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
-                  <p>
-                    {t("contacts2.emailLabel")}
-                    <Link legacyBehavior href="#">
-                      <a
-                        href="mailto:yourdomain@mail.com"
-                        className="blue-color"
-                      >
-                        hello@yourdomain.com
-                      </a>
-                    </Link>
-                  </p>
+                  <h5 className="h5-sm steelblue-color">
+                    {t("footer.workingHours")}
+                  </h5>
+                  <p>{t("footer.days")}</p>
+                  <p>{t("footer.hours")}</p>
                 </div>
-              </div>
-              {/* CITY CONTACT DATA */}
-              <div className="col-md-6">
                 <div className="contact-box mb-40">
-                  {/* City */}
-                  <h5 className="h5-sm steelblue-color">Brisbane</h5>
-                  <p>121 King Street, Melbourne,</p>
-                  <p>Victoria 3000 Australia</p>
-                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
-                  <p>
-                    {t("contacts2.emailLabel")}
-                    <Link legacyBehavior href="#">
+                  <h5 className="h5-sm steelblue-color">
+                    {t("footer.followUs")}
+                  </h5>
+                  <div className="contacts2-socials">
+                    {SOCIAL_LINKS.map(({ title, href, Icon, color }) => (
                       <a
-                        href="mailto:yourdomain@mail.com"
-                        className="blue-color"
+                        key={title}
+                        className={`${title.toLowerCase()}icon`}
+                        title={title}
+                        target="blank"
+                        rel="noreferrer"
+                        href={href}
                       >
-                        hello@yourdomain.com
+                        <Icon size={32} color={color} />
+                        <span className="mobiletext02">{title}</span>
                       </a>
-                    </Link>
-                  </p>
-                </div>
-              </div>
-              {/* CITY CONTACT DATA */}
-              <div className="col-md-6">
-                <div className="contact-box mb-40">
-                  {/* City */}
-                  <h5 className="h5-sm steelblue-color">Adelaide</h5>
-                  <p>121 King Street, Melbourne,</p>
-                  <p>Victoria 3000 Australia</p>
-                  <p>{t("contacts2.phoneLabel")} 1-(800)-569-7890</p>
-                  <p>
-                    {t("contacts2.emailLabel")}
-                    <Link legacyBehavior href="#">
-                      <a
-                        href="mailto:yourdomain@mail.com"
-                        className="blue-color"
-                      >
-                        hello@yourdomain.com
-                      </a>
-                    </Link>
-                  </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* END CONTACTS INFO */}
-          {/* CONTACT FORM */}
+          {/* END CONTACT DETAILS */}
+
+          {/* CONTACT FORM (name + phone/email + message only) */}
           <div className="col-lg-5">
             <div className="form-holder mb-40">
               <form
                 name="contactForm"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleSubmit}
                 className="row contact-form"
               >
-                {/* Contact Form Input */}
+                {/* Name */}
                 <div id="input-name" className="col-md-12">
                   <input
                     type="text"
@@ -120,49 +235,23 @@ const Contacts02 = () => {
                     className="form-control name"
                     placeholder={t("contacts2.phName")}
                     required
+                    value={formData.name}
+                    onChange={handleInputChange}
                   />
                 </div>
-                <div id="input-email" className="col-md-12">
+                {/* Single compulsory phone OR email input */}
+                <div id="input-contact" className="col-md-12">
                   <input
                     type="text"
-                    name="email"
-                    className="form-control email"
-                    placeholder={t("contacts2.phEmail")}
+                    name="contact"
+                    className="form-control contact"
+                    placeholder={t("contacts2.phContact")}
                     required
+                    value={formData.contact}
+                    onChange={handleInputChange}
                   />
                 </div>
-                <div id="input-phone" className="col-md-12">
-                  <input
-                    type="tel"
-                    name="phone"
-                    className="form-control phone"
-                    placeholder={t("contacts2.phPhone")}
-                    required
-                  />
-                </div>
-                {/* Form Select */}
-                <div id="input-patient" className="col-md-12 input-patient">
-                  <select
-                    id="inlineFormCustomSelect3"
-                    name="patient"
-                    className="custom-select patient"
-                    required
-                  >
-                    <option>{t("contacts2.optVisited")}</option>
-                    <option>{t("contacts2.optNew")}</option>
-                    <option>{t("contacts2.optReturning")}</option>
-                    <option>{t("contacts2.optOther")}</option>
-                  </select>
-                </div>
-                <div id="input-subject" className="col-md-12">
-                  <input
-                    type="text"
-                    name="subject"
-                    className="form-control subject"
-                    placeholder={t("contacts2.phSubject")}
-                    required
-                  />
-                </div>
+                {/* Message */}
                 <div id="input-message" className="col-md-12 input-message">
                   <textarea
                     className="form-control message"
@@ -170,25 +259,34 @@ const Contacts02 = () => {
                     rows={6}
                     placeholder={t("contacts2.phMessage")}
                     required
-                    defaultValue=""
+                    value={formData.message}
+                    onChange={handleInputChange}
                   />
                 </div>
                 {/* Contact Form Button */}
-                <div className="col-lg-12 mt-15 form-btn">
+                <div className="col-lg-12 mt-15 form-btn d-flex align-items-center">
                   <button
                     type="submit"
                     className="btn btn-blue blue-hover submit"
+                    disabled={loading}
                   >
                     {t("contacts2.submit")}
                   </button>
-                </div>
-                {/* Contact Form Message */}
-                <div className="col-md-12 contact-form-msg text-center">
-                  <div className="sending-msg">
-                    <span className="loading" />
-                  </div>
+                  {loading ? (
+                    <div className="ml-3">
+                      <CircleLoader />
+                    </div>
+                  ) : null}
                 </div>
               </form>
+              {/* Contact Form Message */}
+              <div
+                className={`contacts2-form-status text-center font-weight-bold ${
+                  status.ok ? "text-success" : "text-danger"
+                }`}
+              >
+                {status.text}
+              </div>
             </div>
           </div>
           {/* END CONTACT FORM */}
@@ -196,8 +294,14 @@ const Contacts02 = () => {
         {/* End row */}
       </div>
       {/* End container */}
+      <PopupDialog
+        isOpen={isDialDialogOpen}
+        onClose={() => setIsDialDialogOpen(false)}
+        options={dialOptions}
+      />
     </section>
   );
 };
 
 export default Contacts02;
+

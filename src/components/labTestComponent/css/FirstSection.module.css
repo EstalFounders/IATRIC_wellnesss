@@ -39,7 +39,7 @@
   flex-wrap: wrap;
   border-radius: 20px;
   
-  border: 1px solid #3b5f1d;
+  border: 1px solid var(--color-primary);
   @media (max-width: 768px) {
     margin-top: 5%;
   }
@@ -54,18 +54,18 @@
   font-size: 14px;
   font-weight: 700;
   border-radius: 10px;
-  border: 1px solid #8e8333;
+  border: 1px solid var(--color-secondary);
 }
 
 .searchBar:focus {
   outline: none; /* Removes the default blue outline */
-  border-color: #8e8333; /* Changes the border color to a shade of green */
+  border-color: var(--color-secondary); /* Changes the border color to a shade of green */
   box-shadow: 0 0 0 3px rgba(142, 131, 51, 1) 
   /* You can adjust the color and size of the box-shadow as needed */
 }
 
 .searchIcon {
-  background: #3b5f1d;
+  background: var(--color-primary);
   width: 56px;
   height: 58px;
   padding: 17.5px 17px 16.5px 15px;
@@ -83,7 +83,7 @@ padding: 8px;
 gap: 10px;
 border-radius: 8px;
 border: 10px 0px 0px 0px;
-background-color: #3b5f1d;
+background-color: var(--color-primary);
 /* border: 10px solid #8e8333, */
 
 }
@@ -129,7 +129,7 @@ background-color: #3b5f1d;
 
 .viewAllLink {
   padding: 10px;
-  color: #8e8333;
+  color: var(--color-secondary);
   font-weight: bold;
   cursor: pointer;
   text-align: center;
@@ -138,7 +138,7 @@ background-color: #3b5f1d;
 }
 
 .viewAllLink a {
-  color: #8e8333;
+  color: var(--color-secondary);
   font-weight: bold;
   text-decoration: none;
 }
@@ -159,7 +159,7 @@ background-color: #3b5f1d;
   padding: 5px 10px;
   font-size: 12px;
   background-color: white;
-  color: #3b5f1d;
+  color: var(--color-primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -170,6 +170,6 @@ background-color: #3b5f1d;
 }
 
 .itemButton:hover {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   color: white;
 }

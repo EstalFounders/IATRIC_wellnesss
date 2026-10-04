@@ -11,6 +11,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { LanguageProvider } from "../src/i18n/LanguageContext";
 import LanguageToggle from "../src/components/Common/LanguageToggle";
 import SeoMetadata from "../src/marketing/components/SeoMetadata";
+import PageStructuredData from "../src/components/Common/PageStructuredData";
 
 function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
@@ -41,6 +42,8 @@ function MyApp({ Component, pageProps, ...rest }) {
       </Head>
       {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
       <SeoMetadata metadata={pageProps?.seoMetadata} />
+      {/* Same reason: JSON-LD has to be in the HTML, not added after hydration. */}
+      <PageStructuredData />
       {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>

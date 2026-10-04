@@ -103,7 +103,7 @@
 }
 
 .saveBtn {
-  background: #3b5f1d;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 8px 24px;
@@ -192,7 +192,7 @@
 }
 
 .toggleSwitch input:checked + .slider {
-  background: #3b5f1d;
+  background: var(--color-primary);
 }
 
 .slider::before {

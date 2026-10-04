@@ -1,6 +1,13 @@
 // components/IconRenderer.jsx
 import React from "react";
-import { GeneralPhysician } from "../../../public/svgIcon/all-department-svg-icon";
+import {
+  GeneralPhysician,
+  PhysiotherapyIcon,
+  NursingCareIcon,
+  MedicineDelivery,
+  LabInvestigation,
+  HomeCareIcon,
+} from "../../../public/svgIcon/all-department-svg-icon";
 import {
   AudioIcon,
   VideoIcon,
@@ -34,6 +41,25 @@ const iconMap = {
   session: TrainingIcon,
   training: TrainingIcon,
   audits: TrainingIcon,
+  // Corporate-healthcare services
+  emergency: ClinicIcon,
+  physiotherapy: PhysiotherapyIcon,
+  doctor: GeneralPhysician,
+  "health package": EquipmentIcon,
+  // Home-care services (one icon per card of the Home Care branch)
+  "doctor home visit": HomeVisitIcon,
+  "nursing care": NursingCareIcon,
+  "medicine delivery": MedicineDelivery,
+  "lab sample collection": LabInvestigation,
+  "support at home": HomeCareIcon,
+  // Nursing-care procedures (drawn with the closest existing icon set)
+  "iv drip": LabTestIcon,
+  injection: LabTestIcon,
+  vaccination: LabTestIcon,
+  "post operation": ClinicIcon,
+  "wound care": ClinicIcon,
+  "elderly care": GDAIcon,
+  "patient care": GDAIcon,
   // ...more mappings
 };
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Form } from "react-bootstrap";
-import { api, marketing_info_local_storage } from "../../constant";
+import { api, marketing_info_local_storage, color_schema } from "../../constant";
 import styles from "./css/marketingPanel.module.css";
 
 const MarketingLogin = () => {
@@ -122,7 +122,7 @@ const MarketingLogin = () => {
             type="submit"
             disabled={loading}
             className="w-100"
-            style={{ backgroundColor: "#3b5f1d", border: "none" }}
+            style={{ backgroundColor: color_schema.green, border: "none" }}
           >
             <strong>{loading ? "Signing in…" : "Sign in"}</strong>
           </Button>

@@ -11,7 +11,7 @@
   gap: 16px;
   flex-wrap: wrap;
   padding: 14px 24px;
-  background: #3b5f1d;
+  background: var(--color-primary);
   color: #ffffff;
 }
 
@@ -90,7 +90,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   background: #eef3e6;
-  color: #3b5f1d;
+  color: var(--color-primary);
   white-space: nowrap;
 }
 
@@ -176,7 +176,7 @@
   display: grid;
   grid-template-columns: minmax(300px, 380px) 1fr;
   gap: 18px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 @media (max-width: 860px) {
@@ -202,7 +202,7 @@
   margin-top: 12px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #3b5f1d;
+  color: var(--color-primary);
 }
 
 

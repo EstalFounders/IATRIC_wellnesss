@@ -109,56 +109,56 @@ line-height: 30px;
 /* ------------------------------------------------------------------ */
 
 .label {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.3;
   color: #334155;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.3rem;
 }
 
 /* The site stylesheet forces `.appointment-form .form-control{height:54px;
    font-size:16px;line-height:1;padding:4px 15px}` and lets the +91 prefix grow
-   freely, so both sides of the mobile group are normalised to one compact height. */
+   freely, so both sides of the mobile group are normalised to one tall height. */
 .field :global(.form-control) {
-  height: 34px !important;
+  height: 46px !important;
   min-height: 0 !important;
-  padding: 0 0.6rem !important;
+  padding: 0 0.9rem !important;
   margin-bottom: 0 !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   line-height: 1.4 !important;
   border-color: #e2e8f0;
 }
 
 .field :global(.input-group-prepend) {
-  height: 34px !important;
+  height: 46px !important;
   min-height: 0 !important;
 }
 
 .field :global(.input-group-prepend) :global(.input-group-text) {
-  height: 34px !important;
+  height: 46px !important;
   min-height: 0 !important;
   display: flex !important;
   align-items: center !important;
-  padding: 0 0.6rem !important;
-  font-size: 0.875rem !important;
+  padding: 0 0.9rem !important;
+  font-size: 1rem !important;
   line-height: 1.4 !important;
 }
 
 .field :global(.form-control:focus) {
-  border-color: #3b5f1d;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 0.12rem rgba(59, 95, 29, 0.14);
 }
 
 /* Reason for Consultation — outline pills */
 .pill {
   border-radius: 999px !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   line-height: 1.4 !important;
-  padding: 0.2rem 0.65rem !important;
+  padding: 0.4rem 0.9rem !important;
   border: 1px solid #e2e8f0 !important;
   background-color: #ffffff !important;
   color: #475569 !important;
-  margin: 0 0.3rem 0.3rem 0 !important;
+  margin: 0 0.4rem 0.4rem 0 !important;
   box-shadow: none !important;
   transition: border-color 0.15s ease, background-color 0.15s ease,
     color 0.15s ease, box-shadow 0.15s ease;
@@ -168,16 +168,16 @@ line-height: 30px;
    (specificity 0,3,0) outranks a plain class, so the brand hover/selected
    states below are intentionally over-specific to keep contrast readable. */
 .pill.pill.pill:hover:not(.pillOn) {
-  border-color: #3b5f1d !important;
+  border-color: var(--color-primary) !important;
   background-color: #ffffff !important;
-  color: #3b5f1d !important;
+  color: var(--color-primary) !important;
 }
 
 .pillOn.pillOn.pillOn,
 .pillOn.pillOn.pillOn:hover {
-  border-color: #3b5f1d !important;
+  border-color: var(--color-primary) !important;
   background-color: #f7f8ee !important;
-  color: #3b5f1d !important;
+  color: var(--color-primary) !important;
   font-weight: 700 !important;
   box-shadow: 0 0 0 2px rgba(59, 95, 29, 0.12) !important;
 }
@@ -185,9 +185,9 @@ line-height: 30px;
 /* Consultation type / Timing — subtle outline tiles */
 .seg {
   border-radius: 10px !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   line-height: 1.4 !important;
-  padding: 0.3rem 0.5rem !important;
+  padding: 0.6rem 0.7rem !important;
   border: 1px solid #e2e8f0 !important;
   background-color: #ffffff !important;
   color: #475569 !important;
@@ -197,16 +197,16 @@ line-height: 30px;
 }
 
 .seg.seg.seg:hover:not(.segOn) {
-  border-color: #3b5f1d !important;
+  border-color: var(--color-primary) !important;
   background-color: #ffffff !important;
-  color: #3b5f1d !important;
+  color: var(--color-primary) !important;
 }
 
 .segOn.segOn.segOn,
 .segOn.segOn.segOn:hover {
-  border-color: #3b5f1d !important;
+  border-color: var(--color-primary) !important;
   background-color: #f7f8ee !important;
-  color: #3b5f1d !important;
+  color: var(--color-primary) !important;
   font-weight: 600 !important;
   box-shadow: 0 0 0 2px rgba(142, 131, 51, 0.18) !important;
 }
@@ -220,7 +220,7 @@ line-height: 30px;
   font-weight: 600 !important;
   letter-spacing: 0.01em !important;
   color: #ffffff !important;
-  background-color: #3b5f1d !important;
+  background-color: var(--color-primary) !important;
   background-image: none !important;
   box-shadow: 0 2px 10px rgba(59, 95, 29, 0.25) !important;
   transition: background-color 0.2s ease, box-shadow 0.2s ease,
@@ -241,11 +241,11 @@ line-height: 30px;
 
 /* Scrollable option list (Reason for Consultation) */
 .optionArea {
-  max-height: 88px;
+  max-height: 150px;
   overflow-y: auto;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 0.4rem 0.4rem 0.05rem 0.4rem;
+  padding: 0.55rem 0.55rem 0.15rem 0.55rem;
   background-color: #ffffff;
   scrollbar-width: thin;
 }
@@ -270,7 +270,7 @@ line-height: 30px;
   position: relative !important;
   height: auto !important;
   min-height: 0 !important;
-  padding: 0.25rem 0.65rem !important;
+  padding: 0.4rem 0.9rem !important;
   line-height: 1.35 !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -281,7 +281,7 @@ line-height: 30px;
   position: relative !important;
   height: auto !important;
   min-height: 0 !important;
-  padding: 0.3rem 0.5rem !important;
+  padding: 0.6rem 0.7rem !important;
   line-height: 1.35 !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -308,8 +308,8 @@ line-height: 30px;
 }
 
 /* ConsultationButton's shared `.consultation-btn` is a 24px/font CTA; inside this
-   form it stays small and is centred in its wrapper (it has no className prop of
-   its own, hence the descendant override). */
+   form it stays full-size and is centred in its wrapper (it has no className prop
+   of its own, hence the descendant override). */
 .ctaWrap {
   text-align: center;
 }
@@ -317,11 +317,29 @@ line-height: 30px;
 .ctaWrap :global(.consultation-btn) {
   display: inline-block;
   width: auto;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  padding: 9px 22px;
-  border-radius: 8px;
+  padding: 13px 34px;
+  border-radius: 10px;
   box-shadow: none;
   margin-top: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Appointment form — overall scale (wide card, tall fields)            */
+/* ------------------------------------------------------------------ */
+
+/* Card metrics live here instead of inline in `Appointmentform.js`: an inline
+   `max-width` cannot be overridden by a stylesheet rule, and the form has to
+   fold back to full width once the two-column layout stops fitting. */
+.card {
+  width: 100%;
+  max-width: 1040px;
+}
+
+@media (max-width: 991.98px) {
+  .card {
+    max-width: 100%;
+  }
 }
 

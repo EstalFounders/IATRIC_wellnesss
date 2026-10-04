@@ -13,7 +13,15 @@
     "tasks:process": "node scripts/runSheetTasks.js",
     "tasks:process:dry": "node scripts/runSheetTasks.js --dry-run --limit=10",
     "db:clean-education": "node scripts/cleanDoctorEducation.js",
-    "db:clean-education:apply": "node scripts/cleanDoctorEducation.js --apply"
+    "db:clean-education:apply": "node scripts/cleanDoctorEducation.js --apply",
+    "db:clean-languages": "node scripts/cleanDoctorLanguages.js",
+    "db:clean-languages:apply": "node scripts/cleanDoctorLanguages.js --apply",
+    "db:remove-degree": "node scripts/removeDoctorDegree.js",
+    "db:remove-degree:apply": "node scripts/removeDoctorDegree.js --apply",
+    "db:seed-service-tab": "node scripts/seedServiceOfferedContent.js",
+    "db:seed-service-tab:apply": "node scripts/seedServiceOfferedContent.js --apply",
+    "db:update-service-desc": "node scripts/updateServiceOfferedDescription.js",
+    "db:update-service-desc:apply": "node scripts/updateServiceOfferedDescription.js --apply"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",

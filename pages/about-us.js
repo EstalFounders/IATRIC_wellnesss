@@ -3,7 +3,6 @@ import { getSeoStaticProps } from "../src/api/marketing/helpers/seoServer";
 // Marketing panel SEO: tags are part of the built HTML (60s refresh).
 export const getStaticProps = () => getSeoStaticProps("/about-us");
 
-
 import AboutUsInfo4 from "../src/components/About-us/AboutUsInfo4";
 import AboutUsVideo2 from "../src/components/About-us/AboutUsVideo2";
 import Banner5 from "../src/components/Common/Banner-5";
@@ -12,6 +11,9 @@ import Statistic1 from "../src/components/Common/Statistic-1";
 import Layouts from "../src/layout/Layouts";
 import PageBanner from "../src/layout/PageBanner";
 
+// Headings/structured data: the page H1 lives in <AboutUsInfo4>. This route's
+// JSON-LD is in src/components/Common/PageStructuredData.js, which _app renders
+// outside <NoSsr> so it is part of the SSR HTML.
 const AboutUs = () => {
   return (
     <Layouts>

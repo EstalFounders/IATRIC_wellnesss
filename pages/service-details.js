@@ -44,4 +44,12 @@ const AboutUs = () => {
   );
 };
 
+// Server-rendered so the first HTML already carries this service's FAQPage
+// JSON-LD: PageStructuredData (rendered outside <NoSsr> in _app.js) reads
+// router.query, which is only populated for a server-rendered request. The page
+// body stays client-only (NoSsr + redux).
+export async function getServerSideProps() {
+  return { props: {} };
+}
+
 export default AboutUs;

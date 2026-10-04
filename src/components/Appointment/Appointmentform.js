@@ -12,12 +12,7 @@ import {
 import { useLanguage } from "../../i18n/LanguageContext";
 import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
-import {
-  CHOOSE_TIME,
-  IS_NOW,
-  price_symbol,
-  superAdminConsultationtype,
-} from "../../constant";
+import { CHOOSE_TIME, IS_NOW, price_symbol, superAdminConsultationtype, color_schema } from "../../constant";
 import { useGlobalData } from "../../customUtils/useGlobalData";
 import { formatTime } from "../helper";
 
@@ -177,18 +172,16 @@ const AppointmentForm = ({
 
   return (
     <Card
-      className="border-0 mx-auto"
+      className={`border-0 mx-auto ${styles.card}`}
       style={{
-        maxWidth: 780,
-        width: "100%",
         borderRadius: 14,
         boxShadow: "0 6px 24px rgba(15, 23, 42, 0.08)",
       }}
     >
-      <Card.Body className="p-2" style={{ fontSize: "0.9375rem" }}>
+      <Card.Body className="p-3 p-md-4" style={{ fontSize: "1rem" }}>
         <h4
-          className="text-center mb-2"
-          style={{ fontWeight: 600, color: "#0f172a" }}
+          className="text-center mb-3"
+          style={{ fontWeight: 600, color: "#0f172a", fontSize: "1.6rem" }}
         >
           {t("af.title")}
         </h4>
@@ -226,9 +219,9 @@ const AppointmentForm = ({
                   <InputGroup.Prepend>
                     <InputGroup.Text
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: "1rem",
                         fontWeight: 600,
-                        color: "#3b5f1d",
+                        color: color_schema.green,
                         background: "#f7f8ee",
                         borderColor: "#e2e8f0",
                       }}
@@ -311,7 +304,7 @@ const AppointmentForm = ({
                     size="sm"
                     className="mt-2"
                     placeholder={t("af.symptoms")}
-                    style={{ fontSize: "0.9375rem" }}
+                    style={{ fontSize: "1rem" }}
                     value={appointmentState.symptoms}
                     onChange={handleDescriptionChange}
                   />
@@ -436,7 +429,7 @@ const AppointmentForm = ({
                       ) : (
                         <small
                           className="text-muted"
-                          style={{ fontSize: "0.875rem" }}
+                          style={{ fontSize: "1rem" }}
                         >
                           {t("af.noSlots")}
                         </small>
@@ -508,7 +501,7 @@ const AppointmentForm = ({
                   ? setter.setAgreedToTerms(e.target.checked)
                   : null
               }
-              style={{ fontSize: "0.875rem", paddingLeft: 0 }}
+              style={{ fontSize: "1rem", paddingLeft: 0 }}
               label={
                 <span style={{ color: "#475569" }}>
                   {t("af.terms")}{" "}
@@ -517,7 +510,7 @@ const AppointmentForm = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={t("af.viewTerms")}
-                    style={{ color: "#3b5f1d", fontWeight: 600 }}
+                    style={{ color: color_schema.green, fontWeight: 600 }}
                   >
                     ↗
                   </a>
@@ -547,7 +540,7 @@ const AppointmentForm = ({
               dismissible
               onClose={handleCloseSnackBar}
               className="mt-2 mb-0"
-              style={{ fontSize: "0.875rem" }}
+              style={{ fontSize: "1rem" }}
             >
               {appointmentState.snackBarMessage}
             </Alert>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ItemCard from "./AppointmentItemCards";
 import { Col, Row, Pagination } from "react-bootstrap";
 import { CustomPagination } from "../../../helper";
+import { color_schema } from "../../../constant";
 
 const Appointments = ({ source,data, onStatusChanged, onUpdateStatus }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,25 +32,25 @@ const Appointments = ({ source,data, onStatusChanged, onUpdateStatus }) => {
           }}
           className="mt-4"
         >
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Consultation Type</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Appointment Time</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Booking Time</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Symptoms</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Mobile Number</b>
           </Col>
-          <Col style={{ color: "#8e8333" }}>
+          <Col style={{ color: color_schema.yellow }}>
             <b>Status</b>
           </Col>
         </Row>

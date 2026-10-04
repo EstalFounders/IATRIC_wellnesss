@@ -4,6 +4,7 @@
 // inline styles, the convention for every panel/tag UI (see WorkDaysPicker).
 import React from "react";
 import { MdDelete } from "react-icons/md";
+import { color_schema } from "../../constant";
 
 const rowStyle = {
   display: "flex",
@@ -39,10 +40,10 @@ const removeButtonStyle = (disabled) => ({
 const addButtonStyle = {
   marginTop: 4,
   padding: "8px 14px",
-  border: "1px solid #3b5f1d",
+  border: `1px solid ${color_schema.green}`,
   borderRadius: 5,
   background: "#fff",
-  color: "#3b5f1d",
+  color: color_schema.green,
   fontWeight: 600,
   fontSize: "0.9rem",
   cursor: "pointer",

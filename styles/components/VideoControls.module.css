@@ -34,19 +34,19 @@
 
 .controlBtnActive {
   background: #dcecd0;
-  color: #3b5f1d;
+  color: var(--color-primary);
 }
 
 .controlBtnOff {
   background: #f8f5eb;
-  color: #8e8333;
+  color: var(--color-secondary);
 }
 
 .controlBtnEnd {
   width: 52px;
   height: 44px;
   border-radius: 22px;
-  background: linear-gradient(135deg, #c3af5b 0%, #8e8333 100%);
+  background: linear-gradient(135deg, #c3af5b 0%, var(--color-secondary) 100%);
   color: #fff;
   font-size: 16px;
 }

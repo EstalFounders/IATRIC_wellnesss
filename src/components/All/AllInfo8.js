@@ -26,21 +26,21 @@ const AllInfo8 = () => {
                                         <td>Mon – Fri</td>
                                         <td> - </td>
                                         <td className="text-right">
-                                            8:00 AM - 8:00 PM
+                                            7:00 AM - 10:00 PM
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Saturday</td>
                                         <td>-</td>
                                         <td className="text-right">
-                                            10:00 AM - 6:00 PM
+                                            7:00 AM - 10:00 PM
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr className="last-tr">
                                         <td>Sunday</td>
                                         <td>-</td>
                                         <td className="text-right">
-                                            10:00 AM - 4:00 PM
+                                            7:00 AM - 10:00 PM
                                         </td>
                                     </tr>
                                 </tbody>

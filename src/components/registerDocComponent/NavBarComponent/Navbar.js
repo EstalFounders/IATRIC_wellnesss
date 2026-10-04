@@ -7,6 +7,7 @@ import { IconContext } from "react-icons";
 import Link from "next/link";
 import { SidebarData } from "./SideBarData";
 import { Col, Row } from "react-bootstrap";
+import { color_schema } from "../../../constant";
 
 function Navbar() {
   const [sidebar, setSidebar] = useState(false);
@@ -19,7 +20,7 @@ function Navbar() {
         <div className={styles.navbar}>
           <div className={styles["menu-bars"]}>
             <FaIcons.FaBars
-              color="#3b5f1d"
+              color={color_schema.green}
               size={30}
               onClick={showSidebar}
               className="ml-2"

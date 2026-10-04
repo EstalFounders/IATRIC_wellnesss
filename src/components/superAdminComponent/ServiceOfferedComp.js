@@ -5,6 +5,27 @@ import { api, serviceCategoryType } from "../../constant";
 import { Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
+// Blank shape of the "Add New Service" form. The tab-1 copy fields
+// (image / subheading / description + their Hindi counterparts) are optional but
+// render on the homepage speciality tabs.
+const EMPTY_SERVICE = {
+  name: "",
+  description: "",
+  subheading: "",
+  subheadingHi: "",
+  descriptionHi: "",
+  image: "",
+  hsn_percentage: "",
+  hsn_code: "",
+  share: "",
+  gst: "",
+  platformfee: "",
+  processingfee: "",
+  freight: "",
+  isActive: true,
+  categoryType: serviceCategoryType.MAJOR,
+};
+
 const ServiceOfferedComp = () => {
   const [loader, setLoader] = useState(false);
   const [service, setService] = useState([]);
@@ -14,19 +35,7 @@ const ServiceOfferedComp = () => {
   const [updateError, setUpdateError] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
   const [filterCategory, setFilterCategory] = useState("");
-  const [newService, setNewService] = useState({
-    name: "",
-    description: "",
-    hsn_percentage: "",
-    hsn_code: "",
-    share: "",
-    gst: "",
-    platformfee: "",
-    processingfee: "",
-    freight: "",
-    isActive: true,
-    categoryType: serviceCategoryType.MAJOR,
-  });
+  const [newService, setNewService] = useState({ ...EMPTY_SERVICE });
   const storedService = useSelector(
     (state) => state.superAdminHomePage.serviceOffered
   );
@@ -97,7 +106,7 @@ const ServiceOfferedComp = () => {
       })
       .then((data) => {
         setService((prev) => [...prev, data]);
-        setNewService({ name: "", fee: "", isActive: true, categoryType: serviceCategoryType.MAJOR });
+        setNewService({ ...EMPTY_SERVICE });
         setLoader(false);
         setError(null);
       })
@@ -299,6 +308,72 @@ const ServiceOfferedComp = () => {
                       />
                     </div>
 
+                    {/* Copy rendered by the homepage speciality tabs (Tabs-1). */}
+                    <div className={styles.editGroupFull}>
+                      <label className={styles.editLabel}>Image</label>
+                      <input
+                        className={styles.input}
+                        type="text"
+                        placeholder="/images/cardiology.jpg"
+                        value={editedService.image || ""}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, image: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Subheading</label>
+                      <input
+                        className={styles.input}
+                        type="text"
+                        placeholder="Subheading"
+                        value={editedService.subheading || ""}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, subheading: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroup}>
+                      <label className={styles.editLabel}>Subheading (Hindi)</label>
+                      <input
+                        className={styles.input}
+                        type="text"
+                        placeholder="हिंदी उपशीर्षक"
+                        value={editedService.subheadingHi || ""}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, subheadingHi: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroupFull}>
+                      <label className={styles.editLabel}>Description</label>
+                      <textarea
+                        className={styles.textarea}
+                        rows={4}
+                        placeholder="Paragraph shown on the homepage speciality tab"
+                        value={editedService.description || ""}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, description: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.editGroupFull}>
+                      <label className={styles.editLabel}>Description (Hindi)</label>
+                      <textarea
+                        className={styles.textarea}
+                        rows={4}
+                        placeholder="हिंदी विवरण"
+                        value={editedService.descriptionHi || ""}
+                        onChange={(e) =>
+                          setEditedService({ ...editedService, descriptionHi: e.target.value })
+                        }
+                      />
+                    </div>
+
                     <div className={styles.editGroupFull}>
                       <label className={styles.editLabel}>Category</label>
                       <select
@@ -400,6 +475,8 @@ const ServiceOfferedComp = () => {
                     {renderField("Platform Fee", service.platformfee)}
                     {renderField("Processing Fee", service.processingfee)}
                     {renderField("Freight", service.freight)}
+                    {renderField("Subheading", service.subheading)}
+                    {renderField("Image", service.image)}
                   </div>
 
                   {service.description && (
@@ -407,6 +484,15 @@ const ServiceOfferedComp = () => {
                       <div className={styles.fieldLabel}>Description</div>
                       <div className={styles.fieldValue}>
                         {service.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {service.descriptionHi && (
+                    <div className={styles.fieldDescription}>
+                      <div className={styles.fieldLabel}>Description (Hindi)</div>
+                      <div className={styles.fieldValue}>
+                        {service.descriptionHi}
                       </div>
                     </div>
                   )}
@@ -458,15 +544,63 @@ const ServiceOfferedComp = () => {
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={`${styles.formGroup} ${styles.formGroupFull}`}>
             <label>Description</label>
+            <textarea
+              className={styles.textarea}
+              name="description"
+              rows={4}
+              value={newService.description}
+              onChange={handleChange}
+              placeholder="Paragraph shown on the homepage speciality tab"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Subheading</label>
             <input
               className={styles.input}
               type="text"
-              name="description"
-              value={newService.description}
+              name="subheading"
+              value={newService.subheading}
               onChange={handleChange}
-              placeholder="Enter description"
+              placeholder="e.g., Primary Care, Always Accessible"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Subheading (Hindi)</label>
+            <input
+              className={styles.input}
+              type="text"
+              name="subheadingHi"
+              value={newService.subheadingHi}
+              onChange={handleChange}
+              placeholder="हिंदी उपशीर्षक"
+            />
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.formGroupFull}`}>
+            <label>Description (Hindi)</label>
+            <textarea
+              className={styles.textarea}
+              name="descriptionHi"
+              rows={4}
+              value={newService.descriptionHi}
+              onChange={handleChange}
+              placeholder="हिंदी विवरण"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Image</label>
+            <input
+              className={styles.input}
+              type="text"
+              name="image"
+              value={newService.image}
+              onChange={handleChange}
+              placeholder="/images/cardiology.jpg"
             />
           </div>
 

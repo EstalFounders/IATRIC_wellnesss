@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Table } from "react-bootstrap";
-import { api } from "../../constant";
+import { api, color_schema } from "../../constant";
 import styles from "../components/css/marketingPanel.module.css";
 import EditBlogModal from "../components/blog/EditBlogModal";
 
@@ -127,7 +127,7 @@ const BlogManagementView = () => {
             setModalPost(null);
             setModalOpen(true);
           }}
-          style={{ backgroundColor: "#3b5f1d", border: "none" }}
+          style={{ backgroundColor: color_schema.green, border: "none" }}
         >
           New post
         </Button>

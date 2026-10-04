@@ -94,16 +94,7 @@ const Footer2 = () => {
               <h5 className="h5-xs">Working Time</h5>
               {/* Working Hours */}
               <p className="p-sm">
-                Mon - Wed - <span>9:00 AM - 7:00 PM</span>
-              </p>
-              <p className="p-sm">
-                Thursday - <span>9:00 AM - 6:30 PM</span>
-              </p>
-              <p className="p-sm">
-                Friday - <span>9:00 AM - 6:00 PM</span>
-              </p>
-              <p className="p-sm">
-                Sat - Sun - <span>Closed</span>
+                Monday - Sunday - <span>7:00 AM - 10:00 PM</span>
               </p>
             </div>
           </div>

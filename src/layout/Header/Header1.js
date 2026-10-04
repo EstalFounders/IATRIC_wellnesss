@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import MobileMenu from "../MobileMenu";
 import { IoMenu } from "react-icons/io5";
@@ -36,7 +36,6 @@ const Header1 = ({ scrollToContact }) => {
   const isMedicinePage = router.pathname.includes("/medicine");
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [comingSoonItems, setComingSoonItems] = useState(new Set());
   const consultationTypes = useSelector(
     (state) => state.otherConfigSlice.activeConsultation,
   );
@@ -62,13 +61,7 @@ const Header1 = ({ scrollToContact }) => {
   };
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  
-  const handleComingSoonClick = useCallback((href) => {
-    setComingSoonItems((prev) => new Set(prev).add(href));
-  }, []);
-  
-  const isComingSoon = useCallback((href) => comingSoonItems.has(href), [comingSoonItems]);
-  
+
   const updateCartItemCount = (count) => setCartItemCount(count);
   const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
   const updateMedicineCartItemCount = (count) => setMedicineCartItemCount(count);
@@ -88,7 +81,7 @@ const Header1 = ({ scrollToContact }) => {
             onClick={() => toggleMobileMenu()}
             aria-label={t("nav.openMenu")}
             style={{
-              background: "#3b5f1d",
+              background: color_schema.green,
               border: "none",
               borderRadius: 8,
               width: 38,
@@ -114,7 +107,7 @@ const Header1 = ({ scrollToContact }) => {
       </div>
 
       {/* HEADER STRIP */}
-      <div className="headtoppart clearfix" style={{ backgroundColor: "#3b5f1d" }}>
+      <div className="headtoppart clearfix" style={{ backgroundColor: color_schema.green }}>
         <div className="headerwp clearfix">
           <div className="headertopleft">
             <div className="address clearfix">
@@ -236,12 +229,9 @@ const Header1 = ({ scrollToContact }) => {
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
                             <li>
-                              <span
-                                onClick={() => handleComingSoonClick("/medicine/homepage")}
-                                style={{ cursor: "pointer", display: "block", lineHeight: "18px", padding: "15px 0px", fontSize: "15px", fontWeight: 400, color: isComingSoon("/medicine/homepage") ? "#8e8333" : "#888" }}
-                              >
-                                {isComingSoon("/medicine/homepage") ? t("nav.medicinesSoon") : t("nav.medicines")}
-                              </span>
+                              <Link legacyBehavior href="/faqs">
+                                <a>{t("nav.faq")}</a>
+                              </Link>
                             </li>
                             <li><Link legacyBehavior href="/all-doctors"><a>{t("nav.allDoctors")}</a></Link></li>
                             <li><Link legacyBehavior href="/join-us"><a>{t("nav.joinUs")}</a></Link></li>

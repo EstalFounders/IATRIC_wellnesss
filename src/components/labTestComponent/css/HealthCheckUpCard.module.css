@@ -89,7 +89,7 @@ font-weight: 700;
 line-height: 17.07px;
 text-align: center;
 color: #2B3133;
-border: 1px solid #8e8333;
+border: 1px solid var(--color-secondary);
 background-color: white;
 
 display: flex;
@@ -97,7 +97,7 @@ justify-content: center;
 align-items: center;
   }
   .addToCartbutton:hover {
-    background-color: #8e8333;
+    background-color: var(--color-secondary);
     color: white;
   }
   
@@ -121,7 +121,7 @@ align-items: center;
 justify-content: center;
 align-items: center;
     /* background: linear-gradient(to bottom,#3b5f1d, #A69D50);  */
-    background-color: #3b5f1d;
+    background-color: var(--color-primary);
     transition: background-color 0.3s ease; /* Smooth transition */
 }
   

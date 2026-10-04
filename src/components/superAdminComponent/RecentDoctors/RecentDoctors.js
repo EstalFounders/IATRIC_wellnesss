@@ -2,6 +2,7 @@
 import React from "react";
 import ItemCard from "./DocItemCards";
 import { Button, Col, Row } from "react-bootstrap";
+import { color_schema } from "../../../constant";
 
 const RecentDoctors = ({ doctors, refreshDoctorList }) => {
   return (
@@ -14,19 +15,16 @@ const RecentDoctors = ({ doctors, refreshDoctorList }) => {
           }}
           className="mt-4"
         >
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Area of Expertise</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
-            <b>Degree</b>
-          </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Work Days</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Joining Date</b>
           </Col>
         </Row>

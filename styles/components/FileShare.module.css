@@ -60,7 +60,7 @@
 .dropZoneIcon {
   font-size: 32px;
   margin-bottom: 8px;
-  color: #3b5f1d;
+  color: var(--color-primary);
 }
 
 .dropZoneText {
@@ -167,7 +167,7 @@
 
 .fileActionBtn:hover {
   background: rgba(59,95,29,0.08);
-  color: #3b5f1d;
+  color: var(--color-primary);
 }
 
 /* Upload Progress */

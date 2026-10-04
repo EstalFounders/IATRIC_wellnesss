@@ -33,7 +33,7 @@ const DiscoverMoreComp = () => {
       service: "nursing-services",
       description:
         t("dm.desc.nursing"),
-      icon: <HomeCareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
+      icon: <NursingCareIcon color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: t("dm.viewDetails"),
     },
     {
@@ -62,8 +62,9 @@ const DiscoverMoreComp = () => {
     },
     {
       title: t("dm.title.corporate"),
-      description:
-        t("dm.desc.community"),
+      // Linked to its own content block so the CTA is not a dead end.
+      service: "corporate-healthcare",
+      description: t("dm.desc.corporate"),
       icon: (
         <CorporateHealthcareIcon color={`${color_schema.yellow}`} size={70} />
       ), // Using the SVG icon component
@@ -71,8 +72,10 @@ const DiscoverMoreComp = () => {
     },
     {
       title: t("dm.title.home"),
+      // Home care has its own content block (separate branch from nursing care).
+      service: "home-care",
       description:
-        t("dm.desc.community"),
+        t("dm.desc.home"),
       icon: (
         <HomeCareIcon color={`${color_schema.yellow}`} size={70} />
       ), // Using the SVG icon component
@@ -81,7 +84,7 @@ const DiscoverMoreComp = () => {
     {
       title: t("dm.title.physio"),
       description:
-        t("dm.desc.community"),
+        t("dm.desc.physio"),
       icon: (
         <PhysiotherapyIcon color={`${color_schema.yellow}`} size={70} />
       ), // Using the SVG icon component

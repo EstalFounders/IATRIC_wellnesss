@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button, Form, Modal } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, color_schema } from "../../../constant";
 import { POPUP_FALLBACK_IMAGE } from "../../../../data/popupBanner";
 import { uploadBannerImage } from "../../../services/firebaseStorage";
 import styles from "../css/marketingPanel.module.css";
@@ -158,7 +158,7 @@ const EditBannerModal = ({ show, banner, onHide, onSaved }) => {
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
             style={{
-              border: `2px dashed ${dragging ? "#3b5f1d" : "#cdd5c4"}`,
+              border: `2px dashed ${dragging ? color_schema.green : "#cdd5c4"}`,
               background: dragging ? "#eef3e6" : "#fafbf8",
               borderRadius: "12px",
               padding: "18px",
@@ -269,7 +269,7 @@ const EditBannerModal = ({ show, banner, onHide, onSaved }) => {
             size="sm"
             type="submit"
             disabled={busy}
-            style={{ backgroundColor: "#3b5f1d", border: "none" }}
+            style={{ backgroundColor: color_schema.green, border: "none" }}
           >
             {uploading ? "Uploading…" : saving ? "Saving…" : "Save & Replace"}
           </Button>

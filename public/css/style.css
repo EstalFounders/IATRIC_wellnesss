@@ -12,8 +12,8 @@
   01. GENERAL & BASIC STYLES
   =========================================================================== */
 /*------------------------------------------*/root {
-  --primary-link-color: #3b5f1d;
-  --secondary-link-color: #8e8333;
+  --primary-link-color: var(--color-primary);
+  --secondary-link-color: var(--color-secondary);
   --primary-text-color: #333;
   --secondary-text-color: #555;
   --primary-bg-color: #f8f9fb;
@@ -704,7 +704,7 @@ body {
 }
 
 .bg-blue {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
 }
 
 .bg-deepblue {
@@ -978,7 +978,7 @@ ul.content-list li:last-child {
 /*  BUTTON SETTINGS
   /*------------------------------------------*/
 .custom-btn {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   font-size: 0.915rem;
   line-height: 1;
   font-weight: 400;
@@ -1073,8 +1073,8 @@ ul.content-list li:last-child {
 .btn-blue,
 .white-color .btn-blue {
   color: #fff;
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .btn-darkgreen,
@@ -1110,7 +1110,7 @@ ul.content-list li:last-child {
 
 .green-hover:hover {
   color: #fff;
-  background-color: #3b5f1d;
+  background-color: var(--color-primary);
   border-color: #fff;
 }
 
@@ -1263,8 +1263,8 @@ ul.content-list li:last-child {
 }
 
 .video-btn.play-icon-blue {
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .video-btn.play-icon-lime {
@@ -1559,7 +1559,7 @@ span.id-color {
 .white-color .blue-color,
 .steelblue-color .blue-color,
 .blue-color span {
-  color: #8e8333;
+  color: var(--color-secondary);
 }
 
 .darkblue-color,
@@ -1882,7 +1882,7 @@ span.id-color {
 
 .hero-widget {
   padding: 15px 0;
-  border-bottom: 1px solid #8e8333;
+  border-bottom: 1px solid var(--color-secondary);
   ;
 }
 
@@ -2771,8 +2771,8 @@ p.header-widget-phone {
 }
 
 .abox-4-table.blue-table {
-  background-color: #8e8333;
-  border: 1px solid #8e8333;
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
   color: #fff;
   box-shadow: none;
 }
@@ -2927,8 +2927,8 @@ td.text-right {
 }
 
 .bg-lightgrey .sbox-2:hover {
-  background-color: #8e8333;
-  border: 1px solid #8e8333;
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
 }
 
 .bg-lightgrey .sbox-2:hover .sbox-2-icon,
@@ -3077,7 +3077,7 @@ td.text-right {
   /*------------------------------------------*/
 
 .sbox-2-icon {
-  color: #8e8333;
+  color: var(--color-secondary);
   -webkit-transition: all 300ms ease-in-out;
   -moz-transition: all 300ms ease-in-out;
   -o-transition: all 300ms ease-in-out;
@@ -3086,7 +3086,7 @@ td.text-right {
 }
 
 .sbox-3-icon {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   display: inline-block;
   width: 110px;
   height: 110px;
@@ -3142,8 +3142,8 @@ td.text-right {
 }
 
 .services-7-table.blue-table {
-  background-color: #8e8333;
-  border: 1px solid #8e8333;
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
   color: #fff;
   box-shadow: none;
 }
@@ -3313,7 +3313,7 @@ td.text-right {
   /*------------------------------------------*/
 
 #info-8 .txt-block {
-  background-color: #8e8333;
+  background-color: var(--color-secondary);
   padding: 50px 60px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
@@ -3561,8 +3561,8 @@ td.text-right {
 
 .nav-pills .nav-link.active,
 .nav-pills .nav-link.active:hover {
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
   color: #fff;
 }
 
@@ -3571,7 +3571,7 @@ td.text-right {
   background-color: #f8f8f8;
   color: #333;
   border: none;
-  border-right: 2px solid #8e8333;
+  border-right: 2px solid var(--color-secondary);
 }
 
 .nav-pills .nav-link:hover {
@@ -3641,8 +3641,8 @@ td.text-right {
 .gallery-filter button:hover,
 .gallery-filter button:focus {
   background-color: transparent;
-  color: #8e8333;
-  border-bottom: 2px solid #8e8333;
+  color: var(--color-secondary);
+  border-bottom: 2px solid var(--color-secondary);
   outline: 0px none;
 }
 
@@ -3651,9 +3651,9 @@ td.text-right {
   /*------------------------------------------*/
 
 .gallery-filter button.is-checked {
-  color: #8e8333;
+  color: var(--color-secondary);
   cursor: default;
-  border-bottom: 2px solid #8e8333;
+  border-bottom: 2px solid var(--color-secondary);
   outline: 0px none;
 }
 
@@ -4217,7 +4217,7 @@ td.text-right {
 }
 
 .doctor-info .table span i {
-  color: #8e8333;
+  color: var(--color-secondary);
   font-size: 12px;
   margin-right: 3px;
 }
@@ -4424,7 +4424,7 @@ td.text-right {
   height: 100px;
   border-radius: 60%;
   background-color: white;
-  color: #8e8333;
+  color: var(--color-secondary);
   font-size: 3rem;
   font-weight: bold;
   display: flex;
@@ -4605,7 +4605,7 @@ td.text-right {
 }
 
 #banner-8 {
-  background-image: url(../images/banner-8.jpg);
+  background-image: url(../images/banner-8.png);
   padding-top: 100px;
   padding-bottom: 100px;
 }
@@ -4919,8 +4919,8 @@ td.text-right {
 }
 
 .post-tags-list span a:hover {
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
   color: #fff;
 }
 
@@ -5333,7 +5333,7 @@ p.contact-notice {
 
 .contact-form .form-control:focus {
   background-color: #fff;
-  border-color: #8e8333;
+  border-color: var(--color-secondary);
   outline: 0px none;
   box-shadow: none;
 }
@@ -5856,8 +5856,8 @@ ul.blog-category-list li:hover {
 }
 
 .badge:hover {
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .badge:hover a {
@@ -5881,8 +5881,8 @@ ul.blog-category-list li:hover {
 }
 
 .sidebar-table.blue-table {
-  background-color: #8e8333;
-  border: 1px solid #8e8333;
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
   color: #fff;
   box-shadow: none;
 }
@@ -6027,7 +6027,7 @@ ul.blog-category-list li:hover {
 }
 
 .breadcrumb-item a:hover {
-  color: #8e8333;
+  color: var(--color-secondary);
 }
 
 .breadcrumb-item.active {
@@ -6106,8 +6106,8 @@ ul.blog-category-list li:hover {
 .primary-theme .page-link:hover,
 .primary-theme .page-link:focus,
 .primary-theme .page-item.active .page-link {
-  background-color: #8e8333;
-  border-color: #8e8333;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 /* ==========================================================================
@@ -6169,7 +6169,7 @@ ul.blog-category-list li:hover {
 
 .appointment-form .form-control:focus {
   background-color: #fff;
-  border-color: #8e8333;
+  border-color: var(--color-secondary);
   outline: 0px none;
   box-shadow: none;
 }
@@ -6276,14 +6276,14 @@ ul.blog-category-list li:hover {
 
 #faqs-page #accordion [data-toggle="collapse"].collapsed:after,
 #faqs-page #accordion [data-toggle="collapse"]:after {
-  color: #8e8333;
+  color: var(--color-secondary);
   font-size: 13px;
   top: 25px;
   right: 5px;
 }
 
 #faqs-page #accordion [data-toggle="collapse"].collapsed:after {
-  color: #8e8333;
+  color: var(--color-secondary);
   content: "\f067";
 }
 
@@ -6470,7 +6470,7 @@ nav a#pull {
 }
 
 #stlChanger .chBut {
-  background: #8e8333;
+  background: var(--color-secondary);
   width: 50px;
   height: 50px;
   position: absolute;
@@ -6478,7 +6478,7 @@ nav a#pull {
   left: 0;
   z-index: 1000000;
   text-align: center;
-  border: 1px solid #8e8333;
+  border: 1px solid var(--color-secondary);
   border-left: none;
   border-radius: 6px 0px 0px 6px;
   -webkit-transition: all 300ms ease-in-out;

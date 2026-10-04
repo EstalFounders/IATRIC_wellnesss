@@ -10,6 +10,7 @@ import ConfirmModal from "../model/ConfirmModel";
 import { useSelector } from "react-redux";
 import { formatWorkDaysLabel } from "../../../customUtils/workDays";
 import { appendEducationTraining } from "../../../customUtils/educationTraining";
+import { appendLanguages } from "../../../customUtils/languages";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -58,9 +59,9 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
 
     formData.append("name", updatedDoctor.name);
     formData.append("expertise", updatedDoctor.expertise);
-    formData.append("degree", updatedDoctor.degree);
     formData.append("mobileNumber", updatedDoctor.mobileNumber);
-    formData.append("language", updatedDoctor.language);
+    // One field per entry, same as education + training on the line below.
+    appendLanguages(formData, updatedDoctor.language);
     formData.append("workDays", updatedDoctor.workDays);
     formData.append("overview", updatedDoctor.overview);
     // One field per entry; blank rows are dropped and a blank field clears the
@@ -115,7 +116,6 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
       >
         <Col>{doctor.name}</Col>
         <Col>{doctor.expertise}</Col>
-        <Col>{doctor.degree}</Col>
         <Col>{formatWorkDaysLabel(doctor.workDays) || doctor.workDays}</Col>
         <Col>{formatDate(doctor.joiningDate)}</Col>
         <Col>

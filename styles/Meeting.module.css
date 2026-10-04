@@ -69,7 +69,7 @@
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #8e8333;
+  color: var(--color-secondary);
 }
 
 .errorMessage {
@@ -81,7 +81,7 @@
 
 .retryButton {
   padding: 10px 24px;
-  background: linear-gradient(135deg, #70b340 0%, #3b5f1d 100%);
+  background: linear-gradient(135deg, #70b340 0%, var(--color-primary) 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -93,7 +93,7 @@
 }
 
 .retryButton:hover {
-  background: #3b5f1d;
+  background: var(--color-primary);
   box-shadow: 0 4px 12px rgba(59,95,29,0.25);
   transform: translateY(-1px);
 }
@@ -134,7 +134,7 @@
 
 .leaveButton {
   padding: 12px 32px;
-  background: linear-gradient(135deg, #70b340 0%, #3b5f1d 100%);
+  background: linear-gradient(135deg, #70b340 0%, var(--color-primary) 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -146,7 +146,7 @@
 }
 
 .leaveButton:hover {
-  background: #3b5f1d;
+  background: var(--color-primary);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59,95,29,0.25);
 }
@@ -214,7 +214,7 @@
   border: 1px solid #e1d7ad;
   border-radius: 20px;
   font-size: 12px;
-  color: #8e8333;
+  color: var(--color-secondary);
   font-weight: 500;
 }
 
@@ -383,7 +383,7 @@
 
 .controlButtonActive {
   background: #dcecd0;
-  color: #3b5f1d;
+  color: var(--color-primary);
 }
 
 .controlButtonActive:hover {
@@ -392,7 +392,7 @@
 
 .controlButtonOff {
   background: #f8f5eb;
-  color: #8e8333;
+  color: var(--color-secondary);
 }
 
 .controlButtonOff:hover {
@@ -418,7 +418,7 @@
   width: 52px;
   height: 44px;
   border-radius: 22px;
-  background: linear-gradient(135deg, #c3af5b 0%, #8e8333 100%);
+  background: linear-gradient(135deg, #c3af5b 0%, var(--color-secondary) 100%);
   color: #fff;
   font-size: 16px;
 }

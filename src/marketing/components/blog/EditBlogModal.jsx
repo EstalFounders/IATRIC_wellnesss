@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button, Form, Modal } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, color_schema } from "../../../constant";
 import { uploadBlogCover } from "../../../services/firebaseStorage";
 import { BLOG_LIMITS, slugify } from "../../../api/marketing/utils/blogPayload";
 import styles from "../css/marketingPanel.module.css";
@@ -270,7 +270,7 @@ const EditBlogModal = ({ show, post, onHide, onSaved }) => {
             size="sm"
             type="submit"
             disabled={busy}
-            style={{ backgroundColor: "#3b5f1d", border: "none" }}
+            style={{ backgroundColor: color_schema.green, border: "none" }}
           >
             {uploading ? "Uploading…" : saving ? "Saving…" : "Save post"}
           </Button>

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Layouts from "../../src/layout/Layouts";
 import PageBanner from "../../src/layout/PageBanner";
-import { price_symbol } from "../../src/constant";
+import { price_symbol, color_schema } from "../../src/constant";
 
 const MAX_ATTEMPTS = 12; // ~36s max, then show Retry instead of infinite spinner
 const POLL_INTERVAL = 3000;
@@ -105,7 +105,7 @@ const ThankYou = () => {
   const buttonStyle = {
     display: "inline-block",
     padding: "12px 28px",
-    background: "#3b5f1d",
+    background: color_schema.green,
     color: "#ffffff",
     border: "none",
     borderRadius: 8,
@@ -120,8 +120,8 @@ const ThankYou = () => {
     display: "inline-block",
     padding: "12px 28px",
     background: "#ffffff",
-    color: "#3b5f1d",
-    border: "2px solid #3b5f1d",
+    color: color_schema.green,
+    border: `2px solid ${color_schema.green}`,
     borderRadius: 8,
     fontSize: 14,
     fontWeight: 600,
@@ -293,12 +293,12 @@ const ThankYou = () => {
               height: 44,
               borderRadius: "50%",
               border: "4px solid rgba(142,131,51,0.2)",
-              borderTopColor: "#8e8333",
+              borderTopColor: color_schema.yellow,
               animation: "spin 1s linear infinite",
             }}
           />
         </div>
-        <h2 style={{ color: "#8e8333", margin: "0 0 12px", fontSize: 26 }}>
+        <h2 style={{ color: color_schema.yellow, margin: "0 0 12px", fontSize: 26 }}>
           {paymentState === "pending"
             ? "Payment Status Pending"
             : "Verifying Your Payment"}

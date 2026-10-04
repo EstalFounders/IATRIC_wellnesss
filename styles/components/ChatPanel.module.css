@@ -191,7 +191,7 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: linear-gradient(135deg, #70b340 0%, #3b5f1d 100%);
+  background: linear-gradient(135deg, #70b340 0%, var(--color-primary) 100%);
   color: #ffffff;
   cursor: pointer;
   font-size: 16px;
@@ -200,7 +200,7 @@
 }
 
 .sendBtn:hover {
-  background: #3b5f1d;
+  background: var(--color-primary);
   transform: scale(1.05);
 }
 

@@ -8,17 +8,14 @@ import {
   convertTimeIntoDate,
   isMobileValid,
 } from "../../helper";
-import {
-  api,
-  DoctorType,
-  superAdminConsultationtype,
-  userTypeConstant,
-} from "../../constant";
+import { api, DoctorType, superAdminConsultationtype, userTypeConstant, color_schema } from "../../constant";
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
 import WorkDaysPicker from "../Common/WorkDaysPicker";
 import EducationTrainingInput from "../Common/EducationTrainingInput";
+import LanguageInput from "../Common/LanguageInput";
 import { formatWorkDays, parseWorkDays } from "../../customUtils/workDays";
 import { parseEducationTraining } from "../../customUtils/educationTraining";
+import { parseLanguages } from "../../customUtils/languages";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -57,6 +54,15 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   const [educationItems, setEducationItems] = useState(
     parseEducationTraining(doctor.educationTraining)
   );
+
+  // Draft rows for the repeatable language inputs. Like education/work days,
+  // `editedDoctor` keeps the stored value untouched until a row is actually
+  // edited, so an untouched legacy value still reports "no change" in the
+  // doctor-panel approval diff (see RegisterDocLoginHeader).
+  const [languageItems, setLanguageItems] = useState(
+    parseLanguages(doctor.language)
+  );
+  const [languageError, setLanguageError] = useState("");
 
   const dispatch = useDispatch();
   const storedService = useSelector(
@@ -140,6 +146,10 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
       setWorkDaysError("Please select at least one workday");
       return;
     }
+    if (parseLanguages(languageItems).length === 0) {
+      setLanguageError("Please add at least one language");
+      return;
+    }
     if (!isMobileValid(editedDoctor.mobileNumber)) {
       alert("Please enter a valid mobile number");
       return;
@@ -201,6 +211,14 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     });
   };
 
+  // Languages - one entry per language, stored as an array of trimmed strings.
+  // `parseLanguages` drops the blank rows the user left open.
+  const handleLanguagesChange = (items) => {
+    setLanguageItems(items);
+    setEditedDoctor({ ...editedDoctor, language: parseLanguages(items) });
+    if (parseLanguages(items).length > 0) setLanguageError("");
+  };
+
   console.log(editedDoctor, "edited doctor");
 
   return (
@@ -247,26 +265,14 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="degree" className="mb-3">
-                <Form.Label>
-                  <b>Degree</b>
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="degree"
-                  value={editedDoctor.degree}
-                  onChange={handleChange}
-                />
-              </Form.Group>
               <Form.Group controlId="language" className="mb-3">
                 <Form.Label>
                   <b>Language</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="language"
-                  value={editedDoctor.language}
-                  onChange={handleChange}
+                <LanguageInput
+                  value={languageItems}
+                  onChange={handleLanguagesChange}
+                  error={languageError}
                 />
               </Form.Group>
             </Col>
@@ -394,7 +400,7 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   <button
                     onClick={() => setShowAddInput(true)}
                     style={{
-                      background: "#3b5f1d",
+                      background: color_schema.green,
                       color: "white",
                       border: "none",
                       borderRadius: "50%",

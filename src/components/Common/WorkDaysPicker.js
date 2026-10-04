@@ -8,14 +8,15 @@ import {
   WORK_DAY_SHORT_LABELS,
   parseWorkDays,
 } from "../../customUtils/workDays";
+import { color_schema } from "../../constant";
 
 const chipStyle = (isSelected) => ({
   minWidth: 52,
   padding: "6px 12px",
   borderRadius: 18,
-  border: "1px solid #3b5f1d",
-  background: isSelected ? "#3b5f1d" : "#fff",
-  color: isSelected ? "#fff" : "#3b5f1d",
+  border: `1px solid ${color_schema.green}`,
+  background: isSelected ? color_schema.green : "#fff",
+  color: isSelected ? "#fff" : color_schema.green,
   fontWeight: 600,
   fontSize: "0.85rem",
   lineHeight: 1.2,

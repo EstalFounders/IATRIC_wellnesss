@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ItemCard from "./LabItemCards";
 import { Button, Col, Row } from "react-bootstrap";
 import { CustomPagination } from "../../../../helper";
+import { color_schema } from "../../../../constant";
 
 const LabList = ({source,  data, appointments }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,19 +31,19 @@ const LabList = ({source,  data, appointments }) => {
           }}
           className="mt-4"
         >
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Name</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Area of Expertise</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>User Remarks</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>No of Booking</b>
           </Col>
-          <Col md={2} style={{ color: "#8e8333" }}>
+          <Col md={2} style={{ color: color_schema.yellow }}>
             <b>Admin Remarks</b>
           </Col>
         </Row>

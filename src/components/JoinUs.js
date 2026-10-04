@@ -132,7 +132,7 @@ const JoinUs = () => {
             <div className="contact-box mb-40">
               <h2 className="text-dark">Working Hours</h2>
               <hr />
-              <h5>Monday – Sunday : 8:00 AM - 8:00 PM</h5>
+              <h5>Monday – Sunday : 7:00 AM - 10:00 PM</h5>
             </div>
           </div>
 

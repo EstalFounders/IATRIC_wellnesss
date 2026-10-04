@@ -22,12 +22,7 @@ import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
 import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
-import {
-  address,
-  contact_no,
-  existingUser,
-  facebook_page_url,
-} from "../../constant";
+import { address, contact_no, existingUser, facebook_page_url, color_schema } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import Link from "next/link";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
@@ -104,7 +99,7 @@ function LabTesLandingPageHeader() {
         {/* HEADER STRIP */}
         <div
           className="headtoppart clearfix"
-          style={{ backgroundColor: "#3b5f1d" }}
+          style={{ backgroundColor: color_schema.green }}
         >
           <div className="headerwp clearfix">
             {/* Address */}
@@ -133,7 +128,7 @@ function LabTesLandingPageHeader() {
                     href={`tel:${contact_no}`}
                     className="callusbtn"
                     onMouseOver={(e) => {
-                      e.target.style.color = "#8e8333";
+                      e.target.style.color = color_schema.yellow;
                     }} // Change color on hover
                     onMouseOut={(e) => {
                       e.target.style.color = "#ffffff";

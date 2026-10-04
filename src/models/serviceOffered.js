@@ -51,6 +51,21 @@ const serviceOfferedSchema = new Schema({
     enum: ["MAJOR", "SUB"],
     default: "MAJOR",
   },
+  // Tab-1 (homepage speciality tabs) presentation copy. Seeded from the
+  // previously hardcoded assets by `scripts/seedServiceOfferedContent.js` and
+  // editable in the super-admin "Service Offered" panel.
+  image: {
+    type: String,
+  },
+  subheading: {
+    type: String,
+  },
+  subheadingHi: {
+    type: String,
+  },
+  descriptionHi: {
+    type: String,
+  },
 });
 
 // Use a unique model identifier

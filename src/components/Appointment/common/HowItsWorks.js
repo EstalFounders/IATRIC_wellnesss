@@ -5,6 +5,7 @@ import {
   ChatBubbleOutline,
   LocalPharmacy,
 } from "@mui/icons-material";
+import { color_schema } from "../../../constant";
 
 const steps = [
   {
@@ -53,7 +54,7 @@ const HowItWorks = () => {
                   style={{
                     width: "2px",
                     height: "30px",
-                    backgroundColor: "#3b5f1d",
+                    backgroundColor: color_schema.green,
                     margin: "0 auto",
                     zIndex: 2,
                   }}
@@ -69,7 +70,7 @@ const HowItWorks = () => {
                     width: "60px",
                     height: "60px",
                     backgroundColor: "#e6f4ea",
-                    color: "#3b5f1d",
+                    color: color_schema.green,
                   }}
                 >
                   {step.icon}
@@ -83,7 +84,7 @@ const HowItWorks = () => {
           <div
             className="d-none d-md-block position-absolute top-50 start-0 w-100"
             style={{
-              borderTop: "2px solid #3b5f1d",
+              borderTop: `2px solid ${color_schema.green}`,
               zIndex: 1,
               transform: "translateY(-50%)",
             }}

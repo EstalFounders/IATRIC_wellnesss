@@ -56,9 +56,7 @@ const AllContacts1 = () => {
             {/* Working Hours */}
             <div className="contact-box mb-40">
               <h5 className="h5-sm">Working Hours</h5>
-              <p>Monday – Friday : 8:00 AM - 8:00 PM</p>
-              <p>Saturday : 10:00 AM - 6:00 PM</p>
-              <p>Sunday : 10:00 AM - 4:00 PM</p>
+              <p>Monday – Sunday : 7:00 AM - 10:00 PM</p>
             </div>
           </div>
           {/* END CONTACTS INFO */}

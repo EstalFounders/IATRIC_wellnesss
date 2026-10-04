@@ -10,29 +10,42 @@ import {
   serviceOffered,
 } from "../../constant";
 import { handleServiceClick } from "./commonMethod";
-import { servicesData } from "../../../data/services";
 import { ConsultationButton } from "./commonUi";
 import CalltoBookPopup from "./CalltoBookPopup";
 import { useLanguage } from "../../i18n/LanguageContext";
-import {
-  mergeServiceLists,
-  slugifyService,
-  useGlobalData,
-} from "../../customUtils/useGlobalData";
+import { slugifyService, useGlobalData } from "../../customUtils/useGlobalData";
 
-// Fallback artwork for items that exist in the DB but not in the static list yet.
+// Fallback artwork for a serviceOffered document without an `image`.
 const DEFAULT_SERVICE_IMAGE = "/images/general_physicians.jpg";
 
+// `image` accepts a path ("/images/x.jpg", "images/x.jpg" or just "x.jpg") or a
+// hosted url. Remote urls skip the optimizer because next.config.js only
+// whitelists the firebase host.
+const resolveServiceImage = (image) => {
+  const value = String(image || "").trim();
+  if (!value) return DEFAULT_SERVICE_IMAGE;
+  if (/^(https?:)?\/\//i.test(value) || value.startsWith("data:")) return value;
+  return value.startsWith("/") ? value : `/images/${value}`;
+};
+
+const isRemoteImage = (image) => /^(https?:)?\/\//i.test(String(image || ""));
+
+// A serviceOffered document carries one copy per language; fall back to the other
+// language so a missing Hindi (or English) value never renders an empty panel.
+const localizedServiceText = (isHindi, english, hindi) =>
+  String((isHindi ? hindi : english) || (isHindi ? english : hindi) || "").trim();
+
 const ServicesTabs = () => {
-  // Single source of truth: globalData slice speciality list; the static servicesData
-  // list supplies image/subheading/description assets keyed by name.
+  // Every rendered field comes from the serviceOffered API (globalData slice -> SUB
+  // items): name, image, subheading (+ Hi) and description (+ Hi) are stored per
+  // document, so the panel needs no static service list anymore.
   const { speciality } = useGlobalData();
   const services = useMemo(
     () =>
-      mergeServiceLists(speciality, servicesData, "name").map((item) => ({
+      speciality.map((item) => ({
         ...item,
         id: item.id ?? slugifyService(item.name),
-        image: item.image || DEFAULT_SERVICE_IMAGE,
+        image: resolveServiceImage(item.image),
       })),
     [speciality]
   );
@@ -40,7 +53,7 @@ const ServicesTabs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 4;
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
   const totalPages = Math.ceil(services.length / servicesPerPage);
@@ -95,15 +108,32 @@ const ServicesTabs = () => {
     handleServiceClick(serviceName, id, router);
   };
 
-  const boldKeywords = (text, keywords) => {
-    if (!keywords || keywords.length === 0) return text;
-    const escapedKeywords = keywords.map((kw) =>
-      kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const isHindi = lang === "hi";
+
+  // Description + subheading are rendered straight from the serviceOffered document
+  // (admin copy), with no i18n/static fallback: an empty document simply hides the line.
+  const renderDescription = (service) =>
+    localizedServiceText(
+      isHindi,
+      service.description,
+      service.descriptionHi
+    ) || null;
+
+  const renderSubheading = (service) => {
+    const text = localizedServiceText(
+      isHindi,
+      service.subheading,
+      service.subheadingHi
     );
-    const regex = new RegExp(`(${escapedKeywords.join("|")})`, "gi");
-    return text
-      .split(regex)
-      .map((part, i) => (regex.test(part) ? <b key={i}>{part}</b> : part));
+    if (!text) return null;
+    return (
+      <h4
+        className="section-subheading blue-color mb-3"
+        style={{ fontSize: "1.8rem", fontWeight: "600" }}
+      >
+        {text}
+      </h4>
+    );
   };
 
   return (
@@ -168,6 +198,7 @@ const ServicesTabs = () => {
                       src={service.image}
                       alt={service.name}
                       fill
+                      unoptimized={isRemoteImage(service.image)}
                       sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
                       style={{ objectFit: "cover" }}
                     />
@@ -177,12 +208,7 @@ const ServicesTabs = () => {
                 {/* Right Column - Text */}
                 <div className="col-lg-6 d-flex flex-column justify-content-center text-column">
                   {/* Subheading */}
-                  <h4
-                    className="section-subheading blue-color mb-3"
-                    style={{ fontSize: "1.8rem", fontWeight: "600" }}
-                  >
-                    {t(`subheading.${service.name}`, service.subheading)}
-                  </h4>
+                  {renderSubheading(service)}
 
                   {/* Heading */}
                   <h3
@@ -201,59 +227,12 @@ const ServicesTabs = () => {
                     {t(`service.${service.name}`, service.name)}
                   </h3>
 
-                  {/* Description */}
+                  {/* Description — rendered from the serviceOffered description */}
                   <div
                     className="service-description h5 box-list grey-color mb-4"
                     style={{ lineHeight: "1.6" }}
                   >
-                    {boldKeywords(
-                      t(`tabdesc.${service.name}`, service.description),
-                      [
-                      "General Physician",
-                      "trusted care",
-                      "Pediatrics",
-                      "monitoring",
-                      "immunizations",
-                      "Cardiology",
-                      "advanced care",
-                      "Dermatologist",
-                      "effective treatments",
-                      "Orthopaedics",
-                      "bone",
-                      "joint",
-                      "muscle disorders",
-                      "Gynaecology",
-                      "preventive screenings",
-                      "reproductive health care",
-                      "Ophthalmology",
-                      "comprehensive eye care",
-                      "Pulmonology",
-                      "respiratory",
-                      "lung conditions",
-                      "Psychiatrist",
-                      "mental health care",
-                      "Dentistry",
-                      "comprehensive oral care",
-                      "Physiotherapy",
-                      "restore movement",
-                      "Nursing care",
-                      "professional support",
-                      "Home care",
-                      "quality healthcare",
-                      "Medicine Delivery",
-                      "prescriptions",
-                      "Lab Investigation",
-                      "diagnostic tests",
-                      "Corporate Healthcare",
-                      "employee wellness",
-                      "Healthcamp",
-                      "community health camps",
-                      "Obstetrics",
-                      "pregnancy",
-                      "childbirth",
-                      "postpartum period",
-                      "personalized attention",
-                    ])}
+                    {renderDescription(service)}
                   </div>
 
                   {/* Call to Book Button */}

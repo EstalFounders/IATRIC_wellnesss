@@ -13,7 +13,12 @@ import {
 import TimePicker from "react-time-picker";
 import WorkDaysPicker from "../../Common/WorkDaysPicker.js";
 import EducationTrainingInput from "../../Common/EducationTrainingInput.js";
+import LanguageInput from "../../Common/LanguageInput.js";
 import { appendEducationTraining } from "../../../customUtils/educationTraining.js";
+import {
+  appendLanguages,
+  parseLanguages,
+} from "../../../customUtils/languages.js";
 import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,14 +38,14 @@ import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlic
  * uses the same "draft rows live in their own state" pattern as
  * <EducationTrainingInput />: the rows are held in `educationItems`, blank rows
  * are dropped on submit and every remaining entry becomes its own FormData field.
+ * `language` is repeatable the same way (<LanguageInput /> + `languageItems`), so
+ * it is validated in `handleSubmit` rather than in the list below.
  */
 const MANDATORY_TEXT_FIELDS = [
   ["name", "Name"],
   ["email", "Email"],
   ["mobileNumber", "Mobile Number"],
   ["expertise", "Area of Expertise"],
-  ["degree", "Degree"],
-  ["language", "Language"],
   ["workExperience", "Work Experience"],
   ["workDays", "Work Days"],
   ["overview", "Overview"],
@@ -66,15 +71,18 @@ const AddDoctorForm = () => {
   // Draft rows for the repeatable education/training inputs; blank rows are
   // filtered out on submit by `appendEducationTraining`.
   const [educationItems, setEducationItems] = useState([""]);
+  // Draft rows for the repeatable language inputs; blank rows are filtered out on
+  // submit by `appendLanguages`. The field is mandatory, so `handleSubmit` raises
+  // an inline error (the same pattern as the work-day chips).
+  const [languageItems, setLanguageItems] = useState([""]);
+  const [languageError, setLanguageError] = useState("");
   const dispatch = useDispatch();
 
   const [doctorDetails, setDoctorDetails] = useState({
     name: "",
     email: "",
     expertise: "",
-    degree: "",
     gender: "",
-    language: "",
     workDays: "",
     overview: "",
     location: "None",
@@ -181,6 +189,13 @@ const AddDoctorForm = () => {
     if (days.length > 0) setWorkDaysError("");
   };
 
+  // Languages - draft rows in, array out; `editedDoctor`-style payloads and the
+  // FormData body are built on submit by `appendLanguages`.
+  const handleLanguagesChange = (items) => {
+    setLanguageItems(items);
+    if (parseLanguages(items).length > 0) setLanguageError("");
+  };
+
   const handleShowDialog = (msg) => {
     setMessage(msg);
     setShowDialog(true);
@@ -243,6 +258,14 @@ const AddDoctorForm = () => {
       ([key]) => !String(doctorDetails[key] ?? "").trim(),
     ).map(([, label]) => label);
 
+    // Languages live in their own draft-row state, so they cannot be part of the
+    // `MANDATORY_TEXT_FIELDS` loop above.
+    const hasLanguages = parseLanguages(languageItems).length > 0;
+    setLanguageError(hasLanguages ? "" : "Please add at least one language");
+    if (!hasLanguages) {
+      missingFields.push("Language");
+    }
+
     if (selectedTypes.length === 0) {
       missingFields.push("Select Consultation Type");
     }
@@ -276,8 +299,8 @@ const AddDoctorForm = () => {
     formData.append("gender", doctorDetails.gender);
     formData.append("mobileNumber", doctorDetails.mobileNumber);
     formData.append("expertise", doctorDetails.expertise);
-    formData.append("degree", doctorDetails.degree);
-    formData.append("language", doctorDetails.language);
+    // One field per entry; a blank field clears the list on the API side.
+    appendLanguages(formData, languageItems);
     formData.append("workDays", doctorDetails.workDays);
     formData.append("overview", doctorDetails.overview);
     // One field per entry; a blank field clears the list on the API side.
@@ -372,29 +395,14 @@ const AddDoctorForm = () => {
             />
           </label>
 
-          <label className={styles.label}>
-            <b>Degree:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="degree"
-              value={doctorDetails.degree}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className={styles.label}>
+          <div className={styles.label}>
             <b>Language:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="language"
-              value={doctorDetails.language}
-              onChange={handleChange}
-              required
+            <LanguageInput
+              value={languageItems}
+              onChange={handleLanguagesChange}
+              error={languageError}
             />
-          </label>
+          </div>
 
           <label className={styles.label}>
             <b>Work Experience:</b>

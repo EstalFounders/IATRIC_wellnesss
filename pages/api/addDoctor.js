@@ -16,6 +16,7 @@ import {
 import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 import { parseEducationTraining } from "../../src/customUtils/educationTraining";
+import { parseLanguages } from "../../src/customUtils/languages";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
@@ -24,6 +25,21 @@ import { logErrorToGoogleSheet } from "./helper";
 
 // Global variable to store the database connection
 let isConnected = false;
+
+/**
+ * Columns that no longer exist on the Doctor schema. They are stripped from both
+ * the create (POST) and the update (PUT) payloads, so an older/cached client -
+ * or a pending doctor-panel change request saved before the removal - cannot
+ * write the dropped column back into MongoDB. The one-off cleanup of the
+ * documents that already carry them lives in `scripts/removeDoctorDegree.js`.
+ */
+const REMOVED_DOCTOR_FIELDS = ["degree"];
+
+function stripRemovedDoctorFields(fields) {
+  const cleaned = { ...fields };
+  for (const field of REMOVED_DOCTOR_FIELDS) delete cleaned[field];
+  return cleaned;
+}
 
 export const config = {
   api: {
@@ -148,11 +164,14 @@ export default async function handler(req, res) {
           );
           console.log(stringFields, "string fiels");
           const addedDoctor = await Doctor.create({
-            ...stringFields,
+            ...stripRemovedDoctorFields(stringFields),
             // Repeatable field: `fields.educationTraining` is one entry per
             // appended form field, so it must not be taken from the
             // comma-joined `stringFields` spread.
             educationTraining: parseEducationTraining(fields.educationTraining),
+            // Repeatable field as well: one entry per appended `formData.append`
+            // ("English", "Hindi"), never the comma-joined `stringFields` value.
+            language: parseLanguages(fields.language),
             password: fields.password?.[0] || "",
             profilePictureUrl,
             diplomasCertificatesUrls,
@@ -334,7 +353,7 @@ export default async function handler(req, res) {
 
         // Update doctor data in MongoDB
         const updateData = {
-          ...stringFields,
+          ...stripRemovedDoctorFields(stringFields),
           profilePictureUrl,
           diplomasCertificatesUrls,
           consultationType: stringFields.consultationType
@@ -360,6 +379,14 @@ export default async function handler(req, res) {
           updateData.educationTraining = parseEducationTraining(
             fields.educationTraining
           );
+        }
+
+        // Languages - repeatable field like educationTraining, so it also comes
+        // straight from the raw multiparty values. Only touched when the client
+        // sends it: a present-but-blank field clears the list, an absent one
+        // keeps the stored value (the doctor-panel approval PUT never sends it).
+        if (fields.language !== undefined) {
+          updateData.language = parseLanguages(fields.language);
         }
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,

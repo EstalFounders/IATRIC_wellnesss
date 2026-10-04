@@ -22,6 +22,8 @@ import { color_schema } from "../../constant";
 import { useAddToCart } from "./common/CommonMethod";
 import { setMedicineDetail } from "../../store/slices/medicine/MedicineHomePageApiData";
 import { useDispatch } from "react-redux";
+import FaqSection from "../Common/FaqSection";
+import { getFaqsForTopic } from "../../../data/faqs";
 
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const PAGE_LIMIT = 50;
@@ -36,6 +38,9 @@ const MedicineDeliveryComp = () => {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 25;
   const dispatch = useDispatch();
+
+  // FAQs for medicine delivery only - the group data/faqs.js defines for it.
+  const medicineFaqs = getFaqsForTopic("medicine-delivery");
 
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
@@ -167,7 +172,7 @@ const MedicineDeliveryComp = () => {
                   "&:hover": {
                     boxShadow: 6,
                     transform: "translateY(-4px)",
-                    border: "1px solid #3b5f1d",
+                    border: `1px solid ${color_schema.green}`,
                   },
                 }}
               >
@@ -190,8 +195,8 @@ const MedicineDeliveryComp = () => {
                   </IconButton>
                   <Button
                     sx={{
-                      color: "#3b5f1d",
-                      border: "1px solid #3b5f1d",
+                      color: color_schema.green,
+                      border: `1px solid ${color_schema.green}`,
                       "&:hover": {
                         boxShadow: 6,
                         transform: "translateY(-4px) scale(1.02)",
@@ -256,6 +261,18 @@ const MedicineDeliveryComp = () => {
           message="Item added to cart"
         />
       )}
+
+      {/* FAQs for medicine delivery only - the same copy /faqs shows for it. */}
+      {medicineFaqs ? (
+        <Box sx={{ mt: 6 }}>
+          <FaqSection
+            items={medicineFaqs.items}
+            title="Frequently Asked Questions"
+            headingId="faq-medicine-delivery"
+            seeAllHref={`/faqs#${medicineFaqs.anchor}`}
+          />
+        </Box>
+      ) : null}
     </Box>
   );
 };

@@ -6,6 +6,60 @@ import { company_number, WHATSAPP_USER_QUERY_TEMPLATE } from "./utils/constants"
 import { rateLimit } from "../../src/lib/rateLimiter";
 import { logErrorToGoogleSheet } from "./helper";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/**
+ * Normalises a public query submission.
+ *
+ * The contacts page now collects only name + one "phone or email" field +
+ * message, so the body may carry `contact` (the combined field), or the older
+ * `email` / `mobile_number` pair. Removed fields (subject, patient, city,
+ * address, ...) are ignored instead of being cast into the model, and
+ * `mobile_number` is only forwarded when the value really is a phone number -
+ * a raw `Number("abc")` used to surface as a Mongoose cast error (HTTP 500).
+ *
+ * Returns `{ payload }`, or `{ error }` when no usable contact method was sent.
+ */
+function normalizeQueryPayload(body) {
+  const source = body && typeof body === "object" ? body : {};
+  const asText = (value) =>
+    value === undefined || value === null ? "" : String(value).trim();
+
+  const payload = {};
+
+  const name = asText(source.name);
+  if (name) payload.name = name;
+
+  const message = asText(source.message);
+  if (message) payload.message = message;
+
+  if (source.visited_before !== undefined) {
+    payload.visited_before = source.visited_before;
+  }
+
+  const contact = asText(
+    source.contact || source.phone_or_email || source.email || source.mobile_number
+  );
+  if (!contact) {
+    return { error: "A phone number or email address is required" };
+  }
+
+  if (EMAIL_REGEX.test(contact)) {
+    payload.email = contact.toLowerCase();
+    return { payload };
+  }
+
+  // Accepts plain 10 digits or a 10-digit number with a +91/91 country prefix.
+  const digits = contact.replace(/\D/g, "");
+  const mobile = digits.slice(-10);
+  if (digits.length >= 10 && digits.length <= 12 && /^\d{10}$/.test(mobile)) {
+    payload.mobile_number = Number(mobile);
+    return { payload };
+  }
+
+  return { error: "A valid phone number or email address is required" };
+}
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -62,14 +116,14 @@ export default async function handler(req, res) {
         });
       }
 
-      const payload = req.body;
+      const { payload, error: validationError } = normalizeQueryPayload(
+        req.body
+      );
 
       console.log(payload, "payload");
 
-      if (!payload) {
-        return res
-          .status(400)
-          .json({ message: "Category name and description are required" });
+      if (validationError) {
+        return res.status(400).json({ message: validationError });
       }
 
       const newQuery = await Query.create(payload);

@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MeetingRoom from "../../../src/components/MeetingRoom/MeetingRoom";
 import { getConsultationByMeetingId } from "../../../src/components/ApiService/BookConsultationApiCall";
+import { color_schema } from "../../../src/constant";
 
 export default function PatientMeetingPage() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export default function PatientMeetingPage() {
             fontSize: 20,
             fontWeight: 600,
             marginBottom: 8,
-            color: "#8e8333",
+            color: color_schema.yellow,
           }}
         >
           Failed to Load Consultation
@@ -109,7 +110,7 @@ export default function PatientMeetingPage() {
           onClick={() => router.push("/")}
           style={{
             padding: "10px 24px",
-            background: "#3b5f1d",
+            background: color_schema.green,
             color: "#fff",
             border: "none",
             borderRadius: 8,

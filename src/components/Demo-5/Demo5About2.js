@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { api, callToBook, contact_no } from "../../constant";
+import { api, callToBook, contact_no, color_schema } from "../../constant";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../Common/PopupDialog";
 import { FaPhoneAlt } from "react-icons/fa";
@@ -93,7 +93,7 @@ const consultationTypes = useSelector(
                 <br />
                 <div
                   className="font-weight-bold h4 mt-2"
-                  style={{ color: "#3b5f1d" }}
+                  style={{ color: color_schema.green }}
                 >
                   {t("demo5.about.bookOnline")}
                 </div>

@@ -263,6 +263,36 @@ export const servicesData = [
       "Chronic condition management",
     ],
   },
+  {
+    id: 11,
+    key: "tab-12",
+    name: "Corporate Healthcare",
+    image: "/images/nursing/health-camp-india.jpg",
+    subheading: "Pan-India Employee Health, OHC & Wellness Programs",
+    description:
+      "Pan-India corporate healthcare services - OHC medical rooms, doctors, nursing, emergency and physiotherapy support, employee health packages, health camps, awareness and basic training sessions.",
+    // `service` maps to the rich content block in ServiceDetailsComponent (and keeps
+    // this tab visible even when the API speciality list does not carry it yet);
+    // `detailsLink` is where the tab CTA sends the visitor.
+    service: "corporate-healthcare",
+    detailsLink:
+      "/service-details?name=Corporate%20Healthcare&Service=corporate-healthcare",
+    content: [
+      "HealthPath delivers corporate healthcare services across India - from a single OHC medical room in your office to complete medical cover for plants, warehouses and project sites. We set up, staff and run the medical facility, design employee health packages around your company policy, and bring health camps, awareness sessions and training to your teams, in every city you operate in.",
+      "One contract covers every location, with local doctors, nurses, paramedics and physiotherapists backed by teleconsultation, NABH-informed protocols and SLA-based response times. You get compliance-ready records, incident logs and monthly MIS that HR and EHS teams can act on - plus emergency readiness, OHC audit checklists and a single point of contact across every site you run.",
+    ],
+    options: [
+      "OHC medical room setup, staffing & day-to-day operations",
+      "Doctors, nursing, emergency & ambulance response support",
+      "Physiotherapy & rehabilitation at office or on call",
+      "Employee health packages tailored to your company policy",
+      "Health camps, screening & vaccination drives",
+      "Awareness sessions on lifestyle, stress & nutrition",
+      "First aid, CPR, BLS & ERT training with certification",
+      "Pan-India coverage - metro, tier-1, tier-2 & remote sites",
+      "Digital health records, incident logs & monthly MIS reports",
+    ],
+  },
 ];
 
 export const AllDepartmentService = [
@@ -345,12 +375,14 @@ export const AllDepartmentService = [
   },
   {
     title: "Corporate Healthcare",
-    description: "Employee wellness and preventive care programs.",
+    description:
+      "Pan-India employee health and OHC programs - onsite doctors, nursing, health camps and training.",
     icon: <CorporateHealthcareIcon />,
   },
   {
     title: "Healthcamp",
-    description: "Organize wellness camps and preventive screening drives.",
+    description:
+      "Pan-India health check-up camps for schools, corporates, elderly care and underprivileged communities - screenings, doctor consults and reports.",
     icon: <HealthCampIcon />,
   },
 ];
@@ -373,16 +405,17 @@ export const demo5ServiceHighlights = [
     titleKey: "demo5.services.nursingCare",
     service: "nursing-services",
     description:
-      "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
+      "Qualified nurses at home or in clinic - injections, IV drips, wound care, elderly and post-operative nursing support.",
     icon: <NursingCareIcon size={70} />,
     btntext: "View Details",
   },
   {
     title: "Home Care",
     titleKey: "demo5.services.homeCare",
-    service: "nursing-services",
+    // Own content block: home care is a separate branch from nursing care.
+    service: "home-care",
     description:
-      "Receive professional healthcare and medical support at home, including nursing, therapy, and wellness services, ensuring comfort and convenience for you and your family.",
+      "Doctor visits, nursing, physiotherapy, medicines, lab sample collection, GDA attendants and medical equipment - all at home.",
     icon: <HomeCareIcon size={70} />,
     btntext: "View Details",
   },
@@ -400,15 +433,16 @@ export const demo5ServiceHighlights = [
     titleKey: "demo5.services.communityCare",
     service: "community-care",
     description:
-      "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      "Health camps, screening drives, awareness sessions and training that bring preventive care to communities, schools and local groups.",
     icon: <HealthCampIcon size={70} />,
     btntext: "View Details",
   },
   {
     title: "Corporate Healthcare",
     titleKey: "demo5.services.corporate",
+    service: "corporate-healthcare",
     description:
-      "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      "Pan-India corporate healthcare - OHC medical rooms, onsite doctors and nursing, emergency and physiotherapy support, employee health packages, health camps and training.",
     icon: <CorporateHealthcareIcon size={70} />,
     btntext: "View Details",
   },
@@ -416,7 +450,7 @@ export const demo5ServiceHighlights = [
     title: "Physiotherapy",
     titleKey: "demo5.services.physiotherapy",
     description:
-      "Enhance employee well-being and productivity with comprehensive corporate healthcare solutions, including health screenings, wellness programs, and medical support for organizations.",
+      "Physiotherapy at home, in clinic or at your workplace - pain relief, post-surgical rehabilitation, sports injury care and mobility training.",
     icon: <PhysiotherapyIcon size={70} />,
     btntext: "View Details",
   },
@@ -433,7 +467,7 @@ export const testimonials = [
     name: "Adhira",
     role: "Brand Manager",
     text: "I got expert medical advice from my living room, saving me so much time and hassle. Highly recommend their virtual consultations.",
-    image: "/image/review/avatar2.jpeg",
+    image: "/image/review/avatar8.jpeg",
   },
   {
     name: "Jayant",
@@ -469,7 +503,7 @@ export const testimonials = [
     name: "Dharampal",
     role: "CA",
     text: "From skipping traffic to avoiding long queues, Healthpath has made healthcare accessible and stress-free. My health journey feels much more manageable now.",
-    image: "/image/review/avatar8.jpeg",
+    image: "/image/review/avatar2.jpeg",
   },
   {
     name: "Anjali",

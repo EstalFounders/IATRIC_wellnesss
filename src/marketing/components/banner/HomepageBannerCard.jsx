@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Badge, Button } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, color_schema } from "../../../constant";
 import { POPUP_FALLBACK_IMAGE } from "../../../../data/popupBanner";
 import { BANNER_STORAGE_PATH, applyBannerCacheMetadata, getBannerImageUrl, withCacheBuster } from "../../../services/firebaseStorage";
 import styles from "../css/marketingPanel.module.css";
@@ -148,7 +148,7 @@ const HomepageBannerCard = ({ moduleInfo }) => {
             setNotice("");
             setModalOpen(true);
           }}
-          style={{ backgroundColor: "#3b5f1d", border: "none" }}
+          style={{ backgroundColor: color_schema.green, border: "none" }}
         >
           {banner?.bannerUrl || storageImage ? "Edit Banner" : "Upload New Image"}
         </Button>

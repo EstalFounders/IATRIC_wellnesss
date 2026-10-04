@@ -17,6 +17,16 @@
 @import "../public/css/style.css";
 @import "../public/css/responsive.css";
 @import "../public/css/customStyle.css";
+:root {
+  /* Brand palette - single source of truth for CSS values. Mirrors
+     color_schema in src/constant.js (green -> primary, yellow -> secondary). */
+  --color-primary: #3b5f1d;
+  --color-secondary: #8e8333;
+  --color-white: #ffffff;
+  --color-black: #000000;
+}
+
+
 
 
 
@@ -69,7 +79,7 @@ img.mfp-img {
 }
 
 .blue-color {
-  color: #8e8333 !important;
+  color: var(--color-secondary) !important;
 }
 
 /* Compact breadcrumb variant — used on /appointment so the whole booking form
