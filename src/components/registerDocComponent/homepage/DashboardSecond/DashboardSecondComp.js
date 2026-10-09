@@ -1,30 +1,31 @@
+// DashboardSecondComp.js
+// The lower half of the doctor home page: the appointments table first, then the
+// read-only practice summary (the card that used to be an empty "Doctor's
+// Remarks" band). Both are plain props pass-throughs - HomepageComp owns the
+// data and the selected filter.
 import React from "react";
-import Remarks from "./Remarks";
 import AppointmentsTable from "./AppointmentTable";
+import PracticeSummary from "./PracticeSummary";
+import styles from "../../css/HomePage.module.css";
 
-const DashboardSecondComp = ({ appointments, filterText }) => {
-  const containerStyle = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-    padding: "20px",
-  };
-
-  const sectionStyle = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-    flex: "1",
-    marginBottom: "20px",
-  };
-  return (
-    <div style={containerStyle}>
-      <div style={sectionStyle}>
-        <Remarks />
-        <AppointmentsTable appointments={appointments} filterText={filterText} />
-      </div>
-    </div>
-  );
-};
+const DashboardSecondComp = ({
+  doctor,
+  appointments,
+  view,
+  onViewChange,
+  state,
+  onRetry,
+}) => (
+  <div className={styles.dashboard}>
+    <AppointmentsTable
+      appointments={appointments}
+      view={view}
+      onViewChange={onViewChange}
+      state={state}
+      onRetry={onRetry}
+    />
+    <PracticeSummary doctor={doctor} />
+  </div>
+);
 
 export default DashboardSecondComp;

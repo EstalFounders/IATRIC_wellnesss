@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { doctorDisplayName } from "../../utils/doctorName";
 
 // Component to represent each doctor
 export const DoctorComponent = ({ doctor }) => (
@@ -14,7 +15,7 @@ export const DoctorComponent = ({ doctor }) => (
       </div>
       {/* Doctor Meta */}
       <div className="doctor-meta">
-        <h5 className="h5-xs blue-color">{doctor.name}</h5>
+        <h5 className="h5-xs blue-color">{doctorDisplayName(doctor.name)}</h5>
         <span>{doctor.specialization}</span>
         <span>{doctor.experience}</span>
         <span>{doctor.gender}</span>

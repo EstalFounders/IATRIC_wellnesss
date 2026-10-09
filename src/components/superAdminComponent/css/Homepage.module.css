@@ -1,0 +1,335 @@
+/* Homepage.module.css
+   Styling for the super-admin home page (pages/superAdmin/homepage.js).
+
+   Tokens are copied from the doctor panel's HomePage.module.css /
+   StatsCard.module.css (brand colours from `color_schema`: green #3b5f1d,
+   yellow #8e8333) so both panels read as one product.
+
+   The page previously styled itself entirely with inline objects: three
+   `rounded-circle` cards inside a `w-50` CardDeck (unreadable below ~768px)
+   and a `w-75` + `border p-4` doctors block. Every home-page style now lives
+   here, so this file is the single source of layout truth. */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  color: #1f2933;
+}
+
+/* The doctors block is an in-page anchor target (the "Doctors" stat tile). */
+.section {
+  scroll-margin-top: 84px;
+  margin-top: 20px;
+}
+
+/* ── Hero (who is signed in + the two actions) ───────── */
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.heroInfo {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.heroEyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e8333;
+}
+
+.heroName {
+  margin: 0 0 6px;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+  word-break: break-word;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  font-size: 0.88rem;
+  color: #616e7c;
+}
+
+.metaItem strong {
+  color: #3f4c5a;
+  font-weight: 600;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: #2f4c17;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #fff;
+  color: #3b5f1d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostBtn:hover:not(:disabled) {
+  background: #f4f7f0;
+}
+
+.ghostBtn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Inline result of "Create doctor slots" - replaces the window.alert. */
+.note {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.noteOk {
+  background: #f4f7f0;
+  border: 1px solid #3b5f1d;
+  color: #2f4c17;
+}
+
+.noteErr {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  color: #8b2b21;
+}
+
+/* ── Stat tiles ─────────────────────────────────────── */
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  border-color: #3b5f1d;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.statLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.statValue {
+  font-family: "TT Ramillas", serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #3b5f1d;
+}
+
+.statValueEarning {
+  color: #8e8333;
+}
+
+.statHint {
+  font-size: 0.78rem;
+  color: #7b8794;
+}
+
+/* ── Cards ──────────────────────────────────────────── */
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.cardTitle svg {
+  color: #8e8333;
+}
+
+.cardTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cardTitleRow .cardTitle {
+  margin: 0;
+}
+
+/* Pending approvals */
+.pendingList { display: flex; flex-direction: column; gap: 10px; }
+.pendingRow {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 10px;
+  padding: 12px 14px; border: 1px solid #ececec; border-radius: 12px;
+  background: #fcfdfb; font-size: 0.9rem; color: #3f4c5a; text-decoration: none;
+}
+.pendingRow:hover { border-color: #8e8333; text-decoration: none; color: #3f4c5a; }
+.pendingLabel { display: flex; align-items: center; gap: 10px; }
+.pendingCount {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; padding: 2px 9px; border-radius: 999px;
+  background: #fff8e1; border: 1px solid #8e8333; color: #6b6329;
+  font-weight: 700; font-size: 0.8rem;
+}
+.pendingCountZero { background: #f0f2f4; border-color: #e0e0e0; color: #7b8794; }
+
+/* Quick actions */
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.quickTile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border: 1px solid #ececec; border-radius: 12px;
+  background: #fcfdfb; color: #1f2933; text-align: left; cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.quickTile:hover { border-color: #3b5f1d; transform: translateY(-2px); }
+.quickIcon { display: inline-flex; color: #3b5f1d; font-size: 1.35rem; }
+.quickLabel { display: block; font-weight: 600; font-size: 0.95rem; }
+.quickHint { display: block; font-size: 0.78rem; color: #7b8794; }
+
+/* Doctors table: the scroll stays inside the card, so the page never overflows */
+.searchRow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.searchInput { flex: 1 1 240px; max-width: 320px; padding: 9px 12px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 0.9rem; }
+.searchInput:focus-visible { outline: 2px solid #3b5f1d; outline-offset: 1px; }
+.countNote { font-size: 0.82rem; color: #7b8794; }
+.tableWrap { margin-top: 14px; overflow-x: auto; }
+.table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 0.9rem; }
+.th { padding: 10px 12px; text-align: left; font-size: 0.76rem; letter-spacing: 0.05em; text-transform: uppercase; color: #7b8794; background: #f4f7f0; border-bottom: 2px solid #e0e0e0; white-space: nowrap; }
+.td { padding: 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; color: #3f4c5a; }
+.name { font-weight: 600; color: #1f2933; }
+.contact { display: block; margin-top: 2px; font-size: 0.78rem; font-weight: 400; color: #7b8794; }
+.nowrap { white-space: nowrap; }
+.rowActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.rowBtn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid #3b5f1d; border-radius: 8px; background: #fff; color: #3b5f1d; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.rowBtn:hover:not(:disabled) { background: #f4f7f0; }
+.rowBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.rowBtnDanger { border-color: #c62828; color: #c62828; }
+.rowBtnDanger:hover:not(:disabled) { background: #fdecea; }
+
+/* Empty / error / feedback */
+.empty { margin: 8px 0 0; padding: 18px 0; text-align: center; color: #9aa5b1; font-size: 0.9rem; }
+.errorBox { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #f5c6c2; border-radius: 10px; background: #fdecea; color: #8b2b21; font-size: 0.9rem; }
+.retry { padding: 6px 14px; border: 1px solid #8b2b21; border-radius: 8px; background: #fff; color: #8b2b21; font-weight: 600; cursor: pointer; }
+.hint { margin: 12px 0 0; font-size: 0.8rem; color: #7b8794; }
+.loading { margin: 12px 0 0; color: #7b8794; font-size: 0.9rem; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .statGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 576px) {
+  .statGrid { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding: 16px 18px; gap: 14px; }
+  .heroName { font-size: 1.35rem; }
+  .statValue { font-size: 1.5rem; }
+  .card { padding: 16px; }
+  .page { padding: 16px 12px 24px; }
+}
+
+/* Anchors styled as buttons (next/link renders the <a>) */
+.primaryBtn,
+.ghostBtn,
+.rowBtn {
+  text-decoration: none;
+}
+
+.primaryBtn:hover,
+.ghostBtn:hover,
+.rowBtn:hover {
+  text-decoration: none;
+}
+
+/* Footer row under the doctors table */
+.footerRow {
+  margin-top: 16px;
+}

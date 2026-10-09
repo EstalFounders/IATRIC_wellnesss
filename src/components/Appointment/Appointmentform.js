@@ -15,6 +15,7 @@ import styles from "./css/appointmentPage.module.css";
 import { CHOOSE_TIME, IS_NOW, price_symbol, superAdminConsultationtype, color_schema } from "../../constant";
 import { useGlobalData } from "../../customUtils/useGlobalData";
 import { formatTime } from "../helper";
+import { doctorDisplayName } from "../../utils/doctorName";
 
 // Common complaints offered as quick-select pills on the form.
 const COMMON_DISEASES = [
@@ -479,7 +480,7 @@ const AppointmentForm = ({
                       </option>
                       {visibleDoctors.map((doctor) => (
                         <option key={doctor._id} value={doctor._id}>
-                          {doctor.name}
+                          {doctorDisplayName(doctor.name)}
                         </option>
                       ))}
                     </Form.Control>

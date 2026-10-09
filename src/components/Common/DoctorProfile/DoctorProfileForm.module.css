@@ -1,0 +1,397 @@
+/* DoctorProfileForm.module.css
+   Styling for the dedicated doctor profile page that replaced the
+   "Edit Doctor Details" popup. Brand tokens come from `color_schema`:
+   green #3b5f1d, yellow #8e8333. */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  color: #1f2933;
+}
+
+/* ── Hero ───────────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3b5f1d;
+  background: #f4f7f0;
+}
+
+.avatarFallback {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 3px solid #3b5f1d;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+}
+
+.heroInfo {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.heroName {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+  word-break: break-word;
+}
+
+.heroSpeciality {
+  margin: 0 0 10px;
+  color: #52606d;
+  font-size: 1rem;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.88rem;
+  color: #616e7c;
+}
+
+.metaItem strong {
+  color: #3f4c5a;
+  font-weight: 600;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.statusInactive {
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* ── Banners ────────────────────────────────────────── */
+
+.banner {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: #e8f5e9;
+  border: 1px solid #2e7d32;
+  color: #2e7d32;
+}
+
+.bannerInfo {
+  background: #fff8e1;
+  border-color: #8e8333;
+  color: #6b6329;
+}
+
+/* ── Layout ─────────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: start;
+}
+
+.main,
+.rail {
+  min-width: 0;
+}
+
+/* ── Cards / fields ─────────────────────────────────── */
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 20px 22px 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.cardTitle svg {
+  color: #8e8333;
+}
+
+.label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3f4c5a;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: #7b8794;
+}
+
+.timeInput {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* ── Tags / selects ─────────────────────────────────── */
+
+.tagList {
+  margin-bottom: 8px;
+}
+
+.tagEmpty {
+  font-size: 0.85rem;
+  color: #9aa5b1;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 4px 2px 0;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.85rem;
+}
+
+.tagRemove {
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: #c62828;
+}
+
+.selectInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.addRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #3b5f1d;
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.smallBtn {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #333;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* ── Files ──────────────────────────────────────────── */
+
+.fileInput {
+  display: block;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.docGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.docThumbWrap {
+  position: relative;
+  width: 140px;
+}
+
+.docThumb {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.docRemove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  cursor: pointer;
+  color: #c62828;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  padding: 3px;
+}
+
+/* ── Rail ───────────────────────────────────────────── */
+
+.railCard {
+  position: sticky;
+  top: 16px;
+}
+
+.stampImg {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.stampCaption {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: #7b8794;
+  text-align: center;
+}
+
+.tipList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: #52606d;
+  line-height: 1.6;
+}
+
+/* ── Sticky action bar ──────────────────────────────── */
+
+.actionBar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 14px 20px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.dirtyNote {
+  margin-right: auto;
+  font-size: 0.85rem;
+  color: #8e8333;
+}
+
+.primaryBtn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghostBtn {
+  padding: 10px 20px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #fff;
+  color: #3b5f1d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── States ─────────────────────────────────────────── */
+
+.state {
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 28px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  color: #52606d;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 992px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .railCard {
+    position: static;
+  }
+}
+
+

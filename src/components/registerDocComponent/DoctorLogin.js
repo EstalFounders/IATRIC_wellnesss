@@ -5,8 +5,8 @@ import Preloader from "../Preloader";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Image from "next/image";
 import Logo from "../../../public/images/logo.png";
+import CompanyLogo from "../../../public/images/company_logo.png";
 // import GoogleSvg from "../assets/icons8-google.svg";
-import ImageSrc from "../../../public/images/Doctor/doctor-removebg-preview.png"; // Adjust the path as necessary
 import styles from "./css/DoctorLogin.module.css"; // Import the CSS file
 import CustomDialog from "../CustomPopup";
 
@@ -56,10 +56,14 @@ export default function DoctorLogin() {
   };
 
   return (
-    <div className={`${styles.container} p-4`}>
+    <div className="p-4">
       <div className={styles["login-main"]}>
         <div className={styles["login-left"]}>
-          <Image src={ImageSrc} alt="Login Image" />
+          <Image
+            src={CompanyLogo}
+            alt="HealthPath - Your path to healthy living"
+            priority
+          />
         </div>
         <div className={styles["login-right"]}>
           <div className={styles["form-container"]}>

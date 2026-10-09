@@ -244,7 +244,7 @@ const AddLabComponent = () => {
                 {lab.tests_offered
                   .map((testId) => {
                     const test = availableTests.find((t) => t._id === testId);
-                    return test ? test.testName : ""; // Return empty string instead of null
+                    return test ? test.title : ""; // Return empty string instead of null
                   })
                   .slice(0, 3)
                   .join(", ")}
@@ -486,7 +486,7 @@ const AddLabComponent = () => {
                                 }}
                               >
                                 <span style={{ marginRight: "10px" }}>
-                                  {test?.testName || "Unknown Test"}
+                                  {test?.title || "Unknown Test"}
                                 </span>
                                 <div
                                   onClick={() => handleRemoveTest(testId)}
@@ -531,7 +531,7 @@ const AddLabComponent = () => {
                         {availableTests
                           .filter(
                             (test) =>
-                              test.testName
+                              (test.title || "")
                                 .toLowerCase()
                                 .includes(searchQuery || "") &&
                               !currentLab.tests_offered.includes(test._id) // Exclude already added tests
@@ -556,7 +556,7 @@ const AddLabComponent = () => {
                                 className="form-check-input"
                                 type="checkbox"
                                 id={test._id}
-                                value={test.testName}
+                                value={test.title}
                                 onChange={() => handleAddTest(test._id)}
                                 style={{
                                   marginRight: "9px",
@@ -566,7 +566,7 @@ const AddLabComponent = () => {
                                 className="form-check-label"
                                 htmlFor={test._id}
                               >
-                                {test.testName}
+                                {test.title}
                               </label>
                             </div>
                           ))}

@@ -25,6 +25,7 @@ import {
 import { formatPhoneNumber } from "../../pages/api/utils/commonmethod";
 import { sendAdminNotification } from "../../pages/api/lib/sendNotification";
 import { logErrorToGoogleSheet } from "../../pages/api/helper";
+import { doctorDisplayName } from "../utils/doctorName";
 
 /**
  * Confirms an appointment ONLY after verified successful payment.
@@ -43,6 +44,10 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
 
   const doctor = await Doctor.findById(appointment.doctorId);
   const docName = doctor?.name || "";
+  // Every WhatsApp body below names the doctor to the patient (and to the
+  // doctor), so it carries the title; `docName` itself stays exactly as stored
+  // because it is the value written back/compared elsewhere.
+  const docDisplayName = doctorDisplayName(docName);
   const doctorMobileNo = doctor?.mobileNumber?.toString() || "";
   const patientMobileNo = appointment.patientMobNo?.toString() || "";
 
@@ -79,7 +84,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
 
   const confirmMessageBody = getConfirmMessageBody(
     appointment.appointmentTime,
-    docName,
+    docDisplayName,
     appointment.name,
     appointment.consultationType,
     contact_no,
@@ -207,7 +212,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     });
 
     const reminderPatientBody = getReminderMessageBodyPatient(
-      docName,
+      docDisplayName,
       appointment.name,
       confirmMessageBody.appointment_date,
       confirmMessageBody.appointment_time,
@@ -215,7 +220,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     );
 
     const reminderDoctorBody = getReminderMessageBodyDoctor(
-      docName,
+      docDisplayName,
       appointment.name,
       confirmMessageBody.appointment_date,
       confirmMessageBody.appointment_time,

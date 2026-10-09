@@ -1,32 +1,55 @@
-import { price_symbol } from "../../../../constant";
 import styles from "../../css/StatsCard.module.css";
 
-const StatsCard = ({ todayBooking, totalEarning, totalBooking, onCardClick }) => {
-  return (
-    <div className={styles.container}>
-      <div
-        className={`${styles.card} clickable-div`}
-        onClick={() => onCardClick("today")} // Handle today's booking click
-      >
-        <h3 className={styles.title}>Today&apos;s Booking</h3>
-        <p className={styles.value}>{todayBooking}</p>
-      </div>
-      <div
-        className={`${styles.card} clickable-div`}
-        onClick={() => onCardClick("total")} // Handle total booking click
-      >
-        <h3 className={styles.title}>Total Booking</h3>
-        <p className={styles.value}>{totalBooking}</p>
-      </div>
-      <div className={`${styles.card} clickable-div`} onClick={() => onCardClick("payment")}>
-        <h3 className={styles.title}>Total Earning</h3>
-        <p className={styles.value}>
-          {price_symbol}
-          {totalEarning}
-        </p>
-      </div>
+// The home page's stat cards. Three of them select the filter of the
+// appointments table below (activeView); the earnings card opens the payments
+// page instead, which is the only action that leaves the home page.
+const StatsCard = ({
+  cards = [],
+  activeView,
+  onSelect,
+  loading = false,
+  error = "",
+  onRetry,
+}) => (
+  <>
+    <div className={styles.grid} aria-busy={loading}>
+      {cards.map((card) => {
+        const isFilter = !card.earning;
+        const isActive = isFilter && activeView === card.key;
+
+        return (
+          <button
+            key={card.key}
+            type="button"
+            className={`${styles.card} ${isActive ? styles.cardActive : ""}`}
+            aria-pressed={isFilter ? isActive : undefined}
+            onClick={() => onSelect?.(card.key)}
+          >
+            <span className={styles.label}>{card.label}</span>
+            <span
+              className={`${styles.value} ${
+                card.earning ? styles.valueEarning : ""
+              }`}
+            >
+              {card.value}
+            </span>
+            <span className={styles.hint}>{card.hint}</span>
+          </button>
+        );
+      })}
     </div>
-  );
-};
+
+    {error ? (
+      <div className={styles.errorBox} role="alert">
+        <span>{error}</span>
+        {onRetry ? (
+          <button type="button" className={styles.retry} onClick={onRetry}>
+            Retry
+          </button>
+        ) : null}
+      </div>
+    ) : null}
+  </>
+);
 
 export default StatsCard;

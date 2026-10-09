@@ -25,12 +25,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
-  let session;
   try {
     await dbConnect();
-
-    session = await mongoose.connection.startSession();
-    session.startTransaction();
 
     // Destructure explicit fields from req.body to safely use as lookups or fallbacks
     // patientNo is sent from the frontend (dynamic mobile input); patientMobNo from DB lookup
@@ -48,40 +44,44 @@ export default async function handler(req, res) {
           prescriptionUrl: prescriptionUrl,
           status: appointment_status.completed,
         },
-        { new: true, session }
+        { new: true }
       );
     }
 
-    // Commit the database transaction safely
-    await session.commitTransaction();
-    session.endSession();
-    session = null;
-
     // 2. WhatsApp Notification Flow
+    let whatsapp = { sent: false };
     try {
       // Determine recipient details (use updated DB values, or fall back to payload fields)
-      const recipientNumber = updateStatus?.patientMobNo || patientNo || patientMobNo;
-      const recipientName = updateStatus?.name || name || "Patient";
+      const recipientNumber = patientNo || updateStatus?.patientMobNo || patientMobNo;
+      const recipientName = name || updateStatus?.name || "Patient";
 
       if (recipientNumber) {
-        await sendWhatsAppConfirmation(
+        const result = await sendWhatsAppConfirmation(
           formatPhoneNumber(recipientNumber.toString()),
           { patient_name: recipientName, prescription_url: prescriptionUrl },
           WHATSAPP_PRESCRIPTION_TEMPLATE
         );
+        // Fast2SMS returns HTTP 200 with `return: false` on rejection (it does not throw),
+        // so treat that as a failure too, otherwise real errors hide behind "send successfully".
+        if (result && result.return === false) {
+          const reason = Array.isArray(result.message)
+            ? result.message.join(", ")
+            : result.message || "fast2sms_rejected";
+          whatsapp = { sent: false, reason, number: recipientNumber.toString() };
+        } else {
+          whatsapp = { sent: true, number: recipientNumber.toString() };
+        }
       } else {
         console.warn("Skipping WhatsApp: No phone number provided in request or database.");
+        whatsapp = { sent: false, reason: "no_phone_number" };
       }
     } catch (whatsappError) {
       console.error("WhatsApp prescription notification failed:", whatsappError);
+      whatsapp = { sent: false, reason: whatsappError.message || "whatsapp_error" };
     }
 
-    res.status(200).json({ status: "send successfully" });
+    res.status(200).json({ status: "send successfully", whatsapp });
   } catch (error) {
-    if (session) {
-      await session.abortTransaction();
-      session.endSession();
-    }
     console.error("Error:", error);
     await logErrorToGoogleSheet({
       apiName: "prescription - POST",

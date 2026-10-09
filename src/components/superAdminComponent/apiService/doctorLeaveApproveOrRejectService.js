@@ -16,12 +16,17 @@ export const handleLeaveApproveOrRejectService = async (id, action) => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log("Request processed successfully:", data);
+        return { success: true, data };
       } else {
         console.error(data.error);
-        alert(`Error: ${data.error}`);
+        return { success: false, error: data.error };
       }
     } catch (error) {
       console.error("Error while processing the request:", error);
-      alert("Something went wrong. Please try again later.");
+      return {
+        success: false,
+        error: "Something went wrong. Please try again later.",
+      };
     }
   };

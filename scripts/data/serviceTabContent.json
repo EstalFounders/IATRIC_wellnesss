@@ -88,6 +88,14 @@
       "subheadingHi": "पुनर्वास सेवा, गति सुधार",
       "description": "Our Physiotherapy services help restore movement and function after injury, surgery, or illness. We design personalized rehabilitation programs to reduce pain and improve mobility.",
       "descriptionHi": "हमारी फिजियोथेरेपी सेवाएं चोट, सर्जरी या बीमारी के बाद गति और कार्यक्षमता बहाल करने में मदद करती हैं। दर्द कम करने के लिए व्यक्तिगत पुनर्वास कार्यक्रम।"
+    },
+    {
+      "dbName": "Nutritionist",
+      "image": "/images/commonHealth/lose-weight.jpg",
+      "subheading": "Eat Right, Live Well",
+      "subheadingHi": "सही खाएँ, स्वस्थ रहें",
+      "description": "Our Nutritionists and Dietitians build practical eating plans around your health goals - weight management, diabetes, thyroid and PCOS, heart health, pregnancy and child nutrition. Every plan starts with a detailed assessment of your current intake, body measurements and lab reports, followed by simple, sustainable meal plans and regular follow-ups that adjust as your goals and reports change.",
+      "descriptionHi": "हमारे आहार विशेषज्ञ आपके स्वास्थ्य लक्ष्यों के अनुसार व्यावहारिक आहार योजना बनाते हैं - वजन प्रबंधन, मधुमेह, थायरॉइड और पीसीओएस, हृदय स्वास्थ्य, गर्भावस्था और बाल पोषण। प्रत्येक योजना आपकी वर्तमान खान-पान, शरीर की माप और रिपोर्ट के मूल्यांकन से शुरू होती है, फिर सरल और टिकाऊ भोजन योजना तथा नियमित फॉलो-अप के साथ इसे आपके लक्ष्यों के अनुसार बदला जाता है।"
     }
   ]
 }

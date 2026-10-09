@@ -12,6 +12,7 @@ import {
   LabInvestigation,
   MedicineDelivery,
   NursingCareIcon,
+  NutritionistIcon,
   OphthalmologyIcon,
   OrthopaedicsIcon,
   PediatricsIcon,
@@ -293,6 +294,28 @@ export const servicesData = [
       "Digital health records, incident logs & monthly MIS reports",
     ],
   },
+  {
+    id: 12,
+    key: "tab-13",
+    name: "Nutritionist",
+    image: "/images/commonHealth/lose-weight.jpg",
+    subheading: "Eat Right, Live Well",
+    description:
+      "Our Nutritionists and Dietitians build practical eating plans around your health goals - weight management, diabetes, thyroid and PCOS, heart health, pregnancy and child nutrition.",
+    link: "/service-1",
+    content: [
+      "Our Nutritionists and Dietitians create personalised diet plans around your medical condition, lifestyle, food preferences and culture - covering weight management, diabetes, thyroid, PCOS, heart, kidney and liver conditions, pregnancy, child growth and sports or recovery nutrition.",
+      "Every plan starts with a detailed assessment of your current intake, body measurements and lab reports, followed by simple, sustainable meal plans and regular follow-ups that adjust the plan as your goals and reports change.",
+    ],
+    options: [
+      "Personalised weight loss and weight gain diets",
+      "Diabetes, thyroid and PCOS nutrition plans",
+      "Heart-healthy and cholesterol-lowering diets",
+      "Pregnancy, lactation and child nutrition guidance",
+      "Sports, fitness and recovery nutrition",
+      "Therapeutic diets for kidney, liver and gut conditions",
+    ],
+  },
 ];
 
 export const AllDepartmentService = [
@@ -384,6 +407,12 @@ export const AllDepartmentService = [
     description:
       "Pan-India health check-up camps for schools, corporates, elderly care and underprivileged communities - screenings, doctor consults and reports.",
     icon: <HealthCampIcon />,
+  },
+  {
+    title: "Nutritionist",
+    description:
+      "Personalised diet plans for weight, diabetes, heart, pregnancy and child nutrition.",
+    icon: <NutritionistIcon />,
   },
 ];
 

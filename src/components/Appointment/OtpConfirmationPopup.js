@@ -147,7 +147,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               ref={(el) => (inputRefs.current[index] = el)}
-              className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
+              className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none text-center"
               style={{
                 width: "40px",
                 height: "50px",
@@ -167,7 +167,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
             className={`font-semibold ${
               resendCooldown > 0
                 ? "text-gray-400 cursor-not-allowed"
-                : "text-blue-600 hover:underline"
+                : "text-primary hover:underline"
             }`}
             onClick={generateAndSendOtp}
             disabled={resendCooldown > 0}

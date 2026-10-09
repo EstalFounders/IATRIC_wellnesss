@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   TextField,
@@ -18,6 +18,7 @@ import {
   ShoppingCart,
 } from "@mui/icons-material";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { color_schema } from "../../constant";
 import { useAddToCart } from "./common/CommonMethod";
 import { setMedicineDetail } from "../../store/slices/medicine/MedicineHomePageApiData";
@@ -26,18 +27,20 @@ import FaqSection from "../Common/FaqSection";
 import { getFaqsForTopic } from "../../../data/faqs";
 
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-const PAGE_LIMIT = 50;
+const ITEMS_PER_PAGE = 25;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const MedicineDeliveryComp = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [allAlphabetMedicines, setAllAlphabetMedicines] = useState([]);
-  const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [medicines, setMedicines] = useState([]);
   const [selectedAlphabet, setSelectedAlphabet] = useState("A");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const itemsPerPage = 25;
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // FAQs for medicine delivery only - the group data/faqs.js defines for it.
   const medicineFaqs = getFaqsForTopic("medicine-delivery");
@@ -45,50 +48,63 @@ const MedicineDeliveryComp = () => {
   const { snackbarOpen, isClicked, handleAddToCart, handleSnackbarClose } =
     useAddToCart();
 
-  const fetchMedicines = async (alphabet) => {
+  // Server side filtering + paging. The API used to ignore the `alphabet` param,
+  // so every letter click downloaded the whole catalogue (27k documents / ~6 MB)
+  // and this component paginated that array in the browser.
+  const fetchMedicines = useCallback(async (alphabet, currentPage, term) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.get(`/api/medicineInfo`, {
-        params: { alphabet }, // should return all medicines with this alphabet
+        params: {
+          // A typed term searches the whole catalogue, otherwise the letter tab
+          // narrows it down.
+          alphabet: term ? undefined : alphabet,
+          search: term || undefined,
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+        },
       });
-      const all = res.data.medicines || [];
-      setAllAlphabetMedicines(all);
-      setFilteredMedicines(all);
-      setPage(1);
-      setTotalPages(Math.ceil(all.length / itemsPerPage));
-    } catch (error) {
-      console.error("Failed to fetch medicines", error);
+      setMedicines(res.data?.medicines || []);
+      setTotalPages(res.data?.totalPages || 1);
+    } catch (err) {
+      console.error("Failed to fetch medicines", err);
+      setError("Failed to fetch medicines. Please try again.");
+      setMedicines([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  // Debounce the search box so typing does not fire one request per keystroke.
   useEffect(() => {
-    fetchMedicines(selectedAlphabet);
-  }, [selectedAlphabet]);
-
-  useEffect(() => {
-    const filtered = allAlphabetMedicines.filter((med) =>
-      med.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const timer = setTimeout(
+      () => setDebouncedSearch(searchTerm.trim()),
+      SEARCH_DEBOUNCE_MS
     );
-    setFilteredMedicines(filtered);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchMedicines(selectedAlphabet, page, debouncedSearch);
+  }, [fetchMedicines, selectedAlphabet, page, debouncedSearch]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
     setPage(1);
-    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-  }, [searchTerm, allAlphabetMedicines]);
+  };
 
   const handleAlphabetClick = (letter) => {
     setSelectedAlphabet(letter);
     setSearchTerm("");
+    setDebouncedSearch("");
+    setPage(1);
   };
 
   const handlePageChange = (_, value) => {
     setPage(value);
   };
-
-  const paginatedMedicines = filteredMedicines.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
 
   const handleViewDetails = (medicine) => {
     dispatch(setMedicineDetail(medicine));
@@ -153,9 +169,19 @@ const MedicineDeliveryComp = () => {
       />
 
       {/* Medicine List */}
-      {!loading ? (
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+      {!loading && medicines.length === 0 && (
+        <Typography sx={{ mt: 3, textAlign: "center" }}>
+          No medicines found.
+        </Typography>
+      )}
+      {!loading && (
         <Grid container spacing={3}>
-          {paginatedMedicines.map((medicine) => (
+          {medicines.map((medicine) => (
             <Grid
               item
               xs={12}
@@ -214,7 +240,8 @@ const MedicineDeliveryComp = () => {
             </Grid>
           ))}
         </Grid>
-      ) : (
+      )}
+      {loading && (
         <Typography sx={{ mt: 3 }}>Loading medicines...</Typography>
       )}
 

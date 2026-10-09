@@ -98,6 +98,7 @@ export const speciality = [
   "Psychiatrist",
   "Dentistry",
   "Physiotherapy",
+  "Nutritionist",
 ];
 
 export const consultationTypeMapping = {
@@ -217,8 +218,12 @@ export const Linkdn_url =
   "https://www.linkedin.com/in/iatrichealthcare/";
 export const color_schema = {
   green: "#3b5f1d",
-  yellow: "#8e8333",
+  gold: "#916f38",
+  // `yellow` kept for backwards compatibility; the gold in the current scheme.
+  yellow: "#916f38",
   white: "#ffffff",
+  grey: "#717171",
+  ink: "#010101",
   black: "#000000",
 };
 

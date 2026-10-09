@@ -1,3 +1,37 @@
+/* ==========================================================================
+   TT Ramillas - the single brand typeface for the whole site.
+   The woff2/woff files live in /public/fonts and are served from the site
+   root, so the url() paths are root-relative (webpack leaves "/"-prefixed
+   urls untouched).
+   ========================================================================== */
+@font-face {
+  font-family: "TT Ramillas";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/TTRamillas-Regular.woff2") format("woff2"),
+       url("/fonts/TTRamillas-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "TT Ramillas";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/TTRamillas-SemiBold.woff2") format("woff2"),
+       url("/fonts/TTRamillas-SemiBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "TT Ramillas";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/TTRamillas-Bold.woff2") format("woff2"),
+       url("/fonts/TTRamillas-Bold.woff") format("woff");
+}
+
+
 .labtest-bg-image {
   background-image: url("/images/labtest/labTestFirstSectionBg.png");
   background-size: cover;
@@ -1210,6 +1244,165 @@ h2.steelblue-color {
    markup. */
 li.p-sm {
   font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Brand pass - one typeface, one palette, no blue.
+   Palette: green #3b5f1d, gold #916f38, white #ffffff, grey #717171,
+   ink #010101. This file is the project override layer and is imported after
+   every template stylesheet (style.css / responsive.css / menu.css / demo),
+   so equal-specificity rules here win.
+   ========================================================================== */
+
+/* --- Typography: TT Ramillas is the only text family. There is deliberately
+   no blanket `* { ... }` rule, so Flaticon / Font Awesome keep their own
+   icon fonts (.initials-avatar below used to hard-code candara). ---------- */
+html,
+body,
+button,
+input,
+select,
+textarea,
+optgroup,
+.btn,
+.form-control,
+.page-link,
+h1, h2, h3, h4, h5, h6,
+p, a, li, span, b, strong, em, i, small, label, td, th, dt, dd, blockquote,
+.initials-avatar,
+.MuiTypography-root,
+.MuiButton-root,
+.MuiButtonBase-root,
+.MuiInputBase-root,
+.MuiFormLabel-root,
+.MuiInputLabel-root,
+.MuiMenuItem-root,
+.MuiTableCell-root,
+.MuiTab-root {
+  font-family: "TT Ramillas", serif;
+}
+
+/* --- Text colours from the scheme. -------------------------------------- */
+body {
+  color: var(--color-ink);
+}
+
+.grey-color,
+.grey-color h1, .grey-color h2, .grey-color h3,
+.grey-color h4, .grey-color h5, .grey-color h6,
+.grey-color p, .grey-color a, .grey-color li,
+.grey-color i, .grey-color span {
+  color: var(--color-grey);
+}
+
+/* --- Retire the template's blue / teal family (style.css hard-codes
+   #004861 / #1d437b / #004a91 / #5496ff on these). --------------------- */
+.steelblue-color,
+.steelblue-color h1, .steelblue-color h2, .steelblue-color h3,
+.steelblue-color h4, .steelblue-color h5, .steelblue-color h6,
+.steelblue-color p, .steelblue-color a, .steelblue-color li,
+.steelblue-color i, .steelblue-color span,
+h1.steelblue-color,
+h2.steelblue-color,
+.darkblue-color,
+.darkblue-color h1, .darkblue-color h2, .darkblue-color h3,
+.darkblue-color h4, .darkblue-color h5, .darkblue-color h6,
+.darkblue-color p, .darkblue-color a, .darkblue-color li,
+.darkblue-color i, .darkblue-color span {
+  color: var(--color-primary);
+}
+
+.bg-steelblue,
+.bg-deepblue {
+  background-color: var(--color-primary);
+}
+
+.on-hover-blue:hover,
+.on-hover-blue:focus {
+  color: var(--color-primary);
+}
+
+/* Swiper bullet nav that used the teal outline. */
+.slider.blue-nav .indicators .swiper-pagination-bullet {
+  border-color: var(--color-primary);
+}
+.slider.blue-nav .indicators .swiper-pagination-bullet.swiper-pagination-bullet-active {
+  background-color: var(--color-primary);
+}
+
+/* Pagination pills were #5496ff. */
+.page-link:hover,
+.page-link:focus,
+.page-item.active .page-link {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* --- Bootstrap primary / blue utilities -> brand green. ----------------- */
+.text-primary { color: var(--color-primary) !important; }
+.bg-primary { background-color: var(--color-primary) !important; }
+.border-primary { border-color: var(--color-primary) !important; }
+.link-primary { color: var(--color-primary); }
+.badge-primary { background-color: var(--color-primary); }
+.text-info { color: var(--color-grey) !important; }
+
+.btn-primary {
+  color: #fff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:not(:disabled):not(.disabled):active {
+  color: #fff;
+  background-color: #31511a;
+  border-color: #31511a;
+}
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  color: #fff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.alert-primary {
+  color: #fff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Remaining hard-coded teal (#004861 / #0e8eab) on template widgets:
+   icon swatches, the owl-carousel dots, the `blue-hover` buttons and the
+   mobile-menu header button (menu.css). ---------------------------------- */
+.sbox-3-icon.st-blue-icon {
+  background-color: var(--color-primary);
+}
+
+.services-section .owl-theme .owl-dots .owl-dot span,
+.reviews-section .owl-theme .owl-dots .owl-dot span {
+  border-color: var(--color-primary);
+}
+
+.services-section .owl-theme .owl-dots .owl-dot.active span,
+.services-section .owl-theme .owl-dots .owl-dot:hover span,
+.reviews-section .owl-theme .owl-dots .owl-dot.active span,
+.reviews-section .owl-theme .owl-dots .owl-dot:hover span {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.blue-hover:hover,
+.white-color .blue-hover:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.wsmenu > .wsmenu-list > li.header-btn a:hover {
+  background-color: var(--color-primary);
 }
 
 

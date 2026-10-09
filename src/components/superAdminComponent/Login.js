@@ -1,70 +1,161 @@
 import { useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { loginUser } from "../../helper";
+import Image from "next/image";
 import { useRouter } from "next/router";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { loginUser } from "../../helper";
 import Preloader from "../Preloader";
+import CustomDialog from "../CustomPopup";
+import Logo from "../../../public/images/logo.png";
+import CompanyLogo from "../../../public/images/company_logo.png";
+import styles from "./css/SuperAdminLogin.module.css";
 
+const BAD_CREDENTIALS_MESSAGE =
+  "Wrong Input, Please try again with the correct credentials";
 
 export default function Login() {
-    const [loader, setLoader] = useState(false)
-    const router = useRouter()
-    const [loginErr, setLoginErr] = useState()
-    const [userInfo, setUserInfo] = useState({ email: '', password: '' })
+  const [loader, setLoader] = useState(false);
+  const router = useRouter();
+  const [loginErr, setLoginErr] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [userInfo, setUserInfo] = useState({ email: "", password: "" });
 
-    const loginDoc = async () => {
-        setLoader(true)
+  const closeDialog = () => {
+    setShowDialog(false);
+    setDialogMessage("");
+  };
 
-        const loginRes = await loginUser({
-            email: userInfo.email,
-            password: userInfo.password
-        })
+  const loginDoc = async (event) => {
+    // The form is a real <form>, so Enter submits. Stop the browser reload here.
+    event.preventDefault();
+    if (loader) return;
 
-        console.log(loginRes.ok, 'login resp')
+    const email = userInfo.email.trim();
+    const password = userInfo.password;
 
-        if (loginRes && !loginRes.ok) {
-            setLoader(false)
-            setLoginErr('Please check your password & email')
-        } else {
-            setLoader(false)
-            router.push('/superAdmin/homepage')
-        }
-      
+    // Native `required` already blocks the empty case; this guard keeps the
+    // handler safe if it is ever invoked directly.
+    if (!email || !password) {
+      setLoginErr("Please enter both your email and password.");
+      return;
     }
 
-    return (
-        <Container>
-            {loader && <Preloader />}
-            <Row className="text-center">
-                <Col md={3} className="mt-2 border border-info rounded ml-auto mr-auto p-4" style={{ backgroundColor: '#f5d49a' }}>
-                    <Form>
-                        <Form.Group className="mb-1" controlId="formBasicEmail">
-                            <Form.Label><b><strong>Email address</strong></b></Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" onChange={event => setUserInfo({ ...userInfo, email: event.target.value })} />
-                            <Form.Text className="text-muted">
-                                <strong>
-                                    We will never share your email with anyone else.
-                                </strong>
-                            </Form.Text>
-                        </Form.Group>
+    setLoader(true);
+    setLoginErr("");
 
-                        <Form.Group className="mb-1" controlId="formBasicPassword">
-                            <Form.Label><b><strong>Password</strong></b></Form.Label>
-                            <Form.Control type="password" placeholder="Password" onChange={event => setUserInfo({ ...userInfo, password: event.target.value })} />
-                        </Form.Group>
-                        {/* <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                        <Form.Check type="checkbox" label="Check me out" />
-                    </Form.Group> */}
-                        <Button variant="primary" type="button" className="bg-primary mt-4" onClick={loginDoc}>
-                            Login
-                        </Button>
-                    </Form>
-                    <Row className="mt-2">
-                        <Col className="text-center text-danger">
-                        <b>{loginErr}</b>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-        </Container>
-    )
+    try {
+      // loginUser -> next-auth signIn(..., { redirect: false }): a wrong
+      // credential pair resolves as { ok: false } instead of throwing.
+      const loginRes = await loginUser({ email, password });
+
+      setLoader(false);
+
+      if (loginRes && !loginRes.ok) {
+        setLoginErr("Please check your password & email");
+        setDialogMessage(BAD_CREDENTIALS_MESSAGE);
+        setShowDialog(true);
+        setUserInfo((prev) => ({ ...prev, password: "" }));
+      } else {
+        router.push("/superAdmin/homepage");
+      }
+    } catch (error) {
+      console.error("Error during super-admin sign-in:", error);
+      setLoader(false);
+      setLoginErr("An error occurred. Please try again later.");
+    }
+  };
+
+  const invalid = Boolean(loginErr);
+
+  return (
+    <div className={styles["login-main"]}>
+      <div className={styles["login-left"]}>
+        {/* Sized off its container by the CSS module, so the emblem scales with
+            the page instead of overflowing narrow viewports. */}
+        <Image
+          src={CompanyLogo}
+          alt="HealthPath - your path to healthy living"
+          priority
+        />
+      </div>
+
+      <div className={styles["login-right"]}>
+        <div className={styles["form-container"]}>
+          <div className={styles["login-logo"]}>
+            <Image src={Logo} alt="HealthPath" priority />
+          </div>
+
+          <div className={styles["login-center"]}>
+            <h1>HealthPath Super Admin</h1>
+            <h6>Sign in to the super admin console</h6>
+
+            <form className={styles.form} onSubmit={loginDoc}>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                autoComplete="email"
+                aria-label="Email address"
+                aria-invalid={invalid}
+                aria-describedby={invalid ? "login-error" : undefined}
+                required
+                value={userInfo.email}
+                onChange={(event) =>
+                  setUserInfo({ ...userInfo, email: event.target.value })
+                }
+              />
+
+              <div className={styles["pass-input-div"]}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  autoComplete="current-password"
+                  aria-label="Password"
+                  aria-invalid={invalid}
+                  aria-describedby={invalid ? "login-error" : undefined}
+                  required
+                  value={userInfo.password}
+                  onChange={(event) =>
+                    setUserInfo({ ...userInfo, password: event.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              <button type="submit" disabled={loader}>
+                {loader ? "Signing in..." : "Log In"}
+              </button>
+            </form>
+
+            {invalid && (
+              <p
+                id="login-error"
+                role="alert"
+                aria-live="polite"
+                className={styles["error-message"]}
+              >
+                {loginErr}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {loader && <Preloader />}
+      <CustomDialog
+        show={showDialog}
+        handleClose={closeDialog}
+        message={dialogMessage}
+      />
+    </div>
+  );
 }

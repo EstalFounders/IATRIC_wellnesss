@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { api } from "../../../constant";
-import { postMedicineApi } from "../utils/helperApi";
 import FrequencyTimeSelector from "./FrequencyTimeSelector";
 
 /* ── Shared compact input/select styles ── */
@@ -21,6 +20,11 @@ const labelStyle = {
   color: "#333",
 };
 
+// Server side cap for the autocomplete payload. Without it a one-letter search
+// matched the whole catalogue (~6 MB) and the aborted request surfaced here as
+// "Failed to fetch medicines".
+const MEDICINE_LOOKUP_LIMIT = 50;
+
 const MedicineForm = ({ onChange }) => {
   const [medicineName, setMedicineName] = useState("");
   const [medicineGeneric, setMedicineGeneric] = useState("");
@@ -38,42 +42,73 @@ const MedicineForm = ({ onChange }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isMedicineIncluded, setMedicineIncluded] = useState("");
   const debounceRef = useRef(null);
+  const searchAbortRef = useRef(null);
+  const searchRequestIdRef = useRef(0);
 
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (searchAbortRef.current) searchAbortRef.current.abort();
     };
   }, []);
 
-  // Function to handle changes in input fields
+  // Autocomplete lookup. Each keystroke aborts the request still in flight and
+  // stale responses are discarded, so a slow earlier lookup (or an abort) can
+  // never overwrite the newest results nor be reported as a failed fetch.
   const handleMedicineSearch = useCallback(async (searchTerm) => {
-    if (!searchTerm.trim()) {
+    const term = searchTerm.trim();
+
+    if (searchAbortRef.current) searchAbortRef.current.abort();
+    searchRequestIdRef.current += 1;
+    const requestId = searchRequestIdRef.current;
+
+    if (!term) {
       setMedicinesInfo([]);
       setShowDropdown(false);
+      setError(null);
+      setLoading(false);
       return;
     }
+
+    const controller =
+      typeof AbortController !== "undefined" ? new AbortController() : null;
+    searchAbortRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(
-        `${api.medicineInfoApiCall}${encodeURIComponent(searchTerm)}`,
+        `${api.medicineInfoApiCall}${encodeURIComponent(term)}&limit=${MEDICINE_LOOKUP_LIMIT}`,
+        controller ? { signal: controller.signal } : undefined,
       );
+      if (!response.ok) {
+        throw new Error(`Medicine lookup failed (${response.status})`);
+      }
       const data = await response.json();
-      const medicines = data?.medicines || [];
-      setMedicinesInfo(medicines);
-      setShowDropdown(medicines.length > 0);
+      if (searchRequestIdRef.current !== requestId) return;
+      setMedicinesInfo(data?.medicines || []);
+      setShowDropdown(true);
       setSelectedIndex(-1);
     } catch (err) {
+      if (
+        err.name === "AbortError" ||
+        searchRequestIdRef.current !== requestId
+      ) {
+        return;
+      }
       console.error("Error fetching medicine:", err);
-      setError("Failed to fetch medicines");
+      setError("Failed to fetch medicines. Check your connection and retry.");
       setMedicinesInfo([]);
+      setShowDropdown(false);
     } finally {
-      setLoading(false);
+      if (searchRequestIdRef.current === requestId) setLoading(false);
     }
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let changed = {};
+
     switch (name) {
       case "medicineName":
         setMedicineName(value);
@@ -82,26 +117,34 @@ const MedicineForm = ({ onChange }) => {
           () => handleMedicineSearch(value),
           300,
         );
-        emitEvent();
+        changed = { medicineName: value };
         break;
       case "unit":
         setUnit(value);
+        changed = { unit: value };
         break;
       case "dosage":
         setDosage(value);
+        changed = { dosage: value };
         break;
       case "days":
         daysRef.current = value;
+        changed = { days: value };
         break;
       case "medicationSchedule":
         setMedicationSchedule(value);
+        changed = { medicationSchedule: value };
         break;
       case "noOfTimes":
         setNoOfTimes(value);
+        changed = { noOfTimes: value };
         break;
       default:
         break;
     }
+
+    // Emit the just-typed value explicitly - React state only updates on the
+    // next render, so reading it back here would report the previous keystroke.
     onChange({
       medicineName,
       medicineGeneric,
@@ -112,6 +155,7 @@ const MedicineForm = ({ onChange }) => {
       noOfTimes,
       time: selectedTimes.join(", "),
       medicationSchedule,
+      ...changed,
     });
   };
 
@@ -121,11 +165,13 @@ const MedicineForm = ({ onChange }) => {
     setShowDropdown(false);
     setMedicinesInfo([]);
 
-    emitEvent();
+    // Pass the picked medicine explicitly, the state setters above only apply
+    // on the next render.
+    emitEvent({ medicineName: medicine.name, medicineGeneric: medicine.salt });
   };
 
-  const emitEvent = () => {
-    const updatedData = {
+  const emitEvent = (overrides = {}) => {
+    onChange({
       medicineName,
       medicineGeneric,
       unit,
@@ -136,10 +182,8 @@ const MedicineForm = ({ onChange }) => {
       time: selectedTimes.join(", "),
       medicationSchedule,
       isMedicineIncluded,
-    };
-
-    console.log("Child sending:", updatedData); // Check your console!
-    onChange(updatedData);
+      ...overrides,
+    });
   };
 
   const handleKeyDown = (e) => {
@@ -165,9 +209,9 @@ const MedicineForm = ({ onChange }) => {
   return (
     <div style={{ marginBottom: "12px" }}>
       <div style={{ display: "grid", gap: "6px" }}>
-        {/* ── Row 1: Unit + Medicine Name ── */}
+        {/* ── Row 1: Medicine name (primary) + Unit ── */}
         <Row>
-          <Col xs={12} md={8}>
+          <Col xs={12} md={4} className="order-md-2">
             <label style={labelStyle}>
               UNIT:
               <select
@@ -176,7 +220,7 @@ const MedicineForm = ({ onChange }) => {
                 onChange={handleInputChange}
                 value={unit}
               >
-                <option value="select">select Unit</option>
+                <option value="select">Select unit</option>
                 <option value="UNIT">UNIT</option>
                 <option value="TABLET">TABLET</option>
                 <option value="CAPSULE">CAPSULE</option>
@@ -189,9 +233,9 @@ const MedicineForm = ({ onChange }) => {
               </select>
             </label>
           </Col>
-          <Col xs={12} md={4}>
+          <Col xs={12} md={8} className="order-md-1">
             <label style={labelStyle}>
-              Medicine Name:
+              MEDICINE NAME:
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
@@ -200,13 +244,14 @@ const MedicineForm = ({ onChange }) => {
                   style={inputStyle}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
+                  placeholder="Search or type a medicine"
                   autoComplete="off"
                 />
                 {loading && (
                   <small
                     style={{ position: "absolute", right: "8px", top: "8px" }}
                   >
-                    ...
+                    Searching…
                   </small>
                 )}
                 {showDropdown && medicinesInfo.length > 0 && (
@@ -272,16 +317,13 @@ const MedicineForm = ({ onChange }) => {
                         onClick={() => {
                           setShowDropdown(false);
                           setMedicinesInfo([]);
-                          onChange({
+                          // Manual medicine: keep the typed name with the rest of
+                          // the fields. (The previous handler referenced an
+                          // undefined `time` variable and threw on click.)
+                          emitEvent({
                             medicineName,
                             medicineGeneric: "",
-                            unit,
-                            dosage,
-                            days: daysRef.current,
-                            frequency: Array.isArray(frequency) ? frequency.join(", ") : frequency,
-                            noOfTimes,
-                            time,
-                            medicationSchedule,
+                            time: selectedTimes.join(", "),
                           });
                         }}
                       >
@@ -309,6 +351,7 @@ const MedicineForm = ({ onChange }) => {
                 type="text"
                 name="dosage"
                 style={inputStyle}
+                placeholder="e.g. 500 mg"
                 onChange={handleInputChange}
               />
             </label>
@@ -320,6 +363,7 @@ const MedicineForm = ({ onChange }) => {
                 type="text"
                 name="days"
                 style={inputStyle}
+                placeholder="e.g. 5"
                 onChange={handleInputChange}
               />
             </label>
@@ -366,6 +410,7 @@ const MedicineForm = ({ onChange }) => {
               <input
                 name="noOfTimes"
                 style={inputStyle}
+                placeholder="e.g. 2"
                 onChange={handleInputChange}
               />
             </label>

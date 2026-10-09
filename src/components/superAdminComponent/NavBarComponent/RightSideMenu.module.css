@@ -1,39 +1,111 @@
-/* Dropdown.module.css */
+/* RightSideMenu.module.css - the account menu in the header. */
 
 .dropdown {
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .dropdown-toggle {
-    display: flex;
-    align-items: center;
-    margin-top: 8px;
-  }
-  
-  .arrow-icon {
-    font-size: 18px; /* Adjust the font size as needed */
-    margin-left: 5px; /* Adjust the margin as needed */
-  }
-  
-  .dropdown-menu {
-    position: fixed;
-    top: 60px; /* Adjust this value based on your header's height */
-    background-color: #CDD5CC;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    min-width: 120px;
-  }
-  
-  .dropdown-item {
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .dropdown-item:hover {
-    background-color: #f5f5f5;
-  }
-  
+  position: relative;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #1f2933;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: #f4f7f0;
+}
+
+.adminName {
+  max-width: 140px;
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.arrow {
+  font-size: 14px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1060;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.menuLabel {
+  margin: 0;
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a9a86;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #1f2933;
+  font-size: 14px;
+  text-align: left;
+}
+
+.item:hover {
+  background: #f4f7f0;
+}
+
+.itemBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.itemLink {
+  text-decoration: none;
+}
+
+.itemLink:hover {
+  text-decoration: none;
+}
+
+.itemCount {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #eef3e8;
+  color: #3d5120;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.itemCountZero {
+  background: #f1f1f1;
+  color: #8a9a86;
+}
+
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: #ececec;
+}

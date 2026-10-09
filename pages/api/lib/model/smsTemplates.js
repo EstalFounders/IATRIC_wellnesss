@@ -7,6 +7,7 @@ import {
   WHATSAPP_NUMBER_CONFIRMATION,
   WHATSAPP_USER_QUERY_TEMPLATE,
 } from "../../utils/constants";
+import { doctorDisplayName } from "../../../../src/utils/doctorName";
 
 /**
  * Double-encodes only the Firebase Storage object-path segment so it survives
@@ -59,7 +60,7 @@ export function buildWhatsAppPayload(template, body) {
         message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
         variables_values: [
           capitalize(body.patient_name),
-          `Dr. ${capitalize(body.doctor_name)}`, 
+          doctorDisplayName(capitalize(body.doctor_name)),
           body.appointment_date,
           body.appointment_time,
           body.consultation_type,
@@ -70,7 +71,7 @@ export function buildWhatsAppPayload(template, body) {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_PATIENT_ID,
         variables_values: [
           capitalize(body.patient_name),
-          `Dr. ${capitalize(body.doctor_name)}`,
+          doctorDisplayName(capitalize(body.doctor_name)),
           body.appointment_date,
           body.appointment_time,
           body.meeting_url || "",  // plain app URL — no special chars, no encoding needed
@@ -81,7 +82,7 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_DOCTOR_ID,
         variables_values: [
-          `Dr. ${capitalize(body.doctor_name)}`,
+          doctorDisplayName(capitalize(body.doctor_name)),
           capitalize(body.patient_name),
           body.appointment_date,
           body.appointment_time,

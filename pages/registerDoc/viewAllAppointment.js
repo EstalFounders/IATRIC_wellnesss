@@ -1,6 +1,7 @@
-// pages/login.js
+// pages/registerDoc/viewAllAppointment.js
+// The full appointment list behind the home page's "View all appointments"
+// button; the type query param (Today|Total) selects the initial filter.
 
-import HomepageComp from "../../src/components/registerDocComponent/homepage/HomepageComp";
 import ViewAllAppointmentComp from "../../src/components/registerDocComponent/ViewAllAppointmentComp";
 import Layouts from "../../src/layout/Layouts";
 import DoctorAuthenticatedComponent from "../api/auth/doctorauthenticatedcomponent";

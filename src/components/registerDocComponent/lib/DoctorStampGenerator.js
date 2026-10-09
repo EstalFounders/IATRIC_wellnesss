@@ -1,16 +1,17 @@
 /**
  * DoctorStampGenerator.js
  *
- * Generates a circular rubber-stamp SVG for a doctor.
- * Input:  { name, degree, dmcNo }
+ * Generates a rubber-stamp SVG for a doctor - one shared design for every
+ * doctor profile (present and future).
+ * Input:  { name, specialization, regNo }   // `dmcNo` still accepted
  * Output: SVG markup string OR a data-URL (inline <img> src)
  *
  * Layout (vertical stack, no arc text):
  *   ┌─────────────────────┐
    │      ╭──────╮       │
    │  Doctor Name (bold)  │
-   │   MBBS, MD (degree)  │
-   │    DMC-12345 (reg)   │
+   │   Specialization     │
+   │   Reg. No: 12345     │
    │      ╰──────╯       │
  *   └─────────────────────┘
  *
@@ -22,12 +23,153 @@
 // ─────────────────────────────────────────────────────
 
 import { capitalize } from "../utils/helper";
+import { doctorDisplayName } from "../../../utils/doctorName";
+
+// ─────────────────────────────────────────────────────
+// 0.  Shared stamp model (SVG + jsPDF + Canvas)
+// ─────────────────────────────────────────────────────
+
+// Stamp ink - the same blue in both flavours: CSS hex for the screen (SVG /
+// canvas) and an RGB vector for the PDF.
+const STAMP_INK = "#1a56db";
+const STAMP_INK_RGB = [26, 86, 219];
+
+/**
+ * The lines printed on the standard stamp, top to bottom:
+ * NAME / SPECIALIZATION / REG. NO. Every doctor profile gets the same stamp
+ * (the old degree line is gone) and the REG. NO row is compulsory - it prints
+ * for every profile, as `STAMP_REG_NO_PLACEHOLDER` while the number is missing.
+ * Sizes are fractions of the stamp *width*, so a
+ * single model renders the same stamp as SVG pixels (300 x 180), jsPDF
+ * millimetres (the measured stamp box) and canvas pixels.
+ *
+ * `wrap` = how many wrapped lines are tolerated before that line shrinks.
+ */
+const STAMP_LINES = [
+  { key: "name", weight: "bold", maxFs: 0.09, minFs: 0.05, wrap: 2 },
+  { key: "specialization", weight: "600", maxFs: 0.067, minFs: 0.047, wrap: 2 },
+  { key: "regNo", weight: "normal", maxFs: 0.06, minFs: 0.047, wrap: 1 },
+];
+
+const STAMP_TEXT_RATIO = 0.55; // average glyph width / font size
+const STAMP_SAFE_WIDTH = 0.9; // text never uses more than 90 % of the box width
+const STAMP_SAFE_HEIGHT = 0.82; // the stack never uses more than 82 % of the height
+
+/**
+ * The registration row is compulsory: while a (legacy) profile has no number
+ * yet, the stamp still prints the row with this text instead of dropping it. A
+ * real number is never invented and the line never disappears by accident.
+ */
+const STAMP_REG_NO_PLACEHOLDER = "Reg. No: Not provided";
+
+/** First entry of a comma separated list ("" when there is nothing to read). */
+const firstEntry = (value) =>
+  String(value ?? "")
+    .split(",")[0]
+    .trim();
+
+/** XML-escape a text node (a doctor name may contain "&"). */
+const escapeXml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+/**
+ * Normalise a stamp input into the printable lines. The three rows are fixed:
+ * NAME / SPECIALIZATION / REG. NO - the registration number is compulsory on the
+ * doctor profile, so that row is never dropped: a profile that has not been
+ * filled in yet prints `STAMP_REG_NO_PLACEHOLDER`. Only name and specialization
+ * are still omitted when they are empty. `dmcNo` is kept as a legacy alias of
+ * `regNo`.
+ *
+ * @param {StampInput} input
+ * @returns {Array<{key: string, text: string, weight: string,
+ *                  maxFs: number, minFs: number, wrap: number}>}
+ */
+function stampContent(input = {}) {
+  const name = input.name || "";
+  const regNo = String(input.regNo ?? input.dmcNo ?? "").trim();
+
+  return [
+    {
+      ...STAMP_LINES[0],
+      text: capitalize(doctorDisplayName(name)),
+    },
+    // Only the primary entry of a comma separated list fits on a stamp.
+    { ...STAMP_LINES[1], text: firstEntry(input.specialization) },
+    // Compulsory row - never empty, so the filter below can only drop the two
+    // rows above it.
+    {
+      ...STAMP_LINES[2],
+      text: regNo ? `Reg. No: ${regNo}` : STAMP_REG_NO_PLACEHOLDER,
+    },
+  ].filter((line) => line.text);
+}
+
+/**
+ * Lay the stamp lines out as a vertically centred stack inside a `w` x `h` box.
+ * The units are the caller's own (SVG pixels, jsPDF millimetres, canvas
+ * pixels); every renderer below goes through this helper, so the stamp on
+ * screen, in the DOM data-URL and in the PDF can never drift apart.
+ *
+ * @returns {Array<{text: string, weight: string, fs: number, lh: number,
+ *                  lines: string[], firstBaseline: number}>}
+ */
+function layoutStampStack(input, w, h) {
+  const innerW = w * STAMP_SAFE_WIDTH;
+  const gap = w * 0.02;
+  const lineHeight = (fs) => fs + w * 0.01;
+  const stackHeight = (items) =>
+    items.reduce(
+      (sum, item, index) =>
+        sum + item.lines.length * item.lh + (index ? gap : 0),
+      0,
+    );
+
+  // A long value first shrinks inside its own line budget; if the wrapped stack
+  // is still taller than the box, the whole stack shrinks together.
+  let scale = 1;
+  let items = [];
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    items = stampContent(input).map((line) => {
+      const minFs = w * line.minFs * scale;
+      let fs = w * line.maxFs * scale;
+      let lines = [line.text];
+      for (let step = 0; step < 8; step += 1) {
+        const perLine = Math.max(
+          4,
+          Math.floor(innerW / (fs * STAMP_TEXT_RATIO)),
+        );
+        lines = splitToLines(line.text, perLine);
+        if (lines.length <= line.wrap || fs <= minFs) break;
+        fs = Math.max(minFs, fs - w * 0.006);
+      }
+      return { ...line, fs, lines, lh: lineHeight(fs) };
+    });
+
+    if (stackHeight(items) <= h * STAMP_SAFE_HEIGHT || scale <= 0.6) break;
+    scale -= 0.08;
+  }
+
+  // Centre the stack; the first baseline sits one ascent below its block top
+  // (`y` is a text baseline in both SVG and jsPDF).
+  let cursor = (h - stackHeight(items)) / 2;
+  return items.map((item) => {
+    const placed = { ...item, firstBaseline: cursor + item.fs };
+    cursor += item.lines.length * item.lh + gap;
+    return placed;
+  });
+}
 
 /**
  * @typedef {Object} StampInput
- * @property {string} name      – Doctor name
- * @property {string} degree    – Degree abbreviation (e.g. "MBBS, MD")
- * @property {string} dmcNo     – DMC / registration number
+ * @property {string} name           – Doctor name
+ * @property {string} specialization – Specialization (first entry of a list)
+ * @property {string} regNo          – Registration number (compulsory; the row
+ *                                      prints `STAMP_REG_NO_PLACEHOLDER` while
+ *                                      the profile has no number)
+ * @property {string} [dmcNo]        – Legacy alias of `regNo`
  */
 
 /**
@@ -41,96 +183,29 @@ import { capitalize } from "../utils/helper";
  * @param {number}     [opts.borderWidth=4]     – Outer border stroke width
  * @returns {string}   SVG markup
  */
-export function buildStampSvg({ name, degree, dmcNo }, opts = {}) {
-  const ink = opts.ink ?? "#1a56db";
+export function buildStampSvg(input, opts = {}) {
+  const ink = opts.ink ?? STAMP_INK;
   const W = opts.width ?? 300;
   const H = opts.height ?? 180;
   const bw = opts.borderWidth ?? 4;
-  const pad = 12;                     // inner padding from border
-  const cx = W / 2;                   // horizontal centre
+  const pad = 12; // inner padding from the border
+  const cx = W / 2; // horizontal centre
 
-  // Escape XML special chars
-  const esc = (s) =>
-    (s ?? "").replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
-
-  // Prepend "Dr. " to the doctor's name and apply Title Case
-  const safeName = esc(
-    capitalize(name && !name.startsWith("Dr.") ? `Dr. ${name}` : name || ""),
-  );
-  const safeDegree = esc(degree);
-  const safeDmc = esc(dmcNo ? `DMC - ${dmcNo}` : "—");
-
-  // ── Layout y-offsets from top ─────────────────────
-  const Y_NAME = 46;                 // Name block (near top)
-  const Y_DEG_START = 84;            // Degree block (middle)
-  const Y_DEG_LH = 18;               // Degree line-height
-  const Y_DMC = 130;                 // DMC block (bottom area)
-
-  // ── Available text width ──────────────────────────
-  //   Rectangular: full inner width minus padding on both sides
-  const innerW = W - (pad + bw) * 2;
-
-  //   We apply a 90 % safety margin
-  const wName = innerW * 0.90;
-  const wDeg  = innerW * 0.90;
-  const wDmc  = innerW * 0.90;
-
-  // ── Dynamic font sizing ───────────────────────────
-  const RATIO = 0.55;
-
-  const fitSize = (text, maxWidth, maxSize, minSize) => {
-    const len = text.length || 1;
-    const ideal = Math.floor(maxWidth / (len * RATIO));
-    return Math.max(minSize, Math.min(maxSize, ideal));
-  };
-
-  let nameFs = fitSize(safeName, wName, 27, 19);
-  let degFs  = fitSize(safeDegree, wDeg, 21, 17);
-  let dmcFs  = fitSize(safeDmc, wDmc, 19, 17);
-
-  // ── Line-wrapping ─────────────────────────────────
-  const charsPerLine = (fs, mw) => Math.max(1, Math.floor(mw / (fs * RATIO)));
-
-  let nameMaxPerLine = charsPerLine(nameFs, wName);
-  let nameLines = splitToLines(safeName, nameMaxPerLine);
-  while (nameLines.length > 2 && nameFs > 19) {
-    nameFs -= 1;
-    nameMaxPerLine = charsPerLine(nameFs, wName);
-    nameLines = splitToLines(safeName, nameMaxPerLine);
-  }
-
-  let degMaxPerLine = charsPerLine(degFs, wDeg);
-  let degLines = splitToLines(safeDegree, degMaxPerLine);
-  while (degLines.length > 2 && degFs > 17) {
-    degFs -= 1;
-    degMaxPerLine = charsPerLine(degFs, wDeg);
-    degLines = splitToLines(safeDegree, degMaxPerLine);
-  }
-
-  let dmcMaxPerLine = charsPerLine(dmcFs, wDmc);
-  let dmcLines = splitToLines(safeDmc, dmcMaxPerLine);
-  while (dmcLines.length > 1 && dmcFs > 17) {
-    dmcFs -= 1;
-    dmcMaxPerLine = charsPerLine(dmcFs, wDmc);
-    dmcLines = splitToLines(safeDmc, dmcMaxPerLine);
-  }
-
-  // ── Build text elements ───────────────────────────
-  const textTag = (lines, x, startY, fs, lh, weight) =>
-    lines
-      .map(
-        (line, i) =>
-          `<text x="${x}" y="${startY + i * lh}" fill="${ink}"
+  // NAME / SPECIALIZATION / REG. NO, laid out as one centred stack (section 0).
+  const textTags = layoutStampStack(input, W, H)
+    .map((block) =>
+      block.lines
+        .map((line, index) => {
+          const y = block.firstBaseline + index * block.lh;
+          return `<text x="${cx}" y="${y}" fill="${ink}"
              text-anchor="middle"
-             font-size="${fs}px"
-             font-weight="${weight}"
-             font-family="sans-serif">${line}</text>`,
-      )
-      .join("\n    ");
-
-  const nameBlock = textTag(nameLines, cx, Y_NAME, nameFs, nameFs + 3, "bold");
-  const degBlock  = textTag(degLines,  cx, Y_DEG_START, degFs, degFs + 3, "600");
-  const dmcBlock  = textTag(dmcLines,  cx, Y_DMC, dmcFs, dmcFs + 3, "normal");
+             font-size="${block.fs.toFixed(2)}px"
+             font-weight="${block.weight}"
+             font-family="sans-serif">${escapeXml(line)}</text>`;
+        })
+        .join("\n    "),
+    )
+    .join("\n\n  ");
 
   // ── Assemble rectangular SVG ──────────────────────
   return `<svg xmlns="http://www.w3.org/2000/svg"
@@ -146,14 +221,8 @@ export function buildStampSvg({ name, degree, dmcNo }, opts = {}) {
         width="${W - (bw + pad) * 2 + 8}" height="${H - (bw + pad) * 2 + 8}"
         rx="5" ry="5" class="box" stroke-width="1.8"/>
 
-  <!-- Doctor Name (bold, top) -->
-  ${nameBlock}
-
-  <!-- Degree (medium, middle) -->
-  ${degBlock}
-
-  <!-- DMC No (bottom) -->
-  ${dmcBlock}
+  <!-- Doctor name, specialization and registration number (blue ink) -->
+  ${textTags}
 </svg>`;
 }
 
@@ -194,7 +263,7 @@ export function stampDataUrl(input, opts) {
  * @param {number[]}              [opts.ink=[26,86,219]] – RGB blue
  */
 export function drawStampOnPdf(doc, input, x, y, w = 40, h = 24, opts = {}) {
-  const ink = opts.ink ?? [26, 86, 219];
+  const ink = opts.ink ?? STAMP_INK_RGB;
   const [cr, cg, cb] = ink;
   const bw = 1.0;
   const cx = x + w / 2;
@@ -208,36 +277,22 @@ export function drawStampOnPdf(doc, input, x, y, w = 40, h = 24, opts = {}) {
   doc.setLineWidth(0.4);
   doc.roundedRect(x + 2.5, y + 2.5, w - 5, h - 5, 1.5, 1.5, "S");
 
-  doc.setFont("helvetica", "bold");
   doc.setTextColor(cr, cg, cb);
 
-  // Prepend "Dr. " to name and apply Title Case
-  const stampName = capitalize(
-    input.name && !input.name.startsWith("Dr.") ? `Dr. ${input.name}` : input.name || "",
-  );
+  // Same stack model as the on-screen SVG, simply measured in millimetres - so
+  // the printed stamp matches the preview and the PDF can never drift: name
+  // bold, specialization + registration number regular.
+  layoutStampStack(input, w, h).forEach((block) => {
+    doc.setFont("helvetica", block.weight === "bold" ? "bold" : "normal");
+    doc.setFontSize(block.fs);
+    block.lines.forEach((line, index) =>
+      doc.text(line, cx, y + block.firstBaseline + index * block.lh, {
+        align: "center",
+      }),
+    );
+  });
 
-  // Layout y positions (mm from top)
-  const nameY = y + h * 0.28;
-  const degY  = y + h * 0.52;
-  const degLh = h * 0.13;
-  const dmcY  = y + h * 0.78;
-
-  // Font sizing
-  const nameFs = Math.max(5, Math.min(12, w * 0.20));
-  const degFs  = Math.max(5, Math.min(11, w * 0.16));
-  const dmcFs  = Math.max(4, Math.min(10, w * 0.14));
-
-  const nameLines = splitToLines(stampName, 18);
-  const degLines  = splitToLines(input.degree, 22);
-  const dmcLines  = splitToLines(input.dmcNo ? `DMC - ${input.dmcNo}` : "—", 22);
-
-  doc.setFontSize(nameFs);
-  nameLines.forEach((line, i) => doc.text(line, cx, nameY + i * (nameFs * 0.5), { align: "center" }));
-  doc.setFontSize(degFs);
-  degLines.forEach((line, i) => doc.text(line, cx, degY + i * degLh, { align: "center" }));
-  doc.setFontSize(dmcFs);
-  dmcLines.forEach((line, i) => doc.text(line, cx, dmcY + i * (dmcFs * 0.5), { align: "center" }));
-
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(0, 0, 0);
 }
 
@@ -258,7 +313,7 @@ export function drawStampOnPdf(doc, input, x, y, w = 40, h = 24, opts = {}) {
  * @param {string}                   [opts.ink='#1a56db']
  */
 export function drawStampOnCanvas(ctx, input, x, y, w = 300, h = 180, opts = {}) {
-  const ink = opts.ink ?? "#1a56db";
+  const ink = opts.ink ?? STAMP_INK;
   const bw = 4;
   const cx = x + w / 2;
 
@@ -279,32 +334,14 @@ export function drawStampOnCanvas(ctx, input, x, y, w = 300, h = 180, opts = {})
 
   ctx.textAlign = "center";
 
-  // Prepend "Dr. " to name and apply Title Case
-  const stampName = capitalize(
-    input.name && !input.name.startsWith("Dr.") ? `Dr. ${input.name}` : input.name || "",
-  );
-
-  const nameLines = splitToLines(stampName, 20);
-  const degLines  = splitToLines(input.degree, 26);
-  const dmcLines  = splitToLines(input.dmcNo ? `DMC - ${input.dmcNo}` : "—", 26);
-
-  // Name
-  const nameFs = Math.max(17, Math.min(25, w * 0.07));
-  ctx.font = `bold ${nameFs}px sans-serif`;
-  const nameY = y + h * 0.28;
-  nameLines.forEach((line, i) => ctx.fillText(line, cx, nameY + i * (nameFs * 0.6)));
-
-  // Degree
-  const degFs = Math.max(15, Math.min(19, w * 0.05));
-  ctx.font = `600 ${degFs}px sans-serif`;
-  const degY = y + h * 0.52;
-  degLines.forEach((line, i) => ctx.fillText(line, cx, degY + i * (degFs * 0.6)));
-
-  // DMC
-  const dmcFs = Math.max(14, Math.min(17, w * 0.045));
-  ctx.font = `${dmcFs}px sans-serif`;
-  const dmcY = y + h * 0.78;
-  dmcLines.forEach((line, i) => ctx.fillText(line, cx, dmcY + i * (dmcFs * 0.6)));
+  // Same stack model as the SVG and the PDF renderers (name / specialization /
+  // registration number), so all three draw an identical stamp.
+  layoutStampStack(input, w, h).forEach((block) => {
+    ctx.font = `${block.weight} ${block.fs}px sans-serif`;
+    block.lines.forEach((line, index) =>
+      ctx.fillText(line, cx, y + block.firstBaseline + index * block.lh),
+    );
+  });
 
   ctx.restore();
 }

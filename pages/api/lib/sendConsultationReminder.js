@@ -12,6 +12,7 @@ import {
 } from "../utils/constants";
 import { formatPhoneNumber } from "../utils/commonmethod";
 import { formatData } from "../../../src/components/registerDocComponent/utils/helper";
+import { doctorDisplayName } from "../../../src/utils/doctorName";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -49,14 +50,14 @@ export default async function handler(req, res) {
 
       // Prepare messages
       const reminderMessageBodyPateint = {
-        doctor_name: doctor.name,
+        doctor_name: doctorDisplayName(doctor?.name),
         patient_name: appointment.name,
         appointment_time: appointmentTime,
         meeting_url: appointment.patientMeetingUrl,
       };
 
       const reminderMessageBodyDoctor = {
-        doctor_name: doctor.name,
+        doctor_name: doctorDisplayName(doctor?.name),
         patient_name: appointment.name,
         appointment_time: appointmentTime,
         meeting_url: appointment.doctorMeetingUrl,

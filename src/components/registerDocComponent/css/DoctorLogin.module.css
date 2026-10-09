@@ -16,24 +16,38 @@ body {
 
 .login-main {
   display: flex;
+  align-items: stretch;
+  /* The wrapper carries Bootstrap's `.p-4` (1.5rem per side), so subtract it
+     to keep the two panels exactly one screen tall instead of overflowing. */
+  min-height: calc(100vh - 3rem);
 }
 
 .login-left {
-  flex-grow: 1;
-  height: 100vh;
+  flex: 1 1 50%;
+  min-height: calc(100vh - 3rem);
   /* background-color: #E9E9E9; */
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 24px;
 }
 
+/* Full HealthPath emblem (gold heart + person + wordmark + tagline). It is much
+   squarer than the old wordmark logo, so allow it to match the form width
+   (.form-container, 420px) and keep both columns on one centre line. */
 .login-left img {
-  width: 400px;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  object-fit: contain;
 }
 
 .login-right {
-  height: 100vh;
-  flex-grow: 1;
+  flex: 1 1 50%;
+  min-height: calc(100vh - 3rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .login-right-container {
@@ -45,33 +59,51 @@ body {
   justify-content: center;
 }
 
+/* Actual wrapper of the form inside the right panel - kept centred and
+   width-limited so the login block lines up with the logo on the left. */
+.form-container {
+  width: 100%;
+  max-width: 540px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .login-right form {
   display: flex;
   flex-direction: column;
 }
 
+/* Compact brand logo shown at the top of the form only when the left
+   panel is hidden (below 1366px - see media query) */
 .login-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 50px;
-  }
-  
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 32px;
+}
+
 
 .login-center {
-  margin: auto 0;
   text-align: center;
-  margin-top: 10%;
-
 }
 
 .login-logo img {
-  width: 120px;
-  height: 50px;
+  width: 180px;
+  height: auto;
 }
 
 .login-center h2 {
-  font-size: 3.5rem;
+  font-size: 3rem;
+  margin-bottom: 8px;
+}
+
+.login-center h6 {
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: #6b7280;
+  margin-bottom: 36px;
 }
 
 .login-center p {
@@ -84,7 +116,8 @@ body {
 .form input[type='password'],
 .form input[type='text'] {
   width: 100%;
-  padding: 16px;
+  padding: 20px;
+  font-size: 1.1rem;
   margin-bottom: 16px;
   border: 0px;
   border-bottom: 1px solid black;
@@ -96,21 +129,24 @@ body {
   position: relative;
 }
 
+/* Centred on the input's midline regardless of its padding, using the
+   divider bottom margin (16px) to offset from the wrapper's box. */
 .pass-input-div svg {
-  font-size: 20px;
+  font-size: 22px;
   position: absolute;
   right: 10px;
-  bottom: 35px;
+  top: calc(50% - 8px);
+  transform: translateY(-50%);
   cursor: pointer;
   outline: none;
 }
 
 .form button[type='submit'] {
   width: 80%;
-  padding: 16px;
+  padding: 18px;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 1.15rem;
   cursor: pointer;
   border-radius: 30px;
   font-weight: 600;
@@ -141,7 +177,7 @@ body {
 
 .forgot-pass-link {
   text-decoration: none;
-  font-size: 1.0rem;
+  font-size: 1.1rem;
   font-weight: 1000;
 }
 
@@ -202,6 +238,34 @@ body {
   .login-left {
     display: none;
   }
+
+  /* Left panel is hidden - bring the brand logo back to the top of the form */
+  .login-logo {
+    display: flex;
+  }
+}
+
+/* Phones: the upsized heading/form would otherwise wrap - trim the heading
+   and the horizontal padding back down while keeping the larger proportions */
+@media(max-width: 480px) {
+  .form-container {
+    padding: 24px 20px;
+  }
+
+  .login-center h2 {
+    font-size: 2.25rem;
+  }
+
+  .login-center h6 {
+    font-size: 1rem;
+  }
+
+  .form input[type='email'],
+  .form input[type='password'],
+  .form input[type='text'] {
+    padding: 16px;
+    font-size: 1rem;
+  }
 }
 
 @media(max-width: 370px) {
@@ -216,10 +280,10 @@ body {
   }
 
   .login-center h2 {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .login-center p {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 }

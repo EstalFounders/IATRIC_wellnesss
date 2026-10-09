@@ -43,7 +43,7 @@ color: #939393;
   .button {
     padding: 10px 15px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #3b5f1d;
     color: white;
     border: none;
     border-radius: 5px;
@@ -341,5 +341,23 @@ line-height: 30px;
   .card {
     max-width: 100%;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Super-admin booking screen — fill the page height                    */
+/* ------------------------------------------------------------------ */
+
+/* The admin console renders this form and nothing else, so the wrapper takes
+   the whole area under the super-admin bar (SuperAdmin.module.css: headerInner
+   min-height 64px + 1px bottom border = 65px) and centres the 1040px card in
+   it, instead of leaving the card at the top of an otherwise empty page. The
+   card keeps its width; only the dead space below it is removed. `min-height`
+   (not `height`) keeps this safe on small screens: once the card is taller than
+   the viewport the wrapper grows and the page scrolls as usual. */
+.adminBooking {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 65px);
 }
 

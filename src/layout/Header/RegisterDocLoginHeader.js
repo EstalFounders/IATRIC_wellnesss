@@ -3,43 +3,16 @@ import { Col, Row } from "react-bootstrap";
 import Image from "next/image";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
-import { doctor_info_local_storage, api, single_call, userTypeConstant, color_schema } from "../../constant";
-import DoctorModalComp from "../../components/superAdminComponent/DoctorModalComp";
+import { doctor_info_local_storage, api, single_call } from "../../constant";
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
 import LeaveRequestModel from "../../components/registerDocComponent/model/LeaveRequestModel";
 import ManageSlotsModal from "../../components/registerDocComponent/model/ManageSlotsModal";
 
-/**
- * Upload a photo picked in the Doctor Panel and return its Firebase URL.
- * The URL is what goes into the approval request - passing the File itself would
- * serialise to "{}" in the JSON body and the new photo would be lost.
- * See pages/api/doctor/upload-avatar.js.
- */
-const uploadDoctorAvatarWeb = async (file, doctorId) => {
-  const formData = new FormData();
-  formData.append("profilePicture", file, file.name || "doctor-photo.jpg");
-  if (doctorId) formData.append("doctorId", doctorId);
-
-  const response = await fetch(api.uploadDoctorAvatar, {
-    method: "POST",
-    body: formData,
-  });
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok || !data.ok) {
-    throw new Error(data.error || "photo upload failed");
-  }
-
-  return data.url;
-};
-
 const RegisterDocLoginHeader = () => {
-  const [show, setShow] = useState(false);
   const [manageSlotsModelShow, setManageSlotsModelShow] = useState(false);
   const [leaveRequestModelShow, setLeaveRequestModelShow] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState("");
   const DoctorInfo = JSON.parse(
     sessionStorage.getItem(doctor_info_local_storage)
   );
@@ -48,109 +21,8 @@ const RegisterDocLoginHeader = () => {
     sessionStorage.getItem(single_call)
   ); // Initialize as false
 
-  const handleSaveDoctor = async (updatedDoctor) => {
-    console.log("Updated Doctor:", updatedDoctor);
-    setLoader(true);
-
-    let changedFields = {};
-    let hasChanges = false; // Flag to track changes
-    let pendingPhoto = null; // File picked in the modal - uploaded before saving
-
-    Object.keys(updatedDoctor).forEach((key) => {
-      // A new photo arrives as a File, which cannot travel in this JSON request
-      // (it would serialise to "{}"). Upload it first and send its URL instead.
-      if (
-        key === "profilePictureUrl" &&
-        typeof File !== "undefined" &&
-        updatedDoctor[key] instanceof File
-      ) {
-        pendingPhoto = updatedDoctor[key];
-        hasChanges = true;
-        return;
-      }
-
-      if (Array.isArray(updatedDoctor[key])) {
-        const updatedArray = updatedDoctor[key];
-        const originalArray = DoctorInfo.user[key] || [];
-
-        // Compare arrays (length and content)
-        const arraysAreEqual =
-          Array.isArray(originalArray) &&
-          updatedArray.length === originalArray.length &&
-          updatedArray.every((value, index) => value === originalArray[index]);
-
-        if (!arraysAreEqual) {
-          hasChanges = true; // Mark changes found
-          changedFields[key] = updatedArray;
-        }
-      } else {
-        if (updatedDoctor[key] !== DoctorInfo.user[key]) {
-          hasChanges = true; // Mark changes found
-          changedFields[key] = updatedDoctor[key];
-        }
-      }
-    });
-
-    // If no changes were detected, exit early
-    if (!hasChanges) {
-      window.alert("You have changed nothing");
-      setLoader(false);
-      return; // Stops further execution
-    }
-
-    // New photo: upload it first so the approval request carries a real URL.
-    if (pendingPhoto) {
-      try {
-        setUploadStatus("Uploading your profile photo...");
-        changedFields.profilePictureUrl = await uploadDoctorAvatarWeb(
-          pendingPhoto,
-          updatedDoctor._id
-        );
-      } catch (error) {
-        // The photo failed but the rest of the profile changes still go through.
-        window.alert(
-          `Your new photo could not be uploaded (${error.message}). The rest of your profile changes will still be submitted.`
-        );
-      } finally {
-        setUploadStatus("");
-      }
-    }
-
-    // Only the photo changed and it failed - there is nothing left to submit.
-    if (!Object.keys(changedFields).length) {
-      setLoader(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${api.doctorUpdateRequest}/?id=${updatedDoctor._id}&name=${DoctorInfo.user.name}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ changedFields }),
-        }
-      );
-
-      const data = await response.json();
-      setLoader(false);
-      window.alert(data.message);
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error submitting update request:", error);
-      setLoader(false);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShow(false);
-  };
-
-  const handleShowModel = () => {
-    setShow(true);
-  };
+  // The profile form and its save flow moved to the dedicated profile page
+  // (pages/registerDoc/profile.js -> DoctorProfilePage -> doctorProfileSubmit).
 
   const handleShowLeaveReqestModel = () => {
     setLeaveRequestModelShow(true);
@@ -226,7 +98,7 @@ const RegisterDocLoginHeader = () => {
     setLoader(true);
     try {
       const response = await fetch(
-        `${api.leaveRequest}/?id=${DoctorInfo.user._id}&name=${DoctorInfo.user.name}`, // Use '&' to separate query parameters
+        `${api.leaveRequest}/?id=${DoctorInfo?.user?._id ?? DoctorInfo?._id}&name=${DoctorInfo?.user?.name ?? DoctorInfo?.name}`, // Use '&' to separate query parameters
         {
           method: "POST",
           headers: {
@@ -239,7 +111,6 @@ const RegisterDocLoginHeader = () => {
       const data = await response.json();
       setLoader(false);
       window.alert(data.message);
-      handleCloseModal();
     } catch (error) {
       console.error("Error submitting update request:", error);
     }
@@ -311,22 +182,12 @@ const RegisterDocLoginHeader = () => {
             <RightSideMenu
               user={DoctorInfo}
               onLogout={handleLogout}
-              handleShowModel={handleShowModel}
               handleShowLeaveReqestModel={handleShowLeaveReqestModel}
               handleShowManageSlotsModel={handleShowManageSlotsModel}
             />
           </div>
         )}
       </Col>
-      <div>
-        <DoctorModalComp
-          show={show}
-          handleClose={handleCloseModal}
-          doctor={DoctorInfo.user}
-          onSave={handleSaveDoctor}
-          origin={userTypeConstant.doctor}
-        />
-      </div>
       <div>
         <LeaveRequestModel
           show={leaveRequestModelShow}
@@ -338,40 +199,14 @@ const RegisterDocLoginHeader = () => {
         <ManageSlotsModal
           show={manageSlotsModelShow}
           onClose={handleCloseManageSlotsModel}
-          doctorId={DoctorInfo?.user?._id}
+          doctorId={DoctorInfo?.user?._id ?? DoctorInfo?._id}
         />
       </div>
-      <div>
-        {loader ? (
-          <div>
-            <Preloader />
-            {uploadStatus && (
-              <div
-                role="status"
-                style={{
-                  position: "fixed",
-                  bottom: "28px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  zIndex: 1080,
-                  maxWidth: "90vw",
-                  textAlign: "center",
-                  background: color_schema.green,
-                  color: "#ffffff",
-                  padding: "12px 20px",
-                  borderRadius: "10px",
-                  boxShadow: "0 6px 18px rgba(0, 0, 0, 0.25)",
-                  fontSize: "14px",
-                }}
-              >
-                {uploadStatus}
-              </div>
-            )}
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
+      {loader ? (
+        <div>
+          <Preloader />
+        </div>
+      ) : null}
     </Row>
   );
 };

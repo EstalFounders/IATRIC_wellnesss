@@ -19,11 +19,14 @@
 @import "../public/css/customStyle.css";
 :root {
   /* Brand palette - single source of truth for CSS values. Mirrors
-     color_schema in src/constant.js (green -> primary, yellow -> secondary). */
+     color_schema in src/constant.js. */
   --color-primary: #3b5f1d;
-  --color-secondary: #8e8333;
+  --color-secondary: #916f38;
   --color-white: #ffffff;
   --color-black: #000000;
+  --color-gold: #916f38;
+  --color-grey: #717171;
+  --color-ink: #010101;
 }
 
 

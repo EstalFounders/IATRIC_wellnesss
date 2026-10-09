@@ -1,0 +1,211 @@
+/* Super-admin sign-in (/superAdmin/onload -> OnLoadPage -> Login).
+   Mirrors src/components/registerDocComponent/css/DoctorLogin.module.css so both
+   login screens read as one brand. Colours come from the tokens declared in
+   styles/globals.css (:root -> --color-primary / --color-secondary, which mirror
+   color_schema in src/constant.js). Nothing here is a hard-coded brand hex. */
+
+.login-main {
+  display: flex;
+  align-items: stretch;
+  /* Bootstrap's reboot (imported by globals.css) zeroes the body margin, so the
+     two panels can own the whole viewport. */
+  min-height: 100vh;
+}
+
+.login-left {
+  flex: 1 1 50%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+/* The emblem is sized off its container instead of a fixed pixel size, so it
+   scales with the page: full width of the panel, capped against both the column
+   width and the viewport height, aspect ratio always preserved. */
+.login-left img {
+  width: 100%;
+  max-width: min(520px, 70vh);
+  height: auto;
+  object-fit: contain;
+}
+
+.login-right {
+  flex: 1 1 50%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  width: 100%;
+  /* Wide enough that the single-line "HealthPath Super Admin" heading (TT
+     Ramillas 700, ~10.7px of width per px of font-size) fits inside the padding
+     at every breakpoint. Measured against the running page, not guessed. */
+  max-width: 560px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Compact brand mark above the form - only rendered (below 1366px) when the
+   emblem panel is hidden, exactly like the doctor login. */
+.login-logo {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 32px;
+}
+
+.login-logo img {
+  width: clamp(140px, 34vw, 180px);
+  height: auto;
+}
+
+.login-center {
+  text-align: center;
+}
+
+/* One line, always. The vw-driven middle term shrinks the heading with the page
+   (the card is a share of the viewport), and nowrap stops it breaking in two;
+   the top bound keeps ~50px of slack at desktop widths and the bottom bound keeps
+   it inside the card down to ~280px of content width. */
+.login-center h1 {
+  font-size: clamp(1.35rem, 3.2vw + 0.5rem, 2.5rem);
+  line-height: 1.15;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.login-center h6 {
+  font-weight: 400;
+  font-size: clamp(1rem, 0.4vw + 0.9rem, 1.15rem);
+  color: #6b7280;
+  margin-bottom: 36px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form input[type="email"],
+.form input[type="password"],
+.form input[type="text"] {
+  width: 100%;
+  padding: clamp(14px, 3.5vw, 20px);
+  font-size: clamp(1rem, 0.5vw + 0.9rem, 1.1rem);
+  margin-bottom: 16px;
+  border: 0px;
+  border-bottom: 1px solid var(--color-black);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form input[type="email"]:focus-visible,
+.form input[type="password"]:focus-visible,
+.form input[type="text"]:focus-visible {
+  border-bottom-color: var(--color-primary);
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Invalid attempt: mark the fields without adding a second colour to the page. */
+.form input[aria-invalid="true"] {
+  border-bottom-color: #b00020;
+}
+
+.pass-input-div {
+  position: relative;
+}
+
+/* Centred on the input's midline: this wrapper is a flex item (so it establishes
+   its own formatting context) and therefore also carries the input's 16px
+   bottom margin - hence the -8px offset. Same trick as the doctor login. */
+.pass-input-div button {
+  position: absolute;
+  right: 4px;
+  top: calc(50% - 8px);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: #6b7280;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pass-input-div button:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+.form button[type="submit"] {
+  width: 80%;
+  padding: 18px;
+  margin-top: 24px;
+  align-self: center;
+  border: 1px solid var(--color-primary);
+  border-radius: 30px;
+  font-size: clamp(1rem, 0.5vw + 0.95rem, 1.15rem);
+  font-weight: 600;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form button[type="submit"]:hover:not(:disabled),
+.form button[type="submit"]:focus-visible:not(:disabled) {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.form button[type="submit"]:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin: 16px 0 0;
+  color: #b00020;
+  font-size: clamp(0.9rem, 0.3vw + 0.85rem, 1rem);
+  font-weight: 600;
+}
+
+/* Emblem panel hidden: bring the compact brand mark back above the form. */
+@media (max-width: 1366px) {
+  .login-left {
+    display: none;
+  }
+
+  .login-logo {
+    display: flex;
+  }
+}
+
+/* Phones: trim the padding and the space under the subtitle. */
+@media (max-width: 480px) {
+  .form-container {
+    padding: 24px 20px;
+  }
+
+  .login-center h6 {
+    margin-bottom: 24px;
+  }
+}
+
+/* Very narrow: the CTA goes full width so its label never overflows. */
+@media (max-width: 370px) {
+  .form button[type="submit"] {
+    width: 100%;
+  }
+}

@@ -12,6 +12,13 @@ import { LanguageProvider } from "../src/i18n/LanguageContext";
 import LanguageToggle from "../src/components/Common/LanguageToggle";
 import SeoMetadata from "../src/marketing/components/SeoMetadata";
 import PageStructuredData from "../src/components/Common/PageStructuredData";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+// TT Ramillas is the only brand typeface. This theme makes every MUI component
+// (Dialogs, TextFields, Buttons, MenuItems, ...) inherit it instead of Roboto.
+const brandTheme = createTheme({
+  typography: { fontFamily: '"TT Ramillas", serif' },
+});
 
 function MyApp({ Component, pageProps, ...rest }) {
   const [loader, setLoader] = useState(true);
@@ -28,14 +35,6 @@ function MyApp({ Component, pageProps, ...rest }) {
   return (
     <Fragment>
       <Head>
-        <link
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css?family=Lato:400,700,900,900&display=swap"
-          rel="stylesheet"
-        />
         <title>Health Path</title>
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
@@ -49,9 +48,11 @@ function MyApp({ Component, pageProps, ...rest }) {
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <LanguageProvider>
-              <Component {...props.pageProps} />
-              <SeoMetadata metadata={pageProps?.seoMetadata} />
-              <LanguageToggle />
+              <ThemeProvider theme={brandTheme}>
+                <Component {...props.pageProps} />
+                <SeoMetadata metadata={pageProps?.seoMetadata} />
+                <LanguageToggle />
+              </ThemeProvider>
             </LanguageProvider>
           </PersistGate>
         </Provider>

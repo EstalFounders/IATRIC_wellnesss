@@ -24,7 +24,7 @@ export const SidebarData = [
   },
   {
     title: "Contract",
-    path: "/registerDoc/prescription",
+    path: "/registerDoc/contract",
     icon: <IoIcons.IoMdClipboard />,
     cName: "nav-text",
   },

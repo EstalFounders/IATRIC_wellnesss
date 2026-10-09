@@ -680,6 +680,44 @@ export const HealthCampIcon = ({
   );
 };
 
+export const NutritionistIcon = ({
+  className,
+  width = 120,
+  height = 120,
+  ...props
+}) => {
+  return (
+    <svg
+      width={dimension.width}
+      height={dimension.height}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M23.2 16V8.4C23.2 7.96 23.56 7.6 24 7.6C24.44 7.6 24.8 7.96 24.8 8.4V16H23.2Z"
+        fill="currentColor"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M24.9 15.2C25.6 10.4 29.8 6.8 35.4 7C35.9 7 36.3 7.04 36.7 7.1C36 11.9 31.8 15.5 26.2 15.3C25.8 15.28 25.4 15.25 24.9 15.2Z"
+        fill="currentColor"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M24 16C21.7 12.5 16.8 12 13.5 14.4C9.5 17.2 8.4 22 9.9 26.1C11.3 30.6 14.2 36 17.7 36C19.6 36 21.2 34.6 24 34.6C26.8 34.6 28.4 36 30.3 36C33.8 36 36.7 30.6 38.1 26.1C39.6 22 38.5 17.2 34.5 14.4C31.2 12 26.3 12.5 24 16Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 
 
 

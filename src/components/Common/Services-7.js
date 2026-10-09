@@ -222,7 +222,7 @@ const Services7 = () => {
                   <a
                     href={`tel:${contact_no}`}
                     style={{
-                      fontFamily: "bold",
+                      fontWeight: "bold",
                       textDecoration: "none",
                       color: "#ffffff",
                     }}

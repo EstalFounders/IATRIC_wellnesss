@@ -28,7 +28,6 @@ import {
   bookConsultationApiCall,
   getServiceOffered,
 } from "../ApiService/BookConsultationApiCall";
-import CommonHealthConcerns from "./CommonHealthConcern";
 import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
@@ -39,14 +38,11 @@ const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
 const AppointmentPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const isAppointmentPage = router.asPath.includes(
+  // The super-admin console books on behalf of a customer, so it gets the form
+  // only - the public /appointment page keeps the marketing sections below.
+  const isAdminBooking = router.asPath.includes(
     "/superAdmin/bookConsultationFromAdmin"
   );
-  const bookFromAdmin = router.asPath.includes(
-    "/superAdmin/bookConsultationFromAdmin"
-  )
-    ? false
-    : true;
   // State variables
   const [isDoctorLoading, setIsDoctorLoading] = useState();
   const [doctorChoice, setDoctorChoice] = useState("any");
@@ -427,7 +423,12 @@ const AppointmentPage = () => {
   };
 
   return (
-    <div id="" className={`wide-60 ${styles.appointmentWrap}`}>
+    <div
+      id=""
+      className={`wide-60 ${styles.appointmentWrap}${
+        isAdminBooking ? ` ${styles.adminBooking}` : ""
+      }`}
+    >
       <div className="container-fluid">
         <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
@@ -444,17 +445,25 @@ const AppointmentPage = () => {
             handleCloseSnackBar={handleCloseSnackBar}
           />
 
-          <div>
-            <Demo5Doctors1 />
-          </div>
+          {/* Marketing sections are for the public /appointment page only; the
+              super-admin booking screen shows the form and nothing else. */}
+          {!isAdminBooking && (
+            <div>
+              <Demo5Doctors1 />
+            </div>
+          )}
 
-          <div className="w-100 d-flex justify-content-center">
-            <HowItWorks />
-          </div>
+          {!isAdminBooking && (
+            <div className="w-100 d-flex justify-content-center">
+              <HowItWorks />
+            </div>
+          )}
 
-          <div>
-            <FaqSection />
-          </div>
+          {!isAdminBooking && (
+            <div>
+              <FaqSection />
+            </div>
+          )}
 
           {/* END SIDEBAR */}
           <AppointmentBookingModal

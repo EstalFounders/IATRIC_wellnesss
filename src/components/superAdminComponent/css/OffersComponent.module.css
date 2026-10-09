@@ -162,7 +162,7 @@
     padding: 10px 20px;
     font-size: 16px;
     font-weight: bold;
-    background-color: #007bff;
+    background-color: #3b5f1d;
     color: white;
     border: none;
     border-radius: 5px;
@@ -171,7 +171,7 @@
   }
   
   .buttonAdd:hover {
-    background-color: #0056b3;
+    background-color: #31511a;
   }
 
   .toggleSwitch {

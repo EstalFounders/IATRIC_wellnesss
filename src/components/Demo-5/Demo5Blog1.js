@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { api } from "../../constant";
+import { api, color_schema } from "../../constant";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { richText } from "../../i18n/richText";
 
@@ -137,7 +137,7 @@ const Demo5Blog1 = () => {
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             <span className="section-id blue-color">
-              <h4>{t("blog1.title")}</h4>
+              <h4 style={{ color: color_schema.green }}>{t("blog1.title")}</h4>
             </span>
             {/* Title 	*/}
             <h3 className="h3-md text-dark">{t("blog1.heading")}</h3>

@@ -144,7 +144,7 @@ export default function SignUp() {
 
                         <Row>
                             <Col>
-                                <Form.Label style={{ fontFamily: 'sans-serif' }}><strong>Please select your Date of birth</strong></Form.Label>
+                                <Form.Label style={{ fontFamily: '"TT Ramillas", serif' }}><strong>Please select your Date of birth</strong></Form.Label>
                                 <Form.Control
                                     type="date"
                                     name="setDob"

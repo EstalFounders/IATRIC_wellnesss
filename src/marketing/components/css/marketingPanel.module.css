@@ -216,7 +216,7 @@
 }
 
 .tableUrl {
-  font-family: monospace;
+  font-family: inherit;
   font-size: 0.82rem;
   color: #22310f;
 }

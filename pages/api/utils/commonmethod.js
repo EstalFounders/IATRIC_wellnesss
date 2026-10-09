@@ -1,6 +1,7 @@
 import { serviceOffered } from "../../../src/constant";
 import Appointment from "../../../src/models/appointmentSchema";
 import BookLabTest from "../../../src/models/bookLabTestSchema";
+import { doctorDisplayName } from "../../../src/utils/doctorName";
 
 export const createServicesToBill = (appointments, labTests, serviceOffer) => {
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
@@ -42,7 +43,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       const combinedService = {
         // serviceIds: `${appointment._id},${matchingLabTest._id}`,
         name: appointment.name + " + " + matchingLabTest.name,
-        doctorName: appointment.doctorId?.name || "",
+        doctorName: doctorDisplayName(appointment.doctorId?.name),
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice + matchingLabTest.totalPrice,
@@ -88,7 +89,7 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
       const appointmentService = {
         // serviceIds: appointment._id,
         name: appointment.name,
-        doctorName: appointment.doctorId?.name || "",
+        doctorName: doctorDisplayName(appointment.doctorId?.name),
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
         subTotal: appointment.consultationprice,

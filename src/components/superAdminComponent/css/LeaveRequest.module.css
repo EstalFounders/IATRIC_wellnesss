@@ -1,0 +1,617 @@
+/* LeaveRequest.module.css - the styles of the super-admin
+   /superAdmin/viewAllDoctorLeaveRequest page
+   (src/components/superAdminComponent/ViewAllDocLeaveReqComp.js).
+
+   Same visual language as css/DoctorUpdateRequest.module.css and
+   css/ConsultationBooked.module.css: brand green #3b5f1d / yellow #8e8333,
+   white 14px-radius cards, uppercase card titles, serif figures, so the panel
+   reads as one product.
+
+   The page is an approval queue, so the two states that matter are "this still
+   needs a decision" (green rail + pending badge) and "this is already decided"
+   (flat, muted, actions disabled). The date range and the day count are the
+   reason the page exists, so they get the only accent on the screen. */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  color: #1f2933;
+}
+
+/* ── Page head ───────────────────────────────────────── */
+
+.pageHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: "TT Ramillas", serif;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: #3b5f1d;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 640px;
+  font-size: 0.95rem;
+  color: #52606d;
+}
+
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+
+.primary,
+.ghost,
+.danger,
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.primary {
+  padding: 9px 16px;
+  border: 1px solid #3b5f1d;
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.primary:hover:not(:disabled) {
+  background: #2f4c17;
+}
+
+.ghost {
+  padding: 9px 16px;
+  border: 1px solid #3b5f1d;
+  background: #fff;
+  color: #3b5f1d;
+}
+
+.ghost:hover:not(:disabled) {
+  background: #f4f7f0;
+}
+
+.danger {
+  padding: 9px 16px;
+  border: 1px solid #f5c6c2;
+  background: #fff;
+  color: #8b2b21;
+}
+
+.danger:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+/* Quiet text action - "Open doctor". */
+.linkBtn {
+  padding: 9px 14px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #52606d;
+}
+
+.linkBtn:hover {
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.primary:disabled,
+.ghost:disabled,
+.danger:disabled,
+.linkBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary:focus-visible,
+.ghost:focus-visible,
+.danger:focus-visible,
+.linkBtn:focus-visible,
+.tab:focus-visible,
+.search:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* ── Inline feedback ─────────────────────────────────── */
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.noticeOk {
+  background: #f4f7f0;
+  border: 1px solid #3b5f1d;
+  color: #2f4c17;
+}
+
+.noticeError {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  color: #8b2b21;
+}
+
+.noticeClose {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ── Loading / error / empty ─────────────────────────── */
+
+.stateBox {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  color: #52606d;
+  font-size: 0.92rem;
+}
+
+.stateBox p {
+  margin: 0 0 12px;
+}
+
+.stateError {
+  border-color: #f5c6c2;
+  background: #fdecea;
+  color: #8b2b21;
+}
+
+/* ── Status counters ─────────────────────────────────── */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stat {
+  flex: 1 1 150px;
+  padding: 14px 16px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.statValue {
+  display: block;
+  font-family: "TT Ramillas", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #1f2933;
+}
+
+.statLabel {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.statPending {
+  border-color: #3b5f1d;
+  background: #f4f7f0;
+}
+
+.statPending .statValue {
+  color: #3b5f1d;
+}
+
+.statApproved .statValue {
+  color: #2f4c17;
+}
+
+.statRejected .statValue {
+  color: #8b2b21;
+}
+
+/* ── Toolbar: search + status tabs ───────────────────── */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #fafbf8;
+}
+
+.search {
+  flex: 1 1 220px;
+  max-width: 320px;
+  padding: 9px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #3f4c5a;
+  background: #fff;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #52606d;
+  cursor: pointer;
+}
+
+.tab:hover {
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.tabActive {
+  border-color: #3b5f1d;
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.tabActive:hover {
+  color: #fff;
+}
+
+.tabCount {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #f0f2f4;
+  color: #52606d;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabActive .tabCount {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.resultCount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7b8794;
+}
+
+/* ── Request cards ───────────────────────────────────── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.card {
+  padding: 16px 18px;
+  border: 1px solid #ececec;
+  border-left: 4px solid #e0e0e0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Only an undecided request keeps the brand rail - a reviewed one is history. */
+.cardPending {
+  border-left-color: #3b5f1d;
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.avatar,
+.avatarFallback {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 50%;
+  border: 1px solid #ececec;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+}
+
+.docName {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #1f2933;
+}
+
+.docMeta {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+.badge {
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badgePending {
+  background: #f4f7f0;
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.badgeApproved {
+  background: #f0f2f4;
+  border-color: #d9e2e8;
+  color: #2f4c17;
+}
+
+.badgeRejected {
+  background: #fdecea;
+  border-color: #f5c6c2;
+  color: #8b2b21;
+}
+
+
+/* ── Leave details ───────────────────────────────────── */
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px 20px;
+  margin: 14px 0 0;
+  padding: 14px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  background: #fafbf8;
+}
+
+.detail {
+  min-width: 0;
+}
+
+.detailLabel {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.detailValue {
+  font-size: 0.9rem;
+  color: #1f2933;
+  overflow-wrap: anywhere;
+}
+
+/* The day count is the one number on the card - brand green, serif. */
+.duration {
+  font-family: "TT Ramillas", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.reason {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  color: #52606d;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.reasonEmpty {
+  color: #b0b7bd;
+  font-style: italic;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.actionSpacer {
+  flex: 1 1 auto;
+}
+
+.busyNote {
+  font-size: 0.8rem;
+  color: #8e8333;
+  font-weight: 600;
+}
+
+/* ── Pagination (PanelPagination bar) ────────────────── */
+
+.paginationWrap {
+  margin-top: 18px;
+}
+
+/* ── Review modal ────────────────────────────────────── */
+
+.dialog {
+  max-width: 640px;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border-bottom: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px 14px 0 0;
+  background: #fff;
+}
+
+.modalDoctor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.modalTitle {
+  margin: 0;
+  font-family: "TT Ramillas", serif;
+  font-size: 1.25rem;
+  color: #3b5f1d;
+}
+
+.modalMeta {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #7b8794;
+  font-variant-numeric: tabular-nums;
+}
+
+.modalBody {
+  padding: 18px 20px;
+}
+
+.modalFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-top: 1px solid #ececec;
+  background: #fafbf8;
+  border-radius: 0 0 14px 14px;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px 20px;
+}
+
+.modalBlock {
+  grid-column: 1 / -1;
+}
+
+/* ── Small screens ───────────────────────────────────── */
+
+@media (max-width: 576px) {
+  .pageHead {
+    padding: 16px 14px;
+  }
+
+  .title {
+    font-size: 1.35rem;
+  }
+
+  .stat {
+    flex: 1 1 100%;
+  }
+
+  .search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .cardActions .primary,
+  .cardActions .danger,
+  .cardActions .ghost,
+  .modalFoot .primary,
+  .modalFoot .danger,
+  .modalFoot .ghost,
+  .modalFoot .linkBtn {
+    flex: 1 1 auto;
+  }
+
+  .modalFoot .actionSpacer,
+  .modalFoot .busyNote {
+    order: -1;
+    flex: 1 0 100%;
+  }
+}
+

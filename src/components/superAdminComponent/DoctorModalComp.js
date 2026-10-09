@@ -154,6 +154,12 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
       alert("Please enter a valid mobile number");
       return;
     }
+    // Compulsory field - `<Form>` here has no onSubmit, so the native `required`
+    // never fires and this check is the one that bites.
+    if (!String(editedDoctor.doctorRegistrationNo || "").trim()) {
+      alert("Please enter the registration number");
+      return;
+    }
     onSave(editedDoctor);
     handleClose();
   };
@@ -260,6 +266,18 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   type="text"
                   name="expertise"
                   value={editedDoctor.expertise}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              {/* Compulsory: printed as the third line of the prescription stamp. */}
+              <Form.Group controlId="doctorRegistrationNo" className="mb-3">
+                <Form.Label>
+                  <b>Registration Number *</b>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="doctorRegistrationNo"
+                  value={editedDoctor.doctorRegistrationNo || ""}
                   onChange={handleChange}
                 />
               </Form.Group>

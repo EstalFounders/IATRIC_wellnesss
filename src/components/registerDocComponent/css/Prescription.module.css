@@ -1,0 +1,712 @@
+/* ── Register Doctor › Prescription page ──
+   Card based layout that replaces the previous flat stack of unstyled inputs.
+   Green accents follow color_schema.green (#3b5f1d). */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+  font-family: "TT Ramillas", serif;
+  color: #2c3a22;
+}
+
+/* ── Page header ── */
+.pageHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e2e6da;
+  padding-bottom: 16px;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.pageSubtitle {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: #6b7a5e;
+  max-width: 560px;
+}
+
+.doctorChip {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f4f7f0;
+  border: 1px solid #e2e6da;
+  border-radius: 12px;
+}
+
+.doctorChipIcon {
+  font-size: 26px;
+  color: #3b5f1d;
+}
+
+.doctorChip strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.doctorChip span {
+  font-size: 0.8rem;
+  color: #6b7a5e;
+}
+
+/* ── Section quick nav ── */
+.sectionNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.navPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border: 1px solid #d8dfcd;
+  background: #fff;
+  color: #3b5f1d;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.navPill:hover {
+  background: #eef3e7;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(59, 95, 29, 0.12);
+}
+
+.navPillIcon {
+  font-size: 0.9rem;
+}
+
+.navPillCount {
+  background: #3b5f1d;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+/* ── Cards ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+  /* Leaves room for the sticky action bar so the last card can scroll clear. */
+  margin-bottom: 24px;
+}
+
+/* Bootstrap 4.1 has no `gy-*` gutters, so the vertical spacing between the
+   columns of a wrapped Row comes from flexbox row-gap instead. */
+.formGrid {
+  row-gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e2e6da;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(44, 58, 34, 0.06);
+  overflow: hidden;
+  scroll-margin-top: 90px;
+}
+
+.cardWide {
+  grid-column: 1 / -1;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #f4f7f0;
+  border-bottom: 1px solid #e2e6da;
+  flex-wrap: wrap;
+}
+
+.cardIndex {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  background: #3b5f1d;
+  color: #fff;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardHint {
+  margin: 2px 0 0;
+  font-size: 0.76rem;
+  color: #6b7a5e;
+}
+
+.cardBadge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e6ecdd;
+  color: #3b5f1d;
+  white-space: nowrap;
+}
+
+.cardBadgeOk {
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.cardBody {
+  padding: 18px 20px 20px;
+}
+
+/* ── Fields ── */
+.label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3f4a35;
+  margin-bottom: 6px;
+}
+
+.required {
+  color: #b23b3b;
+  margin-left: 2px;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #2c3a22;
+  background: #fff;
+  border: 1px solid #cbd3c0;
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #3b5f1d;
+  box-shadow: 0 0 0 3px rgba(59, 95, 29, 0.12);
+}
+
+.inputReadOnly {
+  background: #f5f5f2;
+  color: #5d6650;
+  cursor: default;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.5;
+}
+
+.fieldError {
+  border-color: #c9483f;
+}
+
+.helper {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: #8a9480;
+}
+
+.counter {
+  font-size: 0.7rem;
+  color: #8a9480;
+  white-space: nowrap;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ── Quick pick chips ── */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  background: #f4f7f0;
+  border: 1px dashed #b9c8a6;
+  border-radius: 999px;
+  color: #3b5f1d;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.chip:hover {
+  background: #e6ecdd;
+}
+
+/* ── Patient autocomplete ── */
+.autocomplete {
+  position: relative;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.displayField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: #f5f5f2;
+  border: 1px solid #cbd3c0;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 43px;
+}
+
+.displayFieldEmpty {
+  color: #8a9480;
+  font-style: italic;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border: 1px solid #d8dfcd;
+  background: #fff;
+  border-radius: 8px;
+  color: #3b5f1d;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.iconBtn:hover {
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.iconBtnDanger:hover {
+  background: #c9483f;
+  border-color: #c9483f;
+  color: #fff;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 210px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #d8dfcd;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(44, 58, 34, 0.16);
+  z-index: 40;
+}
+
+.dropdownItem {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f3ec;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.dropdownItem:hover {
+  background: #f4f7f0;
+}
+
+.dropdownEmpty {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #8a9480;
+}
+
+.dropdownMeta {
+  display: block;
+  font-size: 0.72rem;
+  color: #8a9480;
+}
+
+/* ── Tag list (test advices) ── */
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 12px;
+  font-size: 0.82rem;
+  background: #e6ecdd;
+  border: 1px solid #cbd8b8;
+  border-radius: 999px;
+  color: #2f4a1c;
+}
+
+.tagRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(59, 95, 29, 0.12);
+  color: #3b5f1d;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.tagRemove:hover {
+  background: #c9483f;
+  color: #fff;
+}
+
+/* ── Medicine list ── */
+.medicineList {
+  display: grid;
+  gap: 14px;
+}
+
+.medicineCard {
+  border: 1px solid #e2e6da;
+  border-left: 4px solid #3b5f1d;
+  border-radius: 12px;
+  background: #fdfefc;
+  padding: 14px 16px 6px;
+}
+
+.medicineHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.medicineTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.medicineHeader .iconBtn {
+  margin-left: auto;
+}
+
+.emptyState {
+  padding: 22px 16px;
+  text-align: center;
+  border: 1px dashed #cbd8b8;
+  border-radius: 12px;
+  background: #fafbf8;
+  color: #6b7a5e;
+  font-size: 0.88rem;
+}
+
+.emptyStateIcon {
+  display: block;
+  margin: 0 auto 8px;
+  font-size: 26px;
+  color: #b9c8a6;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  background: #3b5f1d;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.addBtn:hover {
+  background: #2f4a17;
+  transform: translateY(-1px);
+}
+
+/* ── Sticky action bar ── */
+.actionBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #e2e6da;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -6px 18px rgba(44, 58, 34, 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.checklist {
+  min-width: 260px;
+}
+
+.checklistTitle {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3f4a35;
+}
+
+.checklistItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+}
+
+.checkItem {
+  font-size: 0.74rem;
+  color: #8a9480;
+}
+
+.checkItemDone {
+  color: #3b5f1d;
+}
+
+.checkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: #3b5f1d;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 95, 29, 0.24);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.primaryBtn:hover {
+  background: #2f4a17;
+  transform: translateY(-1px);
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3f4a35;
+  background: #fff;
+  border: 1px solid #cbd3c0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ghostBtn:hover {
+  background: #f4f7f0;
+}
+
+.formError {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #8f2f28;
+  background: #fdecea;
+  border: 1px solid #f3c4bf;
+  border-radius: 10px;
+}
+
+/* ── Preview modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 26, 16, 0.55);
+}
+
+.modalContent {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px 20px;
+}
+
+.modalClose {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 30px;
+  line-height: 1;
+  color: #6b7a5e;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modalClose:hover {
+  color: #3b5f1d;
+}
+
+.modalTitle {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #3b5f1d;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pageTitle {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 18px 12px 96px;
+  }
+
+  .pageHeader {
+    align-items: flex-start;
+  }
+
+  .doctorChip {
+    width: 100%;
+  }
+
+  .cardHeader,
+  .cardBody {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .checklistTitle {
+    font-size: 0.8rem;
+  }
+
+  .checkItem,
+  .checkItemDone {
+    font-size: 0.7rem;
+  }
+
+  .actionBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .actionButtons {
+    justify-content: stretch;
+  }
+
+  .primaryBtn,
+  .ghostBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+}

@@ -31,7 +31,7 @@ function levelColor(level) {
     case "fatal": return "#b71c1c";
     case "warn": return "#ed6c02";
     case "debug": return "#757575";
-    default: return "#1976d2";
+    default: return "#3b5f1d";
   }
 }
 

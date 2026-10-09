@@ -28,6 +28,18 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Area of expertise is required"],
   },
+  // Medical registration number, printed as the third line of the prescription
+  // stamp and in the doctor identity block. Compulsory: the Add Doctor POST goes
+  // through `Doctor.create`, so a blank value is rejected right there. Documents
+  // created before this rule stay readable - the stamp simply drops its
+  // "Reg. No:" line - and their owner is asked for the number on the next
+  // profile save, because the PUT / approval paths use `findByIdAndUpdate`
+  // without `runValidators` and therefore do not re-run this validator.
+  doctorRegistrationNo: {
+    type: String,
+    trim: true,
+    required: [true, "Registration number is required"],
+  },
   // NOTE: the old `degree` field was removed from the doctor module. It is
   // intentionally absent from this schema so mongoose strips it from every
   // create/update payload; `scripts/removeDoctorDegree.js` unsets it on the

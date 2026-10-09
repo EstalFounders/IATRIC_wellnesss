@@ -115,4 +115,887 @@
     cursor: pointer;
   }
   
+/* ══════════════════════════════════════════════════════════════════════════
+   Super-admin "Consultation booked" page (pages/superAdmin/consultationBooked.js)
+
+   The rules ABOVE stay untouched because the LabTest booked page imports this
+   same module (.bookingContainer / .circle / .circleText …). Everything below
+   is the redesigned page and copies the visual language of
+   css/Homepage.module.css and AddDoctor/AddDoctorForm.module.css: brand green
+   #3b5f1d / yellow #8e8333, white 14px-radius cards, a 6px green left-border
+   hero, uppercase card titles and serif figures, so every panel reads as one
+   product.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  color: #1f2933;
+}
+
+/* ── Hero ───────────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.heroIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-size: 1.6rem;
+}
+
+.heroInfo {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.heroEyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e8333;
+}
+
+.heroTitle {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+  word-break: break-word;
+}
+
+.heroSubtitle {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: #2f4c17;
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #fff;
+  color: #3b5f1d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostBtn:hover:not(:disabled) {
+  background: #f4f7f0;
+}
+
+.primaryBtn:disabled,
+.ghostBtn:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.primaryBtn,
+.ghostBtn,
+.rowBtn {
+  text-decoration: none;
+}
+
+.primaryBtn:hover,
+.ghostBtn:hover,
+.rowBtn:hover {
+  text-decoration: none;
+}
+
+/* ── Inline feedback (replaces window.alert / the MUI snackbar) ── */
+
+.note {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.noteOk {
+  background: #f4f7f0;
+  border: 1px solid #3b5f1d;
+  color: #2f4c17;
+}
+
+.noteErr {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  color: #8b2b21;
+}
+
+.errorBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #f5c6c2;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #8b2b21;
+  font-size: 0.9rem;
+}
+
+.retry {
+  padding: 6px 14px;
+  border: 1px solid #8b2b21;
+  border-radius: 8px;
+  background: #fff;
+  color: #8b2b21;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Filter tiles (the old three 400px "circles") ───── */
+
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tile:hover {
+  transform: translateY(-3px);
+  border-color: #3b5f1d;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.tileActive {
+  border-color: #3b5f1d;
+  background: #f4f7f0;
+  box-shadow: inset 0 0 0 1px #3b5f1d;
+}
+
+.tileLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.tileValue {
+  font-family: "TT Ramillas", serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #3b5f1d;
+}
+
+.tileValueAlert {
+  color: #8e8333;
+}
+
+.tileHint {
+  font-size: 0.78rem;
+  color: #7b8794;
+}
+
+/* ── Cards ──────────────────────────────────────────── */
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.cardTitle svg {
+  color: #8e8333;
+}
+
+/* ── Search row ─────────────────────────────────────── */
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchInput {
+  flex: 1 1 240px;
+  max-width: 340px;
+  padding: 9px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.searchInput:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+.countNote {
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+/* ── Tables ─────────────────────────────────────────── */
+
+.tableWrap {
+  margin-top: 14px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  /* Nine columns (patient · type · date · doctor · department · payment ·
+     symptoms · status · update). The <colgroup> in BookingsTable pins every
+     column width and this is its exact sum, so at the card's desktop width each
+     column lands on its intended size and the table never scrolls. For that to
+     hold, no *cell* may want more than its column: `overflow-wrap: anywhere` on
+     the cells below keeps each column's minimum width at a single character, so
+     the browser can always honour the colgroup instead of growing the table.
+     Below this width the wrap scrolls (unchanged behaviour). */
+  min-width: 1102px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table caption {
+  padding: 0 0 10px;
+  text-align: left;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+/* The modal shows the same table inside a 700px dialog, so it may shrink. */
+.modalTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+  background: #f4f7f0;
+  border-bottom: 2px solid #e0e0e0;
+  /* Headers wrap instead of forcing their whole label onto one line: a
+     two-word header like "Consultation status" was the widest thing in its
+     column, which pushed the nine-column Consultations table past its card at
+     every desktop width. `anywhere` extends that to single long words, so a
+     header can never widen a column past its <colgroup> width. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.td {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  color: #3f4c5a;
+  /* Same reason as .th: with auto table layout a single long word (a phone
+     number typed without spaces, an unbreakable test name) would otherwise
+     dictate its column's width and push the table past its card. This only
+     affects minimum-content sizing - a word still stays whole whenever its
+     column is wide enough for it. */
+  overflow-wrap: anywhere;
+}
+
+.name {
+  display: block;
+  font-weight: 600;
+  color: #1f2933;
+  /* Inherited from .td, but stated here too because this is the one cell whose
+     width is a product decision: the <colgroup> gives the column 208px, which
+     holds any real name on a single line, and only a genuinely unbreakable
+     value (a test name typed without any space) is ever split. */
+  overflow-wrap: anywhere;
+}
+
+.nameBtn {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: #3b5f1d;
+  text-decoration: underline;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.nameBtn:hover {
+  color: #2f4c17;
+}
+
+.contact {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: #7b8794;
+}
+
+/* ── Stacked date / time cell ───────────────────────── */
+/* The appointment date and its time sit on two lines instead of one long
+   "23/05/2025, 05:20:00 pm" string: the single line was the widest thing in
+   the table, and splitting it returns ~100px to the patient-name column. */
+
+.cellStack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.dateLine {
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.timeLine {
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 220px;
+}
+
+.countCell {
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+/* ── Status chips ───────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+  background: #f0f2f4;
+  color: #3f4c5a;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* The payment column is deliberately narrow (the space went to the patient name
+   and the two status selects), and "Payment pending" / "No payment record" do
+   not fit on one line there: the chip wraps onto two or three lines instead of
+   forcing the column - and with it the whole table - wider. */
+.paymentChip {
+  white-space: normal;
+}
+
+.badgePending {
+  background: #fff8e1;
+  border-color: #8e8333;
+  color: #6b6329;
+}
+
+.badgeConfirmed {
+  background: #f4f7f0;
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.badgeCompleted {
+  background: #3b5f1d;
+  border-color: #3b5f1d;
+  color: #fff;
+}
+
+.badgeRescheduled {
+  background: #eef2f7;
+  border-color: #9aa5b1;
+  color: #3f4c5a;
+}
+
+.badgeCancelled {
+  background: #fdecea;
+  border-color: #f5c6c2;
+  color: #8b2b21;
+}
+
+.badgeNeutral {
+  background: #f0f2f4;
+  border-color: #e0e0e0;
+  color: #7b8794;
+}
+
+/* ── Row controls ───────────────────────────────────── */
+
+/* ── Update payment + consultation status ───────────── */
+/* Two labelled selects stacked over one Update button: side by side they would
+   need ~320px and squeeze every other column, and the stacked form keeps the
+   control inside its 160px column at every desktop width. */
+
+.statusStack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.statusField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.statusLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.rowBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #fff;
+  color: #3b5f1d;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rowBtn:hover:not(:disabled) {
+  background: #f4f7f0;
+}
+
+.rowBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rowBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rowBtnPrimary:hover:not(:disabled) {
+  background: #2f4c17;
+}
+
+.rowBtnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.select {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 150px;
+  padding: 6px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.8rem;
+  color: #3f4c5a;
+}
+
+.select:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* ── Doctor-bookings dialog ─────────────────────────── */
+
+.modalTitle {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+}
+
+.modalSub {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: #7b8794;
+}
+
+/* ── Empty / loading ────────────────────────────────── */
+
+.empty {
+  margin: 8px 0 0;
+  padding: 18px 0;
+  text-align: center;
+  color: #9aa5b1;
+  font-size: 0.9rem;
+}
+
+.loading {
+  margin: 12px 0 0;
+  color: #7b8794;
+  font-size: 0.9rem;
+}
+
+/* ── Pagination ─────────────────────────────────────── */
+
+/* PanelPagination is a <nav> of plain buttons: no bootstrap .page-item /
+   .page-link classes, so the blue, heavy-shadowed `.page-link` rules of
+   public/css/style.css cannot reach it. Same layout as the customer-query
+   panel (divide from the table, centered, "Page x of y" on the right). */
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pageBtn {
+  min-width: 38px;
+  padding: 7px 12px;
+  border: 1px solid #dfe3e0;
+  border-radius: 8px;
+  background: #fff;
+  color: #52606d;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: #f4f7f0;
+  border-color: #3b5f1d;
+  color: #3b5f1d;
+}
+
+.pageBtn:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 2px;
+}
+
+.pageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageBtnActive,
+.pageBtnActive:hover:not(:disabled) {
+  background: #3b5f1d;
+  border-color: #3b5f1d;
+  color: #fff;
+}
+
+.pageGap {
+  padding: 0 2px;
+  color: #7b8794;
+  font-size: 0.82rem;
+}
+
+.pageInfo {
+  margin-left: 8px;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 992px) {
+  .tileGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .tileGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero {
+    padding: 16px 18px;
+    gap: 14px;
+  }
+  .heroTitle {
+    font-size: 1.35rem;
+  }
+  .tileValue {
+    font-size: 1.5rem;
+  }
+  .card {
+    padding: 16px;
+  }
+  .page {
+    padding: 16px 12px 24px;
+  }
+  .searchInput {
+    max-width: none;
+  }
+  .pageBtn {
+    min-width: 34px;
+    padding: 6px 10px;
+  }
+  /* Drop "Page x of y" onto its own line instead of squeezing the buttons. */
+  .pageInfo {
+    flex: 1 0 100%;
+    margin: 4px 0 0;
+    text-align: center;
+  }
+}
+
+
+/* ── Page-wide consultation-date range ──────────────── */
+/* One control above the tiles: every tile count and both tables read the
+   From/To range it sets (either end "" = open, both "" = every date). The
+   values are plain YYYY-MM-DD, which is exactly what istDayKey() returns, so
+   the filter is a string compare with no timezone maths. */
+
+.dateBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dateLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+/* The "From" / "To" captions that sit immediately before each date input, so
+   which end is which is never ambiguous (the native control only shows a
+   placeholder once it is empty). */
+.dateFieldLabel {
+  margin-left: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #52606d;
+}
+
+.dateInput {
+  min-width: 168px;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #3f4c5a;
+  background: #fff;
+}
+
+.dateInput:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+.dateBtn {
+  padding: 8px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f4c5a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dateBtn:hover {
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.dateBtn:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+.dateBtnActive,
+.dateBtnActive:hover {
+  border-color: #3b5f1d;
+  background: #f4f7f0;
+  color: #2f4c17;
+}
+
+.dateNote {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+/* ── "Consultation closed" tile ─────────────────────── */
+
+.tileValueOk {
+  color: #2f4c17;
+}
+
+/* ── Payment chips (same shell as the status chips) ─── */
+
+.paymentPaid {
+  background: #f4f7f0;
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.paymentPending {
+  background: #fff8e1;
+  border-color: #8e8333;
+  color: #6b6329;
+}
+
+.paymentFailed {
+  background: #fdecea;
+  border-color: #f5c6c2;
+  color: #8b2b21;
+}
+
+.paymentRefund {
+  background: #eef2f7;
+  border-color: #9aa5b1;
+  color: #3f4c5a;
+}
+
+.paymentNone {
+  background: #f0f2f4;
+  border-color: #e0e0e0;
+  color: #7b8794;
+}
+
+/* ── Booking ID line + closed marker ────────────────── */
+
+.idLine {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: #7b8794;
+  font-variant-numeric: tabular-nums;
+}
+
+.closedTag {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #2f4c17;
+}
+
+@media (max-width: 576px) {
+  .dateBar {
+    padding: 12px 14px;
+  }
+  .dateInput {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .dateNote {
+    flex: 1 0 100%;
+    margin: 0;
+  }
+}
+
   

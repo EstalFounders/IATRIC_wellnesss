@@ -10,8 +10,35 @@ import { capitalize, formatData } from "../utils/helper";
 import CircleLoader from "../../circleLoader";
 import { sendPrescriptionToFirebase } from "../../../utils";
 import { stampDataUrl, drawStampOnPdf } from "./DoctorStampGenerator";
+import { doctorDisplayName } from "../../../utils/doctorName";
 import { AiOutlineGlobal } from "react-icons/ai";
 import { MdEmail, MdPhone } from "react-icons/md";
+
+/**
+ * STANDARD PRESCRIPTION FORMAT (applies to every doctor profile, existing and
+ * newly added). The sheet is printed in this exact block order so that the PDF
+ * always matches the on-screen form in `prescriptionComp.js`:
+ *
+ *   1. Green header bar + HealthPath watermark
+ *   2. Logo (left) + doctor identity (right) — degree comes from the doctor's
+ *      `educationTraining`; this header's own registration line is only printed
+ *      when the profile carries a `doctorRegistrationNo` (no hard-coded fallback)
+ *   2b. The stamp below repeats the same identity as three blue lines:
+ *      name / area of expertise / `Reg. No:` (`lib/DoctorStampGenerator.js`).
+ *      The stamp's registration row is compulsory, so it prints for every
+ *      profile and reads `Reg. No: Not provided` until the number is filled in -
+ *      unlike the header line in 2 above, which stays hidden while it is blank.
+ *   3. Patient details (left) + date (right)
+ *   4. History — HOPI / provisional diagnosis, known case / known allergy
+ *   5. Rx mark + Medicines table
+ *   6. Diagnosis & advice (Advice + Notes)
+ *   7. Test advices
+ *   8. Signature + stamp
+ *   9. Footer (website / email / phone)
+ *
+ * Keep this order here only: this one component renders the prescription for
+ * all doctors, so no per-doctor template exists or should be introduced.
+ */
 
 const PDF_WIDTH = 720; // design width of #pdfContainer (px)
 const A4_WIDTH_MM = 210; // A4 width in mm - used to map DOM rects into PDF units
@@ -139,8 +166,12 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
 
     const dynamicStampUrl = stampDataUrl({
       name: data.doctorName,
-      degree: data.doctorDegree,
-      dmcNo: data.doctorRegNo || "101542",
+      // The stamp shows the doctor's primary speciality (`expertise`), not the
+      // joined `serviceOffered` list used by the sheet header above.
+      specialization: data.doctorExpertise || "",
+      // The stamp's Reg. No row is compulsory: `DoctorStampGenerator` prints the
+      // number here or its "Not provided" placeholder - never a borrowed number.
+      regNo: data.doctorRegNo || "",
     });
     setStampUrl(dynamicStampUrl);
     setSignNstampLoader(false);
@@ -219,9 +250,11 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
     drawStampOnPdf(
       doc,
       {
+        // Exactly the three fields of the on-screen stamp above; a blank `regNo`
+        // makes the generator print its "Not provided" row, never a fake number.
         name: data.doctorName,
-        degree: data.doctorDegree,
-        dmcNo: data.doctorRegNo || "101542",
+        specialization: data.doctorExpertise || "",
+        regNo: data.doctorRegNo || "",
       },
       stampBox.x,
       stampBox.y,
@@ -301,6 +334,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           appointmentId: data.appointmentId,
           prescriptionUrl,
           patientNo: data.patientNo || "",
+          name: data.patientName || "",
         }),
       });
 
@@ -430,16 +464,18 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 <div
                   style={{ fontSize: "16px", fontWeight: 700, color: "#111" }}
                 >
-                  Dr.{capitalize(data.doctorName)}
+                  {doctorDisplayName(capitalize(data.doctorName))}
                 </div>
                 <div style={{ fontSize: "15px", color: "#222" }}>
                   {data.doctorSepecialization
                     ? data.doctorSepecialization.split(",")[0].trim()
                     : "Family Physician"}
                 </div>
-                <div style={{ fontSize: "15px", color: "#222" }}>
-                  Reg no : {data.doctorRegNo || "101542"}
-                </div>
+                {data.doctorRegNo && (
+                  <div style={{ fontSize: "15px", color: "#222" }}>
+                    Reg no : {data.doctorRegNo}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -626,16 +662,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 paddingBottom: "16px",
               }}
             >
-              {/* Left: test advice + advice list */}
+              {/* Left: diagnosis & advice, then test advices — the same order as
+                  the on-screen form and the standard block order documented at
+                  the top of this file (every doctor profile prints this). */}
               <div style={{ flex: 1, paddingRight: "16px" }}>
-                <div style={{ marginBottom: "8px" }}>
-                  Test advices &ndash;&nbsp;
-                  <span>
-                    {Array.isArray(data.testAdvices)
-                      ? data.testAdvices.filter(Boolean).join(", ") || "NA"
-                      : data.testAdvices?.trim() || "NA"}
-                  </span>
-                </div>
                 <div>Advice &ndash;</div>
                 {adviceItems.map((item, i) => (
                   <div
@@ -650,6 +680,14 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                     {data.notes}
                   </div>
                 )}
+                <div style={{ marginTop: "8px" }}>
+                  Test advices &ndash;&nbsp;
+                  <span>
+                    {Array.isArray(data.testAdvices)
+                      ? data.testAdvices.filter(Boolean).join(", ") || "NA"
+                      : data.testAdvices?.trim() || "NA"}
+                  </span>
+                </div>
               </div>
 
               {/* Right: signature + stamp */}

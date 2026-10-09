@@ -1,8 +1,16 @@
 // AddDoctorForm.js
 import React, { useEffect, useState } from "react";
 import styles from "./AddDoctorForm.module.css";
-import { Button, Col, Row } from "react-bootstrap";
-import { useDropzone } from "react-dropzone";
+import { Col, Row } from "react-bootstrap";
+import {
+  FaCalendarCheck,
+  FaClipboardList,
+  FaFileUpload,
+  FaLock,
+  FaStethoscope,
+  FaUserCircle,
+  FaUserMd,
+} from "react-icons/fa";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import Preloader from "../../Preloader.js";
 import {
@@ -10,7 +18,6 @@ import {
   DoctorType,
   superAdminConsultationtype,
 } from "../../../constant.js";
-import TimePicker from "react-time-picker";
 import WorkDaysPicker from "../../Common/WorkDaysPicker.js";
 import EducationTrainingInput from "../../Common/EducationTrainingInput.js";
 import LanguageInput from "../../Common/LanguageInput.js";
@@ -22,7 +29,6 @@ import {
 import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
-import { setConsultationType } from "../../../store/slices/superAdmin/otherDetailsSlice.js";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
 
 /**
@@ -49,7 +55,32 @@ const MANDATORY_TEXT_FIELDS = [
   ["workExperience", "Work Experience"],
   ["workDays", "Work Days"],
   ["overview", "Overview"],
+  ["doctorRegistrationNo", "Registration No"],
 ];
+
+// Blank form state, also used by the Reset button so a second registration
+// starts from a clean slate. `location` defaults to "None", exactly like the
+// previous form.
+const EMPTY_DOCTOR = {
+  name: "",
+  email: "",
+  expertise: "",
+  doctorRegistrationNo: "",
+  gender: "",
+  workDays: "",
+  overview: "",
+  location: "None",
+  workExperience: "",
+  consultationType: "",
+  serviceOffered: "",
+  password: "",
+  doctorType: DoctorType.individual,
+  doctorShare: "",
+  price: "",
+  slotStartTime: "",
+  slotEndTime: "",
+  mobileNumber: "",
+};
 
 const AddDoctorForm = () => {
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
@@ -78,32 +109,13 @@ const AddDoctorForm = () => {
   const [languageError, setLanguageError] = useState("");
   const dispatch = useDispatch();
 
-  const [doctorDetails, setDoctorDetails] = useState({
-    name: "",
-    email: "",
-    expertise: "",
-    gender: "",
-    workDays: "",
-    overview: "",
-    location: "None",
-    workExperience: "",
-    consultationType: "",
-    serviceOffered: "",
-    password: "",
-    doctorType: DoctorType.individual,
-    doctorShare: "",
-    price: "",
-    slotStartTime: "",
-    slotEndTime: "",
-    mobileNumber: "",
-  });
+  const [doctorDetails, setDoctorDetails] = useState(EMPTY_DOCTOR);
+  // Bumped by the Reset button so the <ImageUploader />s remount (their preview
+  // state lives inside that component).
+  const [uploaderKey, setUploaderKey] = useState(0);
 
   const storedService = useSelector(
     (state) => state.superAdminHomePage.serviceOffered,
-  );
-
-  const consultationTypeStore = useSelector(
-    (state) => state.otherDetailsSlice.consultationType,
   );
 
   useEffect(() => {
@@ -206,9 +218,29 @@ const AddDoctorForm = () => {
     setMessage("");
   };
 
+  // Clears the whole form. `uploaderKey` is bumped so the <ImageUploader />s
+  // remount, which empties their internal preview state.
+  const handleReset = () => {
+    setDoctorDetails(EMPTY_DOCTOR);
+    setSelectedTypes([]);
+    setSelectedService([]);
+    setSelectedWorkDays([]);
+    setEducationItems([""]);
+    setLanguageItems([""]);
+    setprofilePicture("");
+    setDoctorStamp("");
+    setDoctorSignature("");
+    setDiplomasCertificates([]);
+    setCPassword();
+    setSlotStartTime("09:00");
+    setSlotEndTime("21:00");
+    setWorkDaysError("");
+    setLanguageError("");
+    setUploaderKey((key) => key + 1);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, "name", value, "value");
     // Parse the selected time
     if (name === "slotStartTime" || name === "slotEndTime") {
       {
@@ -245,7 +277,6 @@ const AddDoctorForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log(doctorDetails, "doctor details");
     setLoader(true);
     e.preventDefault();
 
@@ -299,6 +330,9 @@ const AddDoctorForm = () => {
     formData.append("gender", doctorDetails.gender);
     formData.append("mobileNumber", doctorDetails.mobileNumber);
     formData.append("expertise", doctorDetails.expertise);
+    // Compulsory field - it is listed in `MANDATORY_TEXT_FIELDS` and rejected by
+    // the Add Doctor POST while it is blank.
+    formData.append("doctorRegistrationNo", doctorDetails.doctorRegistrationNo);
     // One field per entry; a blank field clears the list on the API side.
     appendLanguages(formData, languageItems);
     formData.append("workDays", doctorDetails.workDays);
@@ -343,397 +377,530 @@ const AddDoctorForm = () => {
   };
 
   return (
-    <div className={styles.formContainer}>
-      <h2 className={styles.heading}>Add Doctor</h2>
-      <form onSubmit={handleSubmit}>
-        <Row>
-          <label className={styles.label}>
-            <b>Name:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="name"
-              value={doctorDetails.name}
-              onChange={handleChange}
-              required
-            />
-          </label>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <span className={styles.heroIcon} aria-hidden="true">
+          <FaUserMd />
+        </span>
+        <div>
+          <h1 className={styles.heroTitle}>Add a new doctor</h1>
+          <p className={styles.heroSubtitle}>
+            Register a doctor on the platform. Fields marked{" "}
+            <span className={styles.req}>*</span> are mandatory.
+          </p>
+        </div>
+      </header>
 
-          <label className={styles.label}>
-            <b>Email:</b>
-            <input
-              className={styles.input}
-              type="email"
-              name="email"
-              value={doctorDetails.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className={styles.label}>
-            <b>Mobile Number:</b>
-            <input
-              className={styles.input}
-              type="number"
-              name="mobileNumber"
-              value={doctorDetails.mobileNumber}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className={styles.label}>
-            <b>Area of Expertise:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="expertise"
-              value={doctorDetails.expertise}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <div className={styles.label}>
-            <b>Language:</b>
-            <LanguageInput
-              value={languageItems}
-              onChange={handleLanguagesChange}
-              error={languageError}
-            />
-          </div>
-
-          <label className={styles.label}>
-            <b>Work Experience:</b>
-            <input
-              className={styles.input}
-              type="text"
-              name="workExperience"
-              value={doctorDetails.workExperience}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          {/* <label htmlFor="consultationType" className={styles.label}>
-            Consultation Type:
-          </label> */}
-          <div className="font-weight-bold row ml-0">
-            <div className="col-md-6">
-              <label>Select Consultation Type:</label>
-              <select
-                id="consultationType"
-                className={styles.input}
-                onChange={handleAddType}
-                value=""
-              >
-                <option value="" disabled>
-                  Select options
-                </option>
-                {superAdminConsultationtype.map((option) => (
-                  <option
-                    key={option.name}
-                    value={option.name}
-                    disabled={selectedTypes.includes(option.name)}
-                  >
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Display selected options as "tags" */}
-              <div className={styles.tagsContainer}>
-                {selectedTypes.map((type) => (
-                  <div key={type} className={styles.tag}>
-                    {type}
-                    <button
-                      type="button"
-                      className={styles.removeButton}
-                      onClick={() => handleRemoveType(type)}
-                    >
-                      ✖
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Location input for specific consultation types */}
-              {(selectedTypes.includes("Off-line consultations") ||
-                selectedTypes.includes("Home visit")) && (
-                <div>
-                  <label htmlFor="Location" className="ml-3">
-                    Location:
+      <form onSubmit={handleSubmit} noValidate>
+        <div className={styles.layout}>
+          <div className={styles.main}>
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaUserCircle /> Personal details
+              </h2>
+              <Row>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Name <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      name="name"
+                      value={doctorDetails.name}
+                      onChange={handleChange}
+                      required
+                    />
                   </label>
-                  <input
-                    type="text"
-                    id="Location"
-                    className={styles.input}
-                    placeholder="Enter location"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="font-weight-bold col-md-6">
-              <label>Select Services Offered:</label>
-              <select
-                id="ServicesOffered"
-                className={styles.input}
-                onChange={handleAddService}
-                value=""
-              >
-                <option value="" disabled>
-                  Select options
-                </option>
-                {storedService
-                  .filter((option) => option.isActive !== false)
-                  .map((option) => (
-                    <option
-                      key={option._id || option.name}
-                      value={option.name}
-                      disabled={selectedService.includes(option.name)}
-                    >
-                      {option.name}
-                    </option>
-                  ))}
-              </select>
-
-              {/* Display selected options as "tags" */}
-              <div className={styles.tagsContainer}>
-                {selectedService.map((type) => (
-                  <div key={type} className={styles.tag}>
-                    {type}
-                    <button
-                      type="button"
-                      className={styles.removeButton}
-                      onClick={() => handleRemoveService(type)}
-                    >
-                      ✖
-                    </button>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Email <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="email"
+                      name="email"
+                      value={doctorDetails.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </label>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Mobile Number <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="tel"
+                      inputMode="numeric"
+                      name="mobileNumber"
+                      value={doctorDetails.mobileNumber}
+                      onChange={handleChange}
+                      required
+                    />
+                  </label>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Location</span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      name="location"
+                      value={doctorDetails.location}
+                      onChange={handleLocationTextChange}
+                      placeholder="e.g. Mumbai"
+                    />
+                    <span className={styles.hint}>
+                      Used for off-line and home-visit consultations.
+                    </span>
+                  </label>
+                </Col>
+                <Col md={12}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Gender</span>
+                    <div className={styles.radioRow}>
+                      <label className={styles.radioOption}>
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="male"
+                          checked={doctorDetails.gender === "male"}
+                          onChange={handleChange}
+                        />
+                        Male
+                      </label>
+                      <label className={styles.radioOption}>
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="female"
+                          checked={doctorDetails.gender === "female"}
+                          onChange={handleChange}
+                        />
+                        Female
+                      </label>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </Col>
+              </Row>
+            </section>
+
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaStethoscope /> Professional details
+              </h2>
+              <Row>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Area of Expertise <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      name="expertise"
+                      value={doctorDetails.expertise}
+                      onChange={handleChange}
+                      required
+                    />
+                  </label>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Registration No <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      name="doctorRegistrationNo"
+                      value={doctorDetails.doctorRegistrationNo}
+                      onChange={handleChange}
+                      required
+                    />
+                    <span className={styles.hint}>
+                      Printed on the prescription stamp as &quot;Reg. No:&quot;.
+                    </span>
+                  </label>
+                </Col>
+                <Col md={12}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Work Experience <span className={styles.req}>*</span>
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      name="workExperience"
+                      value={doctorDetails.workExperience}
+                      onChange={handleChange}
+                      placeholder="e.g. 8 years"
+                      required
+                    />
+                  </label>
+                </Col>
+                <Col md={12}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Overview <span className={styles.req}>*</span>
+                    </span>
+                    <textarea
+                      className={styles.textarea}
+                      name="overview"
+                      value={doctorDetails.overview}
+                      onChange={handleChange}
+                      required
+                    />
+                  </label>
+                </Col>
+                <Col md={12}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Education + Training</span>
+                    <EducationTrainingInput
+                      value={educationItems}
+                      onChange={setEducationItems}
+                    />
+                  </div>
+                </Col>
+              </Row>
+            </section>
+
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaClipboardList /> Consultation &amp; services
+              </h2>
+              <Row>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>
+                      Consultation Type <span className={styles.req}>*</span>
+                    </span>
+                    <select
+                      id="consultationType"
+                      className={styles.select}
+                      onChange={handleAddType}
+                      value=""
+                    >
+                      <option value="" disabled>
+                        Select options
+                      </option>
+                      {superAdminConsultationtype.map((option) => (
+                        <option
+                          key={option.name}
+                          value={option.name}
+                          disabled={selectedTypes.includes(option.name)}
+                        >
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className={styles.tagsContainer}>
+                      {selectedTypes.map((type) => (
+                        <div key={type} className={styles.tag}>
+                          {type}
+                          <button
+                            type="button"
+                            className={styles.removeButton}
+                            aria-label={`Remove ${type}`}
+                            onClick={() => handleRemoveType(type)}
+                          >
+                            ✖
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>
+                      Services Offered <span className={styles.req}>*</span>
+                    </span>
+                    <select
+                      id="ServicesOffered"
+                      className={styles.select}
+                      onChange={handleAddService}
+                      value=""
+                    >
+                      <option value="" disabled>
+                        Select options
+                      </option>
+                      {storedService
+                        .filter((option) => option.isActive !== false)
+                        .map((option) => (
+                          <option
+                            key={option._id || option.name}
+                            value={option.name}
+                            disabled={selectedService.includes(option.name)}
+                          >
+                            {option.name}
+                          </option>
+                        ))}
+                    </select>
+                    <div className={styles.tagsContainer}>
+                      {selectedService.map((type) => (
+                        <div key={type} className={styles.tag}>
+                          {type}
+                          <button
+                            type="button"
+                            className={styles.removeButton}
+                            aria-label={`Remove ${type}`}
+                            onClick={() => handleRemoveService(type)}
+                          >
+                            ✖
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Col>
+                <Col md={4}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Price</span>
+                    <input
+                      type="number"
+                      name="price"
+                      value={doctorDetails.price}
+                      onChange={handleChange}
+                      className={styles.input}
+                    />
+                  </label>
+                </Col>
+                <Col md={4}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Doctor Share (%)</span>
+                    <input
+                      type="number"
+                      name="doctorShare"
+                      value={doctorDetails.doctorShare}
+                      onChange={handleChange}
+                      className={styles.input}
+                      min="0"
+                      max="100"
+                    />
+                  </label>
+                </Col>
+                <Col md={4}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Doctor Type</span>
+                    <select
+                      name="doctorType"
+                      value={doctorDetails.doctorType}
+                      onChange={handleChange}
+                      className={styles.select}
+                    >
+                      <option value={DoctorType.individual}>
+                        {DoctorType.individual}
+                      </option>
+                      <option value={DoctorType.company}>
+                        {DoctorType.company}
+                      </option>
+                    </select>
+                  </label>
+                </Col>
+              </Row>
+            </section>
+
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaCalendarCheck /> Availability
+              </h2>
+              <Row>
+                <Col md={12}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>
+                      Work Days <span className={styles.req}>*</span>
+                    </span>
+                    <WorkDaysPicker
+                      value={selectedWorkDays}
+                      onChange={handleWorkDaysChange}
+                      error={workDaysError}
+                    />
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Start time</span>
+                    <input
+                      type="time"
+                      id="slotStartTime"
+                      name="slotStartTime"
+                      value={slotStartTime}
+                      onChange={handleChange}
+                      min="08:00"
+                      max="23:00"
+                      className={styles.input}
+                    />
+                  </label>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>End time</span>
+                    <input
+                      type="time"
+                      id="slotEndTime"
+                      name="slotEndTime"
+                      value={slotEndTime}
+                      onChange={handleChange}
+                      min={slotStartTime}
+                      max="23:00"
+                      className={styles.input}
+                    />
+                  </label>
+                </Col>
+              </Row>
+            </section>
+
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaLock /> Account &amp; access
+              </h2>
+              <p className={styles.hint}>
+                Optional. If set, the two password fields must match.
+              </p>
+              <Row>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Password</span>
+                    <input
+                      className={styles.input}
+                      type="password"
+                      name="password"
+                      value={doctorDetails.password || ""}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Confirm Password</span>
+                    <input
+                      className={styles.input}
+                      type="password"
+                      name="confirm_password"
+                      value={cpassword || ""}
+                      onChange={(e) => setCPassword(e.target.value)}
+                    />
+                  </label>
+                </Col>
+              </Row>
+            </section>
+
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>
+                <FaFileUpload /> Documents &amp; media
+              </h2>
+              <p className={styles.hint}>
+                Optional, but certificates, the picture, the signature and the
+                stamp improve the prescription and the doctor profile.
+              </p>
+              <Row key={uploaderKey}>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>
+                      Diplomas and Certificates
+                    </span>
+                    <ImageUploader
+                      id="diplomasCertificates"
+                      multiple={true}
+                      onImagesChange={handleImagesChange}
+                    />
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Doctor Picture</span>
+                    <ImageUploader
+                      id="profilePicture"
+                      multiple={true}
+                      onImagesChange={handleImagesChange}
+                    />
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Digital Signature</span>
+                    <ImageUploader
+                      id="doctorSignature"
+                      multiple={false}
+                      onImagesChange={handleImagesChange}
+                    />
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Doctor Stamp</span>
+                    <ImageUploader
+                      id="doctorStamp"
+                      multiple={false}
+                      onImagesChange={handleImagesChange}
+                    />
+                  </div>
+                </Col>
+              </Row>
+            </section>
+          </div>
+
+          <aside className={styles.rail}>
+            <div className={styles.railCard}>
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>
+                  <FaClipboardList /> Before you submit
+                </h2>
+                <ul className={styles.tipList}>
+                  <li>Name, email and mobile number are required.</li>
+                  <li>
+                    Expertise, registration number and work experience are
+                    required.
+                  </li>
+                  <li>Overview and at least one language are required.</li>
+                  <li>
+                    Select the consultation type(s) and the services offered.
+                  </li>
+                  <li>Pick at least one work day.</li>
+                  <li>
+                    Passwords are optional; if set, both fields must match.
+                  </li>
+                </ul>
+              </section>
+
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>
+                  <FaUserMd /> Tips
+                </h2>
+                <ul className={styles.tipList}>
+                  <li>Blank education and language rows are ignored.</li>
+                  <li>
+                    Documents can be re-uploaded later from the doctor profile.
+                  </li>
+                </ul>
+              </section>
             </div>
-          </div>
+          </aside>
+        </div>
 
-          <div className={styles.label}>
-            <b>Work Days:</b>
-            <WorkDaysPicker
-              value={selectedWorkDays}
-              onChange={handleWorkDaysChange}
-              error={workDaysError}
-            />
-          </div>
-
-          <label className={styles.label}>
-            <b>Overview:</b>
-            <textarea
-              className={styles.textarea}
-              name="overview"
-              value={doctorDetails.overview}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <div className={styles.label}>
-            <b>Education + Training:</b>
-            <EducationTrainingInput
-              value={educationItems}
-              onChange={setEducationItems}
-            />
-          </div>
-          <Row>
-            <Col>
-              <label className={styles.label}>
-                <b>Price</b>
-                <input
-                  type="number"
-                  name="price"
-                  value={doctorDetails.price}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
-              </label>
-            </Col>
-            <Col>
-              <label className={styles.label}>
-                <b>Doctor Share (%)</b>
-                <input
-                  type="number"
-                  name="doctorShare"
-                  value={doctorDetails.doctorShare}
-                  onChange={handleChange}
-                  className={styles.input}
-                  min="0"
-                  max="100"
-                />
-              </label>
-            </Col>
-            <Col>
-              <label className={styles.label}>
-                <b>Doctor Type</b>
-                <select
-                  name="doctorType"
-                  value={doctorDetails.doctorType}
-                  onChange={handleChange}
-                  className={styles.select}
-                >
-                  <option value={DoctorType.individual}>
-                    {DoctorType.individual}
-                  </option>
-                  <option value={DoctorType.company}>
-                    {DoctorType.company}
-                  </option>
-                </select>
-              </label>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <label className={styles.label}>
-                <b>Start time:</b>
-                <input
-                  type="time"
-                  id="slotStartTime"
-                  name="slotStartTime"
-                  value={slotStartTime}
-                  onChange={handleChange}
-                  min="08:00"
-                  max="23:00"
-                  className={styles.input}
-                />
-              </label>
-            </Col>
-
-            <Col className="ml-5">
-              <label className={styles.label}>
-                <b>End time:</b>
-                <input
-                  type="time"
-                  id="slotEndTime"
-                  name="slotEndTime"
-                  value={slotEndTime}
-                  onChange={handleChange}
-                  min={slotStartTime}
-                  max="23:00"
-                  className={styles.input}
-                />
-              </label>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <label className={styles.label}>
-                <b>Password:</b>
-                <input
-                  className={styles.input}
-                  type="password"
-                  name="password"
-                  value={doctorDetails.password || ""}
-                  onChange={handleChange}
-                />
-              </label>
-            </Col>
-
-            <Col>
-              <label className={styles.label}>
-                <b>Confirm Password:</b>
-                <input
-                  className={styles.input}
-                  type="password"
-                  name="confirm_password"
-                  value={cpassword || ""}
-                  onChange={(e) => setCPassword(e.target.value)}
-                />
-              </label>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <div className={styles.label}>
-                <b>Diplomas and Certificates:</b>
-                <ImageUploader
-                  id="diplomasCertificates"
-                  multiple={true}
-                  onImagesChange={handleImagesChange}
-                />
-              </div>
-            </Col>
-            <Col>
-              <div className={styles.label}>
-                <b>Doctor Picture:</b>
-                <ImageUploader
-                  id="profilePicture"
-                  multiple={true}
-                  onImagesChange={handleImagesChange}
-                />
-              </div>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
-              <div className={styles.label}>
-                <b>Digital Signature:</b>
-                <ImageUploader
-                  id="doctorSignature"
-                  multiple={false}
-                  onImagesChange={handleImagesChange}
-                />
-              </div>
-            </Col>
-            <Col>
-              <div className={styles.label}>
-                <b>Doctor Stamp:</b>
-                <ImageUploader
-                  id="doctorStamp"
-                  multiple={false}
-                  onImagesChange={handleImagesChange}
-                />
-              </div>
-            </Col>
-          </Row>
-        </Row>
-
-        <Row className="mt-4">
-          <Col className="text-right">
-            <label className={styles.label}>
-              <b>Male</b>
-              <input
-                // className={styles.input}
-                className="ml-1"
-                type="radio"
-                name="gender"
-                value="male"
-                onChange={handleChange}
-              />
-            </label>
-          </Col>
-          <Col className="text-left">
-            <label className={styles.label}>
-              <b>Female</b>
-              <input
-                // className={styles.input}
-                className="ml-1"
-                type="radio"
-                name="gender"
-                value="female"
-                onChange={handleChange}
-              />
-            </label>
-          </Col>
-        </Row>
-
-        <Row className="mt-4">
-          <Col className="text-center">
-            <button className={styles.button} type="submit">
-              Add Doctor
-            </button>
-          </Col>
-        </Row>
+        <div className={styles.actionBar}>
+          <span className={styles.actionNote}>
+            <span className={styles.req}>*</span> Mandatory fields must be
+            filled before the doctor can be registered.
+          </span>
+          <button
+            type="button"
+            className={styles.ghostBtn}
+            onClick={handleReset}
+          >
+            Reset
+          </button>
+          <button className={styles.primaryBtn} type="submit">
+            Add Doctor
+          </button>
+        </div>
 
         <CustomDialog
           show={showDialog}
@@ -741,6 +908,7 @@ const AddDoctorForm = () => {
           message={message}
         />
       </form>
+
       {loader && <Preloader />}
     </div>
   );

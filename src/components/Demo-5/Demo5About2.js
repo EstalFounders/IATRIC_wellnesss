@@ -93,7 +93,7 @@ const consultationTypes = useSelector(
                 <br />
                 <div
                   className="font-weight-bold h4 mt-2"
-                  style={{ color: color_schema.green }}
+                  style={{ color: color_schema.gold }}
                 >
                   {t("demo5.about.bookOnline")}
                 </div>

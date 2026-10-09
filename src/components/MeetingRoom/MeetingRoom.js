@@ -6,6 +6,7 @@ import chatStyles from "../../../styles/components/ChatPanel.module.css";
 import fileStyles from "../../../styles/components/FileShare.module.css";
 import infoStyles from "../../../styles/components/ParticipantInfo.module.css";
 import { getSocket } from "../../lib/socket";
+import { doctorDisplayName } from "../../utils/doctorName";
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + " B";
@@ -102,7 +103,8 @@ const SidePanel = ({ activeTab, onTabChange, onClose, consultation, messages, on
 
   const isDoctor = userType === "doctor";
   const patientName = consultation?.name || "Patient";
-  const doctorName = consultation?.doctorDetails?.name || "Doctor";
+  const doctorName =
+    doctorDisplayName(consultation?.doctorDetails?.name) || "Doctor";
   const doctorSpecialty = consultation?.doctorDetails?.speciality || "General";
   const patientMobNo = consultation?.patientMobNo || "";
   const consultationPrice = consultation?.consultationprice || "";
@@ -367,7 +369,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       console.log("Socket connected, joining room:", mid);
       setMySocketId(socket.id);
       const userName = isDoctor
-        ? consultation?.doctorDetails?.name || "Doctor"
+        ? doctorDisplayName(consultation?.doctorDetails?.name) || "Doctor"
         : consultation?.name || "Patient";
       socket.emit("join-room", {
         meetingId: mid,
@@ -610,7 +612,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
       }
       // Show a toast notification
       const displayName = data.role === "doctor"
-        ? consultation?.doctorDetails?.name || "Doctor"
+        ? doctorDisplayName(consultation?.doctorDetails?.name) || "Doctor"
         : consultation?.name || "Patient";
       const message = data.isVideoOn
         ? `${displayName} turned on camera`
@@ -1011,7 +1013,8 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     a.click();
   };
 
-  const doctorName = consultation?.doctorDetails?.name || "Doctor";
+  const doctorName =
+    doctorDisplayName(consultation?.doctorDetails?.name) || "Doctor";
   const doctorSpecialty = consultation?.doctorDetails?.speciality || "General";
   const patientName = consultation?.name || "Patient";
 

@@ -1,27 +1,127 @@
 // pages/homepage.js
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { Button, Col, Row } from "react-bootstrap";
 import MedicineForm from "../registerDocComponent/lib/MedicineForm";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
-import { api, appointment_status, doctor_info_local_storage, color_schema } from "../../constant";
+import { api, appointment_status, doctor_info_local_storage } from "../../constant";
+import { doctorDisplayName } from "../../utils/doctorName";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
 import { useSelector } from "react-redux";
 import {
   ADVICES,
   CHIEF_COMPLAINTS_TXT,
+  HISTORY_KNOWN_ALLERGY_TXT,
   KNOWN_CASES_TXT,
   LAST_HEALTH_TEXT_DONE_TXT,
   NOTES,
-  TEST_ADVICES,
   UNDER_TREATMENT_TXT,
 } from "./utils/constant";
 import { IoIosClose } from "react-icons/io";
-import { BiPencil, BiSolidPencil, BiPlus } from "react-icons/bi";
+import { BiSolidPencil, BiPlus } from "react-icons/bi";
+import {
+  FaCheckCircle,
+  FaNotesMedical,
+  FaPills,
+  FaRedoAlt,
+  FaStethoscope,
+  FaUserInjured,
+  FaUserMd,
+  FaVial,
+} from "react-icons/fa";
+import styles from "./css/Prescription.module.css";
+
+// Common findings / advice a doctor repeats all day - one click appends them
+// to the matching free-text field instead of typing the same words again.
+const CHIEF_COMPLAINT_PRESETS = [
+  "Fever",
+  "Cough",
+  "Cold",
+  "Sore throat",
+  "Headache",
+  "Body ache",
+  "Loose motions",
+  "Acidity",
+];
+
+const ADVICE_PRESETS = [
+  "Take plenty of fluids",
+  "Take complete rest",
+  "Avoid oily and spicy food",
+  "Complete the antibiotic course",
+  "Review after 5 days",
+];
+
+// ── Doctor identity for the standard prescription sheet ─────────────────────
+// `lib/DoctorPrescriptionGenerator.js` is the single template used by every
+// doctor profile, so it may only read fields that ANY doctor is guaranteed to
+// have - including one added after today.
+// `doctor.degree` was removed from the doctor model, so the degree line is
+// built from the repeatable `educationTraining` list instead.
+const joinDoctorQualifications = (educationTraining) =>
+  (Array.isArray(educationTraining) ? educationTraining : [educationTraining])
+    .map((entry) => (entry || "").trim())
+    .filter(Boolean)
+    .join(", ");
+
+// `doctorSepecialization` used to be hard-coded to "" so every prescription
+// printed the "Family Physician" fallback; use the doctor's specialities now.
+const joinDoctorSpecialities = (serviceOffered) =>
+  (Array.isArray(serviceOffered) ? serviceOffered : [serviceOffered])
+    .map((entry) => (entry || "").trim())
+    .filter(Boolean)
+    .join(", ");
+
+// Single source of truth for the form shape - used for the initial state and
+// for "Clear form", so a reset can never drift from the original defaults.
+const buildInitialFormDetails = (doctor) => ({
+  doctorName: "",
+  doctorDegree: joinDoctorQualifications(doctor.educationTraining),
+  doctorSepecialization: joinDoctorSpecialities(doctor.serviceOffered),
+  // The stamp (name / specialization / Reg. No) reads its own pair of fields:
+  // `expertise` is the area the doctor is stamped with, while the sheet header
+  // keeps the joined `serviceOffered` list above. They only differ on a profile
+  // whose `expertise` and `serviceOffered` disagree.
+  doctorExpertise: doctor.expertise || "",
+  // Compulsory on the doctor profile: this drives the sheet header's `Reg no :`
+  // line (hidden while blank) and the stamp's `Reg. No:` row (always printed -
+  // the stamp shows "Reg. No: Not provided" until the number is entered).
+  doctorRegNo: doctor.doctorRegistrationNo || "",
+  doctorMobNo: doctor.mobileNumber,
+  patientName: "",
+  age: "",
+  gender: "Male",
+  patientNo: "",
+  patientId: "",
+  anyDrugAllergy: "No known allergy from medicine",
+  lastHealthTest: "Within 6 months",
+  medicineInfo: [],
+  knownCases: "",
+  underTreatmentSince: "",
+  cheifCompalaints: "",
+  advices: "",
+  notes: "",
+  testAdvices: [],
+  doctorStampUrl: "",
+  doctorSignatureUrl: "",
+  appointmentId: "",
+  doctorId: "",
+});
+
+// Builds a fresh, valid 24-hex Mongo ObjectId for manual (doctor-typed) entries.
+// A random id never matches a real appointment, so the previously selected
+// appointment is left untouched and the typed name/number are used instead.
+const generateObjectId = () =>
+  Math.floor(Date.now() / 1000)
+    .toString(16)
+    .padStart(8, "0") +
+  Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 16).toString(16),
+  ).join("");
 
 const PrescriptionComp = () => {
   const [availableTests, setAvailableTests] = useState([]);
@@ -39,6 +139,7 @@ const PrescriptionComp = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isManualEntry, setIsManualEntry] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [testAdviceSearchTerm, setTestAdviceSearchTerm] = useState("");
   const [testAdviceSuggestions, setTestAdviceSuggestions] = useState([]);
@@ -46,33 +147,15 @@ const PrescriptionComp = () => {
   const [allTestNames, setAllTestNames] = useState([]);
   const [testAdviceDropdownStyle, setTestAdviceDropdownStyle] = useState({});
   const testAdviceContainerRef = useRef(null);
+  const editSnapshotRef = useRef(null);
 
-  const [updatedFormDetails, setUpdatedFormDetails] = useState({
-    doctorName: "",
-    doctorDegree: doctorInfo.user.degree,
-    doctorSepecialization: "",
-    doctorMobNo: doctorInfo.user.mobileNumber,
-    patientName: "",
-    age: "",
-    gender: "Male",
-    patientNo: "",
-    patientId: "",
-    anyDrugAllergy: "No known allergy from medicine",
-    // lastDoctorVisit: "Within 1 month",
-    lastHealthTest: "Within 6 months",
-    medicineInfo: [],
-    knownCases: "",
-    underTreatmentSince: "",
-    cheifCompalaints: "",
-    advices: "",
-    notes: "",
-    testAdvices: [],
-    doctorStampUrl: "",
-    doctorSignatureUrl: "",
-    appointmentId: "",
-    doctorId: "",
-    // Add more fields as needed
-  });
+  const [formError, setFormError] = useState("");
+  // Bumped by "Clear form" so every MedicineForm remounts with empty inputs.
+  const [formResetKey, setFormResetKey] = useState(0);
+
+  const [updatedFormDetails, setUpdatedFormDetails] = useState(() =>
+    buildInitialFormDetails(doctorInfo.user),
+  );
 
   const handleMedicineFormChange = (formValues, index) => {
     console.log(formValues, "form value in homepage");
@@ -134,7 +217,129 @@ const PrescriptionComp = () => {
       doctorName: doctors.name,
       doctorStampUrl: doctors.doctorStampUrl,
       doctorSignatureUrl: doctors.doctorSignatureUrl,
+      // Manual entry (doctor clicked edit / + and typed their own name & number):
+      // use a fresh appointmentId so the previously selected appointment is not
+      // touched and the typed name/number are used for the WhatsApp message.
+      ...(isManualEntry ? { appointmentId: generateObjectId() } : {}),
     }));
+  };
+
+  // ── Layout / UX helpers ───────────────────────────────────────────────
+  // Smooth-scrolls to a section card (used by the quick nav and by the
+  // checklist when a required field is still missing).
+  const scrollToSection = (sectionId) => {
+    if (typeof document === "undefined") return;
+    document
+      .getElementById(sectionId)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // Appends a preset phrase to a free-text field, skipping duplicates so the
+  // same chip can be clicked twice without repeating the text.
+  const appendPreset = (field, value) => {
+    setUpdatedFormDetails((prev) => {
+      const current = (prev[field] || "").trim();
+      if (current.toLowerCase().includes(value.toLowerCase())) return prev;
+      return { ...prev, [field]: current ? `${current}, ${value}` : value };
+    });
+  };
+
+  const addMedicineForm = () => {
+    setMedicineForms((prev) => [...prev, {}]);
+    setTimeout(() => scrollToSection("medicines-section"), 0);
+  };
+
+  const medicineNamesCount = medicineForms.filter((form) =>
+    Boolean(form?.medicineName?.trim()),
+  ).length;
+
+  // Live checklist rendered in the action bar. Only the patient name is a hard
+  // requirement (the PDF, the WhatsApp message and the saved appointment all
+  // key off it) - the rest is surfaced as a gentle reminder.
+  const requiredItems = useMemo(
+    () => [
+      {
+        key: "patient",
+        label: "Patient name",
+        done: Boolean((selectedName || searchTerm).trim()),
+        section: "patient-section",
+      },
+      {
+        key: "age",
+        label: "Age",
+        done: Boolean(String(updatedFormDetails.age || "").trim()),
+        section: "patient-section",
+      },
+      {
+        key: "complaints",
+        label: "Chief complaints",
+        done: Boolean(updatedFormDetails.cheifCompalaints?.trim()),
+        section: "history-section",
+      },
+      {
+        key: "medicines",
+        label: "At least one medicine",
+        done: medicineNamesCount > 0,
+        section: "medicines-section",
+      },
+      {
+        key: "tests",
+        label: "At least one test advice",
+        done: updatedFormDetails.testAdvices.length > 0,
+        section: "tests-section",
+      },
+    ],
+    [
+      selectedName,
+      searchTerm,
+      updatedFormDetails.age,
+      updatedFormDetails.cheifCompalaints,
+      updatedFormDetails.testAdvices.length,
+      medicineNamesCount,
+    ],
+  );
+
+  const pendingItems = requiredItems.filter((item) => !item.done);
+
+  // "Create prescription" is gated by the two things that would silently
+  // produce a bad prescription: no patient on the form, or a bad mobile number.
+  const handleCreatePrescription = () => {
+    if (!(selectedName || searchTerm).trim()) {
+      setFormError("Choose a patient from the list (or add a name) first.");
+      scrollToSection("patient-section");
+      return;
+    }
+
+    const mobile = (updatedFormDetails.patientNo || "").trim();
+    if (mobile && !/^\d{10}$/.test(mobile)) {
+      setFormError("Mobile number must be exactly 10 digits.");
+      scrollToSection("patient-section");
+      return;
+    }
+
+    setFormError("");
+    handlePreview();
+  };
+
+  const handleResetForm = () => {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm("Clear every field and start a new prescription?")
+    ) {
+      return;
+    }
+    setUpdatedFormDetails(buildInitialFormDetails(doctorInfo.user));
+    setMedicineForms([]);
+    setSearchTerm("");
+    setSelectedName("");
+    setSuggestions(appointments);
+    setIsEditing(false);
+    setIsManualEntry(false);
+    setShowDropdown(false);
+    setTestAdviceSearchTerm("");
+    setFormError("");
+    setFormResetKey((key) => key + 1);
+    scrollToSection("patient-section");
   };
 
   // useEffect(() => {
@@ -191,6 +396,7 @@ const PrescriptionComp = () => {
     setSelectedName(appointment.name); // Store the selected name
     setShowDropdown(false);
     setIsEditing(false); // Go to view mode after selection
+    setIsManualEntry(false); // Choosing from the list is not a manual entry
     handleOtherFormDetailsChange({
       patientName: appointment.name,
       patientId: appointment._id,
@@ -211,8 +417,29 @@ const PrescriptionComp = () => {
     }, 100);
   };
 
-  const handleEditClick = () => {
+  // Enters edit mode and remembers the current patient so it can be restored.
+  const startEdit = () => {
+    editSnapshotRef.current = { ...updatedFormDetails };
+    setIsManualEntry(true);
     setIsEditing(true);
+  };
+
+  // Leaves edit mode: discards any typing and restores the previous selection.
+  const cancelEdit = () => {
+    const snapshot = editSnapshotRef.current;
+    if (snapshot) {
+      handleOtherFormDetailsChange({
+        patientName: snapshot.patientName,
+        patientNo: snapshot.patientNo,
+        patientId: snapshot.patientId,
+        appointmentId: snapshot.appointmentId,
+      });
+      setSearchTerm(snapshot.patientName || "");
+      setSelectedName(snapshot.patientName || "");
+    }
+    setShowDropdown(false);
+    setIsManualEntry(false);
+    setIsEditing(false);
   };
 
   useEffect(() => {
@@ -385,565 +612,691 @@ const PrescriptionComp = () => {
     };
   }, [showTestAdviceDropdown, updateTestAdviceDropdownPosition]);
 
-  // CSS for the modal
-  const modalStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
+  // Quick jump targets rendered above the form.
+  const sectionLinks = [
+    { id: "patient-section", label: "Patient", icon: FaUserInjured },
+    { id: "history-section", label: "History", icon: FaNotesMedical },
+    {
+      id: "medicines-section",
+      label: "Medicines",
+      icon: FaPills,
+      count: medicineForms.length,
+    },
+    {
+      id: "diagnosis-section",
+      label: "Diagnosis & advice",
+      icon: FaStethoscope,
+    },
+    {
+      id: "tests-section",
+      label: "Test advices",
+      icon: FaVial,
+      count: updatedFormDetails.testAdvices.length,
+    },
+  ];
 
-  const modalContentStyle = {
-    backgroundColor: "#fefefe",
-    padding: "20px",
-    borderRadius: "5px",
-    maxHeight: "90%",
-    overflowY: "auto",
-  };
-
-  const closeButtonStyle = {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    cursor: "pointer",
-  };
+  const patientReady = Boolean((selectedName || searchTerm).trim());
+  const mobileValue = (updatedFormDetails.patientNo || "").trim();
+  const mobileInvalid = Boolean(mobileValue) && !/^\d{10}$/.test(mobileValue);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        fontFamily: "TT Ramillas, sans-serif",
-      }}
-    >
-      <h1
-        style={{ marginBottom: "30px", color: color_schema.green }}
-        className="text-center"
-      >
-        <b>
-          <u>Doctor Prescription</u>
-        </b>
-      </h1>
-      <div style={{ width: "90%", maxWidth: "500px" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <div style={{ display: "grid", gap: "10px" }}>
-            <div className="row">
-              <div className="col">
-                <div className="font-weight-bold">
-                  {" "}
-                  Dr {doctorInfo.user.name}
-                </div>
-              </div>
-            </div>
-            <Row>
-              <Col>
-                <label>
-                  Patient Name:
-                  <div
-                    style={{
-                      position: "relative",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    {isEditing ? (
-                      <>
-                        <input
-                          type="text"
-                          name="patientName"
-                          style={{
-                            padding: "10px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            width: "100%",
-                            marginRight: "8px",
-                          }}
-                          required
-                          value={searchTerm}
-                          onChange={handleInputChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                        />
-                        <input
-                          type="tel"
-                          name="patientNo"
-                          placeholder="Mobile No"
-                          style={{
-                            padding: "10px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            width: "100%",
-                            marginRight: "8px",
-                          }}
-                          value={updatedFormDetails.patientNo}
-                          onChange={(e) =>
-                            handleOtherFormDetailsChange({
-                              patientNo: e.target.value,
-                            })
-                          }
-                        />
-                      </>
-                    ) : (
-                      <div
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                          marginRight: "8px",
-                          cursor: "pointer",
-                          backgroundColor: "#f0f0f0",
-                        }}
-                        onClick={handleInputClick}
-                      >
-                        {selectedName || "Select Patient"}
-                      </div>
-                    )}
+    <div className={styles.page}>
+      {/* ── Page header ── */}
+      <header className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Doctor Prescription</h1>
+          <p className={styles.pageSubtitle}>
+            Pick the patient, record the findings, add medicines and advice, then
+            create the signed prescription PDF.
+          </p>
+        </div>
+        <div className={styles.doctorChip}>
+          <FaUserMd className={styles.doctorChipIcon} />
+          <div>
+            <strong>{doctorDisplayName(doctorInfo?.user?.name) || "Doctor"}</strong>
+            {joinDoctorQualifications(doctorInfo?.user?.educationTraining) && (
+              <span>
+                {joinDoctorQualifications(doctorInfo?.user?.educationTraining)}
+              </span>
+            )}
+          </div>
+        </div>
+      </header>
 
-                    {!isEditing && selectedName && (
-                      <BiSolidPencil size={16} onClick={handleEditClick} />
-                    )}
-                    {!isEditing && !selectedName && (
-                      <BiPlus
-                        size={18}
-                        onClick={() => {
-                          setIsEditing(true);
-                          setSelectedName("");
-                          setSearchTerm("");
-                        }}
-                        style={{ cursor: "pointer", marginLeft: "8px" }}
+      {/* ── Section quick nav ── */}
+      <nav className={styles.sectionNav} aria-label="Prescription sections">
+        {sectionLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <button
+              key={link.id}
+              type="button"
+              className={styles.navPill}
+              onClick={() => scrollToSection(link.id)}
+            >
+              <Icon className={styles.navPillIcon} />
+              {link.label}
+              {typeof link.count === "number" && (
+                <span className={styles.navPillCount}>{link.count}</span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className={styles.grid}>
+        {/* ── 1. Patient ── */}
+        <section
+          id="patient-section"
+          className={`${styles.card} ${styles.cardWide}`}
+        >
+          <div className={styles.cardHeader}>
+            <span className={styles.cardIndex}>1</span>
+            <div>
+              <h2 className={styles.cardTitle}>
+                <FaUserInjured /> Patient details
+              </h2>
+              <p className={styles.cardHint}>
+                Search an appointment to auto-fill the name and mobile number, or
+                add a walk-in patient manually.
+              </p>
+            </div>
+            <span
+              className={`${styles.cardBadge} ${
+                patientReady ? styles.cardBadgeOk : ""
+              }`}
+            >
+              {patientReady ? "Patient ready" : "No patient yet"}
+            </span>
+          </div>
+          <div className={styles.cardBody}>
+            <Row className={styles.formGrid}>
+              <Col xs={12} lg={5}>
+                <label className={styles.label} htmlFor="patientName">
+                  Patient name<span className={styles.required}>*</span>
+                </label>
+                <div className={styles.autocomplete}>
+                  {isEditing ? (
+                    <div className={styles.nameRow}>
+                      <input
+                        id="patientName"
+                        type="text"
+                        name="patientName"
+                        className={styles.input}
+                        value={searchTerm}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        placeholder="Type or pick a name"
+                        autoComplete="off"
                       />
-                    )}
-                    {showDropdown && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "calc(100% + 2px)",
-                          left: 0,
-                          width: "100%",
-                          backgroundColor: "white",
-                          border: "1px solid #ccc",
-                          borderRadius: "5px",
-                          zIndex: 10,
-                          maxHeight: "150px",
-                          overflowY: "auto",
-                        }}
+                      <button
+                        type="button"
+                        className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                        title="Cancel editing"
+                        onClick={cancelEdit}
                       >
-                        {suggestions
-                          .filter(
-                            (appointment) =>
-                              appointment.status !==
-                              appointment_status.completed,
-                          )
-                          .map((appointment) => (
-                            <div
-                              key={appointment.id || appointment.name}
-                              style={{ padding: "8px", cursor: "pointer" }}
-                              onClick={() => handleSuggestionClick(appointment)}
-                            >
-                              {appointment.name}
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                    {showDropdown && suggestions.length === 0 && searchTerm && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "calc(100% + 2px)",
-                          left: 0,
-                          width: "100%",
-                          backgroundColor: "white",
-                          border: "1px solid #ccc",
-                          borderRadius: "5px",
-                          zIndex: 10,
-                          padding: "8px",
-                          fontStyle: "italic",
-                          color: "#777",
-                        }}
-                      >
-                        No matching patients
-                      </div>
-                    )}
-                    {showDropdown &&
-                      suggestions.length === 0 &&
-                      !searchTerm && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "calc(100% + 2px)",
-                            left: 0,
-                            width: "100%",
-                            backgroundColor: "white",
-                            border: "1px solid #ccc",
-                            borderRadius: "5px",
-                            zIndex: 10,
-                            padding: "8px",
-                            fontStyle: "italic",
-                            color: "#777",
+                        <IoIosClose />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className={`${styles.displayField} ${
+                        selectedName ? "" : styles.displayFieldEmpty
+                      }`}
+                      onClick={handleInputClick}
+                    >
+                      <span>{selectedName || "Select patient"}</span>
+                      {selectedName ? (
+                        <BiSolidPencil size={16} title="Edit patient" />
+                      ) : (
+                        <BiPlus
+                          size={18}
+                          title="Add a new patient"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            startEdit();
                           }}
-                        >
-                          No appointments available
+                        />
+                      )}
+                    </div>
+                  )}
+                  {showDropdown && (
+                    <div className={styles.dropdown}>
+                      {(suggestions || [])
+                        .filter(
+                          (appointment) =>
+                            appointment.status !== appointment_status.completed,
+                        )
+                        .map((appointment) => (
+                          <div
+                            key={appointment.id || appointment.name}
+                            className={styles.dropdownItem}
+                            onClick={() => handleSuggestionClick(appointment)}
+                          >
+                            {appointment.name}
+                            {appointment.patientMobNo && (
+                              <span className={styles.dropdownMeta}>
+                                {appointment.patientMobNo}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      {suggestions?.length === 0 && (
+                        <div className={styles.dropdownEmpty}>
+                          {searchTerm
+                            ? "No matching patients"
+                            : "No appointments available"}
                         </div>
                       )}
-                  </div>
-                </label>
+                    </div>
+                  )}
+                </div>
+                <small className={styles.helper}>
+                  {isEditing
+                    ? "Type to filter appointments, or keep the typed name for a walk-in patient."
+                    : "Click the field to list the available appointments."}
+                </small>
               </Col>
-              <Col md={2}>
-                <label>
-                  Age:
-                  <input
-                    type="text"
-                    name="age"
-                    style={{
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      width: "100%",
-                    }}
-                    required
-                    onChange={handleOtherFormDetailsChange}
-                  />
+              <Col xs={6} lg={2}>
+                <label className={styles.label} htmlFor="age">
+                  Age<span className={styles.required}>*</span>
                 </label>
+                <input
+                  id="age"
+                  type="text"
+                  name="age"
+                  inputMode="numeric"
+                  className={styles.input}
+                  placeholder="e.g. 32"
+                  value={updatedFormDetails.age}
+                  onChange={handleOtherFormDetailsChange}
+                />
               </Col>
-              <Col>
-                <label>
-                  Gender:
-                  <select
-                    name="gender"
-                    style={{
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      width: "100%",
-                    }}
-                    value={updatedFormDetails.gender}
-                    required
-                    onChange={handleOtherFormDetailsChange}
-                  >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
+              <Col xs={6} lg={2}>
+                <label className={styles.label} htmlFor="gender">
+                  Gender
                 </label>
+                <select
+                  id="gender"
+                  name="gender"
+                  className={styles.select}
+                  value={updatedFormDetails.gender}
+                  onChange={handleOtherFormDetailsChange}
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </Col>
+              <Col xs={12} lg={3}>
+                <label className={styles.label} htmlFor="patientNo">
+                  Mobile number
+                </label>
+                <input
+                  id="patientNo"
+                  type="tel"
+                  name="patientNo"
+                  inputMode="numeric"
+                  maxLength={10}
+                  className={`${styles.input} ${
+                    isEditing ? "" : styles.inputReadOnly
+                  } ${mobileInvalid ? styles.fieldError : ""}`}
+                  placeholder="10-digit mobile"
+                  value={updatedFormDetails.patientNo || ""}
+                  readOnly={!isEditing}
+                  onChange={(event) =>
+                    handleOtherFormDetailsChange({
+                      patientNo: event.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10),
+                    })
+                  }
+                />
+                <small className={styles.helper}>
+                  {isEditing
+                    ? "Digits only - the prescription copy is sent to this number."
+                    : "Auto-filled from the selected appointment."}
+                </small>
               </Col>
             </Row>
           </div>
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{KNOWN_CASES_TXT}</h2>
-          <input
-            name="knownCases"
-            type="text"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            pattern="[0-9]{10}"
-            required
-            onChange={handleOtherFormDetailsChange}
-          />
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{UNDER_TREATMENT_TXT}</h2>
-          <input
-            name="underTreatmentSince"
-            type="text"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            pattern="[0-9]{10}"
-            required
-            onChange={handleOtherFormDetailsChange}
-          />
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{CHIEF_COMPLAINTS_TXT}</h2>
-          <input
-            name="cheifCompalaints"
-            type="text"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            pattern="[0-9]{10}"
-            required
-            onChange={handleOtherFormDetailsChange}
-          />
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Drug Allergies</h2>
-          <label>
-            Any Drug Allergies:
-            <select
-              name="anyDrugAllergy"
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                width: "100%",
-              }}
-              required
-              onChange={handleOtherFormDetailsChange}
-              value={updatedFormDetails.anyDrugAllergy}
+        </section>
+        {/* ── 2. Medical history ── */}
+        <section
+          id="history-section"
+          className={`${styles.card} ${styles.cardWide}`}
+        >
+          <div className={styles.cardHeader}>
+            <span className={styles.cardIndex}>2</span>
+            <div>
+              <h2 className={styles.cardTitle}>
+                <FaNotesMedical /> Medical history
+              </h2>
+              <p className={styles.cardHint}>
+                Complaints print under HOPI, known case and allergies print in the
+                right column of the prescription.
+              </p>
+            </div>
+            <span
+              className={`${styles.cardBadge} ${
+                updatedFormDetails.cheifCompalaints?.trim()
+                  ? styles.cardBadgeOk
+                  : ""
+              }`}
             >
-              <option value="No known allergy from medicine">
-                No known allergy from medicine
-              </option>
-              <option value="Dust allergy">Dust allergy</option>
-              <option value="Food allergy">Food allergy</option>
-              <option value="Other allergies">Other allergies</option>
-            </select>
-          </label>
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{LAST_HEALTH_TEXT_DONE_TXT}</h2>
-          <label>
-            When was the last health test:
-            <select
-              name="lastHealthTest"
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                width: "100%",
-              }}
-              required
-              onChange={handleOtherFormDetailsChange}
-              value={updatedFormDetails.lastHealthTest}
-            >
-              <option value="Within 6 months">Within 6 months</option>
-              <option value="Over 6 months ago">Over 6 months ago</option>
-            </select>
-          </label>
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{ADVICES}</h2>
-          <input
-            name="advices"
-            type="text"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            pattern="[0-9]{10}"
-            required
-            onChange={handleOtherFormDetailsChange}
-          />
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>{NOTES}</h2>
-          <input
-            name="notes"
-            type="text"
-            style={{
-              padding: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
-            pattern="[0-9]{10}"
-            required
-            onChange={handleOtherFormDetailsChange}
-          />
-        </div>
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Test Advices</h2>
-          <div ref={testAdviceContainerRef} style={{ position: "relative" }}>
-            <input
-              name="testAdvicesInput"
-              type="text"
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                width: "100%",
-              }}
-              value={testAdviceSearchTerm}
-              onChange={handleTestAdviceInputChange}
-              onKeyDown={handleInputKeyDown}
-              onBlur={handleTestAdviceBlur}
-              onFocus={handleTestAdviceFocus}
-              autoComplete="off"
-            />
-            {showTestAdviceDropdown && testAdviceSuggestions.length > 0 && (
-              <div style={testAdviceDropdownStyle}>
-                {testAdviceSuggestions.map((advice, index) => (
-                  <div
-                    key={advice}
-                    style={{
-                      padding: "10px 12px",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #f0f0f0",
-                      transition: "background-color 0.15s",
-                    }}
-                    onClick={() => handleTestAdviceSuggestionClick(advice)}
-                    onMouseEnter={(e) =>
-                      (e.target.style.backgroundColor = "#f5f5f5")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.backgroundColor = "white")
-                    }
+              {updatedFormDetails.cheifCompalaints?.trim()
+                ? "Complaints added"
+                : "Complaints pending"}
+            </span>
+          </div>
+          <div className={styles.cardBody}>
+            <Row className={styles.formGrid}>
+              <Col xs={12} lg={6}>
+                <div className={styles.labelRow}>
+                  <label className={styles.label} htmlFor="cheifCompalaints">
+                    {CHIEF_COMPLAINTS_TXT}
+                  </label>
+                  <span className={styles.counter}>
+                    {(updatedFormDetails.cheifCompalaints || "").length}/300
+                  </span>
+                </div>
+                <textarea
+                  id="cheifCompalaints"
+                  name="cheifCompalaints"
+                  rows={3}
+                  maxLength={300}
+                  className={styles.textarea}
+                  placeholder="e.g. Fever since 2 days, dry cough"
+                  value={updatedFormDetails.cheifCompalaints}
+                  onChange={handleOtherFormDetailsChange}
+                />
+                <div className={styles.chipRow}>
+                  {CHIEF_COMPLAINT_PRESETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      className={styles.chip}
+                      onClick={() => appendPreset("cheifCompalaints", preset)}
+                    >
+                      <BiPlus size={12} />
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ marginTop: "14px" }}>
+                  <label className={styles.label} htmlFor="anyDrugAllergy">
+                    {HISTORY_KNOWN_ALLERGY_TXT}
+                  </label>
+                  <select
+                    id="anyDrugAllergy"
+                    name="anyDrugAllergy"
+                    className={styles.select}
+                    value={updatedFormDetails.anyDrugAllergy}
+                    onChange={handleOtherFormDetailsChange}
                   >
-                    {advice}
+                    <option value="No known allergy from medicine">
+                      No known allergy from medicine
+                    </option>
+                    <option value="Dust allergy">Dust allergy</option>
+                    <option value="Food allergy">Food allergy</option>
+                    <option value="Other allergies">Other allergies</option>
+                  </select>
+                </div>
+              </Col>
+              <Col xs={12} lg={6}>
+                <label className={styles.label} htmlFor="knownCases">
+                  {KNOWN_CASES_TXT}
+                </label>
+                <input
+                  id="knownCases"
+                  name="knownCases"
+                  type="text"
+                  className={styles.input}
+                  placeholder="e.g. Diabetes, Hypertension, Thyroid"
+                  value={updatedFormDetails.knownCases}
+                  onChange={handleOtherFormDetailsChange}
+                />
+                <div style={{ marginTop: "14px" }}>
+                  <label className={styles.label} htmlFor="underTreatmentSince">
+                    {UNDER_TREATMENT_TXT}
+                  </label>
+                  <input
+                    id="underTreatmentSince"
+                    name="underTreatmentSince"
+                    type="text"
+                    className={styles.input}
+                    placeholder="e.g. 3 months"
+                    value={updatedFormDetails.underTreatmentSince}
+                    onChange={handleOtherFormDetailsChange}
+                  />
+                </div>
+                <div style={{ marginTop: "14px" }}>
+                  <label className={styles.label} htmlFor="lastHealthTest">
+                    {LAST_HEALTH_TEXT_DONE_TXT}
+                  </label>
+                  <select
+                    id="lastHealthTest"
+                    name="lastHealthTest"
+                    className={styles.select}
+                    value={updatedFormDetails.lastHealthTest}
+                    onChange={handleOtherFormDetailsChange}
+                  >
+                    <option value="Within 6 months">Within 6 months</option>
+                    <option value="Over 6 months ago">
+                      Over 6 months ago
+                    </option>
+                  </select>
+                </div>
+              </Col>
+            </Row>
+          </div>
+        </section>
+        {/* ── 3. Medicines ── */}
+        <section
+          id="medicines-section"
+          className={`${styles.card} ${styles.cardWide}`}
+        >
+          <div className={styles.cardHeader}>
+            <span className={styles.cardIndex}>3</span>
+            <div>
+              <h2 className={styles.cardTitle}>
+                <FaPills /> Medicines
+              </h2>
+              <p className={styles.cardHint}>
+                One card per medicine. Unit, dosage, days and timing print in the
+                Rx table.
+              </p>
+            </div>
+            <button
+              type="button"
+              className={styles.addBtn}
+              style={{ marginLeft: "auto" }}
+              onClick={addMedicineForm}
+            >
+              <FaPlus /> Add medicine
+            </button>
+          </div>
+          <div className={styles.cardBody}>
+            {medicineForms.length === 0 ? (
+              <div className={styles.emptyState}>
+                <FaPills className={styles.emptyStateIcon} />
+                No medicines added yet. Use &ldquo;Add medicine&rdquo; to start the
+                Rx list.
+              </div>
+            ) : (
+              <div className={styles.medicineList}>
+                {medicineForms.map((form, index) => (
+                  <div
+                    className={styles.medicineCard}
+                    key={`medicine-${formResetKey}-${index}`}
+                  >
+                    <div className={styles.medicineHeader}>
+                      <span className={styles.cardIndex}>{index + 1}</span>
+                      <h3 className={styles.medicineTitle}>
+                        {form?.medicineName?.trim() ||
+                          `Medicine ${index + 1} (untitled)`}
+                      </h3>
+                      <button
+                        type="button"
+                        className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                        title="Remove this medicine"
+                        onClick={() => handleDeleteMedicineForm(index)}
+                      >
+                        <MdDelete />
+                      </button>
+                    </div>
+                    <MedicineForm
+                      onChange={(formValues) =>
+                        handleMedicineFormChange(formValues, index)
+                      }
+                    />
                   </div>
                 ))}
               </div>
             )}
-            {showTestAdviceDropdown &&
-              testAdviceSearchTerm &&
-              testAdviceSuggestions.length === 0 && (
-                <div
-                  style={{
-                    ...testAdviceDropdownStyle,
-                    maxHeight: "auto",
-                    overflowY: "visible",
-                    padding: "12px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
+          </div>
+        </section>
+        {/* ── 4. Diagnosis & advice ── */}
+        <section id="diagnosis-section" className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardIndex}>4</span>
+            <div>
+              <h2 className={styles.cardTitle}>
+                <FaStethoscope /> Diagnosis &amp; advice
+              </h2>
+              <p className={styles.cardHint}>
+                One advice per line - every line prints as a separate point.
+              </p>
+            </div>
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.labelRow}>
+              <label className={styles.label} htmlFor="advices">
+                {ADVICES}
+              </label>
+              <span className={styles.counter}>
+                {(updatedFormDetails.advices || "").length}/500
+              </span>
+            </div>
+            <textarea
+              id="advices"
+              name="advices"
+              rows={4}
+              maxLength={500}
+              className={styles.textarea}
+              placeholder={"Take complete rest\nPlenty of fluids\nReview after 5 days"}
+              value={updatedFormDetails.advices}
+              onChange={handleOtherFormDetailsChange}
+            />
+            <div className={styles.chipRow}>
+              {ADVICE_PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  className={styles.chip}
+                  onClick={() => appendPreset("advices", preset)}
                 >
-                  <span style={{ fontStyle: "italic", color: "#777" }}>
-                    No matching tests
-                  </span>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => {
-                      setUpdatedFormDetails((prevDetails) => ({
-                        ...prevDetails,
-                        testAdvices: [
-                          ...prevDetails.testAdvices,
-                          testAdviceSearchTerm,
-                        ],
-                      }));
-                      setTestAdviceSearchTerm("");
-                      setShowTestAdviceDropdown(false);
-                    }}
-                  >
-                    Add &quot;{testAdviceSearchTerm}&quot; anyway
-                  </Button>
+                  <BiPlus size={12} />
+                  {preset}
+                </button>
+              ))}
+            </div>
+            <div style={{ marginTop: "14px" }}>
+              <div className={styles.labelRow}>
+                <label className={styles.label} htmlFor="notes">
+                  {NOTES}
+                </label>
+                <span className={styles.counter}>
+                  {(updatedFormDetails.notes || "").length}/200
+                </span>
+              </div>
+              <textarea
+                id="notes"
+                name="notes"
+                rows={2}
+                maxLength={200}
+                className={styles.textarea}
+                placeholder="Anything else to remember (optional)"
+                value={updatedFormDetails.notes}
+                onChange={handleOtherFormDetailsChange}
+              />
+            </div>
+          </div>
+        </section>
+        {/* ── 5. Test advices ── */}
+        <section id="tests-section" className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardIndex}>5</span>
+            <div>
+              <h2 className={styles.cardTitle}>
+                <FaVial /> Test advices
+              </h2>
+              <p className={styles.cardHint}>
+                Search the lab test list, press Enter or pick from the list.
+              </p>
+            </div>
+            <span
+              className={`${styles.cardBadge} ${
+                updatedFormDetails.testAdvices.length
+                  ? styles.cardBadgeOk
+                  : ""
+              }`}
+            >
+              {updatedFormDetails.testAdvices.length} added
+            </span>
+          </div>
+          <div className={styles.cardBody}>
+            <label className={styles.label} htmlFor="testAdvicesInput">
+              Test / investigation
+            </label>
+            <div ref={testAdviceContainerRef} className={styles.autocomplete}>
+              <input
+                id="testAdvicesInput"
+                name="testAdvicesInput"
+                type="text"
+                className={styles.input}
+                placeholder="e.g. CBC, HbA1c, X-ray chest"
+                value={testAdviceSearchTerm}
+                onChange={handleTestAdviceInputChange}
+                onKeyDown={handleInputKeyDown}
+                onBlur={handleTestAdviceBlur}
+                onFocus={handleTestAdviceFocus}
+                autoComplete="off"
+              />
+              {showTestAdviceDropdown && testAdviceSuggestions.length > 0 && (
+                <div style={testAdviceDropdownStyle}>
+                  {testAdviceSuggestions.map((advice) => (
+                    <div
+                      key={advice}
+                      className={styles.dropdownItem}
+                      onClick={() => handleTestAdviceSuggestionClick(advice)}
+                    >
+                      {advice}
+                    </div>
+                  ))}
                 </div>
               )}
-          </div>
-          {updatedFormDetails.testAdvices.length > 0 && (
-            <div style={{ marginTop: "10px" }}>
-              <strong>Added Tests:</strong>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {updatedFormDetails.testAdvices.map((advice, index) => (
+              {showTestAdviceDropdown &&
+                testAdviceSearchTerm &&
+                testAdviceSuggestions.length === 0 && (
                   <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "4px 8px",
-                      backgroundColor: "#e0e0e0",
-                      borderRadius: "16px",
-                      border: "1px solid #ccc",
-                      gap: "4px",
-                    }}
+                    style={{ ...testAdviceDropdownStyle, maxHeight: "auto" }}
                   >
-                    <span>{advice}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveAdvice(index)}
-                      className="p-0 h-6 w-6"
+                    <div
+                      className={styles.dropdownEmpty}
+                      style={{ display: "flex", alignItems: "center", gap: "10px" }}
                     >
-                      <IoIosClose className="h-4 w-4 text-gray-600 hover:text-red-500" />
-                    </Button>
+                      <span style={{ flex: 1 }}>No matching tests</span>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => {
+                          setUpdatedFormDetails((prevDetails) => ({
+                            ...prevDetails,
+                            testAdvices: [
+                              ...prevDetails.testAdvices,
+                              testAdviceSearchTerm,
+                            ],
+                          }));
+                          setTestAdviceSearchTerm("");
+                          setShowTestAdviceDropdown(false);
+                        }}
+                      >
+                        Add anyway
+                      </Button>
+                    </div>
                   </div>
+                )}
+            </div>
+            {updatedFormDetails.testAdvices.length === 0 ? (
+              <small className={styles.helper}>
+                No tests advised yet - leave empty if none are needed.
+              </small>
+            ) : (
+              <div className={styles.tagList}>
+                {updatedFormDetails.testAdvices.map((advice, index) => (
+                  <span className={styles.tag} key={`${advice}-${index}`}>
+                    {advice}
+                    <button
+                      type="button"
+                      className={styles.tagRemove}
+                      title={`Remove ${advice}`}
+                      onClick={() => handleRemoveAdvice(index)}
+                    >
+                      <IoIosClose />
+                    </button>
+                  </span>
                 ))}
               </div>
-            </div>
-          )}
-        </div>
-        <div
-          className="text-center mb-4"
-          onClick={() => setMedicineForms([...medicineForms, {}])}
-        >
-          <b>
-            <strong className="text-primary">Add Medicine</strong>
-          </b>
-          <FaPlus className="ml-1" />
-        </div>
-        {medicineForms.map((form, index) => (
-          <div key={index}>
-            <MedicineForm
-              onChange={(formValues) =>
-                handleMedicineFormChange(formValues, index)
-              }
-            />
-            <MdDelete
-              onClick={() => handleDeleteMedicineForm(index)}
-              className="mb-4"
-            />
+            )}
           </div>
-        ))}
+        </section>
       </div>
-      <div className="mb-4">
-        {/* <button
-          onClick={handleCreatePrescription}
-          className="bg-success border rounded px-3 text-white py-1"
-        >
-          Create
-        </button> */}
-        <button
-          onClick={handlePreview}
-          className="border rounded px-3 text-white py-1"
-          style={{ backgroundColor: "#3a5e1c" }}
-        >
-          Create
-        </button>
-        {showPasswordPopup && (
-          <DoctorPasswordPopup
-            onClose={() => setPasswordPopup(false)}
-            onSubmit={doctorPasswordValidation}
-          />
-        )}
-        <div style={{ height: "30px" }} />
+      {/* ── Sticky action bar ── */}
+      <div className={styles.actionBar}>
+        <div className={styles.checklist}>
+          <span className={styles.checklistTitle}>
+            {pendingItems.length === 0
+              ? "All set - ready to create the prescription"
+              : `${pendingItems.length} item${
+                  pendingItems.length > 1 ? "s" : ""
+                } still missing`}
+          </span>
+          <div className={styles.checklistItems}>
+            {requiredItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={`${styles.checkBtn} ${
+                  item.done ? styles.checkItemDone : styles.checkItem
+                }`}
+                onClick={() => scrollToSection(item.section)}
+              >
+                {item.done ? "✓" : "○"} {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className={styles.actionButtons}>
+          <button
+            type="button"
+            className={styles.ghostBtn}
+            onClick={handleResetForm}
+          >
+            <FaRedoAlt /> Clear form
+          </button>
+          <button
+            type="button"
+            className={styles.primaryBtn}
+            onClick={handleCreatePrescription}
+          >
+            <FaCheckCircle /> Create prescription
+          </button>
+        </div>
+        {formError && <div className={styles.formError}>{formError}</div>}
       </div>
-      {/* Preview Modal */}
+
+      {showPasswordPopup && (
+        <DoctorPasswordPopup
+          onClose={() => setPasswordPopup(false)}
+          onSubmit={doctorPasswordValidation}
+        />
+      )}
+
+      {/* ── Preview modal ── */}
       {previewVisible && (
-        <div className="modal" style={modalStyle}>
-          <div className="modal-content" style={modalContentStyle}>
-            <span
-              className="close"
-              style={closeButtonStyle}
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <button
+              type="button"
+              className={styles.modalClose}
               onClick={togglePreview}
+              aria-label="Close preview"
             >
               &times;
-            </span>
-            <h2
-              className="text-secondary"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <DocPrescriptionGeneratePdf
-                data={updatedFormDetails}
-                // handlePDF={handleGeneratePDF}
-              />
-            </h2>
+            </button>
+            <h2 className={styles.modalTitle}>Prescription preview</h2>
+            <DocPrescriptionGeneratePdf data={updatedFormDetails} />
           </div>
         </div>
       )}

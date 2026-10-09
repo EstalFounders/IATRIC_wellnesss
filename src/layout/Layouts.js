@@ -10,7 +10,6 @@ import Header3 from "./Header/Header3";
 import Header4 from "./Header/Header4";
 import Header5 from "./Header/Header5";
 import Header6 from "./Header/Header6";
-import DocLoginHeader from "./Header/SuperAdminLoginHeader";
 import SuperAdminLoginHeader from "./Header/SuperAdminLoginHeader";
 import RegisterDocLoginHeader from "./Header/RegisterDocLoginHeader";
 

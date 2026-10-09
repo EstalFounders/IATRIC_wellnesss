@@ -1,20 +1,97 @@
-.cartIconContainer {
-    position: relative;
-    display: inline-block;
-    margin-left: 1rem;
+/* layout/css/SuperAdmin.module.css
+   The super-admin panel header - one 64px sticky bar that replaces the old
+   three-column react-bootstrap Row. The file used to hold only the bell
+   styles (.cartIconContainer / .cartItemCount). */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: #fff;
+  border-bottom: 1px solid #ececec;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 6px 16px;
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.logo {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #1f2933;
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: #f4f7f0;
+}
+
+.badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #4f6628;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* Below 576px the bar must not wrap: the drawer handle, the logo and the
+   bell stay on one 64px line. */
+@media (max-width: 576px) {
+  .headerInner {
+    padding: 6px 12px;
   }
 
-  .cartItemCount {
-    position: absolute;
-    top: -8px;
-    right: -4px;
-    background-color: #4F6628;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .logo {
+    height: 34px;
   }
+}

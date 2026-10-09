@@ -1,4 +1,3 @@
-import ConsultationFeeComponent from "../../src/components/superAdminComponent/ConsultationFee";
 import OffersComponent from "../../src/components/superAdminComponent/Offers";
 import Layouts from "../../src/layout/Layouts";
 import AuthenticatedComponent from "../api/auth/authenticatedcomponent";

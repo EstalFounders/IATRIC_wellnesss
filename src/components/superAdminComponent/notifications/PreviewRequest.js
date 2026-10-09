@@ -1,8 +1,18 @@
 import React from "react";
 import styles from "./NotificationSection.module.css";
+import {
+  formatFieldValue,
+  groupFields,
+} from "../../../utils/doctorUpdateRequest";
 
+// The bell's preview of one doctor change request. It has no doctor document to
+// compare against (the bell only carries the request), so it lists the requested
+// values using the same labels and the same indexed-key grouping as the full
+// review page - "Consultation types: Video, Clinic, Audio" instead of
+// "consultationType[0]", "consultationType[1]", "consultationType[2]".
 const PreviewRequest = ({ request, handleDoctReqApproveOrReject, onClose }) => {
   const id = request._id;
+  const fields = groupFields(request.updatedFields);
 
   return (
     <div style={{ padding: 24, minWidth: 400 }}>
@@ -17,12 +27,23 @@ const PreviewRequest = ({ request, handleDoctReqApproveOrReject, onClose }) => {
         Requested Updates
       </div>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-        {Object.entries(request.updatedFields || {}).map(([key, value], index) => (
-          <li key={index} style={{ marginBottom: 8, fontSize: "0.85rem", color: "#444" }}>
-            <strong style={{ color: "#222", fontWeight: 600 }}>{key}:</strong>{" "}
-            <span>{Array.isArray(value) ? value.join(", ") : value}</span>
+        {fields.length === 0 ? (
+          <li style={{ marginBottom: 8, fontSize: "0.85rem", color: "#444" }}>
+            This request carries no field values.
           </li>
-        ))}
+        ) : (
+          fields.map((field) => (
+            <li
+              key={field.key}
+              style={{ marginBottom: 8, fontSize: "0.85rem", color: "#444" }}
+            >
+              <strong style={{ color: "#222", fontWeight: 600 }}>
+                {field.label}:
+              </strong>{" "}
+              <span>{formatFieldValue(field.key, field.value) || "—"}</span>
+            </li>
+          ))
+        )}
       </ul>
 
       <div style={{ display: "flex", gap: 10, marginTop: 20 }}>

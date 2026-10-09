@@ -8,6 +8,7 @@ import Preloader from "../../../Preloader";
 import SuperAdminModel from "../../model/SuperAdminModel";
 import AppointTable from "../../common/AppointmentTable";
 import LabBookedListTable from "../../common/LabBookedListTable";
+import { doctorDisplayName } from "../../../../utils/doctorName";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -107,7 +108,7 @@ const ItemCards = ({
         }}
         className="mt-4"
       >
-        <Col>{doctor.name}</Col>
+        <Col>{doctorDisplayName(doctor.name)}</Col>
         <Col>{doctor.expertise}</Col>
         <Col>{"userRemarks"}</Col>
         <Col className="font-weight-bold text-primary" onClick={() => setShowModal(true)}>

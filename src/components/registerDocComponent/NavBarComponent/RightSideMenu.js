@@ -4,17 +4,27 @@ import { FiCircle } from "react-icons/fi";
 import styles from "./RightSideMenu.module.css";
 import { FaAngleDown } from "react-icons/fa";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
 import { doctor_info_local_storage, single_call } from "../../../constant";
+import { doctorShortName } from "../../../utils/doctorName";
 
 const Dropdown = ({
   user,
   onLogout,
-  handleShowModel,
   handleShowLeaveReqestModel,
   handleShowManageSlotsModel,
 }) => {
   console.log(user, "doctor name on right side menu");
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  // The panel stores the whole next-auth session (`{ user: <doctor>, expires }`),
+  // but a session whose `user` claim is missing (or a blob written by an older
+  // build that kept the doctor document at the top level) has no nested doc.
+  // Reading `user.user.name` unguarded used to crash EVERY doctor page with
+  // "Cannot read properties of undefined (reading 'name')" - same tolerance as
+  // readSessionDoctor() in DoctorProfile/lib/doctorProfileSession.js.
+  const doctor = user?.user ?? user;
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -22,7 +32,10 @@ const Dropdown = ({
 
   const handleItemClick = async (item) => {
     console.log(`Clicked on ${item}`);
-    if (item == "Profile") handleShowModel();
+    if (item == "Profile")
+      // The dedicated profile page replaced the "Edit Doctor Details" popup, so
+      // the header no longer passes a `handleShowModel` callback.
+      router.push("/registerDoc/profile");
     if (item == "Manage Slots") handleShowManageSlotsModel();
     if (item == "Leave Request") handleShowLeaveReqestModel();
     if (item == "Logout")
@@ -44,7 +57,7 @@ const Dropdown = ({
   return (
     <div className={styles.dropdown}>
       <div className={styles["dropdown-toggle"]} onClick={toggleDropdown}>
-        <strong>{user ? user.user.name.split(" ")[0] : null}</strong>
+        <strong>{doctor?.name ? doctorShortName(doctor.name) : null}</strong>
         <FaAngleDown size={20} className={styles["arrow-icon"]} />
       </div>
 

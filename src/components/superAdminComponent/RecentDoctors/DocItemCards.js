@@ -1,133 +1,59 @@
-import React, { useState } from "react";
-import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+// DocItemCards.js - one row of the home-page doctors table.
+//
+// The delete confirmation lives in RecentDoctors (a single modal for the whole
+// table), so this row only reports the intent upwards. The edit pencil is now
+// a real link to the doctor profile page.
+import React from "react";
+import Link from "next/link";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaEdit } from "react-icons/fa";
-import DoctorModal from "../DoctorModalComp";
-import DoctorModalComp from "../DoctorModalComp";
-import { api, roles } from "../../../constant";
-import Preloader from "../../Preloader";
 import { MdDelete } from "react-icons/md";
-import ConfirmModal from "../model/ConfirmModel";
-import { useSelector } from "react-redux";
 import { formatWorkDaysLabel } from "../../../customUtils/workDays";
-import { appendEducationTraining } from "../../../customUtils/educationTraining";
-import { appendLanguages } from "../../../customUtils/languages";
+import { doctorDisplayName } from "../../../utils/doctorName";
+import styles from "../css/Homepage.module.css";
 
 const formatDate = (dateString) => {
+  if (!dateString) return "-";
   const date = new Date(dateString);
-  return date.toLocaleDateString();
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString("en-IN");
 };
 
-const ItemCards = ({ index, doctor, refreshDoctorList }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [loader, setLoader] = useState(false);
-  const [doctorInCard, setDoctorInCard] = useState(doctor);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const userDetails = useSelector((state) => state.userDetails.userDetails);
-
-  const handleEdit = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleDelete = async () => {
-    setLoader(true);
-    const id = doctor._id;
-    const requestOptions = {
-      method: "DELETE",
-    };
-    try {
-      const response = await fetch(`${api.addDoctor}?id=${id}`, requestOptions);
-      if (response.ok) {
-        window.alert("Doctor has been deleted");
-        refreshDoctorList(); // Call refreshDoctorList to update the list after deletion
-      }
-    } catch (error) {
-      console.error("Error deleting doctor:", error);
-    } finally {
-      setLoader(false);
-    }
-  };
-
-  const handleSaveDoctor = async (updatedDoctor) => {
-    // setLoader(true);
-    console.log("Updated Doctor:", updatedDoctor);
-    const id = updatedDoctor._id;
-    const formData = new FormData();
-
-    formData.append("name", updatedDoctor.name);
-    formData.append("expertise", updatedDoctor.expertise);
-    formData.append("mobileNumber", updatedDoctor.mobileNumber);
-    // One field per entry, same as education + training on the line below.
-    appendLanguages(formData, updatedDoctor.language);
-    formData.append("workDays", updatedDoctor.workDays);
-    formData.append("overview", updatedDoctor.overview);
-    // One field per entry; blank rows are dropped and a blank field clears the
-    // list on the API side.
-    appendEducationTraining(formData, updatedDoctor.educationTraining);
-    formData.append("workExperience", updatedDoctor.workExperience);
-    formData.append("consultationType", updatedDoctor.consultationType);
-    formData.append(
-      "serviceOffered",
-      (updatedDoctor.serviceOffered || []).join(",")
-    );
-    formData.append("location", updatedDoctor.location);
-    formData.append("profilePicture", updatedDoctor.profilePictureUrl);
-    formData.append("doctorType", updatedDoctor.doctorType);
-    formData.append("price", updatedDoctor.price);
-    formData.append("slotStartTime", updatedDoctor.slotStartTime);
-    formData.append("slotEndTime", updatedDoctor.slotEndTime);
-    updatedDoctor.diplomasCertificatesUrls.forEach((certificate, index) => {
-      formData.append(`diplomasCertificatesUrls[${index}]`, certificate);
-    });
-
-    const requestOptions = {
-      method: "PUT",
-      body: formData,
-    };
-    try {
-      const response = await fetch(`${api.addDoctor}?id=${id}`, requestOptions);
-      {
-        response.ok ? setLoader(false) : null;
-      }
-      if (response.ok) {
-        setLoader(false);
-        console.log(response, "response");
-        return window.alert("Doctor has been updated");
-      }
-    } catch (error) {
-      console.error("Error updating doctor:", error);
-      throw error;
-    }
-  };
+const ItemCards = ({ doctor, canDelete, busy, onDeleteRequest }) => {
+  const workDays = formatWorkDaysLabel(doctor.workDays) || doctor.workDays;
+  const contact = doctor.mobileNumber || doctor.email;
 
   return (
-    <>
-      <Row
-        style={{
-          borderBottom: "1px solid #ccc",
-          borderBottomWidth: 3,
-          display: "flex",
-          flexDirection: "row",
-        }}
-        className="mt-4"
-      >
-        <Col>{doctor.name}</Col>
-        <Col>{doctor.expertise}</Col>
-        <Col>{formatWorkDaysLabel(doctor.workDays) || doctor.workDays}</Col>
-        <Col>{formatDate(doctor.joiningDate)}</Col>
-        <Col>
-          <FaEdit onClick={handleEdit} style={{ cursor: "pointer" }} />
-
-          {Array.isArray(userDetails?.role) &&
-          userDetails.role.includes(roles.superAdmin) ? (
-            <MdDelete
-              onClick={() => setShowConfirmModal(true)}
-              style={{ cursor: "pointer" }}
-              className="ml-2"
-            />
+    <tr>
+      <td className={styles.td}>
+        <span className={styles.name}>{doctorDisplayName(doctor.name)}</span>
+        {contact ? <span className={styles.contact}>{contact}</span> : null}
+      </td>
+      <td className={styles.td}>{doctor.expertise || "-"}</td>
+      <td className={styles.td}>{doctor.doctorRegistrationNo || "-"}</td>
+      <td className={styles.td}>{workDays || "-"}</td>
+      <td className={`${styles.td} ${styles.nowrap}`}>
+        {formatDate(doctor.joiningDate)}
+      </td>
+      <td className={styles.td}>
+        <div className={styles.rowActions}>
+          <Link
+            className={styles.rowBtn}
+            href={`/superAdmin/doctorProfile?id=${doctor._id}`}
+          >
+            <FaEdit />
+            Edit
+          </Link>
+          {canDelete ? (
+            <button
+              type="button"
+              className={`${styles.rowBtn} ${styles.rowBtnDanger}`}
+              onClick={() => onDeleteRequest(doctor)}
+              disabled={busy}
+            >
+              <MdDelete />
+              Delete
+            </button>
           ) : (
             <OverlayTrigger
               placement="top"
@@ -135,29 +61,21 @@ const ItemCards = ({ index, doctor, refreshDoctorList }) => {
                 <Tooltip>You are not allowed to perform this action</Tooltip>
               }
             >
-              <span className="d-inline-block">
-                <MdDelete
-                  style={{ cursor: "not-allowed", opacity: 0.5 }}
-                  tabIndex={0}
-                />
+              <span className={styles.nowrap}>
+                <button
+                  type="button"
+                  className={`${styles.rowBtn} ${styles.rowBtnDanger}`}
+                  disabled
+                >
+                  <MdDelete />
+                  Delete
+                </button>
               </span>
             </OverlayTrigger>
           )}
-        </Col>
-      </Row>
-      <DoctorModalComp
-        show={showModal}
-        handleClose={handleCloseModal}
-        doctor={doctor}
-        onSave={handleSaveDoctor}
-      />
-      <ConfirmModal
-        show={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={handleDelete}
-      />
-      {loader && <Preloader />}
-    </>
+        </div>
+      </td>
+    </tr>
   );
 };
 

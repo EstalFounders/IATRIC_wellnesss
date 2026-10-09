@@ -299,6 +299,41 @@ export const faqGroups = [
     ],
   },
   {
+    title: "Nutrition & Dietetics",
+    service: [
+      "Nutritionist",
+      "Dietitian",
+      "Dietician",
+      "Nutrition",
+      "Nutrition & Dietetics",
+      "Dietetics",
+    ],
+    items: [
+      {
+        question: "How can a nutritionist help me lose weight?",
+        answer:
+          "Weight loss with us is a sustainable plan, not a crash diet. The nutritionist first reviews your eating pattern, medical history, activity level and lab reports, then builds a calorie-appropriate meal plan around the food you already like - with portion guides, simple swaps and regular follow-ups that adjust the plan as your weight and reports change.",
+      },
+      {
+        question:
+          "Do you provide diet plans for diabetes, thyroid, PCOS and heart conditions?",
+        answer:
+          "Yes. We design therapeutic diets for diabetes and pre-diabetes, thyroid disorders, PCOS, high cholesterol and heart disease, high blood pressure, kidney and liver conditions, and gut problems such as acidity, IBS and fatty liver. The plan is matched to your medicines, your doctor's advice and your lab values, and revised as your reports change.",
+      },
+      {
+        question:
+          "Can I get a diet plan for pregnancy, breastfeeding or my child?",
+        answer:
+          "Yes. We cover pregnancy and lactation nutrition, anaemia and post-delivery recovery, and child nutrition for growth, picky eating, underweight and overweight children. Plans are doctor-informed so they support both the mother and the baby safely.",
+      },
+      {
+        question: "Are the diet consultations available online?",
+        answer:
+          "Yes. You can consult a nutritionist online by video or audio call, or visit in person. Follow-ups, plan sharing and progress reviews happen online, so you can continue the programme from any city and add family members to the same plan.",
+      },
+    ],
+  },
+  {
     title: "Nursing Care at Home",
     service: ["nursing-services", "Nursing Care at Home", "Nursing Care", "Nursing Services", "Nursing"],
     items: [

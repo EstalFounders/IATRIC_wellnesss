@@ -1,143 +1,580 @@
-/* ConsultationComponent.module.css */
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* ConsultationFee.module.css - the styles of the super-admin
+   /superAdmin/consultationFee page (src/components/superAdminComponent/ConsultationFee.js).
+
+   Same visual language as css/ConsultationBooked.module.css and
+   css/CustomerQueryComp.module.css: brand green #3b5f1d / yellow #8e8333,
+   white 14px-radius cards, uppercase card titles, serif figures, so the panel
+   reads as one product.
+
+   Two tables live here. The types table never scrolls; the fee matrix can have
+   any number of columns, so it is wrapped in .tableWrap (overflow-x: auto) with
+   the doctor column pinned by .stickyCol - scrolling right never loses whose
+   row you are editing. */
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  color: #1f2933;
+}
+
+/* ── Page head ───────────────────────────────────────── */
+
+.pageHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .title {
-    font-size: 2.5rem;
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-.cardContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.input {
-    width: 80%;
-    padding: 8px;
-    margin: 10px 0;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.editButton, .updateButton, .discardButton {
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.editButton {
-    background-color: #0070f3;
-    color: white;
-}
-
-.editButton:hover {
-    background-color: #005bb5;
-}
-
-.updateButton {
-    background-color: #28a745;
-    color: white;
-}
-
-.updateButton:hover {
-    background-color: #218838;
-}
-
-.discardButton {
-    background-color: #dc3545;
-    color: white;
-    margin-left: 10px;
-}
-
-.discardButton:hover {
-    background-color: #c82333;
+  margin: 0 0 6px;
+  font-family: "TT Ramillas", serif;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: #3b5f1d;
 }
 
 .subtitle {
-    font-size: 1.8rem;
-    color: #333;
-    margin-top: 30px;
-    margin-bottom: 15px;
-    text-align: center;
+  margin: 0;
+  max-width: 640px;
+  font-size: 0.95rem;
+  color: #52606d;
 }
 
-.form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+/* ── Buttons ─────────────────────────────────────────── */
+
+.primary,
+.ghost,
+.danger,
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.addButton {
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.primary {
+  padding: 10px 20px;
+  border: none;
+  background: #3b5f1d;
+  color: #fff;
 }
 
-.addButton:hover {
-    background-color: #005bb5;
-}
-.toggleSwitch {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    width: 40px;
-    height: 20px;
-    border-radius: 15px;
-    position: relative;
-    margin: 5px 0;
+.primary:hover:not(:disabled) {
+  background: #2f4c17;
 }
 
-.toggleKnob {
-    position: absolute;
-    top: 2px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: white;
-    transition: left 0.2s ease;
+.ghost {
+  padding: 10px 18px;
+  border: 1px solid #3b5f1d;
+  background: #fff;
+  color: #3b5f1d;
+  font-size: 0.9rem;
 }
 
-.statusText {
-    font-size: 12px;
-    color: black;
-    margin-top: 5px;
-    text-align: center;
+.ghost:hover:not(:disabled) {
+  background: #f4f7f0;
 }
+
+.danger {
+  padding: 8px 12px;
+  border: 1px solid #f5c6c2;
+  background: #fff;
+  color: #8b2b21;
+}
+
+.danger:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.iconBtn:hover:not(:disabled) {
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.primary:disabled,
+.ghost:disabled,
+.danger:disabled,
+.iconBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary:focus-visible,
+.ghost:focus-visible,
+.danger:focus-visible,
+.iconBtn:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* ── Inline feedback ─────────────────────────────────── */
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.noticeOk {
+  background: #f4f7f0;
+  border: 1px solid #3b5f1d;
+  color: #2f4c17;
+}
+
+.noticeError {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  color: #8b2b21;
+}
+
+.noticeClose {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ── Loading / error / empty ─────────────────────────── */
+
+.stateBox {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  color: #52606d;
+  font-size: 0.92rem;
+}
+
+.stateError {
+  border-color: #f5c6c2;
+  background: #fdecea;
+  color: #8b2b21;
+}
+
+.stateError p {
+  margin: 0 0 12px;
+}
+
+/* ── Cards ───────────────────────────────────────────── */
+
+.card {
+  margin-top: 20px;
+  padding: 20px 22px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cardHead {
+  margin-bottom: 14px;
+}
+
+.cardTitle {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.cardHint {
+  margin: 0;
+  max-width: 720px;
+  font-size: 0.85rem;
+  color: #7b8794;
+}
+
+/* ── Tables (shared) ─────────────────────────────────── */
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.caption {
+  padding: 0 0 10px;
+  text-align: left;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.table thead th {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+  background: #f4f7f0;
+  border-bottom: 2px solid #e0e0e0;
+  white-space: normal;
+}
+
+.table tbody tr:hover {
+  background: #fafbf8;
+}
+
+.num {
+  text-align: right;
+}
+
+.actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.editingRow {
+  background: #f4f7f0;
+}
+
+/* ── Types table ─────────────────────────────────────── */
+
+.typeNameCell {
+  text-align: left;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.typeName {
+  font-size: 0.95rem;
+}
+
+.systemTag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7b8794;
+  background: #f0f2f4;
+}
+
+.keyChip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f0f2f4;
+  color: #52606d;
+  font-size: 0.78rem;
+}
+
+.feeValue {
+  font-family: "TT Ramillas", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.muted {
+  color: #7b8794;
+  font-size: 0.85rem;
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #3f4c5a;
+  background: #fff;
+}
+
+.input:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* ── Status pill / checkbox ──────────────────────────── */
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.pillOn {
+  background: #f4f7f0;
+  border-color: #3b5f1d;
+  color: #2f4c17;
+}
+
+.pillOff {
+  background: #f0f2f4;
+  border-color: #e0e0e0;
+  color: #7b8794;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #52606d;
+  cursor: pointer;
+}
+
+.check input {
+  accent-color: #3b5f1d;
+}
+
+/* ── Add-a-type form ─────────────────────────────────── */
+
+.addRow {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.addTitle {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8e8333;
+}
+
+.addGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 1 220px;
+}
+
+.fieldLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #52606d;
+}
+
+.addHint {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: #7b8794;
+}
+
+/* ── Matrix toolbar ──────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #fafbf8;
+}
+
+.search {
+  flex: 1 1 220px;
+  max-width: 300px;
+  padding: 9px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.search:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.dirtyCount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7b8794;
+}
+
+/* ── Fee matrix ──────────────────────────────────────── */
+
+/* The doctor column stays put while the type columns scroll sideways, so a row
+   is never edited without knowing whose it is. */
+.stickyCol {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  background: #fff;
+  min-width: 200px;
+}
+
+.table thead .stickyCol {
+  background: #f4f7f0;
+}
+
+.doctorCell {
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.doctorName {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.doctorMeta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: #7b8794;
+  font-variant-numeric: tabular-nums;
+}
+
+.colName {
+  display: block;
+}
+
+.colDefault {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #8e8333;
+}
+
+.table thead .num .pillOff {
+  margin-top: 4px;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A cell that holds an unsaved edit is ringed in the brand yellow: the value on
+   screen is not yet what patients would be charged. */
+.cellDirty {
+  background: #fffbeb;
+  box-shadow: inset 0 0 0 1px #8e8333;
+}
+
+.cellInput {
+  width: 110px;
+  max-width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  text-align: right;
+  font-size: 0.88rem;
+  color: #3f4c5a;
+  background: #fff;
+}
+
+.cellInput::placeholder {
+  color: #b0b7bd;
+  font-style: italic;
+}
+
+.cellInput:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+.cellInputError {
+  border-color: #8b2b21;
+  background: #fdecea;
+}
+
+.cellError {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: #8b2b21;
+}
+
+.notOffered {
+  font-size: 0.76rem;
+  color: #b0b7bd;
+}
+
+/* ── Small screens ───────────────────────────────────── */
+
+@media (max-width: 576px) {
+  .pageHead,
+  .card {
+    padding: 16px 14px;
+  }
+
+  .field,
+  .search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .toolbar .dirtyCount {
+    order: -1;
+    flex: 1 0 100%;
+  }
+
+  .cellInput {
+    width: 84px;
+  }
+}
+

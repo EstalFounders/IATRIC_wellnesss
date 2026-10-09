@@ -1,97 +1,118 @@
-import {
-  Button,
-  Card,
-  CardDeck,
-  Col,
-  Container,
-  Form,
-  Row,
-} from "react-bootstrap";
+// HomepageComp.js - the super-admin home page.
+//
+// Every style lives in css/Homepage.module.css and the four visual blocks live
+// in ./Homepage. The data load is one Promise.all with a single failure box and
+// Retry button, instead of four silent console.error calls.
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { FaMoneyBill, FaUser } from "react-icons/fa";
-import { GrTest } from "react-icons/gr";
-import { api, vapidKey } from "../../constant";
-import Preloader from "../Preloader";
-import { Alert, Snackbar } from "@mui/material";
-import AppointTable from "./common/AppointmentTable";
-import RecentDoctors from "./RecentDoctors/RecentDoctors";
 import { useDispatch } from "react-redux";
+import Link from "next/link";
+import { getMessagingIfSupported } from "../../../lib/firebase";
+import { onMessage } from "firebase/messaging";
+import { api } from "../../constant";
+import { fetchDoctors } from "../ApiService/ConsultationApiService";
 import {
   setAllappointments,
-  setAllDoctor,
   setAllLab,
   setAllLabTest,
   setServiceOffered,
 } from "../../store/slices/superAdmin/homepageSlice";
-import { calculateTotalIncome } from "./utility/helper";
 import { setConsultationType } from "../../store/slices/superAdmin/otherDetailsSlice";
-import { fetchDoctors } from "../ApiService/ConsultationApiService";
-import { getMessagingIfSupported } from "../../../lib/firebase";
-import { getToken, onMessage } from "firebase/messaging";
-import NotificationHandler from "./common/NotificationHandler";
+import { calculateTotalIncome } from "./utility/helper";
+import HeroBand from "./Homepage/HeroBand";
+import StatTiles from "./Homepage/StatTiles";
+import QuickActions from "./Homepage/QuickActions";
+import PendingApprovals from "./Homepage/PendingApprovals";
+import RecentDoctors from "./RecentDoctors/RecentDoctors";
+import styles from "./css/Homepage.module.css";
 
 export default function HomepageComp() {
-  const [isDoctorLoading, setIsDoctorLoading] = useState(true);
-  const [isAppointmentLoading, setIsAppointmentLoading] = useState(true);
-  const [loader, setLoader] = useState(false);
-  const [doctors, setDoctors] = useState([]);
+  const dispatch = useDispatch();
   const [appointments, setAppointments] = useState([]);
   const [labTests, setLabTests] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
-  const [totalPatients, setTotalPatients] = useState(0);
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [snackBarMessage, setSnackBarMessage] = useState(
-    "staus has been changed"
-  );
-  const [severity, setSeverity] = useState("success");
-  const router = useRouter();
-  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDoctorLoading, setIsDoctorLoading] = useState(true);
+  const [failures, setFailures] = useState([]);
+  const [foregroundNote, setForegroundNote] = useState("");
 
+  const loadDashboard = useCallback(async () => {
+    setIsLoading(true);
+    const failed = [];
 
-
-
-  
-
-  useEffect(() => {
-    // If no data in local storage, fetch from API
-    fetch(api.consiltationFee)
-      .then((response) => {
+    const load = async (url, label) => {
+      try {
+        const response = await fetch(url);
         if (!response.ok) {
-          throw new Error("Failed to fetch consultations");
+          throw new Error(`${response.status} ${response.statusText}`);
         }
-        return response.json();
-      })
-      .then((data) => {
-        dispatch(setConsultationType(data));
-      })
-      .catch((error) => console.error("Error fetching consultations:", error));
-  }, []);
+        return await response.json();
+      } catch (error) {
+        console.error(`Could not load ${label}:`, error);
+        failed.push(label);
+        return null;
+      }
+    };
+    const [fee, appointmentData, labTestData, labData, serviceData] =
+      await Promise.all([
+        load(api.consiltationFee, "consultation fees"),
+        load(api.bookConsultation, "consultation bookings"),
+        load(api.bookLabTest, "lab test bookings"),
+        load(api.addNewLab, "labs"),
+        load(api.serviceOffered, "services offered"),
+      ]);
+
+    // The lists other pages read from the store are always dispatched, even
+    // when empty, so no consumer is left showing stale data.
+    const appointmentList = Array.isArray(appointmentData?.appointments)
+      ? appointmentData.appointments
+      : [];
+    const labTestList = Array.isArray(labTestData?.labTests)
+      ? labTestData.labTests
+      : [];
+
+    dispatch(setAllappointments(appointmentList));
+    dispatch(setAllLabTest(labTestList));
+    if (fee) dispatch(setConsultationType(fee));
+    if (labData) dispatch(setAllLab(labData));
+    if (serviceData) dispatch(setServiceOffered(serviceData));
+
+    setAppointments(appointmentList);
+    setLabTests(labTestList);
+    setTotalIncome(
+      calculateTotalIncome(appointmentList, labTestList).totatIncome
+    );
+    setFailures(failed);
+    setIsLoading(false);
+  }, [dispatch]);
+
+  const loadDoctors = useCallback(async () => {
+    setIsDoctorLoading(true);
+    await fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
+  }, [dispatch]);
 
   useEffect(() => {
-    console.log(doctors, "doctors in use eeffe");
-    if (!(doctors.length > 0)) {
-      fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
-    }
-  }, []); // Empty dependency array ensures the effect runs only once
+    loadDashboard();
+  }, [loadDashboard]);
+
+  useEffect(() => {
+    loadDoctors();
+  }, [loadDoctors]);
 
   useEffect(() => {
     let unsubscribe;
     let cancelled = false;
 
-    // Foreground messages - skipped entirely when web push is unsupported (mobile).
+    // Foreground messages - skipped entirely when web push is unsupported.
     (async () => {
       const messaging = await getMessagingIfSupported();
       if (!messaging || cancelled) return;
 
       unsubscribe = onMessage(messaging, (payload) => {
-        console.log("Message received in foreground:", payload);
         const notification = payload?.notification || {};
         const data = payload?.data || {};
-        alert(
-          `${notification.title || data.title || "Notification"}: ${
-            notification.body || data.body || ""
-          }`
+        setForegroundNote(
+          notification.title || data.title || "New notification"
         );
       });
     })();
@@ -102,246 +123,73 @@ export default function HomepageComp() {
     };
   }, []);
 
-  useEffect(() => {
-    setIsAppointmentLoading(true);
-    const fetchData = async () => {
-      try {
-        const [
-          appointmentsResponse,
-          labTestsResponse,
-          labResponse,
-          serviceOfferedResponse,
-        ] = await Promise.all([
-          fetch(api.bookConsultation), // Replace with actual API endpoint
-          fetch(api.bookLabTest), // Replace with actual API endpoint
-          fetch(api.addNewLab),
-          fetch(api.serviceOffered),
-        ]);
-
-        const [appointmentsData, labTestsData, labData, serviceOfferedData] =
-          await Promise.all([
-            appointmentsResponse.json(),
-            labTestsResponse.json(),
-            labResponse.json(),
-            serviceOfferedResponse.json(),
-          ]);
-        const appointments = appointmentsData.appointments;
-        const labTest = labTestsData.labTests;
-        setAppointments(appointments);
-        setLabTests(labTest);
-        dispatch(setAllappointments(appointments));
-        dispatch(setAllLabTest(labTest));
-        dispatch(setAllLab(labData));
-        dispatch(setServiceOffered(serviceOfferedData));
-        // Calculate totals
-        const calculatedTotals = calculateTotalIncome(appointments, labTest);
-        console.log(calculatedTotals.totatIncome, "calculated totals");
-        setTotalIncome(calculatedTotals.totatIncome);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsAppointmentLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const requestNotificationPermission = async () => {
-    try {
-      if (typeof window === "undefined" || typeof Notification === "undefined") {
-        console.warn("Notifications are not supported in this browser.");
-        return;
-      }
-
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        console.warn("Permission denied");
-        return;
-      }
-
-      const messaging = await getMessagingIfSupported();
-      if (!messaging) {
-        console.warn(
-          "Firebase Messaging is not supported here (e.g. iOS Safari) - skipping FCM token."
-        );
-        return;
-      }
-
-      const token = await getToken(messaging, {
-        vapidKey: vapidKey,
-      });
-      console.log("FCM Token:", token);
-    } catch (error) {
-      console.error("Error getting FCM token:", error);
-    }
-  };
-
-  // const calculateStatistics = (appointments) => {
-  //   const uniquePatients = new Set();
-
-  //   appointments.forEach((appointment) => {
-  //     if (appointment.patientMobNo) {
-  //       uniquePatients.add(appointment.mobileNumber);
-  //     }
-  //     if (appointment.price) {
-  //       totalIncome += Number(appointment.price); // Convert price to a number
-  //     }
-  //   });
-
-  //   setTotalPatients(uniquePatients.size);
-  // };
-
-  const refreshDoctorList = async () => {
-    await fetchDoctors();
-  };
-
-  const handleOpenSnackBar = () => {
-    console.log("handle open snack bar");
-    setOpenSnackBar(true);
-  };
-
-  const handleCloseSnackBar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenSnackBar(false);
-  };
-
-  const createDoctorSlots = async () => {
-    console.log("create doctor slot");
-    try {
-      const response = await fetch("/api/lib/runCronJob", {
-        method: "POST",
-      });
-
-      if (response.ok) {
-        window.alert("Slots Created");
-        // Reset form fields or navigate to another page
-      } else {
-        console.error("Error adding doctor:", response.statusText);
-        window.alert("Something went wrong, please try again");
-      }
-    } catch (error) {
-      console.error("Error adding doctor:", error.message);
-    }
-  };
+  const refreshDoctorList = () => loadDoctors();
 
   return (
-    <>
-      <Row className="m-4">
+    <div className={styles.page}>
+      <HeroBand />
 
-        <Col style={{ marginTop: 60 }}>
-          <CardDeck className="w-50 ml-auto mr-auto mt-4">
-            <Card
-              className="rounded-circle"
-              onClick={() => router.push("/superAdmin/consultationBooked")}
-            >
-              <div className="text-center mt-4">
-                <FaUser color="#0009C7" size={50} />
-              </div>
-              <Card.Body>
-                <Card.Title className="text-center">
-                  Consultation Booked
-                </Card.Title>
-                <Card.Text className="text-center">
-                  <b>{appointments.length}</b>
-                </Card.Text>
-              </Card.Body>
-            </Card>
-            <Card
-              className="rounded-circle"
-              onClick={() => router.push("/superAdmin/labTestBooked")}
-            >
-              <div className="text-center mt-4">
-                <GrTest color="#C70018" size={50} />
-              </div>
-              <Card.Body>
-                <Card.Title className="text-center">LabTest Booked</Card.Title>
-                <Card.Text className="text-center">
-                  <b>{labTests.length}</b>
-                </Card.Text>
-              </Card.Body>
-            </Card>
-            <Card
-              className="rounded-circle"
-              onClick={() => router.push("/superAdmin/earnings")}
-            >
-              <div className="text-center mt-4">
-                <FaMoneyBill color="#18C700" size={50} />
-              </div>
-              <Card.Body>
-                <Card.Title className="text-center">Total Earning</Card.Title>
-                <Card.Text className="text-center">
-                  <b>{totalIncome} rs</b>
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </CardDeck>
-        </Col>
-      </Row>
-
-      {/* <div>
-        <AppointTable
-          heading={"Appointments"}
-          isLoading={isAppointmentLoading}
-          appointments={appointments}
-          onUpdateStatus={handleUpdateStatus}
-        />
-      </div> */}
-
-      <Row
-        className="w-75 ml-auto mr-auto border p-4 mb-4"
-        style={{ marginTop: 100, borderRadius: 20 }}
-      >
-        <div
-          className="mx-1 font-weight-bold text-primary text-center float-right clickable-div"
-          onClick={createDoctorSlots}
-        >
-          <u>Create Doctor Slots</u>
-        </div>
-        <Row className="w-100 mx-2 border-bottom pb-1">
-          {/* Added w-100 to make the child Row full width */}
-          <Col className="mt-3">
-            <h4>
-              <b>Doctors</b>
-            </h4>
-          </Col>
-          <Col className="text-right mt-2">
-            <Button className="bg-secondary" href="/superAdmin/addDoctor">
-              Add Doctor
-            </Button>
-          </Col>
-        </Row>
-        <Row className="ml-4 w-100 mt-3">
-          {isDoctorLoading ? (
-            <p>Loading...</p>
-          ) : doctors.length === 0 ? (
-            <p>No doctors found.</p>
-          ) : (
-            <Col>
-              <RecentDoctors
-                doctors={doctors}
-                refreshDoctorList={refreshDoctorList}
-              />
-            </Col>
-          )}
-          <Snackbar
-            open={openSnackBar}
-            autoHideDuration={3000}
-            onClose={handleCloseSnackBar}
+      {failures.length > 0 ? (
+        <div className={styles.errorBox} role="alert">
+          <span>
+            Some data could not be loaded: {failures.join(", ")}.
+          </span>
+          <button
+            type="button"
+            className={styles.retry}
+            onClick={loadDashboard}
           >
-            <Alert
-              onClose={handleCloseSnackBar}
-              severity={severity}
-              sx={{ width: "100%" }}
-            >
-              {snackBarMessage}
-            </Alert>
-          </Snackbar>
-        </Row>
-      </Row>
-    </>
+            Retry
+          </button>
+        </div>
+      ) : null}
+
+      {foregroundNote ? (
+        <p className={`${styles.note} ${styles.noteOk}`} role="status">
+          {foregroundNote}
+          <button
+            type="button"
+            className={styles.retry}
+            onClick={() => setForegroundNote("")}
+          >
+            Dismiss
+          </button>
+        </p>
+      ) : null}
+
+      <StatTiles
+        appointmentCount={appointments.length}
+        labTestCount={labTests.length}
+        doctorCount={doctors.length}
+        totalIncome={totalIncome}
+        isLoading={isLoading}
+      />
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>Pending approvals</h2>
+        <PendingApprovals />
+      </section>
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>Quick actions</h2>
+        <QuickActions />
+      </section>
+
+      <section id="superAdminDoctors" className={styles.section}>
+        <div className={styles.card}>
+          <div className={styles.cardTitleRow}>
+            <h2 className={styles.cardTitle}>Doctors</h2>
+            <Link className={styles.ghostBtn} href="/superAdmin/addDoctor">
+              Add doctor
+            </Link>
+          </div>
+          <RecentDoctors
+            doctors={doctors}
+            isLoading={isDoctorLoading}
+            refreshDoctorList={refreshDoctorList}
+          />
+        </div>
+      </section>
+    </div>
   );
 }

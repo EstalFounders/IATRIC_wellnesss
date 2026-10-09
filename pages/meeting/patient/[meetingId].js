@@ -43,7 +43,7 @@ export default function PatientMeetingPage() {
           alignItems: "center",
           background: "#f8faf5",
           color: "#1a202c",
-          fontFamily: "sans-serif",
+          fontFamily: "'TT Ramillas', serif",
         }}
       >
         <div
@@ -82,7 +82,7 @@ export default function PatientMeetingPage() {
           color: "#1a202c",
           textAlign: "center",
           padding: 40,
-          fontFamily: "sans-serif",
+          fontFamily: "'TT Ramillas', serif",
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>

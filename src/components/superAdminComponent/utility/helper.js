@@ -1,7 +1,6 @@
 import { labTest_payment_status, labTest_status } from "../../../constant";
 
 export const calculateTotalIncome = (appointments, labTests) => {
-  console.log(appointments, labTests, "all appointments and labtest");
   let totatIncome = 0;
 
   // Initialize totals

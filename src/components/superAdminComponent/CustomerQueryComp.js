@@ -1,226 +1,427 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Form } from "react-bootstrap";
-import { api, color_schema } from "../../constant";
+// CustomerQueryComp.js - the super-admin "Customer query" page
+// (pages/superAdmin/customerQuery.js).
+//
+// This page used to be a plain accordion list with three action buttons
+// (Reply / Assign / Close) and a "Send Reply" box that had no backend behind
+// them - pages/api/userQuery.js only implements GET, and the PUT/DELETE handlers
+// are commented out. It has been rebuilt on the panel's own design system (the
+// same hero, filter tiles, card, table and pagination vocabulary as
+// ConsultationBooked / ServiceOffered) so the data is scannable and the actions
+// are honest: every button here either changes what is on screen or opens a
+// real mail/call link.
+//
+// Read-only on purpose. It gets its data with a single GET to api.userQuery and
+// normalises it (the API may return a bare array or a { data } envelope). The
+// tile/date filters live here because they feed the hero numbers; the actual
+// search, paging and row rendering live in ./CustomerQuery/CustomerQueryTable.
+//
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Modal } from "react-bootstrap";
+import {
+  MdClose,
+  MdContentCopy,
+  MdEmail,
+  MdOutlineQueryStats,
+  MdPhone,
+  MdRefresh,
+} from "react-icons/md";
+import { api } from "../../constant";
+import CustomerQueryTable from "./CustomerQuery/CustomerQueryTable";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  contactOf,
+  dayKey,
+  formatDateTime,
+  formatDayKey,
+  isRecent,
+  isVisited,
+  toText,
+} from "./CustomerQuery/customerQueryUtils";
 import styles from "./css/CustomerQueryComp.module.css";
 
-const ITEMS_PER_PAGE = 10;
-
-const formatDate = (dateStr) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", {
-    day: "numeric", month: "short", year: "numeric",
-  });
-};
-
-const getInitials = (name) => {
-  return (name || "U")
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-};
+// The filter tiles double as the hero's summary numbers, so both read from this
+// one list.
+const FILTERS = [
+  {
+    key: "total",
+    label: "Total",
+    hint: "Every query",
+  },
+  {
+    key: "recent",
+    label: "Last 7 days",
+    hint: "Received this week",
+    empty: "Nothing came in over the last 7 days.",
+  },
+  {
+    key: CONTACT_EMAIL,
+    label: "Email contact",
+    hint: "Reachable by email",
+    empty: "No query left an email address.",
+  },
+  {
+    key: CONTACT_PHONE,
+    label: "Phone contact",
+    hint: "Shared a phone number",
+    empty: "No query left a phone number.",
+  },
+];
 
 const CustomerQueryComp = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedQuery, setSelectedQuery] = useState(null);
   const [queries, setQueries] = useState([]);
-  const [expandedId, setExpandedId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("total");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const fetchQueries = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(api.userQuery);
-        const data = await response.json();
-        setQueries(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Error fetching queries:", error);
-        setQueries([]);
-      } finally {
-        setLoading(false);
+  const loadQueries = useCallback(async () => {
+    setLoading(true);
+    setFailed(false);
+    try {
+      const response = await fetch(api.userQuery);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
       }
-    };
-    fetchQueries();
+      const payload = await response.json();
+      // The route returns a bare array today, but tolerate a { data } envelope
+      // so a future change cannot silently blank the table.
+      const list = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload && payload.data)
+        ? payload.data
+        : [];
+      // The API returns insertion order, so sort newest-first here: the newest
+      // query then tops the table and the hero can name it as "latest".
+      const sorted = [...list].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setQueries(sorted);
+    } catch (error) {
+      console.error("Error fetching customer queries:", error);
+      setQueries([]);
+      setFailed(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(queries.length / ITEMS_PER_PAGE));
-  const paginatedQueries = queries.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+  useEffect(() => {
+    loadQueries();
+  }, [loadQueries]);
+
+  // --- Date range filter (on createdAt). An empty From/To means "no bound". ---
+  const rangedQueries = useMemo(() => {
+    if (!fromDate && !toDate) return queries;
+    return queries.filter((query) => {
+      const key = dayKey(query.createdAt);
+      if (!key) return false;
+      if (fromDate && key < fromDate) return false;
+      if (toDate && key > toDate) return false;
+      return true;
+    });
+  }, [queries, fromDate, toDate]);
+
+  // Tile numbers, computed off the date-ranged set so they read as "of what is
+  // in the date range".
+  const counts = useMemo(
+    () => ({
+      total: rangedQueries.length,
+      recent: rangedQueries.filter((query) => isRecent(query.createdAt)).length,
+      [CONTACT_EMAIL]: rangedQueries.filter(
+        (query) => contactOf(query).type === CONTACT_EMAIL
+      ).length,
+      [CONTACT_PHONE]: rangedQueries.filter(
+        (query) => contactOf(query).type === CONTACT_PHONE
+      ).length,
+    }),
+    [rangedQueries]
   );
 
-  const handleView = (query) => {
-    setSelectedQuery(query);
-    setShowModal(true);
+  const visibleQueries = useMemo(() => {
+    if (activeFilter === "total") return rangedQueries;
+    if (activeFilter === "recent") {
+      return rangedQueries.filter((query) => isRecent(query.createdAt));
+    }
+    return rangedQueries.filter((query) => contactOf(query).type === activeFilter);
+  }, [rangedQueries, activeFilter]);
+
+  const activeMeta =
+    FILTERS.find((filter) => filter.key === activeFilter) || FILTERS[0];
+
+  const dateSummary = useMemo(() => {
+    if (!fromDate && !toDate) return "";
+    if (fromDate && toDate) {
+      return `${formatDayKey(fromDate)} – ${formatDayKey(toDate)}`;
+    }
+    if (fromDate) return `from ${formatDayKey(fromDate)}`;
+    return `up to ${formatDayKey(toDate)}`;
+  }, [fromDate, toDate]);
+
+  const setTodayRange = () => {
+    const today = dayKey(new Date());
+    setFromDate(today);
+    setToDate(today);
   };
 
-  const toggleExpand = (id) => {
-    setExpandedId(expandedId === id ? null : id);
+  const clearRange = () => {
+    setFromDate("");
+    setToDate("");
   };
+
+  const openDetails = (query) => {
+    setCopied(false);
+    setSelected(query);
+  };
+
+  const closeDetails = () => setSelected(null);
+
+  const copyMessage = async () => {
+    const text = toText(selected && selected.message);
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+    } catch (error) {
+      console.error("Could not copy to clipboard:", error);
+    }
+  };
+
+  const selectedContact = selected ? contactOf(selected) : null;
+
+  const heroSubtitle =
+    queries.length === 0
+      ? "Enquiries submitted through the website contact form."
+      : `${queries.length} ${
+          queries.length === 1 ? "query" : "queries"
+        } received · latest ${formatDateTime(queries[0].createdAt)}`;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h5 className={styles.headerTitle}>Customer Queries</h5>
-        <span className={styles.headerCount}>{queries.length} total</span>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <span className={styles.heroIcon} aria-hidden="true">
+          <MdOutlineQueryStats />
+        </span>
+        <div className={styles.heroInfo}>
+          <p className={styles.heroEyebrow}>Super admin · Customer queries</p>
+          <h1 className={styles.heroTitle}>Customer Queries</h1>
+          <p className={styles.heroSubtitle}>{heroSubtitle}</p>
+        </div>
+        <div className={styles.heroActions}>
+          <button
+            type="button"
+            className={styles.ghostBtn}
+            onClick={loadQueries}
+            disabled={loading}
+          >
+            <MdRefresh aria-hidden="true" />
+            {loading ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
+      </header>
+
+      {failed ? (
+        <div className={styles.errorBox} role="alert">
+          <span>Could not load customer queries. Please try again.</span>
+          <button
+            type="button"
+            className={styles.retry}
+            onClick={loadQueries}
+            disabled={loading}
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
+
+      <div className={styles.tileGrid}>
+        {FILTERS.map((filter) => {
+          const isActive = filter.key === activeFilter;
+          return (
+            <button
+              key={filter.key}
+              type="button"
+              className={`${styles.tile}${isActive ? ` ${styles.tileActive}` : ""}`}
+              aria-pressed={isActive}
+              onClick={() => setActiveFilter(filter.key)}
+            >
+              <span className={styles.tileLabel}>{filter.label}</span>
+              <span className={styles.tileValue}>{counts[filter.key] ?? 0}</span>
+              <span className={styles.tileHint}>{filter.hint}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {loading ? (
-        <div className={styles.loadingState}>Loading queries...</div>
-      ) : queries.length === 0 ? (
-        <div className={styles.emptyState}>No queries found</div>
-      ) : (
-        <>
-          {paginatedQueries.map((query) => {
-            const isExpanded = expandedId === query._id;
-            return (
-              <div key={query._id} className={styles.queryItem}>
-                <div className={styles.queryMain} onClick={() => toggleExpand(query._id)}>
-                  <div className={styles.queryAvatar}>
-                    {getInitials(query.name)}
-                  </div>
-                  <div className={styles.queryInfo}>
-                    <div className={styles.queryName}>{query.name || "Unknown"}</div>
-                    <div className={styles.queryMeta}>
-                      <span>📅 {formatDate(query.createdAt)}</span>
-                      {query.email && <span>✉️ {query.email}</span>}
-                      {query.mobile_number && <span>📞 {query.mobile_number}</span>}
-                    </div>
-                  </div>
-                  {query.message && (
-                    <div className={styles.queryMessage}>{query.message}</div>
-                  )}
-                  <span className={`${styles.expandIcon} ${isExpanded ? styles.expandIconOpen : ""}`}>
-                    ▼
-                  </span>
+      <div className={styles.dateBar}>
+        <span className={styles.dateBarLabel}>Received between</span>
+        <label className={styles.dateField}>
+          <span className={styles.dateFieldLabel}>From</span>
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={fromDate}
+            max={toDate || undefined}
+            onChange={(event) => setFromDate(event.target.value)}
+          />
+        </label>
+        <label className={styles.dateField}>
+          <span className={styles.dateFieldLabel}>To</span>
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(event) => setToDate(event.target.value)}
+          />
+        </label>
+        <button type="button" className={styles.ghostBtn} onClick={setTodayRange}>
+          Today
+        </button>
+        <button
+          type="button"
+          className={styles.ghostBtn}
+          onClick={clearRange}
+          disabled={!fromDate && !toDate}
+        >
+          All dates
+        </button>
+        {dateSummary ? (
+          <span className={styles.dateNote}>Showing {dateSummary}</span>
+        ) : null}
+      </div>
+
+      <section className={styles.card}>
+        <div className={styles.cardHead}>
+          <h2 className={styles.cardTitle}>{activeMeta.label}</h2>
+          <span className={styles.cardCount}>
+            {visibleQueries.length} shown
+          </span>
+        </div>
+
+        <CustomerQueryTable
+          queries={visibleQueries}
+          loading={loading}
+          emptyMessage={
+            activeFilter === "total"
+              ? "No customer queries yet."
+              : activeMeta.empty || "No queries in this view."
+          }
+          onView={openDetails}
+        />
+      </section>
+
+      <Modal
+        show={Boolean(selected)}
+        onHide={closeDetails}
+        centered
+        className={styles.modal}
+        aria-labelledby="queryDetailsTitle"
+      >
+        {selected ? (
+          <>
+            <Modal.Header className={styles.modalHeader}>
+              <Modal.Title
+                id="queryDetailsTitle"
+                className={styles.modalTitle}
+              >
+                {toText(selected.name) || "Customer query"}
+              </Modal.Title>
+              <button
+                type="button"
+                className={styles.modalClose}
+                onClick={closeDetails}
+                aria-label="Close"
+              >
+                <MdClose aria-hidden="true" />
+              </button>
+            </Modal.Header>
+            <Modal.Body className={styles.modalBody}>
+              <dl className={styles.modalFields}>
+                <div className={styles.modalField}>
+                  <dt>Received</dt>
+                  <dd>{formatDateTime(selected.createdAt)}</dd>
                 </div>
+                <div className={styles.modalField}>
+                  <dt>Contact</dt>
+                  <dd>
+                    {selectedContact && selectedContact.type !== "none" ? (
+                      <a
+                        className={styles.contactLink}
+                        href={selectedContact.href}
+                      >
+                        {selectedContact.value}
+                      </a>
+                    ) : (
+                      <span className={styles.muted}>Not provided</span>
+                    )}
+                  </dd>
+                </div>
+                <div className={styles.modalField}>
+                  <dt>Visited before</dt>
+                  <dd>{isVisited(selected.visited_before) ? "Yes" : "No"}</dd>
+                </div>
+                <div className={styles.modalField}>
+                  <dt>Query ID</dt>
+                  <dd className={styles.modalId}>#{String(selected._id)}</dd>
+                </div>
+              </dl>
 
-                {isExpanded && (
-                  <div className={styles.queryExpanded}>
-                    <div className={styles.expandedField}>
-                      <strong>Query ID:</strong> {query._id}
-                    </div>
-                    {query.email && (
-                      <div className={styles.expandedField}>
-                        <strong>Email:</strong> {query.email}
-                      </div>
-                    )}
-                    {query.mobile_number && (
-                      <div className={styles.expandedField}>
-                        <strong>Phone:</strong> {query.mobile_number}
-                      </div>
-                    )}
-                    {query.visited_before !== undefined && (
-                      <div className={styles.expandedField}>
-                        <strong>Visited Before:</strong> {query.visited_before ? "Yes" : "No"}
-                      </div>
-                    )}
-                    {query.message && (
-                      <div className={styles.expandedField}>
-                        <strong>Message:</strong> {query.message}
-                      </div>
-                    )}
-                    <div className={styles.expandedActions}>
-                      <button className={`${styles.actionBtn} ${styles.viewBtn}`} onClick={() => handleView(query)}>
-                        View
-                      </button>
-                      <button className={`${styles.actionBtn} ${styles.replyBtn}`}>
-                        Reply
-                      </button>
-                      <button className={`${styles.actionBtn} ${styles.assignBtn}`}>
-                        Assign
-                      </button>
-                      <button className={`${styles.actionBtn} ${styles.closeBtn}`}>
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                )}
+              <div className={styles.messageBlock}>
+                <div className={styles.messageBlockHead}>
+                  <span>Message</span>
+                  <button
+                    type="button"
+                    className={styles.ghostBtn}
+                    onClick={copyMessage}
+                    disabled={!toText(selected.message)}
+                  >
+                    <MdContentCopy aria-hidden="true" />
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+                <p className={styles.messageFull}>
+                  {toText(selected.message) || "No message was provided."}
+                </p>
               </div>
-            );
-          })}
-
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <button
-                className={styles.pageBtn}
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              >
-                ‹ Prev
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ""}`}
-                  onClick={() => setCurrentPage(page)}
+            </Modal.Body>
+            <Modal.Footer className={styles.modalFooter}>
+              {selectedContact && selectedContact.type === CONTACT_EMAIL ? (
+                <a
+                  className={styles.primaryBtn}
+                  href={selectedContact.href}
                 >
-                  {page}
-                </button>
-              ))}
+                  <MdEmail aria-hidden="true" />
+                  Reply by email
+                </a>
+              ) : null}
+              {selectedContact && selectedContact.type === CONTACT_PHONE ? (
+                <a
+                  className={styles.primaryBtn}
+                  href={selectedContact.href}
+                >
+                  <MdPhone aria-hidden="true" />
+                  Call back
+                </a>
+              ) : null}
               <button
-                className={styles.pageBtn}
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                type="button"
+                className={styles.ghostBtn}
+                onClick={closeDetails}
               >
-                Next ›
+                Close
               </button>
-              <span className={styles.pageInfo}>
-                Page {currentPage} of {totalPages}
-              </span>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Query Details Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Query Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedQuery && (
-            <>
-              <p><strong>Query ID:</strong> {selectedQuery._id}</p>
-              <p><strong>Customer Name:</strong> {selectedQuery.name}</p>
-              <p><strong>Query Date:</strong> {formatDate(selectedQuery.createdAt)}</p>
-              <p><strong>Email:</strong> {selectedQuery.email}</p>
-              {selectedQuery.mobile_number && (
-                <p><strong>Phone:</strong> {selectedQuery.mobile_number}</p>
-              )}
-              {selectedQuery.message && (
-                <p><strong>Message:</strong> {selectedQuery.message}</p>
-              )}
-              <Form>
-                <Form.Group>
-                  <Form.Label>Reply</Form.Label>
-                  <Form.Control as="textarea" rows={3} placeholder="Write your response..." />
-                </Form.Group>
-              </Form>
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <div
-            className="py-2 px-3 rounded font-weight-bold"
-            onClick={() => setShowModal(false)}
-            style={{ cursor: "pointer", background: "#f5f5f5", color: "#555", border: "1px solid #ddd" }}
-          >
-            Cancel
-          </div>
-          <div
-            className="py-2 px-3 rounded font-weight-bold"
-            style={{ cursor: "pointer", background: color_schema.green, color: "#fff" }}
-          >
-            Send Reply
-          </div>
-        </Modal.Footer>
+            </Modal.Footer>
+          </>
+        ) : null}
       </Modal>
     </div>
   );
 };
 
 export default CustomerQueryComp;
+

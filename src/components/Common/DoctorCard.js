@@ -7,6 +7,7 @@ import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageS
 import { ConsultationButton } from "./commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fmt } from "../../i18n/format";
+import { doctorDisplayName } from "../../utils/doctorName";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
@@ -52,7 +53,7 @@ const DoctorCard = ({ doctor, index }) => {
 
         <div className={`mt-4 ${styles["doctor-primary-info col"]}`}>
           <h2 className={styles["new-doctor-name mt-4"]}>
-            {t("doctor.namePrefix")} {doctor.name}
+            {doctorDisplayName(doctor.name, t("doctor.namePrefix"))}
           </h2>
           <p className={styles["doctor-text"]}>{doctor.speciality}</p>
           <p className={styles["doctor-text"]}>
