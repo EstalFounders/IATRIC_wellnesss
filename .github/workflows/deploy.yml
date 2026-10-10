@@ -12,9 +12,11 @@
 #   VPS_HEALTH_URL_MAIN     e.g. http://127.0.0.1:3000/   (adds a post-deploy check)
 #   VPS_HEALTH_URL_STAGING  e.g. http://127.0.0.1:3001/
 #
-# Rollback: the previous commit is remembered and the previous `.next` build is kept
-# as `.next.prev`. If npm ci, the build, the PM2 reload or the health check fails, the
-# old commit + build are restored and PM2 is reloaded again.
+# Failure policy: a failed run is NOT rolled back automatically. The build is made in a side
+# directory (NEXT_DIST_DIR=.next-next), so the live `.next` and PM2 are untouched until a build
+# has verifiably succeeded; if anything fails, the site keeps serving the previous build and the
+# checkout simply stays on the new commit. Going back is explicit: re-run this workflow with
+# mode=rollback (the previous build is kept in .next.prev for exactly that).
 name: Deploy
 
 on:
@@ -24,8 +26,14 @@ on:
     paths-ignore:
       - "docs/**"
       - "**/*.md"
-  # Allow a manual re-deploy from the Actions tab.
+  # Allow a manual re-deploy or an explicit rollback from the Actions tab.
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "deploy = normal deploy; rollback = switch the live build back to the previous one (.next.prev)"
+        type: choice
+        options: [deploy, rollback]
+        default: deploy
 
 # One deploy per branch at a time, and never cancel one that is already running.
 concurrency:
@@ -36,7 +44,9 @@ jobs:
   deploy:
     name: Deploy ${{ github.ref_name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # The VPS build is slow and mostly silent; a job timeout would also sever the ssh
+    # session mid-build, so keep it comfortably above the observed build time.
+    timeout-minutes: 45
     # The VPS uses this read-only token for its git fetch (private repo), so keep it minimal.
     permissions:
       contents: read
@@ -47,6 +57,8 @@ jobs:
       BRANCH: ${{ github.ref_name }}
       HEALTH_URL: ${{ github.ref_name == 'main' && secrets.VPS_HEALTH_URL_MAIN || secrets.VPS_HEALTH_URL_STAGING }}
       VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      # workflow_dispatch input; empty for push events, which always means a normal deploy.
+      MODE: ${{ inputs.mode || 'deploy' }}
 
     steps:
       - name: Target
@@ -63,7 +75,8 @@ jobs:
           echo "branch : $BRANCH"
           echo "path   : $DEPLOY_PATH"
           echo "pm2    : $PM2_APP"
-          echo "health : ${HEALTH_URL:-<not configured - post-deploy check will be skipped>}"
+          echo "health : ${HEALTH_URL:-<not configured - falls back to a PM2 status check>}"
+          echo "mode   : $MODE"
           echo
           echo "--- connection secrets (GitHub masks the values, so only safe comparisons are printed) ---"
           echo "VPS_SSH_KEY secret       : $SSH_KEY_STATUS"
@@ -99,8 +112,10 @@ jobs:
           set -o pipefail
           ssh -v -i ~/.ssh/deploy_key -p "$VPS_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=8 \
+            -o TCPKeepAlive=yes \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL' '${{ secrets.GITHUB_TOKEN }}'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
+            "bash -s -- '$DEPLOY_PATH' '$PM2_APP' '$BRANCH' '$HEALTH_URL' '${{ secrets.GITHUB_TOKEN }}' '$MODE'" 2>&1 <<'REMOTE' | tee /tmp/deploy.log
           set -euo pipefail
 
           DEPLOY_PATH="$1"
@@ -108,6 +123,12 @@ jobs:
           BRANCH="$3"
           HEALTH_URL="${4:-}"
           GH_TOKEN="${5:-}"
+          MODE="${6:-deploy}"
+
+          if [ "$MODE" != "deploy" ] && [ "$MODE" != "rollback" ]; then
+            echo "✗ mode must be 'deploy' or 'rollback' (got '$MODE')"
+            exit 1
+          fi
 
           # Private repo: the workflow passes a read-only token, applied inline with -c so it is
           # never written into .git/config. Falls back to plain git when no token is supplied.
@@ -123,7 +144,7 @@ jobs:
           git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "✗ $DEPLOY_PATH is not a git checkout"; exit 1; }
 
           # Non-interactive ssh does NOT source .bashrc/.nvm, so fail fast and clearly
-          # instead of tripping the rollback further down.
+          # instead of failing later with a confusing error.
           missing=""
           for bin in git node npm pm2 curl; do
             command -v "$bin" >/dev/null 2>&1 || missing="$missing $bin"
@@ -150,28 +171,50 @@ jobs:
             exit 1
           fi
 
-          rollback() {
-            trap - ERR
+          # Failure policy: NOTHING is rolled back automatically. Up to the switch step below the
+          # live .next build and PM2 are untouched, so a failed run leaves the site exactly as it
+          # was (the checkout stays on the new commit). Going back is an explicit action: re-run the
+          # workflow with mode=rollback.
+          live_build="$( [ -f .next/BUILD_ID ] && cat .next/BUILD_ID || echo 'no live BUILD_ID (was already broken before this run)' )"
+          echo "  live build: $live_build"
+
+          fail() {
+            trap - ERR HUP INT TERM
             echo
-            echo "✗ DEPLOY FAILED - rolling back to $PREVIOUS_COMMIT"
-            git reset --hard "$PREVIOUS_COMMIT" || true
-            if [ -d .next.prev ]; then
-              rm -rf .next
-              mv .next.prev .next
-              echo "✓ previous .next build restored"
-            fi
-            npm ci --no-audit --no-fund || true
-            pm2 reload "$PM2_APP" --update-env || pm2 restart "$PM2_APP" --update-env || true
-            echo "✗ deploy aborted - $PM2_APP is running the previous commit"
+            echo "✗ DEPLOY FAILED - nothing on the VPS was switched."
+            echo "  live build : $live_build (still what the site is serving)"
+            echo "  checkout   : $(git log -1 --oneline 2>/dev/null || echo unknown) (left as-is on purpose)"
+            echo "  PM2        : not touched"
+            echo "  previous   : $PREVIOUS_COMMIT"
+            echo "  to go back : nothing to do - the site was never switched (mode=rollback forces the previous build)"
+            exit 1
           }
-          trap rollback ERR
+          trap 'echo "!! ssh session interrupted (HUP/INT/TERM) - nothing was switched: live build and PM2 untouched" >&2; exit 130' HUP INT TERM
+
+          # mode=rollback: explicit, human-triggered rollback to the previous build.
+          if [ "$MODE" = "rollback" ]; then
+            echo "→ MANUAL ROLLBACK: switching the live build back to .next.prev"
+            if [ ! -f .next.prev/BUILD_ID ]; then
+              echo "✗ no usable previous build (.next.prev/BUILD_ID is missing) - nothing to roll back to"
+              exit 1
+            fi
+            if [ -d .next ]; then mv .next .next.broken; fi
+            mv .next.prev .next
+            echo "  live build is now: $(cat .next/BUILD_ID)"
+            echo "  code checkout left as-is: $(git log -1 --oneline)"
+            if pm2 reload "$PM2_APP" --update-env; then :; else pm2 restart "$PM2_APP" --update-env; fi
+            pm2 save
+            echo "  the build that was live is kept in .next.broken (cleared by the next deploy)"
+            echo "✓ rollback done - $PM2_APP is serving the previous build"
+            exit 0
+          fi
 
           # 1) sync the tracked tree to the pushed branch (untracked files such as
           #    .env.production.local or uploads are deliberately left untouched)
           if ! git_net ls-remote --heads origin "$BRANCH" >/dev/null 2>&1; then
             echo "!! cannot read origin/$BRANCH - the repo is private, so the VPS needs credentials"
             echo "   (this workflow passes a read-only GITHUB_TOKEN for exactly this fetch)"
-            false
+            fail
           fi
           git_net fetch --prune origin
           echo "--- VPS-local commits that will be discarded (expected: none) ---"
@@ -183,38 +226,74 @@ jobs:
           # 2) dependencies straight from the lockfile (fails loudly on drift)
           npm ci --no-audit --no-fund
 
-          # 3) fresh build, keeping the previous artifacts for the rollback
-          rm -rf .next.prev
-          if [ -d .next ]; then mv .next .next.prev; fi
-          npm run build
+          # 3) build into a SIDE directory: the live .next is not touched while building, so a
+          #    failure here cannot affect the running site (it keeps serving the old build).
+          rm -rf .next-next .next.broken
+          if ! NEXT_DIST_DIR=.next-next npm run build; then
+            echo "✗ the build failed - the live build was never touched"
+            fail
+          fi
+          if [ ! -f .next-next/BUILD_ID ]; then
+            echo "✗ the build produced no .next-next/BUILD_ID"
+            fail
+          fi
+          echo "  new build ready: $(cat .next-next/BUILD_ID)"
 
-          # 4) restart under PM2
+          # 4) switch the live build - the only step that changes what the app serves. The build
+          #    that was live becomes the rollback artifact, but ONLY when it is actually usable:
+          #    a half-written .next (a previous run died mid-build) must never become the target
+          #    of mode=rollback, so the older known-good .next.prev is kept in that case.
+          if [ -f .next/BUILD_ID ]; then
+            rm -rf .next.prev
+            mv .next .next.prev
+          else
+            echo "  ⚠ the live .next had no BUILD_ID (broken by an earlier run) - keeping the older .next.prev"
+            rm -rf .next
+          fi
+          mv .next-next .next
+
+          # 5) restart under PM2
           if pm2 reload "$PM2_APP" --update-env; then :; else pm2 restart "$PM2_APP" --update-env; fi
           pm2 save
           pm2 describe "$PM2_APP" | grep -E 'status|uptime|restarts' || true
 
-          # 5) post-deploy health check (only when a URL is configured)
+          # 6) post-deploy health check - REPORT ONLY. A failure here turns the run red and tells
+          #    you how to go back; it never rolls back on its own.
           if [ -z "$HEALTH_URL" ]; then
-            echo "⚠ VPS_HEALTH_URL_* is not configured - skipping the post-deploy check"
+            echo "⚠ VPS_HEALTH_URL_* is not configured - falling back to a PM2 status check"
+            pm2_out="$(pm2 describe "$PM2_APP" 2>/dev/null || true)"
+            case "$pm2_out" in
+              *online*)
+                echo "✓ PM2 reports $PM2_APP as online"
+                ;;
+              *)
+                echo "✗ PM2 does not report $PM2_APP as online - the NEW build is live"
+                echo "  revert: re-run this workflow with mode=rollback (or: cd $DEPLOY_PATH && mv .next .next.broken && mv .next.prev .next && pm2 reload $PM2_APP --update-env)"
+                false
+                ;;
+            esac
           else
+            healthy=""
             for attempt in $(seq 1 10); do
               code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$HEALTH_URL" || true)"
               if [ "$code" = "200" ]; then
                 echo "✓ health check OK ($HEALTH_URL -> $code)"
+                healthy=yes
                 break
               fi
               echo "… attempt $attempt/10: $HEALTH_URL -> $code"
               sleep 3
-              if [ "$attempt" = "10" ]; then
-                echo "✗ health check failed - rolling back"
-                false
-              fi
             done
+            if [ -z "$healthy" ]; then
+              echo "✗ health check failed after 10 attempts ($HEALTH_URL) - the NEW build is live"
+              echo "  revert: re-run this workflow with mode=rollback (or: cd $DEPLOY_PATH && mv .next .next.broken && mv .next.prev .next && pm2 reload $PM2_APP --update-env)"
+              false
+            fi
           fi
 
-          rm -rf .next.prev
-          trap - ERR
-          echo "✓ deploy finished: $(git rev-parse --short HEAD) on $BRANCH"
+          # .next.prev is deliberately kept - it is what mode=rollback switches back to.
+          trap - ERR HUP INT TERM
+          echo "✓ deploy finished: $(git rev-parse --short HEAD) on $BRANCH (previous build kept in .next.prev)"
           REMOTE
 
       - name: Deploy log

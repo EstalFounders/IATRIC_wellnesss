@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 
 module.exports = {
+  // The deploy workflow builds into a side directory (NEXT_DIST_DIR=.next-next) so the live
+  // .next is never touched while building; it is renamed into place only after a good build.
+  // At runtime NEXT_DIST_DIR is unset (PM2), so the app reads plain .next as always.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   productionBrowserSourceMaps: false,
   experimental: {
     serverSourceMaps: false,
