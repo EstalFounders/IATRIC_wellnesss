@@ -110,7 +110,12 @@ const AppointmentForm = ({
 
   const handleDateChange = (e) => {
     const [year, month, day] = e.target.value.split("-");
-    setter.setSelectedDate(new Date(year, month - 1, day));
+    // Noon UTC of the picked day - see `todayAtNoonUTC` in AppointmentPage.js. A
+    // local-midnight Date is the previous UTC day for IST users, and fetchSlot
+    // windows its query on the UTC day, so the day's slots came back empty.
+    setter.setSelectedDate(
+      new Date(Date.UTC(Number(year), Number(month) - 1, Number(day), 12))
+    );
   };
 
   // Reuse the parent's event-based handlers with the toggle value.

@@ -251,10 +251,23 @@ app.prepare().then(() => {
     cron.schedule("0 0 * * *", async () => {
       console.log("[CRON] Starting daily slot generation...");
       try {
-        await fetch(`http://${hostname}:${port}/api/lib/cron-jobs`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+        // Must be /api/lib/runCronJob: /api/lib/cron-jobs is the task module the
+        // route imports (it never touches `res`), so POSTing straight to it left
+        // the request hanging - the log reported "failed" even on a good run.
+        const response = await fetch(
+          `http://${hostname}:${port}/api/lib/runCronJob`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // The run walks each doctor day by day and takes minutes.
+            signal: AbortSignal.timeout(15 * 60 * 1000),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+
         console.log("[CRON] Slot generation completed successfully.");
       } catch (err) {
         console.error("[CRON] Slot generation failed:", err);

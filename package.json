@@ -21,7 +21,9 @@
     "db:seed-service-tab": "node scripts/seedServiceOfferedContent.js",
     "db:seed-service-tab:apply": "node scripts/seedServiceOfferedContent.js --apply",
     "db:update-service-desc": "node scripts/updateServiceOfferedDescription.js",
-    "db:update-service-desc:apply": "node scripts/updateServiceOfferedDescription.js --apply"
+    "db:update-service-desc:apply": "node scripts/updateServiceOfferedDescription.js --apply",
+    "db:set-slot-windows": "node scripts/setDoctorSlotWindows.js --env=production",
+    "db:set-slot-windows:apply": "node scripts/setDoctorSlotWindows.js --env=production --apply"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",

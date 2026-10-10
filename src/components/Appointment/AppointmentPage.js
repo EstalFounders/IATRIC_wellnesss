@@ -35,6 +35,23 @@ import FaqSection from "./common/FAQComponent";
 // Consultation types to look for in services data
 const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
 
+/**
+ * Noon UTC of the user's calendar day.
+ *
+ * `/api/slots/fetchSlot` windows its query around the date it is given
+ * (`setUTCHours(0)` .. `setUTCHours(23, 59)`), so the value has to be the UTC day
+ * that matches the day the user sees. A plain `new Date()` is wrong early in the
+ * morning in IST (e.g. 01:30 IST on the 11th is still the 10th in UTC, so the
+ * "today" slots of the 11th were never requested), while UTC *midnight* of that
+ * calendar day renders as the previous day west of Greenwich. Noon UTC is the same
+ * day everywhere within +/-12h - the same trick `ManageSlotsModal` uses.
+ */
+const todayAtNoonUTC = () => {
+  const now = new Date();
+
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12));
+};
+
 const AppointmentPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -56,7 +73,7 @@ const AppointmentPage = () => {
     useState(false);
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(todayAtNoonUTC);
   const storedDoctors = useSelector((state) => state.allDoctorS.allDoctors);
   const [doctors, setDoctors] = useState(storedDoctors);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
