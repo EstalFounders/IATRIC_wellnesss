@@ -87,7 +87,10 @@ const consultationTypes = useSelector(
           <div className="abox-2-holder py-2">
             <div className="text-center mb-5">
               <h1 className="steelblue-color">{t("demo5.about.welcome")}</h1>
-              <div className="h5 mx-auto steelblue-color w-100">
+              <div
+                className="h5 mx-auto steelblue-color w-100"
+                style={{ color: "#010101" }}
+              >
                 {t("demo5.about.intro1")}{" "}
                 <br /> {t("demo5.about.intro2")}
                 <br />

@@ -42,7 +42,7 @@ const Demo5Hero5 = () => {
               >
                 <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>{t("demo5.hero.bestQuality")}</div>
               </h4>
-              <h3 className="steelblue-color">
+              <h3 className="steelblue-color" style={{ color: "#3b5f1d" }}>
                 {t("demo5.hero.title")}
               </h3>
               {/* CONTENT BOX #1 */}
@@ -50,14 +50,17 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
-                <div className="h5 mx-auto steelblue-color">
+                <div
+                  className="h5 mx-auto steelblue-color"
+                  style={{ color: "#010101" }}
+                >
                   {t("demo5.hero.optimal")} ,{" "}
-                  <strong style={{ color: `${color_schema.green}` }}>
+                  <strong style={{ color: "#010101" }}>
                     {t("demo5.hero.anytime")}
                   </strong>{" "}
                   <br />
                   <br />
-                  <b style={{ color: color_schema.green }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
+                  <b style={{ color: "#010101" }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
 
 
                 </div>

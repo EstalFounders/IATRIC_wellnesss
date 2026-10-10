@@ -12,6 +12,7 @@ import {
   Button,
   Tabs,
   Tab,
+  Alert,
 } from "@mui/material";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
 import { address, callToBook, color_schema, contact_no } from "../../constant";
@@ -24,6 +25,7 @@ import {
 } from "../../customUtils/serviceLinks";
 import FaqSection from "../Common/FaqSection";
 import { getFaqsForTopic } from "../../../data/faqs";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const serviceDetails = {
   consultation: {
@@ -147,6 +149,10 @@ const serviceDetails = {
     seoTitle: "Home Lab Sample Collection & Testing | HealthPath",
     seoDescription:
       "Convenient home sample collection and lab testing services. Accurate results, certified labs, trusted healthcare.",
+    // Merged "Labtest" / "Lab Investigation" service: published as one page and
+    // announced as coming soon, so no booking CTA is offered yet.
+    comingSoon: true,
+    h1: "Lab Investigation",
     offline: [
       {
         name: "Home Sample Collection",
@@ -166,6 +172,9 @@ const serviceDetails = {
     seoTitle: "Medicine Delivery & HomeCare Equipment | HealthPath",
     seoDescription:
       "Reliable medicine delivery, home care support, and medical equipment for patients and families. Fast & safe.",
+    // Announced as coming soon: the page explains what will be offered, but no
+    // booking CTA is offered yet.
+    comingSoon: true,
     offline: [
       {
         name: "At Home",
@@ -865,6 +874,7 @@ const iconCircleSx = {
 
 const ServiceDetail = () => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
   // Active panel of the optional coverage tabs (`tabs` in a serviceDetails block).
   const [activeDetailTab, setActiveDetailTab] = useState(0);
@@ -1001,6 +1011,13 @@ const ServiceDetail = () => {
             getServiceDescription(serviceName) ||
             medical_service.seoDescription}
         </Typography>
+
+        {/* Merged lab service: announce the launch instead of offering booking. */}
+        {medical_service.comingSoon ? (
+          <Alert severity="info" sx={{ mb: 3, fontWeight: 600 }}>
+            {serviceName || medical_service.h1} - {t("common.comingSoon")}
+          </Alert>
+        ) : null}
 
         {/* Crisp, crawlable service bullets (only rendered when a service defines them). */}
         {medical_service.highlights?.length ? (
@@ -1231,11 +1248,20 @@ const ServiceDetail = () => {
                       </Box>
                     </CardContent>
                     <div>
-                      <ConsultationButton
-                        onClick={() => handleOpenCalltoBookDialog(item.name)}
-                      >
-                        {callToBook}
-                      </ConsultationButton>
+                      {medical_service.comingSoon ? (
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: color_schema.green, pb: 1 }}
+                        >
+                          {t("common.comingSoon")}
+                        </Typography>
+                      ) : (
+                        <ConsultationButton
+                          onClick={() => handleOpenCalltoBookDialog(item.name)}
+                        >
+                          {callToBook}
+                        </ConsultationButton>
+                      )}
                     </div>
                   </Card>
                 </Grid>
@@ -1323,11 +1349,20 @@ const ServiceDetail = () => {
                       </Box>
                     </CardContent>
                     <Box sx={{ px: item.image ? 2 : 0, pb: item.image ? 2 : 0 }}>
-                      <ConsultationButton
-                        onClick={() => handleOpenCalltoBookDialog(item.name)}
-                      >
-                        {callToBook}
-                      </ConsultationButton>
+                      {medical_service.comingSoon ? (
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: color_schema.green, pb: item.image ? 0 : 1 }}
+                        >
+                          {t("common.comingSoon")}
+                        </Typography>
+                      ) : (
+                        <ConsultationButton
+                          onClick={() => handleOpenCalltoBookDialog(item.name)}
+                        >
+                          {callToBook}
+                        </ConsultationButton>
+                      )}
                     </Box>
                   </Card>
                 </Grid>

@@ -475,6 +475,22 @@
   color: #ffffff;
 } 
 
+/* "Coming soon" pill shown on a service card/link before the service launches
+   (currently the merged lab-tests service). */
+.service-coming-soon {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* Animations */
 @keyframes scroll-left {
   0% {
@@ -1403,6 +1419,39 @@ h2.steelblue-color,
 
 .wsmenu > .wsmenu-list > li.header-btn a:hover {
   background-color: var(--color-primary);
+}
+
+/* Services mega-menu: the "Book Doctor Consultation" group with its three
+   sub-pointers (Audio / Video / Clinic). menu.css has no nested-list styling,
+   so the sub-items are indented, smaller and dotted. */
+.link-list li.has-sub > a {
+  padding-bottom: 6px;
+}
+
+.link-list .sub-link-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0 0 0 14px;
+}
+
+.link-list .sub-link-list > li {
+  border-bottom: 1px dotted #dcdcdc;
+}
+
+.link-list .sub-link-list > li:last-child {
+  border-bottom: none;
+}
+
+.link-list .sub-link-list > li > a {
+  display: block;
+  padding: 8px 0;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #565656;
+}
+
+.link-list .sub-link-list > li > a:hover {
+  color: var(--color-primary);
 }
 
 

@@ -71,6 +71,10 @@ const TermsPage = () => (
       physically examine you. The doctor may advise diagnostic tests, in-person
       evaluation, specialist care, or emergency care when needed.
     </p>
+    <p>
+      <strong>Free follow-up:</strong> Free follow-up is available only within
+      48 hours of your consultation and only for the same or a related problem.
+    </p>
 
     <h2>5. Fees, Payments, and Refunds</h2>
     <p>

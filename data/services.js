@@ -449,11 +449,12 @@ export const demo5ServiceHighlights = [
     btntext: "View Details",
   },
   {
-    title: "Blood Test & Diagnostics",
-    titleKey: "demo5.services.bloodTest",
+    // Merged "Labtest" / "Lab Investigation" service - single card, single name.
+    title: "Lab Investigation",
     service: "lab-test",
+    comingSoon: true,
     description:
-      "Access advanced treatments and specialized medical care from experienced healthcare professionals, designed to meet your unique health needs and conditions.",
+      "Blood tests and lab investigations at home, with reports on your phone.",
     icon: <LabInvestigation size={70} />,
     btntext: "View Details",
   },

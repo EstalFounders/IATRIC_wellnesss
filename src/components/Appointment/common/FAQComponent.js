@@ -22,6 +22,10 @@ const faqData = [
     qKey: 'faq.q3',
     aKey: 'faq.a3',
   },
+  {
+    qKey: 'faq.q4',
+    aKey: 'faq.a4',
+  },
 ];
 
 const FaqSection = () => {

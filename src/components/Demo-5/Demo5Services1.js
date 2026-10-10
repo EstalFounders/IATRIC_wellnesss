@@ -9,6 +9,10 @@ import {
 } from "../../customUtils/useGlobalData";
 import {
   getServiceDescription,
+  isComingSoonService,
+  isLabService,
+  LAB_SERVICE_KEY,
+  LAB_SERVICE_NAME,
   serviceDetailsPath,
 } from "../../customUtils/serviceLinks";
 import {
@@ -140,7 +144,13 @@ const Demo5Services1 = () => {
   };
 
   const handleClick = (item) => {
-    // Clean URL: the service name is what the details page displays.
+    // Clean URL: the service name is what the details page displays. The merged
+    // lab service always links to its single canonical URL whatever alias the
+    // DB/static list happens to carry ("Labtest", "Blood Test & Diagnostics").
+    if (isLabService(item.name || item.title || item.service)) {
+      router.push(serviceDetailsPath({ name: LAB_SERVICE_NAME, service: LAB_SERVICE_KEY }));
+      return;
+    }
     router.push(serviceDetailsPath(item));
   };
 
@@ -181,8 +191,15 @@ const Demo5Services1 = () => {
                         {item.icon || renderServiceIcon(item.name)}
                       </div>
                       <div className="service-title-dept font-weight-bold">
-                        {t(item.titleKey, item.title)}
+                        {isLabService(item.name || item.title)
+                          ? LAB_SERVICE_NAME
+                          : t(item.titleKey, item.title)}
                       </div>
+                      {isComingSoonService(item.name || item.title) ? (
+                        <div className="service-coming-soon">
+                          {t("common.comingSoon")}
+                        </div>
+                      ) : null}
                       <div className="service-card-desc">
                         {item.description ||
                           getServiceDescription(item.name || item.title)}

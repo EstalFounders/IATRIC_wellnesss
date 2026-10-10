@@ -26,7 +26,23 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { handleServiceClick } from "../../components/Common/commonMethod";
 import { demo5ServiceHighlights } from "../../../data/services";
 import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
-import { serviceDetailsPath } from "../../customUtils/serviceLinks";
+import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../../customUtils/serviceLinks";
+
+// Quick Links > "Book Doctor Consultation": every pointer opens the booking form
+// with the consultation type preselected (AppointmentPage reads ?type=...).
+const BOOK_CONSULTATION_HREF = `/appointment?service=${encodeURIComponent(
+  "Book_Consultation"
+)}`;
+const DOCTOR_CONSULTATION_LINKS = [
+  { type: "Audio", labelKey: "nav.audioConsultation" },
+  { type: "Video", labelKey: "nav.videoConsultation" },
+  { type: "Clinic", labelKey: "nav.clinicVisit" },
+];
+
+// The standalone "Audio" / "Video" service rows are dropped from the Quick
+// Links: they are shown once, as sub-pointers of "Book Doctor Consultation".
+const isConsultationRow = (service) =>
+  isConsultationService(service.name || service.title);
 
 const Header1 = ({ scrollToContact }) => {
   const router = useRouter();
@@ -47,6 +63,29 @@ const Header1 = ({ scrollToContact }) => {
     () => mergeServiceLists(globalServices, demo5ServiceHighlights),
     [globalServices]
   );
+
+  // One row of the Services mega-menu. The merged lab service always shows its
+  // single name plus the Coming Soon tag, whatever alias the DB row carries
+  // ("Labtest" today), and always links to the canonical URL.
+  const renderNavService = (service, index) => {
+    const lab = isLabService(service.name || service.title);
+    const comingSoon = isComingSoonService(service.name || service.title);
+    const label = lab ? LAB_SERVICE_NAME : service.title;
+    const href = serviceDetailsPath(
+      lab ? { name: LAB_SERVICE_NAME, service: LAB_SERVICE_KEY } : service
+    );
+
+    return (
+      <li key={`${label}-${index}`}>
+        <Link legacyBehavior href={href}>
+          <a>
+            {label}
+            {comingSoon ? ` - ${t("common.comingSoon")}` : ""}
+          </a>
+        </Link>
+      </li>
+    );
+  };
   const hiddenRoutes = ["/appointment", "/some-other-route"];
 
   const [medicineCartItems, setMedicineCartItems] = useState(getMedicineCartItems());
@@ -57,7 +96,7 @@ const Header1 = ({ scrollToContact }) => {
   const [isMedicinePanelOpen, setIsMedicinePanelOpen] = useState(false);
 
   const handleConsultationTypeOpenDialog = () => {
-    router.push(`/appointment?service=${encodeURIComponent("Book_Consultation")}`);
+    router.push(BOOK_CONSULTATION_HREF);
   };
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -192,23 +231,37 @@ const Header1 = ({ scrollToContact }) => {
                         <div className="row">
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title">{t("footer.quickLinks")}:</li>
-                            {navServices.slice(0, 4).map((service) => (
-                              <li key={service.title}>
-                                <Link legacyBehavior href={serviceDetailsPath(service)}>
-                                  <a>{service.title}</a>
-                                </Link>
-                              </li>
-                            ))}
+                            {navServices
+                              .slice(0, 4)
+                              .filter((service) => !isConsultationRow(service))
+                              .map(renderNavService)}
+                            {/* Book Doctor Consultation + its three sub-pointers */}
+                            <li className="has-sub">
+                              <Link legacyBehavior href={BOOK_CONSULTATION_HREF}>
+                                <a>{t("nav.bookDoctorConsultation")}</a>
+                              </Link>
+                              <ul className="sub-link-list">
+                                {DOCTOR_CONSULTATION_LINKS.map((link) => (
+                                  <li key={link.type}>
+                                    <Link
+                                      legacyBehavior
+                                      href={`${BOOK_CONSULTATION_HREF}&type=${link.type}`}
+                                    >
+                                      <a>{t(link.labelKey)}</a>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </li>
                           </ul>
                           <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
                             <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            {navServices.slice(4).map((service) => (
-                              <li key={service.title}>
-                                <Link legacyBehavior href={serviceDetailsPath(service)}>
-                                  <a>{service.title}</a>
-                                </Link>
-                              </li>
-                            ))}
+                            {navServices
+                              .slice(4)
+                              .filter((service) => !isConsultationRow(service))
+                              .map((service, index) =>
+                                renderNavService(service, index + 4)
+                              )}
                           </ul>
                         </div>
                       </div>

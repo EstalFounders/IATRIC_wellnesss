@@ -1,10 +1,21 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useGlobalData } from "../customUtils/useGlobalData";
-import { serviceDetailsPath } from "../customUtils/serviceLinks";
+import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../customUtils/serviceLinks";
 import { color_schema } from "../constant";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage"];
+
+// Quick Links > "Book Doctor Consultation": the three pointers open the booking
+// form with the consultation type preselected (AppointmentPage reads ?type=...).
+const BOOK_CONSULTATION_HREF = `/appointment?service=${encodeURIComponent(
+  "Book_Consultation"
+)}`;
+const DOCTOR_CONSULTATION_LINKS = [
+  { type: "Audio", label: "Audio Consultation" },
+  { type: "Video", label: "Video Consultation" },
+  { type: "Clinic", label: "Clinic Visit" },
+];
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
@@ -26,13 +37,30 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   ];
 
   // Services shown inside the drawer (DB list when available, static fallback
-  // otherwise), each with a clean name-only URL.
+  // otherwise), each with a clean name-only URL. The merged lab service shows one
+  // name plus the Coming Soon tag, whatever alias its DB row carries, and the
+  // standalone "Audio" / "Video" rows are dropped: they are shown once, as
+  // sub-pointers of "Book Doctor Consultation".
   const serviceItems = (services || [])
-    .map((service) => ({
-      key: service.service || service.name,
-      label: service.title || service.name,
-      href: serviceDetailsPath(service),
-    }))
+    .filter(
+      (service) =>
+        !isConsultationService(service.service || service.name || service.title)
+    )
+    .map((service) => {
+      const lab = isLabService(service.service || service.name || service.title);
+      const comingSoon =
+        lab ||
+        isComingSoonService(service.service || service.name || service.title);
+
+      return {
+        key: lab ? LAB_SERVICE_KEY : service.service || service.name,
+        label: lab ? LAB_SERVICE_NAME : service.title || service.name,
+        comingSoon,
+        href: serviceDetailsPath(
+          lab ? { name: LAB_SERVICE_NAME, service: LAB_SERVICE_KEY } : service
+        ),
+      };
+    })
     .filter((service) => service.label)
     .slice(0, 12);
 
@@ -164,7 +192,12 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                     <div
                       style={{
                         maxHeight: servicesOpen
-                          ? `${serviceItems.length * 46 + 108}px`
+                          ? `${
+                              serviceItems.length * 46 +
+                              108 +
+                              46 +
+                              DOCTOR_CONSULTATION_LINKS.length * 46
+                            }px`
                           : 0,
                         overflow: "hidden",
                         transition: "max-height 0.35s ease",
@@ -192,6 +225,50 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                           style={{
                             padding: "12px 16px 12px 30px",
                             fontSize: "15px",
+                            color: "#333",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #f4f5f2",
+                          }}
+                        >
+                          {service.label}
+                          {service.comingSoon ? (
+                            <span
+                              className="service-coming-soon"
+                              style={{ marginLeft: 8 }}
+                            >
+                              Coming Soon
+                            </span>
+                          ) : null}
+                        </div>
+                      ))}
+
+                      <div
+                        onClick={() =>
+                          handleNavigation(BOOK_CONSULTATION_HREF)
+                        }
+                        style={{
+                          padding: "12px 16px 12px 30px",
+                          fontSize: "15px",
+                          fontWeight: "600",
+                          color: color_schema.green,
+                          cursor: "pointer",
+                          borderBottom: "1px solid #f4f5f2",
+                        }}
+                      >
+                        Book Doctor Consultation
+                      </div>
+
+                      {DOCTOR_CONSULTATION_LINKS.map((service) => (
+                        <div
+                          key={`consultation-${service.type}`}
+                          onClick={() =>
+                            handleNavigation(
+                              `${BOOK_CONSULTATION_HREF}&type=${service.type}`
+                            )
+                          }
+                          style={{
+                            padding: "12px 16px 12px 46px",
+                            fontSize: "14px",
                             color: "#333",
                             cursor: "pointer",
                             borderBottom: "1px solid #f4f5f2",

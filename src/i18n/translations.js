@@ -27,6 +27,10 @@ export const translations = {
     "nav.joinUs": "JOIN US",
     "nav.login": "Login",
     "nav.bookConsultation": "BOOK CONSULTATION",
+    "nav.bookDoctorConsultation": "Book Doctor Consultation",
+    "nav.audioConsultation": "Audio Consultation",
+    "nav.videoConsultation": "Video Consultation",
+    "nav.clinicVisit": "Clinic Visit",
 
     "footer.quickLinks": "Quick Links",
     "footer.ourServices": "Our Services",
@@ -363,6 +367,8 @@ export const translations = {
     "faq.a2": "Yes, all consultations are end-to-end encrypted, and your data is stored securely.",
     "faq.q3": "Can I get a prescription?",
     "faq.a3": "Yes, doctors provide digital prescriptions after the consultation if necessary.",
+    "faq.q4": "Is the follow-up consultation free?",
+    "faq.a4": "A free follow-up is available only within 48 hours of your consultation and only for the same or a related health problem.",
     "footer.address": "Sector 57, Gurgaon, Haryana-122003",
   },
   hi: {
@@ -392,6 +398,10 @@ export const translations = {
     "nav.joinUs": "हमसे जुड़ें",
     "nav.login": "लॉगिन",
     "nav.bookConsultation": "परामर्श बुक करें",
+    "nav.bookDoctorConsultation": "डॉक्टर परामर्श बुक करें",
+    "nav.audioConsultation": "ऑडियो परामर्श",
+    "nav.videoConsultation": "वीडियो परामर्श",
+    "nav.clinicVisit": "क्लिनिक विज़िट",
 
     "footer.quickLinks": "त्वरित लिंक",
     "footer.ourServices": "हमारी सेवाएं",
@@ -726,6 +736,8 @@ export const translations = {
     "faq.a2": "हां, सभी परामर्श एंड-टू-एंड एन्क्रिप्टेड हैं और आपका डेटा सुरक्षित रहता है।",
     "faq.q3": "क्या मुझे पर्चा मिल सकता है?",
     "faq.a3": "हां, जरूरत पड़ने पर डॉक्टर परामर्श के बाद डिजिटल पर्चा देते हैं।",
+    "faq.q4": "क्या फ़ॉलो-अप परामर्श मुफ़्त है?",
+    "faq.a4": "मुफ़्त फ़ॉलो-अप केवल आपके परामर्श के 48 घंटे के भीतर और केवल उसी या संबंधित स्वास्थ्य समस्या के लिए उपलब्ध है।",
     "footer.address": "सेक्टर 57, गुरुग्राम, हरियाणा-122003",
   },
 };

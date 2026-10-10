@@ -239,6 +239,10 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
             <li>
               THIS IS A COMPUTER GENERATED INVOICE. NO SIGNATURE REQUIRED.
             </li>
+            <li>
+              FREE FOLLOW-UP IS AVAILABLE ONLY WITHIN 48 HOURS OF THE
+              CONSULTATION AND ONLY FOR THE SAME OR A RELATED PROBLEM.
+            </li>
           </ol>
           <hr />
         </div>

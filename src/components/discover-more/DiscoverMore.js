@@ -4,7 +4,12 @@ import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { serviceDetailsPath } from "../../customUtils/serviceLinks";
+import {
+  getServiceDescription,
+  LAB_SERVICE_KEY,
+  LAB_SERVICE_NAME,
+  serviceDetailsPath,
+} from "../../customUtils/serviceLinks";
 import {
   CorporateHealthcareIcon,
   GeneralPhysician,
@@ -37,10 +42,11 @@ const DiscoverMoreComp = () => {
       btntext: t("dm.viewDetails"),
     },
     {
-      title: t("dm.title.lab"),
-      service: "lab-test",
-      description:
-        t("dm.desc.lab"),
+      // Merged "Labtest" / "Lab Investigation" service - one card, one name.
+      title: LAB_SERVICE_NAME,
+      service: LAB_SERVICE_KEY,
+      comingSoon: true,
+      description: getServiceDescription(LAB_SERVICE_NAME),
       icon: <LabInvestigation color={`${color_schema.yellow}`} size={70} />, // Using the SVG icon component
       btntext: t("dm.viewDetails"),
     },
@@ -140,6 +146,11 @@ const DiscoverMoreComp = () => {
               {/* Card Content */}
               <div className="pt-5 mt-4">
                 <div className="h5 mt-3 font-weight-bold">{item.title}</div>
+                {item.comingSoon ? (
+                  <div className="service-coming-soon">
+                    {t("common.comingSoon")}
+                  </div>
+                ) : null}
                 <hr
                   style={{
                     borderTop: "1px solid rgba(255,255,255,0.3)",

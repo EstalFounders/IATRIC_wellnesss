@@ -107,6 +107,27 @@ const AppointmentPage = () => {
     }
   }, [consultationOptions]);
 
+  // Quick Links sub-pointers ("Book Doctor Consultation" > Audio / Video /
+  // Clinic in Header1 / MobileMenu) deep-link as ?type=Audio|Video|Clinic.
+  // Preselect the matching consultation tile so the form opens on the requested
+  // mode; unknown or unavailable values keep the default tile.
+  useEffect(() => {
+    const requested =
+      typeof router.query.type === "string" ? router.query.type.trim() : "";
+    if (!requested) return;
+
+    const match = consultationOptions.find((option) => {
+      const name = String(option.name || "").toLowerCase();
+      if (name === requested.toLowerCase()) return true;
+      const mapped = consultationTypeMapping[requested];
+      return Boolean(mapped) && name === String(mapped).toLowerCase();
+    });
+    if (!match) return;
+
+    setConsultationType(match.name);
+    setConsultationPrice(match.fee || "");
+  }, [router.query.type, consultationOptions]);
+
   // All state and setters/functions in one object
   const appointmentState = {
     doctorChoice,

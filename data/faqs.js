@@ -32,6 +32,11 @@ export const faqGroups = [
           "Book online from this website - choose your speciality, pick a doctor and select an audio, video or in-clinic slot. If you prefer, our care desk will book it for you over the phone during working hours.",
       },
       {
+        question: "Is the follow-up consultation free?",
+        answer:
+          "A free follow-up is available only within 48 hours of your consultation and only for the same or a related health problem. Please mention your previous consultation while booking so the doctor can review your history.",
+      },
+      {
         question: "What are your working hours?",
         answer:
           "Doctors and our care desk are available from 7:00 AM to 10:00 PM, all 7 days a week, including Sundays and public holidays. Home visits, nursing, physiotherapy, lab sample collection and medicine delivery run in the same window.",
