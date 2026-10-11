@@ -491,6 +491,22 @@
   text-transform: uppercase;
 }
 
+/* Uniform-height band for the Discover More grid. The pill is 22px tall plus
+   its old 8px top margin, so reserving 30px on *every* card makes a card with
+   the pill exactly as tall as the ones without it: <hr>, description and CTA
+   stay aligned across the whole grid. */
+.service-coming-soon-slot {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inside the slot the pill is centred, so drop its standalone top margin. */
+.service-coming-soon-slot .service-coming-soon {
+  margin-top: 0;
+}
+
 /* Animations */
 @keyframes scroll-left {
   0% {

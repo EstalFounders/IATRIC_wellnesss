@@ -93,6 +93,9 @@ const serviceDetails = {
       {
         name: "IV Drips & Injections at Home",
         iconKey: "iv drip",
+        image: "/images/nursing/iv-drip-at-home.png",
+        imageAlt:
+          "Nurse administering an IV drip and injection to a patient at home",
         description:
           "IV fluids, IM/IV injections, cannula and line care administered safely at home by a qualified nurse.",
       },
@@ -115,6 +118,9 @@ const serviceDetails = {
       {
         name: "Wound Care & Dressing",
         iconKey: "wound care",
+        image: "/images/nursing/wound-care-dressing.png",
+        imageAlt:
+          "Nurse cleaning and dressing a patient's wound at home",
         description:
           "Sterile dressing of wounds, bed sores, diabetic foot ulcers and burns, with progress monitoring.",
       },
@@ -878,6 +884,11 @@ const ServiceDetail = () => {
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
   // Active panel of the optional coverage tabs (`tabs` in a serviceDetails block).
   const [activeDetailTab, setActiveDetailTab] = useState(0);
+  // Photos that failed to load. A service card can declare an `image`; if that
+  // file is missing we drop back to the icon-only card instead of showing a gap.
+  const [failedCardImages, setFailedCardImages] = useState([]);
+  const hasCardImage = (item) =>
+    Boolean(item.image) && !failedCardImages.includes(item.image);
 
   // Display name for the heading (clean name, never a raw slug/id) and the key
   // for the rich content blocks in `serviceDetails`.
@@ -1281,7 +1292,7 @@ const ServiceDetail = () => {
                 <Grid item xs={12} sm={6} md={4} key={idx}>
                   <Card
                     sx={{
-                      p: item.image ? 0 : 2,
+                      p: hasCardImage(item) ? 0 : 2,
                       display: "flex",
                       flexDirection: "column",
                       height: "100%", // Make card take full available height
@@ -1300,7 +1311,7 @@ const ServiceDetail = () => {
                   >
                     {/* Relevant photo for the service + the icon badge on top, so the
                         card is still scannable when the image is hidden/skipped. */}
-                    {item.image ? (
+                    {hasCardImage(item) ? (
                       <Box sx={{ position: "relative", height: 150, flexShrink: 0 }}>
                         <Image
                           src={item.image}
@@ -1311,6 +1322,13 @@ const ServiceDetail = () => {
                           fill
                           sizes="(max-width: 599px) 100vw, (max-width: 899px) 50vw, 360px"
                           style={{ objectFit: "cover" }}
+                          onError={() =>
+                            setFailedCardImages((prev) =>
+                              prev.includes(item.image)
+                                ? prev
+                                : [...prev, item.image]
+                            )
+                          }
                         />
                         <Box
                           sx={{
@@ -1332,7 +1350,7 @@ const ServiceDetail = () => {
                         flexGrow: 1, // Make content stretch
                       }}
                     >
-                      {item.image ? null : (
+                      {hasCardImage(item) ? null : (
                         <Box sx={iconCircleSx}>
                           <IconRenderer name={item.iconKey} size={28} />
                         </Box>
@@ -1348,11 +1366,20 @@ const ServiceDetail = () => {
                         </Typography>
                       </Box>
                     </CardContent>
-                    <Box sx={{ px: item.image ? 2 : 0, pb: item.image ? 2 : 0 }}>
+                    <Box
+                      sx={{
+                        px: hasCardImage(item) ? 2 : 0,
+                        pb: hasCardImage(item) ? 2 : 0,
+                      }}
+                    >
                       {medical_service.comingSoon ? (
                         <Typography
                           variant="body2"
-                          sx={{ fontWeight: 600, color: color_schema.green, pb: item.image ? 0 : 1 }}
+                          sx={{
+                            fontWeight: 600,
+                            color: color_schema.green,
+                            pb: hasCardImage(item) ? 0 : 1,
+                          }}
                         >
                           {t("common.comingSoon")}
                         </Typography>
