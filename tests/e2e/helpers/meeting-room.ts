@@ -33,7 +33,15 @@ export interface ConsultationFixture {
 }
 
 export const PATIENT_NAME = 'E2E Patient';
+/**
+ * The doctor name *as stored* on the consultation (`doctorDetails.name`). Kept
+ * without the "Dr." dot on purpose: the room prints and broadcasts the title
+ * through `doctorDisplayName()` (src/utils/doctorName.js), which normalises it.
+ * Assertions must therefore expect `DOCTOR_DISPLAY_NAME`, not this raw value.
+ */
 export const DOCTOR_NAME = 'Dr E2E Rao';
+/** What the meeting room renders / emits after `doctorDisplayName(DOCTOR_NAME)`. */
+export const DOCTOR_DISPLAY_NAME = 'Dr. E2E Rao';
 export const DOCTOR_SPECIALITY = 'General Medicine';
 
 export function consultationFixture(kind: ConsultationKind, meetingId: string): ConsultationFixture {
@@ -87,8 +95,6 @@ export function needsSyntheticMedia(browserName: string): boolean {
 }
 
 /**
-=======
->>>>>>> 006e060fc11fb9850164619398317b27dbb6b331
  * Instruments `navigator.mediaDevices.getUserMedia` before the app boots:
  *
  *  - every call is recorded in `window.__mediaRequests`, which lets a test prove

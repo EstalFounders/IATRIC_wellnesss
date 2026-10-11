@@ -389,3 +389,10 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - `npm run db:set-slot-windows` (dry run) / `npm run db:set-slot-windows:apply` → `scripts/setDoctorSlotWindows.js`, which fills the window **only where it is missing** (defaults 07:00–22:00 `+05:30`, overridable with `--start/--end/--offset`).
 - Generate slots on demand with `curl -X POST https://healthpath.co.in/api/lib/runCronJob` (takes ~3 min; it generated Oct 11–16, 45 slots/day/doctor = 540 rows). **`server.js` nightly cron still POSTs to `/api/lib/cron-jobs`** — a task module with no `res.*`, so that call hangs, the log always says "Slot generation failed", and there is no boot catch-up. The correct endpoint is `/api/lib/runCronJob` (what the super-admin HeroBand button already uses).
 - Appointment UI date convention: `fetchSlot` windows its query on the **UTC day** of the `date` it is given, so the picked day must be sent as noon UTC (`ManageSlotsModal` already does `selectedDate + "T12:00:00Z"`; `AppointmentPage.todayAtNoonUTC` and `Appointmentform.handleDateChange` now do the same). A local-midnight `Date` resolved to the *previous* UTC day for IST users.
+
+
+## `scripts/` folder removed from the repo root
+
+- The one-off maintenance/migration scripts (`seedConsultationTypes`, `seedServiceOfferedContent` + `scripts/data/serviceTabContent.json`, `setDoctorSlotWindows`, `removeDoctorDegree`, `cleanDoctorEducation`, `cleanDoctorLanguages`, `updateServiceOfferedDescription`) and the throwaway `tmp-verify-*.mjs` verifiers were **deleted** — nothing in `src/`, `pages/`, `tests/`, `lib/` or CI ever imported them, they were only run by hand.
+- Their `npm run db:*` / `tasks:process` entries were removed from `package.json` at the same time (`tasks:process` was already dead: `scripts/runSheetTasks.js` did not exist). The `npm run db:*` commands mentioned in the sections above no longer exist - the migrations they performed are already applied.
+- Recover any file from history if a fresh database ever has to be seeded again: `git show <sha>:scripts/<file>` (find the commit with `git log --oneline -- scripts/`).
