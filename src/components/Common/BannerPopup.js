@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { Modal } from "react-bootstrap";
 import { POPUP_FALLBACK_IMAGE, popupBanner } from "../../../data/popupBanner";
@@ -12,10 +13,9 @@ import { useLanguage } from "../../i18n/LanguageContext";
 
 // Shown once per browser session (survives reloads, resets with a new tab/session).
 const SESSION_KEY = "popup_banner_shown";
-const SHOW_DELAY_MS = 800;
-// Identical for the warm-up copy and the modal copy so both resolve to the same
-// /_next/image URL: one network request, cached for the modal to reuse.
-const POPUP_SIZES = "(max-width: 768px) 100vw, 800px";
+// Safety net only: the modal normally opens the moment the banner image has
+// decoded, so this is the worst-case wait when the download is slow or fails.
+const SHOW_MAX_WAIT_MS = 2500;
 
 /**
  * Homepage popup.
@@ -26,10 +26,11 @@ const POPUP_SIZES = "(max-width: 768px) 100vw, 800px";
  * configured the popup is not shown at all. An empty/failing URL renders
  * POPUP_FALLBACK_IMAGE.
  *
- * Performance: as soon as we know the popup will be shown, the image is rendered
- * off-screen with `priority`, so the browser downloads the exact optimised URL the
- * modal needs while the show delay runs. The modal then paints from cache instead of
- * starting a download when it opens.
+ * Performance: the image is served straight from Firebase Storage (Google's CDN) via
+ * `unoptimized` - no /_next/image transform on our own VPS, which is what made the
+ * popup lag, especially right after a deploy cleared the optimiser cache. The URL is
+ * known at build time, so <Head> preloads it while the HTML is still parsing, and the
+ * modal opens only once that image has actually decoded.
  */
 const BannerPopup = ({ initialBanner = null }) => {
   const router = useRouter();
@@ -39,6 +40,9 @@ const BannerPopup = ({ initialBanner = null }) => {
   const [managedBanner, setManagedBanner] = useState(initialBanner);
   const [resolved, setResolved] = useState(false);
   const [warmUp, setWarmUp] = useState(false);
+  // True once the banner image has decoded (or fallen back to the local placeholder).
+  // The modal waits for this instead of a fixed delay, so it never opens empty.
+  const [imageReady, setImageReady] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -111,18 +115,28 @@ const BannerPopup = ({ initialBanner = null }) => {
     }
     if (alreadyShown) return undefined;
 
-    // Only opened after mount so SSR/first paint match the client markup.
-    const timer = setTimeout(() => {
+    // Only opened after mount (so SSR and the first client paint agree) and as soon as
+    // the image is ready to paint - no fixed delay, so the picture is already there
+    // when the modal appears.
+    const openPopup = () => {
       setShow(true);
       try {
         window.sessionStorage.setItem(SESSION_KEY, "1");
       } catch (err) {
         // ignore storage errors
       }
-    }, SHOW_DELAY_MS);
+    };
+
+    if (imageReady) {
+      openPopup();
+      return undefined;
+    }
+
+    // A slow or failing download must never keep the popup closed forever.
+    const timer = setTimeout(openPopup, SHOW_MAX_WAIT_MS);
 
     return () => clearTimeout(timer);
-  }, [resolved, banner?.url]);
+  }, [resolved, banner?.url, imageReady]);
 
   // Nothing configured in the panel (and no static URL) -> no popup.
   if (!banner?.url) return null;
@@ -142,9 +156,17 @@ const BannerPopup = ({ initialBanner = null }) => {
 
   return (
     <>
-      {/* Off-screen warm-up copy of the banner. `priority` makes Next emit the
-          <link rel="preload" as="image"> hint and fetches it immediately, so opening
-          the popup paints from cache instead of waiting for the download. */}
+      {/* The banner URL is versioned (withCacheBuster), so preloading it is safe to
+          repeat: a cached copy is reused and only a replaced banner is re-fetched.
+          Only rendered for a deterministic (versioned) URL so SSR and hydration agree. */}
+      {banner.lastUpdated ? (
+        <Head>
+          <link rel="preload" as="image" href={imageSrc} />
+        </Head>
+      ) : null}
+
+      {/* Off-screen warm-up copy of the banner: it starts the download and its onLoad
+          is what tells us the image is decodable (which opens the popup). */}
       {warmUp && !show && (
         <div
           aria-hidden="true"
@@ -164,8 +186,9 @@ const BannerPopup = ({ initialBanner = null }) => {
             alt=""
             width={1200}
             height={630}
-            sizes={POPUP_SIZES}
             priority
+            unoptimized
+            onLoad={() => setImageReady(true)}
             onError={() => setBroken(true)}
           />
         </div>
@@ -215,9 +238,10 @@ const BannerPopup = ({ initialBanner = null }) => {
             alt={banner.alt || t("popup.bannerAlt", "HealthPath")}
             width={1200}
             height={630}
-            sizes={POPUP_SIZES}
             priority
+            unoptimized
             style={{ width: "100%", height: "auto", display: "block" }}
+            onLoad={() => setImageReady(true)}
             onError={() => setBroken(true)}
           />
         </div>

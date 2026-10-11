@@ -23,6 +23,24 @@ export const CASHFREE_CHECKOUT_BASE_URL =
     ? "https://payments.cashfree.com"
     : "https://sandbox.cashfree.com");
 
+/**
+ * Which environment the browser checkout SDK must be loaded for.
+ *
+ * A payment_session_id is only valid in the environment that created it: loading the
+ * SDK for the other one makes Cashfree's checkout answer
+ * {"code":"payment_session_id_invalid","type":"request_failed"}.
+ *
+ * This is derived from CASHFREE_BASE_URL - the endpoint the server actually created the
+ * order on - and NOT from CASHFREE_ENVIRONMENT or NEXT_PUBLIC_CASHFREE_ENVIRONMENT:
+ * per-host overrides (e.g. the staging VPS runs Cashfree sandbox through
+ * .env.production.local) and build-time inlining make those drift apart.
+ */
+export function getCashfreeCheckoutMode() {
+  return /^https:\/\/api\.cashfree\.com/i.test(CASHFREE_BASE_URL)
+    ? "production"
+    : "sandbox";
+}
+
 export function getCashfreeCheckoutUrl(paymentSessionId) {
   return `${CASHFREE_CHECKOUT_BASE_URL}/pg/checkout?payment_session_id=${encodeURIComponent(
     paymentSessionId
