@@ -146,11 +146,16 @@ const DiscoverMoreComp = () => {
               {/* Card Content */}
               <div className="pt-5 mt-4">
                 <div className="h5 mt-3 font-weight-bold">{item.title}</div>
-                {item.comingSoon ? (
-                  <div className="service-coming-soon">
-                    {t("common.comingSoon")}
-                  </div>
-                ) : null}
+                {/* Fixed band reserved on every card, so the optional "Coming
+                    Soon" pill can never stretch one card (and push its CTA out
+                    of line with the other cells in the same row). */}
+                <div className="service-coming-soon-slot">
+                  {item.comingSoon ? (
+                    <div className="service-coming-soon">
+                      {t("common.comingSoon")}
+                    </div>
+                  ) : null}
+                </div>
                 <hr
                   style={{
                     borderTop: "1px solid rgba(255,255,255,0.3)",
