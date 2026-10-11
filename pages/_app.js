@@ -20,10 +20,18 @@ const brandTheme = createTheme({
   typography: { fontFamily: '"TT Ramillas", serif' },
 });
 
-function MyApp({ Component, pageProps, ...rest }) {
+function MyApp({ Component, pageProps, router, ...rest }) {
   const [loader, setLoader] = useState(true);
   const { store, props } = wrapper.useWrappedStore(rest);
   const persistor = persistStore(store);
+
+  // The meeting room is a standalone, full-screen call UI. Its control bar sits in
+  // the bottom-right corner on phones - exactly where the floating widget (fixed,
+  // right/bottom 10px) renders - so the widget would intercept the taps meant for
+  // the last controls ("Record", "End Call"). The room has no header/footer, so the
+  // language + support widget is dropped there entirely.
+  const isMeetingRoom =
+    typeof router?.pathname === "string" && router.pathname.startsWith("/meeting/");
 
   useEffect(() => {
     animation();
@@ -51,7 +59,7 @@ function MyApp({ Component, pageProps, ...rest }) {
               <ThemeProvider theme={brandTheme}>
                 <Component {...props.pageProps} />
                 <SeoMetadata metadata={pageProps?.seoMetadata} />
-                <LanguageToggle />
+                {!isMeetingRoom && <LanguageToggle />}
               </ThemeProvider>
             </LanguageProvider>
           </PersistGate>
