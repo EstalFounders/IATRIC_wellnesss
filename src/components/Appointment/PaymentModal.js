@@ -57,6 +57,9 @@ const PaymentModal = ({
 
   const handlePay = async () => {
     if (isInitializing || initializedRef.current) return;
+    // Which environment the checkout SDK ends up using - logged when Cashfree rejects
+    // the session, because that failure is a config mismatch, not a payment error.
+    let sdkMode = "unknown";
     setIsInitializing(true);
     setInitError("");
 
@@ -82,13 +85,28 @@ const PaymentModal = ({
         return;
       }
 
-      // Load / ensure the Cashfree JS SDK is available (official npm package)
+      // A missing session id must never reach Cashfree: it answers with an opaque
+      // {"code":"payment_session_id_invalid"} body that reads like an outage.
+      if (!data.paymentSessionId) {
+        console.error("create-order returned no payment session", data);
+        initializedRef.current = false;
+        setInitError(t("pm.initError"));
+        setIsInitializing(false);
+        return;
+      }
+
+      // Load / ensure the Cashfree JS SDK is available (official npm package).
+      // The mode comes from the server that minted the session (checkoutMode) so the
+      // SDK always targets the same environment; NEXT_PUBLIC_CASHFREE_ENVIRONMENT is
+      // inlined at build time and cannot be trusted per host.
       if (!cashfreeRef.current) {
         const mode =
-          process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT &&
+          data.checkoutMode ||
+          (process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT &&
           process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT.toUpperCase() === "PRODUCTION"
             ? "production"
-            : "sandbox";
+            : "sandbox");
+        sdkMode = mode;
         cashfreeRef.current = await load({ mode });
       }
 
@@ -120,7 +138,25 @@ const PaymentModal = ({
       // When it expires, checkout() rejects/errors. We cannot extend it, but we
       // can generate a FRESH session (same orderId - create-order is idempotent)
       // and let the user re-open checkout with one click.
-      const msg = (err?.message || "").toLowerCase();
+      const rawMessage = err?.message || "";
+      const msg = rawMessage.toLowerCase();
+
+      // Cashfree rejects a session that belongs to the other environment (or an unknown
+      // one) with {"code":"payment_session_id_invalid","type":"request_failed"}. That is
+      // a deployment/config mismatch, NOT an expiry - and the "session" heuristic below
+      // used to swallow it, telling the patient to "click Pay again" forever.
+      if (rawMessage.includes("payment_session_id_invalid")) {
+        console.error(
+          "Cashfree checkout rejected the payment session - the SDK environment does not match the one that created the order",
+          { sdkMode, error: rawMessage }
+        );
+        initializedRef.current = false;
+        setPaymentState("idle");
+        setInitError(t("pm.configError"));
+        setIsInitializing(false);
+        return;
+      }
+
       const sessionExpired =
         msg.includes("expired") ||
         msg.includes("session") ||

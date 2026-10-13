@@ -35,6 +35,15 @@ export const openSupportWhatsAppWeb = () => {
   window.open(whatsappWebUrl, "_blank");
 };
 
+// `wa.me` opens the native WhatsApp app on phones and WhatsApp Web on desktop.
+// (Unlike `openSupportWhatsAppWeb`, which forces web.whatsapp.com and lands on a
+// blank page on mobile.)
+export const openSupportWhatsAppChat = (message = "") => {
+  const number = String(contact_no).replace(/\D/g, ""); // "+91 78959 59925" -> "917895959925"
+  const text = message ? `?text=${encodeURIComponent(message)}` : "";
+  window.open(`https://wa.me/${number}${text}`, "_blank", "noopener,noreferrer");
+};
+
 export const convertDateIntoTime = (dateString) => {
   // Create a Date object from the string
   const date = new Date(dateString);

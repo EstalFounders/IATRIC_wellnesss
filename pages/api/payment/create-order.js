@@ -7,6 +7,7 @@ import {
   createCashfreeOrder,
   getCashfreeOrderStatus,
   getCashfreeCheckoutUrl,
+  getCashfreeCheckoutMode,
 } from "../../../src/lib/cashfree";
 import { rateLimit } from "../../../src/lib/rateLimiter";
 import { cacheGet, cacheSet } from "../../../src/lib/cache";
@@ -136,6 +137,9 @@ export default async function handler(req, res) {
         checkoutUrl: getCashfreeCheckoutUrl(
           freshCashfreeOrder.payment_session_id
         ),
+        // Which environment the browser must load the checkout SDK for - the session
+        // above was minted on this server's CASHFREE_BASE_URL, so it is the authority.
+        checkoutMode: getCashfreeCheckoutMode(),
         orderId: payment.orderId,
         amount: Number(payment.amount),
         alreadyExists: true,
@@ -207,6 +211,7 @@ export default async function handler(req, res) {
       success: true,
       paymentSessionId: cashfreeOrder.payment_session_id,
       checkoutUrl: getCashfreeCheckoutUrl(cashfreeOrder.payment_session_id),
+      checkoutMode: getCashfreeCheckoutMode(),
       orderId,
       amount,
     });

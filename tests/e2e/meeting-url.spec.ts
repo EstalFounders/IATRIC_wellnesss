@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
-  DOCTOR_NAME,
+  DOCTOR_DISPLAY_NAME,
   DOCTOR_SPECIALITY,
   MockMeetingSocket,
   PATIENT_NAME,
@@ -89,10 +89,11 @@ test.describe('audio-only consultation', () => {
     await expect(page.locator('video')).toHaveCount(0);
     await expect(page.locator('audio')).toHaveCount(1); // hidden remote-mic sink
 
-    // Remote tile = the doctor, local tile = yourself.
+    // Remote tile = the doctor, local tile = yourself. The room prints the name
+    // through doctorDisplayName(), so the fixture's "Dr E2E Rao" renders as "Dr. E2E Rao".
     const names = page.locator('[class*="videoPlaceholderName"]');
     await expect(names).toHaveCount(2);
-    await expect(names.nth(0)).toHaveText(DOCTOR_NAME);
+    await expect(names.nth(0)).toHaveText(DOCTOR_DISPLAY_NAME);
     await expect(names.nth(1)).toHaveText('You');
     await expect(tiles.nth(0).getByText(`Doctor - ${DOCTOR_SPECIALITY}`)).toBeVisible();
     await expect(tiles.nth(1).getByText('Patient', { exact: true })).toBeVisible();
@@ -107,12 +108,12 @@ test.describe('audio-only consultation', () => {
   test('doctor: joins as doctor, sees the patient tile and reports its role', async ({ page }) => {
     const socket = await openRoom(page, 'doctor', 'Audio');
 
-    // join-room must carry the meeting + the doctor's identity.
+    // join-room must carry the meeting + the doctor's identity (normalised title).
     const [join] = await socket.waitForEvent('join-room');
     expect(join).toMatchObject({
       meetingId: MEETING_ID,
       role: 'doctor',
-      userData: { name: DOCTOR_NAME, role: 'doctor' },
+      userData: { name: DOCTOR_DISPLAY_NAME, role: 'doctor' },
     });
 
     await expect.poll(() => mediaPattern(page)).toEqual(['video:false|audio:true']);
@@ -205,7 +206,7 @@ test.describe('video consultation', () => {
     // The remote tile falls back to a placeholder until the peer connects.
     const tiles = participantTiles(page);
     await expect(tiles).toHaveCount(2);
-    await expect(tiles.nth(0).locator('[class*="videoPlaceholderName"]')).toHaveText(DOCTOR_NAME);
+    await expect(tiles.nth(0).locator('[class*="videoPlaceholderName"]')).toHaveText(DOCTOR_DISPLAY_NAME);
     await expect(tiles.nth(1).getByText('You', { exact: true })).toHaveCount(1);
   });
 
