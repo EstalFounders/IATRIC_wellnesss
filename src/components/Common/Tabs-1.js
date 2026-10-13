@@ -13,7 +13,11 @@ import { handleServiceClick } from "./commonMethod";
 import { ConsultationButton } from "./commonUi";
 import CalltoBookPopup from "./CalltoBookPopup";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { slugifyService, useGlobalData } from "../../customUtils/useGlobalData";
+import {
+  getServiceAsset,
+  slugifyService,
+  useGlobalData,
+} from "../../customUtils/useGlobalData";
 
 // Fallback artwork for a serviceOffered document without an `image`.
 const DEFAULT_SERVICE_IMAGE = "/images/general_physicians.jpg";
@@ -42,15 +46,21 @@ const ServicesTabs = () => {
   const { speciality } = useGlobalData();
   const services = useMemo(
     () =>
-      speciality.map((item) => ({
-        ...item,
-        id: item.id ?? slugifyService(item.name),
-        image: resolveServiceImage(item.image),
-      })),
+      speciality.map((item) => {
+        const asset = getServiceAsset(item.name);
+        return {
+          ...item,
+          id: item.id ?? slugifyService(item.name),
+          subheading: item.subheading || asset?.subheading || "",
+          description: item.description || asset?.description || "",
+          image: resolveServiceImage(item.image || asset?.image),
+        };
+      }),
     [speciality]
   );
   const [activeTab, setActiveTab] = useState(services[0]?.id || 0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [brokenImages, setBrokenImages] = useState({});
   const servicesPerPage = 4;
   const router = useRouter();
   const { t, lang } = useLanguage();
@@ -136,6 +146,16 @@ const ServicesTabs = () => {
     );
   };
 
+  if (!services.length) {
+    return (
+      <section className="custom-tabs-section mt-50 pb-100">
+        <div className="container">
+          <p className="text-center grey-color mb-0">Loading services…</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="custom-tabs-section mt-50 pb-100">
       <div className="container">
@@ -195,12 +215,27 @@ const ServicesTabs = () => {
                         handleServiceClickLocal(service.name, service.id)
                       }
                       className="image"
-                      src={service.image}
+                      src={
+                        brokenImages[service.id]
+                          ? DEFAULT_SERVICE_IMAGE
+                          : service.image
+                      }
                       alt={service.name}
                       fill
-                      unoptimized={isRemoteImage(service.image)}
+                      unoptimized={isRemoteImage(
+                        brokenImages[service.id]
+                          ? DEFAULT_SERVICE_IMAGE
+                          : service.image
+                      )}
                       sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 535px"
                       style={{ objectFit: "cover" }}
+                      onError={() =>
+                        setBrokenImages((prev) =>
+                          prev[service.id]
+                            ? prev
+                            : { ...prev, [service.id]: true }
+                        )
+                      }
                     />
                   </div>
                 </div>

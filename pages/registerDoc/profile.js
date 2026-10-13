@@ -9,7 +9,7 @@ import { userTypeConstant } from "../../src/constant";
 export default function profile() {
   return (
     <DoctorAuthenticatedComponent>
-      <Layouts header={9} footer={7}>
+      <Layouts header={9} footer={8}>
         <DoctorProfilePage origin={userTypeConstant.doctor} />
       </Layouts>
     </DoctorAuthenticatedComponent>

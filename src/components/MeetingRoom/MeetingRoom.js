@@ -7,6 +7,7 @@ import fileStyles from "../../../styles/components/FileShare.module.css";
 import infoStyles from "../../../styles/components/ParticipantInfo.module.css";
 import { getSocket } from "../../lib/socket";
 import { doctorDisplayName } from "../../utils/doctorName";
+import useConsultationRecorder from "./useConsultationRecorder";
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + " B";
@@ -19,6 +20,33 @@ const getFileIcon = (type) => {
   if (type === "application/pdf") return { emoji: "📄", className: fileStyles.fileIconPdf };
   if (type.includes("document") || type.includes("sheet") || type.includes("text")) return { emoji: "📝", className: fileStyles.fileIconDoc };
   return { emoji: "📁", className: fileStyles.fileIconGeneric };
+};
+
+// Live recording state shown in the consultation header. Idle hides itself, so
+// nothing extra is rendered before the automatic recording begins.
+const RecordingIndicator = ({ isRecording, isUploading, isSaved, hasError, error }) => {
+  if (hasError) {
+    return (
+      <div className={styles.recordingBadge} title={error || "Recording failed"}>
+        ⚠️ Recording failed
+      </div>
+    );
+  }
+  if (isUploading) {
+    return <div className={styles.recordingBadge}>⏳ Saving recording…</div>;
+  }
+  if (isSaved) {
+    return <div className={styles.recordingBadge}>✅ Recording saved</div>;
+  }
+  if (isRecording) {
+    return (
+      <div className={styles.recordingBadge}>
+        <span className={styles.recordingDot} />
+        Recording
+      </div>
+    );
+  }
+  return null;
 };
 
 const useTimer = (isRunning) => {
@@ -311,7 +339,6 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
   const [sidePanelTab, setSidePanelTab] = useState("chat");
@@ -356,6 +383,32 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     consultation?.consultationType === "Audio" ||
     consultation?.consultationType === "Call";
   const mid = meetingId || consultation?.meetingId || consultation?._id;
+
+  // The consultation is recorded from the doctor's room only: their browser
+  // holds both the local and the remote (patient) streams, so a single mixed
+  // recording captures everyone without two uploads racing for the same field.
+  // It starts automatically once the call is active and both the room and the
+  // local media are ready, and finalises/uploads when the call ends.
+  const {
+    isRecording,
+    isUploading,
+    isSaved,
+    hasError,
+    error: recordingError,
+    start: startRecording,
+    stop: stopRecording,
+  } = useConsultationRecorder({
+    enabled: isDoctor && meetingState === "active" && localMediaReady,
+    consultation,
+    meetingId: mid,
+    localStreamRef,
+    localVideoRef,
+    remoteStream,
+    remoteVideoRef,
+    isAudioOnly,
+    localLabel: isDoctor ? "Doctor" : "Patient",
+    remoteLabel: isDoctor ? "Patient" : "Doctor",
+  });
 
   // ---- Socket.io Connection ----
   useEffect(() => {
@@ -1061,7 +1114,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
                     {participantCount >= 2 ? "🟢 Connected" : "🟡 Waiting..."}
                   </div>
                   <div className={styles.meetingTimer}>⏱️ {formattedTime}</div>
-                  {isRecording && <div className={styles.recordingBadge}><span className={styles.recordingDot} />Recording</div>}
+                  <RecordingIndicator isRecording={isRecording} isUploading={isUploading} isSaved={isSaved} hasError={hasError} error={recordingError} />
                 </div>
               </div>
               {/* Hidden element required to play back the remote participant's
@@ -1114,7 +1167,7 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
                     {participantCount >= 2 ? "🟢 Connected" : "🟡 Waiting..."}
                   </div>
                   <div className={styles.meetingTimer}>⏱️ {formattedTime}</div>
-                  {isRecording && <div className={styles.recordingBadge}><span className={styles.recordingDot} />Recording</div>}
+                  <RecordingIndicator isRecording={isRecording} isUploading={isUploading} isSaved={isSaved} hasError={hasError} error={recordingError} />
                 </div>
               </div>
               <div className={`${styles.videoGrid} ${styles.videoGridDual}`}>
@@ -1211,12 +1264,19 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
               </svg>
               <span className={styles.controlLabel}>Files</span>
             </button>
-            <button className={`${styles.controlButton} ${isRecording ? styles.controlButtonActive : ""}`} onClick={() => setIsRecording((prev) => !prev)} title={isRecording ? "Stop Recording" : "Record"}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill={isRecording ? "#ff4757" : "none"}/>
-              </svg>
-              <span className={styles.controlLabel}>{isRecording ? "Stop Rec" : "Record"}</span>
-            </button>
+            {isDoctor ? (
+              <button
+                className={`${styles.controlButton} ${isRecording ? styles.controlButtonActive : ""} ${isUploading ? styles.controlButtonDisabled : ""}`}
+                onClick={() => (isRecording ? stopRecording() : startRecording())}
+                disabled={isUploading}
+                title={isUploading ? "Saving recording…" : isRecording ? "Stop Recording" : "Record"}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill={isRecording ? "#ff4757" : "none"}/>
+                </svg>
+                <span className={styles.controlLabel}>{isUploading ? "Saving…" : isRecording ? "Stop Rec" : "Record"}</span>
+              </button>
+            ) : null}
             <button className={`${styles.controlButton} ${styles.controlButtonEnd}`} onClick={endCall} title="End Call">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>

@@ -25,9 +25,10 @@ const ServiceFormCard = ({
       Add new service
     </h2>
     <p className={styles.cardHint}>
-      Fields marked <span className={styles.reqMark}>*</span> are required. A new
-      service appears in the booking flow and on the homepage speciality tabs as
-      soon as it is added.
+      Fields marked <span className={styles.reqMark}>*</span> are required. Image,
+      subheading and description (English + Hindi) are what the homepage speciality
+      tabs render. The image is stored in Firebase; the public URL is saved on the
+      service.
     </p>
 
     <ServiceFields

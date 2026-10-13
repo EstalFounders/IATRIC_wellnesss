@@ -58,10 +58,23 @@ const ServicesTable = ({ rows, onEdit, onDelete }) => (
           return (
             <tr key={service._id}>
               <td className={`${styles.td} ${styles.nameCol}`}>
-                <span className={styles.name}>{service.name}</span>
-                {service.subheading ? (
-                  <span className={styles.sub}>{service.subheading}</span>
-                ) : null}
+                <div className={styles.nameCell}>
+                  {service.image ? (
+                    <img
+                      src={service.image}
+                      alt=""
+                      className={styles.thumb}
+                    />
+                  ) : (
+                    <span className={styles.thumbPlaceholder} aria-hidden="true" />
+                  )}
+                  <div>
+                    <span className={styles.name}>{service.name}</span>
+                    {service.subheading ? (
+                      <span className={styles.sub}>{service.subheading}</span>
+                    ) : null}
+                  </div>
+                </div>
               </td>
               <td className={styles.td}>
                 <span

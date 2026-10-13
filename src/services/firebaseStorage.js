@@ -7,7 +7,7 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { storage } from "../../lib/firebase";
-import { banner_img_path, blog_img_folder } from "../constant";
+import { banner_img_path, blog_img_folder, service_img_folder } from "../constant";
 
 /**
  * Fixed banner location: every upload overwrites this one object, so the
@@ -19,6 +19,9 @@ export const BANNER_STORAGE_PATH = banner_img_path;
 
 /** Blog cover images live here; each upload gets a unique name (no overwrites). */
 export const BLOG_IMAGE_FOLDER = blog_img_folder;
+
+/** Service-tab images; each upload gets a unique name so a replace never races. */
+export const SERVICE_IMAGE_FOLDER = service_img_folder;
 
 /**
  * Browsers/CSS never request the banner twice for the same URL, so it can be cached
@@ -168,6 +171,36 @@ export const uploadBlogCover = async (file, slug) => {
   const snapshot = await uploadBytes(storageRef, file, {
     contentType: file.type || "image/jpeg",
     cacheControl: "public, max-age=86400",
+  });
+
+  return getDownloadURL(snapshot.ref);
+};
+
+/**
+ * Upload a service-tab image to Firebase Storage (`images/serviceImg` or the
+ * production-scoped folder) and return its public download URL. The SuperAdmin
+ * panel writes that URL into `serviceOffered.image`.
+ */
+export const uploadServiceImage = async (file, serviceName) => {
+  if (!file) throw new Error("No file selected");
+
+  const optimised = await optimizeImageFile(file);
+  const safeName =
+    String(serviceName || "service")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60) || "service";
+  const rawExtension = (optimised.name || file.name || "").split(".").pop() || "jpg";
+  const extension = rawExtension.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const storageRef = ref(
+    storage,
+    `${SERVICE_IMAGE_FOLDER}/${safeName}-${Date.now()}.${extension}`
+  );
+
+  const snapshot = await uploadBytes(storageRef, optimised, {
+    contentType: optimised.type || file.type || "image/jpeg",
+    cacheControl: "public, max-age=31536000",
   });
 
   return getDownloadURL(snapshot.ref);

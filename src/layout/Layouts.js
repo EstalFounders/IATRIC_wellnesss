@@ -12,6 +12,7 @@ import Header5 from "./Header/Header5";
 import Header6 from "./Header/Header6";
 import SuperAdminLoginHeader from "./Header/SuperAdminLoginHeader";
 import RegisterDocLoginHeader from "./Header/RegisterDocLoginHeader";
+import DoctorSupportStrip from "../components/registerDocComponent/DoctorSupportStrip";
 
 const Layouts = ({ children, header, footer }) => {
   const [toggle, setToggle] = useState(false);
@@ -62,6 +63,10 @@ const Layouts = ({ children, header, footer }) => {
         return <Footer5 />;
       case 7:
         return null;
+      case 8:
+        // Doctor panel footer only. The super-admin pages also pass footer={7}
+        // and must stay chrome-free, which is why the doctor pages use 8.
+        return <DoctorSupportStrip />;
       default:
         return <Footer4 />;
     }

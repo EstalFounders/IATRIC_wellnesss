@@ -21,9 +21,10 @@ import {
   FaFileContract,
   FaFolderOpen,
   FaGraduationCap,
+  FaHeadset,
   FaPen,
 } from "react-icons/fa";
-import { api } from "../../../constant";
+import { api, staff_support_email, staff_support_no } from "../../../constant";
 import { convertDateIntoTime } from "../../../helper";
 import {
   formatEducationTrainingLabel,
@@ -380,6 +381,31 @@ const DoctorContractPage = () => {
             </p>
           </>
         )}
+      </section>
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <FaHeadset /> Need help?
+        </h2>
+        <p className={styles.hint}>
+          For contract queries, document uploads (they are handled by the super
+          admin) or any other panel issue, contact the HealthPath team:
+        </p>
+        <p className={styles.hint}>
+          <a
+            href={`mailto:${staff_support_email}`}
+            style={{ color: "#3b5f1d", fontWeight: 600 }}
+          >
+            {staff_support_email}
+          </a>
+          {"  ·  "}
+          <a
+            href={`tel:${staff_support_no.replace(/\s+/g, "")}`}
+            style={{ color: "#3b5f1d", fontWeight: 600 }}
+          >
+            {staff_support_no}
+          </a>
+        </p>
       </section>
 
       <div className={styles.actionBar}>

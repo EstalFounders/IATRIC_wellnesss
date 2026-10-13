@@ -310,7 +310,10 @@ const PrescriptionComp = () => {
       return;
     }
 
-    const mobile = (updatedFormDetails.patientNo || "").trim();
+    // `patientNo` can arrive as a Number (Mongo stores the mobile number as a
+    // double) when a booked patient is selected from the list, so it must be
+    // stringified before any string method - `.trim()` on a Number throws.
+    const mobile = String(updatedFormDetails.patientNo ?? "").trim();
     if (mobile && !/^\d{10}$/.test(mobile)) {
       setFormError("Mobile number must be exactly 10 digits.");
       scrollToSection("patient-section");
@@ -400,7 +403,12 @@ const PrescriptionComp = () => {
     handleOtherFormDetailsChange({
       patientName: appointment.name,
       patientId: appointment._id,
-      patientNo: appointment.patientMobNo,
+      // Mongo returns `patientMobNo` as a number, so it is cast to a string
+      // here - downstream code calls `.trim()` / `.slice()` on this value.
+      patientNo:
+        appointment.patientMobNo != null
+          ? String(appointment.patientMobNo)
+          : "",
       appointmentId: appointment._id,
     });
     // handleOtherFormDetailsChange({
@@ -451,8 +459,10 @@ const PrescriptionComp = () => {
     // Initialize suggestions with all appointments on initial load
     if (!isEditing) {
       // Extract the last 4 digits of the mobile number if it exists, otherwise use a fallback string
-      const lastDigits = updatedFormDetails.patientMobNo
-        ? updatedFormDetails.patientMobNo.slice(-4)
+      // The mobile number lives on `patientNo` (it used to be read from the
+      // non-existent `patientMobNo` form field, which always produced "0000").
+      const lastDigits = updatedFormDetails.patientNo
+        ? String(updatedFormDetails.patientNo).slice(-4)
         : "0000";
 
       // Fallback ID format: PatientName_1234 (sanitized to remove spaces)
@@ -636,7 +646,7 @@ const PrescriptionComp = () => {
   ];
 
   const patientReady = Boolean((selectedName || searchTerm).trim());
-  const mobileValue = (updatedFormDetails.patientNo || "").trim();
+  const mobileValue = String(updatedFormDetails.patientNo ?? "").trim();
   const mobileInvalid = Boolean(mobileValue) && !/^\d{10}$/.test(mobileValue);
 
   return (
