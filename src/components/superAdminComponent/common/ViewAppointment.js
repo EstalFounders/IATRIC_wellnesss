@@ -129,6 +129,24 @@ const ViewAppointmentDetailsComp = () => {
               </tr>
               <tr>
                 <td>
+                  <b>Consultation Recording</b>
+                </td>
+                <td>
+                  {appointment.recordingURL ? (
+                    <a
+                      href={appointment.recordingURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View recording
+                    </a>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td>
                   <b>Payment Status</b>
                 </td>
                 <td>{appointment.paymentId?.status || "N/A"}</td>

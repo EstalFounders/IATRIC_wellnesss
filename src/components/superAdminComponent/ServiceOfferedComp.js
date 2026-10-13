@@ -28,11 +28,20 @@ import ConfirmModal from "./model/ConfirmModel";
 import ServicesTable from "./ServiceOffered/ServicesTable";
 import EditServiceModal from "./ServiceOffered/EditServiceModal";
 import ServiceFormCard from "./ServiceOffered/ServiceFormCard";
+import { uploadServiceImage } from "../../services/firebaseStorage";
 import {
   EMPTY_SERVICE,
   toPayload,
   validateService,
 } from "./ServiceOffered/serviceForm";
+
+const buildSavePayload = async (draft) => {
+  const payload = toPayload(draft);
+  if (draft.imageFile) {
+    payload.image = await uploadServiceImage(draft.imageFile, draft.name);
+  }
+  return payload;
+};
 
 const ROWS_PER_PAGE = 10;
 
@@ -147,7 +156,7 @@ const ServiceOfferedComp = () => {
         await fetch(api.serviceOffered, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(toPayload(newDraft)),
+          body: JSON.stringify(await buildSavePayload(newDraft)),
         })
       );
       persist([created, ...services]);
@@ -162,7 +171,7 @@ const ServiceOfferedComp = () => {
   };
 
   const openEdit = (service) => {
-    setEditDraft({ ...EMPTY_SERVICE, ...service });
+    setEditDraft({ ...EMPTY_SERVICE, ...service, imageFile: null });
     setEditErrors({});
     setEditNote(null);
   };
@@ -196,7 +205,7 @@ const ServiceOfferedComp = () => {
         await fetch(`${api.serviceOffered}?id=${editDraft._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(toPayload(editDraft)),
+          body: JSON.stringify(await buildSavePayload(editDraft)),
         })
       );
       persist(services.map((item) => (item._id === updated._id ? updated : item)));
@@ -278,9 +287,9 @@ const ServiceOfferedComp = () => {
           <p className={styles.heroEyebrow}>Catalogue</p>
           <h1 className={styles.heroTitle}>Service offered</h1>
           <p className={styles.heroSubtitle}>
-            The services patients can book — their fee and tax split (HSN, share,
-            GST, platform and processing fee) plus the copy the homepage speciality
-            tabs render. Changes go live on the booking flow immediately.
+            The services patients can book — fee and tax split, plus the image,
+            subheading and description the homepage speciality tabs render. Replace
+            a picture here to upload it to Firebase and update the live tab.
           </p>
         </div>
         <div className={styles.heroActions}>

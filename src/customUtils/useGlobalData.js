@@ -35,6 +35,8 @@ export const mergeServiceLists = (dbList, staticList, staticNameKey = "title") =
       name: item.name,
       title: asset[staticNameKey] || asset.name || item.name,
       description: item.description || asset.description,
+      subheading: item.subheading || asset.subheading,
+      image: item.image || asset.image,
     };
   });
 };

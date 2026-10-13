@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Button } from "react-bootstrap";
-import { api, style_schema, color_schema } from "../../../constant";
+import { api, style_schema, color_schema, contact_no } from "../../../constant";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { capitalize, formatData } from "../utils/helper";
@@ -419,7 +419,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               style={{
                 fontSize: "92px",
                 fontWeight: 900,
-                color: "rgba(59,95,29,0.2)",
+                color: "rgba(59,95,29,0.08)",
                 fontFamily: "Georgia, serif",
                 letterSpacing: "-2px",
                 lineHeight: 1,
@@ -431,7 +431,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               style={{
                 fontSize: "30px",
                 fontWeight: 700,
-                color: "rgba(210,185,150,0.2)",
+                color: "rgba(210,185,150,0.10)",
                 fontFamily: "Georgia, serif",
                 marginTop: "4px",
               }}
@@ -577,7 +577,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                         padding: "5px 8px",
                         textAlign: align,
                         fontWeight: 700,
-                        background: "transparent",
+                        // Opaque header: the centred page watermark sits behind
+                        // this row, so a transparent header made the column
+                        // labels unreadable.
+                        background: "#fff",
                       }}
                     >
                       {label}
@@ -768,8 +771,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
             <span>
               <MdEmail size={23} /> customercare@healthpath.co.in
             </span>
+            {/* Patient-facing sheet: the customer-support number, not the
+                staff/doctor helpline (that one lives in the doctor panel). */}
             <span>
-              <MdPhone size={23} /> +91 84485 59925
+              <MdPhone size={23} /> {contact_no}
             </span>
           </div>
           <div

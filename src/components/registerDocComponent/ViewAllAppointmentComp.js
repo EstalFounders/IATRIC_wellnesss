@@ -80,6 +80,9 @@ const ViewAllAppointmentComp = () => {
               Consultation Type
             </th>
             <th style={{ padding: "10px", border: "1px solid #ddd" }}>Price</th>
+            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+              Recording
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -104,12 +107,25 @@ const ViewAllAppointmentComp = () => {
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   {price_symbol}{appointment.consultationprice}
                 </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {appointment.recordingURL ? (
+                    <a
+                      href={appointment.recordingURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View recording
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </td>
               </tr>
             ))
           ) : (
             <tr>
               <td
-                colSpan="6"
+                colSpan="7"
                 style={{
                   padding: "10px",
                   textAlign: "center",
