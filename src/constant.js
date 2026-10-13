@@ -17,14 +17,26 @@ export const doctorStamp_img_path = `${IMAGES_ROOT}/doctorStamp/`;
 export const doctorSignature_img_path = `${IMAGES_ROOT}/doctorSignature/`;
 export const prescription_img_path = `${IMAGES_ROOT}/prescription/`;
 export const invoice_img_path = `${IMAGES_ROOT}/invoice/`;
+// Consultation recordings uploaded by the meeting room (MediaRecorder blob).
+export const consultation_recording_folder = `${IMAGES_ROOT}/consultationRecording`;
 
 // Marketing panel media (homepage banner object + blog covers).
 export const banner_img_path = `${METADATA_ROOT}/img.png`;
 export const blog_img_folder = `${METADATA_ROOT}/blogImg`;
 
+// Homepage / SuperAdmin service-tab images. Requested path is image/serviceImg;
+// scoped under IMAGES_ROOT so staging (`images/serviceImg`) and production
+// (`production_img/serviceImg`) never share objects.
+export const service_img_folder = `${IMAGES_ROOT}/serviceImg`;
+
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
 export const contact_no = "+91 78959 59925";
 export const email = "customercare@healthpath.co.in";
+// Staff / doctor support helpline. Used ONLY by the doctor panel and the team's
+// HR/document correspondence - everything a patient sees (site, prescription,
+// invoice) must keep using `contact_no` / `email` above.
+export const staff_support_no = "+91 84485 59925";
+export const staff_support_email = "healthpathhr@gmail.com";
 export const countryCode = "+91";
 export const development_production_url =
   process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";
@@ -47,6 +59,7 @@ export const api = {
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
   getAllMedicine: "/api/medicineInfo",
   prescriptionCall: "/api/prescription",
+  recordingCall: "/api/recording",
   sendWhatsAppCall: "/api/whatsApp",
   recommendedServies: "/api/lib/recommendedServices",
   bookConsultation: "/api/bookConsultation/",

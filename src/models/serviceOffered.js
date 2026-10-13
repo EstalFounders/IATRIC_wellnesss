@@ -51,9 +51,10 @@ const serviceOfferedSchema = new Schema({
     enum: ["MAJOR", "SUB"],
     default: "MAJOR",
   },
-  // Tab-1 (homepage speciality tabs) presentation copy. Seeded from the
-  // previously hardcoded assets by `scripts/seedServiceOfferedContent.js` and
-  // editable in the super-admin "Service Offered" panel.
+  // Tab-1 (homepage speciality tabs) presentation copy. `image` is the public
+  // Firebase download URL (folder `${IMAGES_ROOT}/serviceImg`); `subheading` is
+  // the English line under the tab title (kept as `subheading`, not `subHeading`,
+  // because the panel, API payload and Tabs-1 already use this key).
   image: {
     type: String,
   },

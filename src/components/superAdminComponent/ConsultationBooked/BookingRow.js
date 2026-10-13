@@ -194,6 +194,17 @@ const BookingRow = ({ appointment, doctor, onUpdateStatus, busy }) => {
         {closed ? (
           <span className={styles.closedTag}>Prescription shared</span>
         ) : null}
+        {appointment.recordingURL ? (
+          <a
+            className={styles.recordingLink}
+            href={appointment.recordingURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Watch the consultation recording"
+          >
+            ▶ Recording
+          </a>
+        ) : null}
       </td>
       <td className={styles.td}>
         <div className={styles.statusStack}>

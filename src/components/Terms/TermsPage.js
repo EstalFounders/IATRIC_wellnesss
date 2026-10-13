@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { address, contact_no, email, color_schema } from "../../constant";
 
 const website_url = "https://www.healthpath.co.in";
@@ -12,7 +13,7 @@ const TermsPage = () => (
       it.
     </p>
     <p>
-      <strong>Effective date:</strong> May 9, 2026
+      <strong>Effective date:</strong> October 13, 2026
     </p>
     <p>
       This page is intended to provide clear service terms. It does not replace
@@ -45,6 +46,13 @@ const TermsPage = () => (
       uncontrolled bleeding, stroke symptoms, poisoning, or any life-threatening
       condition, call 112 or visit the nearest emergency facility immediately.
     </p>
+    <p>
+      Consultations are provided under the Telemedicine Practice Guidelines, 2020
+      issued by the National Medical Commission. By booking and attending a
+      consultation you give your informed consent to a teleconsultation, and to
+      the doctor recording your clinical notes, advice and prescription for your
+      medical record.
+    </p>
 
     <h2>3. User Responsibilities</h2>
     <p>
@@ -74,6 +82,20 @@ const TermsPage = () => (
     <p>
       <strong>Free follow-up:</strong> Free follow-up is available only within
       48 hours of your consultation and only for the same or a related problem.
+    </p>
+    <p>
+      <strong>Medicines that cannot be issued online:</strong> doctors do not
+      prescribe Schedule X or narcotic / habit-forming medicines through
+      telemedicine. They also do not provide advice, medicines or assistance for
+      sex determination (prohibited under the PCPNDT Act) or for medical
+      termination of pregnancy online - such cases are directed to an appropriate
+      registered facility. Where a condition needs physical examination or
+      in-person care, the doctor will tell you so.
+    </p>
+    <p>
+      Every prescription carries the doctor&apos;s name, qualification,
+      registration number, date and signature, and is issued only after the
+      consultation.
     </p>
 
     <h2>5. Fees, Payments, and Refunds</h2>
@@ -161,6 +183,17 @@ const TermsPage = () => (
       </li>
       <li>Address: {address}</li>
     </ul>
+    <p>
+      For a complaint about how your personal information is handled, please use
+      the Grievance Officer details in section 12 of our{" "}
+      <Link
+        href="/privacy-policy"
+        style={{ color: color_schema.green, fontWeight: 700 }}
+      >
+        Privacy Policy
+      </Link>
+      .
+    </p>
   </div>
 );
 

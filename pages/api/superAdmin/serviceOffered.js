@@ -4,6 +4,43 @@ import ServiceOffered from '../../../src/models/serviceOffered';
 import { cacheDelFees } from '../../../src/lib/cache';
 import { logErrorToGoogleSheet } from '../helper';
 
+// Only these keys are written. The SuperAdmin form may also send `imageFile`
+// (a client-only File); stripping it here means a stale client cannot store junk.
+// `subHeading` is accepted as an alias of `subheading` and never stored twice.
+const SERVICE_WRITABLE_FIELDS = [
+  "name",
+  "fee",
+  "description",
+  "hsn_percentage",
+  "hsn_code",
+  "share",
+  "gst",
+  "platformfee",
+  "processingfee",
+  "freight",
+  "isActive",
+  "categoryType",
+  "image",
+  "subheading",
+  "subheadingHi",
+  "descriptionHi",
+];
+
+const pickServiceBody = (body = {}) => {
+  const payload = {};
+  SERVICE_WRITABLE_FIELDS.forEach((key) => {
+    if (body[key] !== undefined) payload[key] = body[key];
+  });
+  if (payload.subheading === undefined && body.subHeading !== undefined) {
+    payload.subheading = body.subHeading;
+  }
+  if (typeof payload.image === "string") payload.image = payload.image.trim();
+  if (typeof payload.subheading === "string") {
+    payload.subheading = payload.subheading.trim();
+  }
+  return payload;
+};
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -27,7 +64,7 @@ export default async function handler(req, res) {
     }
   } else if (req.method === 'POST') {
     try {
-      const newService = new ServiceOffered(req.body);
+      const newService = new ServiceOffered(pickServiceBody(req.body));
       await newService.save();
       // Fees may have changed - invalidate cached consultation fees
       await cacheDelFees();
@@ -46,7 +83,11 @@ export default async function handler(req, res) {
   } else if (req.method === 'PUT') {
     const { id } = req.query;
     try {
-      const updatedService = await ServiceOffered.findByIdAndUpdate(id, req.body, { new: true });
+      const updatedService = await ServiceOffered.findByIdAndUpdate(
+        id,
+        pickServiceBody(req.body),
+        { new: true, runValidators: true }
+      );
       // Fees may have changed - invalidate cached consultation fees
       await cacheDelFees();
       res.status(200).json(updatedService);

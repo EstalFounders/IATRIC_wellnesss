@@ -13,7 +13,7 @@ import DoctorAuthenticatedComponent from "../api/auth/doctorauthenticatedcompone
 export default function contract() {
   return (
     <DoctorAuthenticatedComponent>
-      <Layouts header={9} footer={7}>
+      <Layouts header={9} footer={8}>
         <DoctorContractPage />
       </Layouts>
     </DoctorAuthenticatedComponent>

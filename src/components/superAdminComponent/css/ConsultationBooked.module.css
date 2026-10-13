@@ -984,6 +984,20 @@
   color: #2f4c17;
 }
 
+/* Playback link shown under the status badge once a recording has been stored. */
+.recordingLink {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3b5f1d;
+  text-decoration: underline;
+}
+
+.recordingLink:hover {
+  color: #2f4c17;
+}
+
 @media (max-width: 576px) {
   .dateBar {
     padding: 12px 14px;

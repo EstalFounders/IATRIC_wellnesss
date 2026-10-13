@@ -190,6 +190,17 @@ const AppointmentsTable = ({
                             >
                               Prescription
                             </button>
+                            {appointment.recordingURL ? (
+                              <a
+                                className={styles.rowBtn}
+                                href={appointment.recordingURL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Watch the consultation recording"
+                              >
+                                Recording
+                              </a>
+                            ) : null}
                           </div>
                         </td>
                       </tr>

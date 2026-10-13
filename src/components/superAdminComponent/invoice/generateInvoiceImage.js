@@ -259,7 +259,8 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
             <div className="mb-0 text-center">TTANSHE HEALTH PATH PVT. LTD</div>
           </div>
           <div className="col-md-6 text-right text-black font-weight-bold">
-            <div className="mb-0">Contact: +91 84485 59925</div>
+            {/* Customer-facing invoice - prints the customer-support number. */}
+            <div className="mb-0">Contact: {contact_no}</div>
             <div className="mb-0">www.healthpath.co.in</div>
             <div>customercare@healthpath.co.in</div>
           </div>

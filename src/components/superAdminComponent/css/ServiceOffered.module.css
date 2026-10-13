@@ -357,6 +357,27 @@
   z-index: 2;
 }
 
+.nameCell {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.thumb,
+.thumbPlaceholder {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #f4f7f0;
+  border: 1px solid #ececec;
+}
+
+.thumbPlaceholder {
+  display: inline-block;
+}
+
 .name {
   display: block;
   font-weight: 600;
@@ -570,6 +591,52 @@
 .fieldHelp {
   font-size: 0.78rem;
   color: #7b8794;
+}
+
+.imagePicker {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.imagePreview,
+.imagePreviewEmpty {
+  width: 120px;
+  height: 90px;
+  flex: 0 0 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f4f7f0;
+  border: 1px solid #ececec;
+}
+
+.imagePreviewEmpty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa5b1;
+  font-size: 0.78rem;
+}
+
+.imagePickerActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* The Active switch (react-bootstrap Form.Check type="switch"). Its checked

@@ -20,6 +20,8 @@
     "db:remove-degree:apply": "node scripts/removeDoctorDegree.js --apply",
     "db:seed-service-tab": "node scripts/seedServiceOfferedContent.js",
     "db:seed-service-tab:apply": "node scripts/seedServiceOfferedContent.js --apply",
+    "db:upload-service-images": "node scripts/uploadServiceTabImages.js",
+    "db:upload-service-images:apply": "node scripts/uploadServiceTabImages.js --apply --seed",
     "db:update-service-desc": "node scripts/updateServiceOfferedDescription.js",
     "db:update-service-desc:apply": "node scripts/updateServiceOfferedDescription.js --apply",
     "db:set-slot-windows": "node scripts/setDoctorSlotWindows.js --env=production",

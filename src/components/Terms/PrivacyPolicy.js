@@ -9,7 +9,7 @@ const PrivacyPolicy = () => (
       and the choices you have when using our consultation service.
     </p>
     <p>
-      <strong>Effective date:</strong> May 9, 2026
+      <strong>Effective date:</strong> October 13, 2026
     </p>
     <p>
       HealthPath handles health-related information with care because it can be
@@ -86,6 +86,12 @@ const PrivacyPolicy = () => (
       obligations, and support legitimate business purposes. Retention periods
       may vary depending on the type of information and applicable requirements.
     </p>
+    <p>
+      Under the Digital Personal Data Protection Act, 2023 we keep your data only
+      for the purpose it was collected for, or for the period the law requires -
+      consultation and prescription records are preserved as required for medical
+      records, after which they are deleted or de-identified.
+    </p>
 
     <h2>7. Your Choices</h2>
     <p>
@@ -96,6 +102,13 @@ const PrivacyPolicy = () => (
     <p>
       You can choose not to provide certain information, but this may limit our
       ability to connect you with a doctor or complete a consultation safely.
+    </p>
+    <p>
+      <strong>Withdrawing consent:</strong> where we rely on your consent, you may
+      withdraw it at any time by writing to the Grievance Officer in section 12.
+      Withdrawal applies from the date we receive your request; it may mean we can
+      no longer continue the consultation or the service, and we will still keep
+      whatever the law requires us to retain.
     </p>
 
     <h2>8. Cookies and Analytics</h2>
@@ -130,6 +143,31 @@ const PrivacyPolicy = () => (
         {contact_no}
       </a>
       .
+    </p>
+
+    <h2>12. Grievance Officer</h2>
+    <p>
+      If you are unhappy with the way your personal information has been handled,
+      or you want to exercise any right available under the Digital Personal Data
+      Protection Act, 2023, please contact our Grievance Officer:
+    </p>
+    <p>
+      <strong>Grievance Officer, HealthPath</strong>
+      <br />
+      Email:{" "}
+      <a href={`mailto:${email}`} style={{ color: color_schema.green, fontWeight: 700 }}>
+        {email}
+      </a>
+      <br />
+      Phone / WhatsApp:{" "}
+      <a href={`tel:${contact_no}`} style={{ color: color_schema.green, fontWeight: 700 }}>
+        {contact_no}
+      </a>
+    </p>
+    <p>
+      We acknowledge every complaint within 48 hours and aim to resolve it within
+      30 days of receiving it. If you are not satisfied with the outcome, you may
+      also write to the Data Protection Board of India.
     </p>
   </div>
 );

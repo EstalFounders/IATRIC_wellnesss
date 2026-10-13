@@ -9,7 +9,7 @@ import DoctorAuthenticatedComponent from "../api/auth/doctorauthenticatedcompone
 export default function homepage() {
   return (
     <DoctorAuthenticatedComponent>
-      <Layouts header={9} footer={7}>
+      <Layouts header={9} footer={8}>
         <ViewAllAppointmentComp />
       </Layouts>
     </DoctorAuthenticatedComponent>

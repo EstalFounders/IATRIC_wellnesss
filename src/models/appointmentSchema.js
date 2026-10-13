@@ -70,6 +70,13 @@ const appointmentSchema = new mongoose.Schema({
   prescriptionUrl: {
     type: String,
   },
+  // Public Firebase Storage download URL of the consultation recording
+  // (audio+video mixed by the meeting room). Written by pages/api/recording.js
+  // once the doctor's browser finishes uploading the blob; empty until then.
+  recordingURL: {
+    type: String,
+    default: "",
+  },
   invoiceId: {
     type: String,
     default: "",

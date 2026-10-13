@@ -8,29 +8,62 @@ import styles from "../css/DoctorEarnings.module.css"; // Import CSS module
 import { BiRupee } from "react-icons/bi";
 import { useSelector } from "react-redux";
 
+// The redux slice starts as an empty array and the earnings endpoint answers
+// with an object (or `{ error }` when it fails), so "has the summary fields"
+// is what decides whether a payload may be rendered as numbers.
+const EMPTY_EARNINGS = {
+  totalEarningsTimeframe: 0,
+  totalConsultations: 0,
+  averagePerConsultation: 0,
+  earnings: [],
+};
+
+const hasEarningsSummary = (value) =>
+  Boolean(
+    value &&
+      !Array.isArray(value) &&
+      !value.error &&
+      typeof value.totalEarningsTimeframe === "number" &&
+      Array.isArray(value.earnings)
+  );
+
 const DoctorEarnings = () => {
   const initialData = useSelector((state) => state.appointment.doctorEarnings);
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(
+    hasEarningsSummary(initialData) ? initialData : null
+  );
   const [timeframe, setTimeframe] = useState("month"); // Default: This month
 
   const doctorInfo = JSON.parse(
-    sessionStorage.getItem(doctor_info_local_storage)
+    sessionStorage.getItem(doctor_info_local_storage) || "{}"
   );
   const doctorId = doctorInfo?.user?._id;
 
-  const fetchDoctorEarnings = async () => {
-    const res = await fetch(
-      `${api.doctorEarning}?doctorId=${doctorId}&timeframe=${timeframe}`
-    );
-    return res.json();
-  };
-
   useEffect(() => {
-    if (!data || timeframe) {
-      // Run initially if data is missing OR when timeframe changes
-      fetchDoctorEarnings().then(setData).catch(console.error);
+    // No session yet (or a failed call): show the empty state instead of the
+    // numbers blowing up the screen on a hard reload or a direct link.
+    if (!doctorId) {
+      setData({ ...EMPTY_EARNINGS });
+      return undefined;
     }
-  }, [timeframe]);
+
+    let active = true;
+
+    fetch(`${api.doctorEarning}?doctorId=${doctorId}&timeframe=${timeframe}`)
+      .then((res) => res.json())
+      .then((payload) => {
+        if (!active) return;
+        setData(hasEarningsSummary(payload) ? payload : { ...EMPTY_EARNINGS });
+      })
+      .catch((error) => {
+        console.error(error);
+        if (active) setData({ ...EMPTY_EARNINGS });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [doctorId, timeframe]);
 
   if (!data) return <p>Loading...</p>;
 
@@ -49,10 +82,8 @@ const DoctorEarnings = () => {
         </div>
         <div className={styles.summaryItem}>
           <p className={styles.summaryText}>Consultations</p>
-          <p className={styles.summaryValue}>
-            {price_symbol}
-            {data.totalConsultations}
-          </p>
+          {/* A count, not money - it used to print a stray "₹". */}
+          <p className={styles.summaryValue}>{data.totalConsultations}</p>
         </div>
         <div className={styles.summaryItem}>
           <p className={styles.summaryText}>Avg per Consultation</p>
