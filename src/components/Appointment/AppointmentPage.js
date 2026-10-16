@@ -391,7 +391,6 @@ const AppointmentPage = () => {
       return;
     }
     setOtpConfirmationPopup(true);
-    setAvailableSlotsFromServer(true);
   };
 
   const consultationData = {
@@ -410,49 +409,88 @@ const AppointmentPage = () => {
     serviceType,
   };
 
-  const bookConsultation = async () => {
+  /**
+   * Creates the appointment and hands the patient over to the payment gateway.
+   *
+   * `overrides` is what makes the fallback slot cards bookable: they must send
+   * the slot the patient just clicked, and React state updates are asynchronous -
+   * posting the render-time `consultationData` would re-run the server's "Now"
+   * search and answer with the same alternative-slot list again (the slot would
+   * never be booked).
+   *
+   * Returns true once an appointment exists and the payment modal is opening.
+   */
+  const bookConsultation = async (overrides = {}) => {
     try {
       const response = await bookConsultationApiCall({
-        consultationData,
+        consultationData: { ...consultationData, ...overrides },
         setIsLoading,
       });
       const data = await response.json();
-      const message = data.message;
-      const nextSlots = data.nextSlots;
-      const status = data.status;
-      if (status === SERVER_AVAILABLE_SLOTS_CODE) {
+      if (data.status === SERVER_AVAILABLE_SLOTS_CODE) {
+        // Nothing free today (or the slot was taken while this modal was open):
+        // show the server's next available slots.
+        setAvailableSlotsFromServer(data.nextSlots || []);
+        setNoSLotAvailableMessage(data.message);
         setOpenAvailableSlotsFromServer(true);
-        setAvailableSlotsFromServer(nextSlots);
-        setNoSLotAvailableMessage(message);
-        return;
+        return false;
       }
-      if (response.ok) {
-        // Payment gate: the appointment is PENDING until payment is
-        // verified by the backend. Open the payment modal.
-        setPendingPayment({
-          appointmentId: data.appointmentId,
-          amount: data.amount,
-          consultationType,
-        });
-      } else {
-        const errorData = await response.json();
-        setSnackBarMessage(errorData.message || "Failed to book consultation.");
-        handleOpenSnackBar();
-      }
+      // Payment gate: the appointment is PENDING until payment is verified by
+      // the backend. Open the payment modal.
+      setPendingPayment({
+        appointmentId: data.appointmentId,
+        amount: data.amount,
+        consultationType,
+      });
+      return true;
     } catch (err) {
+      console.error("Booking failed:", err);
       setSnackBarMessage("An error occurred. Please try again.");
       handleOpenSnackBar();
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const selectNextAvailableSlot = async (slot) => {
-    setSelectedSlot(slot);
-  };
+  /**
+   * "Book" on one of the alternative slots returned for a "Now" request: books
+   * exactly that slot and goes straight to the payment gateway - same booking
+   * call and same checkout as a normal booking, with no calendar/OTP detour.
+   */
+  const handleBookAlternativeSlot = async (slot) => {
+    const slotDoctorId = slot.doctorId ? String(slot.doctorId) : selectedDoctorId;
+    const knownDoctor = [...filteredDoctors, ...doctors].find(
+      (doctor) => String(doctor._id) === slotDoctorId
+    );
+    const alternativeDoctorName =
+      slot.doctorName || knownDoctor?.name || doctorName || "";
+    const alternativeDoctorMobile =
+      slot.doctorMobileNumber || knownDoctor?.mobileNumber || doctorMobileNumber || "";
+    const alternativeDate = new Date(slot.startTime);
 
-  const onBookNextAvailableSlot = async () => {
-    bookConsultation();
+    // `appointmentTime: CHOOSE_TIME` + the explicit `selectedSlot` tell the API to
+    // lock this slot instead of searching for one "now".
+    const booked = await bookConsultation({
+      selectedDoctorId: slotDoctorId,
+      doctorName: alternativeDoctorName,
+      doctorMobileNumber: alternativeDoctorMobile,
+      appointmentTime: CHOOSE_TIME,
+      selectedSlot: slot,
+      selectedDate: alternativeDate,
+    });
+
+    if (booked) {
+      // Keep the form in sync with what was just booked before the payment modal
+      // takes over.
+      setSelectedDoctorId(slotDoctorId);
+      setDoctorName(alternativeDoctorName);
+      setDoctorMobileNumber(alternativeDoctorMobile);
+      setSelectedSlot(slot);
+      setSelectedDate(alternativeDate);
+      setAppointmentTime(CHOOSE_TIME);
+      setOpenAvailableSlotsFromServer(false);
+    }
   };
 
   const whatsappConfrimation = () => {
@@ -525,8 +563,7 @@ const AppointmentPage = () => {
           >
             <AvailableSlots
               slots={availableSlotsFromServer}
-              selectSlot={selectNextAvailableSlot}
-              onBookSlot={onBookNextAvailableSlot}
+              onBookSlot={handleBookAlternativeSlot}
               message={noSLotAvailableMessage}
             />
           </AvailableSlotsModel>
