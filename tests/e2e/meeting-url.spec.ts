@@ -279,14 +279,22 @@ test.describe('meeting controls', () => {
   test('patient: exposes the full toolset and a closable side panel', async ({ page }) => {
     await openRoom(page, 'patient', 'Video');
 
-    for (const title of ['Mute', 'Camera Off', 'Screen Share', 'Raise Hand', 'Chat', 'Files', 'Record', 'End Call']) {
+    // Recording is doctor-only (`useConsultationRecorder`'s `enabled` flag), so
+    // the patient's control bar ends at End Call.
+    for (const title of ['Mute', 'Camera Off', 'Screen Share', 'Raise Hand', 'Chat', 'Files', 'End Call']) {
       await expect(page.getByTitle(title, { exact: true })).toBeVisible();
     }
+    await expect(page.getByTitle('Record', { exact: true })).toHaveCount(0);
+    await expect(page.getByTitle('Stop Recording')).toHaveCount(0);
 
-    // The panel is open by default (except on mobile, where `openMeeting` had to
-    // close it because it overlays the control bar): "Chat" is control + tab.
+    // The panel starts closed: only the control-bar "Chat"/"Files" buttons open
+    // it, so on load there is a single "Chat" button and no panel tabs.
     const infoTab = page.getByRole('button', { name: 'Info' });
-    if ((await infoTab.count()) === 0) await page.getByTitle('Chat').click();
+    await expect(infoTab).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Chat' })).toHaveCount(1);
+
+    // Clicking the control-bar button opens the panel: "Chat" is control + tab.
+    await page.getByTitle('Chat').click();
     await expect(infoTab).toBeVisible();
     await expect(page.getByRole('button', { name: 'Chat' })).toHaveCount(2);
 
@@ -295,17 +303,40 @@ test.describe('meeting controls', () => {
     await expect(infoTab).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Chat' })).toHaveCount(1);
 
-    // Recording toggles its own indicator (panel closed: on tablets/phones the
-    // panel is a full-screen overlay that would cover the control bar).
-    await page.getByTitle('Record', { exact: true }).click();
-    await expect(page.getByTitle('Stop Recording')).toBeVisible();
-    await expect(page.getByText('Recording')).toBeVisible();
-    await page.getByTitle('Stop Recording').click();
-    await expect(page.getByTitle('Record', { exact: true })).toBeVisible();
-
     // The control-bar button reopens the panel.
     await page.getByTitle('Chat').click();
     await expect(infoTab).toBeVisible();
+  });
+
+  test('doctor: the record control mirrors the automatic consultation recording', async ({ page }) => {
+    // The recorder POSTs the finished WebM blob when it stops; stub the upload so
+    // the test never sends a recording to the API.
+    await page.route('**/api/recording**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, recordingURL: 'https://example.test/recording.webm' }),
+      })
+    );
+
+    await openRoom(page, 'doctor', 'Video');
+    await waitForLocalMedia(page);
+
+    // `useConsultationRecorder` starts by itself once the room is recordable
+    // (doctor + active + local media), so the control offers Stop, not Record.
+    await expect(page.getByTitle('Record', { exact: true })).toHaveCount(0);
+    await expect(page.getByTitle('Stop Recording')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('Recording')).toBeVisible();
+
+    // The recorder is timesliced (`TIMESLICE_MS` = 1s) and WebKit only fires
+    // `onstop` once it has buffered data: stopping before the first timeslice
+    // leaves the control stuck on "Stop Rec".
+    await page.waitForTimeout(1500);
+    await page.getByTitle('Stop Recording').click();
+
+    // Stopping hands the file to the (stubbed) upload and idles the control.
+    await expect(page.getByTitle('Record', { exact: true })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTitle('End Call')).toBeVisible();
   });
 });
 

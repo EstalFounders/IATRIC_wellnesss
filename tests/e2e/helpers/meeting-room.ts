@@ -365,20 +365,6 @@ export class MockMeetingSocket {
 export type MeetingRole = 'patient' | 'doctor';
 
 /**
- * On <=768px `.sidePanel` becomes a full-screen fixed overlay, and because the
- * room opens it by default it covers the control bar - close it first.
- */
-export async function closeSidePanelIfOverlaying(page: Page) {
-  const width = page.viewportSize()?.width ?? 1280;
-  if (width > 768) return;
-  const closeButton = page.getByRole('button', { name: '✕' });
-  if ((await closeButton.count()) > 0) {
-    await closeButton.click();
-    await expect(closeButton).toHaveCount(0);
-  }
-}
-
-/**
  * Opens a meeting URL and waits until the room is interactive: the global
  * `_app` preloader is gone and the control bar is on screen.
  */
@@ -386,7 +372,6 @@ export async function openMeeting(page: Page, role: MeetingRole, meetingId: stri
   await page.goto(`/meeting/${role}/${meetingId}`);
   await expect(page.locator('img[alt="Loading..."]')).toHaveCount(0, { timeout: 30_000 });
   await expect(page.getByTitle('End Call')).toBeVisible({ timeout: 30_000 });
-  await closeSidePanelIfOverlaying(page);
 }
 
 /** The two participant tiles (remote + local) of the meeting grid. */

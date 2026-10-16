@@ -340,7 +340,10 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isHandRaised, setIsHandRaised] = useState(false);
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
+  // Closed until the user opens Chat/Files from the control bar: the room used to
+  // open with the panel covering part of the video (and the whole control bar on
+  // <=768px, where the panel is a full-screen overlay).
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [sidePanelTab, setSidePanelTab] = useState("chat");
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
