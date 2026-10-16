@@ -1,72 +1,74 @@
 import React, { useState } from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { formatData } from "../registerDocComponent/utils/helper";
 import { extractDate, formatTime } from "../helper";
 
-const AvailableSlots = ({ slots, selectSlot, onBookSlot, message }) => {
-    const [loader, setLoader] = useState(false)
-    const { t } = useLanguage();
+/**
+ * Fallback slot picker.
+ *
+ * Shown when the patient asked for "Now" but nothing is free today: the booking
+ * API answers `status: 304` plus `nextSlots` (pages/api/helper.js), and this
+ * component lists them.
+ *
+ * Deliberately minimal - one card per slot with a single direct "Book" button.
+ * Each entry already carries its doctor and start time, so there is no calendar
+ * step or "Select" detour between the patient and the payment gateway.
+ */
+const AvailableSlots = ({ slots = [], onBookSlot, message }) => {
+  const { t } = useLanguage();
+  // Slot whose Book button is in flight. Every button disables meanwhile so a
+  // double tap cannot send two bookings for the same slot.
+  const [bookingSlotId, setBookingSlotId] = useState("");
 
-    const bookSlot = () => {
-        onBookSlot()
+  const bookSlot = async (slot) => {
+    if (bookingSlotId) return;
+    setBookingSlotId(slot._id || `${slot.doctorId}-${slot.startTime}`);
+    try {
+      await onBookSlot(slot);
+    } finally {
+      setBookingSlotId("");
     }
+  };
+
   return (
     <div className="container mt-5">
-      <div className="text-center mb-5 text-success">{message}</div>
+      <div className="text-center mb-4 text-success">{message}</div>
       {slots.length > 0 ? (
         <div className="row">
-          {slots.map((slot, index) => (
-            <div key={index} className="col-md-4 mb-4">
-              <div className="card shadow-lg border-0">
-                <div className="card-body">
-                  <div className="card-text text-secondary">
-                    <strong>{t("avs.date")}</strong> {extractDate(slot.startTime)}
-                  </div>
-                  <div
-                    className="card-text d-flex justify-content-between align-items-center"
-                    key={slot._id}
-                    style={{
-                      color: "black",
-                      border: "1px solid black",
-                      padding: "10px",
-                      margin: "10px 0",
-                      borderRadius: "5px",
-                      width: "100%",
-                      maxWidth: "200px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      transition: "background-color 0.3s",
-                      fontSize: "0.9rem",
-                      lineHeight: "1.4",
-                      display: "inline-block",
-                    }}
-                    onClick={() => handleSlotSelection(slot)}
-                  >
-                    <span style={{ fontWeight: "bold" }}>{t("avs.time")}</span>{" "}
-                    {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                  </div>
-                  <div className="d-flex justify-content-between">
+          {slots.map((slot) => {
+            const slotKey = slot._id || `${slot.doctorId}-${slot.startTime}`;
+            return (
+              <div key={slotKey} className="col-md-4 mb-4">
+                <div className="card shadow-lg border-0 h-100">
+                  <div className="card-body d-flex flex-column">
+                    <div className="card-text text-secondary">
+                      <strong>{t("avs.date")}</strong> {extractDate(slot.startTime)}
+                    </div>
+                    <div className="card-text text-secondary">
+                      <strong>{t("avs.time")}</strong> {formatTime(slot.startTime)} -{" "}
+                      {formatTime(slot.endTime)}
+                    </div>
+                    {slot.doctorName ? (
+                      <div className="card-text text-secondary">
+                        <strong>{t("avs.doctor")}</strong> {slot.doctorName}
+                      </div>
+                    ) : null}
                     <button
-                      className="btn btn-success"
-                      onClick={bookSlot}
+                      type="button"
+                      className="btn btn-success mt-3 mt-auto"
+                      disabled={Boolean(bookingSlotId)}
+                      onClick={() => bookSlot(slot)}
                     >
                       {t("avs.book")}
-                    </button>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => selectSlot(slot)}
-                    >
-                      {t("avs.select")}
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center text-muted">
-          <h4>No slots available at the moment</h4>
+          <h4>{t("avs.none")}</h4>
         </div>
       )}
     </div>
