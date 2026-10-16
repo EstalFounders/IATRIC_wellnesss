@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type BrowserContext, type Page } from '@playwright/test';
 
 /**
  * Appointment booking E2E - single suite, executed on every configured device
@@ -62,7 +62,8 @@ const PAYMENT_STATUS_API = /\/api\/payment\/status/;
 
 type CapturedWhatsApp = { method: string; body: { mobile?: string; otp?: string } };
 
-async function fillAppointmentForm(page: Page) {
+/** Fills every field that does not depend on the "When" choice. */
+async function fillAppointmentFormFields(page: Page) {
   const form = page.locator('form.appointment-form');
 
   await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
@@ -72,6 +73,12 @@ async function fillAppointmentForm(page: Page) {
   await page.getByLabel('Mobile Number', { exact: true }).fill(TEST_MOBILE);
   // Consultation type/service is fed from the live ServiceOffered collection.
   await page.locator(`label[id="consultation-${CONSULTATION_TYPE}"]`).click();
+
+  return form;
+}
+
+async function fillAppointmentForm(page: Page) {
+  const form = await fillAppointmentFormFields(page);
 
   // Time: "Choose Time" -> date picker + slot dropdown (locally generated slots)
   await page.locator('label[id="when-later"]').click();
@@ -104,6 +111,78 @@ async function enterOtp(page: Page, code: string) {
   }
 }
 
+type CheckoutCall = { mode?: string; options?: Record<string, unknown> };
+
+/**
+ * Replaces the Cashfree sandbox checkout SDK. The app still calls
+ * load({ mode: 'sandbox' }) + checkout({ paymentSessionId, returnUrl }); the stub
+ * records that call and simulates a completed sandbox payment by returning the
+ * browser to the app return URL with the order id - no real payment is made.
+ */
+async function stubCashfreeCheckout(context: BrowserContext, sink: CheckoutCall[]) {
+  // Lets the stubbed SDK report back to the test (survives navigation).
+  await context.exposeFunction('__e2eCashfreeCheckout', (payload: CheckoutCall) => {
+    sink.push(payload);
+  });
+
+  await context.addInitScript((orderId: string) => {
+    const w = window as any;
+    w.__e2eOrderId = orderId;
+    w.Cashfree = (config: { mode?: string }) => ({
+      checkout: (options: Record<string, unknown>) => {
+        if (typeof w.__e2eCashfreeCheckout === 'function') {
+          w.__e2eCashfreeCheckout({ mode: config?.mode, options });
+        }
+        w.location.assign(
+          `/payment/thankyou?appointmentId=${encodeURIComponent(w.__e2eOrderId)}`
+        );
+        return Promise.resolve();
+      },
+    });
+  }, ORDER_ID);
+}
+
+// ── "Now" fallback fixtures ────────────────────────────────────────────────
+// Shape returned by pages/api/helper.js when the patient asked for "Now" and no
+// doctor has a free slot left today: `status: 304` (SERVER_AVAILABLE_SLOTS_CODE)
+// plus the next free slots, each directly bookable via its `_id`.
+const FALLBACK_MESSAGE = 'No slots available for today. Here are the next available slots.';
+const AVAILABLE_SLOTS_STATUS = '304';
+
+const alternativeSlotTime = (dayOffset: number, hour: number, minute: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + dayOffset);
+  date.setHours(hour, minute, 0, 0);
+  return date.toISOString();
+};
+
+const ALTERNATIVE_SLOTS = [
+  {
+    _id: '64b7f00000000000000b0001',
+    doctorId: '64b7f00000000000000a0001',
+    doctorName: 'Dr. Alternative One',
+    doctorMobileNumber: '9000000001',
+    startTime: alternativeSlotTime(1, 10, 0),
+    endTime: alternativeSlotTime(1, 10, 20),
+  },
+  {
+    _id: '64b7f00000000000000b0002',
+    doctorId: '64b7f00000000000000a0002',
+    doctorName: 'Dr. Alternative Two',
+    doctorMobileNumber: '9000000002',
+    startTime: alternativeSlotTime(1, 11, 0),
+    endTime: alternativeSlotTime(1, 11, 20),
+  },
+  {
+    _id: '64b7f00000000000000b0003',
+    doctorId: '64b7f00000000000000a0001',
+    doctorName: 'Dr. Alternative One',
+    doctorMobileNumber: '9000000001',
+    startTime: alternativeSlotTime(2, 9, 40),
+    endTime: alternativeSlotTime(2, 10, 0),
+  },
+];
+
 test.describe('Appointment booking (sandbox payment)', () => {
   test('books an appointment end to end and confirms it with a sandbox payment', async ({ page }) => {
     test.slow(); // dev-server first compile + full booking flow
@@ -121,34 +200,8 @@ test.describe('Appointment booking (sandbox payment)', () => {
       await dialog.dismiss();
     });
 
-    // Lets the stubbed Cashfree SDK report back to the test (survives navigation).
     const context = page.context();
-    await context.exposeFunction('__e2eCashfreeCheckout', (payload: {
-      mode?: string;
-      options?: Record<string, unknown>;
-    }) => {
-      checkoutCalls.push(payload);
-    });
-
-    // Replace the Cashfree sandbox checkout SDK. The app still calls
-    // load({ mode: 'sandbox' }) + checkout({ paymentSessionId, returnUrl }); the stub
-    // records that call and simulates a completed sandbox payment by returning the
-    // browser to the app return URL with the order id - no real payment is made.
-    await context.addInitScript((orderId: string) => {
-      const w = window as any;
-      w.__e2eOrderId = orderId;
-      w.Cashfree = (config: { mode?: string }) => ({
-        checkout: (options: Record<string, unknown>) => {
-          if (typeof w.__e2eCashfreeCheckout === 'function') {
-            w.__e2eCashfreeCheckout({ mode: config?.mode, options });
-          }
-          w.location.assign(
-            `/payment/thankyou?appointmentId=${encodeURIComponent(w.__e2eOrderId)}`
-          );
-          return Promise.resolve();
-        },
-      });
-    }, ORDER_ID);
+    await stubCashfreeCheckout(context, checkoutCalls);
 
     // ── Mocked boundaries (context level, so a second page is covered too) ──
     // WhatsApp confirmation API (the OTP/WhatsApp sender). Mocked + asserted so that no
@@ -321,6 +374,143 @@ test.describe('Appointment booking (sandbox payment)', () => {
 
     // Exactly one (mocked) WhatsApp confirmation call, no real message sent.
     expect(whatsappCalls).toHaveLength(1);
+  });
+
+  test('offers the next free slots when "Now" has nothing left today and books one into checkout', async ({
+    page,
+  }) => {
+    test.slow(); // dev-server first compile + booking + payment flow
+
+    // ── Observability ────────────────────────────────────────────────
+    const bookingBodies: Array<Record<string, unknown>> = [];
+    const whatsappCalls: CapturedWhatsApp[] = [];
+    let createOrderBody: Record<string, unknown> | undefined;
+    const checkoutCalls: CheckoutCall[] = [];
+
+    page.on('dialog', async (dialog) => {
+      await dialog.dismiss();
+    });
+
+    const context = page.context();
+    await stubCashfreeCheckout(context, checkoutCalls);
+
+    // ── Mocked boundaries ───────────────────────────────────────────
+    await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
+      const request = route.request();
+      whatsappCalls.push({
+        method: request.method(),
+        body: request.postDataJSON() as CapturedWhatsApp['body'],
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'SMS confirmation sent successfully' }),
+      });
+    });
+
+    // Booking API: the "Now" attempt finds nothing free today and answers with the
+    // 3 next available slots; the follow-up "Book" creates the appointment.
+    await context.route(BOOK_CONSULTATION_API, async (route) => {
+      bookingBodies.push(route.request().postDataJSON() as Record<string, unknown>);
+      if (bookingBodies.length === 1) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            message: FALLBACK_MESSAGE,
+            nextSlots: ALTERNATIVE_SLOTS,
+            status: AVAILABLE_SLOTS_STATUS,
+          }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'Consultation booked successfully',
+          appointmentId: APPOINTMENT_ID,
+          amount: CONSULTATION_FEE,
+          consultationType: CONSULTATION_TYPE,
+        }),
+      });
+    });
+
+    await context.route(CREATE_ORDER_API, async (route) => {
+      createOrderBody = route.request().postDataJSON() as Record<string, unknown>;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          paymentSessionId: SANDBOX_SESSION_ID,
+          checkoutUrl: 'https://sandbox.cashfree.com/pg/view/sandbox',
+          orderId: ORDER_ID,
+          amount: CONSULTATION_FEE,
+        }),
+      });
+    });
+
+    await context.route(/fast2sms/i, async (route) => {
+      await route.abort('blockedbyclient');
+    });
+
+    // ── 1. "Now" booking with nothing left today ────────────────────
+    await page.goto('/appointment');
+    await expect(page.getByRole('heading', { name: 'Make Appointment' })).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
+
+    const form = await fillAppointmentFormFields(page);
+    await expect(page.getByRole('radio', { name: 'Now' })).toBeChecked();
+    await form.getByRole('checkbox').check();
+    await form.locator('.consultation-btn').click();
+
+    // OTP gate (mocked sender) - "000000" is the built-in test code.
+    await expect(page.getByText('Verification Code')).toBeVisible();
+    await enterOtp(page, '000000');
+    await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
+
+    // The booking attempt carried the "Now" choice and no slot.
+    await expect.poll(() => bookingBodies.length).toBe(1);
+    expect(bookingBodies[0]).toMatchObject({
+      appointmentTime: 'Now',
+      consultationType: CONSULTATION_TYPE,
+      patientMobNo: TEST_MOBILE,
+    });
+
+    // ── 2. Fallback slots: one card, one direct "Book" button each ──
+    await expect(page.getByText(FALLBACK_MESSAGE)).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
+    const bookButtons = page.getByRole('button', { name: 'Book', exact: true });
+    await expect(bookButtons).toHaveCount(ALTERNATIVE_SLOTS.length);
+    // No extra "Select"/calendar controls on these cards.
+    await expect(page.getByRole('button', { name: 'Select', exact: true })).toHaveCount(0);
+    await expect(page.getByText(ALTERNATIVE_SLOTS[0].doctorName).first()).toBeVisible();
+
+    // ── 3. Book -> same booking call, pinned to the clicked slot ────
+    await bookButtons.first().click();
+    await expect.poll(() => bookingBodies.length).toBe(2);
+    expect(bookingBodies[1]).toMatchObject({
+      appointmentTime: 'ChooseTime',
+      selectedDoctorId: ALTERNATIVE_SLOTS[0].doctorId,
+      selectedSlot: { _id: ALTERNATIVE_SLOTS[0]._id },
+      patientMobNo: TEST_MOBILE,
+    });
+    // No second OTP round trip for the fallback booking.
+    expect(whatsappCalls).toHaveLength(1);
+
+    // ── 4. Straight into the standard payment gateway ───────────────
+    await expect(page.getByText(`Consultation Fee: ₹${CONSULTATION_FEE}`)).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
+    await page.locator('.consultation-btn', { hasText: 'Pay ₹' }).click();
+
+    await expect.poll(() => createOrderBody?.appointmentId).toBe(APPOINTMENT_ID);
+    await expect.poll(() => checkoutCalls.length).toBe(1);
+    expect(checkoutCalls[0].mode).toBe('sandbox');
+    expect(checkoutCalls[0].options?.paymentSessionId).toBe(SANDBOX_SESSION_ID);
   });
 });
 

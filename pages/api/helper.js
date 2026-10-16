@@ -34,6 +34,35 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * How many alternative slots the "nothing free today" fallback offers. The
+ * client renders one card + one direct "Book" button per entry
+ * (src/components/Appointment/AvailableSlots.js).
+ */
+const FALLBACK_SLOT_LIMIT = 3;
+
+/** Same calendar day in the server's timezone - the unit the room books in. */
+const isSameDay = (a, b) =>
+  new Date(a).toDateString() === new Date(b).toDateString();
+
+/**
+ * Serialises a Slot document for the fallback list.
+ *
+ * `_id` is what makes the slot directly bookable: `bookConsultation` locks the
+ * row with `Slot.findOneAndUpdate({ _id, doctorId, isBooked: false })`. The
+ * doctor fields ride along so the client can book straight from the card
+ * without the patient re-picking a doctor.
+ */
+const toFallbackSlot = (slot, doctor) => ({
+  _id: slot._id,
+  doctorId: doctor._id,
+  doctorName: doctor.name,
+  doctorMobileNumber: doctor.mobileNumber,
+  startTime: slot.startTime,
+  endTime: slot.endTime,
+  date: slot.date,
+});
+
 export async function findAvailableDoctorForNow(
   selectedDate,
   genericConsultationType,
@@ -43,11 +72,11 @@ export async function findAvailableDoctorForNow(
   await dbConnect();
 
   // `selectedDate` is the client's picked day anchored at 12:00 UTC (= 5:30 PM
-  // IST), so it is only reliable for *day* comparisons (see `selectedDateObj`
-  // below). Using it as the slot-search floor matched slots hours in the past:
-  // an 8:31 PM "Now" booking picked the first free slot after 5:30 PM (6:00 PM).
-  // The caller now passes the real clock in `floorTime`; the old behaviour is
-  // kept as a fallback for any other caller.
+  // IST), so it is only kept as a fallback search floor for callers that do not
+  // pass `floorTime`. Using it as the floor matched slots hours in the past: an
+  // 8:31 PM "Now" booking picked the first free slot after 5:30 PM (6:00 PM).
+  // The "is this today?" checks below therefore use `nextSlotTime` (the real
+  // clock, rounded up), never this value.
   const selectedDateObj = new Date(selectedDate);
   const searchFrom = floorTime ? new Date(floorTime) : new Date(selectedDateObj);
   const minutes = searchFrom.getMinutes();
@@ -74,11 +103,11 @@ export async function findAvailableDoctorForNow(
     doctorType: "Individual",
   });
 
-  let earliestSlotInfo = null;
+  // Every candidate doctor that still has at least one free slot from the
+  // search floor onwards.
+  const candidates = [];
 
-  let slotsForEarliestDoctor = [];
-
-  async function findEarliestSlotForDoctors(doctors) {
+  async function collectSlotsForDoctors(doctors) {
     for (const doctor of doctors) {
       console.log(
         `Checking available slots for doctor ${doctor._id} (${doctor.name})`,
@@ -89,102 +118,63 @@ export async function findAvailableDoctorForNow(
         isBooked: false,
       })
         .sort({ startTime: 1 })
-        .limit(3);
+        .limit(FALLBACK_SLOT_LIMIT);
 
       console.log(`Available slots for doctor ${doctor._id}:`, availableSlots);
 
       if (availableSlots.length > 0) {
-        const firstSlot = availableSlots[0];
-
-        if (
-          !earliestSlotInfo ||
-          new Date(firstSlot.startTime) <
-            new Date(earliestSlotInfo.slot.startTime)
-        ) {
-          earliestSlotInfo = {
-            doctor,
-            slot: firstSlot,
-          };
-          slotsForEarliestDoctor = availableSlots;
-        }
+        candidates.push({ doctor, slots: availableSlots });
       }
     }
   }
 
   // Step 3: First check company doctors
-  await findEarliestSlotForDoctors(companyDoctors);
+  await collectSlotsForDoctors(companyDoctors);
 
   // Step 4: Then check non-company doctors
-  await findEarliestSlotForDoctors(nonCompanyDoctors);
+  await collectSlotsForDoctors(nonCompanyDoctors);
 
-  // Step 5: Return the doctor + slot with earliest start time (from any group)
-  // if (earliestSlotInfo) {
-  //   return {
-  //     doctor: earliestSlotInfo.doctor,
-  //     slot: earliestSlotInfo.slot,
-  //     additionalSlots: slotsForEarliestDoctor,
-  //   };
-  // }
+  // Step 5: A free slot later today satisfies "Now" - book the earliest one.
+  // Slots earlier today were already excluded by the `nextSlotTime` floor, so
+  // "today" here means "still bookable today".
+  const todaysOptions = candidates
+    .flatMap(({ doctor, slots }) =>
+      slots
+        .filter((slot) => isSameDay(slot.startTime, nextSlotTime))
+        .map((slot) => ({ doctor, slot })),
+    )
+    .sort((a, b) => new Date(a.slot.startTime) - new Date(b.slot.startTime));
 
-  // After the loop, earliestSlotInfo will hold the overall earliest slot across all doctors.
-  // Now, determine nextSlots based on the final earliestSlotInfo
-  let nextSlots = [];
-  if (earliestSlotInfo && slotsForEarliestDoctor.length > 0) {
-    // Check if the overall earliest slot is NOT for the selectedDateObj
-    if (
-      new Date(earliestSlotInfo.slot.startTime).toDateString() !==
-      selectedDateObj.toDateString() // Assuming selectedDateObj is a Date object
-    ) {
-      // If the earliest slot is not today, collect the 2-3 slots from that doctor
-      // that we previously stored in slotsForEarliestDoctor
-      nextSlots = slotsForEarliestDoctor.map((slot) => ({
-        doctorId: earliestSlotInfo.doctor._id, // Use the ID of the doctor with the earliest slot
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-      }));
-    }
-  }
-
-  // Now you can use earliestSlotInfo and nextSlots
-  console.log("Overall Earliest Slot Info:", earliestSlotInfo);
-  console.log("Next Slots (if not today):", nextSlots);
-
-  // If no slot was found at all, return immediately with a safe response
-  if (!earliestSlotInfo) {
-    return res.status(404).json({ message: "No slots found." });
-  }
-
-  console.log(
-    "Next slot is not for today, returning next available slots.",
-    selectedDateObj.toDateString(),
-    earliestSlotInfo,
-    earliestSlotInfo.slot.startTime.toDateString(),
-  );
-
-  const earlietslotdate = earliestSlotInfo.slot.date;
-  const earlietsDoctor = earliestSlotInfo.doctor;
-
-  // Check if the nextSlotTime is for today
-  if (earlietslotdate.toDateString() !== selectedDateObj.toDateString()) {
-    console.log(nextSlots, "next slots in helper 111");
-    if (nextSlots.length > 0) {
-      return res.status(200).json({
-        message:
-          "No slots available for today. Here are the next available slots.",
-        nextSlots: nextSlots,
-        status: SERVER_AVAILABLE_SLOTS_CODE,
-      });
-    }
-  }
-
-  if (earliestSlotInfo) {
+  if (todaysOptions.length > 0) {
     return {
-      doctor: earliestSlotInfo.doctor,
-      slot: earliestSlotInfo.slot,
+      doctor: todaysOptions[0].doctor,
+      slot: todaysOptions[0].slot,
     };
   }
 
-  return res.status(404).json({ message: "No slots found." });
+  // Step 6: Nothing is free today for any doctor - hand the client the next free
+  // slots instead of silently booking a future one. Gathered from every
+  // candidate doctor and ordered by start time, so a doctor whose only free slot
+  // is tomorrow cannot leave the patient with fewer than FALLBACK_SLOT_LIMIT
+  // alternatives.
+  const nextSlots = candidates
+    .flatMap(({ doctor, slots }) =>
+      slots.map((slot) => toFallbackSlot(slot, doctor)),
+    )
+    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+    .slice(0, FALLBACK_SLOT_LIMIT);
+
+  console.log("Next slots (none left today):", nextSlots);
+
+  if (nextSlots.length === 0) {
+    return res.status(404).json({ message: "No slots found." });
+  }
+
+  return res.status(200).json({
+    message: "No slots available for today. Here are the next available slots.",
+    nextSlots,
+    status: SERVER_AVAILABLE_SLOTS_CODE,
+  });
 }
 
 export async function findAvailableDoctorForSpecificTimeSlot(
@@ -316,58 +306,52 @@ export const checkNbookSelectedDoctorForNow = async (
     throw new Error("Doctor not found");
   }
 
-  // Step 2: Find available slots for this doctor
-  const availableSlots = await Slot.find({
+  // Step 2: Find free slots for this doctor from the search floor onwards. A few
+  // extra rows are fetched so the fallback below can still offer
+  // FALLBACK_SLOT_LIMIT slots after the same-day ones are dropped.
+  const upcomingSlots = await Slot.find({
     doctorId: doctor._id.toString(),
     startTime: { $gte: nextSlotTime },
     isBooked: false,
   })
     .sort({ startTime: 1 })
-    .limit(3);
+    .limit(FALLBACK_SLOT_LIMIT * 2);
 
-  console.log(`Available slots for doctor ${doctor._id}:`, availableSlots);
+  console.log(`Available slots for doctor ${doctor._id}:`, upcomingSlots);
 
-  // Check if all 3 available slots are for the next day
-  if (
-    availableSlots.length === 3 &&
-    availableSlots.every(
-      (slot) =>
-        new Date(slot.startTime).toDateString() !== nextSlotTime.toDateString(),
-    )
-  ) {
+  // "Now" means today: when the doctor is free later today, that slot is booked
+  // directly (unchanged behaviour). Slots from earlier today are already gone -
+  // `nextSlotTime` is the rounded-up real clock, so the query cannot return them.
+  const todaysSlots = upcomingSlots.filter((slot) =>
+    isSameDay(slot.startTime, nextSlotTime),
+  );
+
+  if (todaysSlots.length === 0) {
+    // Nothing left today: answer with the doctor's next free slots instead of
+    // silently booking one of them. The caller must not book anything once this
+    // response is sent (see the `result.slot === undefined` guard in
+    // handlePostConsultation).
+    const nextSlots = upcomingSlots
+      .slice(0, FALLBACK_SLOT_LIMIT)
+      .map((slot) => toFallbackSlot(slot, doctor));
+
+    if (nextSlots.length === 0) {
+      res.status(404).json({ message: "No slots found." });
+      return;
+    }
+
     res.status(200).json({
-      message:
-        "No slots available for today. Here are the next available slots.",
-      nextSlots: availableSlots.map((slot) => ({
-        doctorId: doctor._id,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-      })),
+      message: "No slots available for today. Here are the next available slots.",
+      nextSlots,
       status: SERVER_AVAILABLE_SLOTS_CODE,
     });
     return; // Exit early to prevent further processing
   }
 
-  if (availableSlots.length > 0) {
-    const firstSlot = availableSlots[0];
-    return {
-      doctor,
-      slot: firstSlot,
-    };
-  }
-
-  res.status(404).json({ message: "No slots found." });
-
-  // if (availableSlots.length > 0) {
-  //   const firstSlot = availableSlots[0];
-  //   return {
-  //     doctor,
-  //     slot: firstSlot,
-  //     additionalSlots: availableSlots.slice(1), // Return the rest of the available slots
-  //   };
-  // }
-
-  // return ""; // Return empty if no available slots are found
+  return {
+    doctor,
+    slot: todaysSlots[0],
+  };
 };
 
 export const bookConsultation = async ({ bookConsultationParams }) => {
@@ -667,7 +651,15 @@ export async function handlePostConsultation(reqBody, res) {
         res,
         nowSlotFloor,
       );
-      slot = result ? result.slot : "";
+      // The helper answers the fallback itself ("no slots left today" -> next
+      // slots, or 404) and then returns nothing. Without this guard the handler
+      // kept going with an empty slot, which made `bookConsultation` lock an
+      // arbitrary later slot for this doctor *and* write a second response on an
+      // already-sent request.
+      if (!result || result.slot === undefined) {
+        return;
+      }
+      slot = result.slot;
     }
     if (
       doctorId == null &&
