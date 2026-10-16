@@ -102,6 +102,7 @@ const Header1 = ({ scrollToContact }) => {
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   const updateCartItemCount = (count) => setCartItemCount(count);
+  const togglePanel = () => setIsPanelOpen(!isPanelOpen);
   const toggleMedicinePanel = () => setIsMedicinePanelOpen(!isMedicinePanelOpen);
   const updateMedicineCartItemCount = (count) => setMedicineCartItemCount(count);
 
@@ -136,7 +137,11 @@ const Header1 = ({ scrollToContact }) => {
           </button>
 
           <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
-            <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+            <Link legacyBehavior href="/appointment">
+              <a aria-label="Book an appointment" style={{ display: "flex", alignItems: "center" }}>
+                <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+              </a>
+            </Link>
           </span>
 
           <ConsultationButton variant="book-now" onClick={handleConsultationTypeOpenDialog} style={{ fontSize: "0.8rem", padding: "6px 14px", whiteSpace: "nowrap" }}>
@@ -173,9 +178,11 @@ const Header1 = ({ scrollToContact }) => {
         <div className="container">
           <div className="d-flex align-items-center justify-content-between">
             <div>
-              <a href="#">
-                <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
-              </a>
+              <Link legacyBehavior href="/appointment">
+                <a aria-label="Book an appointment">
+                  <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
+                </a>
+              </Link>
             </div>
               <nav className="wsmenu">
                 <ul className="wsmenu-list font-weight-bold d-flex gap-4 mb-0">

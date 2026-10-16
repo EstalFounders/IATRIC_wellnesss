@@ -20,7 +20,7 @@ const steps = [
   },
   {
     icon: <LocalPharmacy fontSize="large" />,
-    label: "Get a digital prescription & a free follow-up",
+    label: "Get a digital prescription and follow-up guidance (terms apply)",
     labelKey: "hiw.step3",
   },
 ];

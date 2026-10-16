@@ -23,10 +23,10 @@ const Demo5Pricing3 = () => {
                 {t("demo5.pricing.title")}
               </h3>
               {/* Text */}
-              <p class="h5 box-list grey-color">
+              <p className="h5 box-list grey-color">
                 {t("demo5.pricing.desc")}
               </p>
-              <p class="h5 box-list grey-color">
+              <p className="h5 box-list grey-color">
                 {t("demo5.pricing.explore")}
               </p>
               <div className="pricing-table mb-40 h5 box-list grey-color">

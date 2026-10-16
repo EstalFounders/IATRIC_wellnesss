@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { contact_no } from "../../constant";
 
 const AllAbout1 = () => {
   return (
@@ -74,7 +75,7 @@ const AllAbout1 = () => {
               {/* Text */}
               <h5 className="h5-lg emergency-call">
                 <i className="fas fa-phone" />
-                1-800-123-4560
+                {contact_no}
               </h5>
               <p className="mt-20">
                 An magnis nulla dolor sapien augue erat iaculis purus tempor

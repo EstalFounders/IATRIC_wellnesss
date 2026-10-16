@@ -6,7 +6,6 @@ export const getStaticProps = () => getSeoStaticProps("/all-doctors");
 
 import AllDoctorsDoctors3 from "../src/components/All-doctors/AllDoctorsDoctors3";
 import Statistic1 from "../src/components/Common/Statistic-1";
-import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import Layouts from "../src/layout/Layouts";
 import PageBanner from "../src/layout/PageBanner";
 
@@ -16,7 +15,6 @@ const AllDoctors = () => {
       <PageBanner pageTitle="Meet the Doctors" />
       <AllDoctorsDoctors3 />
       <Statistic1 />
-      <Demo2Reviews2 />
     </Layouts>
   );
 };

@@ -35,7 +35,7 @@ const Demo2Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-1">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover">
                       View More Info
                     </a>
                   </Link>
@@ -68,7 +68,7 @@ const Demo2Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-2">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover">
                       View More Info
                     </a>
                   </Link>
@@ -101,7 +101,7 @@ const Demo2Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-1">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover">
                       View More Info
                     </a>
                   </Link>
@@ -134,7 +134,7 @@ const Demo2Doctors1 = () => {
                 {/* Profile Link */}
                 <div className="profile-link">
                   <Link legacyBehavior href="/doctor-2">
-                    <a className="btn btn-sm btn-tra-white black-hover" title>
+                    <a className="btn btn-sm btn-tra-white black-hover">
                       View More Info
                     </a>
                   </Link>

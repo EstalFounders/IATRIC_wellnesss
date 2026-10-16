@@ -105,7 +105,7 @@ const Info2 = () => {
                         >
                             <img
                                 className="img-fluid"
-                                src="images/image-04.png"
+                                src="images/image-04.jpeg"
                                 alt="info-image"
                             />
                         </div>

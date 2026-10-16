@@ -154,7 +154,11 @@ export default async function handler(req, res) {
             })
           );
 
-          // const hashedPassword = await bcrypt.hash(fields.password[0], 10); // 10 is the number of salt rounds
+          // Passwords are stored only as bcrypt hashes (10 salt rounds).
+          const rawPassword = fields.password?.[0] || "";
+          const hashedPassword = rawPassword
+            ? await bcrypt.hash(rawPassword, 10)
+            : "";
 
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
@@ -172,7 +176,7 @@ export default async function handler(req, res) {
             // Repeatable field as well: one entry per appended `formData.append`
             // ("English", "Hindi"), never the comma-joined `stringFields` value.
             language: parseLanguages(fields.language),
-            password: fields.password?.[0] || "",
+            password: hashedPassword,
             profilePictureUrl,
             diplomasCertificatesUrls,
             doctorStampUrl,
@@ -388,6 +392,16 @@ export default async function handler(req, res) {
         if (fields.language !== undefined) {
           updateData.language = parseLanguages(fields.language);
         }
+        // The generic field spread above would copy a submitted password into
+        // the document as plain text. Hash a new password, or drop the field so
+        // an edit without a password keeps the stored hash.
+        const newPassword = fields.password?.[0];
+        if (newPassword) {
+          updateData.password = await bcrypt.hash(newPassword, 10);
+        } else {
+          delete updateData.password;
+        }
+
         const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
           new: true,
         });

@@ -98,6 +98,9 @@ const doctorSchema = new Schema({
     // Optional on the super-admin "Add Doctor" form. A doctor created without a
     // password simply cannot log in until one is set.
     required: false,
+    // Stored as a bcrypt hash and excluded from normal queries; read it only
+    // with .select("+password") in login / password verification.
+    select: false,
   },
   profilePictureUrl: {
     type: String,

@@ -5,9 +5,10 @@ import { useSelector } from "react-redux";
 
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
 import { formatLanguagesLabel } from "../../customUtils/languages";
+import { formatWorkDaysLabel } from "../../customUtils/workDays";
 
 const Doctor1Details = () => {
-  const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo);
+  const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo) || {};
   const {
     name,
     expertise,
@@ -15,6 +16,7 @@ const Doctor1Details = () => {
     diplomasCertificatesUrls,
     language,
     workDays,
+    doctorRegistrationNo,
     price,
     profilePictureUrl,
     serviceOffered,
@@ -23,6 +25,17 @@ const Doctor1Details = () => {
   } = doctorInfo;
 
   console.log("Doctor Info: in doctor details page", doctorInfo);
+
+  // Opening the page directly (refresh, bookmark) leaves no doctor in the store.
+  if (!name) {
+    return (
+      <div style={{ padding: "80px 20px", textAlign: "center" }}>
+        <p>This doctor profile could not be found.</p>
+        <Link href="/all-doctors">View all doctors</Link>
+      </div>
+    );
+  }
+
   return (
     <>
       <section
@@ -79,9 +92,13 @@ const Doctor1Details = () => {
                         <td>Language(s)</td>
                         <td>{formatLanguagesLabel(language)}</td>
                       </tr>
+                      <tr>
+                        <td>Registration No.</td>
+                        <td>{doctorRegistrationNo || "Not provided"}</td>
+                      </tr>
                       <tr className="last-tr">
                         <td>Work Days</td>
-                        <td>Tuesday - Thursday</td>
+                        <td>{formatWorkDaysLabel(workDays) || "Not specified"}</td>
                       </tr>
                     </tbody>
                   </table>

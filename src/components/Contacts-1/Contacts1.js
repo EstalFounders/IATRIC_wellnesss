@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { email } from "../../constant";
 
 const Contacts1 = () => {
   return (
@@ -32,8 +33,8 @@ const Contacts1 = () => {
               <p>
                 Email:
                 <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com" className="blue-color">
-                    hello@yourdomain.com
+                  <a href={`mailto:${email}`} className="blue-color">
+                    {email}
                   </a>
                 </Link>
               </p>
@@ -46,8 +47,8 @@ const Contacts1 = () => {
               <p>
                 Email:
                 <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com" className="blue-color">
-                    hello@yourdomain.com
+                  <a href={`mailto:${email}`} className="blue-color">
+                    {email}
                   </a>
                 </Link>
               </p>

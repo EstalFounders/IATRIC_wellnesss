@@ -42,7 +42,7 @@ const AllDoctors3 = () => {
                 <span>Chief Medical Officer</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>
@@ -67,7 +67,7 @@ const AllDoctors3 = () => {
                 <span>Anesthesiologist</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>
@@ -92,7 +92,7 @@ const AllDoctors3 = () => {
                 <span>Cardiology</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>
@@ -117,7 +117,7 @@ const AllDoctors3 = () => {
                 <span>Neurosurgeon</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>
@@ -142,7 +142,7 @@ const AllDoctors3 = () => {
                 <span>Allergist</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>
@@ -167,7 +167,7 @@ const AllDoctors3 = () => {
                 <span>Orthopaedics</span>
                 {/* Button */}
                 <Link legacyBehavior href="/doctor-details">
-                  <a className="btn btn-sm btn-blue blue-hover mt-15" title>
+                  <a className="btn btn-sm btn-blue blue-hover mt-15">
                     View More Info
                   </a>
                 </Link>

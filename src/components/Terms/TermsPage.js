@@ -98,7 +98,7 @@ const TermsPage = () => (
       consultation.
     </p>
 
-    <h2>5. Fees, Payments, and Refunds</h2>
+    <h2 id="refunds">5. Fees, Payments, and Refunds</h2>
     <p>
       Consultation fees are displayed before payment wherever applicable. You
       agree to pay the listed fee and any applicable taxes or payment gateway

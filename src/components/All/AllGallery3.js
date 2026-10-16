@@ -38,7 +38,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-9.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -63,7 +62,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-10.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -88,7 +86,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-11.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -113,7 +110,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-12.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -138,7 +134,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-13.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -163,7 +158,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-14.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -188,7 +182,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-15.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -213,7 +206,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-16.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -238,7 +230,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-17.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -263,7 +254,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-18.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -288,7 +278,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-19.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>
@@ -313,7 +302,6 @@ const AllGallery3 = () => {
                       <a
                         className="image-link"
                         href="images/gallery/image-20.jpg"
-                        title
                       >
                         <i className="fas fa-search-plus" />
                       </a>

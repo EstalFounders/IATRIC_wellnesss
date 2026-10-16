@@ -1,4 +1,5 @@
 import React from "react";
+import { contact_no } from "../../constant";
 
 const AllBanner8 = () => {
     return (
@@ -17,7 +18,7 @@ const AllBanner8 = () => {
                             <h4 className="h4-lg">
                                 Call MedService Clinic Now
                             </h4>
-                            <h2 className="h2-lg">1-800-123-4560</h2>
+                            <h2 className="h2-lg">{contact_no}</h2>
                         </div>
                     </div>
                 </div>

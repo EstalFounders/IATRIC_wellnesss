@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { contact_no } from "../../constant";
 
 const AllBanner3 = () => {
   return (
@@ -18,7 +19,7 @@ const AllBanner3 = () => {
               </span>
               {/* Title  */}
               <h2 className="h2-xl">High Quality Medical Care</h2>
-              <h3 className="h3-md blue-color">+1-800-123-4560</h3>
+              <h3 className="h3-md blue-color">{contact_no}</h3>
               {/* Text */}
               <p>
                 Egestas magna egestas magna ipsum vitae purus ipsum primis in

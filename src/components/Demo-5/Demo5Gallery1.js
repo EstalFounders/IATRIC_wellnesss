@@ -39,7 +39,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-1.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -63,7 +62,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-2.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -87,7 +85,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-3.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -111,7 +108,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-4.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -135,7 +131,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-5.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -159,7 +154,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-6.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -183,7 +177,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-7.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>
@@ -207,7 +200,6 @@ const Demo5Gallery1 = () => {
                 <a
                   className="image-link"
                   href="images/gallery/image-8.jpg"
-                  title
                 >
                   <i className="fas fa-search-plus" />
                 </a>

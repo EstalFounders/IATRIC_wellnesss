@@ -1,6 +1,7 @@
 import Link from "next/dist/client/link";
 import React from "react";
 import MobileMenu from "../MobileMenu";
+import { contact_no } from "../../constant";
 
 const Header5 = ({ toggleMenu }) => {
   return (
@@ -57,7 +58,7 @@ const Header5 = ({ toggleMenu }) => {
 						    				<span class="flaticon-039-emergency-call-1 blue-color"></span>
 							    			<div class="header-widget-txt">
 								    			<p>Emergency Cases</p> 
-												<p class="header-widget-phone steelblue-color">1-800-123-4560</p>
+												<p class="header-widget-phone steelblue-color">{contact_no}</p>
 											</div>
 						    			</div>
 						    		</div>*/}

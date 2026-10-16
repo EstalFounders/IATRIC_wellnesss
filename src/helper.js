@@ -14,7 +14,6 @@ export const loginUser = async ({ email, password }) => {
 };
 
 export async function loginDoctor({ email, password }) {
-  console.log(email, "email", password, "password");
   const res = await signIn("doctor-credentials", {
     redirect: false,
     email,

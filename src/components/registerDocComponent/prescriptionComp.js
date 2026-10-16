@@ -132,7 +132,6 @@ const PrescriptionComp = () => {
     sessionStorage.getItem(doctor_info_local_storage),
   );
   const [doctors, setDoctors] = useState(doctorInfo.user);
-  const [doctorPassword, setDoctorPassword] = useState(doctors.password);
 
   const appointments = useSelector((state) => state.appointment.appointments);
   const [searchTerm, setSearchTerm] = useState("");
@@ -192,10 +191,20 @@ const PrescriptionComp = () => {
     setPreviewVisible(!previewVisible);
   };
 
-  const doctorPasswordValidation = (password) => {
-    console.log(password, "password in prescription");
-    const isPasswordCorrect = password === doctorPassword;
-    // = bcrypt.compareSync(password, doctorPassword);
+  // The password is checked on the server against the stored bcrypt hash.
+  const doctorPasswordValidation = async (password) => {
+    let isPasswordCorrect = false;
+    try {
+      const response = await fetch("/api/registerDoc/verifyPassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorId: doctors._id, password }),
+      });
+      const data = await response.json();
+      isPasswordCorrect = Boolean(data.valid);
+    } catch (error) {
+      console.error("Password check failed:", error);
+    }
 
     if (isPasswordCorrect) {
       setPasswordPopup(false);

@@ -13,9 +13,6 @@ import AllBlog1 from "../src/components/All/AllBlog1";
 import AllBrands1 from "../src/components/All/AllBrands1";
 import AllContacts1 from "../src/components/All/AllContacts1";
 import AllContacts2 from "../src/components/All/AllContacts2";
-import AllDoctors1 from "../src/components/All/AllDoctors1";
-import AllDoctors2 from "../src/components/All/AllDoctors2";
-import AllDoctors3 from "../src/components/All/AllDoctors3";
 import AllFooter1 from "../src/components/All/AllFooter1";
 import AllFooter2 from "../src/components/All/AllFooter2";
 import AllFooter3 from "../src/components/All/AllFooter3";
@@ -36,7 +33,6 @@ import AllInfo9 from "../src/components/All/AllInfo9";
 import AllPricing1 from "../src/components/All/AllPricing1";
 import AllPricing2 from "../src/components/All/AllPricing2";
 import AllPricing3 from "../src/components/All/AllPricing3";
-import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import AllServices1 from "../src/components/All/AllServices1";
 import AllServices2 from "../src/components/All/AllServices2";
 import AllServices3 from "../src/components/All/AllServices3";
@@ -192,18 +188,6 @@ const All = () => {
 			============================================= */}
       <AllGallery3 />
       {/* END GALLERY-3 */}
-      {/* DOCTORS-1
-			============================================= */}
-      <AllDoctors1 />
-      {/* END DOCTORS-1 */}
-      {/* DOCTORS-2
-			============================================= */}
-      <AllDoctors2 />
-      {/* END DOCTORS-2 */}
-      {/* DOCTORS-3
-			============================================= */}
-      <AllDoctors3 />
-      {/* END DOCTORS-3  */}
       {/* VIDEO-1
 			============================================= */}
       <Video1 />
@@ -226,7 +210,6 @@ const All = () => {
       {/* END BRANDS-1 */}
       {/* TESTIMONIALS-1
 			============================================= */}
-      <Demo2Reviews2 />
       {/* END TESTIMONIALS-1 */}
       {/* BANNER-1
 			============================================= */}

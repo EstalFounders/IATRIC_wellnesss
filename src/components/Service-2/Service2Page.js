@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { contact_no } from "../../constant";
 
 const Service2Page = () => {
   return (
@@ -227,39 +228,6 @@ const Service2Page = () => {
           {/* END SERVICE CONTENT */}
           {/* SIDEBAR */}
           <aside id="sidebar" className="col-lg-4">
-            {/* TEXT WIDGET */}
-            <div id="txt-widget" className="sidebar-div mb-50">
-              {/* Title */}
-              <h5 className="h5-sm steelblue-color">The Heart Of Clinic</h5>
-              {/* Head of Clinic */}
-              <div className="txt-widget-unit mb-15 clearfix d-flex align-items-center">
-                {/* Avatar */}
-                <div className="txt-widget-avatar">
-                  <img
-                    src="images/head-of-clinic.jpg"
-                    alt="testimonial-avatar"
-                  />
-                </div>
-                {/* Data */}
-                <div className="txt-widget-data">
-                  <h5 className="h5-md steelblue-color">Dr. Jonathan Barnes</h5>
-                  <span>Chief Medical Officer, Founder</span>
-                  <p className="blue-color">1-800-1234-567</p>
-                </div>
-              </div>
-              {/* End Head of Clinic */}
-              {/* Text */}
-              <p className="p-sm">
-                An enim nullam tempor sapien at gravida donec pretium ipsum
-                porta justo integer at odiovelna vitae auctor integer congue
-                magna purus
-              </p>
-              {/* Button */}
-              <Link legacyBehavior href="/about">
-                <a className="btn btn-blue blue-hover">Learn More</a>
-              </Link>
-            </div>
-            {/* END TEXT WIDGET */}
             {/* SIDEBAR TABLE */}
             <div className="sidebar-table blue-table sidebar-div mb-50">
               {/* Title */}

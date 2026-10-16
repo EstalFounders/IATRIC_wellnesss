@@ -73,8 +73,8 @@ const LanguageToggle = () => {
         aria-label={t("footer.whatsapp")}
         title={t("footer.whatsapp")}
         sx={{
-          width: 40,
-          height: 40,
+          width: 46,
+          height: 46,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
@@ -90,14 +90,14 @@ const LanguageToggle = () => {
             outline: `2px solid ${color_schema.yellow}`,
             outlineOffset: "1px",
           },
-          "@media (max-width:576px)": { width: 42, height: 42 },
+          "@media (max-width:576px)": { width: 48, height: 48 },
           "@media (prefers-reduced-motion: reduce)": {
             transition: "none",
             "&:hover": { transform: "none" },
           },
         }}
       >
-        <FaWhatsapp size={22} />
+        <FaWhatsapp size={26} />
       </Box>
 
       <Box

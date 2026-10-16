@@ -10,7 +10,6 @@ import Banner5 from "../src/components/Common/Banner-5";
 import Statistic1 from "../src/components/Common/Statistic-1";
 import Tabs1 from "../src/components/Common/Tabs-1";
 import Demo2Gallery1 from "../src/components/Demo-2/Demo2Gallery1";
-import Demo2Reviews2 from "../src/components/Demo-2/Demo2Reviews2";
 import Demo5About2 from "../src/components/Demo-5/Demo5About2";
 import Demo5About6 from "../src/components/Demo-5/Demo5About6";
 import Demo5Blog1 from "../src/components/Demo-5/Demo5Blog1";
@@ -80,7 +79,6 @@ const Demo5 = () => {
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.3} duration={1.2}>
-          <Demo2Reviews2 />
         </AnimatedSection>
 
         {/* <AnimatedSection animation="fadeInUp" delay={0.1}>

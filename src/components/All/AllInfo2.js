@@ -42,7 +42,7 @@ const AllInfo2 = () => {
             <div className="info-2-img wow fadeInUp" data-wow-delay="0.6s">
               <img
                 className="img-fluid"
-                src="images/image-04.png"
+                src="images/image-04.jpeg"
                 alt="info-image"
               />
             </div>

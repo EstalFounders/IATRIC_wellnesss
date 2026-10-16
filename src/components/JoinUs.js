@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { api, contact_no, email } from "../constant";
-import { dial, isMobileValid, openSupportWhatsAppWeb } from "../helper";
+import { api, staff_support_email, staff_support_no } from "../constant";
+import { isMobileValid } from "../helper";
 import { useRouter } from "next/router";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -31,8 +31,9 @@ const JoinUs = () => {
     setIsDialDialogOpen(false);
   };
 
+  // Join Us / HR enquiries go to the staff address, not the patient support one.
   const handleEmail = () => {
-    router.push(`mailto:${email}`);
+    router.push(`mailto:${staff_support_email}`);
   };
 
   const handleInputChange = (e) => {
@@ -43,9 +44,16 @@ const JoinUs = () => {
     }));
   };
 
+  // Join Us and HR enquiries go to the staff line, not the patient support line.
+  const dialStaff = () => {
+    window.location.href = `tel:${staff_support_no}`;
+  };
+  const whatsappStaff = () => {
+    window.open(`https://web.whatsapp.com/send?phone=${staff_support_no}`, "_blank");
+  };
   const dialOptions = [
-    { label: "Dial", action: dial },
-    { label: "Whatsapp", action: openSupportWhatsAppWeb },
+    { label: "Dial", action: dialStaff },
+    { label: "Whatsapp", action: whatsappStaff },
   ];
 
   const saveQuery = async (e) => {
@@ -109,7 +117,7 @@ const JoinUs = () => {
                       handleDialDialogOpen();
                     }}
                   >
-                    {contact_no}
+                    {staff_support_no}
                   </a>
                 </Link>
               </h5>
@@ -123,7 +131,7 @@ const JoinUs = () => {
                       e.preventDefault();
                     }}
                   >
-                    {email}
+                    {staff_support_email}
                   </a>
                 </Link>
               </h5>

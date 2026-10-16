@@ -38,12 +38,20 @@ export async function findAvailableDoctorForNow(
   selectedDate,
   genericConsultationType,
   res,
+  floorTime,
 ) {
   await dbConnect();
 
+  // `selectedDate` is the client's picked day anchored at 12:00 UTC (= 5:30 PM
+  // IST), so it is only reliable for *day* comparisons (see `selectedDateObj`
+  // below). Using it as the slot-search floor matched slots hours in the past:
+  // an 8:31 PM "Now" booking picked the first free slot after 5:30 PM (6:00 PM).
+  // The caller now passes the real clock in `floorTime`; the old behaviour is
+  // kept as a fallback for any other caller.
   const selectedDateObj = new Date(selectedDate);
-  const minutes = selectedDateObj.getMinutes();
-  const nextSlotTime = new Date(selectedDateObj);
+  const searchFrom = floorTime ? new Date(floorTime) : new Date(selectedDateObj);
+  const minutes = searchFrom.getMinutes();
+  const nextSlotTime = new Date(searchFrom);
 
   // Round up to the next 20-minute slot
   if (minutes % 20 !== 0) {
@@ -278,12 +286,19 @@ export const checkNbookSelectedDoctorForNow = async (
   selectedDate,
   doctorId,
   res,
+  floorTime,
 ) => {
   await dbConnect();
 
+  // The slot search must start from the real clock (`floorTime`), not from
+  // `selectedDate` - that value is the picked day anchored at 12:00 UTC
+  // (= 5:30 PM IST) and is only valid for *day* comparisons below. Searching
+  // from it made an 8:31 PM "Now" booking lock the first free slot after
+  // 5:30 PM (6:00 PM) and the WhatsApp confirmation quoted that past time.
   const selectedDateObj = new Date(selectedDate.toString());
-  const minutes = selectedDateObj.getMinutes();
-  const nextSlotTime = new Date(selectedDateObj);
+  const searchFrom = floorTime ? new Date(floorTime) : new Date(selectedDateObj);
+  const minutes = searchFrom.getMinutes();
+  const nextSlotTime = new Date(searchFrom);
 
   // Round up to the next 20-minute slot
   if (minutes % 20 !== 0) {
@@ -416,6 +431,22 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
 
     selectedSlot = bookedSlot;
   } else {
+    // Defence in depth: a "Now" booking must never lock a slot that has already
+    // gone by. The UI allows a client-picked slot up to 20 minutes in the past
+    // (see the SELECTED_SLOT_MATCHES_NOW check in AppointmentPage), so only
+    // slots older than that are treated as stale.
+    const resolvedBookingMode = clientSideAppointmentTime || bookingMode;
+    const isNowMode =
+      resolvedBookingMode === IS_NOW ||
+      resolvedBookingMode === IN_TWENTY_MINUTES_NOW;
+
+    if (
+      isNowMode &&
+      new Date(slot.startTime).getTime() < Date.now() - 20 * 60 * 1000
+    ) {
+      throw new Error("Selected slot has already passed.");
+    }
+
     // Book the selected slot if it's not already booked
     const updatedSlot = await Slot.findOneAndUpdate(
       { _id: slot._id, doctorId, isBooked: false },
@@ -615,6 +646,16 @@ export async function handlePostConsultation(reqBody, res) {
 
     // Determine current or specific time
     const now = new Date();
+    // "Now" bookings must search slots from the real clock. The client's
+    // `selectedDate` is the picked day anchored at 12:00 UTC (= 5:30 PM IST),
+    // which is only good for *day* comparisons - using it as the search floor
+    // made an 8:31 PM booking lock the first free slot after 5:30 PM (6:00 PM),
+    // and the WhatsApp confirmation then quoted that already-passed time.
+    // "in twenty minutes now" asks for a slot at least 20 minutes out.
+    const nowSlotFloor =
+      clientSideAppointmentTime === IN_TWENTY_MINUTES_NOW
+        ? new Date(now.getTime() + 20 * 60 * 1000)
+        : now;
     const genericConsultationType = consultationType;
     const meetingId = uuidv4();
 
@@ -624,6 +665,7 @@ export async function handlePostConsultation(reqBody, res) {
         selectedDate,
         doctorId,
         res,
+        nowSlotFloor,
       );
       slot = result ? result.slot : "";
     }
@@ -636,6 +678,7 @@ export async function handlePostConsultation(reqBody, res) {
         selectedDate,
         genericConsultationType,
         res,
+        nowSlotFloor,
       );
       console.log(result, "result 97");
 

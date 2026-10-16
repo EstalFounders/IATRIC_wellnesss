@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { email } from "../../constant";
 
 const AllFooter2 = () => {
   return (
@@ -22,7 +23,7 @@ const AllFooter2 = () => {
               <p className="foo-email">
                 E:
                 <Link legacyBehavior href="#">
-                  <a href="mailto:yourdomain@mail.com">hello@yourdomain.com</a>
+                  <a href={`mailto:${email}`}>{email}</a>
                 </Link>
               </p>
               {/* Phone */}

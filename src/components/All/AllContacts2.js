@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { email } from "../../constant";
 
 const AllContacts2 = () => {
   return (
@@ -41,10 +42,10 @@ const AllContacts2 = () => {
                     Email:
                     <Link legacyBehavior href="#">
                       <a
-                        href="mailto:yourdomain@mail.com"
+                        href={`mailto:${email}`}
                         className="blue-color"
                       >
-                        hello@yourdomain.com
+                        {email}
                       </a>
                     </Link>
                   </p>
@@ -62,10 +63,10 @@ const AllContacts2 = () => {
                     Email:
                     <Link legacyBehavior href="#">
                       <a
-                        href="mailto:yourdomain@mail.com"
+                        href={`mailto:${email}`}
                         className="blue-color"
                       >
-                        hello@yourdomain.com
+                        {email}
                       </a>
                     </Link>
                   </p>
@@ -83,10 +84,10 @@ const AllContacts2 = () => {
                     Email:
                     <Link legacyBehavior href="#">
                       <a
-                        href="mailto:yourdomain@mail.com"
+                        href={`mailto:${email}`}
                         className="blue-color"
                       >
-                        hello@yourdomain.com
+                        {email}
                       </a>
                     </Link>
                   </p>
@@ -104,10 +105,10 @@ const AllContacts2 = () => {
                     Email:
                     <Link legacyBehavior href="#">
                       <a
-                        href="mailto:yourdomain@mail.com"
+                        href={`mailto:${email}`}
                         className="blue-color"
                       >
-                        hello@yourdomain.com
+                        {email}
                       </a>
                     </Link>
                   </p>

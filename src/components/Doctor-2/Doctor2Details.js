@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { email } from "../../constant";
 
 const Doctor2Details = () => {
   return (
@@ -33,8 +34,8 @@ const Doctor2Details = () => {
                 <h4 className="h4-xs blue-color">
                   <i className="fas fa-envelope-open-text" />
                   <Link legacyBehavior href="#">
-                    <a href="mailto:yourdomain@mail.com" className="blue-color">
-                      hello@yourdomain.com
+                    <a href={`mailto:${email}`} className="blue-color">
+                      {email}
                     </a>
                   </Link>
                 </h4>
@@ -142,7 +143,6 @@ const Doctor2Details = () => {
                           }}
                           className="image-link"
                           href="images/certificate-1.png"
-                          title
                         >
                           <img
                             className="img-fluid"
@@ -163,7 +163,6 @@ const Doctor2Details = () => {
                           }}
                           className="image-link"
                           href="images/certificate-2.png"
-                          title
                         >
                           <img
                             className="img-fluid"
@@ -184,7 +183,6 @@ const Doctor2Details = () => {
                           }}
                           className="image-link"
                           href="images/certificate-3.png"
-                          title
                         >
                           <img
                             className="img-fluid"
@@ -205,7 +203,6 @@ const Doctor2Details = () => {
                           }}
                           className="image-link"
                           href="images/certificate-4.png"
-                          title
                         >
                           <img
                             className="img-fluid"
@@ -226,7 +223,6 @@ const Doctor2Details = () => {
                           }}
                           className="image-link"
                           href="images/certificate-5.png"
-                          title
                         >
                           <img
                             className="img-fluid"

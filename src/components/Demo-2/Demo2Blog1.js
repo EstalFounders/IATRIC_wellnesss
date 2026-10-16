@@ -78,7 +78,7 @@ const Demo2Blog1 = () => {
                 {/* Post Data */}
                 <span>
                   Apr 28, 2019 by
-                  <span>Dr.Jonathan Barnes</span>
+                  <span>HealthPath Editorial Team</span>
                 </span>
                 {/* Post Text */}
                 <p>

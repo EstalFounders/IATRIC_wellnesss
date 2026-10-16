@@ -62,20 +62,20 @@ const options = {
         if (!user) {
           throw new Error("Invalid credentials");
         }
-        console.log(user, "user in server");
-        const isPasswordCorrect = credentials.password === user.password;
-
-        if (isPasswordCorrect) {
-          console.log("Password is correct");
-        } else {
-          console.log("Password is incorrect");
-        }
+        // Stored passwords are bcrypt hashes; compare against the hash only.
+        const isPasswordCorrect = Boolean(
+          user.password &&
+            (await compare(credentials.password || "", user.password))
+        );
 
         if (!isPasswordCorrect) {
           throw new Error("Invalid credentials");
         }
 
-        return user;
+        // Never let the password hash reach the JWT, session or browser storage.
+        const doctor = user.toObject();
+        delete doctor.password;
+        return { ...doctor, id: String(user._id) };
       },
     }),
   ],

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./AddDoctorForm.module.css";
 import { Col, Row } from "react-bootstrap";
+import { FaPencilAlt } from "react-icons/fa";
 import {
   FaCalendarCheck,
   FaClipboardList,
@@ -75,7 +76,7 @@ const EMPTY_DOCTOR = {
   serviceOffered: "",
   password: "",
   doctorType: DoctorType.individual,
-  doctorShare: "",
+  doctorShare: "70",
   price: "",
   slotStartTime: "",
   slotEndTime: "",
@@ -110,6 +111,8 @@ const AddDoctorForm = () => {
   const dispatch = useDispatch();
 
   const [doctorDetails, setDoctorDetails] = useState(EMPTY_DOCTOR);
+  // Doctor share defaults to 70% and stays locked until the admin clicks the pencil.
+  const [isShareEditable, setIsShareEditable] = useState(false);
   // Bumped by the Reset button so the <ImageUploader />s remount (their preview
   // state lives inside that component).
   const [uploaderKey, setUploaderKey] = useState(0);
@@ -222,6 +225,7 @@ const AddDoctorForm = () => {
   // remount, which empties their internal preview state.
   const handleReset = () => {
     setDoctorDetails(EMPTY_DOCTOR);
+    setIsShareEditable(false);
     setSelectedTypes([]);
     setSelectedService([]);
     setSelectedWorkDays([]);
@@ -673,18 +677,31 @@ const AddDoctorForm = () => {
                   </label>
                 </Col>
                 <Col md={4}>
-                  <label className={styles.field}>
+                  <div className={styles.field}>
                     <span className={styles.label}>Doctor Share (%)</span>
-                    <input
-                      type="number"
-                      name="doctorShare"
-                      value={doctorDetails.doctorShare}
-                      onChange={handleChange}
-                      className={styles.input}
-                      min="0"
-                      max="100"
-                    />
-                  </label>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <input
+                        type="number"
+                        name="doctorShare"
+                        value={doctorDetails.doctorShare}
+                        onChange={handleChange}
+                        className={styles.input}
+                        min="0"
+                        max="100"
+                        readOnly={!isShareEditable}
+                        style={{ background: isShareEditable ? "#fff" : "#f3f5f7" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsShareEditable((prev) => !prev)}
+                        title={isShareEditable ? "Lock doctor share" : "Edit doctor share"}
+                        aria-label={isShareEditable ? "Lock doctor share" : "Edit doctor share"}
+                        style={{ border: "none", background: "transparent", cursor: "pointer", color: "#3b5f1d", padding: 6 }}
+                      >
+                        <FaPencilAlt />
+                      </button>
+                    </div>
+                  </div>
                 </Col>
                 <Col md={4}>
                   <label className={styles.field}>

@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { richText } from "../../i18n/richText";
 import { ConsultationButton } from "../Common/commonUi";
 import styles from "./css/appointmentPage.module.css";
 import { CHOOSE_TIME, IS_NOW, price_symbol, superAdminConsultationtype, color_schema } from "../../constant";
@@ -495,6 +496,11 @@ const AppointmentForm = ({
 
             </Col>
           </Row>
+
+          {/* Emergency disclaimer - shown with the booking CTA */}
+          <p className="text-center mb-2" style={{ color: "#b45309", fontSize: "0.9rem" }}>
+            {richText(t("af.emergency"))}
+          </p>
 
           {/* Agreement — directly above the submit button */}
           <Form.Group className="mb-2 text-center">

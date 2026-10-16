@@ -112,7 +112,7 @@ const Demo5Blog1 = () => {
       href: "/single-post",
       cover: "images/blog/post-2-img.jpg",
       date: "Apr 28, 2019",
-      author: "Dr.Jonathan Barnes",
+      author: "HealthPath Editorial Team",
       excerpt:
         "Quaerat neque purus ipsum neque dolor primis libero tempus impedit tempor blandit sapien at gravida donec ipsum, at porta justo...",
     },

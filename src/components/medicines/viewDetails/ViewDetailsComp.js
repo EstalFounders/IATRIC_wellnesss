@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "react-bootstrap";
 import styles from "../css/ViewDetails.module.css";
 import { FaUserGroup } from "react-icons/fa6";
@@ -27,9 +28,7 @@ import { ConsultationButton } from "../../Common/commonUi";
 import HealthCheckupCard from "../../labTestComponent/common/HealthCheckupCard";
 
 const ViewDetails = () => {
-  const medicine = useSelector(
-    (state) => state.medicineDetails.heatlhDataDetails.medicineDetail
-  );
+  const medicine = useSelector((state) => state.medicineDetails?.medicineDetail) || {};
   const [storedData, setStoredData] = useState();
   const [expandedTestIndex, setExpandedTestIndex] = useState(null);
 
@@ -41,6 +40,16 @@ const ViewDetails = () => {
     useAddToCart();
 
   console.log(medicine, "healthCheckupData IN VIEW DETAILS");
+
+  // A direct page load has no selected medicine in the store.
+  if (!medicine.title) {
+    return (
+      <div style={{ padding: "80px 20px", textAlign: "center" }}>
+        <p>This medicine could not be found.</p>
+        <Link href="/medicine/homepage">Browse medicines</Link>
+      </div>
+    );
+  }
 
   return (
     <div>

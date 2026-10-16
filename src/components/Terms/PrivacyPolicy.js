@@ -38,10 +38,6 @@ const PrivacyPolicy = () => (
       comply with legal or regulatory obligations.
     </p>
     <p>
-      <strong>Free follow-up:</strong> Free follow-up is available only within
-      48 hours of your consultation and only for the same or a related problem.
-    </p>
-    <p>
       We may use non-identifiable, aggregated insights to understand service
       performance, common health queries, response times, and user experience
       trends.

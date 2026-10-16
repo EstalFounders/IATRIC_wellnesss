@@ -187,6 +187,11 @@ const Footer4 = () => {
           <div className="row">
             <div className="col-md-12 text-righ text-dark">
               <p className="footer-copyright text-dark text-right">
+                <Link href="/privacy-policy">Privacy Policy</Link>{" | "}
+                <Link href="/terms-of-service">Terms &amp; Conditions</Link>{" | "}
+                <Link href="/terms-of-service#refunds">Refund &amp; Cancellation</Link>
+              </p>
+              <p className="footer-copyright text-dark text-right">
                 {new Date().getFullYear()} ©{" "}
                 <span className="text-dark">
                   TTANSHE HEALTHPATH PRIVATE LIMITED

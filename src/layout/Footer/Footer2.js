@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { contact_no } from "../../constant";
 
 const Footer2 = () => {
   return (
@@ -104,7 +105,7 @@ const Footer2 = () => {
               {/* Title */}
               <h5 className="h5-xs">Emergency Cases</h5>
               {/* Footer List */}
-              <h5 className="h5-xl blue-color">1-800-123-4560</h5>
+              <h5 className="h5-xl blue-color">{contact_no}</h5>
               {/* Text */}
               <p className="p-sm mt-15">
                 Aliquam orci nullam undo tempor sapien gravida donec enim ipsum
