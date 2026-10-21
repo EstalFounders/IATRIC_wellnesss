@@ -10,7 +10,9 @@ import {
   mockConsultationApi,
   openMeeting,
   participantTiles,
+  recordingCapabilities,
   roomPayload,
+  supportsRecording,
   waitForLocalMedia,
   type ConsultationKind,
   type MeetingRole,
@@ -321,6 +323,20 @@ test.describe('meeting controls', () => {
 
     await openRoom(page, 'doctor', 'Video');
     await waitForLocalMedia(page);
+
+    // Playwright's WebKit build on Linux cannot record (no usable MediaRecorder /
+    // canvas.captureStream), so the auto-recording contract is skipped there
+    // rather than failing all four WebKit projects - see docs/cline-project-notes.md.
+    // The probe is attached so a browser that passes the guard and still cannot
+    // record says why, instead of leaving an opaque count assertion behind.
+    await test.info().attach('recording-capabilities', {
+      contentType: 'application/json',
+      body: JSON.stringify(await recordingCapabilities(page)),
+    });
+    test.skip(
+      !(await supportsRecording(page)),
+      'MediaRecorder / canvas.captureStream cannot record in this browser'
+    );
 
     // `useConsultationRecorder` starts by itself once the room is recordable
     // (doctor + active + local media), so the control offers Stop, not Record.

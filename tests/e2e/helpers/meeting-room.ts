@@ -238,6 +238,74 @@ export async function waitForLocalMedia(page: Page) {
     .toBe(true);
 }
 
+/* -------------------------------------------------------------------------- */
+/* Recording capability                                                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Codecs the recorder prefers, most wanted first - kept in sync with
+ * `pickMimeType()` in src/components/MeetingRoom/useConsultationRecorder.js.
+ */
+const RECORDING_TYPES = {
+  video: ['video/webm;codecs=vp8,opus', 'video/webm;codecs=vp9,opus', 'video/webm', 'video/mp4'],
+  audio: ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/mpeg'],
+};
+
+export interface RecordingCapabilities {
+  /** `window.MediaRecorder` exists - without it `start()` errors out immediately. */
+  mediaRecorder: boolean;
+  /** `canvas.captureStream()` exists - it supplies the composited video track. */
+  captureStream: boolean;
+  /** Web Audio is available - it mixes both participants' audio. */
+  audioContext: boolean;
+  /** Which of the recorder's preferred containers this browser can encode. */
+  mimeTypes: string[];
+}
+
+/**
+ * Everything `useConsultationRecorder` needs, read straight from the browser.
+ * Kept as data (not just a boolean) so a CI report can say *why* a browser
+ * cannot record instead of leaving an opaque `toHaveCount(0)` failure.
+ */
+export async function recordingCapabilities(page: Page, hasVideo = true): Promise<RecordingCapabilities> {
+  return page.evaluate((candidates: string[]) => {
+    const w = window as any;
+    const mediaRecorder = typeof w.MediaRecorder === 'function';
+    let mimeTypes: string[] = [];
+    if (mediaRecorder) {
+      try {
+        mimeTypes = candidates.filter((type: string) => w.MediaRecorder.isTypeSupported(type));
+      } catch {
+        mimeTypes = [];
+      }
+    }
+    return {
+      mediaRecorder,
+      captureStream: typeof (HTMLCanvasElement.prototype as any).captureStream === 'function',
+      audioContext: !!(w.AudioContext || w.webkitAudioContext),
+      mimeTypes,
+    };
+  }, hasVideo ? RECORDING_TYPES.video : RECORDING_TYPES.audio);
+}
+
+/**
+ * `true` when this browser can actually run the consultation recorder: it needs
+ * `MediaRecorder`, `canvas.captureStream()` (the composited video track), Web
+ * Audio and at least one encodable container - the same requirements
+ * `pickMimeType()` / `start()` in src/components/MeetingRoom/useConsultationRecorder.js
+ * rely on.
+ *
+ * Playwright's WebKit build on Linux has no usable MediaRecorder /
+ * captureStream, which is why the doctor's auto-recording assertions failed all
+ * four WebKit projects on GitHub Actions while Chromium, Firefox (same synthetic
+ * media path) and macOS WebKit passed - see docs/cline-project-notes.md.
+ */
+export async function supportsRecording(page: Page, hasVideo = true): Promise<boolean> {
+  const caps = await recordingCapabilities(page, hasVideo);
+  return caps.mediaRecorder && caps.captureStream && caps.audioContext && caps.mimeTypes.length > 0;
+}
+
+
 
 /* -------------------------------------------------------------------------- */
 /* Socket.io mock                                                              */
