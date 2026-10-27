@@ -212,6 +212,25 @@
   color: #c62828;
 }
 
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.priceName {
+  flex: 0 0 90px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #3f4c5a;
+}
+
+.pricePencil {
+  color: #9aa5b1;
+  font-size: 0.75rem;
+}
+
 .selectInput {
   width: 100%;
   padding: 6px 8px;

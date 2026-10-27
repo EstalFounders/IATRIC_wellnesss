@@ -2,7 +2,11 @@ import { dbConnect } from "../../src/lib/db";
 import Query from "../../src/models/query";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
-import { company_number, WHATSAPP_USER_QUERY_TEMPLATE } from "./utils/constants";
+import {
+  admin_callback_number,
+  WHATSAPP_CALLBACK_REQUEST_TEMPLATE,
+} from "./utils/constants";
+import { getCallbackRequestContact } from "./utils/whatsappMessageBodies";
 import { rateLimit } from "../../src/lib/rateLimiter";
 import { logErrorToGoogleSheet } from "./helper";
 
@@ -58,6 +62,71 @@ function normalizeQueryPayload(body) {
   }
 
   return { error: "A valid phone number or email address is required" };
+}
+
+/**
+ * Sends the "Get a Callback" alert to the admin's WhatsApp number.
+ *
+ * Never throws: a missing template id, a Fast2SMS rejection (HTTP 400/401, or
+ * HTTP 200 with `return: false`) or a network error is reported as `{ sent: false, reason }`
+ * so the query that was already saved is still returned to the caller.
+ */
+async function notifyAdminOfCallback(savedQuery) {
+  const templateId = process.env.FASTSMS_WA_TEMPLATE_CALLBACK_ID;
+  const number = formatPhoneNumber(admin_callback_number);
+
+  // The id is filled in once the admin template is approved in Fast2SMS; until
+  // then every submission stays silent instead of failing on a bad send.
+  if (!templateId) {
+    console.warn(
+      "userQuery: FASTSMS_WA_TEMPLATE_CALLBACK_ID is empty, skipping the admin WhatsApp alert."
+    );
+    return { sent: false, reason: "template_not_configured" };
+  }
+
+  try {
+    const result = await sendWhatsAppConfirmation(
+      number,
+      { contact: getCallbackRequestContact(savedQuery) },
+      WHATSAPP_CALLBACK_REQUEST_TEMPLATE
+    );
+
+    if (result && result.return === false) {
+      const reason = Array.isArray(result.message)
+        ? result.message.join(", ")
+        : result.message || "fast2sms_rejected";
+      console.error("userQuery: admin WhatsApp rejected:", reason);
+      return { sent: false, reason, number };
+    }
+
+    return { sent: true, number };
+  } catch (error) {
+    // The SDK throws a FetchError that carries the Fast2SMS body on `error.data`
+    // ({ status_code, message }); error.message is only the HTTP status text
+    // ("Bad Request"), so read the body first and keep it in the logs and sheet.
+    const body = error?.data;
+    const detail =
+      body?.message ||
+      body?.status_code ||
+      (typeof body === "string" ? body : error.message);
+    const reason = Array.isArray(detail)
+      ? detail.join(", ")
+      : String(detail || "whatsapp_error");
+
+    console.error("userQuery: admin WhatsApp failed:", error?.status || "", reason);
+
+    await logErrorToGoogleSheet({
+      apiName: "userQuery - admin WhatsApp",
+      errorMessage: reason,
+      errorCode: String(error?.status || 500),
+      stackTrace: error.stack,
+      requestPayload: {
+        queryId: savedQuery?._id ? String(savedQuery._id) : undefined,
+        templateId,
+      },
+    });
+    return { sent: false, reason, number };
+  }
 }
 
 export default async function handler(req, res) {
@@ -126,19 +195,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: validationError });
       }
 
-      const newQuery = await Query.create(payload);
+      const savedQuery = await Query.create(payload);
 
-      const savedQuery = await newQuery.save();
+      // Notify the admin on WhatsApp. Deliberately isolated: the request is already
+      // persisted, so a rejected or skipped send must not turn the 201 into an error -
+      // the outcome is reported in `whatsapp` and logged instead.
+      const whatsapp = await notifyAdminOfCallback(savedQuery);
 
-// await sendWhatsAppConfirmation(
-//     formatPhoneNumber(company_number),
-//     payload,
-//     WHATSAPP_USER_QUERY_TEMPLATE
-//   );
- 
-      
-
-      res.status(201).json(savedQuery);
+      res.status(201).json({ ...savedQuery.toObject(), whatsapp });
     } catch (error) {
       console.log(error, "error");
       await logErrorToGoogleSheet({

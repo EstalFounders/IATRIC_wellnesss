@@ -15,6 +15,11 @@ import Preloader from "../Preloader";
 import AppointmentBookingModal from "./modal/AppointmentBookingModal";
 import Image from "next/image";
 import { isMobileValid } from "../../helper";
+import {
+  consultationTypeNames,
+  toConsultationTypeEntries,
+  typeKeyFor,
+} from "../../utils/consultationFee";
 import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
 import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
@@ -105,14 +110,30 @@ const AppointmentPage = () => {
   // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
   const services = useSelector((state) => state.globalData?.services || []);
 
-  // Derive consultation options from services filter for Audio/Video
-  const consultationOptions = (Array.isArray(services) ? services : [])
+  // No-doctor ("Any Doctor") baseline: the consultation services that exist in
+  // serviceOffered (Audio/Video today) and their fees.
+  const serviceConsultationOptions = (Array.isArray(services) ? services : [])
     .filter((s) =>
       CONSULTATION_SERVICE_NAMES.some(
         (name) => s.name && s.name.toLowerCase().includes(name.toLowerCase())
       )
     )
     .map((s) => ({ name: s.name, fee: s.fee }));
+
+  // When a specific doctor is selected, the boxes show that doctor's own
+  // consultation types and prices instead of the generic serviceOffered fees.
+  const selectedDoctor = doctors.find(
+    (doctor) => String(doctor._id) === String(selectedDoctorId)
+  );
+  const doctorConsultationOptions = selectedDoctor
+    ? toConsultationTypeEntries(selectedDoctor.consultationType).map(
+        (entry) => ({ name: entry.name, fee: entry.price })
+      )
+    : [];
+
+  const consultationOptions = selectedDoctorId
+    ? doctorConsultationOptions
+    : serviceConsultationOptions;
 
   // Set initial consultation type based on available options
   useEffect(() => {
@@ -259,6 +280,10 @@ const AppointmentPage = () => {
     setDoctorChoice(choice);
     if (choice === "any") {
       setSelectedDoctorId("");
+      // Back to the generic serviceOffered consultation options (Audio/Video).
+      const first = serviceConsultationOptions[0];
+      setConsultationType(first ? first.name : "");
+      setConsultationPrice(first ? first.fee || "" : "");
     }
     setShowDatePicker(timeSelection === CHOOSE_TIME && choice === "any");
   };
@@ -266,12 +291,21 @@ const AppointmentPage = () => {
   const handleDoctorSelection = (event) => {
     const selectedId = event.target.value;
     setSelectedDoctorId(selectedId);
-    const selectedDoctor = filteredDoctors.find(
-      (doctor) => doctor._id === selectedId
-    );
+    const selectedDoctor =
+      filteredDoctors.find((doctor) => doctor._id === selectedId) ||
+      doctors.find((doctor) => doctor._id === selectedId);
     if (selectedDoctor) {
       setDoctorName(selectedDoctor.name);
       setDoctorMobileNumber(selectedDoctor.mobileNumber);
+
+      // Show this doctor's own consultation types with their prices and
+      // preselect the first one so the selected tile + fee stay in sync.
+      const options = toConsultationTypeEntries(
+        selectedDoctor.consultationType
+      ).map((entry) => ({ name: entry.name, fee: entry.price }));
+      const first = options[0];
+      setConsultationType(first ? first.name : "");
+      setConsultationPrice(first ? first.fee || "" : "");
     }
   };
 
@@ -299,16 +333,12 @@ const AppointmentPage = () => {
   };
 
   const filterDoctors = (selectedOption) => {
-    const type = consultationTypeMapping[selectedOption];
-    const filtered = doctors.filter((doctor) => {
-      if (type === "Call" || type === "Video") {
-        return doctor.consultationType.includes(type);
-      }
-      if (type === "Clinic") {
-        return doctor.consultationType.includes(type);
-      }
-      return doctor.consultationType === "Home visit";
-    });
+    const key = typeKeyFor(selectedOption);
+    const filtered = doctors.filter((doctor) =>
+      consultationTypeNames(doctor.consultationType).some(
+        (name) => typeKeyFor(name) === key
+      )
+    );
     setFilteredDoctors(filtered);
   };
 

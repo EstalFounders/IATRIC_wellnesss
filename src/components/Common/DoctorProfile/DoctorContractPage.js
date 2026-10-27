@@ -33,6 +33,7 @@ import {
 import { formatLanguagesLabel } from "../../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../../customUtils/workDays";
 import { doctorDisplayName } from "../../../utils/doctorName";
+import { consultationTypeNames, formatConsultationTypePrices } from "../../../utils/consultationFee";
 import { readSessionDoctor } from "./lib/doctorProfileSession";
 import styles from "./DoctorContract.module.css";
 
@@ -64,21 +65,11 @@ const formatSlotWindow = (doctor) => {
   return `${from || "?"} – ${to || "?"}`;
 };
 
-const formatPrice = (value) => {
-  const amount = Number(value);
-  if (!Number.isFinite(amount) || amount <= 0) return "";
-  return `₹ ${amount.toLocaleString("en-IN")}`;
-};
-
 const formatShare = (value) => {
   const share = Number(value);
   if (!Number.isFinite(share) || share <= 0) return "";
   return `${share}%`;
 };
-
-/** `consultationType` / `language` are arrays, legacy rows may be Strings. */
-const joinList = (value) =>
-  Array.isArray(value) ? value.filter(Boolean).join(" · ") : value || "";
 
 /** Every document the profile holds, in the order the page shows them. */
 const buildDocuments = (doctor) => {
@@ -127,7 +118,7 @@ const buildDocuments = (doctor) => {
 const buildHiringFacts = (doctor) => [
   { label: "Hire date", value: formatDay(doctor.joiningDate) },
   { label: "Doctor type", value: doctor.doctorType },
-  { label: "Consultation price", value: formatPrice(doctor.price) },
+  { label: "Consultation price", value: formatConsultationTypePrices(doctor.consultationType) },
   {
     label: "Agreed share",
     value: formatShare(doctor.doctorShare),
@@ -142,7 +133,7 @@ const buildHiringFacts = (doctor) => [
   },
   { label: "Work days", value: formatWorkDaysLabel(doctor.workDays) },
   { label: "Slot hours", value: formatSlotWindow(doctor) },
-  { label: "Consultation types", value: joinList(doctor.consultationType) },
+  { label: "Consultation types", value: consultationTypeNames(doctor.consultationType).join(" · ") },
   { label: "Languages", value: formatLanguagesLabel(doctor.language) },
   { label: "Work experience", value: doctor.workExperience },
   { label: "Area of expertise", value: doctor.expertise },

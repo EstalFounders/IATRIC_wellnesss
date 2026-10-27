@@ -8,6 +8,7 @@ import { ConsultationButton } from "./commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fmt } from "../../i18n/format";
 import { doctorDisplayName } from "../../utils/doctorName";
+import { formatConsultationTypePrices } from "../../utils/consultationFee";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
@@ -64,9 +65,11 @@ const DoctorCard = ({ doctor, index }) => {
               {/* {doctor.location} */}
             </span>{" "}
           </p>
-          <p className={styles["doctor-text"]}>
-            {fmt(t("doctor.fee"), { price: doctor.price })}
-          </p>
+          {formatConsultationTypePrices(doctor.consultationType) ? (
+            <p className={styles["doctor-text"]}>
+              {formatConsultationTypePrices(doctor.consultationType)}
+            </p>
+          ) : null}
           <div className={styles["patient-stories"]}>
             <div className={styles["thumbs-up-container"]}>
               <span className={styles["percentage"]}>96%</span>

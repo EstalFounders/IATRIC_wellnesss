@@ -4,7 +4,7 @@
 // pages also pass footer={7} and stay chrome-free - they never render this.
 //
 // The contacts here are deliberately the STAFF/DOCTOR ones
-// (healthpathhr@gmail.com / +91 84485 59925). Anything a patient sees (website,
+// (hrhealthpath@gmail.com / +91 84485 59925). Anything a patient sees (website,
 // printed prescription, invoice) uses `contact_no` / `email` from constant.js,
 // which are the customer-care number and address.
 import React from "react";

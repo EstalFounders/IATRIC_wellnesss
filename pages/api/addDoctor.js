@@ -33,12 +33,50 @@ let isConnected = false;
  * write the dropped column back into MongoDB. The one-off cleanup of the
  * documents that already carry them lives in `scripts/removeDoctorDegree.js`.
  */
-const REMOVED_DOCTOR_FIELDS = ["degree"];
+const REMOVED_DOCTOR_FIELDS = ["degree", "price", "servicePrices"];
 
 function stripRemovedDoctorFields(fields) {
   const cleaned = { ...fields };
   for (const field of REMOVED_DOCTOR_FIELDS) delete cleaned[field];
   return cleaned;
+}
+
+/**
+ * `consultationType` is now an array of `{ name, price }` entries, sent as one
+ * JSON string form field. Accept both that and the legacy comma-joined string
+ * ("Audio,Video"), normalising every entry to `{ name, price }` (price null when
+ * absent). Always returns an array (possibly empty).
+ */
+function parseConsultationTypes(raw) {
+  let value = raw;
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("[")) {
+      try {
+        value = JSON.parse(trimmed);
+      } catch {
+        value = trimmed.split(",");
+      }
+    } else {
+      value = trimmed.split(",");
+    }
+  }
+
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((entry) => {
+      if (typeof entry === "string") {
+        const name = entry.trim();
+        return name ? { name, price: null } : null;
+      }
+      const name = String(entry?.name || "").trim();
+      if (!name) return null;
+      const numeric = Number(entry?.price);
+      const price = Number.isFinite(numeric) && numeric >= 0 ? numeric : null;
+      return { name, price };
+    })
+    .filter(Boolean);
 }
 
 export const config = {
@@ -181,11 +219,9 @@ export default async function handler(req, res) {
             diplomasCertificatesUrls,
             doctorStampUrl,
             doctorSignatureUrl,
-            consultationType: stringFields.consultationType
-              ? stringFields.consultationType
-                  .split(",")
-                  .map((type) => type.trim())
-              : [], // Convert to array & trim spaces
+            consultationType: parseConsultationTypes(
+              fields.consultationType?.[0]
+            ),
             serviceOffered: stringFields.serviceOffered
               ? stringFields.serviceOffered
                   .split(",")
@@ -360,11 +396,9 @@ export default async function handler(req, res) {
           ...stripRemovedDoctorFields(stringFields),
           profilePictureUrl,
           diplomasCertificatesUrls,
-          consultationType: stringFields.consultationType
-            ? stringFields.consultationType
-                .split(",")
-                .map((type) => type.trim())
-            : [], // Convert to array & trim spaces
+          consultationType: parseConsultationTypes(
+            fields.consultationType?.[0]
+          ),
         };
 
         // Services offered - only touch it when the client sends the field

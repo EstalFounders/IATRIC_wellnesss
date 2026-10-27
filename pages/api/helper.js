@@ -28,6 +28,16 @@ import {
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
 } from "./utils/constants";
 import { sendAdminNotification } from "./lib/sendNotification";
+import {
+  toConsultationTypeEntries,
+  typeKeyFor,
+} from "../../src/utils/consultationFee";
+
+// consultationType is stored as `[{ name, price }]` (legacy string entries also
+// possible), so a type search must match both shapes.
+const consultationTypeMatch = (type) => ({
+  $or: [{ consultationType: type }, { "consultationType.name": type }],
+});
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import path from "path";
@@ -44,6 +54,18 @@ const FALLBACK_SLOT_LIMIT = 3;
 /** Same calendar day in the server's timezone - the unit the room books in. */
 const isSameDay = (a, b) =>
   new Date(a).toDateString() === new Date(b).toDateString();
+
+/**
+ * The doctor's own fee for a consultation type (null when the doctor does not
+ * list that type, or lists it without a price).
+ */
+const doctorPriceForType = (doctor, type) => {
+  const key = typeKeyFor(type);
+  const entry = toConsultationTypeEntries(doctor?.consultationType).find(
+    (item) => typeKeyFor(item.name) === key,
+  );
+  return entry ? entry.price : null;
+};
 
 /**
  * Serialises a Slot document for the fallback list.
@@ -68,6 +90,7 @@ export async function findAvailableDoctorForNow(
   genericConsultationType,
   res,
   floorTime,
+  bookingPrice,
 ) {
   await dbConnect();
 
@@ -93,13 +116,13 @@ export async function findAvailableDoctorForNow(
 
   // Step 1: Get all company doctors
   const companyDoctors = await Doctor.find({
-    consultationType: { $in: [genericConsultationType] },
+    ...consultationTypeMatch(genericConsultationType),
     doctorType: "Company",
   });
 
   // Step 2: Get all non-company doctors (excluding company ones)
   const nonCompanyDoctors = await Doctor.find({
-    consultationType: { $in: [genericConsultationType] },
+    ...consultationTypeMatch(genericConsultationType),
     doctorType: "Individual",
   });
 
@@ -134,16 +157,34 @@ export async function findAvailableDoctorForNow(
   // Step 4: Then check non-company doctors
   await collectSlotsForDoctors(nonCompanyDoctors);
 
-  // Step 5: A free slot later today satisfies "Now" - book the earliest one.
-  // Slots earlier today were already excluded by the `nextSlotTime` floor, so
-  // "today" here means "still bookable today".
+  // No-doctor booking budget: prefer a doctor whose own fee for this type does not
+  // exceed what the patient is paying (`bookingPrice`), cheapest first.
+  const budgetAmount = Number(bookingPrice);
+  const hasBudget = Number.isFinite(budgetAmount) && budgetAmount >= 0;
+  const budgetScore = ({ doctor }) => {
+    const price = doctorPriceForType(doctor, genericConsultationType);
+    const withinBudget =
+      hasBudget && price !== null && Number(price) <= budgetAmount;
+    return { withinBudget, price: price === null ? Infinity : Number(price) };
+  };
+
+  // Step 5: A free slot later today satisfies "Now" - book the earliest one,
+  // preferring doctors within the booking budget (cheapest first).
   const todaysOptions = candidates
     .flatMap(({ doctor, slots }) =>
       slots
         .filter((slot) => isSameDay(slot.startTime, nextSlotTime))
         .map((slot) => ({ doctor, slot })),
     )
-    .sort((a, b) => new Date(a.slot.startTime) - new Date(b.slot.startTime));
+    .sort((a, b) => {
+      const sa = budgetScore(a);
+      const sb = budgetScore(b);
+      if (sa.withinBudget !== sb.withinBudget) return sa.withinBudget ? -1 : 1;
+      if (sa.withinBudget && sb.withinBudget && sa.price !== sb.price) {
+        return sa.price - sb.price;
+      }
+      return new Date(a.slot.startTime) - new Date(b.slot.startTime);
+    });
 
   if (todaysOptions.length > 0) {
     return {
@@ -181,6 +222,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   selectedDate,
   genericConsultationType,
   slot,
+  bookingPrice,
 ) {
   await dbConnect();
 
@@ -191,6 +233,28 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   endOfDay.setHours(23, 59, 59, 999);
 
   const { startTime, endTime } = slot;
+
+  // No-doctor booking budget: prefer a doctor whose own fee for this type is
+  // within `bookingPrice` (cheapest first), without dropping anyone as fallback.
+  const budgetAmount = Number(bookingPrice);
+  const hasBudget = Number.isFinite(budgetAmount) && budgetAmount >= 0;
+  const byPriceAsc = (a, b) =>
+    (doctorPriceForType(a, genericConsultationType) ?? Infinity) -
+    (doctorPriceForType(b, genericConsultationType) ?? Infinity);
+  const preferWithinBudget = (doctors) => {
+    if (!hasBudget) return doctors;
+    const eligible = doctors
+      .filter((doctor) => {
+        const price = doctorPriceForType(doctor, genericConsultationType);
+        return price !== null && Number(price) <= budgetAmount;
+      })
+      .sort(byPriceAsc);
+    const eligibleIds = new Set(eligible.map((doctor) => String(doctor._id)));
+    const rest = doctors.filter(
+      (doctor) => !eligibleIds.has(String(doctor._id)),
+    );
+    return [...eligible, ...rest];
+  };
 
   async function findDoctorWithSlot(doctors) {
     for (const doctor of doctors) {
@@ -212,22 +276,22 @@ export async function findAvailableDoctorForSpecificTimeSlot(
 
   // Step 1: Find company doctors
   let companyDoctors = await Doctor.find({
-    consultationType: { $in: [genericConsultationType] },
+    ...consultationTypeMatch(genericConsultationType),
     doctorType: "Company",
   });
 
-  let result = await findDoctorWithSlot(companyDoctors);
+  let result = await findDoctorWithSlot(preferWithinBudget(companyDoctors));
   if (result) {
     return result;
   }
 
   // Step 2: If no company doctor is available, find non-company doctors
   let nonCompanyDoctors = await Doctor.find({
-    consultationType: { $in: [genericConsultationType] },
+    ...consultationTypeMatch(genericConsultationType),
     doctorType: { $ne: "Individual" },
   });
 
-  result = await findDoctorWithSlot(nonCompanyDoctors);
+  result = await findDoctorWithSlot(preferWithinBudget(nonCompanyDoctors));
   if (result) {
     return result;
   }
@@ -257,13 +321,13 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   }
 
   // Check for nearest slot among company doctors first
-  let nearestSlotInfo = await findNearestSlot(companyDoctors);
+  let nearestSlotInfo = await findNearestSlot(preferWithinBudget(companyDoctors));
   if (nearestSlotInfo) {
     return { doctor: nearestSlotInfo.doctor, slotId: nearestSlotInfo.slot };
   }
 
   // If no nearest slot is found among company doctors, check non-company doctors
-  nearestSlotInfo = await findNearestSlot(nonCompanyDoctors);
+  nearestSlotInfo = await findNearestSlot(preferWithinBudget(nonCompanyDoctors));
   if (nearestSlotInfo) {
     return { doctor: nearestSlotInfo.doctor, slotId: nearestSlotInfo.slot };
   }
@@ -671,6 +735,7 @@ export async function handlePostConsultation(reqBody, res) {
         genericConsultationType,
         res,
         nowSlotFloor,
+        consultationprice,
       );
       console.log(result, "result 97");
 
@@ -707,6 +772,7 @@ export async function handlePostConsultation(reqBody, res) {
         selectedDate,
         genericConsultationType,
         selectedSlot,
+        consultationprice,
       );
       console.log(result, "result 111");
       docName = result.doctor.name;

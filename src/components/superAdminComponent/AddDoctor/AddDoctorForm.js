@@ -77,7 +77,6 @@ const EMPTY_DOCTOR = {
   password: "",
   doctorType: DoctorType.individual,
   doctorShare: "70",
-  price: "",
   slotStartTime: "",
   slotEndTime: "",
   mobileNumber: "",
@@ -133,11 +132,12 @@ const AddDoctorForm = () => {
   }, []);
 
   const handleAddType = (e) => {
-    const value = e.target.value;
+    const value = String(e.target.value || "").trim();
+    if (!value) return;
 
-    if (value && !selectedTypes.includes(value)) {
+    if (!selectedTypes.some((item) => item.name === value)) {
       setSelectedTypes((prevTypes) => {
-        const updatedTypes = [...prevTypes, value];
+        const updatedTypes = [...prevTypes, { name: value, price: null }];
 
         // Update doctorDetails with the new consultationType
         setDoctorDetails((prevDetails) => ({
@@ -152,9 +152,25 @@ const AddDoctorForm = () => {
 
   // Remove option from array when "tag" is clicked
   const handleRemoveType = (type) => {
-    const updatedTypes = selectedTypes.filter((item) => item !== type);
+    const updatedTypes = selectedTypes.filter((item) => item.name !== type);
     setSelectedTypes(updatedTypes);
     // Keep doctorDetails in sync, otherwise the removed tag is still submitted.
+    setDoctorDetails((prevDetails) => ({
+      ...prevDetails,
+      consultationType: updatedTypes,
+    }));
+  };
+
+  const handleServicePriceChange = (type, rawValue) => {
+    const numeric = rawValue === "" ? null : Number(rawValue);
+    const price =
+      numeric === null || !Number.isFinite(numeric) || numeric < 0
+        ? null
+        : numeric;
+    const updatedTypes = selectedTypes.map((item) =>
+      item.name === type ? { ...item, price } : item
+    );
+    setSelectedTypes(updatedTypes);
     setDoctorDetails((prevDetails) => ({
       ...prevDetails,
       consultationType: updatedTypes,
@@ -344,15 +360,13 @@ const AddDoctorForm = () => {
     // One field per entry; a blank field clears the list on the API side.
     appendEducationTraining(formData, educationItems);
     formData.append("workExperience", doctorDetails.workExperience);
-    // Comma-joined, `pages/api/addDoctor.js` splits these back into arrays.
-    formData.append("consultationType", selectedTypes.join(","));
+    formData.append("consultationType", JSON.stringify(selectedTypes));
     formData.append("serviceOffered", selectedService.join(","));
     formData.append("password", doctorDetails.password);
     formData.append("digitalSignature", doctorSignature);
     formData.append("location", doctorDetails.location);
     formData.append("profilePicture", profilePicture);
     formData.append("doctorType", doctorDetails.doctorType);
-    formData.append("price", doctorDetails.price);
     formData.append("slotStartTime", doctorDetails.slotStartTime);
     formData.append("slotEndTime", doctorDetails.slotEndTime);
     formData.append("doctorStamp", doctorStamp);
@@ -606,13 +620,13 @@ const AddDoctorForm = () => {
                     </select>
                     <div className={styles.tagsContainer}>
                       {selectedTypes.map((type) => (
-                        <div key={type} className={styles.tag}>
-                          {type}
+                        <div key={type.name} className={styles.tag}>
+                          {type.name}
                           <button
                             type="button"
                             className={styles.removeButton}
-                            aria-label={`Remove ${type}`}
-                            onClick={() => handleRemoveType(type)}
+                            aria-label={`Remove ${type.name}`}
+                            onClick={() => handleRemoveType(type.name)}
                           >
                             ✖
                           </button>
@@ -664,19 +678,7 @@ const AddDoctorForm = () => {
                     </div>
                   </div>
                 </Col>
-                <Col md={4}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>Price</span>
-                    <input
-                      type="number"
-                      name="price"
-                      value={doctorDetails.price}
-                      onChange={handleChange}
-                      className={styles.input}
-                    />
-                  </label>
-                </Col>
-                <Col md={4}>
+                <Col md={6}>
                   <div className={styles.field}>
                     <span className={styles.label}>Doctor Share (%)</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -703,7 +705,7 @@ const AddDoctorForm = () => {
                     </div>
                   </div>
                 </Col>
-                <Col md={4}>
+                <Col md={6}>
                   <label className={styles.field}>
                     <span className={styles.label}>Doctor Type</span>
                     <select
@@ -722,6 +724,44 @@ const AddDoctorForm = () => {
                   </label>
                 </Col>
               </Row>
+
+              {selectedTypes.length > 0 && (
+                <Row>
+                  <Col md={12}>
+                    <div className={styles.field}>
+                      <span className={styles.label}>
+                        Price per consultation type (₹)
+                      </span>
+                      {selectedTypes.map((type) => (
+                        <div
+                          key={type.name}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginBottom: 6,
+                          }}
+                        >
+                          <span style={{ flex: "1 1 0", fontSize: "0.9rem" }}>
+                            {type.name}
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={type.price ?? ""}
+                            onChange={(e) =>
+                              handleServicePriceChange(type.name, e.target.value)
+                            }
+                            placeholder="e.g. 500"
+                            className={styles.input}
+                            style={{ width: 140 }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </Col>
+                </Row>
+              )}
             </section>
 
             <section className={styles.card}>

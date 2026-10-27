@@ -20,6 +20,7 @@
 // utils/consultationFee.js).
 
 import { convertDateIntoTime } from "../helper";
+import { toConsultationTypeEntries } from "./consultationFee";
 
 export const REQUEST_STATUS = {
   PENDING: "pending",
@@ -229,6 +230,13 @@ const formatMoney = (value) => {
 /** One field value as the reviewer reads it. "" means "nothing to show". */
 export const formatFieldValue = (key, value) => {
   if (value === null || value === undefined || value === "") return "";
+  if (key === "consultationType") {
+    return toConsultationTypeEntries(value)
+      .map((entry) =>
+        entry.price === null ? entry.name : `${entry.name} (₹${entry.price})`
+      )
+      .join(", ");
+  }
   if (Array.isArray(value)) {
     return value
       .map((item) => formatFieldValue(key, item))
