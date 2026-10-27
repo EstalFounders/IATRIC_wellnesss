@@ -1,0 +1,16 @@
+{
+  "doctor-consultation": { "en": "Doctor Consultation", "hi": "डॉक्टर परामर्श" },
+  "medicine-delivery": { "en": "Medicine Delivery", "hi": "दवा डिलीवरी" },
+  "audio": { "en": "Audio", "hi": "ऑडियो" },
+  "video": { "en": "Video", "hi": "वीडियो" },
+  "lab-investigation": { "en": "Lab Investigation", "hi": "ब्लड टेस्ट और जांच" },
+  "home-care": { "en": "Home Care", "hi": "होम केयर" },
+  "nursing-care": { "en": "Nursing Care", "hi": "नर्सिंग देखभाल" },
+  "corporate-healthcare": {
+    "en": "Corporate Healthcare",
+    "hi": "कॉर्पोरेट हेल्थकेयर"
+  },
+  "healthcamp": { "en": "Healthcamp", "hi": "स्वास्थ्य शिविर" },
+  "community-care": { "en": "Community Care", "hi": "कम्युनिटी केयर" },
+  "physiotherapy": { "en": "Physiotherapy", "hi": "फिजियोथेरेपी" }
+}

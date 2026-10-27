@@ -90,6 +90,48 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
       otp: otp, // OTP for WhatsApp number confirmation
     };
   };
+
+  /**
+   * Flattens arbitrary user input into a single Fast2SMS template variable.
+   *
+   * Fast2SMS joins the values of one template with "|" and renders them on one
+   * line, so a pipe typed by the user would shift every following placeholder
+   * and a line break would break the render. Values are therefore flattened,
+   * replaced by `fallback` when empty and capped so a long message cannot
+   * exceed WhatsApp's template variable limit.
+   */
+  export const asTemplateValue = (value, fallback, maxLength) => {
+    if (value === undefined || value === null) return fallback;
+    const text = String(value)
+      .replace(/\|/g, "/")
+      .replace(/[\r\n\t]+/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    if (!text) return fallback;
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+
+  /**
+   * Value for {{1}} of the approved Fast2SMS template 38125
+   * ("user_callback_template"), whose body reads "Phone Number: {{1}}".
+   *
+   * That template has exactly ONE variable, so the admin alert carries a single
+   * value: the 10 digits of the submitted mobile number, or the email when the
+   * visitor left no phone. Fast2SMS rejects a variable count that differs from
+   * the template var_count.
+   * @param {{mobile_number?: number|string, email?: string}} query
+   * @returns {string}
+   */
+  export const getCallbackRequestContact = (query) => {
+    const source = query || {};
+    const mobile = String(source.mobile_number ?? "")
+      .replace(/\D/g, "")
+      .slice(-10);
+
+    if (/^\d{10}$/.test(mobile)) return mobile;
+
+    return asTemplateValue(source.email, "not provided", 80);
+  };
   
   // --- Note on formatData and extractTime ---
   // If you want these functions to be truly self-contained and format dates,

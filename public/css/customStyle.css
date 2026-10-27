@@ -1401,6 +1401,36 @@ h2.steelblue-color,
   background-color: var(--color-primary);
   border-color: var(--color-primary);
 }
+
+/* style.css loads a global `.btn { background: transparent; color: #fff;
+   border: 2px solid transparent }` AFTER bootstrap, which makes the Cancel /
+   Delete buttons in react-bootstrap modals invisible (white-on-white). Restore
+   the bootstrap secondary/danger variants here, since customStyle.css is the
+   last stylesheet loaded. */
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  color: #fff;
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+.btn-danger {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active {
+  color: #fff;
+  background-color: #c82333;
+  border-color: #bd2130;
+}
 .alert-primary {
   color: #fff;
   background-color: var(--color-primary);

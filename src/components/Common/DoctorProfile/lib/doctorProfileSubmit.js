@@ -10,6 +10,7 @@
 import { api, userTypeConstant } from "../../../../constant";
 import { appendEducationTraining } from "../../../../customUtils/educationTraining";
 import { appendLanguages } from "../../../../customUtils/languages";
+import { toConsultationTypeEntries } from "../../../../utils/consultationFee";
 
 const isFile = (value) => typeof File !== "undefined" && value instanceof File;
 
@@ -39,6 +40,16 @@ export const buildChangedFields = (original, edited) => {
     if (key === "profilePictureUrl" && isFile(edited[key])) {
       pendingPhoto = edited[key];
       hasChanges = true;
+      return;
+    }
+
+    if (key === "consultationType") {
+      const next = toConsultationTypeEntries(edited[key]);
+      const current = toConsultationTypeEntries(stored[key]);
+      if (JSON.stringify(next) !== JSON.stringify(current)) {
+        hasChanges = true;
+        changedFields[key] = edited[key];
+      }
       return;
     }
 
@@ -141,7 +152,7 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   // list on the API side.
   appendEducationTraining(formData, editedDoctor.educationTraining);
   formData.append("workExperience", editedDoctor.workExperience);
-  formData.append("consultationType", editedDoctor.consultationType);
+  formData.append("consultationType", JSON.stringify(editedDoctor.consultationType || []));
   formData.append(
     "serviceOffered",
     (editedDoctor.serviceOffered || []).join(",")
@@ -149,7 +160,6 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   formData.append("location", editedDoctor.location);
   formData.append("profilePicture", editedDoctor.profilePictureUrl);
   formData.append("doctorType", editedDoctor.doctorType);
-  formData.append("price", editedDoctor.price);
   formData.append("slotStartTime", editedDoctor.slotStartTime);
   formData.append("slotEndTime", editedDoctor.slotEndTime);
   (editedDoctor.diplomasCertificatesUrls || []).forEach(

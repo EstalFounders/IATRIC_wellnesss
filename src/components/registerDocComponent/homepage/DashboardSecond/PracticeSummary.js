@@ -13,7 +13,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import { FaFileContract } from "react-icons/fa";
 import { convertDateIntoTime } from "../../../../helper";
-import { price_symbol } from "../../../../constant";
+import { formatConsultationTypePrices } from "../../../../utils/consultationFee";
 import { formatWorkDaysLabel } from "../../../../customUtils/workDays";
 import styles from "../../css/HomePage.module.css";
 
@@ -43,12 +43,6 @@ const formatSlotWindow = (doctor) => {
   return `${from || "?"} – ${to || "?"}`;
 };
 
-const formatPrice = (value) => {
-  const amount = Number(value);
-  if (!Number.isFinite(amount) || amount <= 0) return "";
-  return `${price_symbol} ${amount.toLocaleString("en-IN")}`;
-};
-
 const PracticeSummary = ({ doctor }) => {
   const router = useRouter();
 
@@ -58,7 +52,7 @@ const PracticeSummary = ({ doctor }) => {
       value: doctor.isActive === false ? "Inactive" : "Active",
     },
     { label: "Joining date", value: formatDay(doctor.joiningDate) },
-    { label: "Consultation fee", value: formatPrice(doctor.price) },
+    { label: "Consultation fee", value: formatConsultationTypePrices(doctor.consultationType) },
     {
       label: "Your share",
       value:

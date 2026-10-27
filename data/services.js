@@ -419,10 +419,14 @@ export const AllDepartmentService = [
 // Service highlights rendered by the Demo5 "SERVICES" marquee.
 // Kept here (instead of inline in the component) so all service data lives in
 // this single module.
+//
+// `nameId` is the service id in data/serviceNames.json, which holds the localized
+// names ({ en, hi }) for every card. `title` stays the canonical English name
+// (DB matching, header menu, links) and is only a last-resort fallback.
 export const demo5ServiceHighlights = [
   {
     title: "Doctor Consultation",
-    titleKey: "demo5.services.doctorConsultation",
+    nameId: "doctor-consultation",
     service: "consultation",
     description:
       "Connect instantly with top-rated doctors for personalized medical consultations, expert health advice, and tailored treatment plans to improve your well-being.",
@@ -431,7 +435,7 @@ export const demo5ServiceHighlights = [
   },
   {
     title: "Nursing Care",
-    titleKey: "demo5.services.nursingCare",
+    nameId: "nursing-care",
     service: "nursing-services",
     description:
       "Qualified nurses at home or in clinic - injections, IV drips, wound care, elderly and post-operative nursing support.",
@@ -440,7 +444,7 @@ export const demo5ServiceHighlights = [
   },
   {
     title: "Home Care",
-    titleKey: "demo5.services.homeCare",
+    nameId: "home-care",
     // Own content block: home care is a separate branch from nursing care.
     service: "home-care",
     description:
@@ -451,6 +455,7 @@ export const demo5ServiceHighlights = [
   {
     // Merged "Labtest" / "Lab Investigation" service - single card, single name.
     title: "Lab Investigation",
+    nameId: "lab-investigation",
     service: "lab-test",
     comingSoon: true,
     description:
@@ -460,7 +465,7 @@ export const demo5ServiceHighlights = [
   },
   {
     title: "Community Care",
-    titleKey: "demo5.services.communityCare",
+    nameId: "community-care",
     service: "community-care",
     description:
       "Health camps, screening drives, awareness sessions and training that bring preventive care to communities, schools and local groups.",
@@ -469,7 +474,7 @@ export const demo5ServiceHighlights = [
   },
   {
     title: "Corporate Healthcare",
-    titleKey: "demo5.services.corporate",
+    nameId: "corporate-healthcare",
     service: "corporate-healthcare",
     description:
       "Pan-India corporate healthcare - OHC medical rooms, onsite doctors and nursing, emergency and physiotherapy support, employee health packages, health camps and training.",
@@ -478,7 +483,7 @@ export const demo5ServiceHighlights = [
   },
   {
     title: "Physiotherapy",
-    titleKey: "demo5.services.physiotherapy",
+    nameId: "physiotherapy",
     description:
       "Physiotherapy at home, in clinic or at your workplace - pain relief, post-surgical rehabilitation, sports injury care and mobility training.",
     icon: <PhysiotherapyIcon size={70} />,

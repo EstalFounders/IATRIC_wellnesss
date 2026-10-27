@@ -74,6 +74,8 @@ const doctorSchema = new Schema({
     required: true,
   },
   consultationType: {
+    // Array of `{ name, price }` entries; legacy string entries are tolerated
+    // by every reader (see consultationTypeName in src/utils/consultationFee.js).
     type: Array,
     required: true,
   },
@@ -121,11 +123,6 @@ const doctorSchema = new Schema({
   doctorType: {
     type: String,
     required: [true, "Doctor type is required"],
-  },
-  price: {
-    type: Number,
-    // Optional on the super-admin "Add Doctor" form.
-    required: false,
   },
   slotStartTime: {
     type: Date,

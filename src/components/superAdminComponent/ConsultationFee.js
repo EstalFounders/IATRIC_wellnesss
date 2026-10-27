@@ -24,6 +24,8 @@ import styles from "./css/ConsultationFee.module.css";
 import { api } from "../../constant";
 import {
   SYSTEM_CONSULTATION_TYPES,
+  consultationTypeName,
+  formatConsultationTypePrices,
   formatFee,
   resolveFee,
   toFee,
@@ -57,7 +59,7 @@ const offersType = (doctor, type) => {
   // an empty list must not blank out the whole row.
   if (!listed.length) return true;
 
-  return listed.some((name) => typeKeyFor(name) === type.key);
+  return listed.some((name) => typeKeyFor(consultationTypeName(name)) === type.key);
 };
 
 const readJson = async (response) => {
@@ -876,12 +878,9 @@ const ConsultationFeeComponent = () => {
                             <span className={styles.doctorMeta}>
                               {doctor.isActive === false
                                 ? "Inactive doctor"
-                                : `Base fee ${
-                                    doctor.price === undefined ||
-                                    doctor.price === null
-                                      ? "—"
-                                      : formatFee(doctor.price)
-                                  }`}
+                                : formatConsultationTypePrices(
+                                    doctor.consultationType
+                                  ) || "—"}
                             </span>
                           </th>
                           {visibleTypes.map((type) => {

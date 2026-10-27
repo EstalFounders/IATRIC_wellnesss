@@ -3,9 +3,12 @@ name: Playwright Tests
 # merge / push into it must run the E2E suite as well, not just main:
 #   - `push`         -> catches direct pushes AND the merge commit of a merged PR
 #   - `pull_request` -> catches the PR itself, before it is merged
+# `feature-branch` is the working branch and has no deploy target, so a push there runs
+# *only* this workflow: deploy.yml stays on main/staging, which makes the suite the
+# single gate on the branch before it is merged into staging.
 on:
   push:
-    branches: [ main, master, staging ]
+    branches: [ main, master, staging, feature-branch ]
   pull_request:
     branches: [ main, master, staging ]
   # Allow a manual run from the Actions tab (same as the deploy workflow).

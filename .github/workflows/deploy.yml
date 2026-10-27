@@ -3,6 +3,10 @@
 #   main    -> /var/www/IATRIC_wellnesss          PM2: HealthPath
 #   staging -> /var/www/IATRIC_wellnesss_staging  PM2: HealthPath-Staging
 #
+# `feature-branch` (and any other working branch) is deliberately NOT listed here: a push
+# there must run the Playwright suite only (.github/workflows/playwright.yml), never a
+# deploy - the branch has no target directory or PM2 app on the VPS.
+#
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   VPS_HOST       VPS IP / hostname
 #   VPS_USER       ssh user that owns the app directories

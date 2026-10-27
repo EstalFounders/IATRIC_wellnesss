@@ -36,9 +36,13 @@ export async function sendWhatsApp(number, message_id, variables_values) {
 
     return response.data;
   } catch (err) {
+    // Fast2SMS answers 400/401 with { status_code, message }; the SDK throws a
+    // FetchError that carries that body on `err.data` (there is no err.response)
+    // while err.message is only the HTTP status text, e.g. "Bad Request".
     console.error(
       "Fast2SMS WhatsApp Error:",
-      err?.response?.data || err.message,
+      err?.status,
+      err?.data ?? err?.message,
     );
 
     throw err;

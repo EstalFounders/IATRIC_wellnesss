@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { getServiceTitle } from "../../i18n/serviceNames";
 import { demo5ServiceHighlights } from "../../../data/services";
 import {
   mergeServiceLists,
-  slugifyService,
   useGlobalData,
 } from "../../customUtils/useGlobalData";
 import {
@@ -84,7 +84,7 @@ const Demo5Services1 = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const marqueeRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -99,6 +99,27 @@ const Demo5Services1 = () => {
     [services]
   );
   const combinedFeatures = [...highlights, ...highlights];
+
+  // One localized title per card, resolved in this order:
+  //   1. data/serviceNames.json - home-page services, keyed by service id
+  //      (`nameId`), one name per locale ({ en, hi }).
+  //   2. service.<Name> - the shared speciality dictionary already used by
+  //      Tabs-1 / Demo5Services2 (so the static fallback list stays translated).
+  //   3. the DB / static name - last resort only.
+  // The result is always exactly ONE string. The old `t(item.titleKey, item.title)`
+  // call mixed an English `title` with a Hindi dictionary value whenever the DB
+  // name and the dictionary disagreed, and had no entry at all for DB-only rows
+  // (Medicine Delivery, Audio, Video, Healthcamp, Labtest), which stayed English.
+  const serviceTitle = (item) => {
+    const localized = getServiceTitle(
+      item.nameId || item.name || item.title,
+      lang
+    );
+    if (localized) return localized;
+
+    const name = item.name || item.title || "";
+    return t(`service.${name}`, name);
+  };
 
   // ✅ Touch support
   useEffect(() => {
@@ -178,35 +199,44 @@ const Demo5Services1 = () => {
               onMouseMove={handleMouseMove}
             >
               <div className={`services-track-rtl ${isPaused ? "paused" : ""}`}>
-                {combinedFeatures.map((item, index) => (
-                  <div
-                    className="service-card"
-                    key={index}
-                    onClick={() => handleClick(item)}
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div className="service-nav-link-dept">
-                      <div className="service-icon-dept">
-                        {item.icon || renderServiceIcon(item.name)}
-                      </div>
-                      <div className="service-title-dept font-weight-bold">
-                        {isLabService(item.name || item.title)
-                          ? LAB_SERVICE_NAME
-                          : t(item.titleKey, item.title)}
-                      </div>
-                      {isComingSoonService(item.name || item.title) ? (
-                        <div className="service-coming-soon">
-                          {t("common.comingSoon")}
+                {combinedFeatures.map((item, index) => {
+                  // Second half = the marquee clone the -50% animation needs.
+                  // Keep it out of the accessibility tree so screen readers and
+                  // translation audits do not report every title twice.
+                  const isClone = index >= highlights.length;
+                  const cardKey = `${
+                    item.nameId || item.name || item.title || "service"
+                  }-${index}`;
+
+                  return (
+                    <div
+                      className="service-card"
+                      key={cardKey}
+                      aria-hidden={isClone || undefined}
+                      onClick={() => handleClick(item)}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
+                      <div className="service-nav-link-dept">
+                        <div className="service-icon-dept">
+                          {item.icon || renderServiceIcon(item.name)}
                         </div>
-                      ) : null}
-                      <div className="service-card-desc">
-                        {item.description ||
-                          getServiceDescription(item.name || item.title)}
+                        <div className="service-title-dept font-weight-bold">
+                          {serviceTitle(item)}
+                        </div>
+                        {isComingSoonService(item.name || item.title) ? (
+                          <div className="service-coming-soon">
+                            {t("common.comingSoon")}
+                          </div>
+                        ) : null}
+                        <div className="service-card-desc">
+                          {item.description ||
+                            getServiceDescription(item.name || item.title)}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
