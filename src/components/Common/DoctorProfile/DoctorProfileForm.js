@@ -15,6 +15,7 @@ import {
   FaClipboardList,
   FaClock,
   FaFileUpload,
+  FaPencilAlt,
   FaStethoscope,
   FaTrash,
   FaUserCircle,
@@ -39,6 +40,7 @@ import LanguageInput from "../LanguageInput";
 import { formatWorkDays, parseWorkDays } from "../../../customUtils/workDays";
 import { parseEducationTraining } from "../../../customUtils/educationTraining";
 import { doctorDisplayName } from "../../../utils/doctorName";
+import { toConsultationTypeEntries } from "../../../utils/consultationFee";
 import { parseLanguages } from "../../../customUtils/languages";
 import { stampDataUrl } from "../../registerDocComponent/lib/DoctorStampGenerator";
 import { buildChangedFields } from "./lib/doctorProfileSubmit";
@@ -77,10 +79,8 @@ const DoctorProfileForm = ({
     convertDateIntoTime(editedDoctor.slotEndTime)
   );
 
-  const [selectedTypes, setSelectedTypes] = useState(
-    Array.isArray(editedDoctor.consultationType)
-      ? editedDoctor.consultationType
-      : []
+  const [selectedTypes, setSelectedTypes] = useState(() =>
+    toConsultationTypeEntries(editedDoctor.consultationType)
   );
   const [selectedServices, setSelectedServices] = useState(
     Array.isArray(editedDoctor.serviceOffered) ? editedDoctor.serviceOffered : []
@@ -185,9 +185,22 @@ const DoctorProfileForm = ({
   };
 
   const handleRemoveType = (type) => {
-    const updatedTypes = selectedTypes.filter((item) => item !== type);
+    const updatedTypes = selectedTypes.filter((item) => item.name !== type);
     setSelectedTypes(updatedTypes);
-    setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+    setEditedDoctor((prev) => ({ ...prev, consultationType: updatedTypes }));
+  };
+
+  const handleServicePriceChange = (type, rawValue) => {
+    const numeric = rawValue === "" ? null : Number(rawValue);
+    const price =
+      numeric === null || !Number.isFinite(numeric) || numeric < 0
+        ? null
+        : numeric;
+    const updatedTypes = selectedTypes.map((item) =>
+      item.name === type ? { ...item, price } : item
+    );
+    setSelectedTypes(updatedTypes);
+    setEditedDoctor((prev) => ({ ...prev, consultationType: updatedTypes }));
   };
 
   // Consultation type - picked from the fixed list (Audio, Video, Home visit,
@@ -196,11 +209,11 @@ const DoctorProfileForm = ({
     const trimmed = String(value || "").trim();
     if (!trimmed) return;
     // Duplicate check (case-insensitive)
-    if (selectedTypes.some((t) => t.toLowerCase() === trimmed.toLowerCase()))
+    if (selectedTypes.some((t) => t.name.toLowerCase() === trimmed.toLowerCase()))
       return;
-    const updatedTypes = [...selectedTypes, trimmed];
+    const updatedTypes = [...selectedTypes, { name: trimmed, price: null }];
     setSelectedTypes(updatedTypes);
-    setEditedDoctor({ ...editedDoctor, consultationType: updatedTypes });
+    setEditedDoctor((prev) => ({ ...prev, consultationType: updatedTypes }));
     setShowAddInput(false);
   };
 
@@ -604,10 +617,10 @@ const DoctorProfileForm = ({
                       ) : (
                         selectedTypes.map((type, index) => (
                           <span key={index} className={styles.tag}>
-                            {type}
+                            {type.name}
                             <FaTrash
                               className={styles.tagRemove}
-                              onClick={() => handleRemoveType(type)}
+                              onClick={() => handleRemoveType(type.name)}
                             />
                           </span>
                         ))
@@ -628,7 +641,9 @@ const DoctorProfileForm = ({
                             <option
                               key={option.name}
                               value={option.name}
-                              disabled={selectedTypes.includes(option.name)}
+                              disabled={selectedTypes.some(
+                                (t) => t.name === option.name
+                              )}
                             >
                               {option.name}
                             </option>
@@ -703,14 +718,32 @@ const DoctorProfileForm = ({
                 <Col md={6}>
                   <Form.Group>
                     <Form.Label className={styles.label}>
-                      Consultation Price
+                      Price per service (₹)
                     </Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="price"
-                      value={editedDoctor.price || ""}
-                      onChange={handleChange}
-                    />
+                    {selectedTypes.length === 0 ? (
+                      <p className={styles.tagEmpty}>
+                        Select a consultation type to set its price.
+                      </p>
+                    ) : (
+                      selectedTypes.map((type) => (
+                        <div key={type.name} className={styles.priceRow}>
+                          <span className={styles.priceName}>{type.name}</span>
+                          <Form.Control
+                            type="number"
+                            min="0"
+                            value={type.price ?? ""}
+                            onChange={(e) =>
+                              handleServicePriceChange(type.name, e.target.value)
+                            }
+                            placeholder="e.g. 500"
+                          />
+                          <FaPencilAlt
+                            className={styles.pricePencil}
+                            title={`Edit ${type.name} price`}
+                          />
+                        </div>
+                      ))
+                    )}
                   </Form.Group>
                 </Col>
               </Row>

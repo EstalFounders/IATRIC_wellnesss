@@ -110,3 +110,30 @@ export const formatFee = (value) => {
   if (numeric === null) return "—";
   return numeric === 0 ? "Free" : `₹${numeric}`;
 };
+
+/** A consultation-type entry's name (legacy strings stay strings). */
+export const consultationTypeName = (entry) =>
+  typeof entry === "string" ? entry : (entry && entry.name) || "";
+
+export const consultationTypeNames = (list) =>
+  (Array.isArray(list) ? list : []).map(consultationTypeName).filter(Boolean);
+
+export const consultationTypePrice = (entry) =>
+  typeof entry === "string" ? null : toFee(entry?.price);
+
+export const toConsultationTypeEntries = (list) =>
+  (Array.isArray(list) ? list : [])
+    .map((entry) => ({
+      name: consultationTypeName(entry),
+      price: consultationTypePrice(entry),
+    }))
+    .filter((entry) => entry.name);
+
+/** "Audio ₹500 · Video ₹700" from `consultationType`; "" when no prices set. */
+export const formatConsultationTypePrices = (consultationType) => {
+  const entries = toConsultationTypeEntries(consultationType).filter(
+    (entry) => entry.price !== null
+  );
+  if (!entries.length) return "";
+  return entries.map((entry) => `${entry.name} ₹${entry.price}`).join(" · ");
+};

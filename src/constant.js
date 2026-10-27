@@ -36,7 +36,7 @@ export const email = "customercare@healthpath.co.in";
 // HR/document correspondence - everything a patient sees (site, prescription,
 // invoice) must keep using `contact_no` / `email` above.
 export const staff_support_no = "+91 81306 54581";
-export const staff_support_email = "healthpathhr@gmail.com";
+export const staff_support_email = "hrhealthpath@gmail.com";
 export const countryCode = "+91";
 export const development_production_url =
   process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";

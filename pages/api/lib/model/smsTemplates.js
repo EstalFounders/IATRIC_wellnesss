@@ -6,6 +6,7 @@ import {
   WHATSAPP_INVOICE_TEMPLATE,
   WHATSAPP_NUMBER_CONFIRMATION,
   WHATSAPP_USER_QUERY_TEMPLATE,
+  WHATSAPP_CALLBACK_REQUEST_TEMPLATE,
 } from "../../utils/constants";
 import { doctorDisplayName } from "../../../../src/utils/doctorName";
 
@@ -114,6 +115,14 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_OTP_ID,
         variables_values: String(body.otp),
+      };
+    case WHATSAPP_CALLBACK_REQUEST_TEMPLATE:
+      return {
+        // {{1}} phone number - template 38125 ("user_callback_template") has a
+        // single variable, so variables_values must hold ONE value with no "|":
+        // sending three values was rejected by Fast2SMS with HTTP 400.
+        message_id: process.env.FASTSMS_WA_TEMPLATE_CALLBACK_ID,
+        variables_values: String(body.contact ?? ""),
       };
     case WHATSAPP_USER_QUERY_TEMPLATE:
       return {

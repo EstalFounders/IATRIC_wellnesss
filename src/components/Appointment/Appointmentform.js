@@ -347,7 +347,11 @@ const AppointmentForm = ({
                       }`}
                     >
                       {option.name}
-                      {option.fee ? ` · ${price_symbol}${option.fee}` : ""}
+                      {option.fee === 0 || option.fee === "0"
+                        ? " · Free"
+                        : option.fee
+                        ? ` · ${price_symbol}${option.fee}`
+                        : ""}
                     </ToggleButton>
                   ))}
                 </ToggleButtonGroup>
