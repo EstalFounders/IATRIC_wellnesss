@@ -178,11 +178,63 @@ body {
 .forgot-pass-link {
   text-decoration: none;
   font-size: 1.1rem;
-  font-weight: 1000;
+  font-weight: 700;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
 }
 
 .forgot-pass-link:hover {
   text-decoration: underline;
+}
+
+/* Forgot-password modal */
+.forgot-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.forgot-hint {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0 0 16px;
+}
+
+.forgot-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.forgot-error {
+  color: #c62828;
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.forgot-button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #f0f0f0;
+  background-color: black;
+  margin-top: 8px;
+}
+
+.forgot-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .login-center-buttons {

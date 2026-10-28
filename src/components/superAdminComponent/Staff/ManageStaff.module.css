@@ -1,0 +1,64 @@
+/* ManageStaff.module.css */
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+  color: #1f2933;
+}
+
+.hero {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.heroTitle {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+}
+
+.heroSubtitle {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.thumbPlaceholder {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f1f3f5;
+  color: #adb5bd;
+  font-size: 1.2rem;
+}
+
+.empty {
+  color: #7b8794;
+  margin: 0;
+  padding: 12px 0;
+}

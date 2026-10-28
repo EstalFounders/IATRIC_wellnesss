@@ -288,26 +288,46 @@ const AppointmentPage = () => {
     setShowDatePicker(timeSelection === CHOOSE_TIME && choice === "any");
   };
 
-  const handleDoctorSelection = (event) => {
-    const selectedId = event.target.value;
-    setSelectedDoctorId(selectedId);
+  // Selects a doctor by id (shared by the dropdown and the ?doctorId route param).
+  const applyDoctorSelection = (selectedId) => {
+    if (!selectedId) return;
     const selectedDoctor =
-      filteredDoctors.find((doctor) => doctor._id === selectedId) ||
-      doctors.find((doctor) => doctor._id === selectedId);
-    if (selectedDoctor) {
-      setDoctorName(selectedDoctor.name);
-      setDoctorMobileNumber(selectedDoctor.mobileNumber);
+      filteredDoctors.find(
+        (doctor) => String(doctor._id) === String(selectedId)
+      ) ||
+      doctors.find((doctor) => String(doctor._id) === String(selectedId));
+    if (!selectedDoctor) return;
 
-      // Show this doctor's own consultation types with their prices and
-      // preselect the first one so the selected tile + fee stay in sync.
-      const options = toConsultationTypeEntries(
-        selectedDoctor.consultationType
-      ).map((entry) => ({ name: entry.name, fee: entry.price }));
-      const first = options[0];
-      setConsultationType(first ? first.name : "");
-      setConsultationPrice(first ? first.fee || "" : "");
-    }
+    setSelectedDoctorId(selectedDoctor._id);
+    setDoctorChoice("specific");
+    setDoctorName(selectedDoctor.name);
+    setDoctorMobileNumber(selectedDoctor.mobileNumber);
+
+    // Show this doctor's own consultation types with their prices and
+    // preselect the first one so the selected tile + fee stay in sync.
+    const options = toConsultationTypeEntries(
+      selectedDoctor.consultationType
+    ).map((entry) => ({ name: entry.name, fee: entry.price }));
+    const first = options[0];
+    setConsultationType(first ? first.name : "");
+    setConsultationPrice(first ? first.fee || "" : "");
   };
+
+  const handleDoctorSelection = (event) => {
+    applyDoctorSelection(event.target.value);
+  };
+
+  // Pre-select the doctor passed in the URL (?doctorId=<id>) once the doctor
+  // list has loaded, e.g. landing from a doctor card's "Book Consultation".
+  useEffect(() => {
+    const doctorIdFromQuery =
+      typeof router.query.doctorId === "string"
+        ? router.query.doctorId.trim()
+        : "";
+    if (!doctorIdFromQuery || !doctors || doctors.length === 0) return;
+    if (String(selectedDoctorId) === String(doctorIdFromQuery)) return;
+    applyDoctorSelection(doctorIdFromQuery);
+  }, [router.query.doctorId, doctors]);
 
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;

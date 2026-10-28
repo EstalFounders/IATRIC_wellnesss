@@ -4,6 +4,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
+import { formatWorkExperienceLabel } from "../../customUtils/workExperience";
 import { formatLanguagesLabel } from "../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
 
@@ -12,7 +13,9 @@ const Doctor1Details = () => {
   const {
     name,
     expertise,
+    overview,
     educationTraining,
+    workExperience,
     diplomasCertificatesUrls,
     language,
     workDays,
@@ -108,7 +111,10 @@ const Doctor1Details = () => {
 
                 {/* Buttons */}
                 <div className="doctor-photo-btn text-center">
-                  <Link legacyBehavior href="/appointment">
+                  <Link
+                    legacyBehavior
+                    href={`/appointment?doctorId=${doctorInfo._id || ""}`}
+                  >
                     <a className="btn btn-md btn-blue blue-hover">
                       Book an Appointment
                     </a>
@@ -128,9 +134,18 @@ const Doctor1Details = () => {
                 {/* Text */}
                 <p>DOCTOR BIO</p>
                 {/* Title */}
+                <h5 className="h5-md blue-color">Overview</h5>
+                {/* Text - doctor's overview from the API response */}
+                <p>{overview || "Not provided"}</p>
+
+                {/* Title */}
                 <h5 className="h5-md blue-color">Education + Trainings</h5>
                 {/* Text - `educationTraining` is an array of entries */}
                 <p>{formatEducationTrainingLabel(educationTraining)}</p>
+
+                <h5 className="h5-md blue-color">Work Experience</h5>
+                {/* Text - `workExperience` is an array of entries */}
+                <p>{formatWorkExperienceLabel(workExperience)}</p>
 
                 {/* CERTIFICATES */}
                 <div className="certificates">

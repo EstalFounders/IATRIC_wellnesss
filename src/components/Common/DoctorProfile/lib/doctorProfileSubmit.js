@@ -9,7 +9,9 @@
 
 import { api, userTypeConstant } from "../../../../constant";
 import { appendEducationTraining } from "../../../../customUtils/educationTraining";
+import { appendWorkExperience } from "../../../../customUtils/workExperience";
 import { appendLanguages } from "../../../../customUtils/languages";
+import { formatLocation } from "../../../../customUtils/indiaLocations";
 import { toConsultationTypeEntries } from "../../../../utils/consultationFee";
 
 const isFile = (value) => typeof File !== "undefined" && value instanceof File;
@@ -151,13 +153,13 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   // One field per entry; blank rows are dropped and a blank field clears the
   // list on the API side.
   appendEducationTraining(formData, editedDoctor.educationTraining);
-  formData.append("workExperience", editedDoctor.workExperience);
+  appendWorkExperience(formData, editedDoctor.workExperience);
   formData.append("consultationType", JSON.stringify(editedDoctor.consultationType || []));
   formData.append(
     "serviceOffered",
     (editedDoctor.serviceOffered || []).join(",")
   );
-  formData.append("location", editedDoctor.location);
+  formData.append("location", formatLocation(editedDoctor.location));
   formData.append("profilePicture", editedDoctor.profilePictureUrl);
   formData.append("doctorType", editedDoctor.doctorType);
   formData.append("slotStartTime", editedDoctor.slotStartTime);

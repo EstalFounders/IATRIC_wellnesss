@@ -32,6 +32,7 @@ import {
 } from "../../../customUtils/educationTraining";
 import { formatLanguagesLabel } from "../../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../../customUtils/workDays";
+import { formatWorkExperienceLabel } from "../../../customUtils/workExperience";
 import { doctorDisplayName } from "../../../utils/doctorName";
 import { consultationTypeNames, formatConsultationTypePrices } from "../../../utils/consultationFee";
 import { readSessionDoctor } from "./lib/doctorProfileSession";
@@ -135,7 +136,7 @@ const buildHiringFacts = (doctor) => [
   { label: "Slot hours", value: formatSlotWindow(doctor) },
   { label: "Consultation types", value: consultationTypeNames(doctor.consultationType).join(" · ") },
   { label: "Languages", value: formatLanguagesLabel(doctor.language) },
-  { label: "Work experience", value: doctor.workExperience },
+  { label: "Work experience", value: formatWorkExperienceLabel(doctor.workExperience) },
   { label: "Area of expertise", value: doctor.expertise },
 ];
 

@@ -17,6 +17,13 @@ import { dbConnect } from "../../src/lib/db";
 import Doctor from "../../src/models/doctorModel";
 import { parseEducationTraining } from "../../src/customUtils/educationTraining";
 import { parseLanguages } from "../../src/customUtils/languages";
+import { parseLocation } from "../../src/customUtils/indiaLocations";
+import { parseWorkExperience } from "../../src/customUtils/workExperience";
+import { sendWhatsAppConfirmation } from "./lib/communication";
+import { WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE } from "./utils/constants";
+import { getDoctorCredentialsMessageBody } from "./utils/whatsappMessageBodies";
+import { formatPhoneNumber } from "./utils/commonmethod";
+import { getConfiguredAppUrl } from "../../src/lib/appOrigin";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
@@ -39,6 +46,25 @@ function stripRemovedDoctorFields(fields) {
   const cleaned = { ...fields };
   for (const field of REMOVED_DOCTOR_FIELDS) delete cleaned[field];
   return cleaned;
+}
+
+/**
+ * Builds the doctor's `location` value from the multiparty fields. The Add
+ * Doctor form now sends `locationState` + `locationCity`; the doctor-panel edit
+ * form still sends a single `location` string. Returns null when the client
+ * sent none of them, so the PUT can leave the stored value untouched.
+ */
+function parseLocationFields(fields) {
+  if (fields.locationState !== undefined || fields.locationCity !== undefined) {
+    return {
+      state: String(fields.locationState?.[0] ?? "").trim(),
+      city: String(fields.locationCity?.[0] ?? "").trim(),
+    };
+  }
+  if (fields.location !== undefined) {
+    return parseLocation(fields.location?.[0]);
+  }
+  return null;
 }
 
 /**
@@ -205,12 +231,19 @@ export default async function handler(req, res) {
             ])
           );
           console.log(stringFields, "string fiels");
+          const location = parseLocationFields(fields);
+          delete stringFields.location;
+          delete stringFields.locationState;
+          delete stringFields.locationCity;
+          delete stringFields.workExperience;
           const addedDoctor = await Doctor.create({
             ...stripRemovedDoctorFields(stringFields),
+            location: location ?? { state: "", city: "" },
             // Repeatable field: `fields.educationTraining` is one entry per
             // appended form field, so it must not be taken from the
             // comma-joined `stringFields` spread.
             educationTraining: parseEducationTraining(fields.educationTraining),
+            workExperience: parseWorkExperience(fields.workExperience),
             // Repeatable field as well: one entry per appended `formData.append`
             // ("English", "Hindi"), never the comma-joined `stringFields` value.
             language: parseLanguages(fields.language),
@@ -230,6 +263,27 @@ export default async function handler(req, res) {
           });
 
           console.log(addedDoctor._id, "Doctor Added");
+
+          // Send the doctor their login credentials over WhatsApp. Best-effort:
+          // a delivery failure must never fail the doctor creation. Only sent
+          // when a temporary password was actually provided on the form.
+          if (rawPassword) {
+            try {
+              const doctorUrl = `${getConfiguredAppUrl()}/registerDoc/login`;
+              await sendWhatsAppConfirmation(
+                formatPhoneNumber(String(addedDoctor.mobileNumber ?? "")),
+                getDoctorCredentialsMessageBody({
+                  doctorName: addedDoctor.name,
+                  doctorUrl,
+                  mobileNumber: String(addedDoctor.mobileNumber ?? ""),
+                  tempPassword: rawPassword,
+                }),
+                WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE
+              );
+            } catch (notifyError) {
+              console.error("Failed to send doctor credentials WhatsApp:", notifyError);
+            }
+          }
 
           res.status(200).json({
             message: "Doctor Added successfully",
@@ -390,6 +444,11 @@ export default async function handler(req, res) {
         const stringFields = Object.fromEntries(
           Object.entries(fields).map(([key, value]) => [key, value.toString()])
         );
+        const location = parseLocationFields(fields);
+        delete stringFields.location;
+        delete stringFields.locationState;
+        delete stringFields.locationCity;
+        delete stringFields.workExperience;
 
         // Update doctor data in MongoDB
         const updateData = {
@@ -400,6 +459,12 @@ export default async function handler(req, res) {
             fields.consultationType?.[0]
           ),
         };
+
+        // Location - only touch it when the client sends it (the doctor-panel
+        // approval PUT never sends it, so it must keep the stored value).
+        if (location !== null) {
+          updateData.location = location;
+        }
 
         // Services offered - only touch it when the client sends the field
         if (stringFields.serviceOffered !== undefined) {
@@ -425,6 +490,13 @@ export default async function handler(req, res) {
         // keeps the stored value (the doctor-panel approval PUT never sends it).
         if (fields.language !== undefined) {
           updateData.language = parseLanguages(fields.language);
+        }
+
+        // Work experience - repeatable field, so it also comes straight from the
+        // raw multiparty values. Only touched when the client sends it (the
+        // doctor-panel approval PUT never sends this field).
+        if (fields.workExperience !== undefined) {
+          updateData.workExperience = parseWorkExperience(fields.workExperience);
         }
         // The generic field spread above would copy a submitted password into
         // the document as plain text. Hash a new password, or drop the field so

@@ -36,12 +36,15 @@ import {
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice";
 import WorkDaysPicker from "../WorkDaysPicker";
 import EducationTrainingInput from "../EducationTrainingInput";
+import WorkExperienceInput from "../WorkExperienceInput";
 import LanguageInput from "../LanguageInput";
 import { formatWorkDays, parseWorkDays } from "../../../customUtils/workDays";
 import { parseEducationTraining } from "../../../customUtils/educationTraining";
+import { parseWorkExperience } from "../../../customUtils/workExperience";
 import { doctorDisplayName } from "../../../utils/doctorName";
 import { toConsultationTypeEntries } from "../../../utils/consultationFee";
 import { parseLanguages } from "../../../customUtils/languages";
+import { formatLocation } from "../../../customUtils/indiaLocations";
 import { stampDataUrl } from "../../registerDocComponent/lib/DoctorStampGenerator";
 import { buildChangedFields } from "./lib/doctorProfileSubmit";
 import styles from "./DoctorProfileForm.module.css";
@@ -98,6 +101,11 @@ const DoctorProfileForm = ({
   // Draft rows for the repeatable education/training inputs.
   const [educationItems, setEducationItems] = useState(
     parseEducationTraining(doctor.educationTraining)
+  );
+
+  // Draft rows for the repeatable work-experience inputs.
+  const [workExperienceItems, setWorkExperienceItems] = useState(
+    parseWorkExperience(doctor.workExperience)
   );
 
   // Draft rows for the repeatable language inputs.
@@ -249,6 +257,16 @@ const DoctorProfileForm = ({
     setEditedDoctor({
       ...editedDoctor,
       educationTraining: parseEducationTraining(items),
+    });
+  };
+
+  // Work experience - the rows are stored as an array of trimmed strings
+  // (doctor schema is `[String]`), like education + training.
+  const handleWorkExperienceChange = (items) => {
+    setWorkExperienceItems(items);
+    setEditedDoctor({
+      ...editedDoctor,
+      workExperience: parseWorkExperience(items),
     });
   };
 
@@ -422,7 +440,7 @@ const DoctorProfileForm = ({
                     <Form.Control
                       type="text"
                       name="location"
-                      value={editedDoctor.location || ""}
+                      value={formatLocation(editedDoctor.location)}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -518,12 +536,9 @@ const DoctorProfileForm = ({
                     <Form.Label className={styles.label}>
                       Work Experience
                     </Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={3}
-                      name="workExperience"
-                      value={editedDoctor.workExperience || ""}
-                      onChange={handleChange}
+                    <WorkExperienceInput
+                      value={workExperienceItems}
+                      onChange={handleWorkExperienceChange}
                     />
                   </Form.Group>
                 </Col>
