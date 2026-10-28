@@ -15,6 +15,7 @@ import {
   Alert,
 } from "@mui/material";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
+import NursingStaffSection from "./NursingStaffSection";
 import { address, callToBook, color_schema, contact_no } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
@@ -1397,6 +1398,9 @@ const ServiceDetail = () => {
             </>
           )}
         </Grid>
+
+        {/* Our Nursing Staff - shown only on the nursing-services page */}
+        {serviceKey === "nursing-services" ? <NursingStaffSection /> : null}
 
         {/* FAQs - only this service's questions, from data/faqs.js. Exactly the
             same copy as its block on /faqs (linked through the "See all" link),

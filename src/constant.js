@@ -17,6 +17,7 @@ export const doctorStamp_img_path = `${IMAGES_ROOT}/doctorStamp/`;
 export const doctorSignature_img_path = `${IMAGES_ROOT}/doctorSignature/`;
 export const prescription_img_path = `${IMAGES_ROOT}/prescription/`;
 export const invoice_img_path = `${IMAGES_ROOT}/invoice/`;
+export const staffProfilePicture_img_path = `${IMAGES_ROOT}/staff/profilePicture/`;
 // Consultation recordings uploaded by the meeting room (MediaRecorder blob).
 export const consultation_recording_folder = `${IMAGES_ROOT}/consultationRecording`;
 
@@ -54,8 +55,10 @@ export const booking_btn_txt = "Book Now";
 
 export const api = {
   addDoctor: "/api/addDoctor",
+  staff: "/api/staff",
   uploadDoctorAvatar: "/api/doctor/upload-avatar",
   doctorLogin: "/api/doctorLogin",
+  doctorForgotPassword: "/api/registerDoc/forgotPassword",
   medicineInfoApiCall: "/api/medicineInfo?medicineName=",
   getAllMedicine: "/api/medicineInfo",
   prescriptionCall: "/api/prescription",
@@ -84,7 +87,6 @@ export const api = {
   serviceOffered: "/api/superAdmin/serviceOffered",
   sendOtp: "/api/helper/whatsappConfirmationApi",
   serviceSuggestion: "/api/helper/getServiceSuggestion",
-  postArticle: "/api/superAdmin/postArticle",
   helperApi: "/api/helperApi",
   consultationByMeetingId: "/api/getAppointmentId",
   marketingLogin: "/api/marketing/auth/login",
@@ -251,7 +253,7 @@ export const eventEmitter = {
   medicineCartEventEmitter: "medicine-cart-update",
 };
 
-export const apiAction = { fetchCateogories: "fetchCateogories", savePrescription: "savePrescription", getPrescription: "getPrescription" };
+export const apiAction = { savePrescription: "savePrescription", getPrescription: "getPrescription" };
 
 export const labtestCateogory = {
   fullBodyCheckup: "Full Body",

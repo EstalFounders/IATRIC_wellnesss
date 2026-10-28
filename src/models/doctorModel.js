@@ -70,8 +70,19 @@ const doctorSchema = new Schema({
     required: true,
   },
   workExperience: {
-    type: String,
-    required: true,
+    // Repeatable ("8 years - Cardiology"). Stored as an array of trimmed
+    // strings like `educationTraining`, but at least one entry is required.
+    // Legacy documents hold a single String and are cast by mongoose to a
+    // one-element array on read; `parseWorkExperience`
+    // (src/customUtils/workExperience.js) normalises new writes. `required` is
+    // a no-op on a mongoose 8 array path, so the rule is kept as a validator
+    // instead (same as `language`).
+    type: [String],
+    default: [],
+    validate: {
+      validator: (values) => Array.isArray(values) && values.length > 0,
+      message: "Work experience is required",
+    },
   },
   consultationType: {
     // Array of `{ name, price }` entries; legacy string entries are tolerated
@@ -84,7 +95,12 @@ const doctorSchema = new Schema({
     required: true,
   },
   location: {
-    type: String,
+    // Structured `{ state, city }` (set by the Add Doctor form's India location
+    // picker). `Mixed` is used on purpose so legacy documents that still hold a
+    // plain string ("Mumbai", "None") keep reading correctly; readers normalise
+    // through `formatLocation` / `parseLocation` in
+    // `src/customUtils/indiaLocations.js`.
+    type: Schema.Types.Mixed,
     required: false,
   },
   educationTraining: {

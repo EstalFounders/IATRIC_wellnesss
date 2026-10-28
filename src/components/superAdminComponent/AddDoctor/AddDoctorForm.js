@@ -21,8 +21,14 @@ import {
 } from "../../../constant.js";
 import WorkDaysPicker from "../../Common/WorkDaysPicker.js";
 import EducationTrainingInput from "../../Common/EducationTrainingInput.js";
+import WorkExperienceInput from "../../Common/WorkExperienceInput.js";
 import LanguageInput from "../../Common/LanguageInput.js";
+import IndiaLocationPicker from "../../Common/IndiaLocationPicker.js";
 import { appendEducationTraining } from "../../../customUtils/educationTraining.js";
+import {
+  appendWorkExperience,
+  parseWorkExperience,
+} from "../../../customUtils/workExperience.js";
 import {
   appendLanguages,
   parseLanguages,
@@ -53,15 +59,14 @@ const MANDATORY_TEXT_FIELDS = [
   ["email", "Email"],
   ["mobileNumber", "Mobile Number"],
   ["expertise", "Area of Expertise"],
-  ["workExperience", "Work Experience"],
   ["workDays", "Work Days"],
   ["overview", "Overview"],
   ["doctorRegistrationNo", "Registration No"],
 ];
 
 // Blank form state, also used by the Reset button so a second registration
-// starts from a clean slate. `location` defaults to "None", exactly like the
-// previous form.
+// starts from a clean slate. `location` starts empty so the India location
+// picker shows its "Select state" placeholders.
 const EMPTY_DOCTOR = {
   name: "",
   email: "",
@@ -70,7 +75,7 @@ const EMPTY_DOCTOR = {
   gender: "",
   workDays: "",
   overview: "",
-  location: "None",
+  location: { state: "", city: "" },
   workExperience: "",
   consultationType: "",
   serviceOffered: "",
@@ -102,6 +107,11 @@ const AddDoctorForm = () => {
   // Draft rows for the repeatable education/training inputs; blank rows are
   // filtered out on submit by `appendEducationTraining`.
   const [educationItems, setEducationItems] = useState([""]);
+  // Draft rows for the repeatable work-experience inputs; blank rows are
+  // filtered out on submit by `appendWorkExperience`. At least one entry is
+  // required, so `handleSubmit` raises an inline error (like `language`).
+  const [workExperienceItems, setWorkExperienceItems] = useState([""]);
+  const [workExperienceError, setWorkExperienceError] = useState("");
   // Draft rows for the repeatable language inputs; blank rows are filtered out on
   // submit by `appendLanguages`. The field is mandatory, so `handleSubmit` raises
   // an inline error (the same pattern as the work-day chips).
@@ -206,8 +216,8 @@ const AddDoctorForm = () => {
     }));
   };
 
-  const handleLocationTextChange = (e) => {
-    setDoctorDetails({ ...doctorDetails, location: e.target.value });
+  const handleLocationChange = (location) => {
+    setDoctorDetails((prevDetails) => ({ ...prevDetails, location }));
   };
 
   // <WorkDaysPicker /> already returns a Monday -> Sunday ordered array.
@@ -225,6 +235,13 @@ const AddDoctorForm = () => {
   const handleLanguagesChange = (items) => {
     setLanguageItems(items);
     if (parseLanguages(items).length > 0) setLanguageError("");
+  };
+
+  // Work experience - draft rows in, array out; at least one entry is required,
+  // so the inline error is cleared as soon as one non-blank row exists.
+  const handleWorkExperienceChange = (items) => {
+    setWorkExperienceItems(items);
+    if (parseWorkExperience(items).length > 0) setWorkExperienceError("");
   };
 
   const handleShowDialog = (msg) => {
@@ -246,6 +263,7 @@ const AddDoctorForm = () => {
     setSelectedService([]);
     setSelectedWorkDays([]);
     setEducationItems([""]);
+    setWorkExperienceItems([""]);
     setLanguageItems([""]);
     setprofilePicture("");
     setDoctorStamp("");
@@ -256,6 +274,7 @@ const AddDoctorForm = () => {
     setSlotEndTime("21:00");
     setWorkDaysError("");
     setLanguageError("");
+    setWorkExperienceError("");
     setUploaderKey((key) => key + 1);
   };
 
@@ -317,6 +336,17 @@ const AddDoctorForm = () => {
       missingFields.push("Language");
     }
 
+    // Work experience is repeatable too, so it lives in its own draft-row state
+    // and is validated here instead of `MANDATORY_TEXT_FIELDS`.
+    const hasWorkExperience =
+      parseWorkExperience(workExperienceItems).length > 0;
+    setWorkExperienceError(
+      hasWorkExperience ? "" : "Please add at least one work experience"
+    );
+    if (!hasWorkExperience) {
+      missingFields.push("Work Experience");
+    }
+
     if (selectedTypes.length === 0) {
       missingFields.push("Select Consultation Type");
     }
@@ -359,12 +389,14 @@ const AddDoctorForm = () => {
     formData.append("overview", doctorDetails.overview);
     // One field per entry; a blank field clears the list on the API side.
     appendEducationTraining(formData, educationItems);
-    formData.append("workExperience", doctorDetails.workExperience);
+    appendWorkExperience(formData, workExperienceItems);
     formData.append("consultationType", JSON.stringify(selectedTypes));
     formData.append("serviceOffered", selectedService.join(","));
     formData.append("password", doctorDetails.password);
     formData.append("digitalSignature", doctorSignature);
-    formData.append("location", doctorDetails.location);
+    const location = doctorDetails.location || {};
+    formData.append("locationState", location.state || "");
+    formData.append("locationCity", location.city || "");
     formData.append("profilePicture", profilePicture);
     formData.append("doctorType", doctorDetails.doctorType);
     formData.append("slotStartTime", doctorDetails.slotStartTime);
@@ -464,20 +496,14 @@ const AddDoctorForm = () => {
                   </label>
                 </Col>
                 <Col md={6}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>Location</span>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      name="location"
+                  <div className={styles.field}>
+                    <IndiaLocationPicker
+                      key={uploaderKey}
                       value={doctorDetails.location}
-                      onChange={handleLocationTextChange}
-                      placeholder="e.g. Mumbai"
+                      onChange={handleLocationChange}
+                      selectClassName={styles.select}
                     />
-                    <span className={styles.hint}>
-                      Used for off-line and home-visit consultations.
-                    </span>
-                  </label>
+                  </div>
                 </Col>
                 <Col md={12}>
                   <div className={styles.field}>
@@ -548,20 +574,16 @@ const AddDoctorForm = () => {
                   </label>
                 </Col>
                 <Col md={12}>
-                  <label className={styles.field}>
+                  <div className={styles.field}>
                     <span className={styles.label}>
                       Work Experience <span className={styles.req}>*</span>
                     </span>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      name="workExperience"
-                      value={doctorDetails.workExperience}
-                      onChange={handleChange}
-                      placeholder="e.g. 8 years"
-                      required
+                    <WorkExperienceInput
+                      value={workExperienceItems}
+                      onChange={handleWorkExperienceChange}
+                      error={workExperienceError}
                     />
-                  </label>
+                  </div>
                 </Col>
                 <Col md={12}>
                   <label className={styles.field}>
@@ -583,6 +605,18 @@ const AddDoctorForm = () => {
                     <EducationTrainingInput
                       value={educationItems}
                       onChange={setEducationItems}
+                    />
+                  </div>
+                </Col>
+                <Col md={12}>
+                  <div className={styles.field}>
+                    <span className={styles.label}>
+                      Language <span className={styles.req}>*</span>
+                    </span>
+                    <LanguageInput
+                      value={languageItems}
+                      onChange={handleLanguagesChange}
+                      error={languageError}
                     />
                   </div>
                 </Col>

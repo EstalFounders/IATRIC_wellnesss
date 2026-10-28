@@ -56,6 +56,17 @@ export const SidebarData = [
     icon: <MdUpdate />,
   },
   {
+    group: "Staff",
+    title: "Manage staff",
+    path: "/superAdmin/staff",
+    icon: <FaIcons.FaUsers />,
+  },
+  {
+    title: "Add staff member",
+    path: "/superAdmin/addStaff",
+    icon: <FaIcons.FaUserPlus />,
+  },
+  {
     group: "Labs",
     title: "Lab tests",
     path: "/superAdmin/labTest",
@@ -81,11 +92,6 @@ export const SidebarData = [
     title: "Offers",
     path: "/superAdmin/offers",
     icon: <BiSolidOffer />,
-  },
-  {
-    title: "Post articles",
-    path: "/superAdmin/postArticles",
-    icon: <FaIcons.FaListAlt />,
   },
   {
     title: "Customer query",

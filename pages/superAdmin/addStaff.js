@@ -1,15 +1,15 @@
-import PostArticleComp from "../../src/components/superAdminComponent/PostArticle/PostArticleComp";
+import AddStaffForm from "../../src/components/superAdminComponent/AddStaff/AddStaffForm";
 import Layouts from "../../src/layout/Layouts";
 import AuthenticatedComponent from "../api/auth/authenticatedcomponent";
 
-const addDoctor = () => {
+const AddStaff = () => {
   return (
     <AuthenticatedComponent>
       <Layouts header={7} footer={7}>
-        <PostArticleComp />
+        <AddStaffForm />
       </Layouts>
     </AuthenticatedComponent>
   );
 };
 
-export default addDoctor;
+export default AddStaff;

@@ -12,10 +12,13 @@ import { api, DoctorType, superAdminConsultationtype, userTypeConstant, color_sc
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
 import WorkDaysPicker from "../Common/WorkDaysPicker";
 import EducationTrainingInput from "../Common/EducationTrainingInput";
+import WorkExperienceInput from "../Common/WorkExperienceInput";
 import LanguageInput from "../Common/LanguageInput";
 import { formatWorkDays, parseWorkDays } from "../../customUtils/workDays";
 import { parseEducationTraining } from "../../customUtils/educationTraining";
+import { parseWorkExperience } from "../../customUtils/workExperience";
 import { parseLanguages } from "../../customUtils/languages";
+import { formatLocation } from "../../customUtils/indiaLocations";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -53,6 +56,11 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   // approval diff (see RegisterDocLoginHeader).
   const [educationItems, setEducationItems] = useState(
     parseEducationTraining(doctor.educationTraining)
+  );
+
+  // Draft rows for the repeatable work-experience inputs.
+  const [workExperienceItems, setWorkExperienceItems] = useState(
+    parseWorkExperience(doctor.workExperience)
   );
 
   // Draft rows for the repeatable language inputs. Like education/work days,
@@ -217,6 +225,16 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     });
   };
 
+  // Work experience - the rows are stored as an array of trimmed strings
+  // (doctor schema is `[String]`), like education + training.
+  const handleWorkExperienceChange = (items) => {
+    setWorkExperienceItems(items);
+    setEditedDoctor({
+      ...editedDoctor,
+      workExperience: parseWorkExperience(items),
+    });
+  };
+
   // Languages - one entry per language, stored as an array of trimmed strings.
   // `parseLanguages` drops the blank rows the user left open.
   const handleLanguagesChange = (items) => {
@@ -324,11 +342,9 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                 <Form.Label>
                   <b>Work Experience</b>
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="workExperience"
-                  value={editedDoctor.workExperience}
-                  onChange={handleChange}
+                <WorkExperienceInput
+                  value={workExperienceItems}
+                  onChange={handleWorkExperienceChange}
                 />
               </Form.Group>
               <Form.Group controlId="consultationType" className="mb-3">
@@ -508,14 +524,14 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
           <Row>
             <Col md={6}>
               {/* Add Form.Group for profile picture */}
-              <Form.Group controlId="location," className="mb-3">
+              <Form.Group controlId="location" className="mb-3">
                 <Form.Label>
                   <b>Location</b>
                 </Form.Label>
                 <Form.Control
                   type="text"
-                  name="location,"
-                  value={editedDoctor.location}
+                  name="location"
+                  value={formatLocation(editedDoctor.location)}
                   onChange={handleChange}
                 />
               </Form.Group>

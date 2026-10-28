@@ -1,46 +1,41 @@
 /* styles.css */
 
 .dropzone {
-    border: 2px dashed #cccccc;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-  }
-  
-  .dropzone.active {
-    border-color: #4caf50;
-  }
-  
-  .image-preview {
-    margin-top: 10px;
-    overflow: hidden;
-    max-width: 100%;
-  }
-  
-  .image-preview img {
-    max-width: 100%;
-    height: auto;
-  }
+  border: 2px dashed #cccccc;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
 
-  .imageContainer {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .image-preview {
-    position: relative;
-    margin: 10px;
-    overflow: hidden;
-    max-width: 150px;
-  }
-  
-  .removeButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    color: red; /* Customize the color as needed */
-  }
+.dropzone.active {
+  border-color: #4caf50;
+}
+
+.imageContainer {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.image-preview {
+  position: relative;
+  margin: 10px;
+  overflow: hidden;
+  max-width: 150px;
+}
+
+.image-preview img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: red; /* Customize the color as needed */
+}

@@ -1,0 +1,146 @@
+/* AddStaffForm.module.css
+   Add-staff admin form. Visual language matches AddDoctorForm: brand green
+   #3b5f1d, white cards and a clean field grid. */
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+  color: #1f2933;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.heroTitle {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: #3b5f1d;
+  font-family: "TT Ramillas", serif;
+}
+
+.heroSubtitle {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 22px 22px 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.field {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3f4c5a;
+}
+
+.req {
+  color: #c62828;
+  font-weight: 700;
+}
+
+.input,
+.textarea {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #cfd6dd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1f2933;
+  background: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #3b5f1d;
+  box-shadow: 0 0 0 3px rgba(59, 95, 29, 0.15);
+}
+
+.textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #7b8794;
+}
+
+.error {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #c62828;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 14px 0 20px;
+  border-top: 1px solid #ececec;
+}
+
+.primaryBtn {
+  padding: 11px 26px;
+  border: none;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background: #2d4a16;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghostBtn {
+  padding: 11px 22px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #fff;
+  color: #3b5f1d;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.ghostBtn:hover {
+  background: #f4f7f0;
+}

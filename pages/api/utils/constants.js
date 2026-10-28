@@ -12,6 +12,7 @@ export const WHATSAPP_USER_QUERY_TEMPLATE = "user_query";
 // Template id: FASTSMS_WA_TEMPLATE_CALLBACK_ID (blank = the caller skips the send
 // instead of failing the saved request).
 export const WHATSAPP_CALLBACK_REQUEST_TEMPLATE = "callback_request_admin";
+export const WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE = "doctor_credentials";
 
 // Fast2SMS WhatsApp Business API
 export const FASTSMS_API = {

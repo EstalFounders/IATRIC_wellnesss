@@ -20,6 +20,12 @@ module.exports = {
         port: "",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        port: "",
+        pathname: "**",
+      },
     ],
     // Optimised images are cached for a year. Safe because every banner/blog URL is
     // versioned (`&v=<lastUpdated>` via withCacheBuster), so a replaced image is a

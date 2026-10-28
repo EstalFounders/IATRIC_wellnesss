@@ -112,6 +112,26 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
   };
 
   /**
+   * Body for the generic "doctor credentials" WhatsApp template sent right after
+   * a doctor is added from the admin panel.
+   */
+  export const getDoctorCredentialsMessageBody = ({
+    doctorName,
+    doctorUrl,
+    mobileNumber,
+    tempPassword,
+  }) => {
+    return {
+      doctor_name: asTemplateValue(doctorName, "Doctor", 80),
+      greeting: "Welcome to HealthPath",
+      intro: "Your doctor account has been created successfully.",
+      doctor_url: asTemplateValue(doctorUrl, "", 200),
+      username: asTemplateValue(mobileNumber, "", 20),
+      temp_password: asTemplateValue(tempPassword, "", 40),
+    };
+  };
+
+  /**
    * Value for {{1}} of the approved Fast2SMS template 38125
    * ("user_callback_template"), whose body reads "Phone Number: {{1}}".
    *

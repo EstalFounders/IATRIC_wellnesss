@@ -7,6 +7,7 @@ import {
   WHATSAPP_NUMBER_CONFIRMATION,
   WHATSAPP_USER_QUERY_TEMPLATE,
   WHATSAPP_CALLBACK_REQUEST_TEMPLATE,
+  WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE,
 } from "../../utils/constants";
 import { doctorDisplayName } from "../../../../src/utils/doctorName";
 
@@ -128,6 +129,23 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_OTP_ID,
         variables_values: String(body.mobile_number),
+      };
+
+    case WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE:
+      return {
+        // 8 placeholders of the generic "doctor credentials" template:
+        //   Hello {{1}}, / {{2}} / {{3}} / Details: {{4}}: {{5}} / {{6}}: {{7}} / {{8}}
+        message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
+        variables_values: [
+          doctorDisplayName(capitalize(body.doctor_name)), // {{1}}
+          body.greeting,                                    // {{2}}
+          body.intro,                                       // {{3}}
+          "Login URL",                                      // {{4}}
+          body.doctor_url,                                  // {{5}}
+          "Username",                                       // {{6}}
+          body.username,                                    // {{7}}
+          `Temporary Password: ${body.temp_password}`,      // {{8}}
+        ].join("|"),
       };
 
     default:
