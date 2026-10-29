@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { useGlobalData } from "../customUtils/useGlobalData";
+import { useMemo, useState } from "react";
+import { useGlobalData, mergeServiceLists } from "../customUtils/useGlobalData";
 import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../customUtils/serviceLinks";
+import { demo5ServiceHighlights } from "../../data/services";
 import { color_schema } from "../constant";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage"];
@@ -22,6 +23,15 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   const { services } = useGlobalData();
   const [servicesOpen, setServicesOpen] = useState(false);
 
+  // Merge with the static service highlights exactly like the desktop Services
+  // mega-menu (Header1) so every entry carries its canonical title + content key.
+  // Without this the raw DB row is slugified (e.g. "Nursing Care" -> "nursing-care")
+  // and opens the generic fallback page instead of the rich "nursing-services" page.
+  const navServices = useMemo(
+    () => mergeServiceLists(services, demo5ServiceHighlights),
+    [services]
+  );
+
   const menuItems = [
     { label: "Home", href: "/", icon: "🏠" },
     { label: "About Us", href: "/about-us", icon: "ℹ️" },
@@ -41,7 +51,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   // name plus the Coming Soon tag, whatever alias its DB row carries, and the
   // standalone "Audio" / "Video" rows are dropped: they are shown once, as
   // sub-pointers of "Book Doctor Consultation".
-  const serviceItems = (services || [])
+  const serviceItems = navServices
     .filter(
       (service) =>
         !isConsultationService(service.service || service.name || service.title)

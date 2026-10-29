@@ -1,0 +1,113 @@
+/*
+ * HealthPathTeam.module.css
+ *
+ * Card styles for the HealthPathTeam auto-scrolling team strip. The marquee
+ * scroll behaviour itself reuses the global classes in
+ * public/css/customStyle.css (.services-marquee, .services-track-rtl), so these
+ * rules only shape the individual card.
+ */
+
+.teamCard {
+  flex: 0 0 auto;
+  width: 280px;
+  height: 360px;
+  margin: 0 12px;
+  /* Top/bottom headroom so the hover lift (translateY + scale) is never
+     clipped by the marquee's overflow: hidden — same pattern as
+     Demo5Services1, where the inner card is shorter than its wrapper. */
+  padding: 14px 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.teamCardInner {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 20px 24px;
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.teamCardInner:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--color-primary);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eaf5e0;
+  margin-bottom: 14px;
+}
+
+.avatarFallback {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.name {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: #333333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.service {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  color: #6c757d;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bookNowWrap {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+@media (max-width: 767px) {
+  .teamCard {
+    width: 240px;
+    height: 330px;
+    margin: 0 8px;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+  }
+
+  .avatarFallback {
+    font-size: 34px;
+  }
+}
