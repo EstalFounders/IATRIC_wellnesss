@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   api,
@@ -105,6 +105,11 @@ const AppointmentPage = () => {
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
   const [serviceType, setServiceType] = useState("");
   const [pendingPayment, setPendingPayment] = useState(null);
+
+  // Anchor + one-shot flag for the deep-link scroll (?doctorId=...): once the
+  // doctor has been preselected, the page smooth-scrolls to the booking form.
+  const appointmentFormRef = useRef(null);
+  const didAutoScrollRef = useRef(false);
 
   // Services come from the globalData slice (single source of truth, serviceOffered
   // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
@@ -328,6 +333,23 @@ const AppointmentPage = () => {
     if (String(selectedDoctorId) === String(doctorIdFromQuery)) return;
     applyDoctorSelection(doctorIdFromQuery);
   }, [router.query.doctorId, doctors]);
+
+  // Once the deep-linked doctor has actually been preselected, smooth-scroll to
+  // the booking form so the user does not have to scroll manually after landing.
+  useEffect(() => {
+    const doctorIdFromQuery =
+      typeof router.query.doctorId === "string"
+        ? router.query.doctorId.trim()
+        : "";
+    if (!doctorIdFromQuery || !selectedDoctorId || didAutoScrollRef.current) return;
+    if (String(selectedDoctorId) !== String(doctorIdFromQuery)) return;
+
+    didAutoScrollRef.current = true;
+    appointmentFormRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [router.query.doctorId, selectedDoctorId]);
 
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;
@@ -558,18 +580,20 @@ const AppointmentPage = () => {
       <div className="container-fluid">
         <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
-          <AppointmentForm
-            appointmentState={appointmentState}
-            setter={setter}
-            doctors={doctors}
-            handleDoctorChoiceChange={handleDoctorChoiceChange}
-            handleDoctorSelection={handleDoctorSelection}
-            handleTimeSelection={handleTimeSelection}
-            handleSlotSelection={handleSlotSelection}
-            handleConsultationChange={handleConsultationChange}
-            sendWhatsAppConfirmation={sendWhatsAppConfirmation}
-            handleCloseSnackBar={handleCloseSnackBar}
-          />
+          <div ref={appointmentFormRef}>
+            <AppointmentForm
+              appointmentState={appointmentState}
+              setter={setter}
+              doctors={doctors}
+              handleDoctorChoiceChange={handleDoctorChoiceChange}
+              handleDoctorSelection={handleDoctorSelection}
+              handleTimeSelection={handleTimeSelection}
+              handleSlotSelection={handleSlotSelection}
+              handleConsultationChange={handleConsultationChange}
+              sendWhatsAppConfirmation={sendWhatsAppConfirmation}
+              handleCloseSnackBar={handleCloseSnackBar}
+            />
+          </div>
 
           {/* Marketing sections are for the public /appointment page only; the
               super-admin booking screen shows the form and nothing else. */}
