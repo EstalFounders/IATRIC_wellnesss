@@ -5,7 +5,7 @@
 // matching server-side guard.
 import React, { useState } from "react";
 import { Col, Row, Alert } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, imageBlurDataUrl } from "../../../constant";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import styles from "./AddStaffForm.module.css";
 
@@ -116,7 +116,7 @@ const AddStaffForm = () => {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder="e.g. Dr. Ananya Sharma"
+                placeholder="e.g. Ananya Sharma"
               />
               {fieldErrors.name && (
                 <span className={styles.error}>{fieldErrors.name}</span>

@@ -1,0 +1,240 @@
+/* Filter bar for the public doctor listing (/all-doctors).
+ *
+ * Brand colours arrive as CSS variables from FilterBar (color_schema.green and
+ * friends) with safe fallbacks, so the bar keeps working in any theme.
+ */
+.wrapper {
+  width: 100%;
+  margin: 24px 0 8px;
+}
+
+.bar {
+  --fb-primary: #3b5f1d;
+  --fb-primary-soft: #edf3e6;
+  --fb-ring: rgba(59, 95, 29, 0.16);
+  --fb-ink: #0f172a;
+  --fb-muted: #64748b;
+  --fb-line: #e2e8f0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid var(--fb-line);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+    0 10px 28px -18px rgba(16, 24, 40, 0.25);
+  box-sizing: border-box;
+}
+
+/* --- Search ---------------------------------------------------------------- */
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: var(--fb-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 44px;
+  padding: 0 42px 0 40px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--fb-ink);
+  background-color: #f8fafc;
+  border: 1px solid var(--fb-line);
+  border-radius: 999px;
+  outline: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+.searchInput:hover {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.searchInput:focus {
+  background-color: #ffffff;
+  border-color: var(--fb-primary);
+  box-shadow: 0 0 0 4px var(--fb-ring);
+}
+
+.clearSearch {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: #475569;
+  background-color: #e2e8f0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.clearSearch:hover {
+  background-color: #cbd5e1;
+  color: var(--fb-ink);
+}
+
+.clearSearch:focus,
+.clearAll:focus {
+  outline: none;
+}
+
+.clearSearch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--fb-ring);
+}
+
+/* --- Dropdown row ---------------------------------------------------------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- Meta row (result count + clear all) ----------------------------------- */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--fb-line);
+}
+
+.count {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--fb-muted);
+}
+
+.count strong {
+  font-weight: 600;
+  color: var(--fb-ink);
+}
+
+.clearAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  background-color: #ffffff;
+  border: 1px solid var(--fb-line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.clearAll:hover {
+  color: var(--fb-primary);
+  border-color: var(--fb-primary);
+  background-color: var(--fb-primary-soft);
+}
+
+.clearAll:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--fb-ring);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--fb-primary);
+  border-radius: 999px;
+}
+
+/* --- Empty state ----------------------------------------------------------- */
+.empty {
+  width: 100%;
+  padding: 48px 16px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.empty strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+/* --- Responsive ------------------------------------------------------------ */
+@media (max-width: 767px) {
+  .bar {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .searchBox {
+    flex: 1 1 100%;
+  }
+
+  /* Two pills per row keep every panel inside the viewport - a horizontally
+     scrolling strip would clip the absolute dropdown panels. */
+  .controls {
+    gap: 8px;
+  }
+
+  .controls > * {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+  }
+
+  .meta {
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 359px) {
+  .controls > * {
+    flex: 1 1 100%;
+  }
+}

@@ -3,6 +3,7 @@ import { Col, Row, Form, Button } from "react-bootstrap"; // Ensure proper impor
 import { formatData } from "../../registerDocComponent/utils/helper";
 import { appointment_status, payment, price_symbol, showUpdate } from "../../../constant";
 import { useRouter } from "next/router";
+import { formatConsultationTypes } from "../../../utils/consultationFee";
 
 const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);
@@ -45,7 +46,7 @@ const ItemCards = ({ source, data, onStatusChanged, onUpdateStatus }) => {
       >
         <u>{data.name}</u>
       </Col>
-      <Col>{data.consultationType}</Col>
+      <Col>{formatConsultationTypes(data.consultationType)}</Col>
       <Col>{formatData(data.appointmentTime)}</Col>
       <Col>{formatData(data.appointmentTime)}</Col>
       <Col>{data.symptoms}</Col>

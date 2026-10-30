@@ -16,6 +16,7 @@ import {
   eventEmitter,
   lab_test_discount,
   price_symbol,
+  imageBlurDataUrl
 } from "../../../constant";
 import { useDispatch, useSelector } from "react-redux";
 import { setLabTestCartDetails } from "../../../store/slices/cartPanelData";
@@ -254,6 +255,8 @@ const CartPanel = ({
           {responseSuccess ? (
             <div className={styles.successMessage}>
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 src={"/images/success.png"}
                 alt="Thank you"
                 width={100}

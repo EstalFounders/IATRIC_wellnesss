@@ -22,7 +22,7 @@ import { TbReport } from "react-icons/tb";
 import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/router";
 import LabTestModel from "../../components/labTestComponent/modal/LabTestModel";
-import { address, contact_no, existingUser, facebook_page_url, color_schema } from "../../constant";
+import { address, contact_no, existingUser, facebook_page_url, color_schema, imageBlurDataUrl, Linkdn_url } from "../../constant";
 import PopupDialog from "../../components/Common/PopupDialog";
 import Link from "next/link";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
@@ -157,7 +157,7 @@ function LabTesLandingPageHeader() {
                 className="linkedinicon"
                 title="Linkedin"
                 target="blank"
-                href="https://www.linkedin.com/in/iatrichealthcare/"
+                href={Linkdn_url}
               >
                 <FaLinkedin size={25} />
                 <span className="mobiletext02">Linkedin</span>
@@ -193,7 +193,7 @@ function LabTesLandingPageHeader() {
       <Container className={`border-bottom ${styles.container}`}>
         <Row className={`align-items-center ${styles.row}`}>
           <Col xs={8} sm={4} md={2} className="d-flex align-items-center">
-            <Image src="/images/logo.png" width={120} height={60} alt="Logo" />
+            <Image placeholder="blur" blurDataURL={imageBlurDataUrl} src="/images/logo.png" width={120} height={60} alt="Logo" />
           </Col>
 
           <Col md={6} className="d-md-flex justify-content-center">

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Badge, Button } from "react-bootstrap";
-import { api, color_schema } from "../../../constant";
+import { api, color_schema, imageBlurDataUrl } from "../../../constant";
 import { POPUP_FALLBACK_IMAGE } from "../../../../data/popupBanner";
 import { BANNER_STORAGE_PATH, applyBannerCacheMetadata, getBannerImageUrl, withCacheBuster } from "../../../services/firebaseStorage";
 import styles from "../css/marketingPanel.module.css";
@@ -119,6 +119,8 @@ const HomepageBannerCard = ({ moduleInfo }) => {
       </p>
 
       <Image
+        placeholder="blur"
+        blurDataURL={imageBlurDataUrl}
         src={previewSrc}
         alt={banner?.altText || "Homepage banner"}
         width={420}

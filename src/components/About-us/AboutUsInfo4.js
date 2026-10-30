@@ -5,7 +5,7 @@ import { FaAngleDoubleRight } from "react-icons/fa";
 import { ConsultationButton } from "../Common/commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { richText } from "../../i18n/richText";
-import { color_schema } from "../../constant";
+import { color_schema, imageBlurDataUrl } from "../../constant";
 
 // "What you get" answers, two per column. One line each keeps the section short;
 // the full service list (with its own links) is rendered by <Services7 /> on the
@@ -27,6 +27,8 @@ const AboutUsInfo4 = () => {
             <div className="col-lg-6">
               <div className="info-4-img text-center" data-wow-delay="0.6s">
                 <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   src="/images/chief_doctor_700x800.jpg"
                   width={600}
                   height={500}
@@ -131,6 +133,8 @@ const AboutUsInfo4 = () => {
             <div className="col-lg-6">
               <div className="info-4-img text-center" data-wow-delay="0.6s">
                 <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   src="/images/emergency_help_700x800.jpg"
                   width={700}
                   height={800}

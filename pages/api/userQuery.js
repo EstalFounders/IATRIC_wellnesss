@@ -3,10 +3,13 @@ import Query from "../../src/models/query";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import {
-  admin_callback_number,
-  WHATSAPP_CALLBACK_REQUEST_TEMPLATE,
+  SUPPORT_NOTIFICATION_PHONE_NUMBER,
+  WHATSAPP_CALLBACK_SUPPORT_TEMPLATE,
 } from "./utils/constants";
-import { getCallbackRequestContact } from "./utils/whatsappMessageBodies";
+import {
+  getCallbackRequestContact,
+  getCallbackSupportAlertBody,
+} from "./utils/whatsappMessageBodies";
 import { rateLimit } from "../../src/lib/rateLimiter";
 import { logErrorToGoogleSheet } from "./helper";
 
@@ -65,21 +68,44 @@ function normalizeQueryPayload(body) {
 }
 
 /**
- * Sends the "Get a Callback" alert to the admin's WhatsApp number.
+ * Formats the submission time shown in the admin alert (IST, e.g.
+ * "30 Oct 2026, 04:12 pm"). Falls back to "-" for an unparseable date so a bad
+ * value can never produce "Invalid Date" inside the template variable.
+ */
+function formatCallbackRequestedAt(value) {
+  const parsed = value ? new Date(value) : new Date();
+  if (Number.isNaN(parsed.getTime())) return "-";
+
+  return parsed.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
+}
+
+/**
+ * Sends the "Get a Call Back" alert to SUPPORT_NOTIFICATION_PHONE_NUMBER
+ * (8130654581) with the generic WhatsApp template
+ * (FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID):
+ *   "You got a call back request from <phone>. Please call them back ASAP."
  *
  * Never throws: a missing template id, a Fast2SMS rejection (HTTP 400/401, or
  * HTTP 200 with `return: false`) or a network error is reported as `{ sent: false, reason }`
  * so the query that was already saved is still returned to the caller.
  */
 async function notifyAdminOfCallback(savedQuery) {
-  const templateId = process.env.FASTSMS_WA_TEMPLATE_CALLBACK_ID;
-  const number = formatPhoneNumber(admin_callback_number);
+  const templateId = process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID;
+  const number = formatPhoneNumber(SUPPORT_NOTIFICATION_PHONE_NUMBER);
 
-  // The id is filled in once the admin template is approved in Fast2SMS; until
-  // then every submission stays silent instead of failing on a bad send.
+  // A blank id means the env is not configured: skip the send instead of
+  // failing a request that is already persisted.
   if (!templateId) {
     console.warn(
-      "userQuery: FASTSMS_WA_TEMPLATE_CALLBACK_ID is empty, skipping the admin WhatsApp alert."
+      "userQuery: FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID is empty, skipping the support WhatsApp alert."
     );
     return { sent: false, reason: "template_not_configured" };
   }
@@ -87,15 +113,18 @@ async function notifyAdminOfCallback(savedQuery) {
   try {
     const result = await sendWhatsAppConfirmation(
       number,
-      { contact: getCallbackRequestContact(savedQuery) },
-      WHATSAPP_CALLBACK_REQUEST_TEMPLATE
+      getCallbackSupportAlertBody(
+        getCallbackRequestContact(savedQuery),
+        formatCallbackRequestedAt(savedQuery?.createdAt)
+      ),
+      WHATSAPP_CALLBACK_SUPPORT_TEMPLATE
     );
 
     if (result && result.return === false) {
       const reason = Array.isArray(result.message)
         ? result.message.join(", ")
         : result.message || "fast2sms_rejected";
-      console.error("userQuery: admin WhatsApp rejected:", reason);
+      console.error("userQuery: support WhatsApp rejected:", reason);
       return { sent: false, reason, number };
     }
 
@@ -113,16 +142,17 @@ async function notifyAdminOfCallback(savedQuery) {
       ? detail.join(", ")
       : String(detail || "whatsapp_error");
 
-    console.error("userQuery: admin WhatsApp failed:", error?.status || "", reason);
+    console.error("userQuery: support WhatsApp failed:", error?.status || "", reason);
 
     await logErrorToGoogleSheet({
-      apiName: "userQuery - admin WhatsApp",
+      apiName: "userQuery - support WhatsApp",
       errorMessage: reason,
       errorCode: String(error?.status || 500),
       stackTrace: error.stack,
       requestPayload: {
         queryId: savedQuery?._id ? String(savedQuery._id) : undefined,
         templateId,
+        number,
       },
     });
     return { sent: false, reason, number };

@@ -10,7 +10,7 @@ import CompanyLogo from "../../../public/images/company_logo.png";
 // import GoogleSvg from "../assets/icons8-google.svg";
 import styles from "./css/DoctorLogin.module.css"; // Import the CSS file
 import CustomDialog from "../CustomPopup";
-import { api } from "../../constant";
+import { api, imageBlurDataUrl } from "../../constant";
 
 export default function DoctorLogin() {
   const router = useRouter();
@@ -163,6 +163,8 @@ export default function DoctorLogin() {
       <div className={styles["login-main"]}>
         <div className={styles["login-left"]}>
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             src={CompanyLogo}
             alt="HealthPath - Your path to healthy living"
             priority
@@ -171,7 +173,7 @@ export default function DoctorLogin() {
         <div className={styles["login-right"]}>
           <div className={styles["form-container"]}>
             <div className={styles["login-logo"]}>
-              <Image src={Logo} alt="Logo" />
+              <Image placeholder="blur" blurDataURL={imageBlurDataUrl} src={Logo} alt="Logo" />
             </div>
             <div className={styles["login-center"]}>
               <h2>Welcome back!</h2>

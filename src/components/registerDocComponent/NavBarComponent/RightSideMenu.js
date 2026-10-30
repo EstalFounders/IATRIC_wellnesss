@@ -6,7 +6,7 @@ import { FaAngleDown } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { doctor_info_local_storage, single_call } from "../../../constant";
-import { doctorShortName } from "../../../utils/doctorName";
+import { doctorDisplayName } from "../../../utils/doctorName";
 
 const Dropdown = ({
   user,
@@ -57,7 +57,7 @@ const Dropdown = ({
   return (
     <div className={styles.dropdown}>
       <div className={styles["dropdown-toggle"]} onClick={toggleDropdown}>
-        <strong>{doctor?.name ? doctorShortName(doctor.name) : null}</strong>
+        <strong>{doctor?.name ? doctorDisplayName(doctor.name) : null}</strong>
         <FaAngleDown size={20} className={styles["arrow-icon"]} />
       </div>
 

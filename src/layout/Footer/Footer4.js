@@ -8,7 +8,7 @@ import {
   FaMapMarkedAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
-import { address, contact_no, email, facebook_page_url } from "../../constant";
+import { address, contact_no, email, facebook_page_url, Linkdn_url } from "../../constant";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -96,7 +96,7 @@ const Footer4 = () => {
                       className="linkedinicon"
                       title="Linkedin"
                       target="blank"
-                      href="https://www.linkedin.com/in/iatrichealthcare/"
+                      href={Linkdn_url}
                     >
                       <FaLinkedin size={40} color="#ffffff" />
                       <span className="mobiletext02">Linkedin</span>

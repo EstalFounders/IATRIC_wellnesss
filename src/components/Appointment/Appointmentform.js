@@ -143,6 +143,14 @@ const AppointmentForm = ({
   const today = toLocalDateString(new Date());
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 5);
+  // The weekly timetable can hand over a day beyond that horizon; never leave
+  // the preselected day outside the picker's range.
+  if (
+    appointmentState.selectedDate instanceof Date &&
+    appointmentState.selectedDate > maxDate
+  ) {
+    maxDate.setTime(appointmentState.selectedDate.getTime());
+  }
   const maxDateStr = toLocalDateString(maxDate);
 
   const selectedDateStr =
@@ -402,7 +410,7 @@ const AppointmentForm = ({
                     <Col
                       xs={12}
                       sm={6}
-                      className={`mb-2 mb-sm-0 ${styles.field}`}
+                      className={`mb-2 mb-sm-0 ${styles.field} ${styles.slotPicker}`}
                     >
                       <Form.Control
                         size="sm"
@@ -413,7 +421,7 @@ const AppointmentForm = ({
                         onChange={handleDateChange}
                       />
                     </Col>
-                    <Col xs={12} sm={6} className={styles.field}>
+                    <Col xs={12} sm={6} className={`${styles.field} ${styles.slotPicker}`}>
                       {futureSlots.length > 0 ? (
                         <Form.Control
                           as="select"

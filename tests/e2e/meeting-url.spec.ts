@@ -91,8 +91,9 @@ test.describe('audio-only consultation', () => {
     await expect(page.locator('video')).toHaveCount(0);
     await expect(page.locator('audio')).toHaveCount(1); // hidden remote-mic sink
 
-    // Remote tile = the doctor, local tile = yourself. The room prints the name
-    // through doctorDisplayName(), so the fixture's "Dr E2E Rao" renders as "Dr. E2E Rao".
+    // Remote tile = the doctor, local tile = yourself. The room prints the stored
+    // name verbatim - doctorDisplayName() only collapses whitespace - so the
+    // fixture's "Dr E2E Rao" (title included) renders unchanged.
     const names = page.locator('[class*="videoPlaceholderName"]');
     await expect(names).toHaveCount(2);
     await expect(names.nth(0)).toHaveText(DOCTOR_DISPLAY_NAME);

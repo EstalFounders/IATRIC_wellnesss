@@ -3,7 +3,7 @@ import { Col, Row } from "react-bootstrap";
 import Image from "next/image";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
-import { doctor_info_local_storage, api, single_call } from "../../constant";
+import { doctor_info_local_storage, api, single_call, imageBlurDataUrl } from "../../constant";
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
 import LeaveRequestModel from "../../components/registerDocComponent/model/LeaveRequestModel";
@@ -133,6 +133,8 @@ const RegisterDocLoginHeader = () => {
       </Col>
       <Col xs={12} md={5} className="py-3">
         <Image
+          placeholder="blur"
+          blurDataURL={imageBlurDataUrl}
           src="/images/logo.png"
           width={180}
           height={70}

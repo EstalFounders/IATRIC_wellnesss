@@ -41,6 +41,20 @@ export const mergeServiceLists = (dbList, staticList, staticNameKey = "title") =
   });
 };
 
+// The slice is persisted, so a cached copy makes the first paint instant - but it
+// can also be months old (a service deleted in the panel would linger). Revalidate
+// once per page load: one shared request no matter how many components mount.
+let revalidation = null;
+
+export const revalidateGlobalData = (dispatch) => {
+  if (!revalidation) {
+    revalidation = Promise.resolve(fetchGlobalData(dispatch)).catch(
+      () => undefined
+    );
+  }
+  return revalidation;
+};
+
 // Blended source of truth: the globalData slice wins when populated, otherwise the
 // static lists act as fallback/first paint so the initial HTML keeps service names.
 export const useGlobalData = () => {
@@ -49,8 +63,8 @@ export const useGlobalData = () => {
   const speciality = useSelector((state) => state.globalData?.speciality);
 
   useEffect(() => {
-    if (!services?.length && !speciality?.length) fetchGlobalData(dispatch);
-  }, [dispatch, services?.length, speciality?.length]);
+    revalidateGlobalData(dispatch);
+  }, [dispatch]);
 
   return useMemo(() => {
     const serviceList = services?.length ? services : servicesData;

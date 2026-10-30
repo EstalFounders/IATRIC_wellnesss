@@ -7,6 +7,7 @@ import {
   WHATSAPP_NUMBER_CONFIRMATION,
   WHATSAPP_USER_QUERY_TEMPLATE,
   WHATSAPP_CALLBACK_REQUEST_TEMPLATE,
+  WHATSAPP_CALLBACK_SUPPORT_TEMPLATE,
   WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE,
 } from "../../utils/constants";
 import { doctorDisplayName } from "../../../../src/utils/doctorName";
@@ -124,6 +125,24 @@ export function buildWhatsAppPayload(template, body) {
         // sending three values was rejected by Fast2SMS with HTTP 400.
         message_id: process.env.FASTSMS_WA_TEMPLATE_CALLBACK_ID,
         variables_values: String(body.contact ?? ""),
+      };
+    case WHATSAPP_CALLBACK_SUPPORT_TEMPLATE:
+      return {
+        // "Get a Call Back" popup alert to SUPPORT_NOTIFICATION_PHONE_NUMBER.
+        // The generic template (FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID) has
+        // 8 variables, so all of them must be sent - Fast2SMS rejects a variable
+        // count that differs from the template var_count.
+        message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
+        variables_values: [
+          body.admin_name,    // {{1}} Hello {{1}},
+          body.alert_line,    // {{2}} You got a call back request from 98XXXXXXXX.
+          body.action_line,   // {{3}} Please call them back ASAP.
+          body.details_label, // {{4}} Details: {{4}}: {{5}}
+          body.details_value, // {{5}}
+          body.time_label,    // {{6}} {{6}}: {{7}}
+          body.time_value,    // {{7}}
+          body.footer,        // {{8}}
+        ].join("|"),
       };
     case WHATSAPP_USER_QUERY_TEMPLATE:
       return {

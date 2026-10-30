@@ -1,15 +1,13 @@
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
-import { api } from "../../constant";
-import { useDispatch, useSelector } from "react-redux";
-import { setAllDoctor } from "../../store/slices/superAdmin/homepageSlice";
+import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
 import { ConsultationButton } from "../Common/commonUi";
 
 const DoctorsSection = () => {
-  const doctors = useSelector((state) => state.allDoctorS.allDoctors);
-  const dispatch = useDispatch();
+  // Shared redux roster (cache first, API only when empty).
+  const { doctors } = useDoctors();
 
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">

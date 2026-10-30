@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { debounce } from "lodash";
 import { api } from "../../constant";
-import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import { fetchAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { setActiveConsultation } from "../../store/slices/bookingWebsite/otherConfig";
 import { setServiceOffered } from "../../store/slices/superAdmin/homepageSlice";
 import { setServiceOfferedData } from "../../store/slices/bookingWebsite/globalDataSlice";
@@ -9,24 +9,27 @@ import { getIconByName } from "../Common/commonMethod";
 
 export const fetchBasicConfiguration = async (dispatch) => {
   try {
-    const [doctorResponse, serviceOfferedResponse] = await Promise.all([
-      fetch(api.addDoctor), // Replace with actual API endpoint
-      fetch(api.serviceOffered), // Replace with actual API endpoint
+    // Doctors go through the shared cache-first thunk (no duplicate request when
+    // the roster is already in redux); the service list has its own endpoint.
+    const [doctorList, serviceOfferedResponse] = await Promise.all([
+      dispatch(fetchAllDoctors()).unwrap().catch(() => null),
+      fetch(api.serviceOffered),
     ]);
 
-    const [doctorData, serviceOfferedData] = await Promise.all([
-      doctorResponse.json(),
-      serviceOfferedResponse.json(),
-    ]);
-    const doctor = doctorData;
-    const serviceOfferd = serviceOfferedData;
-    dispatch(setAllDoctors(doctor));
+    if (!serviceOfferedResponse.ok) {
+      throw new Error("Failed to fetch serviceOffered");
+    }
+
+    const serviceOfferd = await serviceOfferedResponse.json();
+
     dispatch(setServiceOffered(serviceOfferd));
     // Website-wide single source of truth (MAJOR -> services, SUB -> speciality)
     dispatch(setServiceOfferedData(serviceOfferd));
+
+    return { doctors: doctorList, serviceOffered: serviceOfferd };
   } catch (error) {
     console.error("Error fetching data:", error);
-  } finally {
+    return null;
   }
 };
 

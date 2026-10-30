@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../constant";
 import { useEffect, useState } from "react";
 import styles from "./Common/css/Preloader.module.css";
 

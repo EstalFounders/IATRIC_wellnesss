@@ -16,6 +16,7 @@
 // /api/addDoctor (read-only) so an approval shows up without signing in again.
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 import {
   FaExternalLinkAlt,
   FaFileContract,
@@ -25,6 +26,7 @@ import {
   FaPen,
 } from "react-icons/fa";
 import { api, staff_support_email, staff_support_no } from "../../../constant";
+import { fetchAllDoctors } from "../../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { convertDateIntoTime } from "../../../helper";
 import {
   formatEducationTrainingLabel,
@@ -142,6 +144,7 @@ const buildHiringFacts = (doctor) => [
 
 const DoctorContractPage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -180,11 +183,12 @@ const DoctorContractPage = () => {
 
     setRefreshing(true);
     try {
-      const response = await fetch(api.addDoctor);
-      const data = await response.json();
-      const fresh = Array.isArray(data)
-        ? data.find((item) => item._id === doctorId || item.id === doctorId)
-        : null;
+      // Forced refresh of the shared roster, so the rest of the panel sees the
+      // approval too - not just this page.
+      const data = await dispatch(fetchAllDoctors({ force: true })).unwrap();
+      const fresh = data.find(
+        (item) => item._id === doctorId || item.id === doctorId
+      );
 
       if (fresh) setDoctor(fresh);
       setNotice(
@@ -198,7 +202,7 @@ const DoctorContractPage = () => {
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return <div className={styles.state}>Loading the contract...</div>;

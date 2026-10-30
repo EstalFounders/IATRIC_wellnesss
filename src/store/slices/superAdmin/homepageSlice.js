@@ -1,10 +1,12 @@
-// store/slices/appointmentSlice.js
+// store/slices/superAdmin/homepageSlice.js
+// Panel-side lists for the super-admin dashboard. The doctor roster is NOT here:
+// it has one home - store/slices/bookingWebsite/allDoctorsPageSlice.js - and is
+// read everywhere through `useDoctors` (src/customUtils/useDoctors.js).
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   allAppointments: [],
   labTest: [],
-  allDoctors: [],
   allLab:[],
   serviceOffered: [],
 };
@@ -19,9 +21,6 @@ const homepageSlice = createSlice({
     setAllLabTest: (state, action) => {
       state.labTest = action.payload;
     },
-    setAllDoctor: (state, action) => {
-      state.allDoctors = action.payload;
-    },
     setAllLab: (state, action) => {
       state.allLab = action.payload;
     },
@@ -32,7 +31,7 @@ const homepageSlice = createSlice({
 });
 
 // Export actions
-export const { setAllappointments,setAllLabTest, setAllDoctor, setAllLab,setServiceOffered } = homepageSlice.actions;
+export const { setAllappointments,setAllLabTest, setAllLab,setServiceOffered } = homepageSlice.actions;
 
 // Export reducer
 export default homepageSlice.reducer;

@@ -147,6 +147,13 @@
   color: #8b2b21;
 }
 
+/* Per-row errors under the import result note. */
+.importErrors {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+
 /* ── Stat tiles ─────────────────────────────────────── */
 
 .statGrid {
@@ -174,6 +181,15 @@
   transform: translateY(-3px);
   border-color: #3b5f1d;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Display-only tile (no page behind it): no pointer, no hover lift. */
+.statCardStatic,
+.statCardStatic:hover {
+  cursor: default;
+  transform: none;
+  border-color: #ececec;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .statLabel {

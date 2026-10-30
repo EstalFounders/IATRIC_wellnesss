@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import { Nav, Tab } from "react-bootstrap";
@@ -95,6 +96,8 @@ const AllServicesTabs2 = () => {
                     {/* Image */}
                     <div className="tab-img">
                       <Image
+                        placeholder="blur"
+                        blurDataURL={imageBlurDataUrl}
                         className="img-fluid"
                         src={service.image}
                         width={800}

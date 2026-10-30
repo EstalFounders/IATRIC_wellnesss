@@ -45,8 +45,10 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   const doctor = await Doctor.findById(appointment.doctorId);
   const docName = doctor?.name || "";
   // Every WhatsApp body below names the doctor to the patient (and to the
-  // doctor), so it carries the title; `docName` itself stays exactly as stored
-  // because it is the value written back/compared elsewhere.
+  // doctor), so it goes through the shared formatter. That formatter prints the
+  // stored name verbatim - the title is part of the name - and only collapses
+  // stray whitespace. `docName` itself stays exactly as stored because it is the
+  // value written back/compared elsewhere.
   const docDisplayName = doctorDisplayName(docName);
   const doctorMobileNo = doctor?.mobileNumber?.toString() || "";
   const patientMobileNo = appointment.patientMobNo?.toString() || "";

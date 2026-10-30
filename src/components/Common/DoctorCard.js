@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./css/ViewDoctorListComp.module.css";
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { ConsultationButton } from "./commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { fmt } from "../../i18n/format";
 import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
@@ -42,6 +42,8 @@ const DoctorCard = ({ doctor, index }) => {
       <div className={styles["doctor-profile-pic-container"]}>
         <div className="d-flex justify-content-center align-items-center">
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             width={150}
             height={150}
             src={
@@ -66,7 +68,7 @@ const DoctorCard = ({ doctor, index }) => {
       {/* Info */}
       <div className={styles["doctor-primary-info"]}>
         <h2 className={styles["new-doctor-name"]}>
-          {doctorDisplayName(doctor.name, t("doctor.namePrefix"))}
+          {doctorDisplayName(doctor.name)}
         </h2>
         <p className={`${styles["doctor-text"]} ${styles["doctor-text--single"]}`}>
           {doctor.speciality}
@@ -100,12 +102,6 @@ const DoctorCard = ({ doctor, index }) => {
           </p>
         ) : null}
         <div className={styles["patient-stories"]}>
-          <div className={styles["thumbs-up-container"]}>
-            <span className={styles["percentage"]}>96%</span>
-            <a href="#reviews" className={styles["patient-stories-link"]}>
-              {fmt(t("doctor.patientStories"), { n: doctor.reviews })}
-            </a>
-          </div>
           <div className={styles["availability-info"]}>
             <span className={styles["calendar-icon"]}>📅</span>{" "}
             {t("doctor.availableToday")}
