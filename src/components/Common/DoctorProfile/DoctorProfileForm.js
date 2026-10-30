@@ -44,6 +44,11 @@ import { parseWorkExperience } from "../../../customUtils/workExperience";
 import { doctorDisplayName } from "../../../utils/doctorName";
 import { toConsultationTypeEntries } from "../../../utils/consultationFee";
 import { parseLanguages } from "../../../customUtils/languages";
+import {
+  fileNameFromUrl,
+  isPreviewableImage,
+  isPreviewableImageUrl,
+} from "../../../customUtils/imageUpload";
 import { formatLocation } from "../../../customUtils/indiaLocations";
 import { stampDataUrl } from "../../registerDocComponent/lib/DoctorStampGenerator";
 import { buildChangedFields } from "./lib/doctorProfileSubmit";
@@ -114,10 +119,6 @@ const DoctorProfileForm = ({
   );
   const [languageError, setLanguageError] = useState("");
 
-  // The registration number is compulsory, so it gets its own inline error - the
-  // same pattern the work-day chips and the language rows use.
-  const [regNoError, setRegNoError] = useState("");
-
   const [showAddInput, setShowAddInput] = useState(false);
 
   const dispatch = useDispatch();
@@ -155,29 +156,39 @@ const DoctorProfileForm = ({
         });
       }
     } else {
-      if (name === "doctorRegistrationNo" && value.trim()) setRegNoError("");
       setEditedDoctor({ ...editedDoctor, [name]: value });
     }
   };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setEditedDoctor({
-        ...editedDoctor,
-        profilePictureUrl: file,
-      });
-      setProfilePicturePreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+
+    // Any file type is allowed (the server resizes images and stores documents
+    // as they are); only an image can be rendered as the avatar.
+    setEditedDoctor({
+      ...editedDoctor,
+      profilePictureUrl: file,
+    });
+    setProfilePicturePreview(
+      isPreviewableImage(file) ? URL.createObjectURL(file) : null
+    );
   };
 
   const handleDiplomasCertificatesChange = (e) => {
-    const files = e.target.files;
-    if (files.length > 0) {
-      const urls = Array.from(files).map((file) => file);
-      setEditedDoctor({ ...editedDoctor, diplomasCertificatesUrls: urls });
-      setDiplomasCertificatesPreview(urls);
-    }
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+
+    // Newly picked certificates are ADDED to the ones already stored - adding a
+    // diploma later must never drop the existing documents.
+    const updated = [
+      ...(editedDoctor.diplomasCertificatesUrls || []),
+      ...selected,
+    ];
+    e.target.value = "";
+
+    setEditedDoctor({ ...editedDoctor, diplomasCertificatesUrls: updated });
+    setDiplomasCertificatesPreview(updated);
   };
 
   const handleDeleteProfilePicture = () => {
@@ -333,12 +344,6 @@ const DoctorProfileForm = ({
     }
     if (!isMobileValid(editedDoctor.mobileNumber)) {
       window.alert("Please enter a valid mobile number");
-      return;
-    }
-    // Compulsory - the native `required` on the control catches an empty input,
-    // this also catches a whitespace-only one.
-    if (!String(editedDoctor.doctorRegistrationNo || "").trim()) {
-      setRegNoError("Please enter the registration number");
       return;
     }
     onSave?.(editedDoctor);
@@ -498,25 +503,11 @@ const DoctorProfileForm = ({
                       name="doctorRegistrationNo"
                       value={editedDoctor.doctorRegistrationNo || ""}
                       onChange={handleChange}
-                      isInvalid={Boolean(regNoError)}
-                      required
                     />
-                    {regNoError ? (
-                      <div
-                        style={{
-                          color: "#c62828",
-                          fontSize: "0.8rem",
-                          marginTop: 6,
-                        }}
-                      >
-                        {regNoError}
-                      </div>
-                    ) : (
-                      <p className={styles.hint}>
-                        Compulsory - printed as the third line of the prescription
-                        stamp.
-                      </p>
-                    )}
+                    <p className={styles.hint}>
+                      Optional - printed as the third line of the prescription
+                      stamp and can be filled in at any time.
+                    </p>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
@@ -590,8 +581,8 @@ const DoctorProfileForm = ({
                       name="slotStartTime"
                       value={slotStartTime}
                       onChange={handleChange}
-                      min="09:00"
-                      max="21:00"
+                      min="07:00"
+                      max="22:00"
                       className={styles.timeInput}
                     />
                   </Form.Group>
@@ -605,8 +596,8 @@ const DoctorProfileForm = ({
                       name="slotEndTime"
                       value={slotEndTime}
                       onChange={handleChange}
-                      min="09:00"
-                      max="21:00"
+                      min="07:00"
+                      max="22:00"
                       className={styles.timeInput}
                     />
                   </Form.Group>
@@ -777,20 +768,41 @@ const DoctorProfileForm = ({
                       </Form.Label>
                       <input
                         type="file"
-                        accept="image/*"
                         multiple
                         onChange={handleDiplomasCertificatesChange}
                         className={styles.fileInput}
                       />
+                      <p className={styles.hint}>
+                        Any file type (PDF, JPG, PNG...). Newly added certificates
+                        are kept together with the existing ones.
+                      </p>
                       <div className={styles.docGrid}>
                         {(diplomasCertificatesPreview || []).map(
-                          (url, index) => (
+                          (entry, index) => (
                             <div key={index} className={styles.docThumbWrap}>
-                              <img
-                                src={url}
-                                alt={`Diploma ${index + 1}`}
-                                className={styles.docThumb}
-                              />
+                              {entry instanceof File ? (
+                                isPreviewableImage(entry) ? (
+                                  <img
+                                    src={URL.createObjectURL(entry)}
+                                    alt={`Diploma ${index + 1}`}
+                                    className={styles.docThumb}
+                                  />
+                                ) : (
+                                  <p className={styles.docFileName}>
+                                    {entry.name}
+                                  </p>
+                                )
+                              ) : isPreviewableImageUrl(entry) ? (
+                                <img
+                                  src={entry}
+                                  alt={`Diploma ${index + 1}`}
+                                  className={styles.docThumb}
+                                />
+                              ) : (
+                                <p className={styles.docFileName}>
+                                  {fileNameFromUrl(entry)}
+                                </p>
+                              )}
                               <FaTrash
                                 className={styles.docRemove}
                                 onClick={() =>
@@ -810,12 +822,12 @@ const DoctorProfileForm = ({
                       </Form.Label>
                       <input
                         type="file"
-                        accept="image/*"
                         onChange={handleProfilePictureChange}
                         className={styles.fileInput}
                       />
                       <p className={styles.hint}>
                         Shown in the panel header and on the prescription sheet.
+                        Any file type is accepted.
                       </p>
                       {profilePicturePreview ? (
                         <button

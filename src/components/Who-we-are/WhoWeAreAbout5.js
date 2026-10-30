@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import React from "react";
 
 const WhoWeAreAbout5 = () => {
@@ -10,6 +11,8 @@ const WhoWeAreAbout5 = () => {
           <div className="col-12 col-lg-6 mb-4 mb-lg-0">
             <div className="text-center wow fadeInUp" data-wow-delay="0.6s">
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 src="/images/image-01.png"
                 alt="about-image"
                 width={800}

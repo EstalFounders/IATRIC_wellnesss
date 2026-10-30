@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { contact_no } from "../../constant";
+import { contact_no, imageBlurDataUrl } from "../../constant";
 
 const ContactsBanner8 = () => {
     const { t } = useLanguage();
@@ -17,6 +17,8 @@ const ContactsBanner8 = () => {
                         <div className="banner-txt icon-lg text-center">
                             {/* Brand symbol (replaces the template's hospital glyph)  */}
                             <Image
+                                placeholder="blur"
+                                blurDataURL={imageBlurDataUrl}
                                 src="/images/invoicelogo.png"
                                 alt="HealthPath"
                                 width={110}

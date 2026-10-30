@@ -144,7 +144,10 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   formData.append("name", editedDoctor.name);
   formData.append("expertise", editedDoctor.expertise);
   // Optional; keep the stored value alive across an edit.
-  formData.append("doctorRegistrationNo", editedDoctor.doctorRegistrationNo);
+  formData.append(
+    "doctorRegistrationNo",
+    editedDoctor.doctorRegistrationNo ?? ""
+  );
   formData.append("mobileNumber", editedDoctor.mobileNumber);
   // One field per entry, same as education + training below.
   appendLanguages(formData, editedDoctor.language);
@@ -160,7 +163,11 @@ export const submitDoctorUpdate = async (editedDoctor) => {
     (editedDoctor.serviceOffered || []).join(",")
   );
   formData.append("location", formatLocation(editedDoctor.location));
-  formData.append("profilePicture", editedDoctor.profilePictureUrl);
+  // A stored picture is a URL string - only a newly picked File is uploaded, the
+  // API keeps the stored picture when no file arrives.
+  if (isFile(editedDoctor.profilePictureUrl)) {
+    formData.append("profilePicture", editedDoctor.profilePictureUrl);
+  }
   formData.append("doctorType", editedDoctor.doctorType);
   formData.append("slotStartTime", editedDoctor.slotStartTime);
   formData.append("slotEndTime", editedDoctor.slotEndTime);

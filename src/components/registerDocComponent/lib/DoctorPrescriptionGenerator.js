@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Button } from "react-bootstrap";
-import { api, style_schema, color_schema, contact_no } from "../../../constant";
+import { api, style_schema, color_schema, contact_no, imageBlurDataUrl } from "../../../constant";
 import Preloader from "../../Preloader";
 import Image from "next/image";
 import { capitalize, formatData } from "../utils/helper";
@@ -707,6 +707,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 {signatureUrl && (
                   <div ref={signatureRef} style={{ lineHeight: 0 }}>
                     <Image
+                      placeholder="blur"
+                      blurDataURL={imageBlurDataUrl}
                       src={signatureUrl}
                       alt="Doctor Signature"
                       width={100}
@@ -718,6 +720,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 {stampUrl && (
                   <div ref={stampRef} style={{ lineHeight: 0 }}>
                     <Image
+                      placeholder="blur"
+                      blurDataURL={imageBlurDataUrl}
                       src={stampUrl}
                       alt="Doctor Stamp"
                       width={100}

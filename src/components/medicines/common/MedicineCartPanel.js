@@ -15,6 +15,7 @@ import {
   eventEmitter,
   medicine_discount,
   price_symbol,
+  imageBlurDataUrl
 } from "../../../constant";
 import LabTestModel from "../../labTestComponent/modal/LabTestModel";
 import {
@@ -256,6 +257,8 @@ const MedicineCartPanel = ({
           {responseSuccess ? (
             <div className={styles.successMessage}>
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 src={"/images/success.png"}
                 alt="Thank you"
                 width={100}

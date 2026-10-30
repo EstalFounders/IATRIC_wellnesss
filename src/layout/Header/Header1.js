@@ -11,6 +11,7 @@ import {
   facebook_page_url,
   instagram_page_url,
   Linkdn_url,
+  imageBlurDataUrl
 } from "../../constant";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -180,7 +181,7 @@ const Header1 = ({ scrollToContact }) => {
             <div>
               <Link legacyBehavior href="/appointment">
                 <a aria-label="Book an appointment">
-                  <Image src="/images/logo.png" width={180} height={60} alt="header-logo" />
+                  <Image placeholder="blur" blurDataURL={imageBlurDataUrl} src="/images/logo.png" width={180} height={60} alt="header-logo" />
                 </a>
               </Link>
             </div>

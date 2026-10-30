@@ -14,7 +14,7 @@ const AllDoctors = () => {
     <Layouts>
       <PageBanner pageTitle="Meet the Doctors" />
       <AllDoctorsDoctors3 />
-      <Statistic1 />
+      {/* <Statistic1 /> */}
     </Layouts>
   );
 };

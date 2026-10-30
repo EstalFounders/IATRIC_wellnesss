@@ -19,6 +19,11 @@ import { parseEducationTraining } from "../../customUtils/educationTraining";
 import { parseWorkExperience } from "../../customUtils/workExperience";
 import { parseLanguages } from "../../customUtils/languages";
 import { formatLocation } from "../../customUtils/indiaLocations";
+import {
+  fileNameFromUrl,
+  isPreviewableImage,
+  isPreviewableImageUrl,
+} from "../../customUtils/imageUpload";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -118,22 +123,32 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setEditedDoctor({
-        ...editedDoctor,
-        profilePictureUrl: file,
-      });
-      setProfilePicturePreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+
+    // Any file type is allowed; only an image can be rendered as the avatar.
+    setEditedDoctor({
+      ...editedDoctor,
+      profilePictureUrl: file,
+    });
+    setProfilePicturePreview(
+      isPreviewableImage(file) ? URL.createObjectURL(file) : null
+    );
   };
 
   const handleDiplomasCertificatesChange = (e) => {
-    const files = e.target.files;
-    if (files.length > 0) {
-      const urls = Array.from(files).map((file) => file);
-      setEditedDoctor({ ...editedDoctor, diplomasCertificatesUrls: urls });
-      setDiplomasCertificatesPreview(urls);
-    }
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+
+    // Newly picked certificates are ADDED to the ones already stored - adding a
+    // diploma later must never drop the existing documents.
+    const updated = [
+      ...(editedDoctor.diplomasCertificatesUrls || []),
+      ...selected,
+    ];
+    e.target.value = "";
+
+    setEditedDoctor({ ...editedDoctor, diplomasCertificatesUrls: updated });
+    setDiplomasCertificatesPreview(updated);
   };
 
   const handleDeleteProfilePicture = () => {
@@ -601,8 +616,8 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   name="slotStartTime"
                   value={slotStartTime}
                   onChange={handleChange}
-                  min="09:00"
-                  max="21:00"
+                  min="07:00"
+                  max="22:00"
                 />
               </Form.Group>
             </Col>
@@ -617,8 +632,8 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   name="slotEndTime"
                   value={slotEndTime}
                   onChange={handleChange}
-                  min="09:00"
-                  max="21:00"
+                  min="07:00"
+                  max="22:00"
                 />
               </Form.Group>
             </Col>
@@ -633,18 +648,37 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   </Form.Label>
                   <Form.Control
                     type="file"
-                    accept="image/*"
                     multiple
                     onChange={handleDiplomasCertificatesChange}
                   />
+                  <Form.Text className="text-muted d-block">
+                    Any file type (PDF, JPG, PNG...). Newly added certificates are
+                    kept together with the existing ones.
+                  </Form.Text>
                   {diplomasCertificatesPreview &&
-                    diplomasCertificatesPreview.map((url, index) => (
+                    diplomasCertificatesPreview.map((entry, index) => (
                       <div key={index} style={{ position: "relative" }}>
-                        <img
-                          src={url}
-                          alt={`Diploma ${index + 1}`}
-                          style={{ width: "100%", marginTop: "10px" }}
-                        />
+                        {entry instanceof File ? (
+                          isPreviewableImage(entry) ? (
+                            <img
+                              src={URL.createObjectURL(entry)}
+                              alt={`Diploma ${index + 1}`}
+                              style={{ width: "100%", marginTop: "10px" }}
+                            />
+                          ) : (
+                            <p className="mb-0 mt-2 fw-semibold">{entry.name}</p>
+                          )
+                        ) : isPreviewableImageUrl(entry) ? (
+                          <img
+                            src={entry}
+                            alt={`Diploma ${index + 1}`}
+                            style={{ width: "100%", marginTop: "10px" }}
+                          />
+                        ) : (
+                          <p className="mb-0 mt-2 fw-semibold">
+                            {fileNameFromUrl(entry)}
+                          </p>
+                        )}
                         <FaTrash
                           style={{
                             cursor: "pointer",
@@ -666,9 +700,12 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                   </Form.Label>
                   <input
                     type="file"
-                    accept="image/*"
                     onChange={handleProfilePictureChange}
                   />
+                  <Form.Text className="text-muted d-block">
+                    Shown in the doctor list and on the prescription sheet. Any file
+                    type is accepted.
+                  </Form.Text>
 
                   {profilePicturePreview && (
                     <>

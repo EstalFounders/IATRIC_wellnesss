@@ -10,6 +10,16 @@
     align-items: center;
     margin-top: 8px;
   }
+
+  /* The stored name carries its own title and can be long ("Dr. Sqn Ldr Surya
+     Pratap Budhwar"), so the header keeps one line and ellipsises instead of
+     pushing the caret / control icons out of the bar. */
+  .dropdown-toggle strong {
+    max-width: 220px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   
   .arrow-icon {
     font-size: 18px; /* Adjust the font size as needed */

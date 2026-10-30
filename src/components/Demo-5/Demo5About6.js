@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import Link from "next/link";
 import React from "react";
 import { ConsultationButton } from "../Common/commonUi";
@@ -40,6 +41,8 @@ const Demo5About6 = () => {
               className="about-img text-center"
             >
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 width={500}
                 height={550}
                 className="img-fluid"

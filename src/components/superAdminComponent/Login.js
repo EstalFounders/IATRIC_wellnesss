@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import { useRouter } from "next/router";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { loginUser } from "../../helper";
@@ -74,6 +75,8 @@ export default function Login() {
         {/* Sized off its container by the CSS module, so the emblem scales with
             the page instead of overflowing narrow viewports. */}
         <Image
+          placeholder="blur"
+          blurDataURL={imageBlurDataUrl}
           src={CompanyLogo}
           alt="HealthPath - your path to healthy living"
           priority
@@ -83,7 +86,7 @@ export default function Login() {
       <div className={styles["login-right"]}>
         <div className={styles["form-container"]}>
           <div className={styles["login-logo"]}>
-            <Image src={Logo} alt="HealthPath" priority />
+            <Image placeholder="blur" blurDataURL={imageBlurDataUrl} src={Logo} alt="HealthPath" priority />
           </div>
 
           <div className={styles["login-center"]}>

@@ -9,14 +9,13 @@
 //                  the changed fields to the approval queue.
 //   * superAdmin - the doctor named by `?id=`, looked up in the persisted redux
 //                  list first; saving PUTs the whole form to /api/addDoctor.
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
 import DoctorProfileForm from "./DoctorProfileForm";
 import { saveDoctorProfile } from "./lib/doctorProfileSubmit";
 import styles from "./DoctorProfileForm.module.css";
-import { api, userTypeConstant } from "../../../constant";
-import { setAllDoctor } from "../../../store/slices/superAdmin/homepageSlice";
+import { userTypeConstant } from "../../../constant";
+import { useDoctors } from "../../../customUtils/useDoctors";
 import { readSessionDoctor } from "./lib/doctorProfileSession";
 
 const DOCTOR_LIST_ROUTE = "/superAdmin/homepage";
@@ -25,20 +24,20 @@ const DOCTOR_PANEL_ROUTE = "/registerDoc/homepage";
 const DoctorProfilePage = ({ origin }) => {
   const isDoctor = origin === userTypeConstant.doctor;
   const router = useRouter();
-  const dispatch = useDispatch();
 
-  // Persisted super-admin list - a deep link / refresh is served from here and
-  // only falls back to the API when the doctor is not in it yet.
-  const storedDoctors = useSelector(
-    (state) => state.superAdminHomePage.allDoctors
-  );
+  // The shared redux roster - a deep link / refresh is served from here and only
+  // falls back to the API when the doctor is not in it yet (`useDoctors` decides).
+  const {
+    doctors: storedDoctors,
+    isLoading: doctorsLoading,
+    refetch: refetchDoctors,
+  } = useDoctors();
 
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [banner, setBanner] = useState("");
-  const fetchedRef = useRef(false);
 
   // Doctor panel: the logged-in doctor, exactly like the header / popup did.
   useEffect(() => {
@@ -47,7 +46,8 @@ const DoctorProfilePage = ({ origin }) => {
     setLoading(false);
   }, [isDoctor]);
 
-  // Super admin: the doctor named by `?id=`.
+  // Super admin: the doctor named by `?id=`. The roster arrives from redux (the
+  // hook loads it when the slice is empty), so this only reacts to that data.
   useEffect(() => {
     if (isDoctor || !router.isReady) return;
 
@@ -57,59 +57,33 @@ const DoctorProfilePage = ({ origin }) => {
       return;
     }
 
-    const findDoctor = (list) =>
-      (list || []).find(
-        (item) => item._id === wantedId || item.id === wantedId
-      );
+    const fromStore = storedDoctors.find(
+      (item) => item._id === wantedId || item.id === wantedId
+    );
 
-    const fromStore = findDoctor(storedDoctors);
     if (fromStore) {
       setDoctor(fromStore);
       setLoading(false);
       return;
     }
 
-    // Nothing in the store and the list request already ran - stop here so the
-    // "not found" state renders instead of polling forever.
-    if (fetchedRef.current) {
-      setLoading(false);
+    // Still fetching the roster: stay on the loading state. Once the request is
+    // done and the id is still absent, the "not found" state renders.
+    if (doctorsLoading) {
+      setLoading(true);
       return;
     }
 
-    fetchedRef.current = true;
-    setLoading(true);
-    let active = true;
-
-    fetch(api.addDoctor)
-      .then((response) => response.json())
-      .then((data) => {
-        if (!active || !Array.isArray(data)) return;
-        dispatch(setAllDoctor(data));
-        setDoctor(findDoctor(data) || null);
-      })
-      .catch((error) => console.error("Failed to fetch doctors:", error))
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [isDoctor, router.isReady, router.query.id, storedDoctors, dispatch]);
+    setDoctor(null);
+    setLoading(false);
+  }, [isDoctor, router.isReady, router.query.id, storedDoctors, doctorsLoading]);
 
   const goBack = useCallback(() => {
     router.push(isDoctor ? DOCTOR_PANEL_ROUTE : DOCTOR_LIST_ROUTE);
   }, [isDoctor, router]);
 
-  const refreshDoctorList = async () => {
-    try {
-      const response = await fetch(api.addDoctor);
-      const data = await response.json();
-      if (Array.isArray(data)) dispatch(setAllDoctor(data));
-    } catch (error) {
-      console.error("Failed to refresh the doctor list:", error);
-    }
-  };
+  // Refresh the shared roster so the list behind this page is up to date.
+  const refreshDoctorList = refetchDoctors;
 
   const handleSave = async (editedDoctor) => {
     setSaving(true);

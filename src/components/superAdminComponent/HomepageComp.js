@@ -9,7 +9,7 @@ import Link from "next/link";
 import { getMessagingIfSupported } from "../../../lib/firebase";
 import { onMessage } from "firebase/messaging";
 import { api } from "../../constant";
-import { fetchDoctors } from "../ApiService/ConsultationApiService";
+import { useDoctors } from "../../customUtils/useDoctors";
 import {
   setAllappointments,
   setAllLab,
@@ -29,12 +29,14 @@ export default function HomepageComp() {
   const dispatch = useDispatch();
   const [appointments, setAppointments] = useState([]);
   const [labTests, setLabTests] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  const { doctors, isLoading: isDoctorLoading, refetch: refreshDoctorList } =
+    useDoctors();
   const [totalIncome, setTotalIncome] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDoctorLoading, setIsDoctorLoading] = useState(true);
   const [failures, setFailures] = useState([]);
   const [foregroundNote, setForegroundNote] = useState("");
+  const [importing, setImporting] = useState(true);
+  const [importResult, setImportResult] = useState(null);
 
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
@@ -80,24 +82,15 @@ export default function HomepageComp() {
     setAppointments(appointmentList);
     setLabTests(labTestList);
     setTotalIncome(
-      calculateTotalIncome(appointmentList, labTestList).totatIncome
+      calculateTotalIncome(appointmentList, labTestList).totatIncome,
     );
     setFailures(failed);
     setIsLoading(false);
   }, [dispatch]);
 
-  const loadDoctors = useCallback(async () => {
-    setIsDoctorLoading(true);
-    await fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
-  }, [dispatch]);
-
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
-
-  useEffect(() => {
-    loadDoctors();
-  }, [loadDoctors]);
 
   useEffect(() => {
     let unsubscribe;
@@ -112,7 +105,7 @@ export default function HomepageComp() {
         const notification = payload?.notification || {};
         const data = payload?.data || {};
         setForegroundNote(
-          notification.title || data.title || "New notification"
+          notification.title || data.title || "New notification",
         );
       });
     })();
@@ -123,7 +116,37 @@ export default function HomepageComp() {
     };
   }, []);
 
-  const refreshDoctorList = () => loadDoctors();
+  const handleImportFromSheet = async () => {
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const response = await fetch("/api/superAdmin/importDoctorsFromSheet", {
+        method: "POST",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          data?.error || `${response.status} ${response.statusText}`,
+        );
+      }
+      setImportResult({
+        ok: true,
+        message: `Imported ${data.imported ?? 0} doctor(s) from the sheet${
+          data.skipped ? `, ${data.skipped} skipped` : ""
+        }.`,
+        errors: Array.isArray(data.errors) ? data.errors : [],
+      });
+      await loadDoctors();
+    } catch (error) {
+      console.error("Import from sheet failed:", error);
+      setImportResult({
+        ok: false,
+        message: `Import failed: ${error.message || "unknown error"}`,
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -131,9 +154,7 @@ export default function HomepageComp() {
 
       {failures.length > 0 ? (
         <div className={styles.errorBox} role="alert">
-          <span>
-            Some data could not be loaded: {failures.join(", ")}.
-          </span>
+          <span>Some data could not be loaded: {failures.join(", ")}.</span>
           <button
             type="button"
             className={styles.retry}
@@ -179,10 +200,48 @@ export default function HomepageComp() {
         <div className={styles.card}>
           <div className={styles.cardTitleRow}>
             <h2 className={styles.cardTitle}>Doctors</h2>
-            <Link className={styles.ghostBtn} href="/superAdmin/addDoctor">
-              Add doctor
-            </Link>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                type="button"
+                className={styles.ghostBtn}
+                onClick={handleImportFromSheet}
+                disabled
+                title="Sheet import is temporarily disabled"
+                style={{ font: "inherit", opacity: 0.45, cursor: "not-allowed" }}
+              >
+                Import from sheet (disabled)
+              </button>
+              <Link className={styles.ghostBtn} href="/superAdmin/addDoctor">
+                Add doctor
+              </Link>
+            </div>
           </div>
+          {importResult ? (
+            <div
+              className={`${styles.note} ${
+                importResult.ok ? styles.noteOk : styles.noteErr
+              }`}
+              role="status"
+            >
+              <span>{importResult.message}</span>
+              {importResult.errors?.length ? (
+                <ul className={styles.importErrors}>
+                  {importResult.errors.map((err, index) => (
+                    <li key={index}>
+                      <strong>{err.name}</strong> — {err.error}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
           <RecentDoctors
             doctors={doctors}
             isLoading={isDoctorLoading}

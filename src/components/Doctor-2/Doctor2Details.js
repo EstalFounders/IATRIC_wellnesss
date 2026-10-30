@@ -49,7 +49,7 @@ const Doctor2Details = () => {
               {/* Button */}
               <Link legacyBehavior href="/timetable">
                 <a className="btn btn-md btn-tra-grey grey-hover">
-                  View Timetable
+                  View Available Slot
                 </a>
               </Link>
             </div>

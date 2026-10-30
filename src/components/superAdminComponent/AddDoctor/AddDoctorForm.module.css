@@ -154,6 +154,16 @@
   color: #7b8794;
 }
 
+/* Inline "already registered" message under a unique field (email, mobile
+   number, registration number). */
+.fieldError {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c0392b;
+}
+
 .radioRow {
   display: flex;
   gap: 22px;

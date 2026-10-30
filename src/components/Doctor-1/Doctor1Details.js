@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import Link from "next/link";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -7,6 +8,7 @@ import { formatEducationTrainingLabel } from "../../customUtils/educationTrainin
 import { formatWorkExperienceLabel } from "../../customUtils/workExperience";
 import { formatLanguagesLabel } from "../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
+import { doctorDisplayName } from "../../utils/doctorName";
 
 const Doctor1Details = () => {
   const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo) || {};
@@ -50,7 +52,7 @@ const Doctor1Details = () => {
             <div className="col-md-7 offset-md-5">
               <div className="doctor-data white-color">
                 {/* Name */}
-                <h2 className="h2-xs">Dr. {name}</h2>
+                <h2 className="h2-xs">{doctorDisplayName(name)}</h2>
                 <h5 className="h5-md">{expertise}</h5>
               </div>
             </div>
@@ -70,6 +72,8 @@ const Doctor1Details = () => {
               <div className="doctor-photo mb-40">
                 {/* Photo */}
                 <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   width={300}
                   height={300}
                   className="img-fluid rounded-circle"
@@ -119,9 +123,12 @@ const Doctor1Details = () => {
                       Book an Appointment
                     </a>
                   </Link>
-                  <Link legacyBehavior href="/timetable">
+                  <Link
+                    legacyBehavior
+                    href={`/timetable?doctorId=${doctorInfo._id || ""}`}
+                  >
                     <a className="btn btn-md btn-tra-grey grey-hover">
-                      View Timetable
+                      View Available Slot
                     </a>
                   </Link>
                 </div>
@@ -131,8 +138,6 @@ const Doctor1Details = () => {
             {/* DOCTOR'S BIO */}
             <div className="col-md-7">
               <div className="doctor-bio">
-                {/* Text */}
-                <p>DOCTOR BIO</p>
                 {/* Title */}
                 <h5 className="h5-md blue-color">Overview</h5>
                 {/* Text - doctor's overview from the API response */}
@@ -160,6 +165,8 @@ const Doctor1Details = () => {
                       <div className="col-md-4" key={index}>
                         <div className="certificate-preview mb-30">
                           <Image
+                            placeholder="blur"
+                            blurDataURL={imageBlurDataUrl}
                             width={300}
                             height={200}
                             className="img-fluid"

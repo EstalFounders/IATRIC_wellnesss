@@ -1,64 +1,37 @@
 // doctorName.js
 // One place that decides how a doctor's name is printed.
 //
-// The name is stored on the Doctor document exactly as the doctor typed it, and
-// doctors are inconsistent: some keep it bare ("Raman Kumar"), some already
-// type the title ("Dr. Raman Kumar"). Every screen that used to prefix by hand
-// printed either "Dr Raman Kumar" (no period), "Dr.Raman Kumar" (no space) or
-// "Dr Dr. Raman Kumar" (double prefix) depending on the file. These helpers make
-// the printed form idempotent, so `doctorDisplayName(doctor.name)` is safe to
-// call on any stored value.
+// The title is part of the stored name. The Doctor document has no separate
+// title field, so doctors type "Dr. Raman Kumar" / "Dr Sqn Ldr Surya Pratap
+// Budhwar" themselves and that whole string is what the console saves. Printing
+// therefore means printing the stored value *as it is*: this helper must never
+// add a title of its own, or every screen that used to prefix by hand printed
+// "Dr. Dr Sqn Ldr ..." (or "Dr. Sqn", because the old short-name helper took the
+// first token after stripping the title).
+//
+// All it does is normalise whitespace - stored values like "Dr Ashima Narula "
+// used to leak a trailing space into the UI - so every screen prints the same
+// string. It is safe to call on an empty/undefined name: the caller then keeps
+// its own placeholder ("Doctor", "Unnamed doctor").
 //
 // The title is a *display* concern only: never write the result back into the
-// database or into a profile form input, or the stored value grows a title it
-// has to strip again on the next render.
+// database or into a profile form input, or the stored value is rewritten every
+// time someone opens the profile page.
 //
 // Zero dependencies on purpose - this is imported by public pages and by the
 // meeting room, which must not pull in Firebase (src/utils.js) or the doctor
 // panel bundle (registerDocComponent/utils/helper.js).
 
-// An existing title at the start of the name, with the optional "Dr."/डॉ. dot.
-// `drs` is listed before `dr` so "Drs. Mehta" is not left as "s. Mehta".
-const DOCTOR_PREFIX = /^(?:drs|dr|डॉ)\.?\s*/i;
-
-/** The name with any title it already carries removed. */
-const stripDoctorPrefix = (name) =>
+/**
+ * The doctor name exactly as stored, with stray whitespace collapsed.
+ * Empty/whitespace-only input returns "" so callers can keep their own
+ * placeholder instead of printing an empty name.
+ *
+ * @param {string} name stored doctor name, title included
+ * @returns {string}
+ */
+export const doctorDisplayName = (name) =>
   String(name ?? "")
-    .trim()
-    .replace(DOCTOR_PREFIX, "")
+    .replace(/\s+/g, " ")
     .trim();
 
-/**
- * "Raman Kumar" -> "Dr. Raman Kumar"; "Dr. Raman Kumar" -> "Dr. Raman Kumar".
- * Empty/whitespace-only input returns "" so callers can keep their own
- * placeholder instead of printing a dangling "Dr.".
- *
- * @param {string} name stored doctor name, with or without a title
- * @param {string} prefix title to print, e.g. the i18n value ("Dr." / "डॉ.")
- * @returns {string}
- */
-export const doctorDisplayName = (name, prefix = "Dr.") => {
-  const value = String(name ?? "").trim();
-  if (!value) return "";
-
-  const rest = stripDoctorPrefix(value);
-  // A name that is *only* a title ("Dr.") is printed as stored rather than
-  // printed with an empty name after it.
-  return rest ? `${prefix} ${rest}` : value;
-};
-
-/**
- * The title plus the first name only - what fits in the header dropdown.
- * Same idempotency as doctorDisplayName.
- *
- * @param {string} name stored doctor name, with or without a title
- * @param {string} prefix title to print, e.g. the i18n value ("Dr." / "डॉ.")
- * @returns {string}
- */
-export const doctorShortName = (name, prefix = "Dr.") => {
-  const full = doctorDisplayName(name, prefix);
-  if (!full) return "";
-
-  const first = full.slice(prefix.length).trim().split(/\s+/)[0];
-  return first ? `${prefix} ${first}` : full;
-};

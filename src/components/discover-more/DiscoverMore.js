@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { color_schema } from "../../constant";
+import { color_schema, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -134,6 +134,8 @@ const DiscoverMoreComp = () => {
                 }}
               >
                 {/* <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   src={item.icon}
                   alt={item.title}
                   width={60}

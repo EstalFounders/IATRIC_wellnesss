@@ -34,14 +34,14 @@ export interface ConsultationFixture {
 
 export const PATIENT_NAME = 'E2E Patient';
 /**
- * The doctor name *as stored* on the consultation (`doctorDetails.name`). Kept
- * without the "Dr." dot on purpose: the room prints and broadcasts the title
- * through `doctorDisplayName()` (src/utils/doctorName.js), which normalises it.
- * Assertions must therefore expect `DOCTOR_DISPLAY_NAME`, not this raw value.
+ * The doctor name *as stored* on the consultation (`doctorDetails.name`). The
+ * title is part of the stored value: `doctorDisplayName()` (src/utils/doctorName.js)
+ * prints it verbatim and never adds one of its own, so the rendered form is this
+ * same string with whitespace collapsed.
  */
 export const DOCTOR_NAME = 'Dr E2E Rao';
 /** What the meeting room renders / emits after `doctorDisplayName(DOCTOR_NAME)`. */
-export const DOCTOR_DISPLAY_NAME = 'Dr. E2E Rao';
+export const DOCTOR_DISPLAY_NAME = 'Dr E2E Rao';
 export const DOCTOR_SPECIALITY = 'General Medicine';
 
 export function consultationFixture(kind: ConsultationKind, meetingId: string): ConsultationFixture {

@@ -39,3 +39,11 @@
   right: 5px;
   color: red; /* Customize the color as needed */
 }
+
+/* Name of a file that has no thumbnail (a PDF, a Word document). */
+.fileName {
+  margin: 0;
+  font-size: 0.75rem;
+  word-break: break-word;
+}
+

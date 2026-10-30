@@ -1,11 +1,12 @@
 import Link from "next/link";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
 import { ConsultationButton } from "../Common/commonUi";
 
 const WhoWeAreDoctors1 = () => {
-  const doctors = useSelector((state) => state.allDoctorS.allDoctors);
+  // Same redux roster as /all-doctors - no second source of truth.
+  const { doctors } = useDoctors();
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
       <div className="container">

@@ -3,6 +3,7 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import styles from "../css/VitalOrganCheckUp.module.css";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../../constant";
 import { HiArrowCircleRight } from "react-icons/hi";
 import { MoreButton } from "../common/CommonMethod";
 
@@ -143,6 +144,8 @@ const VitalOrganCheckup = () => {
           <Row className="align-items-center mt-5 mx-4">
             <Col xs={12} md={6}>
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 src={selectedFilterDetails.image}
                 alt={`${selectedFilterDetails.label} Image`}
                 height={650}

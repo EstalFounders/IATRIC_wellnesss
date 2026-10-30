@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FaTrash } from "react-icons/fa"; // Import trash icon
 import styles from "../css/TestDetailsCard.module.css";
 import EditableTestDetails from "./EditableTestDetails";
-import { price_symbol } from "../../../constant";
+import { price_symbol, imageBlurDataUrl } from "../../../constant";
 import { calculateDiscountedPrice } from "../utility/helper";
 
 const TestDetailsCard = ({ test }) => {
@@ -51,7 +51,7 @@ const TestDetailsCard = ({ test }) => {
         <Card.Body>
           <Row className="d-flex">
             <Col sm={10} md={8} lg={9}>
-              <Image src={test.icon} alt={test.Title} width={40} height={40} />
+              <Image placeholder="blur" blurDataURL={imageBlurDataUrl} src={test.icon} alt={test.Title} width={40} height={40} />
             </Col>
             <Col sm={10} md={8} lg={3}>
               {test.discount && (

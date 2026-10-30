@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
 import NursingStaffSection from "./NursingStaffSection";
-import { address, callToBook, color_schema, contact_no } from "../../constant";
+import { address, callToBook, color_schema, contact_no, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
 import {
@@ -1315,6 +1315,8 @@ const ServiceDetail = () => {
                     {hasCardImage(item) ? (
                       <Box sx={{ position: "relative", height: 150, flexShrink: 0 }}>
                         <Image
+                          placeholder="blur"
+                          blurDataURL={imageBlurDataUrl}
                           src={item.image}
                           alt={
                             item.imageAlt ||

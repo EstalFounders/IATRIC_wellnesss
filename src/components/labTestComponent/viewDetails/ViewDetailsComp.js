@@ -20,7 +20,7 @@ import {
 } from "../common/CommonMethod";
 import { Snackbar } from "@mui/material";
 import HealthCheckupCard from "../common/HealthCheckupCard";
-import { price_symbol } from "../../../constant";
+import { price_symbol, imageBlurDataUrl } from "../../../constant";
 import { useSelector } from "react-redux";
 import { ConsultationButton } from "../../Common/commonUi";
 
@@ -97,6 +97,8 @@ const ViewDetails = () => {
         {/* Image Section */}
         <div className="col-12 col-md-6 position-relative d-flex justify-content-center align-items-center">
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             width={200}
             height={200}
             src="/images/labtest/viewDetails/foreGroundImage.png"

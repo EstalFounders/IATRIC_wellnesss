@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "../css/labTestLoginModel.module.css";
 import { useState } from "react";
-import { existingUser } from "../../constant";
+import { existingUser, imageBlurDataUrl } from "../../constant";
 import { isMobileValid } from "../../helper";
 
 export const RequestOtp = ({ onClose, handleOtpRequest, source }) => {
@@ -36,6 +36,8 @@ export const RequestOtp = ({ onClose, handleOtpRequest, source }) => {
       {/* Image Column */}
       <div className="col-12 col-md-4 d-flex ml-2 align-items-center mb-4 mb-md-0">
         <Image
+          placeholder="blur"
+          blurDataURL={imageBlurDataUrl}
           src="/images/labtest/login/loginBg.png"
           width={228}
           height={547}
