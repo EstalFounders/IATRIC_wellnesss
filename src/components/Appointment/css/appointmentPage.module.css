@@ -149,6 +149,17 @@ line-height: 30px;
   box-shadow: 0 0 0 0.12rem rgba(59, 95, 29, 0.14);
 }
 
+/* Date + slot pickers: a light hover so the controls read as clickable. */
+.slotPicker :global(.form-control) {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.slotPicker :global(.form-control:hover) {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(59, 95, 29, 0.12);
+}
+
 /* Reason for Consultation — outline pills */
 .pill {
   border-radius: 999px !important;

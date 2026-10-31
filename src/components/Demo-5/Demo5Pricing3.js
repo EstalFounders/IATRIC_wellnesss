@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import React from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
 
@@ -77,6 +78,8 @@ const Demo5Pricing3 = () => {
           <div className="col-lg-6">
             <div className="pricing-img">
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 width={600}
                 height={550}
                 className="img-fluid"

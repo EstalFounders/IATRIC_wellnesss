@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { price_symbol } from "../../constant";
 import { formatData } from "./utils/helper";
+import { formatConsultationTypes } from "../../utils/consultationFee";
 import { useRouter } from "next/router";
 
 const ViewAllAppointmentComp = () => {
@@ -102,7 +103,7 @@ const ViewAllAppointmentComp = () => {
                   {appointment.status}
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {appointment.consultationType}
+                  {formatConsultationTypes(appointment.consultationType)}
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   {price_symbol}{appointment.consultationprice}

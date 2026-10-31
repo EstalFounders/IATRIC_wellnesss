@@ -153,6 +153,41 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
     return asTemplateValue(source.email, "not provided", 80);
   };
   
+  /**
+   * Body for the admin "Get a Call Back" alert sent to
+   * SUPPORT_NOTIFICATION_PHONE_NUMBER (pages/api/userQuery.js after the save).
+   *
+   * It is rendered with the generic WhatsApp template
+   * (FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID), whose 8 placeholders read:
+   *   Hello {{1}},
+   *   {{2}}
+   *   {{3}}
+   *   Details: {{4}}: {{5}}
+   *   {{6}}: {{7}}
+   *   {{8}}
+   * so the admin reads:
+   *   You got a call back request from <phone>. Please call them back ASAP.
+   *
+   * Every value goes through asTemplateValue() so a pipe or a line break in the
+   * captured contact cannot shift the following placeholders.
+   * @param {string} contact      - phone (or email) submitted by the visitor
+   * @param {string} requestedAt  - pre-formatted submission timestamp
+   */
+  export const getCallbackSupportAlertBody = (contact, requestedAt) => {
+    const phone = asTemplateValue(contact, "not provided", 40);
+
+    return {
+      admin_name: "Admin",                                        // {{1}}
+      alert_line: `You got a call back request from ${phone}.`,   // {{2}}
+      action_line: "Please call them back ASAP.",                 // {{3}}
+      details_label: "Phone Number",                              // {{4}}
+      details_value: phone,                                       // {{5}}
+      time_label: "Requested At",                                 // {{6}}
+      time_value: asTemplateValue(requestedAt, "-", 40),           // {{7}}
+      footer: "Get a Call Back - HealthPath",                     // {{8}}
+    };
+  };
+
   // --- Note on formatData and extractTime ---
   // If you want these functions to be truly self-contained and format dates,
   // you would either import formatData/extractTime from your date utility file

@@ -8,7 +8,7 @@ name: Playwright Tests
 # single gate on the branch before it is merged into staging.
 on:
   push:
-    branches: [ main, master, staging, feature-branch ]
+    branches: [ main, staging ]
   pull_request:
     branches: [ main, master, staging ]
   # Allow a manual run from the Actions tab (same as the deploy workflow).

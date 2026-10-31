@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { FaBookMedical, FaListAlt, FaUserPlus } from "react-icons/fa";
 import { ImLab } from "react-icons/im";
 import { IoIosPricetags } from "react-icons/io";
-import { BiSolidOffer } from "react-icons/bi";
 import styles from "../css/Homepage.module.css";
 
 const ACTIONS = [
@@ -31,12 +30,6 @@ const ACTIONS = [
     hint: "Set the fee per consultation",
     path: "/superAdmin/consultationFee",
     icon: <IoIosPricetags />,
-  },
-  {
-    label: "Offers",
-    hint: "Publish a discount",
-    path: "/superAdmin/offers",
-    icon: <BiSolidOffer />,
   },
   {
     label: "Logs",

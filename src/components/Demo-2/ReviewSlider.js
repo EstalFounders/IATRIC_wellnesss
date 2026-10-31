@@ -4,7 +4,7 @@ import { testimonial2Props } from "../../sliderProps";
 import { Autoplay } from "swiper";
 import { testimonials } from "../../../data/services";
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
-import { color_schema } from "../../constant";
+import { color_schema, imageBlurDataUrl } from "../../constant";
 
 const Testimonials = testimonials;
 
@@ -95,6 +95,8 @@ const ReviewSlider = () => {
                 {/* Avatar */}
                 <div className="testimonial-avatar mb-3">
                   <Image
+                    placeholder="blur"
+                    blurDataURL={imageBlurDataUrl}
                     width={70}
                     height={70}
                     src={t.image || DEFAULT_REVIEW_AVATAR}

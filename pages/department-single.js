@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDoctors } from "../src/customUtils/useDoctors";
 import About5 from "../src/components/Common/About-5";
 import DepartmentDoctors1 from "../src/components/Department-single/DepartmentDoctors1";
 import DepartmentPage from "../src/components/Department-single/DepartmentPage";
@@ -10,7 +10,7 @@ import FaqSection from "../src/components/Common/FaqSection";
 import { getFaqsForTopic } from "../data/faqs";
 
 const DepartmentSingle = () => {
-  const doctors = useSelector((state) => state.allDoctorS.allDoctors);
+  const { doctors } = useDoctors();
   let filterDoctors;
   const router = useRouter();
   const { serviceName, id } = router.query;

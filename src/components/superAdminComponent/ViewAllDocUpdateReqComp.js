@@ -15,7 +15,8 @@
 // a direct link to this page painted "No Request found" until the header happened
 // to load after the first render - and the page's copy of the array was taken
 // once, so an approval never showed up either. The header and the bell keep using
-// the slice exactly as before; nothing in this file dispatches.
+// the slice exactly as before. The doctor roster itself is shared redux state
+// (`useDoctors`) - this page never keeps its own copy of it.
 //
 // Everything that is not a render decision (labels, the indexed-key grouping of
 // `consultationType[0]`, value formatting, the before/after diff, the sort) lives
@@ -25,6 +26,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Modal } from "react-bootstrap";
 import { api } from "../../constant";
+import { useDoctors } from "../../customUtils/useDoctors";
 import { doctorDisplayName } from "../../utils/doctorName";
 import {
   buildDiff,
@@ -151,7 +153,8 @@ const DiffRow = ({ label, currentText, requestedText, changed, hasCurrent }) => 
 
 const ViewAllDocUpdateReqComp = () => {
   const [requests, setRequests] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  // Shared redux roster (cache first): avatars + the "current" column values.
+  const { doctors, refetch: refetchDoctors } = useDoctors();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [notice, setNotice] = useState(null); // { tone: "ok" | "error", text }
@@ -167,9 +170,12 @@ const ViewAllDocUpdateReqComp = () => {
     setLoadError("");
 
     try {
-      const [requestRes, doctorRes] = await Promise.all([
+      // The roster lives in redux; a forced refresh keeps the "current" column
+      // in step with the latest saved document. Its failure must never hide the
+      // queue itself, so it is fired alongside (never awaited as a hard step).
+      const [requestRes] = await Promise.all([
         fetch(api.doctorUpdateRequest, { cache: "no-store" }),
-        fetch(api.addDoctor, { cache: "no-store" }),
+        refetchDoctors(),
       ]);
 
       if (!requestRes.ok) {
@@ -183,17 +189,12 @@ const ViewAllDocUpdateReqComp = () => {
         throw new Error("The update-request API returned an unexpected response.");
       }
       setRequests(requestList);
-
-      // The doctor list only feeds the photos and the "current" column, so a
-      // failure there must never hide the queue itself.
-      const doctorList = doctorRes.ok ? await doctorRes.json() : [];
-      setDoctors(Array.isArray(doctorList) ? doctorList : []);
     } catch (error) {
       setLoadError(error?.message || "The change requests could not be loaded.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refetchDoctors]);
 
   useEffect(() => {
     load();

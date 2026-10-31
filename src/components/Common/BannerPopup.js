@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Modal } from "react-bootstrap";
 import { POPUP_FALLBACK_IMAGE, popupBanner } from "../../../data/popupBanner";
-import { api } from "../../constant";
+import { api, imageBlurDataUrl } from "../../constant";
 import {
   getBannerImageUrl,
   withCacheBuster,
@@ -182,6 +182,8 @@ const BannerPopup = ({ initialBanner = null }) => {
           }}
         >
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             src={imageSrc}
             alt=""
             width={1200}
@@ -234,6 +236,8 @@ const BannerPopup = ({ initialBanner = null }) => {
           style={{ cursor: banner.href ? "pointer" : "default" }}
         >
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             src={imageSrc}
             alt={banner.alt || t("popup.bannerAlt", "HealthPath")}
             width={1200}

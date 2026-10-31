@@ -1,64 +1,97 @@
-import Link from "next/link";
+import React, { useCallback, useMemo, useState } from "react";
 import FilterBar from "../filterbar/filterbar";
-import React, { useState, useEffect } from "react";
-import { DoctorComponent } from "../Common/DoctorComponent";
-import { api } from "../../constant";
-import { useDispatch, useSelector } from "react-redux";
-import { setAllDoctors } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import listStyles from "../filterbar/css/filterBar.module.css";
 import DoctorCard from "../Common/DoctorCard";
+import { useDoctors } from "../../customUtils/useDoctors";
+import { useGlobalData } from "../../customUtils/useGlobalData";
+import { useLanguage } from "../../i18n/LanguageContext";
+import {
+  EMPTY_FILTERS,
+  buildFilterOptions,
+  filterAndSortDoctors,
+} from "../filterbar/filterDoctors";
 
 const AllDoctorsDoctors3 = () => {
-  const [doctors, setDoctors] = useState([]);
-  const storedDoctors = useSelector((state) => state.allDoctorS.allDoctors);
-  const dispatch = useDispatch();
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  // Redux first: the shared slice paints instantly and only calls the API when
+  // it holds no list yet (see `fetchAllDoctors`).
+  const { doctors, isLoading } = useDoctors();
+  const { specialityNames } = useGlobalData();
+  const { t } = useLanguage();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Check if data is stored in session storage
-      
-      // sessionStorage.getItem("doctors");
-      console.log(storedDoctors, "testing in all doctors2");
-      if (storedDoctors) {
-        setDoctors(storedDoctors); // Parse and set to state
-      } else {
-        try {
-          const response = await fetch(api.addDoctor);
-          if (!response.ok) {
-            throw new Error("Failed to fetch");
-          }
-          const data = await response.json();
-          // sessionStorage.setItem("doctors", JSON.stringify(data)); // Store fetched data in session storage
-          dispatch(setAllDoctors(data));
-          setDoctors(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
+  // Only doctors still marked active belong on the public listing.
+  const visibleDoctors = useMemo(
+    () => doctors.filter((doctor) => doctor && doctor.isActive !== false),
+    [doctors]
+  );
 
-    fetchData(); // Call the fetchData function
-  }, []); // Empty dependency array ensures the effect runs only once
+  // Speciality options are the curated SUB services (redux `globalData.speciality`)
+  // - the same names a doctor's `serviceOffered` holds. Locations come from the
+  // loaded doctors.
+  const { specialities, locations } = useMemo(
+    () => buildFilterOptions(visibleDoctors, specialityNames),
+    [visibleDoctors, specialityNames]
+  );
 
-  const getSelectedFilter = (option) => {
-    console.log(option, "testing in all doctors3");
-  };
+  const filteredDoctors = useMemo(
+    () => filterAndSortDoctors(visibleDoctors, filters),
+    [visibleDoctors, filters]
+  );
+
+  const handleFilterChange = useCallback((key, value) => {
+    setFilters((previous) =>
+      previous[key] === value ? previous : { ...previous, [key]: value }
+    );
+  }, []);
+
+  const handleReset = useCallback(() => setFilters(EMPTY_FILTERS), []);
 
   return (
     <section
       id="doctors-3"
       className="bg-lightgrey wide-60 doctors-section division"
     >
-      <FilterBar selectFilter={getSelectedFilter} />
+      <div className="container">
+        <FilterBar
+          filters={filters}
+          onChange={handleFilterChange}
+          onReset={handleReset}
+          specialities={specialities}
+          locations={locations}
+          resultCount={filteredDoctors.length}
+          totalCount={visibleDoctors.length}
+        />
+      </div>
+
       <div className="container">
         <div className="row mt-4 d-flex justify-content-center">
-          {doctors.map((doctor, index) => (
-            <DoctorCard key={index} doctor={doctor} />
+          {filteredDoctors.map((doctor, index) => (
+            <DoctorCard
+              key={doctor._id || doctor.email || index}
+              doctor={doctor}
+              index={index}
+            />
           ))}
-          {/* END DOCTOR #9 */}
+
+          {!isLoading && filteredDoctors.length === 0 && (
+            <div className={listStyles.empty}>
+              <strong>
+                {visibleDoctors.length === 0
+                  ? t("doctors.noneAvailable", "No doctors available right now")
+                  : t("doctors.noMatch", "No doctors match your filters")}
+              </strong>
+              <span>
+                {visibleDoctors.length === 0
+                  ? t("doctors.noneAvailableHint", "Please check back soon.")
+                  : t(
+                      "doctors.noMatchHint",
+                      "Try a different search, or clear the filters to see everyone."
+                    )}
+              </span>
+            </div>
+          )}
         </div>
-        {/* End row */}
       </div>
-      {/* End container */}
     </section>
   );
 };

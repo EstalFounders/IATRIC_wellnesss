@@ -19,8 +19,8 @@ import { FaCalendarCheck, FaPlus, FaSync } from "react-icons/fa";
 import { api, appointment_status } from "../../../constant";
 import {
   setAllappointments,
-  setAllDoctor,
 } from "../../../store/slices/superAdmin/homepageSlice";
+import { useDoctors } from "../../../customUtils/useDoctors";
 import {
   formatIstDate,
   istDayKey,
@@ -77,16 +77,15 @@ const ConsultationBookedComp = () => {
   const [toDate, setToDate] = useState("");
 
   const [appointments, setAppointments] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  // The roster is shared redux state now - cache first, one request (see useDoctors).
+  const { doctors, isLoading: isDoctorLoading } = useDoctors();
   const [isLoading, setIsLoading] = useState(true);
-  const [isDoctorLoading, setIsDoctorLoading] = useState(true);
   const [failures, setFailures] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
   const [note, setNote] = useState(null);
 
   const loadBookings = useCallback(async () => {
     setIsLoading(true);
-    setIsDoctorLoading(true);
     const failed = [];
 
     const load = async (url, label) => {
@@ -103,25 +102,18 @@ const ConsultationBookedComp = () => {
       }
     };
 
-    const [bookingData, doctorData] = await Promise.all([
-      load(api.bookConsultation, "consultation bookings"),
-      load(api.addDoctor, "doctors"),
-    ]);
+    const bookingData = await load(api.bookConsultation, "consultation bookings");
 
     const appointmentList = Array.isArray(bookingData?.appointments)
       ? bookingData.appointments
       : [];
-    const doctorList = Array.isArray(doctorData) ? doctorData : [];
 
     // Dispatched even when empty, so no other panel page keeps a stale list.
     dispatch(setAllappointments(appointmentList));
-    dispatch(setAllDoctor(doctorList));
 
     setAppointments(appointmentList);
-    setDoctors(doctorList);
     setFailures(failed);
     setIsLoading(false);
-    setIsDoctorLoading(false);
   }, [dispatch]);
 
   useEffect(() => {

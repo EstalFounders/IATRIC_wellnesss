@@ -19,6 +19,10 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../lib/firebase";
 import { resizeImage } from "../../../src/components/Common/ResizeImage";
 import { profilePicture_img_path } from "../../../src/constant";
+import {
+  getFileExtension,
+  isResizableImage,
+} from "../../../src/customUtils/imageUpload";
 
 export const config = {
   api: {
@@ -28,10 +32,13 @@ export const config = {
 
 const AVATAR_SIZE = 700;
 const MAX_BYTES = Number(process.env.AVATAR_MAX_UPLOAD_BYTES || 8 * 1024 * 1024);
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+// Extension used when the browser does not send a useful content type. The
+// uploader accepts ANY file type (the doctor forms do), resizing is simply
+// skipped for anything that is not an image.
 const EXTENSION_BY_TYPE = {
   "image/png": "png",
   "image/webp": "webp",
+  "image/gif": "gif",
 };
 
 const storageFolder = () =>
@@ -85,31 +92,26 @@ export default async function handler(req, res) {
       .json({ ok: false, error: 'Attach the photo as the "profilePicture" field' });
   }
 
-  const contentType = String(file.headers?.["content-type"] || "image/jpeg").toLowerCase();
-
-  if (!ALLOWED_TYPES.includes(contentType)) {
-    try {
-      fs.unlinkSync(file.path);
-    } catch (error) {
-      /* temp file already gone */
-    }
-
-    return res.status(415).json({
-      ok: false,
-      error: `Unsupported image type ${contentType}. Use JPEG, PNG or WebP.`,
-    });
-  }
+  const contentType = String(
+    file.headers?.["content-type"] || "application/octet-stream"
+  ).toLowerCase();
 
   try {
     const fileBuffer = fs.readFileSync(file.path);
-    const resized = await resizeImage(fileBuffer, AVATAR_SIZE, AVATAR_SIZE);
+    // Images are squared to AVATAR_SIZE; any other file is stored unchanged.
+    const payload = isResizableImage(file)
+      ? await resizeImage(fileBuffer, AVATAR_SIZE, AVATAR_SIZE)
+      : fileBuffer;
 
     const doctorId = String(parsed.fields?.doctorId?.[0] || "").replace(/[^a-zA-Z0-9_-]/g, "");
-    const extension = EXTENSION_BY_TYPE[contentType] || "jpg";
+    const extension =
+      EXTENSION_BY_TYPE[contentType] ||
+      getFileExtension(file.originalFilename).slice(1) ||
+      "bin";
     const storagePath = `${storageFolder()}/${doctorId || "doctor"}-${Date.now()}.${extension}`;
     const storageRef = ref(storage, storagePath);
 
-    await uploadBytes(storageRef, resized, {
+    await uploadBytes(storageRef, payload, {
       contentType,
       // Filenames are unique per upload, so the file can be cached hard.
       cacheControl: "public, max-age=31536000",

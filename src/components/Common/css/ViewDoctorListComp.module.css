@@ -157,21 +157,6 @@
     padding-top: 0.5rem;
   }
   
-  .thumbs-up-container {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    color: #28a745;
-    font-weight: 600;
-  }
-  
-  .patient-stories-link {
-    font-size: 0.9rem;
-    color: var(--color-primary);
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  
   .doctor-booking-section {
     display: flex;
     flex-direction: column;
@@ -229,20 +214,24 @@
     width: 18px;
     height: 18px;
   }
-  
-  .thumbs-up-icon {
-    color: #28a745;
-    width: 16px;
-    height: 16px;
-  }
 
-  /* Small screens: stack cards full-width (1 per row) so the fixed
-     photo + nowrap booking button never overflow the viewport. */
+  /* Small screens: one card per row so the fixed photo + nowrap booking
+     button never overflow the viewport. The card keeps a 16px gutter on each
+     side instead of sitting edge-to-edge; the gutters are folded into the
+     flex-basis (100% - 32px) so a single card spans exactly one screen and the
+     scroll row never overflows horizontally. */
   @media (max-width: 576px) {
-    .new-doctor-card {
+    .view-doctor-list-container {
       width: 100%;
-      max-width: 100%;
-      flex: 0 0 100%;
+      padding: 12px 0;
+      gap: 0;
+    }
+
+    .new-doctor-card {
+      flex: 0 0 calc(100% - 32px);
+      width: calc(100% - 32px);
+      max-width: calc(100% - 32px);
+      margin: 0 16px;
     }
   }
   

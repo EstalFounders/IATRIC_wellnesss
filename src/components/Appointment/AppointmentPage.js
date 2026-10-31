@@ -7,6 +7,7 @@ import {
   IN_TWENTY_MINUTES_NOW,
   SERVER_AVAILABLE_SLOTS_CODE,
   sessionStorageName,
+  imageBlurDataUrl
 } from "../../constant";
 import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
 import { useRouter } from "next/router";
@@ -27,7 +28,7 @@ import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import PaymentModal from "./PaymentModal";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
-import { fetchDoctors } from "../ApiService/ConsultationApiService";
+import { useDoctors } from "../../customUtils/useDoctors";
 import { useDispatch, useSelector } from "react-redux";
 import {
   bookConsultationApiCall,
@@ -66,7 +67,6 @@ const AppointmentPage = () => {
     "/superAdmin/bookConsultationFromAdmin"
   );
   // State variables
-  const [isDoctorLoading, setIsDoctorLoading] = useState();
   const [doctorChoice, setDoctorChoice] = useState("any");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [doctorName, setDoctorName] = useState("");
@@ -79,8 +79,7 @@ const AppointmentPage = () => {
   const [locallyCreatedSlots, setLocallyCreatedSlots] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(todayAtNoonUTC);
-  const storedDoctors = useSelector((state) => state.allDoctorS.allDoctors);
-  const [doctors, setDoctors] = useState(storedDoctors);
+  const { doctors } = useDoctors();
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [symptoms, setSymptoms] = useState("");
@@ -110,6 +109,14 @@ const AppointmentPage = () => {
   // doctor has been preselected, the page smooth-scrolls to the booking form.
   const appointmentFormRef = useRef(null);
   const didAutoScrollRef = useRef(false);
+
+  // Optional `?date=YYYY-MM-DD&time=HH:MM` pair handed over by the weekly
+  // timetable ("Book an Appointment" on `/timetable`). Both halves are IST, so
+  // the slot below can be looked up by rebuilding the instant (+05:30, no DST).
+  const deepLinkDate =
+    typeof router.query.date === "string" ? router.query.date.trim() : "";
+  const deepLinkTime =
+    typeof router.query.time === "string" ? router.query.time.trim() : "";
 
   // Services come from the globalData slice (single source of truth, serviceOffered
   // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
@@ -274,12 +281,6 @@ const AppointmentPage = () => {
     }
   }, [appointmentState.selectedDoctorId, appointmentState.selectedDate]);
 
-  useEffect(() => {
-    if (!(doctors > 0)) {
-      fetchDoctors(dispatch, setDoctors, setIsDoctorLoading);
-    }
-  }, []);
-
   const handleDoctorChoiceChange = (event) => {
     const choice = event.target.value;
     setDoctorChoice(choice);
@@ -358,6 +359,46 @@ const AppointmentPage = () => {
     setShowDatePicker(timeChoice === CHOOSE_TIME && doctorChoice === "any");
   };
 
+  // Landing with a slot from the timetable: open "Choose time" on that day so
+  // the slot grid (and the preselection below) belongs to it. Noon UTC is the
+  // same calendar day everywhere within +/-12h, and it is the anchor
+  // `fetchSlot` buckets by (see `todayAtNoonUTC`).
+  useEffect(() => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(deepLinkDate)) return;
+    const day = new Date(`${deepLinkDate}T12:00:00Z`);
+    if (Number.isNaN(day.getTime())) return;
+
+    setTimeSelection(CHOOSE_TIME);
+    setAppointmentTime(CHOOSE_TIME);
+    setShowDatePicker(false);
+    setSelectedDate(day);
+  }, [deepLinkDate]);
+
+  // Re-applies whenever the slot grid is rebuilt (the doctor's real rows replace
+  // the generic grid once they are fetched), but only once per list, so a slot
+  // the patient then picks by hand is not overridden.
+  const deepLinkListRef = useRef(null);
+  useEffect(() => {
+    // The timetable always sends `doctorId` too: wait until that doctor is
+    // actually selected, otherwise the generic grid would be matched against.
+    if (!selectedDoctorId) return;
+    if (!deepLinkDate || !deepLinkTime) return;
+    if (deepLinkListRef.current === locallyCreatedSlots) return;
+
+    const wanted = new Date(
+      `${deepLinkDate}T${deepLinkTime}:00+05:30`
+    ).getTime();
+    if (Number.isNaN(wanted)) return;
+
+    const match = locallyCreatedSlots.find(
+      (slot) => new Date(slot.startTime).getTime() === wanted
+    );
+    if (!match) return;
+
+    deepLinkListRef.current = locallyCreatedSlots;
+    setSelectedSlot(match);
+  }, [selectedDoctorId, deepLinkDate, deepLinkTime, locallyCreatedSlots]);
+
   const handleSlotSelection = (slot) => {
     setSelectedSlot(slot);
   };
@@ -391,11 +432,31 @@ const AppointmentPage = () => {
   }, [doctors]);
 
   useEffect(() => {
-    if (timeSelection === CHOOSE_TIME && doctorChoice === "any") {
-      const slots = generateSlotsForChooseTime(selectedDate, 8, 23, 20);
-      setLocallyCreatedSlots(slots);
+    if (timeSelection !== CHOOSE_TIME) return;
+
+    // A named doctor has a real 20-minute grid stored in `slots`: list those rows
+    // (unbooked, not finished yet) instead of the generic 8-23 grid, otherwise
+    // the slot picked on the timetable could not be listed - or booked - here.
+    if (selectedDoctorId) {
+      const now = Date.now();
+      setLocallyCreatedSlots(
+        (availableSlots || [])
+          .filter(
+            (slot) => !slot.isBooked && new Date(slot.endTime).getTime() > now
+          )
+          .map((slot) => ({
+            _id: String(slot._id),
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            isBooked: false,
+          }))
+      );
+      return;
     }
-  }, [selectedDate, timeSelection]);
+
+    const slots = generateSlotsForChooseTime(selectedDate, 8, 23, 20);
+    setLocallyCreatedSlots(slots);
+  }, [selectedDate, timeSelection, selectedDoctorId, availableSlots]);
 
   const handleOpenSnackBar = () => {
     setOpenSnackBar(true);
@@ -622,6 +683,8 @@ const AppointmentPage = () => {
           >
             <div className={styles.successMessage}>
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 alt="success_response"
                 src={"/images/success.png"}
                 width={100}

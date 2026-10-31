@@ -1,5 +1,5 @@
 // AddDoctorForm.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./AddDoctorForm.module.css";
 import { Col, Row } from "react-bootstrap";
 import { FaPencilAlt } from "react-icons/fa";
@@ -7,7 +7,6 @@ import {
   FaCalendarCheck,
   FaClipboardList,
   FaFileUpload,
-  FaLock,
   FaStethoscope,
   FaUserCircle,
   FaUserMd,
@@ -37,10 +36,10 @@ import CustomDialog from "../../CustomPopup.js";
 import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
-
+import { fetchAllDoctors } from "../../../store/slices/bookingWebsite/allDoctorsPageSlice.js";
 /**
  * Fields that MUST be filled to register a doctor. Everything else on this form
- * (gender, education + training, price, doctor share, passwords, picture /
+ * (gender, education + training, price, doctor share, picture /
  * certificates / stamp / signature, slot times) is optional for now.
  * `consultationType` and `serviceOffered` cannot use HTML `required` because
  * their visible <select> always keeps `value=""`, so they are validated through
@@ -61,8 +60,13 @@ const MANDATORY_TEXT_FIELDS = [
   ["expertise", "Area of Expertise"],
   ["workDays", "Work Days"],
   ["overview", "Overview"],
-  ["doctorRegistrationNo", "Registration No"],
 ];
+
+// The two fields the API and the Doctor schema enforce as unique. Each one is
+// checked against `GET /api/addDoctor?checkUnique=1` when it loses focus, so the
+// admin sees the clash before submitting; the POST/PUT 409 repeats it. The
+// registration number is optional and not unique.
+const UNIQUE_TEXT_FIELDS = ["email", "mobileNumber"];
 
 // Blank form state, also used by the Reset button so a second registration
 // starts from a clean slate. `location` starts empty so the India location
@@ -79,7 +83,6 @@ const EMPTY_DOCTOR = {
   workExperience: "",
   consultationType: "",
   serviceOffered: "",
-  password: "",
   doctorType: DoctorType.individual,
   doctorShare: "70",
   slotStartTime: "",
@@ -88,12 +91,12 @@ const EMPTY_DOCTOR = {
 };
 
 const AddDoctorForm = () => {
+  const dispatch = useDispatch();
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
   const [profilePicture, setprofilePicture] = useState("");
   const [doctorStamp, setDoctorStamp] = useState("");
   const [doctorSignature, setDoctorSignature] = useState("");
   const [loader, setLoader] = useState(false);
-  const [cpassword, setCPassword] = useState();
   const [slotStartTime, setSlotStartTime] = useState("09:00");
   const [slotEndTime, setSlotEndTime] = useState("21:00");
   const [message, setMessage] = useState("");
@@ -117,7 +120,6 @@ const AddDoctorForm = () => {
   // an inline error (the same pattern as the work-day chips).
   const [languageItems, setLanguageItems] = useState([""]);
   const [languageError, setLanguageError] = useState("");
-  const dispatch = useDispatch();
 
   const [doctorDetails, setDoctorDetails] = useState(EMPTY_DOCTOR);
   // Doctor share defaults to 70% and stays locked until the admin clicks the pencil.
@@ -125,6 +127,13 @@ const AddDoctorForm = () => {
   // Bumped by the Reset button so the <ImageUploader />s remount (their preview
   // state lives inside that component).
   const [uploaderKey, setUploaderKey] = useState(0);
+  // Inline "already registered" messages for email / mobile number /
+  // registration number, keyed by field name.
+  const [uniqueErrors, setUniqueErrors] = useState({});
+  // Latest form values, so a slow uniqueness response cannot overwrite a message
+  // for a value the admin has changed in the meantime.
+  const latestDetails = useRef(doctorDetails);
+  latestDetails.current = doctorDetails;
 
   const storedService = useSelector(
     (state) => state.superAdminHomePage.serviceOffered,
@@ -269,12 +278,12 @@ const AddDoctorForm = () => {
     setDoctorStamp("");
     setDoctorSignature("");
     setDiplomasCertificates([]);
-    setCPassword();
     setSlotStartTime("09:00");
     setSlotEndTime("21:00");
     setWorkDaysError("");
     setLanguageError("");
     setWorkExperienceError("");
+    setUniqueErrors({});
     setUploaderKey((key) => key + 1);
   };
 
@@ -296,11 +305,54 @@ const AddDoctorForm = () => {
         [name]: convertTimeIntoDate(value),
       });
     } else {
+      if (UNIQUE_TEXT_FIELDS.includes(name) && uniqueErrors[name]) {
+        // The admin is fixing the value - drop the stale "already taken" note.
+        setUniqueErrors((prev) => ({ ...prev, [name]: "" }));
+      }
       setDoctorDetails({
         ...doctorDetails,
         [name]: value,
       });
     }
+  };
+
+  /**
+   * Asks the API whether the value of `name` is still free. Runs on blur so the
+   * admin is warned before submitting, without a request per keystroke.
+   */
+  const checkUniqueField = async (name, value) => {
+    const trimmed = String(value ?? "").trim();
+    if (!trimmed) {
+      setUniqueErrors((prev) => ({ ...prev, [name]: "" }));
+      return;
+    }
+
+    const params = new URLSearchParams({ checkUnique: "1" });
+    params.set(name, trimmed);
+
+    try {
+      const response = await fetch(`${api.addDoctor}?${params.toString()}`);
+      if (!response.ok) return;
+
+      const data = await response.json();
+      // Ignore stale answers: the field may have been edited while in flight.
+      if (String(latestDetails.current[name] ?? "").trim() !== trimmed) return;
+
+      const duplicate = (data.duplicates || []).find(
+        (entry) => entry.field === name
+      );
+      setUniqueErrors((prev) => ({
+        ...prev,
+        [name]: duplicate ? duplicate.message : "",
+      }));
+    } catch (error) {
+      console.error("Could not check the doctor details:", error);
+    }
+  };
+
+  const handleUniqueBlur = (e) => {
+    const { name, value } = e.target;
+    if (UNIQUE_TEXT_FIELDS.includes(name)) checkUniqueField(name, value);
   };
 
   const handleImagesChange = (id, newImages) => {
@@ -361,17 +413,19 @@ const AddDoctorForm = () => {
       );
     }
 
-    // Passwords are optional; they only have to match when one of them is filled.
-    if (
-      (doctorDetails.password || cpassword) &&
-      doctorDetails.password !== cpassword
-    ) {
-      setLoader(false);
-      return handleShowDialog("Password is not matching");
-    }
     if (!isMobileValid(doctorDetails.mobileNumber)) {
       setLoader(false);
       return handleShowDialog("Please correct mobile number");
+    }
+
+    // A known clash from the on-blur check blocks the submit; the server checks
+    // both fields again, so a stale message cannot stop a valid doctor.
+    const knownDuplicates = UNIQUE_TEXT_FIELDS.map(
+      (field) => uniqueErrors[field]
+    ).filter(Boolean);
+    if (knownDuplicates.length > 0) {
+      setLoader(false);
+      return handleShowDialog(knownDuplicates[0]);
     }
 
     const formData = new FormData();
@@ -380,8 +434,7 @@ const AddDoctorForm = () => {
     formData.append("gender", doctorDetails.gender);
     formData.append("mobileNumber", doctorDetails.mobileNumber);
     formData.append("expertise", doctorDetails.expertise);
-    // Compulsory field - it is listed in `MANDATORY_TEXT_FIELDS` and rejected by
-    // the Add Doctor POST while it is blank.
+    // Optional - a blank value is stored as-is and can be filled in later.
     formData.append("doctorRegistrationNo", doctorDetails.doctorRegistrationNo);
     // One field per entry; a blank field clears the list on the API side.
     appendLanguages(formData, languageItems);
@@ -392,7 +445,6 @@ const AddDoctorForm = () => {
     appendWorkExperience(formData, workExperienceItems);
     formData.append("consultationType", JSON.stringify(selectedTypes));
     formData.append("serviceOffered", selectedService.join(","));
-    formData.append("password", doctorDetails.password);
     formData.append("digitalSignature", doctorSignature);
     const location = doctorDetails.location || {};
     formData.append("locationState", location.state || "");
@@ -414,11 +466,39 @@ const AddDoctorForm = () => {
       });
 
       if (response.ok) {
+        // The roster is shared redux state - refresh it so every page (public
+        // listing, panels) sees the new doctor without a reload.
+        dispatch(fetchAllDoctors({ force: true }));
         handleShowDialog("Doctor registered successfully");
         // Reset form fields or navigate to another page
       } else {
+        // The API answers a duplicate with 409 + a friendly `message` and the
+        // clashing field(s); show that instead of a generic failure.
+        let payload = null;
+        try {
+          payload = await response.json();
+        } catch (error) {
+          console.error("Could not read the error response:", error);
+        }
+
+        if (Array.isArray(payload?.duplicates) && payload.duplicates.length > 0) {
+          setUniqueErrors((prev) => {
+            const next = { ...prev };
+            payload.duplicates.forEach((duplicate) => {
+              if (UNIQUE_TEXT_FIELDS.includes(duplicate.field)) {
+                next[duplicate.field] = duplicate.message;
+              }
+            });
+            return next;
+          });
+        }
+
         console.error("Error adding doctor:", response.statusText);
-        handleShowDialog("Something went wrong, please try again");
+        handleShowDialog(
+          payload?.message ||
+            payload?.error ||
+            "Something went wrong, please try again"
+        );
       }
     } catch (error) {
       console.error("Error adding doctor:", error.message);
@@ -475,8 +555,14 @@ const AddDoctorForm = () => {
                       name="email"
                       value={doctorDetails.email}
                       onChange={handleChange}
+                      onBlur={handleUniqueBlur}
                       required
                     />
+                    {uniqueErrors.email ? (
+                      <span className={styles.fieldError} role="alert">
+                        {uniqueErrors.email}
+                      </span>
+                    ) : null}
                   </label>
                 </Col>
                 <Col md={6}>
@@ -491,8 +577,14 @@ const AddDoctorForm = () => {
                       name="mobileNumber"
                       value={doctorDetails.mobileNumber}
                       onChange={handleChange}
+                      onBlur={handleUniqueBlur}
                       required
                     />
+                    {uniqueErrors.mobileNumber ? (
+                      <span className={styles.fieldError} role="alert">
+                        {uniqueErrors.mobileNumber}
+                      </span>
+                    ) : null}
                   </label>
                 </Col>
                 <Col md={6}>
@@ -557,19 +649,17 @@ const AddDoctorForm = () => {
                 </Col>
                 <Col md={6}>
                   <label className={styles.field}>
-                    <span className={styles.label}>
-                      Registration No <span className={styles.req}>*</span>
-                    </span>
+                    <span className={styles.label}>Registration No</span>
                     <input
                       className={styles.input}
                       type="text"
                       name="doctorRegistrationNo"
                       value={doctorDetails.doctorRegistrationNo}
                       onChange={handleChange}
-                      required
                     />
                     <span className={styles.hint}>
-                      Printed on the prescription stamp as &quot;Reg. No:&quot;.
+                      Optional. Printed on the prescription stamp as &quot;Reg.
+                      No:&quot; and can be added later from the edit form.
                     </span>
                   </label>
                 </Col>
@@ -824,8 +914,8 @@ const AddDoctorForm = () => {
                       name="slotStartTime"
                       value={slotStartTime}
                       onChange={handleChange}
-                      min="08:00"
-                      max="23:00"
+                      min="07:00"
+                      max="22:00"
                       className={styles.input}
                     />
                   </label>
@@ -840,43 +930,8 @@ const AddDoctorForm = () => {
                       value={slotEndTime}
                       onChange={handleChange}
                       min={slotStartTime}
-                      max="23:00"
+                      max="22:00"
                       className={styles.input}
-                    />
-                  </label>
-                </Col>
-              </Row>
-            </section>
-
-            <section className={styles.card}>
-              <h2 className={styles.cardTitle}>
-                <FaLock /> Account &amp; access
-              </h2>
-              <p className={styles.hint}>
-                Optional. If set, the two password fields must match.
-              </p>
-              <Row>
-                <Col md={6}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>Password</span>
-                    <input
-                      className={styles.input}
-                      type="password"
-                      name="password"
-                      value={doctorDetails.password || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                </Col>
-                <Col md={6}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>Confirm Password</span>
-                    <input
-                      className={styles.input}
-                      type="password"
-                      name="confirm_password"
-                      value={cpassword || ""}
-                      onChange={(e) => setCPassword(e.target.value)}
                     />
                   </label>
                 </Col>
@@ -889,7 +944,9 @@ const AddDoctorForm = () => {
               </h2>
               <p className={styles.hint}>
                 Optional, but certificates, the picture, the signature and the
-                stamp improve the prescription and the doctor profile.
+                stamp improve the prescription and the doctor profile. Any file
+                type is accepted - images are resized, documents are stored as
+                they are.
               </p>
               <Row key={uploaderKey}>
                 <Col md={6}>
@@ -955,9 +1012,6 @@ const AddDoctorForm = () => {
                     Select the consultation type(s) and the services offered.
                   </li>
                   <li>Pick at least one work day.</li>
-                  <li>
-                    Passwords are optional; if set, both fields must match.
-                  </li>
                 </ul>
               </section>
 

@@ -2,11 +2,12 @@ import React, { useRef } from "react";
 import { healthConcerns } from "../../../data/HealthConcern";
 import { HorizontalScrollContainer } from "../labTestComponent/common/HorizontalContainer";
 import { ConsultationButton } from "../Common/commonUi";
-import { useSelector } from "react-redux";
+import { useDoctors } from "../../customUtils/useDoctors";
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 
 const MedicalCertificate = () => {
-  const doctors = useSelector((state) => state.allDoctorS.allDoctors);
+  const { doctors } = useDoctors();
   return (
     <div className="container py-5">
       <h2 className="fw-bold text-center text-md-start mb-2">
@@ -27,6 +28,8 @@ const MedicalCertificate = () => {
                 }}
               >
                 <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   src={certUrl}
                   width={100}
                   height={200}

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
-import { api } from "../../constant";
+import { api, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
 
@@ -117,6 +117,8 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
         {/* Image */}
         <div className="flex justify-center mb-4 text-center">
           <Image
+            placeholder="blur"
+            blurDataURL={imageBlurDataUrl}
             src="/images/company_logo.png"
             alt="OTP"
             className="mt-5"

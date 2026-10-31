@@ -17,7 +17,7 @@ import SuperAdminModel from "../../components/superAdminComponent/model/SuperAdm
 import NotificationSection from "../../components/superAdminComponent/notifications/NotificationSection";
 import { handleDoctReqApproveOrRejectService } from "../../components/superAdminComponent/apiService/doctrReApproveOrRejectService";
 import { handleLeaveApproveOrRejectService } from "../../components/superAdminComponent/apiService/doctorLeaveApproveOrRejectService";
-import { api } from "../../constant";
+import { api, imageBlurDataUrl } from "../../constant";
 import { getFilteredNotifications } from "../../helper";
 import {
   setDoctorLeaveRequest,
@@ -103,6 +103,8 @@ const SuperAdminLoginHeader = ({ session }) => {
             {session ? <Navbar /> : null}
             <Link className={styles.brand} href="/superAdmin/homepage">
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 src="/images/logo.png"
                 width={150}
                 height={44}

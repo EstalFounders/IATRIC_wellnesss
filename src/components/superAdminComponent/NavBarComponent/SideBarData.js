@@ -13,7 +13,6 @@ import {
   MdUpdate,
 } from "react-icons/md";
 import { ImLab } from "react-icons/im";
-import { BiSolidOffer } from "react-icons/bi";
 import { TbFileInvoice } from "react-icons/tb";
 import { FaBookMedical } from "react-icons/fa";
 
@@ -87,11 +86,6 @@ export const SidebarData = [
     title: "Service offered",
     path: "/superAdmin/serviceOffered",
     icon: <MdMedicalServices />,
-  },
-  {
-    title: "Offers",
-    path: "/superAdmin/offers",
-    icon: <BiSolidOffer />,
   },
   {
     title: "Customer query",

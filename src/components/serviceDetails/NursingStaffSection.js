@@ -13,7 +13,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { api, color_schema } from "../../constant";
+import { api, color_schema, imageBlurDataUrl } from "../../constant";
 
 const NursingStaffSection = () => {
   const [staff, setStaff] = useState([]);
@@ -82,6 +82,8 @@ const NursingStaffSection = () => {
               {member.profilePictureUrl ? (
                 <Box sx={{ position: "relative", height: 220, flexShrink: 0 }}>
                   <Image
+                    placeholder="blur"
+                    blurDataURL={imageBlurDataUrl}
                     src={member.profilePictureUrl}
                     alt={member.name}
                     fill

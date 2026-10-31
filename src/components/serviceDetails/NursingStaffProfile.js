@@ -15,7 +15,7 @@ import {
   Alert,
   Button,
 } from "@mui/material";
-import { api, color_schema } from "../../constant";
+import { api, color_schema, imageBlurDataUrl } from "../../constant";
 
 const NursingStaffProfile = () => {
   const router = useRouter();
@@ -76,6 +76,8 @@ const NursingStaffProfile = () => {
             {member.profilePictureUrl ? (
               <Box sx={{ position: "relative", height: "100%", minHeight: 320 }}>
                 <Image
+                  placeholder="blur"
+                  blurDataURL={imageBlurDataUrl}
                   src={member.profilePictureUrl}
                   alt={member.name}
                   fill

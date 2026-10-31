@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "../css/labTestLoginModel.module.css";
 import { useRef, useEffect, useState } from "react";
-import { api } from "../../constant";
+import { api, imageBlurDataUrl } from "../../constant";
 
 export const OtpScreen = ({ onClose, mobile, handleSubmitOtp }) => {
   console.log("Mobile number:", mobile);
@@ -94,6 +94,8 @@ export const OtpScreen = ({ onClose, mobile, handleSubmitOtp }) => {
       {/* Image Column */}
       <div className="col-12 col-md-4 d-flex ml-2 align-items-center mb-4 mb-md-0">
         <Image
+          placeholder="blur"
+          blurDataURL={imageBlurDataUrl}
           src="/images/labtest/login/loginBg.png"
           width={228}
           height={547}

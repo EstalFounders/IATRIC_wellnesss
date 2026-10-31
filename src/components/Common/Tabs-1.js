@@ -8,6 +8,7 @@ import {
   callToBook,
   color_schema,
   serviceOffered,
+  imageBlurDataUrl
 } from "../../constant";
 import { handleServiceClick } from "./commonMethod";
 import { ConsultationButton } from "./commonUi";
@@ -211,6 +212,8 @@ const ServicesTabs = () => {
                 <div className="col-lg-6 mb-4 mb-lg-0">
                   <div className="image-wrapper position-relative">
                     <Image
+                      placeholder="blur"
+                      blurDataURL={imageBlurDataUrl}
                       onClick={() =>
                         handleServiceClickLocal(service.name, service.id)
                       }

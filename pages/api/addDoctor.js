@@ -27,8 +27,12 @@ import { getConfiguredAppUrl } from "../../src/lib/appOrigin";
 import fs from "fs"; // Import the fs module
 import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
+import { generateTempPassword } from "../../src/utils/generateTempPassword";
 import Slot from "../../src/models/slots";
 import { logErrorToGoogleSheet } from "./helper";
+import {
+  isResizableImage,
+} from "../../src/customUtils/imageUpload";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -46,6 +50,181 @@ function stripRemovedDoctorFields(fields) {
   const cleaned = { ...fields };
   for (const field of REMOVED_DOCTOR_FIELDS) delete cleaned[field];
   return cleaned;
+}
+
+/**
+ * Email and mobile number must be unique across doctors. The Doctor schema backs
+ * them with unique indexes; the helpers below turn a clash into the friendly 409
+ * the admin panel shows, and the `checkUnique` GET branch powers the on-blur check
+ * of the Add Doctor form. The registration number is intentionally not checked -
+ * it is an optional field a doctor can fill in later.
+ */
+const DUPLICATE_DOCTOR_MESSAGE =
+  "A doctor with this email or mobile number already exists.";
+const DUPLICATE_FIELD_MESSAGES = {
+  email: "This email is already registered to another doctor",
+  mobileNumber: "This mobile number is already registered to another doctor",
+};
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function normaliseEmail(value) {
+  return String(value ?? "").trim();
+}
+
+function normaliseRegistrationNo(value) {
+  return String(value ?? "").trim();
+}
+
+/**
+ * `mobileNumber` is stored as a Number, so it has to be compared numerically.
+ * Accepts "+91 98765 43210" / "9876543210" and returns the numeric candidates
+ * (every digit, plus the trailing 10 for numbers sent with a country code).
+ */
+function mobileNumberCandidates(value) {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  if (!digits) return [];
+  const candidates = new Set([Number(digits)]);
+  if (digits.length > 10) candidates.add(Number(digits.slice(-10)));
+  return [...candidates].filter((candidate) => Number.isFinite(candidate));
+}
+
+/**
+ * One `{ field, query }` entry per identity value that was sent, so a clash can
+ * be reported for the exact field the admin has to fix. Email is matched
+ * case-insensitively (MongoDB indexes are case-sensitive); the mobile number is
+ * compared numerically.
+ */
+function buildUniqueFilters({ email, mobileNumber } = {}) {
+  const filters = [];
+  const emailValue = normaliseEmail(email);
+  if (emailValue) {
+    filters.push({
+      field: "email",
+      query: { email: new RegExp(`^${escapeRegExp(emailValue)}$`, "i") },
+    });
+  }
+
+  const mobileCandidates = mobileNumberCandidates(mobileNumber);
+  if (mobileCandidates.length > 0) {
+    filters.push({
+      field: "mobileNumber",
+      query: { mobileNumber: { $in: mobileCandidates } },
+    });
+  }
+
+  return filters;
+}
+
+/**
+ * Returns `[{ field, message }]` for every unique field another doctor already
+ * holds. `excludeId` lets the PUT ignore the doctor that is being edited.
+ */
+async function findDuplicateDoctors(values, excludeId) {
+  const duplicates = [];
+  const excludeSelf =
+    typeof excludeId === "string" && /^[0-9a-fA-F]{24}$/.test(excludeId)
+      ? excludeId
+      : null;
+
+  for (const { field, query } of buildUniqueFilters(values)) {
+    const search = { ...query };
+    if (excludeSelf) search._id = { $ne: excludeSelf };
+
+    const existing = await Doctor.findOne(search).select("_id").lean();
+    if (existing) {
+      duplicates.push({ field, message: DUPLICATE_FIELD_MESSAGES[field] });
+    }
+  }
+
+  return duplicates;
+}
+
+/** 409 with the friendly message + the exact clashing field(s). */
+function sendDuplicateResponse(res, duplicates) {
+  const fields = duplicates.map((duplicate) => duplicate.field);
+  return res.status(409).json({
+    error: DUPLICATE_DOCTOR_MESSAGE,
+    message: DUPLICATE_DOCTOR_MESSAGE,
+    field: fields[0] || null,
+    fields,
+    duplicates,
+  });
+}
+
+/**
+ * Maps a mongoose write error onto a friendly client response and returns true
+ * when it did. `E11000` is what a unique index throws when two requests race
+ * past the pre-check; `ValidationError` is a required/format problem.
+ */
+function sendDoctorWriteError(res, error) {
+  if (error?.code === 11000) {
+    const field = Object.keys(error.keyPattern || {})[0] || null;
+    sendDuplicateResponse(
+      res,
+      field
+        ? [{ field, message: DUPLICATE_FIELD_MESSAGES[field] || DUPLICATE_DOCTOR_MESSAGE }]
+        : []
+    );
+    return true;
+  }
+
+  if (error?.name === "ValidationError") {
+    const message =
+      Object.values(error.errors || {})
+        .map((entry) => entry.message)
+        .filter(Boolean)
+        .join(" ") || "Please check the doctor details and try again.";
+    res.status(400).json({ error: message, message });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Trims the identity fields before they reach mongoose, so " a@b.com " cannot
+ * become a second account next to "a@b.com".
+ */
+function withNormalisedIdentityFields(doctorFields) {
+  const cleaned = { ...doctorFields };
+
+  if (cleaned.email !== undefined) cleaned.email = normaliseEmail(cleaned.email);
+  if (cleaned.doctorRegistrationNo !== undefined) {
+    cleaned.doctorRegistrationNo = normaliseRegistrationNo(
+      cleaned.doctorRegistrationNo
+    );
+  }
+
+  const mobileCandidates = mobileNumberCandidates(cleaned.mobileNumber);
+  if (mobileCandidates.length > 0) cleaned.mobileNumber = mobileCandidates[0];
+
+  return cleaned;
+}
+
+/**
+ * Reads a multiparty upload and returns `{ buffer, contentType }` ready for
+ * Firebase storage. Images are resized (sharp), anything else - a PDF
+ * certificate, a scanned document - is uploaded exactly as it was received; the
+ * forms allow any file type, so the upload path must never assume an image.
+ */
+async function prepareUpload(upload, size = 700) {
+  const buffer = fs.readFileSync(upload.path);
+  const declaredType = String(upload.headers?.["content-type"] || "").trim();
+  const contentType = declaredType || "application/octet-stream";
+
+  if (!isResizableImage(upload)) return { buffer, contentType };
+
+  try {
+    return { buffer: await resizeImage(buffer, size, size), contentType };
+  } catch (error) {
+    // A corrupt/unsupported picture must not fail the whole save - fall back to
+    // storing the original file.
+    console.error("Could not resize the uploaded image:", error.message);
+    return { buffer, contentType };
+  }
 }
 
 /**
@@ -127,6 +306,17 @@ export default async function handler(req, res) {
           return;
         }
         try {
+          // Email and mobile number must be unique. Checked here for the friendly
+          // 409; the unique indexes catch the race.
+          const duplicateDoctors = await findDuplicateDoctors({
+            email: fields.email?.[0],
+            mobileNumber: fields.mobileNumber?.[0],
+          });
+          if (duplicateDoctors.length > 0) {
+            sendDuplicateResponse(res, duplicateDoctors);
+            return;
+          }
+
           // Ensure files.profilePicture and files.diplomasCertificates, doctor stamp, doctor signature are defined
           const doctorSignatureFile =
             files.digitalSignature && files.digitalSignature[0];
@@ -148,13 +338,13 @@ export default async function handler(req, res) {
               storage,
               `${doctorSignature_img_path}/${fields.name[0]}${uuidv4()}`
             );
-            const contentType = doctorSignatureFile.headers["content-type"]; // Extract the content-type from the headers
-            const fileBuffer = fs.readFileSync(doctorSignatureFile.path); // Read the file into a Buffer
-            const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+            const { buffer, contentType } = await prepareUpload(
+              doctorSignatureFile
+            );
             const metadata = {
-              contentType: contentType,
+              contentType,
             };
-            await uploadBytes(doctorSignatureRef, resizedImageBuffer, metadata); // Upload the Buffer
+            await uploadBytes(doctorSignatureRef, buffer, metadata); // Upload the Buffer
 
             // Get profile picture download URL
             doctorSignatureUrl = await getDownloadURL(doctorSignatureRef);
@@ -166,13 +356,11 @@ export default async function handler(req, res) {
               storage,
               `${doctorStamp_img_path}/${fields.name[0]}${uuidv4()}`
             );
-            const contentType = doctorStampFile.headers["content-type"]; // Extract the content-type from the headers
-            const fileBuffer = fs.readFileSync(doctorStampFile.path); // Read the file into a Buffer
-            const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+            const { buffer, contentType } = await prepareUpload(doctorStampFile);
             const metadata = {
-              contentType: contentType,
+              contentType,
             };
-            await uploadBytes(doctorStampRef, resizedImageBuffer, metadata); // Upload the Buffer
+            await uploadBytes(doctorStampRef, buffer, metadata); // Upload the Buffer
 
             // Get profile picture download URL
             doctorStampUrl = await getDownloadURL(doctorStampRef);
@@ -184,45 +372,38 @@ export default async function handler(req, res) {
               storage,
               `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}`
             );
-            const contentType = profilePictureFile.headers["content-type"]; // Extract the content-type from the headers
-            const fileBuffer = fs.readFileSync(profilePictureFile.path); // Read the file into a Buffer
-            const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+            const { buffer, contentType } = await prepareUpload(profilePictureFile);
             const metadata = {
-              contentType: contentType,
+              contentType,
             };
-            await uploadBytes(profilePictureRef, resizedImageBuffer, metadata); // Upload the Buffer
+            await uploadBytes(profilePictureRef, buffer, metadata); // Upload the Buffer
 
             // Get profile picture download URL
             profilePictureUrl = await getDownloadURL(profilePictureRef);
           }
 
-          // Upload diplomas/certificates
+          // Upload diplomas/certificates - images are resized, documents (PDF
+          // scans, for instance) are stored exactly as uploaded.
           const diplomasCertificatesUrls = await Promise.all(
             diplomasCertificatesFiles.map(async (certificate, index) => {
               const certificateRef = ref(
                 storage,
                 `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
               );
-              const contentType = certificate.headers["content-type"]; // Extract the content-type from the headers
-              const fileBuffer = fs.readFileSync(certificate.path); // Read the file into a Buffer
-              const resizedImageBuffer = await resizeImage(
-                fileBuffer,
-                700,
-                700
-              ); // Resize to 700x700
+              const { buffer, contentType } = await prepareUpload(certificate);
               const metadata = {
-                contentType: contentType,
+                contentType,
               };
-              await uploadBytes(certificateRef, resizedImageBuffer, metadata); // Upload the Buffer
+              await uploadBytes(certificateRef, buffer, metadata); // Upload the Buffer
               return getDownloadURL(certificateRef);
             })
           );
 
-          // Passwords are stored only as bcrypt hashes (10 salt rounds).
-          const rawPassword = fields.password?.[0] || "";
-          const hashedPassword = rawPassword
-            ? await bcrypt.hash(rawPassword, 10)
-            : "";
+          // No password is collected on the form any more: every new doctor gets
+          // an auto-generated temporary password, hashed, and it is sent to them
+          // over WhatsApp below.
+          const rawPassword = generateTempPassword();
+          const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
@@ -237,7 +418,9 @@ export default async function handler(req, res) {
           delete stringFields.locationCity;
           delete stringFields.workExperience;
           const addedDoctor = await Doctor.create({
-            ...stripRemovedDoctorFields(stringFields),
+            ...withNormalisedIdentityFields(
+              stripRemovedDoctorFields(stringFields)
+            ),
             location: location ?? { state: "", city: "" },
             // Repeatable field: `fields.educationTraining` is one entry per
             // appended form field, so it must not be taken from the
@@ -265,24 +448,21 @@ export default async function handler(req, res) {
           console.log(addedDoctor._id, "Doctor Added");
 
           // Send the doctor their login credentials over WhatsApp. Best-effort:
-          // a delivery failure must never fail the doctor creation. Only sent
-          // when a temporary password was actually provided on the form.
-          if (rawPassword) {
-            try {
-              const doctorUrl = `${getConfiguredAppUrl()}/registerDoc/login`;
-              await sendWhatsAppConfirmation(
-                formatPhoneNumber(String(addedDoctor.mobileNumber ?? "")),
-                getDoctorCredentialsMessageBody({
-                  doctorName: addedDoctor.name,
-                  doctorUrl,
-                  mobileNumber: String(addedDoctor.mobileNumber ?? ""),
-                  tempPassword: rawPassword,
-                }),
-                WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE
-              );
-            } catch (notifyError) {
-              console.error("Failed to send doctor credentials WhatsApp:", notifyError);
-            }
+          // a delivery failure must never fail the doctor creation.
+          try {
+            const doctorUrl = `${getConfiguredAppUrl()}/registerDoc/login`;
+            await sendWhatsAppConfirmation(
+              formatPhoneNumber(String(addedDoctor.mobileNumber ?? "")),
+              getDoctorCredentialsMessageBody({
+                doctorName: addedDoctor.name,
+                doctorUrl,
+                mobileNumber: String(addedDoctor.mobileNumber ?? ""),
+                tempPassword: rawPassword,
+              }),
+              WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE
+            );
+          } catch (notifyError) {
+            console.error("Failed to send doctor credentials WhatsApp:", notifyError);
           }
 
           res.status(200).json({
@@ -292,6 +472,9 @@ export default async function handler(req, res) {
           // Assuming the rest of your code to handle the response and database operations
         } catch (error) {
           console.error("Error uploading files:", error);
+          // Duplicate that raced past the pre-check, or a rejected document:
+          // answer with the friendly message instead of a generic 500.
+          if (sendDoctorWriteError(res, error)) return;
           await logErrorToGoogleSheet({
             apiName: "addDoctor - POST/formUpload",
             errorMessage: error.message || "File upload failed",
@@ -318,6 +501,34 @@ export default async function handler(req, res) {
   } else if (req.method === "GET") {
     console.log("get method calling");
     
+    // Real-time uniqueness check for the Add Doctor form:
+    //   GET /api/addDoctor?checkUnique=1&email=...&mobileNumber=...
+    // Any combination of the three values may be sent; `excludeId` lets an edit
+    // form ignore the doctor being edited.
+    if (req.query?.checkUnique === "1" || req.query?.checkUnique === "true") {
+      try {
+        const duplicates = await findDuplicateDoctors(
+          {
+            email: req.query.email,
+            mobileNumber: req.query.mobileNumber,
+          },
+          req.query.excludeId
+        );
+
+        return res.status(200).json({
+          available: duplicates.length === 0,
+          duplicates,
+          fields: duplicates.map((duplicate) => duplicate.field),
+          message: duplicates.length > 0 ? DUPLICATE_DOCTOR_MESSAGE : "",
+        });
+      } catch (err) {
+        console.error("Error checking doctor uniqueness:", err);
+        return res
+          .status(500)
+          .json({ error: "An error occurred while checking the doctor details." });
+      }
+    }
+
     try {
       const doctors = await Doctor.find();
       res.status(200).json(doctors);
@@ -370,75 +581,88 @@ export default async function handler(req, res) {
             storage,
             `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}`
           );
-          const contentType = profilePictureFile.headers["content-type"]; // Extract the content-type from the headers
-          const fileBuffer = fs.readFileSync(profilePictureFile.path); // Read the file into a Buffer
-          const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700); // Resize to 700x700
+          const { buffer, contentType } = await prepareUpload(profilePictureFile);
           const metadata = {
-            contentType: contentType,
+            contentType,
           };
-          await uploadBytes(profilePictureRef, resizedImageBuffer, metadata); // Upload the Buffer
+          await uploadBytes(profilePictureRef, buffer, metadata); // Upload the Buffer
 
           // Get profile picture download URL
           profilePictureUrl = await getDownloadURL(profilePictureRef);
           console.log(profilePictureUrl, "profilePictureUrl");
         }
 
-        // Upload diplomas/certificates if new ones are provided
-        let diplomasCertificatesUrls = [];
-        if (diplomasCertificatesFiles.length > 0) {
-          // Upload new diplomas/certificates
-          const diplomasCertificatesUrls =
-            existingDoctor.diplomasCertificatesUrls;
-          if (diplomasCertificatesFiles.length > 0) {
-            // Upload new diplomas/certificates
-            for (const certificateFile of diplomasCertificatesFiles) {
-              const certificateRef = ref(
-                storage,
-                `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
-              );
-              const contentType = certificateFile.headers["content-type"]; // Extract the content-type from the headers
-              const fileBuffer = fs.readFileSync(certificateFile.path); // Read the file into a Buffer
-              const resizedImageBuffer = await resizeImage(
-                fileBuffer,
-                700,
-                700
-              ); // Resize to 700x700
-              const metadata = {
-                contentType: contentType,
-              };
-              await uploadBytes(certificateRef, resizedImageBuffer, metadata); // Upload the Buffer
-              diplomasCertificatesUrls.push(
-                await getDownloadURL(certificateRef)
-              );
-            }
-          }
-          console.log(diplomasCertificatesUrls, "diplomas");
-        } else {
-          // Use existing diplomasCertificatesUrls if no new files are provided
-          diplomasCertificatesUrls = existingDoctor.diplomasCertificatesUrls;
+        // Certificates: the edit forms send the certificates that are kept as
+        // `diplomasCertificatesUrls[i]` text fields and every newly picked file as
+        // a file part. New files are ADDED to the stored list (never replacing it)
+        // - a doctor registered without certificates must be able to add them
+        // later, and an admin adding one must not lose the ones already there.
+        const keptCertificateUrls = Object.keys(fields)
+          .filter((key) => key.startsWith("diplomasCertificatesUrls"))
+          .sort()
+          .flatMap((key) => fields[key] || [])
+          .map((entry) => String(entry).trim())
+          .filter(Boolean);
+        const clientSentCertificateList = Object.keys(fields).some((key) =>
+          key.startsWith("diplomasCertificatesUrls")
+        );
+
+        const uploadedCertificateUrls = [];
+        for (const certificateFile of diplomasCertificatesFiles) {
+          const certificateRef = ref(
+            storage,
+            `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
+          );
+          const { buffer, contentType } = await prepareUpload(certificateFile);
+          await uploadBytes(certificateRef, buffer, { contentType }); // Upload the Buffer
+          uploadedCertificateUrls.push(await getDownloadURL(certificateRef));
         }
+
+        const diplomasCertificatesUrls =
+          diplomasCertificatesFiles.length === 0 && !clientSentCertificateList
+            ? // Nothing about the certificates was submitted (the doctor-panel
+              // approval PUT, for instance): keep the stored list untouched.
+              existingDoctor.diplomasCertificatesUrls
+            : [
+                ...(clientSentCertificateList
+                  ? keptCertificateUrls
+                  : existingDoctor.diplomasCertificatesUrls || []),
+                ...uploadedCertificateUrls,
+              ];
+        console.log(diplomasCertificatesUrls, "diplomas");
 
         // Delete old profile picture from Firebase if a new one is uploaded and it's different from the existing one
         if (
           profilePictureFile &&
+          existingDoctor.profilePictureUrl &&
           profilePictureUrl !== existingDoctor.profilePictureUrl
         ) {
-          const oldProfilePictureRef = ref(
-            storage,
-            existingDoctor.profilePictureUrl
-          );
-          await deleteObject(oldProfilePictureRef);
-        }
-        console.log("deleted old profile picture");
-
-        // Delete old diplomas certificates from Firebase if new ones are uploaded
-        existingDoctor.diplomasCertificatesUrls.forEach(async (url) => {
-          if (!diplomasCertificatesUrls.includes(url)) {
-            const oldCertificateRef = ref(storage, url);
-            await deleteObject(oldCertificateRef);
+          try {
+            const oldProfilePictureRef = ref(
+              storage,
+              existingDoctor.profilePictureUrl
+            );
+            await deleteObject(oldProfilePictureRef);
+            console.log("deleted old profile picture");
+          } catch (error) {
+            // The stored URL may be a legacy/external link - the new picture is
+            // already saved, so a failed cleanup must not fail the request.
+            console.error("Could not delete the old profile picture:", error.message);
           }
-        });
-        console.log("deleted old diploamas");
+        }
+
+        // Delete the certificates the admin/doctor removed. Only URLs that were
+        // stored before and are no longer part of the list are touched, so adding
+        // a certificate never deletes the existing ones.
+        for (const oldUrl of existingDoctor.diplomasCertificatesUrls || []) {
+          if (diplomasCertificatesUrls.includes(oldUrl)) continue;
+          try {
+            await deleteObject(ref(storage, oldUrl));
+          } catch (error) {
+            console.error("Could not delete a removed certificate:", error.message);
+          }
+        }
+        console.log("deleted removed diplomas");
 
         // Update doctor data in MongoDB
         const stringFields = Object.fromEntries(
@@ -449,10 +673,37 @@ export default async function handler(req, res) {
         delete stringFields.locationState;
         delete stringFields.locationCity;
         delete stringFields.workExperience;
+        // Certificate URLs are handled above (kept list + freshly uploaded files);
+        // the raw `diplomasCertificatesUrls[i]` keys must not reach the document.
+        Object.keys(stringFields)
+          .filter((key) => key.startsWith("diplomasCertificatesUrls"))
+          .forEach((key) => delete stringFields[key]);
+
+        // Refuse only a blank email: it is required and unique (it is also the
+        // doctor's login). Every other field - registration number, certificates,
+        // overview... - may be blank on an older document and filled in here.
+        if (fields.email !== undefined && !normaliseEmail(fields.email?.[0])) {
+          return res
+            .status(400)
+            .json({ error: "Email is required", message: "Email is required" });
+        }
+
+        // Email and mobile number must stay unique - the doctor being edited is
+        // excluded from the comparison.
+        const duplicateDoctors = await findDuplicateDoctors(
+          {
+            email: fields.email?.[0],
+            mobileNumber: fields.mobileNumber?.[0],
+          },
+          id
+        );
+        if (duplicateDoctors.length > 0) {
+          return sendDuplicateResponse(res, duplicateDoctors);
+        }
 
         // Update doctor data in MongoDB
         const updateData = {
-          ...stripRemovedDoctorFields(stringFields),
+          ...withNormalisedIdentityFields(stripRemovedDoctorFields(stringFields)),
           profilePictureUrl,
           diplomasCertificatesUrls,
           consultationType: parseConsultationTypes(
@@ -508,15 +759,23 @@ export default async function handler(req, res) {
           delete updateData.password;
         }
 
-        const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
-          new: true,
-        });
+        let updatedDoctor;
+        try {
+          updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
+            new: true,
+          });
+        } catch (error) {
+          // Unique index race / validation problem -> friendly message.
+          if (sendDoctorWriteError(res, error)) return;
+          throw error;
+        }
         console.log(updatedDoctor, "updated doctor");
 
         res.status(200).json({ success: true });
       });
     } catch (error) {
       console.error("Error updating doctor:", error);
+      if (sendDoctorWriteError(res, error)) return;
       await logErrorToGoogleSheet({
         apiName: "addDoctor - PUT",
         errorMessage: error.message || "Update doctor failed",

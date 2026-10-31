@@ -13,7 +13,7 @@ import {
   Form,
   Alert,
 } from "react-bootstrap";
-import { api } from "../../../constant";
+import { api, imageBlurDataUrl } from "../../../constant";
 import ImageUploader from "../../../lib/ImageUploader.js";
 import ConfirmModal from "../model/ConfirmModel";
 import styles from "./ManageStaff.module.css";

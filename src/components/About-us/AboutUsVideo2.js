@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import React from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { richText } from "../../i18n/richText";
@@ -20,6 +21,8 @@ const AboutUsVideo2 = () => {
               data-wow-delay="0.6s"
             >
               <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
                 className="img-fluid"
                 src="/images/image-11.png"
                 width={800}

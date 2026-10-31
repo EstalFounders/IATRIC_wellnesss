@@ -137,3 +137,17 @@ export const formatConsultationTypePrices = (consultationType) => {
   if (!entries.length) return "";
   return entries.map((entry) => `${entry.name} ₹${entry.price}`).join(" · ");
 };
+
+/**
+ * Table-cell copy for a `consultationType` value, whatever shape the document
+ * has: a legacy string ("Video"), a single `{ name, price }` entry or the array
+ * of entries the doctor forms save. Rendering the raw value used to crash React
+ * with "Objects are not valid as a React child (found: object with keys
+ * {name, price})".
+ */
+export const formatConsultationTypes = (consultationType) => {
+  const names = Array.isArray(consultationType)
+    ? consultationTypeNames(consultationType)
+    : [consultationTypeName(consultationType)].filter(Boolean);
+  return names.length ? names.join(", ") : "—";
+};

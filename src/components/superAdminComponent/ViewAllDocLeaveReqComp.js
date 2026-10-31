@@ -14,7 +14,8 @@
 // a direct link to this page painted "No Request found" until the header happened
 // to load after the first render - and the page's copy of the array was taken
 // once, so an approval never showed up either. The header and the bell keep using
-// the slice exactly as before; nothing in this file dispatches.
+// the slice exactly as before. The doctor roster itself is shared redux state
+// (`useDoctors`) - this page never keeps its own copy of it.
 //
 // Everything that is not a render decision (labels, status grouping, the day
 // count, the sorting) lives in utils/leaveRequest.js.
@@ -23,6 +24,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Modal } from "react-bootstrap";
 import { api } from "../../constant";
+import { useDoctors } from "../../customUtils/useDoctors";
 import { doctorDisplayName } from "../../utils/doctorName";
 import {
   countByStatus,
@@ -122,7 +124,8 @@ const durationText = (request) => {
 
 const ViewAllDocLeaveReqComp = () => {
   const [requests, setRequests] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  // Shared redux roster (cache first): avatars + requester details.
+  const { doctors, refetch: refetchDoctors } = useDoctors();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [notice, setNotice] = useState(null); // { tone: "ok" | "error", text }
@@ -133,40 +136,28 @@ const ViewAllDocLeaveReqComp = () => {
   const [confirming, setConfirming] = useState(null); // { request, action }
   const [previewId, setPreviewId] = useState(null);
 
-  // Reads the live list straight from the API. `addDoctor` is a best-effort
-  // enrichment (avatar + email): if it fails, the queue still renders, just with
-  // initials instead of a photo.
+  // Reads the live queue from the API. `addDoctor` is a best-effort enrichment
+  // (avatar + email) served by the shared roster: it is refreshed alongside the
+  // queue, and if it fails the queue still renders, just with initials.
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError("");
     try {
-      const [leaveRes, doctorRes] = await Promise.all([
+      const [leaveRes] = await Promise.all([
         fetch(api.leaveRequest),
-        fetch(api.addDoctor),
+        refetchDoctors(),
       ]);
 
       if (!leaveRes.ok) throw new Error("The server rejected the request.");
       const leaveData = await leaveRes.json();
       setRequests(Array.isArray(leaveData) ? leaveData : []);
-
-      if (doctorRes.ok) {
-        try {
-          const doctorData = await doctorRes.json();
-          const list = Array.isArray(doctorData)
-            ? doctorData
-            : doctorData?.doctors;
-          setDoctors(Array.isArray(list) ? list : []);
-        } catch (error) {
-          console.error("Could not read the doctor list:", error);
-        }
-      }
     } catch (error) {
       console.error("Failed to load leave requests:", error);
       setLoadError("We could not load the leave requests. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refetchDoctors]);
 
   useEffect(() => {
     load();

@@ -1,0 +1,474 @@
+/* Weekly timetable for one doctor (/timetable?doctorId=...).
+   Brand palette only: #3b5f1d on white cards, greys for booked / passed time -
+   the same language as the doctor profile and the doctor panels. */
+
+.shell {
+  background: #ffffff;
+  border: 1px solid #e5e7e1;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 8px 24px rgba(31, 42, 23, 0.05);
+  margin-bottom: 22px;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.identity {
+  min-width: 240px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.doctor-name {
+  margin: 6px 0 2px;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: #1f2a17;
+}
+
+.speciality {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: #717171;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  color: #4d5a41;
+}
+
+.fact i {
+  color: #3b5f1d;
+}
+
+.week-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.range {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1f2a17;
+}
+
+.nav-buttons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #d9dfd0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #3b5f1d;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: #3b5f1d;
+  border-color: #3b5f1d;
+  color: #ffffff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.summary {
+  font-size: 0.82rem;
+  color: #717171;
+}
+
+.summary strong {
+  color: #3b5f1d;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #eef0ea;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  color: #717171;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-available {
+  background: #3b5f1d;
+}
+
+.dot-booked {
+  background: #8d8d8d;
+}
+
+.dot-past {
+  background: #d5d5d0;
+}
+
+/* ── Week grid ─────────────────────────────────────────────────────────── */
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: start;
+  gap: 12px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e5e7e1;
+  border-radius: 12px;
+}
+
+.day-today {
+  border-color: #3b5f1d;
+  box-shadow: 0 6px 18px rgba(59, 95, 29, 0.12);
+}
+
+.day-off {
+  background: #fafaf7;
+}
+
+.day-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 12px 14px;
+  background: #f6f8f2;
+  border-bottom: 1px solid #eef0ea;
+}
+
+.day-off .day-head {
+  background: #f3f3f0;
+}
+
+.day-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.day-off .day-name {
+  color: #8d8d88;
+}
+
+.day-date {
+  font-size: 0.8rem;
+  color: #717171;
+}
+
+.today-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #3b5f1d;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.day-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 8px;
+  border: 0;
+  border-left: 3px solid;
+  border-radius: 6px;
+  overflow: hidden;
+  font: inherit;
+  text-align: left;
+}
+
+.block-time {
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.block-meta {
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.block-available {
+  background: #eef4e6;
+  border-color: #3b5f1d;
+}
+
+.block-available .block-time {
+  color: #2f4d17;
+}
+
+.block-available .block-meta {
+  color: #4d6a2e;
+}
+
+.block-booked {
+  background: #f1f1ef;
+  border-color: #8d8d8d;
+}
+
+.block-booked .block-time {
+  color: #5f5f5c;
+}
+
+.block-booked .block-meta {
+  color: #8d8d88;
+}
+
+.block-past {
+  background: #fafaf8;
+  border-color: #dcdcd8;
+}
+
+.block-past .block-time {
+  color: #a8a8a4;
+}
+
+.block-past .block-meta {
+  color: #b5b5b1;
+}
+
+/* Bookable bands: they lift on hover so the week reads as pickable. */
+.block-pickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.block-pickable:hover {
+  background: #e3eed6;
+  box-shadow: 0 4px 10px rgba(59, 95, 29, 0.18);
+  transform: translateY(-1px);
+}
+
+.block-pickable:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* The band "Book an Appointment" will use (tapped, or the next free one). */
+.block-selected,
+.block-selected:hover {
+  background: #3b5f1d;
+  border-color: #2f4d17;
+  box-shadow: 0 4px 12px rgba(47, 77, 23, 0.28);
+}
+
+.block-selected .block-time {
+  color: #ffffff;
+}
+
+.block-selected .block-meta {
+  color: #d9e6c8;
+}
+
+.day-note {
+  margin: auto 0;
+  padding: 14px 6px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #9a9a95;
+}
+
+.day-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid #eef0ea;
+  font-size: 0.75rem;
+}
+
+.free-count {
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.booked-count {
+  color: #8d8d88;
+}
+
+/* ── States + footer ───────────────────────────────────────────────────── */
+
+.state {
+  padding: 34px 0;
+  text-align: center;
+  color: #717171;
+}
+
+.state-error {
+  color: #b3261e;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.foot-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #8d8d88;
+}
+
+.foot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.foot-picked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1f2a17;
+}
+
+.foot-picked-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+}
+
+.cta-btn {
+  display: inline-block;
+  padding: 11px 22px;
+  border-radius: 8px;
+  background: #3b5f1d;
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cta-btn:hover {
+  background: #2f4d17;
+  color: #ffffff;
+}
+
+.notice {
+  padding: 34px 24px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e5e7e1;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(31, 42, 23, 0.05);
+}
+
+.notice-title {
+  color: #1f2a17;
+}
+
+.notice-text {
+  margin: 8px 0 16px;
+  color: #717171;
+}
+
+@media (max-width: 1100px) {
+  .week {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 18px;
+  }
+
+  .week-nav {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .week {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .foot {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .week {
+    grid-template-columns: 1fr;
+  }
+}

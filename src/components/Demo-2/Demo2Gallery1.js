@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { imageBlurDataUrl } from "../../constant";
 import Link from "next/link";
 import { useLanguage } from "../../i18n/LanguageContext";
 
@@ -57,6 +58,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -81,6 +84,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -105,6 +110,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -129,6 +136,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -153,6 +162,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -177,6 +188,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -201,6 +214,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"
@@ -225,6 +240,8 @@ const Demo2Gallery1 = () => {
           <div className="hover-overlay">
             {/* Gallery Image */}
             <Image
+              placeholder="blur"
+              blurDataURL={imageBlurDataUrl}
               width={500}
               height={500}
               className="img-fluid"

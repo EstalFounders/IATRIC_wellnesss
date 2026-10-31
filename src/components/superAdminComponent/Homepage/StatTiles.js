@@ -1,6 +1,8 @@
 // StatTiles.js - the four headline numbers of the panel.
 // Each tile is a real <button>, so every tile is reachable and activatable
-// from the keyboard (the tiles used to be clickable <div> elements).
+// from the keyboard (the tiles used to be clickable <div> elements). The
+// "Total earning" tile is display-only - the earnings page it used to open was
+// removed, the home page is the only place that reports that total.
 import React from "react";
 import { useRouter } from "next/router";
 import { FaMoneyBill, FaStethoscope, FaUser } from "react-icons/fa";
@@ -46,7 +48,7 @@ const StatTiles = ({
       hint: "Consultations + completed lab tests",
       icon: <FaMoneyBill />,
       earning: true,
-      onClick: () => router.push("/superAdmin/earnings"),
+      // Display only: there is no earnings page to open any more.
     },
     {
       key: "doctors",
@@ -60,28 +62,39 @@ const StatTiles = ({
 
   return (
     <div className={styles.statGrid}>
-      {tiles.map((tile) => (
-        <button
-          key={tile.key}
-          type="button"
-          className={styles.statCard}
-          onClick={tile.onClick}
-          aria-controls={tile.key === "doctors" ? "superAdminDoctors" : undefined}
-        >
-          <span className={styles.statLabel}>
-            {tile.icon}
-            {tile.label}
-          </span>
-          <span
-            className={`${styles.statValue} ${
-              tile.earning ? styles.statValueEarning : ""
+      {tiles.map((tile) => {
+        // A tile without an `onClick` is a plain card: rendering it as a <button>
+        // would put a focus stop and a pointer cursor on something inert.
+        const isInteractive = typeof tile.onClick === "function";
+        const Tile = isInteractive ? "button" : "div";
+
+        return (
+          <Tile
+            key={tile.key}
+            type={isInteractive ? "button" : undefined}
+            className={`${styles.statCard} ${
+              isInteractive ? "" : styles.statCardStatic
             }`}
+            onClick={tile.onClick}
+            aria-controls={
+              tile.key === "doctors" ? "superAdminDoctors" : undefined
+            }
           >
-            {isLoading ? "-" : tile.value}
-          </span>
-          <span className={styles.statHint}>{tile.hint}</span>
-        </button>
-      ))}
+            <span className={styles.statLabel}>
+              {tile.icon}
+              {tile.label}
+            </span>
+            <span
+              className={`${styles.statValue} ${
+                tile.earning ? styles.statValueEarning : ""
+              }`}
+            >
+              {isLoading ? "-" : tile.value}
+            </span>
+            <span className={styles.statHint}>{tile.hint}</span>
+          </Tile>
+        );
+      })}
     </div>
   );
 };

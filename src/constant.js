@@ -77,7 +77,6 @@ export const api = {
   labTestDetails: "/api/superAdmin/labTest/labTestDetails",
   doctorEarning: "/api/registerDoc/doctorEarnings",
   addNewLab: "/api/superAdmin/addNewLab",
-  addNewOffer: "/api/superAdmin/addNewOffer",
   globalVar: "/api/globalVar",
   userQuery: "/api/userQuery",
   joinUsQuery: "/api/joinUsQuery",
@@ -186,12 +185,6 @@ export const sessionStorageName = {
 
 export const price_symbol = "₹";
 export const showUpdate = "showUpdate";
-export const discount_type = {
-  Percentage: "Percentage",
-  Fixed: "Fixed",
-  Free: "Free",
-};
-
 export const roles = {
   superAdmin: "superAdmin",
   doctor: "doctor",
@@ -230,7 +223,7 @@ export const facebook_page_url =
 export const instagram_page_url =
   "https://www.instagram.com/healthpath.pvt/";
 export const Linkdn_url =
-  "https://www.linkedin.com/in/iatrichealthcare/";
+  "https://www.linkedin.com/company/ttanshehealthpath/?viewAsMember=true";
 export const color_schema = {
   green: "#3b5f1d",
   gold: "#916f38",
@@ -270,3 +263,10 @@ export const vapidKey =
 
 export const callToBook = "Get a Call back";
 export const gst_no = "06AALCT8239J1ZS";
+
+// next/image needs an explicit blurDataURL for remote images: Firebase Storage
+// URLs are assembled at runtime, so Next.js cannot derive one from a static
+// import. This is a 1x1 light-grey PNG (#f1f3f5) that Next.js stretches to a
+// soft wash while the real image loads.
+export const imageBlurDataUrl =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR42mP4+PkrAAWyAtqHw3nPAAAAAElFTkSuQmCC";
