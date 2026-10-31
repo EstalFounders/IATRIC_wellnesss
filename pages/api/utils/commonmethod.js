@@ -35,9 +35,19 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
     const mobNo = appointment.patientMobNo;
     const matchingLabTest = labTestsByMobile[mobNo];
     const invoiceNumber = `INV-${randomNumber}`;
+    // A Cashfree offer means the patient paid less than the list price, so the
+    // bill shows the collected amount and the gap as a line discount.
+    const consultationPrice = Number(appointment.consultationprice) || 0;
+    const consultationCharged =
+      typeof appointment.amountAfterOffer === "number"
+        ? appointment.amountAfterOffer
+        : consultationPrice;
+    const consultationDiscount = Math.max(
+      0,
+      Number((consultationPrice - consultationCharged).toFixed(2))
+    );
     const totalPrice =
-      appointment.consultationprice +
-      (matchingLabTest ? matchingLabTest.totalPrice : 0);
+      consultationCharged + (matchingLabTest ? matchingLabTest.totalPrice : 0);
     if (matchingLabTest) {
       // If there's a matching lab test for the same number
       const combinedService = {
@@ -46,9 +56,9 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         doctorName: doctorDisplayName(appointment.doctorId?.name),
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
-        subTotal: appointment.consultationprice + matchingLabTest.totalPrice,
+        subTotal: consultationPrice + matchingLabTest.totalPrice,
         gst: appointmentTaxes[0].gst + labtestTaxes[0].gst,
-        discount: 0,
+        discount: consultationDiscount,
         freight: 0,
         tax: 0,
         totalPrice: totalPrice,
@@ -56,11 +66,11 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
           {
             id: appointment._id,
             name: appointment.consultationType,
-            price: appointment.consultationprice,
+            price: consultationPrice,
             hsn: appointmentTaxes[0].hsn_percentage,
-            discount: 0,
+            discount: consultationDiscount,
             quantity: 1,
-            price: appointment.consultationprice,
+            price: consultationCharged,
             serviceType: appointmentTaxes[0].name,
           },
           {
@@ -92,7 +102,8 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
         doctorName: doctorDisplayName(appointment.doctorId?.name),
         mobNo: mobNo,
         invoiceNumber: invoiceNumber,
-        subTotal: appointment.consultationprice,
+        subTotal: consultationPrice,
+        discount: consultationDiscount,
         totalPrice: totalPrice,
         gst: appointmentTaxes[0].gst,
         freight: 0,
@@ -101,11 +112,11 @@ export const createServicesToBill = (appointments, labTests, serviceOffer) => {
           {
             id: appointment._id,
             name: appointment.consultationType,
-            price: appointment.consultationprice,
+            price: consultationPrice,
             hsn: appointmentTaxes[0].hsn_percentage,
-            discount: 0,
+            discount: consultationDiscount,
             quantity: 1,
-            price: appointment.consultationprice,
+            price: consultationCharged,
             serviceType: appointmentTaxes[0].name,
           },
         ],

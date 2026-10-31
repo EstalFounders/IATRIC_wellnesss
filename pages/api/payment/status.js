@@ -1,5 +1,6 @@
 import { dbConnect } from "../../../src/lib/db";
 import Payment from "../../../src/models/paymentSchema";
+import Appointment from "../../../src/models/appointmentSchema";
 import { payment_status } from "../../../src/constant";
 import { getCashfreeOrderStatus } from "../../../src/lib/cashfree";
 import {
@@ -45,6 +46,9 @@ export default async function handler(req, res) {
         orderId,
         appointmentId,
         amount: payment.amount,
+        // Offer details: the discounted amount only exists once the payment is
+        // reconciled (see applyOfferToAppointment in paymentService).
+        ...(await getOfferFields(appointmentId)),
       });
     }
 
@@ -66,6 +70,7 @@ export default async function handler(req, res) {
         orderId,
         appointmentId,
         amount: payment.amount,
+        ...(await getOfferFields(appointmentId)),
       });
     }
 
@@ -104,4 +109,27 @@ export default async function handler(req, res) {
       message: "Unable to verify payment. Please try again.",
     });
   }
+}
+
+/**
+ * Offer figures for the thank-you page. The appointment is the source of truth
+ * (the payment row only knows the list amount), so it is read here after
+ * confirmation. Returns an empty object if the appointment is missing, keeping
+ * the response backwards compatible.
+ */
+async function getOfferFields(appointmentId) {
+  if (!appointmentId) return {};
+
+  const appointment = await Appointment.findById(appointmentId)
+    .select("consultationprice amountAfterOffer discountAmount offerCode")
+    .lean();
+
+  if (!appointment) return {};
+
+  return {
+    consultationprice: appointment.consultationprice ?? null,
+    amountAfterOffer: appointment.amountAfterOffer ?? null,
+    discountAmount: appointment.discountAmount ?? 0,
+    offerCode: appointment.offerCode ?? null,
+  };
 }

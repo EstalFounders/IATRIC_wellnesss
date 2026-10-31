@@ -48,7 +48,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const amount = refundAmount || payment.amount;
+    // Default to what the patient actually paid: with a Cashfree offer the order
+    // amount is the list price, so refunding `payment.amount` would over-refund.
+    const collected = Number(appointment.amountAfterOffer);
+    const amount =
+      refundAmount ||
+      (Number.isFinite(collected) && collected > 0 ? collected : payment.amount);
     const note = refundNote || "Appointment cancelled - refund";
 
     // Create the Cashfree refund request

@@ -39,6 +39,27 @@ const appointmentSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  // ── Cashfree offer reconciliation ─────────────────────────────────
+  // Offers are created in the Cashfree dashboard and picked by the patient on
+  // the hosted checkout, i.e. AFTER this booking exists, so they are only
+  // known once the payment is verified (see paymentService). That is why
+  // `consultationprice` above stays the list price and the discounted values
+  // live in the three fields below:
+  //   offerCode        - promo code the patient used ("WELCOME10"), null if none
+  //   amountAfterOffer - what Cashfree actually collected (INR)
+  //   discountAmount   - consultationprice - amountAfterOffer
+  offerCode: {
+    type: String,
+    default: null,
+  },
+  amountAfterOffer: {
+    type: Number,
+    default: null,
+  },
+  discountAmount: {
+    type: Number,
+    default: 0,
+  },
   appointmentTime: {
     type: Date,
     required: true,

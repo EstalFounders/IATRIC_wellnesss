@@ -26,6 +26,7 @@ import { formatPhoneNumber } from "../../pages/api/utils/commonmethod";
 import { sendAdminNotification } from "../../pages/api/lib/sendNotification";
 import { logErrorToGoogleSheet } from "../../pages/api/helper";
 import { doctorDisplayName } from "../utils/doctorName";
+import { getCashfreeOrderStatus, getCashfreePaymentStatus } from "./cashfree";
 
 /**
  * Confirms an appointment ONLY after verified successful payment.
@@ -112,6 +113,11 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     payment.bookingMode = appointment.bookingMode;
   }
   await payment.save();
+
+  // ── Cashfree offer: how much did the patient actually pay? ────────
+  // Written before the save below so the offer lands in the same write as the
+  // confirmation. Best-effort: it never throws.
+  await applyOfferToAppointment({ payment, appointment });
 
   appointment.status = appointment_status.confirmed;
   appointment.paymentId = payment._id;
@@ -375,6 +381,106 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   }
 
   return payment;
+}
+
+/**
+ * Records the Cashfree offer on the appointment: the promo code plus the amount
+ * that is left after it.
+ *
+ * Cashfree offers live in the Cashfree dashboard and are picked by the patient
+ * on the hosted checkout, which happens *after* we create the order for the full
+ * consultation fee. `order_amount` therefore stays the list price and the money
+ * actually captured is reported per payment as `payment_amount` - so this is the
+ * only point in the flow where the discount can be observed.
+ *
+ * Idempotent (webhook and status poll both land here) and best-effort: a
+ * Cashfree API hiccup leaves the fields untouched for the next poll instead of
+ * blocking an already-verified confirmation.
+ *
+ * @param {object} params
+ * @param {object} params.payment - Payment document (already PAID).
+ * @param {object} params.appointment - Appointment document, mutated in place.
+ */
+async function applyOfferToAppointment({ payment, appointment }) {
+  // Already reconciled - the amount never changes once the order is captured.
+  if (appointment.amountAfterOffer != null) return;
+
+  const listAmount =
+    Number(payment.amount) || Number(appointment.consultationprice) || 0;
+
+  try {
+    const [paymentRows, cashfreeOrder] = await Promise.all([
+      getCashfreePaymentStatus(payment.orderId),
+      // Only used for `order_tags`; a failure here must not lose the amounts.
+      getCashfreeOrderStatus(payment.orderId).catch(() => null),
+    ]);
+
+    const rows = Array.isArray(paymentRows)
+      ? paymentRows
+      : Array.isArray(paymentRows?.payments)
+        ? paymentRows.payments
+        : [];
+
+    const success = rows.find(
+      (row) => String(row?.payment_status || "").toUpperCase() === "SUCCESS",
+    );
+    if (!success) return;
+
+    const collected = Number(success.payment_amount);
+    if (!Number.isFinite(collected) || collected <= 0) return;
+
+    const amountAfterOffer = Number(collected.toFixed(2));
+    const discountAmount = Math.max(
+      0,
+      Number((listAmount - amountAfterOffer).toFixed(2)),
+    );
+
+    appointment.amountAfterOffer = amountAfterOffer;
+    appointment.discountAmount = discountAmount;
+    appointment.offerCode = resolveOfferCode(success, cashfreeOrder);
+
+    console.log("Cashfree offer reconciled on appointment:", {
+      appointmentId: String(appointment._id),
+      orderId: payment.orderId,
+      listAmount,
+      amountAfterOffer,
+      discountAmount,
+      offerCode: appointment.offerCode,
+    });
+  } catch (err) {
+    console.error(
+      "Cashfree offer reconciliation failed (non-fatal):",
+      err.message,
+    );
+  }
+}
+
+/**
+ * Extracts the applied promo code from a Cashfree payment/order payload.
+ *
+ * Cashfree documents the discount only as an amount, so every known carrier is
+ * probed: the payment row (current and older payload shapes) and the order tags
+ * we set at order creation. Returns null when Cashfree reports just the amount
+ * delta, in which case `amountAfterOffer`/`discountAmount` still tell the story.
+ */
+function resolveOfferCode(paymentRow, cashfreeOrder) {
+  const fromPaymentOffers = Array.isArray(paymentRow?.payment_offers)
+    ? paymentRow.payment_offers.map((offer) => offer?.offer_code)
+    : [];
+
+  const candidates = [
+    paymentRow?.offer_code,
+    paymentRow?.payment_offer_code,
+    paymentRow?.payment_method?.offer_code,
+    ...fromPaymentOffers,
+    cashfreeOrder?.order_tags?.offer_code,
+  ];
+
+  const code = candidates.find(
+    (candidate) => typeof candidate === "string" && candidate.trim(),
+  );
+
+  return code ? code.trim() : null;
 }
 
 /**
