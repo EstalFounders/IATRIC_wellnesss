@@ -3,11 +3,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import {
   api,
   CHOOSE_TIME,
-  consultationTypeMapping,
   IN_TWENTY_MINUTES_NOW,
   SERVER_AVAILABLE_SLOTS_CODE,
   sessionStorageName,
-  imageBlurDataUrl
+  imageBlurDataUrl,
+  superAdminConsultationtype,
 } from "../../constant";
 import { generateSlotsForChooseTime, isWithinBusinessHours } from "../helper";
 import { useRouter } from "next/router";
@@ -28,6 +28,7 @@ import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import PaymentModal from "./PaymentModal";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
+import { normalizeReturnPaymentStatus } from "../../lib/paymentStatus";
 import { useDoctors } from "../../customUtils/useDoctors";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -38,8 +39,13 @@ import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
 
-// Consultation types to look for in services data
-const CONSULTATION_SERVICE_NAMES = ["Audio", "Video"];
+// The consultation types the panel defines (src/constant.js) and the only ones
+// that are bookable, in that order. A serviceOffered row becomes an option only
+// when its name resolves to one of these keys; the label stays the constant name
+// because the booking API switches on exactly these values.
+const CONSULTATION_TYPE_NAMES = superAdminConsultationtype.map(
+  (type) => type.name
+);
 
 /**
  * Noon UTC of the user's calendar day.
@@ -122,26 +128,64 @@ const AppointmentPage = () => {
   // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
   const services = useSelector((state) => state.globalData?.services || []);
 
-  // No-doctor ("Any Doctor") baseline: the consultation services that exist in
-  // serviceOffered (Audio/Video today) and their fees.
-  const serviceConsultationOptions = (Array.isArray(services) ? services : [])
-    .filter((s) =>
-      CONSULTATION_SERVICE_NAMES.some(
-        (name) => s.name && s.name.toLowerCase().includes(name.toLowerCase())
-      )
-    )
-    .map((s) => ({ name: s.name, fee: s.fee }));
+  // Consultation fees come from two levels, and the form shows the level it
+  // books:
+  //   * "Any Doctor" -> the fee of the matching serviceOffered row
+  //                     (Audio / Video / Home visit / Clinic)
+  //   * a doctor     -> that doctor's own price for the type
+  //                     (doctor.consultationType holds [{ name, price }])
+  // serviceOffered also holds non-consultation MAJOR items (lab tests, packages),
+  // so only rows resolving to a type from src/constant.js are offered, in the
+  // constant order.
+  const activeServices = (Array.isArray(services) ? services : []).filter(
+    (service) => service && service.isActive !== false
+  );
 
-  // When a specific doctor is selected, the boxes show that doctor's own
-  // consultation types and prices instead of the generic serviceOffered fees.
-  const selectedDoctor = doctors.find(
+  const serviceForType = (typeName) => {
+    const key = typeKeyFor(typeName);
+    if (!key) return null;
+    return (
+      activeServices.find((service) => typeKeyFor(service.name) === key) ||
+      activeServices.find((service) => typeKeyFor(service.name).includes(key)) ||
+      null
+    );
+  };
+
+  const serviceConsultationOptions = CONSULTATION_TYPE_NAMES.map((typeName) => {
+    const service = serviceForType(typeName);
+    return service ? { name: typeName, fee: service.fee } : null;
+  }).filter(Boolean);
+
+  const selectedDoctor = (doctors || []).find(
     (doctor) => String(doctor._id) === String(selectedDoctorId)
   );
-  const doctorConsultationOptions = selectedDoctor
-    ? toConsultationTypeEntries(selectedDoctor.consultationType).map(
-        (entry) => ({ name: entry.name, fee: entry.price })
-      )
-    : [];
+
+  // A doctor's own types/prices, limited to the constant types. A type the doctor
+  // left unpriced falls back to the serviceOffered fee, so the tile never shows a
+  // mode with no amount next to a tile that does.
+  const doctorConsultationOptionsFor = (doctor) => {
+    if (!doctor) return [];
+
+    const entries = toConsultationTypeEntries(doctor.consultationType);
+
+    return CONSULTATION_TYPE_NAMES.map((typeName) => {
+      const key = typeKeyFor(typeName);
+      const entry = entries.find((item) => typeKeyFor(item.name) === key);
+      if (!entry) return null;
+
+      const serviceFee = serviceForType(typeName)?.fee;
+      const fee =
+        entry.price === null || entry.price === undefined
+          ? serviceFee
+          : entry.price;
+
+      // Keep "" (rather than 0) when nothing is priced anywhere: the tile then
+      // shows just the mode name and the API resolves the stored fee.
+      return { name: typeName, fee: fee === undefined || fee === null ? "" : fee };
+    }).filter(Boolean);
+  };
+
+  const doctorConsultationOptions = doctorConsultationOptionsFor(selectedDoctor);
 
   const consultationOptions = selectedDoctorId
     ? doctorConsultationOptions
@@ -166,12 +210,9 @@ const AppointmentPage = () => {
       typeof router.query.type === "string" ? router.query.type.trim() : "";
     if (!requested) return;
 
-    const match = consultationOptions.find((option) => {
-      const name = String(option.name || "").toLowerCase();
-      if (name === requested.toLowerCase()) return true;
-      const mapped = consultationTypeMapping[requested];
-      return Boolean(mapped) && name === String(mapped).toLowerCase();
-    });
+    const match = consultationOptions.find(
+      (option) => typeKeyFor(option.name) === typeKeyFor(requested)
+    );
     if (!match) return;
 
     setConsultationType(match.name);
@@ -214,7 +255,13 @@ const AppointmentPage = () => {
     setName,
     setEmail,
     setMobNo,
-    setSelectedDate,
+    // Date picks go through here: a slot picked on the previous day is not
+    // bookable on the new one, and the "when" must follow the reset.
+    setSelectedDate: (date) => {
+      setSelectedDate(date);
+      setSelectedSlot("");
+      setAppointmentTime(timeSelection);
+    },
     setServiceType,
     setServiceTypeId,
     setConsultationPrice,
@@ -248,7 +295,12 @@ const AppointmentPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const { serviceParam, appointmentId: orderIdFromReturn } = router.query;
+    const {
+      serviceParam,
+      appointmentId: orderIdFromReturn,
+      payment_status: returnPaymentStatus,
+      status: returnStatus,
+    } = router.query;
     if (typeof serviceParam === "string") {
       const matched = services.find((service) =>
         service.name?.trim().toLowerCase().includes(serviceParam.trim().toLowerCase())
@@ -260,11 +312,17 @@ const AppointmentPage = () => {
     // Returned from Cashfree checkout (our server return_url appends the Cashfree order_id as ?appointmentId=<orderId>).
     // Open the PaymentModal in verify-only mode so it auto-polls the backend status.
     if (typeof orderIdFromReturn === "string" && orderIdFromReturn.trim()) {
+      const single = (value) => (Array.isArray(value) ? value[0] : value);
       setPendingPayment({
         appointmentId: null,
         amount: consultationprice,
         consultationType,
         autoVerifyOrderId: orderIdFromReturn,
+        // A dismissed/failed checkout carries its status back in the URL - the
+        // modal must show that instead of polling an order that stays ACTIVE.
+        initialStatus: normalizeReturnPaymentStatus(
+          single(returnPaymentStatus) || single(returnStatus)
+        ),
       });
       // Clean the query param so refresh doesn't re-trigger
       const cleanQuery = { ...router.query };
@@ -286,7 +344,13 @@ const AppointmentPage = () => {
     setDoctorChoice(choice);
     if (choice === "any") {
       setSelectedDoctorId("");
-      // Back to the generic serviceOffered consultation options (Audio/Video).
+      // The doctor that was picked (and the slot that belonged to them) must not
+      // be posted: the API books exactly what the form shows.
+      setDoctorName("");
+      setDoctorMobileNumber("");
+      setSelectedSlot("");
+      // Back to the generic serviceOffered consultation options (the four types
+      // from src/constant.js).
       const first = serviceConsultationOptions[0];
       setConsultationType(first ? first.name : "");
       setConsultationPrice(first ? first.fee || "" : "");
@@ -308,12 +372,12 @@ const AppointmentPage = () => {
     setDoctorChoice("specific");
     setDoctorName(selectedDoctor.name);
     setDoctorMobileNumber(selectedDoctor.mobileNumber);
+    // A slot chosen for the previous doctor is not theirs to book.
+    setSelectedSlot("");
 
     // Show this doctor's own consultation types with their prices and
     // preselect the first one so the selected tile + fee stay in sync.
-    const options = toConsultationTypeEntries(
-      selectedDoctor.consultationType
-    ).map((entry) => ({ name: entry.name, fee: entry.price }));
+    const options = doctorConsultationOptionsFor(selectedDoctor);
     const first = options[0];
     setConsultationType(first ? first.name : "");
     setConsultationPrice(first ? first.fee || "" : "");
@@ -356,6 +420,10 @@ const AppointmentPage = () => {
     const timeChoice = event.target.value;
     setAppointmentTime(timeChoice);
     setTimeSelection(timeChoice);
+    // Leaving "Choose time" invalidates the slot picked in that mode.
+    if (timeChoice !== CHOOSE_TIME) {
+      setSelectedSlot("");
+    }
     setShowDatePicker(timeChoice === CHOOSE_TIME && doctorChoice === "any");
   };
 
@@ -413,6 +481,35 @@ const AppointmentPage = () => {
       setConsultationPrice(matching.fee || "");
     }
     filterDoctors(selectedType);
+
+    // The doctor dropdown only lists doctors that offer the selected type. When
+    // the current choice is not one of them, the form goes back to "Any Doctor" -
+    // exactly what the dropdown already shows - instead of posting a doctor the
+    // patient can no longer see under a fee that was just replaced.
+    if (selectedDoctorId) {
+      const key = typeKeyFor(selectedType);
+      const stillOffered = (doctors || []).some(
+        (doctor) =>
+          String(doctor._id) === String(selectedDoctorId) &&
+          consultationTypeNames(doctor.consultationType).some(
+            (name) => typeKeyFor(name) === key
+          )
+      );
+
+      if (!stillOffered) {
+        setSelectedDoctorId("");
+        setDoctorChoice("any");
+        setDoctorName("");
+        setDoctorMobileNumber("");
+        setSelectedSlot("");
+        const serviceMatch = serviceConsultationOptions.find(
+          (option) => typeKeyFor(option.name) === key
+        );
+        if (serviceMatch) {
+          setConsultationPrice(serviceMatch.fee || "");
+        }
+      }
+    }
   };
 
   const filterDoctors = (selectedOption) => {
@@ -566,6 +663,16 @@ const AppointmentPage = () => {
         setAvailableSlotsFromServer(data.nextSlots || []);
         setNoSLotAvailableMessage(data.message);
         setOpenAvailableSlotsFromServer(true);
+        return false;
+      }
+      // A refusal (validation, no doctor free, ...) answers with a message but no
+      // appointment. Opening the payment modal on a missing id showed a checkout
+      // for a booking that was never created.
+      if (!data.appointmentId) {
+        setSnackBarMessage(
+          data.message || "All doctor are busy right now, No slot is available"
+        );
+        handleOpenSnackBar();
         return false;
       }
       // Payment gate: the appointment is PENDING until payment is verified by
@@ -724,6 +831,7 @@ const AppointmentPage = () => {
                 amount={pendingPayment.amount}
                 consultationType={consultationType}
                 autoVerifyOrderId={pendingPayment.autoVerifyOrderId || null}
+                initialStatus={pendingPayment.initialStatus || null}
                 onPaymentDone={() => {
                   setMessage("Your consultation has been confirmed.");
                   setBookingResponse(true);

@@ -50,27 +50,43 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
-    // 2. Always derive the amount from the database - never trust client amount
-    const cacheKey = `service:fee:${(consultationType || "").toLowerCase()}`;
-    let service = await cacheGet(cacheKey);
-    if (!service) {
-      service = await ServiceOffered.findOne({
-        name: { $regex: new RegExp(`^${consultationType}$`, "i") },
-        isActive: true,
-      });
-      if (service) {
-        await cacheSet(cacheKey, service, 300); // 5-min TTL
+    // 2. Always derive the amount from the database - never trust the client
+    //    amount. The appointment holds the fee the patient was shown (and that the
+    //    invoice quotes), so it wins; the serviceOffered fee is only the fallback
+    //    for records created without a price. The consultation type is taken from
+    //    the appointment too, so the client cannot switch the charged service.
+    const effectiveType = String(
+      appointment.consultationType || consultationType || "",
+    ).trim();
+
+    const appointmentAmount = Number(appointment.consultationprice);
+    const hasAppointmentAmount =
+      Number.isFinite(appointmentAmount) && appointmentAmount > 0;
+
+    let amount = hasAppointmentAmount ? appointmentAmount : null;
+
+    if (!hasAppointmentAmount) {
+      const cacheKey = `service:fee:${effectiveType.toLowerCase()}`;
+      let service = await cacheGet(cacheKey);
+      if (!service) {
+        service = await ServiceOffered.findOne({
+          name: { $regex: new RegExp(`^${effectiveType}$`, "i") },
+          isActive: true,
+        });
+        if (service) {
+          await cacheSet(cacheKey, service, 300); // 5-min TTL
+        }
       }
-    }
 
-    if (!service || !service.fee) {
-      return res.status(400).json({
-        success: false,
-        message: "Consultation fee not configured for this consultation type",
-      });
-    }
+      if (!service || !service.fee) {
+        return res.status(400).json({
+          success: false,
+          message: "Consultation fee not configured for this consultation type",
+        });
+      }
 
-    const amount = Number(service.fee);
+      amount = Number(service.fee);
+    }
 
     // 3. Idempotency: check for existing active payment
     let payment = await Payment.findOne({

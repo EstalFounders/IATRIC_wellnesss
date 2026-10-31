@@ -84,6 +84,27 @@ const appointmentSchema = new mongoose.Schema({
   serviceType: {
     type: String,
   },
+  // Set when the reserved slot has been handed back (failed/cancelled payment or
+  // a cancellation). A late PAID webhook/status poll must re-acquire the slot
+  // before the appointment can be confirmed - see
+  // paymentService.confirmAppointmentAfterPayment.
+  slotReleasedAt: {
+    type: Date,
+    default: null,
+  },
+  // Stamped once the confirmation WhatsApps went out, so repeated payment-status
+  // polls do not resend them (a poll on an already-PAID payment re-runs the
+  // confirmation flow to heal partial states).
+  confirmationSentAt: {
+    type: Date,
+    default: null,
+  },
+  // Stamped once the 20-minute reminder WhatsApps went out (the reminder job runs
+  // repeatedly inside the 20-minute window).
+  reminderSentAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 // Use a unique model identifier

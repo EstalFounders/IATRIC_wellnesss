@@ -4,16 +4,26 @@ import Link from "next/link";
 import Layouts from "../../src/layout/Layouts";
 import PageBanner from "../../src/layout/PageBanner";
 import { price_symbol, color_schema } from "../../src/constant";
+import {
+  PAYMENT_CANCELLED_MESSAGE,
+  normalizeReturnPaymentStatus,
+} from "../../src/lib/paymentStatus";
 
 const MAX_ATTEMPTS = 12; // ~36s max, then show Retry instead of infinite spinner
 const POLL_INTERVAL = 3000;
 
 const ThankYou = () => {
   const router = useRouter();
-  const { appointmentId } = router.query;
-  const orderId = appointmentId || null;
+  const { appointmentId, order_id, payment_status, status } = router.query;
+  const single = (value) => (Array.isArray(value) ? value[0] : value);
+  // Cashfree substitutes {order_id} in the return_url and may append
+  // `payment_status`; plain `status` is accepted for older/other flows.
+  const orderId = single(appointmentId) || single(order_id) || null;
+  const returnStatus = normalizeReturnPaymentStatus(
+    single(payment_status) || single(status)
+  );
 
-  const [paymentState, setPaymentState] = useState("verifying"); // verifying | success | failed | pending
+  const [paymentState, setPaymentState] = useState("verifying"); // verifying | success | cancelled | failed | pending
   const [resultMessage, setResultMessage] = useState("");
   const [orderInfo, setOrderInfo] = useState(null); // { orderId, amount }
   const pollTimerRef = useRef(null);
@@ -54,10 +64,11 @@ const ThankYou = () => {
         }
 
         if (data.status === "CANCELLED") {
-          setPaymentState("failed");
-          setResultMessage(
-            data.message || "Payment was cancelled. Please try again."
-          );
+          // The patient closed the gateway (or the payment was cancelled).
+          // "Not completed" was the wrong copy here - it reads like a failure
+          // they should wait out instead of a dismissal they can simply retry.
+          setPaymentState("cancelled");
+          setResultMessage(PAYMENT_CANCELLED_MESSAGE);
           return;
         }
 
@@ -88,6 +99,26 @@ const ThankYou = () => {
   };
 
   useEffect(() => {
+    // A terminal status in the return URL settles the page without polling:
+    // Cashfree only appends it once the checkout was closed/failed, so waiting
+    // for `pending` here was what produced the wrong "Payment Status Pending"
+    // screen after a dismissed gateway.
+    if (returnStatus === "cancelled") {
+      setPaymentState("cancelled");
+      setResultMessage(PAYMENT_CANCELLED_MESSAGE);
+      if (orderId) setOrderInfo({ orderId, amount: undefined });
+      return undefined;
+    }
+
+    if (returnStatus === "failed") {
+      setPaymentState("failed");
+      setResultMessage(
+        "Payment failed. Your appointment has not been confirmed. Please try again with another payment method."
+      );
+      if (orderId) setOrderInfo({ orderId, amount: undefined });
+      return undefined;
+    }
+
     if (orderId) {
       verifyPayment();
     } else {
@@ -100,7 +131,7 @@ const ThankYou = () => {
       if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, [orderId, returnStatus]);
 
   const buttonStyle = {
     display: "inline-block",
@@ -217,6 +248,76 @@ const ThankYou = () => {
             </Link>
             <Link legacyBehavior href="/">
               <a style={buttonStyle}>Go to Home</a>
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (paymentState === "cancelled") {
+      return (
+        <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto" }}>
+          <div
+            style={{
+              width: 88,
+              height: 88,
+              borderRadius: "50%",
+              background: "#fff4e5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 24px",
+            }}
+          >
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="#b45309"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h2 style={{ color: "#b45309", margin: "0 0 12px", fontSize: 28 }}>
+            Payment Cancelled
+          </h2>
+          <p style={{ color: "#4a5568", fontSize: 16, margin: "0 0 24px" }}>
+            {resultMessage || PAYMENT_CANCELLED_MESSAGE}
+          </p>
+          {orderInfo?.orderId && (
+            <div
+              style={{
+                background: "#fffaf2",
+                border: "1px solid #f1e0c6",
+                borderRadius: 12,
+                padding: "12px 24px",
+                margin: "0 0 24px",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <span style={{ color: "#718096", fontSize: 14 }}>Order ID</span>
+              <span style={{ color: "#1a202c", fontSize: 14, fontWeight: 600 }}>
+                {orderInfo.orderId}
+              </span>
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link legacyBehavior href="/appointment">
+              <a style={buttonStyle}>Try Again</a>
+            </Link>
+            <Link legacyBehavior href="/">
+              <a style={secondaryButtonStyle}>Go to Home</a>
             </Link>
           </div>
         </div>

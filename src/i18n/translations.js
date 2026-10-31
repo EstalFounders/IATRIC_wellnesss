@@ -369,6 +369,10 @@ export const translations = {
     "pm.success": "Payment successful. Your consultation has been confirmed.",
     "pm.failed": "Payment failed. Your appointment has not been confirmed.",
     "pm.cancelled": "Payment was cancelled. Please try again.",
+    "pm.cancelledTitle": "Payment Cancelled",
+    "pm.cancelledBody":
+      "Your transaction was cancelled. Please try again or choose another payment method.",
+    "pm.bookAgain": "Book Again",
     "pm.expired": "Your payment session has expired. Please click Pay again to refresh the session and complete your payment.",
     "pm.configError": "Payment is temporarily unavailable. Please try again in a few minutes or contact support.",
     "pm.statusError": "Unable to reach the payment status service. Please check again or retry payment.",
@@ -752,6 +756,10 @@ export const translations = {
     "pm.success": "भुगतान सफल। आपका परामर्श कन्फर्म हो गया है।",
     "pm.failed": "भुगतान विफल। अपॉइंटमेंट कन्फर्म नहीं हुआ।",
     "pm.cancelled": "भुगतान रद्द हुआ। कृपया पुनः प्रयास करें।",
+    "pm.cancelledTitle": "भुगतान रद्द हुआ",
+    "pm.cancelledBody":
+      "आपका लेन-देन रद्द कर दिया गया। कृपया पुनः प्रयास करें या कोई अन्य भुगतान विकल्प चुनें।",
+    "pm.bookAgain": "फिर से बुक करें",
     "pm.expired": "आपका भुगतान सत्र समाप्त हो गया। कृपया दोबारा भुगतान करें।",
     "pm.configError": "भुगतान सेवा अस्थायी रूप से उपलब्ध नहीं है। कृपया कुछ मिनट बाद पुनः प्रयास करें या सहायता से संपर्क करें।",
     "pm.statusError": "भुगतान स्थिति सेवा उपलब्ध नहीं है। कृपया दोबारा जांचें।",

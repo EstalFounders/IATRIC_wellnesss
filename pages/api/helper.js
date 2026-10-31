@@ -28,10 +28,11 @@ import {
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
 } from "./utils/constants";
 import { sendAdminNotification } from "./lib/sendNotification";
+import { validateBookingPayload } from "./utils/bookingValidation";
 import {
-  toConsultationTypeEntries,
-  typeKeyFor,
-} from "../../src/utils/consultationFee";
+  doctorFee,
+  resolveBookingConsultationPrice,
+} from "./utils/consultationPricing";
 
 // consultationType is stored as `[{ name, price }]` (legacy string entries also
 // possible), so a type search must match both shapes.
@@ -51,21 +52,48 @@ import { v4 as uuidv4 } from "uuid";
  */
 const FALLBACK_SLOT_LIMIT = 3;
 
-/** Same calendar day in the server's timezone - the unit the room books in. */
+/**
+ * Same calendar day in the server's timezone - the unit the room books in.
+ */
 const isSameDay = (a, b) =>
   new Date(a).toDateString() === new Date(b).toDateString();
 
 /**
- * The doctor's own fee for a consultation type (null when the doctor does not
- * list that type, or lists it without a price).
+ * Whether this MongoDB deployment can run multi-document transactions.
+ *
+ * `session.startTransaction()` only sets a local flag - it does nothing until a
+ * query is actually handed `{ session }`, and `commitTransaction()` fails
+ * ("Transaction numbers are only allowed on a replica set member or mongos") on a
+ * standalone server. Probing once keeps both paths honest: a real transaction on
+ * a replica set / Atlas, and the atomic single-document slot lock plus the
+ * compensating release in `bookConsultation` on a standalone dev database.
+ *
+ * @returns {Promise<boolean>}
  */
-const doctorPriceForType = (doctor, type) => {
-  const key = typeKeyFor(type);
-  const entry = toConsultationTypeEntries(doctor?.consultationType).find(
-    (item) => typeKeyFor(item.name) === key,
-  );
-  return entry ? entry.price : null;
+let transactionsSupported = null;
+const serverSupportsTransactions = async () => {
+  if (transactionsSupported !== null) return transactionsSupported;
+
+  try {
+    const hello = await mongoose.connection.db.admin().command({ hello: 1 });
+    transactionsSupported = Boolean(hello.setName || hello.msg === "isdbgrid");
+  } catch (err) {
+    console.warn(
+      "Could not probe transaction support, falling back to non-transactional booking:",
+      err.message,
+    );
+    transactionsSupported = false;
+  }
+
+  return transactionsSupported;
 };
+
+/**
+ * The doctor's own fee for a consultation type (null when the doctor does not
+ * list that type, or lists it without a price). Shared with the booking fee
+ * resolver so the availability search and the charged amount never disagree.
+ */
+const doctorPriceForType = (doctor, type) => doctorFee(doctor, type);
 
 /**
  * Serialises a Slot document for the fallback list.
@@ -234,6 +262,22 @@ export async function findAvailableDoctorForSpecificTimeSlot(
 
   const { startTime, endTime } = slot;
 
+  // The search must never walk past the end of the requested slot, nor past the
+  // day the patient picked: an unbooked slot tomorrow morning is not an answer to
+  // "10:20 today". (`endOfDay` was computed but never used, so a request whose
+  // slot was fully booked on the chosen day silently resolved to another day.)
+  const requestedEnd = new Date(endTime);
+  let latestStart = requestedEnd;
+  if (
+    !Number.isNaN(endOfDay.getTime()) &&
+    (Number.isNaN(requestedEnd.getTime()) || endOfDay < requestedEnd)
+  ) {
+    latestStart = endOfDay;
+  }
+  if (Number.isNaN(latestStart.getTime())) {
+    latestStart = new Date(startTime);
+  }
+
   // No-doctor booking budget: prefer a doctor whose own fee for this type is
   // within `bookingPrice` (cheapest first), without dropping anyone as fallback.
   const budgetAmount = Number(bookingPrice);
@@ -263,7 +307,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
       );
       const availableSlot = await Slot.findOne({
         doctorId: doctor._id,
-        startTime: { $gte: new Date(startTime), $lte: new Date(endTime) },
+        startTime: { $gte: new Date(startTime), $lte: latestStart },
         isBooked: false,
       });
       console.log(`Available slot for doctor ${doctor._id}:`, availableSlot);
@@ -418,7 +462,10 @@ export const checkNbookSelectedDoctorForNow = async (
   };
 };
 
-export const bookConsultation = async ({ bookConsultationParams }) => {
+export const bookConsultation = async ({
+  bookConsultationParams,
+  session = null,
+}) => {
   console.log("bookConsultationParams in helper", bookConsultationParams);
   const {
     meetingId,
@@ -441,6 +488,9 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   } = bookConsultationParams;
 
   console.log(slot, "slot", doctorId, "doctor id");
+  // Every write below runs inside the caller's transaction when there is one, so
+  // a failure anywhere rolls the slot lock back instead of leaving it taken.
+  const sessionOptions = session ? { session } : undefined;
   let selectedSlot = slot ? slot : null; // Ensure selectedSlot is null if not provided
   if (selectedSlot === null) {
     const now = new Date();
@@ -465,7 +515,7 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
       const updatedSlot = await Slot.findOneAndUpdate(
         { _id: futureSlot._id, doctorId, isBooked: false },
         { isBooked: true },
-        { new: true },
+        { new: true, ...(session ? { session } : {}) },
       );
       if (updatedSlot) {
         bookedSlot = updatedSlot;
@@ -488,6 +538,14 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
       resolvedBookingMode === IS_NOW ||
       resolvedBookingMode === IN_TWENTY_MINUTES_NOW;
 
+    // A slot that has already finished can never be booked - the form only lists
+    // slots that are still running (`endTime > now` in AppointmentPage), so this
+    // only rejects requests that bypass the UI.
+    const slotEnd = new Date(slot.endTime || slot.startTime);
+    if (!Number.isNaN(slotEnd.getTime()) && slotEnd.getTime() < Date.now()) {
+      throw new Error("Selected slot has already passed.");
+    }
+
     if (
       isNowMode &&
       new Date(slot.startTime).getTime() < Date.now() - 20 * 60 * 1000
@@ -499,7 +557,7 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
     const updatedSlot = await Slot.findOneAndUpdate(
       { _id: slot._id, doctorId, isBooked: false },
       { isBooked: true },
-      { new: true },
+      { new: true, ...(session ? { session } : {}) },
     );
 
     if (!updatedSlot) {
@@ -520,22 +578,49 @@ export const bookConsultation = async ({ bookConsultationParams }) => {
   };
 
   // Step 2: Create the appointment
-  const appointment = await Appointment.create({
-    meetingId,
-    doctorId,
-    slotId: slot._id,
-    symptoms,
-    name,
-    email,
-    patientMobNo,
-    consultationType,
-    consultationprice,
-    appointmentTime,
-    bookingMode: bookingMode || clientSideAppointmentTime || null,
-    patientMeetingUrl: ensureHttps(patientMeetingUrl),
-    doctorMeetingUrl: ensureHttps(doctorMeetingUrl),
-    prescriptionUrl,
-  });
+  // `selectedSlot` (the row that was actually locked) is the source of truth:
+  // on the "no slot handed in" path above `slot` is still the request's (empty)
+  // value, and reading `slot._id` from it crashed after the lock was taken.
+  let appointment;
+  try {
+    [appointment] = await Appointment.create(
+      [
+        {
+          meetingId,
+          doctorId,
+          slotId: selectedSlot._id,
+          symptoms,
+          name,
+          email,
+          patientMobNo,
+          consultationType,
+          consultationprice,
+          appointmentTime,
+          bookingMode: bookingMode || clientSideAppointmentTime || null,
+          patientMeetingUrl: ensureHttps(patientMeetingUrl),
+          doctorMeetingUrl: ensureHttps(doctorMeetingUrl),
+          prescriptionUrl,
+        },
+      ],
+      sessionOptions,
+    );
+  } catch (createError) {
+    // The slot is already locked at this point. Without a transaction the lock
+    // would survive the failed insert and block the doctor's time for good, so it
+    // is handed back before the error is re-thrown. (Inside a transaction the same
+    // release runs on the session and is rolled back with it.)
+    await Slot.updateOne(
+      { _id: selectedSlot._id, doctorId, isBooked: true },
+      { isBooked: false },
+      session ? { session } : undefined,
+    ).catch((releaseError) => {
+      console.error(
+        "Failed to release slot after booking failure:",
+        releaseError.message,
+      );
+    });
+    throw createError;
+  }
 
   console.log("start time 249", slot, "slot 249");
 
@@ -665,6 +750,19 @@ export const logErrorToGoogleSheet = async (data) => {
  */
 export async function handlePostConsultation(reqBody, res) {
   let session;
+
+  // The form's own rules, re-checked here: the API is reachable directly, and a
+  // request that the form would have refused must not lock a slot. Nothing the
+  // form allows is rejected - the rules are the same ones.
+  const validation = validateBookingPayload(reqBody);
+  if (!validation.ok) {
+    console.warn("bookConsultation rejected an invalid payload:", validation.message);
+    return res.status(200).json({
+      message: validation.message,
+      code: "INVALID_BOOKING_DATA",
+    });
+  }
+
   const {
     selectedDoctorId,
     appointmentTime,
@@ -678,14 +776,22 @@ export async function handlePostConsultation(reqBody, res) {
     patientMobNo,
     consultationType,
     consultationprice,
-  } = reqBody;
+  } = validation.payload;
 
   const clientSideAppointmentTime = appointmentTime;
 
   try {
     console.log(reqBody);
-    session = await mongoose.connection.startSession();
-    session.startTransaction();
+    // The probe below reads the server's topology, and the booking itself needs a
+    // connection either way.
+    await dbConnect();
+    // The transaction is real only when the deployment supports it; see
+    // `serverSupportsTransactions`. On a standalone database the booking relies on
+    // the atomic single-document slot lock + the compensating release instead.
+    if (await serverSupportsTransactions()) {
+      session = await mongoose.connection.startSession();
+      session.startTransaction();
+    }
     let docName = doctorName == "" ? null : doctorName;
     let doctorMobileNo = doctorMobileNumber == "" ? null : doctorMobileNumber;
     let doctorId = selectedDoctorId === "" ? null : selectedDoctorId;
@@ -785,6 +891,21 @@ export async function handlePostConsultation(reqBody, res) {
       }
     }
 
+    // The fee is resolved from the same two sources the form displays: the fee of
+    // the doctor the patient *chose*, else the serviceOffered fee for the type
+    // (the submitted value only stands in when neither has one). It deliberately
+    // uses `selectedDoctorId`, not the doctor assigned a moment ago for an
+    // "Any Doctor" booking: the form priced that case from serviceOffered, and
+    // the charge has to be the amount that was shown.
+    const resolvedPrice = await resolveBookingConsultationPrice({
+      doctorId:
+        selectedDoctorId === "" || selectedDoctorId === undefined
+          ? null
+          : selectedDoctorId,
+      consultationType,
+      fallback: consultationprice,
+    });
+
     let patientMeetingUrl, doctorMeetingUrl;
     patientMeetingUrl = `${development_production_url}/meeting/patient/${meetingId}`;
     doctorMeetingUrl = `${development_production_url}/meeting/doctor/${meetingId}`;
@@ -798,7 +919,7 @@ export async function handlePostConsultation(reqBody, res) {
       email,
       patientMobNo,
       consultationType,
-      consultationprice,
+      consultationprice: resolvedPrice,
       appointmentTime: slot.startTime,
       status: appointment_status.open,
       patientMeetingUrl: patientMeetingUrl,
@@ -819,13 +940,13 @@ export async function handlePostConsultation(reqBody, res) {
       case "Audio":
       case "Video":
         // Store appointment details
-        result = await bookConsultation({ bookConsultationParams });
+        result = await bookConsultation({ bookConsultationParams, session });
         break;
       case "Home visit":
       case "Clinic":
         // Simply book the consultation
         // Store appointment details
-        result = await bookConsultation({ bookConsultationParams });
+        result = await bookConsultation({ bookConsultationParams, session });
         break;
 
       default:
@@ -833,11 +954,16 @@ export async function handlePostConsultation(reqBody, res) {
           message: "Invalid consultation type.",
         });
     }
-    await Notification.create({
-      title: "consultation-request",
-      body: `Patient ${name} booked a ${consultationType} consultation.`,
-      read: false,
-    });
+    await Notification.create(
+      [
+        {
+          title: "consultation-request",
+          body: `Patient ${name} booked a ${consultationType} consultation.`,
+          read: false,
+        },
+      ],
+      session ? { session } : undefined,
+    );
     try {
       await sendAdminNotification({
         title: "Consultation Booked",
@@ -846,8 +972,7 @@ export async function handlePostConsultation(reqBody, res) {
     } catch (notifErr) {
       console.error("FCM push notification failed:", notifErr.message);
     }
-    await session.commitTransaction();
-    session.endSession();
+    if (session) await session.commitTransaction();
     res.status(200).json({
       message: "Consultation booked successfully",
       appointmentId: result?._id ? String(result._id) : undefined,
@@ -855,9 +980,8 @@ export async function handlePostConsultation(reqBody, res) {
       consultationType,
     });
   } catch (error) {
-    if (session) {
+    if (session?.inTransaction()) {
       await session.abortTransaction();
-      session.endSession();
     }
     console.error("Booking error:", error);
     // Log error to Google Sheets with full context
@@ -890,5 +1014,15 @@ export async function handlePostConsultation(reqBody, res) {
     res.status(200).json({
       message: "All doctor are busy right now, No slot is available",
     });
+  } finally {
+    // Runs for every exit path (including the early `return`s that hand the
+    // response to `findAvailableDoctorForNow`), so no session is ever leaked and
+    // an unfinished transaction is always rolled back.
+    if (session) {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      session.endSession();
+    }
   }
 }

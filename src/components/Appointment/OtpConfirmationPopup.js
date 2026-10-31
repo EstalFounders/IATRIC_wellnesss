@@ -13,6 +13,10 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   const [generatedOtp, setGeneratedOtp] = useState(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState("");
+  // Guard against a double click on "Verify": the booking POST is fired from
+  // `onConfirm`, and two clicks used to start two bookings (the second one then
+  // hit "slot already booked").
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useLanguage();
 
   // Generate OTP and send on load
@@ -96,6 +100,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   };
 
   const handleSubmit = () => {
+    if (isSubmitting) return;
     const enteredCode = otp.join("");
     if (enteredCode.length !== 6) {
       alert(t("otp.errDigits"));
@@ -103,6 +108,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
     }
     if (enteredCode === "000000" || enteredCode === generatedOtp) {
       console.log("OTP verified successfully:", enteredCode);
+      setIsSubmitting(true);
       onConfirm(); // Proceed
     } else {
       alert(t("otp.errInvalid"));

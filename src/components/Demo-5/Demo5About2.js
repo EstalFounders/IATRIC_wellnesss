@@ -133,18 +133,29 @@ const consultationTypes = useSelector(
                   onOtpRequired={handleOtpRequired}
                 />
               </div>
+              {/* Bottom-center on every breakpoint: the default anchor parked the
+                  confirmation in a corner, which reads as "somewhere else on the
+                  page" rather than as the result of the popup the patient just used. */}
               <Snackbar
                 open={openSnackBar}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackBar}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
               >
                 <Alert
                   onClose={handleCloseSnackBar}
                   severity={severity}
                   sx={{
                     width: "100%",
+                    maxWidth: { xs: "calc(100vw - 32px)", sm: 480 },
                     display: "flex",
+                    alignItems: "center",
                     justifyContent: "center",
+                    "& .MuiAlert-message": {
+                      flex: 1,
+                      textAlign: "center",
+                      wordBreak: "break-word",
+                    },
                   }}
                 >
                   {response}

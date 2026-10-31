@@ -9,6 +9,8 @@ import {
 } from "./helper";
 import { rateLimit } from "../../src/lib/rateLimiter";
 import { appointment_status, payment_status } from "../../src/constant";
+import { releaseSlotForAppointment } from "../../src/lib/paymentService";
+import Slot from "../../src/models/slots";
 
 // The values PUT accepts. `TOTAL` is a UI-only sentinel (never stored), so it is
 // not a legal appointment status.
@@ -135,6 +137,15 @@ export default async function handler(req, res) {
 
       const updated = {};
 
+      // Read before writing: releasing the slot needs the previous status (a
+      // second CANCELLED must not hand the same slot back twice) and the slot id.
+      const appointmentBefore = await Appointment.findById(appointmentId).select(
+        "status slotId doctorId slotReleasedAt",
+      );
+      if (!appointmentBefore) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
       if (selectedStatus) {
         await Appointment.findByIdAndUpdate(
           { _id: appointmentId },
@@ -142,6 +153,45 @@ export default async function handler(req, res) {
           { new: true }, // Return the updated document
         );
         updated.status = selectedStatus;
+
+        // A cancelled consultation no longer needs the doctor's time: hand the
+        // slot back so it can be booked again instead of staying blocked forever.
+        if (
+          selectedStatus === appointment_status.cancelled &&
+          appointmentBefore.status !== appointment_status.cancelled
+        ) {
+          await releaseSlotForAppointment({ appointmentId });
+          updated.slotReleased = true;
+        }
+
+        // A slot that was handed back (cancelled, failed payment, abandoned
+        // booking) must be locked again before the panel re-confirms the
+        // appointment, otherwise the same time could be sold twice.
+        if (
+          selectedStatus === appointment_status.confirmed &&
+          appointmentBefore.slotReleasedAt
+        ) {
+          const relocked = await Slot.findOneAndUpdate(
+            {
+              _id: appointmentBefore.slotId,
+              doctorId: appointmentBefore.doctorId,
+              isBooked: false,
+            },
+            { isBooked: true },
+            { new: true },
+          );
+
+          if (relocked) {
+            await Appointment.updateOne(
+              { _id: appointmentId },
+              { slotReleasedAt: null },
+            );
+            updated.slotReleased = false;
+          } else {
+            // Someone else holds that time now - the panel has to rebook it.
+            updated.slotConflict = true;
+          }
+        }
       }
 
       if (payment) {

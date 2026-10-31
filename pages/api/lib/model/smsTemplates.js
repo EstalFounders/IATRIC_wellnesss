@@ -52,6 +52,19 @@ function capitalize(name) {
 }
 
 /**
+ * Guarantees a non-empty WhatsApp template variable.
+ *
+ * Fast2SMS substitutes "*" for a variable it receives empty, so a missing date
+ * reached the doctor as "Date: *" instead of "Date: 31/10/2026". Anything that
+ * is undefined/null/blank now travels as "-" so the delivered message can never
+ * show a bare "*" in place of the appointment date or time.
+ */
+function orDash(value) {
+  const text = value === undefined || value === null ? "" : String(value).trim();
+  return text || "-";
+}
+
+/**
  * Returns the Fast2SMS WhatsApp template ID and pipe-separated variable values
  * for the given template key and body object.
  * Variable order must match the {{1}}, {{2}}, ... placeholders in your approved Fast2SMS template.
@@ -63,9 +76,12 @@ export function buildWhatsAppPayload(template, body) {
         message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
         variables_values: [
           capitalize(body.patient_name),
-          doctorDisplayName(capitalize(body.doctor_name)),
-          body.appointment_date,
-          body.appointment_time,
+          // Doctor names are sent exactly as stored in `doctors.name`: never
+          // re-cased (`capitalize` rewrites the doctor's own spelling), never
+          // stripped of "Dr"/"Dr." and never prefixed with it either.
+          doctorDisplayName(body.doctor_name),
+          orDash(body.appointment_date),
+          orDash(body.appointment_time),
           body.consultation_type,
         ].join("|"),
       };
@@ -74,10 +90,12 @@ export function buildWhatsAppPayload(template, body) {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_PATIENT_ID,
         variables_values: [
           capitalize(body.patient_name),
-          doctorDisplayName(capitalize(body.doctor_name)),
-          body.appointment_date,
-          body.appointment_time,
-          body.meeting_url || "",  // plain app URL — no special chars, no encoding needed
+          doctorDisplayName(body.doctor_name),
+          orDash(body.appointment_date),
+          orDash(body.appointment_time),
+          // Plain app URL — no special chars, no encoding needed. orDash keeps a
+          // missing link from reaching WhatsApp as an empty {{5}} (rendered "*").
+          orDash(body.meeting_url),
         ].join("|"),
       };
 
@@ -85,11 +103,15 @@ export function buildWhatsAppPayload(template, body) {
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_DOCTOR_ID,
         variables_values: [
-          doctorDisplayName(capitalize(body.doctor_name)),
+          // {{1}} doctor / {{2}} patient - the reminder template quotes the
+          // doctor's own name back to them, so it must stay byte-identical to
+          // `doctors.name` (see the note above).
+          doctorDisplayName(body.doctor_name),
           capitalize(body.patient_name),
-          body.appointment_date,
-          body.appointment_time,
-          body.meeting_url || "",  // plain app URL — no special chars, no encoding needed
+          orDash(body.appointment_date),
+          orDash(body.appointment_time),
+          // Plain app URL — no special chars, no encoding needed (see {{5}} note above).
+          orDash(body.meeting_url),
         ].join("|"),
       };
 
@@ -156,7 +178,7 @@ export function buildWhatsAppPayload(template, body) {
         //   Hello {{1}}, / {{2}} / {{3}} / Details: {{4}}: {{5}} / {{6}}: {{7}} / {{8}}
         message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
         variables_values: [
-          doctorDisplayName(capitalize(body.doctor_name)), // {{1}}
+          doctorDisplayName(body.doctor_name),               // {{1}} verbatim, as stored
           body.greeting,                                    // {{2}}
           body.intro,                                       // {{3}}
           "Login URL",                                      // {{4}}
