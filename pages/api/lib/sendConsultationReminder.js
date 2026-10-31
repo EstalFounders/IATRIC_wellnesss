@@ -11,7 +11,7 @@ import {
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
 } from "../utils/constants";
 import { formatPhoneNumber } from "../utils/commonmethod";
-import { formatData } from "../../../src/components/registerDocComponent/utils/helper";
+import { getConfirmMessageBody } from "../utils/whatsappMessageBodies";
 import { doctorDisplayName } from "../../../src/utils/doctorName";
 
 export default async function handler(req, res) {
@@ -24,8 +24,11 @@ export default async function handler(req, res) {
     // 1. Get upcoming appointments within 20 minutes.
     //    Match both OPEN (booking created, payment pending) and CONFIRMED
     //    (payment verified) statuses so paid appointments also get reminders.
+    //    `reminderSentAt: null` (matches "missing" too) keeps the job idempotent:
+    //    it runs repeatedly inside the 20-minute window.
     const upcomingAppointments = await Appointment.find({
       appointmentTime: { $gte: now, $lte: twentyMinutesFromNow },
+      reminderSentAt: null,
       status: {
         $in: [
           new RegExp(appointment_status.open, "i"), // 'i' flag for case-insensitive
@@ -44,14 +47,26 @@ export default async function handler(req, res) {
 
       if (!slot || !doctor) continue;
 
-      const appointmentTime = formatData(slot.startTime);
+      // The reminder template has BOTH `appointment_date` and `appointment_time`.
+      // They must always be filled: Fast2SMS renders an empty variable as "*",
+      // which is why the doctor used to receive "Date: *". getConfirmMessageBody
+      // normalises the value (and falls back to "-" instead of "Invalid Date");
+      // `appointment.appointmentTime` covers legacy slots without `startTime`.
+      const reminderSchedule = getConfirmMessageBody(
+        slot.startTime || appointment.appointmentTime,
+        doctor?.name,
+        appointment.name,
+      );
+      const appointmentDate = reminderSchedule.appointment_date;
+      const appointmentTime = reminderSchedule.appointment_time;
 
-      console.log("Appointment Time:", appointmentTime);
+      console.log("Appointment Time:", appointmentDate, appointmentTime);
 
       // Prepare messages
       const reminderMessageBodyPateint = {
         doctor_name: doctorDisplayName(doctor?.name),
         patient_name: appointment.name,
+        appointment_date: appointmentDate,
         appointment_time: appointmentTime,
         meeting_url: appointment.patientMeetingUrl,
       };
@@ -59,6 +74,7 @@ export default async function handler(req, res) {
       const reminderMessageBodyDoctor = {
         doctor_name: doctorDisplayName(doctor?.name),
         patient_name: appointment.name,
+        appointment_date: appointmentDate,
         appointment_time: appointmentTime,
         meeting_url: appointment.doctorMeetingUrl,
       };
@@ -82,16 +98,31 @@ export default async function handler(req, res) {
         "doctorMobNo",
         formatPhoneNumber(doctorMobNo)
       );
-      await sendWhatsAppConfirmation(
-        formatPhoneNumber(patientMobNo.toString()),
-        reminderMessageBodyPateint,
-        WHATSAPP_REMINDER_TEMPLATE_PATIENT
-      );
-      await sendWhatsAppConfirmation(
-        formatPhoneNumber(doctorMobNo.toString()),
-        reminderMessageBodyDoctor,
-        WHATSAPP_REMINDER_TEMPLATE_DOCTOR
-      );
+
+      // One failing appointment must not stop the reminders of the others: each
+      // pair is sent on its own and only stamped once both messages went out, so
+      // the next run retries a partial send without duplicating it.
+      try {
+        await sendWhatsAppConfirmation(
+          formatPhoneNumber(patientMobNo.toString()),
+          reminderMessageBodyPateint,
+          WHATSAPP_REMINDER_TEMPLATE_PATIENT
+        );
+        await sendWhatsAppConfirmation(
+          formatPhoneNumber(doctorMobNo.toString()),
+          reminderMessageBodyDoctor,
+          WHATSAPP_REMINDER_TEMPLATE_DOCTOR
+        );
+
+        appointment.reminderSentAt = new Date();
+        await appointment.save();
+      } catch (reminderError) {
+        console.error(
+          "Reminder failed for appointment",
+          String(appointment._id),
+          reminderError.message
+        );
+      }
     }
 
     return res.status(200).json({ success: true, message: "Reminders sent." });

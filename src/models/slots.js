@@ -25,6 +25,12 @@ const slotSchema = new Schema({
   }
 });
 
+// One row per (doctor, start time). The booking lock relies on the slot being a
+// single document (`findOneAndUpdate({ _id, doctorId, isBooked: false })`), so a
+// duplicate row for the same instant would let two patients book "the same"
+// time. The slot generator upserts against this key.
+slotSchema.index({ doctorId: 1, startTime: 1 }, { unique: true });
+
 // Use a unique model identifier
 const modelName = 'Slot';
 

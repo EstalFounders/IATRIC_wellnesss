@@ -42,6 +42,45 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   const appointment = await Appointment.findById(payment.appointmentId);
   if (!appointment) throw new Error("Appointment not found");
 
+  // ── Slot re-acquisition (late PAID webhook / status poll) ──────────
+  // `releaseSlotForAppointment` hands the slot back on a failed/cancelled
+  // attempt, so by the time a PAID event arrives the slot may already belong to
+  // someone else. Confirming without re-locking would put two patients on the
+  // same time (or resurrect a cancelled appointment), so the slot is re-acquired
+  // first and the payment is flagged for a refund when it is gone.
+  if (appointment.slotReleasedAt) {
+    if (appointment.status === appointment_status.cancelled) {
+      console.warn(
+        "Payment verified for a cancelled appointment - not confirming:",
+        String(appointment._id),
+      );
+      await flagPaymentForRefund(payment, "appointment cancelled after release");
+      return payment;
+    }
+
+    const relocked = await Slot.findOneAndUpdate(
+      {
+        _id: appointment.slotId,
+        doctorId: appointment.doctorId,
+        isBooked: false,
+      },
+      { isBooked: true },
+      { new: true },
+    );
+
+    if (!relocked) {
+      console.error(
+        "Payment verified but the slot is gone - flagging for refund:",
+        String(appointment._id),
+      );
+      await flagPaymentForRefund(payment, "slot taken before confirmation");
+      return payment;
+    }
+
+    // The slot is ours again: clear the marker so the confirmation below proceeds.
+    appointment.slotReleasedAt = null;
+  }
+
   const doctor = await Doctor.findById(appointment.doctorId);
   const docName = doctor?.name || "";
   // Every WhatsApp body below names the doctor to the patient (and to the
@@ -84,6 +123,21 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     amount: payment.amount,
   });
 
+  // A status poll on an already-confirmed, already-messaged appointment must not
+  // resend the confirmations. `confirmationSentAt` is stamped only after every
+  // send succeeded, so a partial failure is still healed by the next poll.
+  if (appointment.confirmationSentAt) {
+    console.log(
+      "Confirmation messages already sent for appointment:",
+      String(appointment._id),
+    );
+    return payment;
+  }
+
+  // Set by any failed send below: keeps `confirmationSentAt` unset so the next
+  // status poll retries the messages that did not go out.
+  let messagingFailed = false;
+
   const confirmMessageBody = getConfirmMessageBody(
     appointment.appointmentTime,
     docDisplayName,
@@ -113,6 +167,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
         WHATSAPP_CONFIRMATION_TEMPLATE,
       );
     } catch (waErr) {
+      messagingFailed = true;
       console.error(
         "Patient WhatsApp confirmation failed (non-fatal):",
         waErr.message,
@@ -147,6 +202,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
         WHATSAPP_CONFIRMATION_TEMPLATE,
       );
     } catch (waErr) {
+      messagingFailed = true;
       console.error(
         "Doctor WhatsApp confirmation failed (non-fatal):",
         waErr.message,
@@ -236,6 +292,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
         WHATSAPP_REMINDER_TEMPLATE_PATIENT,
       );
     } catch (waErr) {
+      messagingFailed = true;
       console.error(
         "Patient Now-appointment reminder failed (non-fatal):",
         waErr.message,
@@ -264,6 +321,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
         WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
       );
     } catch (waErr) {
+      messagingFailed = true;
       console.error(
         "Doctor Now-appointment reminder failed (non-fatal):",
         waErr.message,
@@ -286,6 +344,14 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     }
   }
 
+  // The meeting-link messages above use the same reminder templates as the
+  // 20-minute reminder job, so they are stamped: the job then skips this
+  // appointment instead of sending the same reminder twice.
+  if (isNowAppointment && !messagingFailed) {
+    appointment.reminderSentAt = appointment.reminderSentAt || new Date();
+    await appointment.save();
+  }
+
   await Notification.create({
     title: "consultation-request",
     body: `Patient ${appointment.name} confirmed a ${appointment.consultationType} consultation.`,
@@ -301,6 +367,13 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     console.error("FCM push notification failed:", notifErr.message);
   }
 
+  // Stamped only when every send above succeeded, so a later status poll neither
+  // duplicates the messages nor skips the ones that failed.
+  if (!messagingFailed) {
+    appointment.confirmationSentAt = new Date();
+    await appointment.save();
+  }
+
   return payment;
 }
 
@@ -314,11 +387,54 @@ export async function releaseSlotForAppointment({ appointmentId }) {
   const appointment = await Appointment.findById(appointmentId);
   if (!appointment || !appointment.slotId) return;
 
-  await Slot.findOneAndUpdate(
+  const released = await Slot.findOneAndUpdate(
     { _id: appointment.slotId, doctorId: appointment.doctorId, isBooked: true },
     { isBooked: false },
     { new: true },
   );
 
-  console.log("Slot released for appointment:", String(appointmentId));
+  // Marks the slot as given back, so a PAID event that arrives late re-acquires it
+  // (or is flagged for a refund) instead of confirming over someone else's slot.
+  appointment.slotReleasedAt = new Date();
+  await appointment.save();
+
+  console.log("Slot released for appointment:", String(appointmentId), {
+    slotWasBooked: Boolean(released),
+  });
+}
+
+/**
+ * Marks a verified payment for manual refund when the appointment it belongs to
+ * can no longer be honoured (its slot was handed back and taken by someone else,
+ * or the appointment was cancelled). The appointment is never confirmed here -
+ * the decision belongs to the ops team - but a trail is left in the panel
+ * notifications and in the error sheet.
+ *
+ * @param {object} payment - The Payment document (already loaded).
+ * @param {string} reason - Short human readable reason, used in the logs.
+ */
+async function flagPaymentForRefund(payment, reason) {
+  payment.status = payment_status.REFUND_PENDING;
+  await payment.save();
+
+  try {
+    await Notification.create({
+      title: "refund-pending",
+      body: `Payment ${payment.orderId} needs a refund: ${reason}.`,
+      read: false,
+    });
+  } catch (notifErr) {
+    console.error("Refund notification failed:", notifErr.message);
+  }
+
+  await logErrorToGoogleSheet({
+    apiName: "paymentService/confirmAppointmentAfterPayment",
+    errorMessage: `Payment verified but the appointment cannot be confirmed: ${reason}`,
+    errorCode: "409",
+    requestPayload: {
+      orderId: payment.orderId,
+      appointmentId: payment.appointmentId ? String(payment.appointmentId) : "",
+      amount: payment.amount,
+    },
+  });
 }
