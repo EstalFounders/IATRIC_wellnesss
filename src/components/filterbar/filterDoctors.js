@@ -115,17 +115,17 @@ const wordsMatch = (left, right) => {
 };
 
 /**
- * Tolerant match of a SUB service name against the doctor's services.
+ * Tolerant match of one filter against a list of service names.
  * Exact / slug-equal first, then every word of the filter must appear in the
- * doctor's text (as a word, a prefix, or a near-miss spelling).
+ * candidate text (as a word, a prefix, or a near-miss spelling).
  */
-export const matchesSpeciality = (doctor, filter) => {
+const matchesNames = (names, filter) => {
   const target = normalize(filter);
   if (!target) return true;
 
   const targetWords = words(filter);
 
-  return doctorSpecialityHaystack(doctor).some((name) => {
+  return names.some((name) => {
     const value = normalize(name);
     if (value === target || slugify(name) === slugify(filter)) return true;
 
@@ -137,6 +137,18 @@ export const matchesSpeciality = (doctor, filter) => {
     );
   });
 };
+
+/** Tolerant match of a speciality against everything a doctor is tagged with. */
+export const matchesSpeciality = (doctor, filter) =>
+  matchesNames(doctorSpecialityHaystack(doctor), filter);
+
+/**
+ * Appointment-page matcher: only the doctor's `serviceOffered` counts, so a
+ * doctor whose free-text `expertise` merely mentions a field is not listed
+ * under it. Records without `serviceOffered` match no speciality.
+ */
+export const matchesServiceOffered = (doctor, filter) =>
+  matchesNames(asArray(doctor?.serviceOffered), filter);
 
 // --- Location -----------------------------------------------------------------
 export const doctorLocation = (doctor) => {

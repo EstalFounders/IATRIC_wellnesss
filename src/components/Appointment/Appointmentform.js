@@ -17,6 +17,7 @@ import { CHOOSE_TIME, IS_NOW, price_symbol, superAdminConsultationtype, color_sc
 import { useGlobalData } from "../../customUtils/useGlobalData";
 import { formatTime } from "../helper";
 import { doctorDisplayName } from "../../utils/doctorName";
+import { matchesServiceOffered } from "../filterbar/filterDoctors";
 
 // Common complaints offered as quick-select pills on the form.
 const COMMON_DISEASES = [
@@ -43,41 +44,15 @@ const ALERT_VARIANTS = {
 };
 
 // --- Speciality <-> doctor matching ------------------------------------------
-// Doctor docs carry no `speciality` field: the specialities a doctor covers live in
-// `serviceOffered` (legacy `speciality` is still honoured when present).
+// Doctor docs carry no `speciality` field: what a doctor practises is stored in
+// `serviceOffered`, and only that list decides whether the doctor is listed under
+// the selected speciality (`matchesServiceOffered`; a free-text `expertise` alone
+// must not put a doctor under a speciality).
 const CONSULTATION_TYPES = superAdminConsultationtype.map((type) =>
   String(type.name || "").trim().toLowerCase()
 );
 
 const normalizeValue = (value) => String(value || "").trim().toLowerCase();
-
-const slugifyValue = (value) =>
-  normalizeValue(value)
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-const doctorServiceNames = (doctor) =>
-  [
-    doctor?.speciality,
-    ...(Array.isArray(doctor?.serviceOffered) ? doctor.serviceOffered : []),
-  ].filter(Boolean);
-
-// Tolerant match: equal, slug-equal, or partial either way - so "Gynaecology &
-// Obstetrics" also matches a doctor tagged "gynecology & obs".
-const matchesSpeciality = (doctor, filter) => {
-  const target = normalizeValue(filter);
-  if (!target) return true;
-
-  return doctorServiceNames(doctor).some((name) => {
-    const value = normalizeValue(name);
-    return (
-      value === target ||
-      slugifyValue(name) === slugifyValue(filter) ||
-      value.includes(target) ||
-      target.includes(value)
-    );
-  });
-};
 
 const toLocalDateString = (date) => {
   const d = new Date(date);
@@ -166,18 +141,18 @@ const AppointmentForm = ({
     ? appointmentState.filteredDoctors
     : doctorOptions;
 
-  // Speciality list: globalData slice (serviceOffered SUB items) first, then any
-  // service found on doctor records, minus consultation types (Audio/Video/...).
-  const specialityOptions = [
-    ...new Set([
-      ...specialityNames,
-      ...doctorOptions.flatMap((doctor) => doctorServiceNames(doctor)),
-    ]),
-  ].filter((name) => !CONSULTATION_TYPES.includes(normalizeValue(name)));
+  // Speciality list: only the canonical specialities (globalData SUB items, with
+  // the static fallback for first paint), minus consultation types (Audio/Video).
+  // Doctor records are deliberately not merged in - their free-text `expertise`
+  // and service names would flood the list with near-duplicates.
+  const specialityOptions = [...new Set(specialityNames)].filter(
+    (name) => name && !CONSULTATION_TYPES.includes(normalizeValue(name))
+  );
 
-  // Doctor list narrowed by the selected speciality (match on the doctor's services).
+  // Doctor list narrowed by the selected speciality: a doctor is listed only when
+  // the speciality appears in their `serviceOffered` (see matchesServiceOffered).
   const visibleDoctors = specialityFilter
-    ? scopedDoctors.filter((doctor) => matchesSpeciality(doctor, specialityFilter))
+    ? scopedDoctors.filter((doctor) => matchesServiceOffered(doctor, specialityFilter))
     : scopedDoctors;
 
   const futureSlots = (appointmentState.locallyCreatedSlots || []).filter(
@@ -505,6 +480,22 @@ const AppointmentForm = ({
                   </Form.Group>
                 </Col>
               </Row>
+
+              {/* Kept outside the two columns and full width: the card is a
+                  shrink-to-fit flex item, so a long line inside a column used to
+                  widen the whole form. */}
+              {specialityFilter && visibleDoctors.length === 0 ? (
+                <p
+                  className="mb-2 text-center"
+                  style={{
+                    color: "#b45309",
+                    fontSize: "0.85rem",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {t("af.noDoctorForSpeciality")}
+                </p>
+              ) : null}
 
             </Col>
           </Row>

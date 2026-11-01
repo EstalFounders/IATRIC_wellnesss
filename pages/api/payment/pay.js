@@ -148,6 +148,10 @@ export default async function handler(req, res) {
       const cashfreeOrder = await createCashfreeOrder({
         orderId,
         amount,
+        orderTags: {
+          appointment_id: String(appointment._id),
+          consultation_type: appointment.consultationType,
+        },
         customerDetails,
       });
 

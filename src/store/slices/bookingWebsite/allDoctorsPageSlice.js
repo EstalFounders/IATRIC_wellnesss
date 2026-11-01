@@ -17,7 +17,16 @@ const initialState = {
   // Mirrors the thunk lifecycle so every consumer renders the same states.
   status: "idle", // idle | loading | succeeded | failed
   error: null,
+  // When the roster was last loaded from the API. The slice is persisted, so this
+  // survives reloads - a list restored from localStorage is immediately "stale"
+  // and is refreshed in the background (see `condition` below).
+  fetchedAt: null,
 };
+
+// How long a loaded roster is trusted before the next consumer mount refreshes it.
+// Short on purpose: the roster is small and a doctor added in the panel must show
+// up without the visitor clearing site data.
+const FRESH_FOR_MS = 60 * 1000;
 
 // The endpoint answers with an array today; the `{ doctors: [...] }` shape is
 // tolerated so an API tweak cannot blank the whole site.
@@ -36,16 +45,20 @@ let inFlight = false;
  * Loads the doctor roster into redux - cache first.
  *
  * `condition` is what makes every caller "check redux, then fall back to the
- * API": the request is skipped when the slice already holds a list, and a
- * second component mounting while a request is in flight joins that request
- * instead of firing its own. Pass `{ force: true }` for an explicit refresh.
+ * API": the request is skipped while the roster is still fresh, and a second
+ * component mounting while a request is in flight joins that request instead of
+ * firing its own. A roster restored from localStorage (or older than
+ * `FRESH_FOR_MS`) does *not* count as fresh, so the list self-heals on the next
+ * mount instead of staying frozen until someone clears site data. Pass
+ * `{ force: true }` for an explicit refresh (admin add/edit).
  */
 export const fetchAllDoctors = createAsyncThunk(
   "allDoctorsPage/fetchAllDoctors",
   async (_args, { rejectWithValue }) => {
     inFlight = true;
     try {
-      const response = await fetch(api.addDoctor);
+      // `no-store`: the roster must never come from the browser HTTP cache.
+      const response = await fetch(api.addDoctor, { cache: "no-store" });
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
@@ -60,7 +73,11 @@ export const fetchAllDoctors = createAsyncThunk(
     condition: (args, { getState }) => {
       if (inFlight) return false;
       if (args?.force) return true;
-      return !getState().allDoctorS?.allDoctors?.length;
+
+      const slice = getState().allDoctorS;
+      if (!slice?.allDoctors?.length) return true;
+
+      return Date.now() - (slice.fetchedAt || 0) > FRESH_FOR_MS;
     },
   }
 );
@@ -73,6 +90,7 @@ const allDoctorsPageSlice = createSlice({
       state.allDoctors = normalizeDoctors(action.payload);
       state.status = "succeeded";
       state.error = null;
+      state.fetchedAt = Date.now();
     },
     setDoctorInfo: (state, action) => {
       state.doctorInfo = action.payload;
@@ -90,6 +108,7 @@ const allDoctorsPageSlice = createSlice({
       .addCase(fetchAllDoctors.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.allDoctors = action.payload;
+        state.fetchedAt = Date.now();
       })
       .addCase(fetchAllDoctors.rejected, (state, action) => {
         state.status = "failed";

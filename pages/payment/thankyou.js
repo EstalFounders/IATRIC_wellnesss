@@ -45,6 +45,11 @@ const ThankYou = () => {
         setOrderInfo({
           orderId: data.orderId || orderId,
           amount: data.amount,
+          // Filled in once the payment is reconciled: the amount Cashfree
+          // actually collected and the offer that reduced it (null/0 if none).
+          amountAfterOffer: data.amountAfterOffer,
+          discountAmount: data.discountAmount,
+          offerCode: data.offerCode,
         });
 
         if (data.success && data.status === "PAID") {
@@ -223,7 +228,8 @@ const ThankYou = () => {
                   {orderInfo.orderId}
                 </span>
               </div>
-              {typeof orderInfo.amount === "number" && (
+              {typeof (orderInfo.amountAfterOffer ?? orderInfo.amount) ===
+                "number" && (
                 <div
                   style={{
                     display: "flex",
@@ -236,10 +242,29 @@ const ThankYou = () => {
                   </span>
                   <span style={{ color: "#1a202c", fontSize: 14, fontWeight: 600 }}>
                     {price_symbol}
-                    {orderInfo.amount}
+                    {orderInfo.amountAfterOffer ?? orderInfo.amount}
                   </span>
                 </div>
               )}
+              {typeof orderInfo.discountAmount === "number" &&
+                orderInfo.discountAmount > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "8px 0",
+                    }}
+                  >
+                    <span style={{ color: "#718096", fontSize: 14 }}>
+                      Offer
+                      {orderInfo.offerCode ? ` (${orderInfo.offerCode})` : ""}
+                    </span>
+                    <span style={{ color: "#2f855a", fontSize: 14, fontWeight: 600 }}>
+                      -{price_symbol}
+                      {orderInfo.discountAmount}
+                    </span>
+                  </div>
+                )}
             </div>
           )}
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>

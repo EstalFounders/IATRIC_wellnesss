@@ -125,6 +125,12 @@ export default async function handler(req, res) {
       const freshCashfreeOrder = await createCashfreeOrder({
         orderId: payment.orderId,
         amount: Number(payment.amount),
+        // Echoed back on the PAID webhook / order status, so a payment can be
+        // traced to its appointment without parsing our order-id format.
+        orderTags: {
+          appointment_id: String(appointment._id),
+          consultation_type: effectiveType,
+        },
         customerDetails: {
           customerId: `CUST_${appointment.patientMobNo || "NA"}`,
           customerName: appointment.name || "Patient",
@@ -191,6 +197,10 @@ export default async function handler(req, res) {
     const cashfreeOrder = await createCashfreeOrder({
       orderId,
       amount,
+      orderTags: {
+        appointment_id: String(appointment._id),
+        consultation_type: effectiveType,
+      },
       customerDetails,
     });
 

@@ -58,7 +58,15 @@ export function getCashfreeConfig() {
   return { clientId, clientSecret };
 }
 
-export async function createCashfreeOrder({ orderId, amount, customerDetails }) {
+export async function createCashfreeOrder({
+  orderId,
+  amount,
+  customerDetails,
+  // Optional tags echoed back on the order (and in the PAID webhook), used to
+  // tie a Cashfree order to our appointment - and to carry the offer code when
+  // one is known up front - without another lookup.
+  orderTags,
+}) {
   const { clientId, clientSecret } = getCashfreeConfig();
 
   // Public host used in the return/notify URLs below - these are where Cashfree
@@ -96,6 +104,10 @@ export async function createCashfreeOrder({ orderId, amount, customerDetails }) 
       notify_url: `https://${appBase}api/payment/webhook`,
     },
   };
+
+  if (orderTags && typeof orderTags === "object") {
+    body.order_tags = orderTags;
+  }
 
   const response = await fetch(`${CASHFREE_BASE_URL}/pg/orders`, {
     method: "POST",

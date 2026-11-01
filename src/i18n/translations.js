@@ -333,6 +333,8 @@ export const translations = {
     "af.consultType": "Consultation Type",
     "af.doctor": "Doctor",
     "af.anyDoctor": "Any Doctor",
+    "af.noDoctorForSpeciality":
+      "No doctor available for this speciality right now. Choose Any Doctor or call us.",
     "af.chooseDoctor": "Choose Doctor",
     "af.selectDoctor": "Select a doctor",
     "af.speciality": "Speciality",
@@ -724,6 +726,8 @@ export const translations = {
     "af.consultType": "परामर्श का प्रकार",
     "af.doctor": "डॉक्टर",
     "af.anyDoctor": "कोई भी डॉक्टर",
+    "af.noDoctorForSpeciality":
+      "अभी इस विशेषज्ञता के लिए कोई डॉक्टर उपलब्ध नहीं है। कोई भी डॉक्टर चुनें या हमें कॉल करें।",
     "af.chooseDoctor": "डॉक्टर चुनें",
     "af.selectDoctor": "डॉक्टर का चयन करें",
     "af.speciality": "विशेषज्ञता",
