@@ -2,11 +2,11 @@
 //
 // The one way components consume doctor data.
 //
-// Mount -> check redux -> only when the slice has no list (or a refresh is
-// forced) does `fetchAllDoctors` hit `GET /api/addDoctor` and store the answer.
+// Mount -> check redux -> the thunk fetches only when the slice is empty or the
+// cached roster is older than its freshness window, then stores the answer.
 // Because the guard lives in the thunk's `condition`, a page with ten doctor
-// widgets still performs a single request, and the cached list paints instantly
-// on the next visit.
+// widgets still performs a single request, the cached list paints instantly and a
+// doctor added in the panel shows up on the next visit without clearing storage.
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -43,9 +43,12 @@ export const useDoctors = ({ enabled = true, force = false } = {}) => {
 
   return {
     doctors,
+    // Only a cold start (nothing cached yet) counts as loading: a background
+    // revalidation must not flash a spinner over an already rendered roster.
     isLoading:
       enabled &&
-      (status === "loading" || (status === "idle" && doctors.length === 0)),
+      doctors.length === 0 &&
+      (status === "loading" || status === "idle"),
     error,
     isLoaded: doctors.length > 0,
     refetch,

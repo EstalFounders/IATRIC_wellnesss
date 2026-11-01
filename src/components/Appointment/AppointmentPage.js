@@ -748,7 +748,13 @@ const AppointmentPage = () => {
       <div className="container-fluid">
         <div className="row d-flex justify-content-center align-item-center">
           {/* SERVICE DETAILS */}
-          <div ref={appointmentFormRef}>
+          {/* `w-100`: the wrapper is a flex item of the row, so without a width the
+              card sized to its content and a long line (e.g. the "no doctor for
+              this speciality" hint) widened the whole form. */}
+          <div
+            ref={appointmentFormRef}
+            className="w-100 d-flex justify-content-center"
+          >
             <AppointmentForm
               appointmentState={appointmentState}
               setter={setter}
