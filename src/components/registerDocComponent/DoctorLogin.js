@@ -11,10 +11,18 @@ import CompanyLogo from "../../../public/images/company_logo.png";
 import styles from "./css/DoctorLogin.module.css"; // Import the CSS file
 import CustomDialog from "../CustomPopup";
 import { api, imageBlurDataUrl } from "../../constant";
+import {
+  INVALID_LOGIN_MESSAGE,
+  LOGIN_IDENTIFIER_LABEL,
+  parseLoginIdentifier,
+} from "../../lib/loginIdentifier";
 
 export default function DoctorLogin() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  // One field holds either the registered email or the registered mobile number.
+  const [identifier, setIdentifier] = useState("");
+  // Kept for the inline validation message of the identifier field.
+  const [identifierError, setIdentifierError] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -136,25 +144,39 @@ export default function DoctorLogin() {
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
     setError("");
+    setIdentifierError("");
 
+    // Accept a well-formed email OR a 10-digit mobile number before we touch
+    // the network; anything else is a typo, not a credentials problem.
+    const parsed = parseLoginIdentifier(identifier);
+    if (parsed.kind === "empty") {
+      setIdentifierError(`Please enter your ${LOGIN_IDENTIFIER_LABEL}`);
+      return;
+    }
+    if (parsed.kind === "invalid") {
+      setIdentifierError("Enter a valid email address or 10-digit mobile number");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await loginDoctor({ email, password });
+      const res = await loginDoctor({ identifier, password });
       if (res.ok) {
         router.push("/registerDoc/homepage");
       } else {
         // console.log(res.status, 'error message')
         setError(res.error);
-        handleShowDialog("Wrong Input, Please try again with the correct credentials");
-        setEmail("")
-        setPassword("")
+        handleShowDialog(INVALID_LOGIN_MESSAGE);
+        setIdentifier("");
+        setPassword("");
         setLoading(false);
       }
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again later.");
+      setLoading(false);
     }
   };
 
@@ -178,14 +200,36 @@ export default function DoctorLogin() {
             <div className={styles["login-center"]}>
               <h2>Welcome back!</h2>
               <h6>Please enter your details</h6>
-              <form onSubmit={handleSubmit} className={styles.form}>
+              <form onSubmit={handleSubmit} className={styles.form} noValidate>
                 <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  id="doctor-login-identifier"
+                  name="identifier"
+                  placeholder={LOGIN_IDENTIFIER_LABEL}
+                  aria-label={LOGIN_IDENTIFIER_LABEL}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  value={identifier}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    if (identifierError) setIdentifierError("");
+                  }}
                   className={styles.input}
+                  aria-invalid={Boolean(identifierError)}
+                  aria-describedby={
+                    identifierError ? "doctor-login-identifier-error" : undefined
+                  }
                 />
+                {identifierError && (
+                  <span
+                    id="doctor-login-identifier-error"
+                    role="alert"
+                    className={styles["login-error"]}
+                  >
+                    {identifierError}
+                  </span>
+                )}
                 <div className={styles["pass-input-div"]}>
                   <input
                     type={showPassword ? "text" : "password"}

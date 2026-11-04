@@ -5,6 +5,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import User from "../../../src/models/userModel";
 import Doctor from "../../../src/models/doctorModel";
 import {
+  INVALID_LOGIN_MESSAGE,
+  doctorLoginFilter,
+} from "../../../src/lib/loginIdentifier";
+import {
   getRequestOrigin,
   getSameSiteOrigin,
   isTrustedRedirectUrl,
@@ -49,18 +53,22 @@ const options = {
       id: "doctor-credentials",
       name: "Doctor Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        // One field for both: the value is resolved to an email or a mobile
+        // number by doctorLoginFilter (src/lib/loginIdentifier.js).
+        identifier: { label: "Email or Phone Number", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         await dbConnect().catch((err) => {
           throw new Error(err);
         });
-        const user = await Doctor.findOne({
-          email: credentials?.email,
-        }).select("+password");
+        const filter = doctorLoginFilter(credentials?.identifier);
+        if (!filter) {
+          throw new Error(INVALID_LOGIN_MESSAGE);
+        }
+        const user = await Doctor.findOne(filter).select("+password");
         if (!user) {
-          throw new Error("Invalid credentials");
+          throw new Error(INVALID_LOGIN_MESSAGE);
         }
         // Stored passwords are bcrypt hashes; compare against the hash only.
         const isPasswordCorrect = Boolean(
@@ -69,7 +77,7 @@ const options = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error("Invalid credentials");
+          throw new Error(INVALID_LOGIN_MESSAGE);
         }
 
         // Never let the password hash reach the JWT, session or browser storage.
@@ -82,7 +90,8 @@ const options = {
   pages: {
     signIn: {
       superAdmin: "/superAdmin/onload",
-      doctor: "/doctor/login",
+      // Real doctor login page is pages/registerDoc/login.js (there is no pages/doctor dir).
+      doctor: "/registerDoc/login",
     },
   },
   session: false,
