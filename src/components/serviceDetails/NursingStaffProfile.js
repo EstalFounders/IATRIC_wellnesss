@@ -74,7 +74,17 @@ const NursingStaffProfile = () => {
         <Grid container>
           <Grid item xs={12} md={4}>
             {member.profilePictureUrl ? (
-              <Box sx={{ position: "relative", height: "100%", minHeight: 320 }}>
+              // On phones the photo keeps a portrait ratio; from `md` up the
+              // column is as tall as the details beside it, so `height: 100%`
+              // governs and `cover` trims the sides instead of the head.
+              <Box
+                sx={{
+                  position: "relative",
+                  aspectRatio: { xs: "3 / 4", md: "auto" },
+                  height: { md: "100%" },
+                  minHeight: { xs: "auto", md: 360 },
+                }}
+              >
                 <Image
                   placeholder="blur"
                   blurDataURL={imageBlurDataUrl}
@@ -82,14 +92,15 @@ const NursingStaffProfile = () => {
                   alt={member.name}
                   fill
                   sizes="(max-width: 899px) 100vw, 400px"
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: "cover", objectPosition: "center 25%" }}
                 />
               </Box>
             ) : (
               <Box
                 sx={{
-                  height: "100%",
-                  minHeight: 320,
+                  aspectRatio: { xs: "3 / 4", md: "auto" },
+                  height: { md: "100%" },
+                  minHeight: { xs: "auto", md: 360 },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

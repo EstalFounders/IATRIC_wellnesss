@@ -333,6 +333,7 @@ const ManageStaffComp = () => {
                         width: 64,
                         height: 64,
                         objectFit: "cover",
+                        objectPosition: "center 20%",
                         borderRadius: "50%",
                       }}
                     />

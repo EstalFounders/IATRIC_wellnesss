@@ -115,23 +115,33 @@
     min-width: 0;
   }
 
-  /* Reserve exactly two lines for the qualifications text so a 1-line degree
-     ("MBBS") and a 2-line one occupy the same vertical space. */
+  /* Reserve exactly ONE line of the qualifications text so a 1-line degree
+     ("MBBS") and a truncated 5-degree string occupy the same vertical space. */
   .doctor-education .doctor-text {
-    min-height: 3em;
+    min-height: 1.5em;
+  }
+
+  /* Speciality and fees are single-line slots too: reserving the line keeps the
+     availability row and the CTA on the same baseline even when a doctor has no
+     fees configured. */
+  .doctor-speciality,
+  .doctor-fees {
+    min-height: 1.5em;
   }
 
   .education-more-btn--hidden {
     visibility: hidden;
   }
-  
+
+  /* One line + ellipsis; the "More" toggle below reveals the full string. */
   .doctor-text--clamped {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .education-more-btn {
     background: none;
     border: none;
@@ -157,10 +167,13 @@
     padding-top: 0.5rem;
   }
   
+  /* `margin-top: auto` pins the CTA to the card baseline: whatever height the
+     qualifications/fees block ends up at, every button in a row lines up. */
   .doctor-booking-section {
     display: flex;
     flex-direction: column;
-    margin-top: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
   }
 
   .doctor-booking-section .consultation-btn {

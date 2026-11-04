@@ -80,21 +80,30 @@ const NursingStaffSection = () => {
               }}
             >
               {member.profilePictureUrl ? (
-                <Box sx={{ position: "relative", height: 220, flexShrink: 0 }}>
+                // Compact portrait crop: tall enough to show the face properly,
+                // short enough that the card stays a card (a full 3:4 frame made
+                // the grid look like a gallery).
+                <Box
+                  sx={{
+                    position: "relative",
+                    height: 300,
+                    flexShrink: 0,
+                  }}
+                >
                   <Image
                     placeholder="blur"
                     blurDataURL={imageBlurDataUrl}
                     src={member.profilePictureUrl}
                     alt={member.name}
                     fill
-                    sizes="(max-width: 599px) 100vw, (max-width: 899px) 50vw, 360px"
-                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 599px) 100vw, (max-width: 899px) 50vw, 380px"
+                    style={{ objectFit: "cover", objectPosition: "center 25%" }}
                   />
                 </Box>
               ) : (
                 <Box
                   sx={{
-                    height: 220,
+                    height: 300,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

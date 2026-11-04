@@ -16,18 +16,30 @@ const DoctorCard = ({ doctor, index }) => {
   const dispatch = useDispatch();
   const { t } = useLanguage();
 
-  // Education line: clamped to two lines so the card keeps its height; a
-  // "More"/"Show less" toggle reveals the rest only when the text overflows.
+  // Education line: clamped to exactly one line so every card in the grid keeps
+  // the same height; a "More"/"Show less" toggle reveals the rest only when the
+  // text overflows (the button keeps its row even when hidden, so two cards side
+  // by side stay aligned).
   const educationLabel = formatEducationTrainingLabel(doctor.educationTraining);
+  const feesLabel = formatConsultationTypePrices(doctor.consultationType);
   const [educationExpanded, setEducationExpanded] = useState(false);
   const [educationOverflowing, setEducationOverflowing] = useState(false);
   const educationRef = useRef(null);
 
+  // Measured on mount and re-measured on resize: with a one-line clamp a narrower
+  // card can overflow where a wider one does not, so the toggle has to follow the
+  // real width. Nothing is measured while expanded (the text is not clamped then).
   useEffect(() => {
-    if (educationExpanded) return;
+    if (educationExpanded) return undefined;
     const el = educationRef.current;
-    if (!el) return;
-    setEducationOverflowing(el.scrollHeight > el.clientHeight + 1);
+    if (!el) return undefined;
+
+    const measure = () =>
+      setEducationOverflowing(el.scrollHeight > el.clientHeight + 1);
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, [educationLabel, educationExpanded]);
 
   const handleViewProfile = (doctor) => {
@@ -70,37 +82,39 @@ const DoctorCard = ({ doctor, index }) => {
         <h2 className={styles["new-doctor-name"]}>
           {doctorDisplayName(doctor.name)}
         </h2>
-        <p className={`${styles["doctor-text"]} ${styles["doctor-text--single"]}`}>
-          {doctor.speciality}
+        <p
+          className={`${styles["doctor-text"]} ${styles["doctor-text--single"]} ${styles["doctor-speciality"]}`}
+        >
+          {doctor.speciality || "\u00A0"}
         </p>
-        {educationLabel ? (
-          <div className={styles["doctor-education"]}>
-            <p
-              ref={educationRef}
-              className={`${styles["doctor-text"]} ${
-                educationExpanded ? "" : styles["doctor-text--clamped"]
-              }`}
-            >
-              {educationLabel}
-            </p>
-            <button
-              type="button"
-              className={`${styles["education-more-btn"]} ${
-                educationOverflowing ? "" : styles["education-more-btn--hidden"]
-              }`}
-              onClick={() => setEducationExpanded((prev) => !prev)}
-              aria-hidden={!educationOverflowing}
-              tabIndex={educationOverflowing ? 0 : -1}
-            >
-              {educationExpanded ? "Show less" : "More"}
-            </button>
-          </div>
-        ) : null}
-        {formatConsultationTypePrices(doctor.consultationType) ? (
-          <p className={`${styles["doctor-text"]} ${styles["doctor-text--single"]}`}>
-            {formatConsultationTypePrices(doctor.consultationType)}
+        {/* Always rendered: the slot (one line + the toggle row) is identical on
+            every card, so cards with 1 degree and cards with 5 line up. */}
+        <div className={styles["doctor-education"]}>
+          <p
+            ref={educationRef}
+            className={`${styles["doctor-text"]} ${
+              educationExpanded ? "" : styles["doctor-text--clamped"]
+            }`}
+          >
+            {educationLabel || "\u00A0"}
           </p>
-        ) : null}
+          <button
+            type="button"
+            className={`${styles["education-more-btn"]} ${
+              educationOverflowing ? "" : styles["education-more-btn--hidden"]
+            }`}
+            onClick={() => setEducationExpanded((prev) => !prev)}
+            aria-hidden={!educationOverflowing}
+            tabIndex={educationOverflowing ? 0 : -1}
+          >
+            {educationExpanded ? "Show less" : "More"}
+          </button>
+        </div>
+        <p
+          className={`${styles["doctor-text"]} ${styles["doctor-text--single"]} ${styles["doctor-fees"]}`}
+        >
+          {feesLabel || "\u00A0"}
+        </p>
         <div className={styles["patient-stories"]}>
           <div className={styles["availability-info"]}>
             <span className={styles["calendar-icon"]}>📅</span>{" "}
