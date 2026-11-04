@@ -25,7 +25,9 @@
     "db:update-service-desc": "node scripts/updateServiceOfferedDescription.js",
     "db:update-service-desc:apply": "node scripts/updateServiceOfferedDescription.js --apply",
     "db:set-slot-windows": "node scripts/setDoctorSlotWindows.js --env=production",
-    "db:set-slot-windows:apply": "node scripts/setDoctorSlotWindows.js --env=production --apply"
+    "db:set-slot-windows:apply": "node scripts/setDoctorSlotWindows.js --env=production --apply",
+    "db:empty-appointments": "node scripts/emptyAppointments.js --env=production",
+    "db:empty-appointments:apply": "node scripts/emptyAppointments.js --env=production --apply"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",

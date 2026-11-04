@@ -385,7 +385,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                                 fill
                                 draggable={false}
                                 sizes="(max-width: 575px) 92px, (max-width: 991px) 104px, 120px"
-                                style={{ objectFit: "cover" }}
+                                style={{ objectFit: "cover", objectPosition: "center 20%" }}
                               />
                             ) : (
                               <span className={styles.avatarFallback}>

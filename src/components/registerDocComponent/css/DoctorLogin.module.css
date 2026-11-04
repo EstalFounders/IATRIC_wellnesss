@@ -129,6 +129,17 @@ body {
   position: relative;
 }
 
+/* Inline validation message under the combined email/mobile field. It is a
+   <span> on purpose: `.login-center p` would blow it up to 2rem. */
+.login-error {
+  display: block;
+  color: #c62828;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: -10px 0 12px;
+  text-align: left;
+}
+
 /* Centred on the input's midline regardless of its padding, using the
    divider bottom margin (16px) to offset from the wrapper's box. */
 .pass-input-div svg {

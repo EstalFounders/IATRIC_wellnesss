@@ -13,10 +13,13 @@ export const loginUser = async ({ email, password }) => {
   return res;
 };
 
-export async function loginDoctor({ email, password }) {
+// The doctor login form has ONE field for either the registered email or the
+// registered mobile number; the server resolves it via
+// doctorLoginFilter (src/lib/loginIdentifier.js).
+export async function loginDoctor({ identifier, password }) {
   const res = await signIn("doctor-credentials", {
     redirect: false,
-    email,
+    identifier,
     password,
   });
 

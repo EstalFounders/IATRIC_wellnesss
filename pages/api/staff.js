@@ -89,7 +89,14 @@ export default async function handler(req, res) {
           const contentType =
             profilePictureFile.headers["content-type"] || "image/jpeg";
           const fileBuffer = fs.readFileSync(profilePictureFile.path);
-          const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700);
+          // Keep the whole frame: sharp's default `cover` crops the photo to a
+          // square, which permanently cuts the head/feet off a portrait and is exactly
+          // what the staff cards and the profile page then show. `inside` fits the long
+          // edge into 1200px and never crops.
+          const resizedImageBuffer = await resizeImage(fileBuffer, 1200, 1200, {
+            fit: "inside",
+            withoutEnlargement: true,
+          });
           await uploadBytes(profilePictureRef, resizedImageBuffer, {
             contentType,
           });
@@ -192,7 +199,14 @@ export default async function handler(req, res) {
           const contentType =
             profilePictureFile.headers["content-type"] || "image/jpeg";
           const fileBuffer = fs.readFileSync(profilePictureFile.path);
-          const resizedImageBuffer = await resizeImage(fileBuffer, 700, 700);
+          // Keep the whole frame: sharp's default `cover` crops the photo to a
+          // square, which permanently cuts the head/feet off a portrait and is exactly
+          // what the staff cards and the profile page then show. `inside` fits the long
+          // edge into 1200px and never crops.
+          const resizedImageBuffer = await resizeImage(fileBuffer, 1200, 1200, {
+            fit: "inside",
+            withoutEnlargement: true,
+          });
           await uploadBytes(profilePictureRef, resizedImageBuffer, {
             contentType,
           });
