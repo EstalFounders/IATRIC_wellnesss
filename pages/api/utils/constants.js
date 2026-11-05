@@ -36,4 +36,14 @@ export const SUPPORT_NOTIFICATION_PHONE_NUMBER = "8130654581";
 // Legacy alias kept for older imports; same recipient as the support number above.
 export const admin_callback_number = SUPPORT_NOTIFICATION_PHONE_NUMBER;
 
+// Testing switch for the "doctor added" credentials WhatsApp ONLY, i.e. the
+// message built with WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE ("doctor_credentials"
+// → FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID, sent by /api/addDoctor and the
+// sheet importer). While this holds a number, that one message is delivered here
+// instead of to the doctor's own mobile; the body still carries the doctor's
+// number and temp password. Every other WhatsApp/SMS template is unaffected.
+// Set to null (or DOCTOR_CREDENTIALS_OVERRIDE_NUMBER="") to restore delivery to
+// the real doctor — no code change needed.
+export const DOCTOR_CREDENTIALS_OVERRIDE_PHONE_NUMBER = "8130654581";
+
 export const IS_NOW = "Now";

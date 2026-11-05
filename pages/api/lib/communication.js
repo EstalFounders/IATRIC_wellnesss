@@ -1,16 +1,57 @@
 import { buildWhatsAppPayload } from "./model/smsTemplates";
 import fast2Sms from "@api/fast2sms";
+import {
+  DOCTOR_CREDENTIALS_OVERRIDE_PHONE_NUMBER,
+  WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE,
+} from "../utils/constants";
 
 fast2Sms.auth(process.env.FASTSMS_API_TOKEN);
+
+/**
+ * Testing switch: the "doctor added" credentials message
+ * (WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE / FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID)
+ * is delivered to DOCTOR_CREDENTIALS_OVERRIDE_PHONE_NUMBER instead of the
+ * doctor's own mobile. Nothing else is redirected — the caller passes the
+ * template, so the guard cannot leak into another message type.
+ *
+ * Normalisation is done inline (last 10 digits + 91) rather than importing
+ * formatPhoneNumber from utils/commonmethod, which would pull the mongoose
+ * models into every bundle that sends a WhatsApp message.
+ *
+ * @param {string} number - Caller's intended recipient, e.g. "919876543210"
+ * @returns {string} the override number, or `number` when the switch is off
+ */
+function redirectDoctorCredentials(number) {
+  const raw =
+    process.env.DOCTOR_CREDENTIALS_OVERRIDE_NUMBER ??
+    DOCTOR_CREDENTIALS_OVERRIDE_PHONE_NUMBER;
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  if (!digits) return number; // switch off → real doctor
+
+  const last10 = digits.slice(-10);
+  if (last10.length !== 10) return number; // misconfigured → real doctor
+  const target = `91${last10}`;
+
+  if (target !== number) {
+    console.log(
+      `[whatsapp] doctor-credentials redirected: ${number} -> ${target}`
+    );
+  }
+  return target;
+}
 
 /**
  * Sends a WhatsApp template message via Fast2SMS WhatsApp Business API.
  * Signature kept identical to the old implementation for zero caller changes.
  */
 export async function sendWhatsAppConfirmation(number, body, template) {
+  const recipient =
+    template === WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE
+      ? redirectDoctorCredentials(number)
+      : number;
   const { message_id, variables_values } = buildWhatsAppPayload(template, body);
   console.log("Built WhatsApp Payload:", { message_id, variables_values });
-  return sendWhatsApp(number, message_id, variables_values);
+  return sendWhatsApp(recipient, message_id, variables_values);
 }
 
 /**

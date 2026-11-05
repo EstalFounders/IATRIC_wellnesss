@@ -40,7 +40,9 @@ import { fetchAllDoctors } from "../../../store/slices/bookingWebsite/allDoctors
 /**
  * Fields that MUST be filled to register a doctor. Everything else on this form
  * (gender, education + training, price, doctor share, picture /
- * certificates / stamp / signature, slot times) is optional for now.
+ * certificates / signature, slot times) is optional for now. The prescription
+ * stamp is NOT collected here: it is generated at runtime from the doctor's
+ * name, expertise and registration number (lib/DoctorStampGenerator.js).
  * `consultationType` and `serviceOffered` cannot use HTML `required` because
  * their visible <select> always keeps `value=""`, so they are validated through
  * `selectedTypes` / `selectedService` in `handleSubmit` instead. `workDays` uses
@@ -94,7 +96,6 @@ const AddDoctorForm = () => {
   const dispatch = useDispatch();
   const [diplomasCertificates, setDiplomasCertificates] = useState([]);
   const [profilePicture, setprofilePicture] = useState("");
-  const [doctorStamp, setDoctorStamp] = useState("");
   const [doctorSignature, setDoctorSignature] = useState("");
   const [loader, setLoader] = useState(false);
   const [slotStartTime, setSlotStartTime] = useState("09:00");
@@ -275,7 +276,6 @@ const AddDoctorForm = () => {
     setWorkExperienceItems([""]);
     setLanguageItems([""]);
     setprofilePicture("");
-    setDoctorStamp("");
     setDoctorSignature("");
     setDiplomasCertificates([]);
     setSlotStartTime("09:00");
@@ -360,8 +360,6 @@ const AddDoctorForm = () => {
       setprofilePicture(newImages.length > 0 ? newImages[0] : "");
     } else if (id === "diplomasCertificates") {
       setDiplomasCertificates(newImages);
-    } else if (id === "doctorStamp") {
-      setDoctorStamp(newImages.length > 0 ? newImages[0] : "");
     } else if (id === "doctorSignature") {
       setDoctorSignature(newImages.length > 0 ? newImages[0] : "");
     }
@@ -453,7 +451,6 @@ const AddDoctorForm = () => {
     formData.append("doctorType", doctorDetails.doctorType);
     formData.append("slotStartTime", doctorDetails.slotStartTime);
     formData.append("slotEndTime", doctorDetails.slotEndTime);
-    formData.append("doctorStamp", doctorStamp);
     formData.append("doctorShare", doctorDetails.doctorShare);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
@@ -943,13 +940,13 @@ const AddDoctorForm = () => {
                 <FaFileUpload /> Documents &amp; media
               </h2>
               <p className={styles.hint}>
-                Optional, but certificates, the picture, the signature and the
-                stamp improve the prescription and the doctor profile. Any file
-                type is accepted - images are resized, documents are stored as
-                they are.
+                Optional, but certificates, the picture and the signature
+                improve the prescription and the doctor profile. Any file type
+                is accepted - images are resized, documents are stored as they
+                are.
               </p>
               <Row key={uploaderKey}>
-                <Col md={6}>
+                <Col md={4}>
                   <div className={styles.field}>
                     <span className={styles.label}>
                       Diplomas and Certificates
@@ -961,7 +958,7 @@ const AddDoctorForm = () => {
                     />
                   </div>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <div className={styles.field}>
                     <span className={styles.label}>Doctor Picture</span>
                     <ImageUploader
@@ -971,21 +968,11 @@ const AddDoctorForm = () => {
                     />
                   </div>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <div className={styles.field}>
                     <span className={styles.label}>Digital Signature</span>
                     <ImageUploader
                       id="doctorSignature"
-                      multiple={false}
-                      onImagesChange={handleImagesChange}
-                    />
-                  </div>
-                </Col>
-                <Col md={6}>
-                  <div className={styles.field}>
-                    <span className={styles.label}>Doctor Stamp</span>
-                    <ImageUploader
-                      id="doctorStamp"
                       multiple={false}
                       onImagesChange={handleImagesChange}
                     />
