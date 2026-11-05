@@ -42,11 +42,13 @@ const HeroGreetingComp = ({ doctor }) => {
     .map((word) => word[0].toUpperCase())
     .join("");
 
-  // The three fields the prescription prints and the profile form owns.
+  // The fields the prescription prints that the doctor profile form owns. The
+  // stamp is NOT one of them: it is generated at runtime from the name,
+  // expertise and registration number (lib/DoctorStampGenerator.js), so a
+  // doctor can never be "missing" it.
   const missing = [];
   if (!regNo) missing.push("registration number");
   if (!doctor.doctorSignatureUrl) missing.push("signature");
-  if (!doctor.doctorStampUrl) missing.push("stamp");
 
   return (
     <section className={styles.hero}>
