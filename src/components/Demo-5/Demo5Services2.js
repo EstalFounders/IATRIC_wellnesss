@@ -24,8 +24,11 @@ import {
   CardiologyIcon,
   Dentistry,
   DermatologistIcon,
+  ENTIcon,
   GeneralPhysician,
   GynaecologyIcon,
+  NeurologyIcon,
+  NutritionistDietitianIcon,
   NutritionistIcon,
   OphthalmologyIcon,
   OrthopaedicsIcon,
@@ -34,6 +37,10 @@ import {
   Psychiatrist,
   PulmonologyIcon,
 } from "../../../public/svgIcon/all-department-svg-icon";
+import {
+  normalizeDepartmentName,
+  resolveDepartmentIcon,
+} from "../Common/departmentIcons";
 
 // Name -> icon map so reordering or adding specialities in the DB can never
 // shift the wrong icon onto a card (previously index-based).
@@ -59,6 +66,16 @@ const ICON_BY_NAME = {
   "nutrition & dietetics": NutritionistIcon,
   dietetics: NutritionistIcon,
   diet: NutritionistIcon,
+  // specialities that only exist in the DB, so the keys above never matched
+  ent: ENTIcon,
+  "ent surgery": ENTIcon,
+  "ear nose throat": ENTIcon,
+  neurology: NeurologyIcon,
+  "neurology (brain & spine)": NeurologyIcon,
+  "neurology (brain and spine)": NeurologyIcon,
+  "brain & spine": NeurologyIcon,
+  "dietitian & nutritionist": NutritionistDietitianIcon,
+  "dietitian and nutritionist": NutritionistDietitianIcon,
   // service-type names (used if a MAJOR item is ever rendered here)
   labtest: GiErlenmeyer,
   "lab investigation": GiErlenmeyer,
@@ -143,7 +160,12 @@ const Demo5Services2 = () => {
   };
 
   const renderIcon = (name, index) => {
-    const Icon = ICON_BY_NAME[String(name || "").toLowerCase()] || FaStethoscope;
+    // exact name -> keyword resolver -> generic stethoscope, so a new speciality
+    // in the DB can never leave a card without an icon.
+    const Icon =
+      ICON_BY_NAME[normalizeDepartmentName(name)] ||
+      resolveDepartmentIcon(name) ||
+      FaStethoscope;
     return (
       <Icon
         size={80}
@@ -153,7 +175,7 @@ const Demo5Services2 = () => {
   };
 
   return (
-    <section className="services-section pb-70">
+    <section className="services-section services-section--speciality pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
@@ -189,9 +211,6 @@ const Demo5Services2 = () => {
                       </div>
                       <div className="service-title font-weight-bold">
                         {t(`service.${item.name}`, item.name)}
-                      </div>
-                      <div className="service-card-desc">
-                        {item.description || getServiceDescription(item.name)}
                       </div>
                     </div>
                   </div>

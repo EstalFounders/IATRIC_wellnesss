@@ -171,11 +171,39 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   formData.append("doctorType", editedDoctor.doctorType);
   formData.append("slotStartTime", editedDoctor.slotStartTime);
   formData.append("slotEndTime", editedDoctor.slotEndTime);
-  (editedDoctor.diplomasCertificatesUrls || []).forEach(
-    (certificate, index) => {
-      formData.append(`diplomasCertificatesUrls[${index}]`, certificate);
+  // Certificates travel as two different multipart parts:
+  //   * a stored Firebase URL -> `diplomasCertificatesUrls[i]` text field (the
+  //     list the admin kept), and
+  //   * a newly picked File    -> `diplomasCertificates[i]` file part, which the
+  //     API uploads and appends to that list.
+  // The blank `diplomasCertificatesUrls` marker is ALWAYS sent: without it the API
+  // cannot tell "this request says nothing about certificates" from "the admin
+  // deleted every certificate", and deleting the LAST one was silently ignored -
+  // the stored path stayed in MongoDB and the file stayed in Firebase Storage.
+  const keptCertificateUrls = [];
+  const pickedCertificateFiles = [];
+  (editedDoctor.diplomasCertificatesUrls || []).forEach((entry) => {
+    if (isFile(entry)) {
+      pickedCertificateFiles.push(entry);
+      return;
     }
-  );
+    const url = typeof entry === "string" ? entry.trim() : "";
+    if (url) keptCertificateUrls.push(url);
+  });
+
+  keptCertificateUrls.forEach((certificate, index) => {
+    formData.append(`diplomasCertificatesUrls[${index}]`, certificate);
+  });
+  if (keptCertificateUrls.length === 0) {
+    formData.append("diplomasCertificatesUrls", "");
+  }
+  pickedCertificateFiles.forEach((file, index) => {
+    formData.append(
+      `diplomasCertificates[${index}]`,
+      file,
+      file.name || `certificate-${index + 1}`
+    );
+  });
 
   const response = await fetch(`${api.addDoctor}?id=${editedDoctor._id}`, {
     method: "PUT",

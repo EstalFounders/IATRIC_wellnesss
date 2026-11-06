@@ -355,7 +355,10 @@
 
 .service-card {
   flex: 0 0 auto;
-  width: 240px;
+  /* wide enough for the longest DB speciality name on one line (see
+     .service-title below): "Neurology (Brain & Spine)" measures ~242px at 21px
+     bold, and the card interior is width - 44px (20px padding + 2px border). */
+  width: 260px;
   height: 260px;
   margin: 0 12px;
   display: flex;
@@ -399,9 +402,17 @@
   transform: translateY(-6px) scale(1.03);
 }
 
+/* Marquee card interior. It used to be a fixed `height: 80%` (208px of the
+   260px card), but a card with the "Coming Soon" pill needs ~226px
+   (icon 120 + title line 32 + pill band 30 + 44 padding/border). A fixed box
+   made flexbox shrink the overflow away, and the title was the only child that
+   *could* shrink (`overflow: hidden` => `min-height: 0`), so it collapsed to a
+   ~14px slice and the service name looked missing. Growing the box instead of
+   squashing its content keeps every name readable. */
 .service-nav-link-dept {
   width: 100%;
-  height: 80%;
+  height: auto;
+  min-height: 80%;
   padding: 20px;
   border-radius: 20px;
   background-color: white;
@@ -423,11 +434,19 @@
   margin-bottom: 15px;
 }
 
+/* Service names are always one line: DB names like "Neurology (Brain & Spine)"
+   or "Dietitian & Nutritionist" must not wrap onto a second line and push the
+   icon/description around. `nowrap` guarantees the single line, `ellipsis` is
+   only the guard for a name longer than the card interior. */
 .service-title {
   font-size: 21px;
   text-align: center;
   color: var(--color-primary);
   transition: color 0.3s ease;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .service-title-dept {
@@ -435,10 +454,30 @@
   text-align: center;
   color: var(--color-secondary);
   transition: color 0.3s ease;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Never let an extra row (the "Coming Soon" band) squeeze the title: it is
+     the only child with `min-height: 0`, so it would absorb all the shrink. */
+  flex: 0 0 auto;
 }
 
 .service-nav-link:hover .service-title {
   color: white;
+}
+
+/* Demo-5 specialities are DB driven, so titles can be long ("Dietitian &
+   Nutritionist", "Neurology (Brain & Spine)"). The card is widened and the
+   title kept on a single line (see .service-title) so those names fit instead
+   of wrapping onto a second line. */
+.services-section--speciality .service-card {
+  width: 280px;
+}
+
+.services-section--speciality .service-title {
+  font-size: 19px;
+  line-height: 1.25;
 }
 
 
