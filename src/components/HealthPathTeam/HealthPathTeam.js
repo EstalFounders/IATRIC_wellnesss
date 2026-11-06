@@ -7,10 +7,14 @@ import React, {
   useState,
 } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 import { api, booking_btn_txt, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useDoctors } from "../../customUtils/useDoctors";
 import { doctorDisplayName } from "../../utils/doctorName";
+import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import styles from "./HealthPathTeam.module.css";
 
 // Horizontal speed of the strip. Constant in px/second (not "one pass per N
@@ -66,6 +70,8 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
   // The doctor half of the strip comes from the shared redux roster (cache first,
   // the API is only hit when the slice is still empty).
   const { doctors, isLoading: doctorsLoading } = useDoctors();
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [staff, setStaff] = useState([]);
   const [staffLoading, setStaffLoading] = useState(true);
 
@@ -126,6 +132,12 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
         profilePictureUrl: doctor.profilePictureUrl,
         // Book this specific doctor (same deep-link as DoctorCard).
         bookNowHref: `/appointment?doctorId=${doctor._id}`,
+        // Tapping the card (anywhere but "Book Now") opens the profile. There is
+        // no `/doctor/[id]` route: the page renders `state.allDoctorS.doctorInfo`,
+        // so the raw document is kept here and dispatched on click - exactly what
+        // DoctorCard's "View Profile" does.
+        profileHref: "/doctor-info",
+        source: doctor,
       }));
 
     const staffCards = staff
@@ -144,10 +156,33 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
         bookNowHref: `/service-details?name=${encodeURIComponent(
           "Nursing Care"
         )}&Service=nursing-services`,
+        // Nurses do have a real dynamic profile page, so this link navigates by
+        // itself - no redux hop needed.
+        profileHref: `/nursing-staff/${member._id}`,
+        source: member,
       }));
 
     return [...doctorCards, ...staffCards];
   }, [doctors, staff]);
+
+  // Card click (anywhere except the "Book Now" CTA) opens the profile. Staff are
+  // handled by their Link; a doctor profile is redux driven, so the document has
+  // to be dispatched before the push.
+  const openDoctorProfile = useCallback(
+    (event, member) => {
+      if (member.type !== "doctor") return;
+
+      // Keep the native anchor from navigating before the store is filled.
+      event.preventDefault();
+
+      // Signatures/stamps never belong on the public profile page.
+      const { doctorSignatureUrl, doctorStampUrl, ...profile } =
+        member.source || {};
+      dispatch(setDoctorInfo(profile));
+      router.push(member.profileHref);
+    },
+    [dispatch, router]
+  );
 
   // Writes the cached offset to the track. Called from the rAF loop and from the
   // drag handlers; kept outside React state so a 60fps tick never re-renders.
@@ -375,31 +410,56 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                         key={`${member.type}-${member.id}`}
                       >
                         <div className={styles.teamCardInner}>
-                          <div className={styles.avatar}>
-                            {member.profilePictureUrl ? (
-                              <Image
-                                placeholder="blur"
-                                blurDataURL={imageBlurDataUrl}
-                                src={member.profilePictureUrl}
-                                alt={member.name}
-                                fill
-                                draggable={false}
-                                sizes="(max-width: 575px) 92px, (max-width: 991px) 104px, 120px"
-                                style={{ objectFit: "cover", objectPosition: "center 20%" }}
-                              />
-                            ) : (
-                              <span className={styles.avatarFallback}>
-                                {(member.name || "?").charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                          {/* Everything above "Book Now" opens the profile: the
+                              link stretches over the card's free space, so the
+                              whole card is the tap target except the CTA. */}
+                          <Link
+                            href={member.profileHref}
+                            className={styles.profileLink}
+                            // A native link drag would fight the strip's own
+                            // pointer drag.
+                            draggable={false}
+                            // Clone copies are aria-hidden, so keep them out of
+                            // the tab order as well.
+                            tabIndex={copyIndex > 0 ? -1 : undefined}
+                            onClick={
+                              member.type === "doctor"
+                                ? (event) => openDoctorProfile(event, member)
+                                : undefined
+                            }
+                          >
+                            <div className={styles.avatar}>
+                              {member.profilePictureUrl ? (
+                                <Image
+                                  placeholder="blur"
+                                  blurDataURL={imageBlurDataUrl}
+                                  src={member.profilePictureUrl}
+                                  alt={member.name}
+                                  fill
+                                  draggable={false}
+                                  sizes="(max-width: 575px) 92px, (max-width: 991px) 104px, 120px"
+                                  style={{
+                                    objectFit: "cover",
+                                    objectPosition: "center 20%",
+                                  }}
+                                />
+                              ) : (
+                                <span className={styles.avatarFallback}>
+                                  {(member.name || "?").charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
 
-                          <div className={styles.name} title={member.name}>
-                            {member.name}
-                          </div>
-                          <div className={styles.service} title={member.serviceLabel}>
-                            {member.serviceLabel}
-                          </div>
+                            <div className={styles.name} title={member.name}>
+                              {member.name}
+                            </div>
+                            <div
+                              className={styles.service}
+                              title={member.serviceLabel}
+                            >
+                              {member.serviceLabel}
+                            </div>
+                          </Link>
 
                           <div className={styles.bookNowWrap}>
                             <ConsultationButton path={member.bookNowHref}>

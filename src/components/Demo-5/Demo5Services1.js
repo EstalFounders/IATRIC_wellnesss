@@ -224,14 +224,16 @@ const Demo5Services1 = () => {
                         <div className="service-title-dept font-weight-bold">
                           {serviceTitle(item)}
                         </div>
-                        {isComingSoonService(item.name || item.title) ? (
-                          <div className="service-coming-soon">
-                            {t("common.comingSoon")}
-                          </div>
-                        ) : null}
-                        <div className="service-card-desc">
-                          {item.description ||
-                            getServiceDescription(item.name || item.title)}
+                        {/* Reserved band on *every* card (empty when the
+                            service is live) so a card with the pill is exactly
+                            as tall as one without it - see
+                            `.service-coming-soon-slot` in customStyle.css. */}
+                        <div className="service-coming-soon-slot">
+                          {isComingSoonService(item.name || item.title) ? (
+                            <div className="service-coming-soon">
+                              {t("common.comingSoon")}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     </div>

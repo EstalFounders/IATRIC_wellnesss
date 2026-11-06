@@ -9,6 +9,14 @@ import { AllDepartmentService } from "../../../data/services";
 import { GeneralPhysician } from "../../../public/svgIcon/all-department-svg-icon";
 import { ConsultationButton } from "../Common/commonUi";
 import { mergeServiceLists, useGlobalData } from "../../customUtils/useGlobalData";
+import { resolveDepartmentIcon } from "../Common/departmentIcons";
+
+// The static list already ships an icon per name; the DB can add specialities it
+// does not know (ENT, Neurology, Dietitian & Nutritionist), so fall back to the
+// keyword resolver before the generic doctor icon.
+const renderServiceIcon = (service) =>
+  service.icon ||
+  React.createElement(resolveDepartmentIcon(service.title) || GeneralPhysician);
 
 const AllDepartmentServices7 = () => {
   // Single source of truth: globalData slice speciality list; icon/description
@@ -69,7 +77,7 @@ const AllDepartmentServices7 = () => {
                           // backgroundColor: `${color_schema.yellow}`,
                         }}
                       >
-                        {service.icon || <GeneralPhysician />}
+                        {renderServiceIcon(service)}
                       </div>
 
                       {/* Text content with hover-only effect */}

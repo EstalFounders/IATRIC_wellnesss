@@ -5,6 +5,7 @@ import {
   doctorSignature_img_path,
   doctorStamp_img_path,
   profilePicture_img_path,
+  storage_bucket_url,
 } from "../../src/constant";
 import { storage } from "../../lib/firebase";
 import {
@@ -33,6 +34,10 @@ import { logErrorToGoogleSheet } from "./helper";
 import {
   isResizableImage,
 } from "../../src/customUtils/imageUpload";
+import {
+  firebaseBucketName,
+  firebaseStoragePathFromUrl,
+} from "../../src/customUtils/firebaseStoragePath";
 
 // Global variable to store the database connection
 let isConnected = false;
@@ -50,6 +55,70 @@ function stripRemovedDoctorFields(fields) {
   const cleaned = { ...fields };
   for (const field of REMOVED_DOCTOR_FIELDS) delete cleaned[field];
   return cleaned;
+}
+
+/**
+ * Firebase Storage deletes for the files a doctor no longer references
+ * (a removed diploma/certificate, a replaced profile picture, the stamp or the
+ * signature of a deleted doctor).
+ *
+ * Why the Admin SDK: uploads/deletes in this route use the public web SDK, so a
+ * delete is only allowed when the Storage rules allow `delete` on that path. The
+ * Admin SDK bypasses the rules entirely (it authenticates with the service
+ * account from .env), which is what makes the cleanup reliable - a removed
+ * certificate must not stay in the bucket because of a rules quirk. The web SDK
+ * `deleteObject` stays as the fallback for environments without the service
+ * account (local dev, previews).
+ *
+ * A stored field may hold a Firebase download URL, a gs:// reference or a bare
+ * object path; `firebaseStoragePathFromUrl` resolves all three. Anything else
+ * (a /public asset, an external link) is skipped - the object is not ours.
+ */
+const STORAGE_BUCKET_NAME =
+  firebaseBucketName(storage_bucket_url) || "iatrichealthcare-998f5.appspot.com";
+
+let adminBucketPromise = null;
+function getAdminStorageBucket() {
+  if (!adminBucketPromise) {
+    adminBucketPromise = import("../../lib/firebaseAdmin")
+      .then(({ default: admin }) => admin.storage().bucket(STORAGE_BUCKET_NAME))
+      .catch((error) => {
+        // No service account configured - allow a retry on the next request.
+        adminBucketPromise = null;
+        throw error;
+      });
+  }
+  return adminBucketPromise;
+}
+
+/**
+ * Delete one Storage object referenced by a stored URL. Never throws: the caller
+ * is completing a DB write that has already succeeded, so a failed cleanup is
+ * logged and reported (returns false) only.
+ */
+async function deleteStoredFirebaseObject(url, label = "file") {
+  const path = firebaseStoragePathFromUrl(url);
+  if (!path) return false; // not a Firebase object - nothing to delete
+
+  try {
+    const bucket = await getAdminStorageBucket();
+    await bucket.file(path).delete({ ignoreNotFound: true });
+    console.log(`Deleted ${label} from Storage: ${path}`);
+    return true;
+  } catch (adminError) {
+    try {
+      await deleteObject(ref(storage, url));
+      console.log(`Deleted ${label} from Storage (web SDK): ${path}`);
+      return true;
+    } catch (error) {
+      console.error(
+        `Could not delete ${label} "${path}" from Storage:`,
+        error.message,
+        `(admin bucket unavailable: ${adminError.message})`
+      );
+      return false;
+    }
+  }
 }
 
 /**
@@ -631,38 +700,10 @@ export default async function handler(req, res) {
               ];
         console.log(diplomasCertificatesUrls, "diplomas");
 
-        // Delete old profile picture from Firebase if a new one is uploaded and it's different from the existing one
-        if (
-          profilePictureFile &&
-          existingDoctor.profilePictureUrl &&
-          profilePictureUrl !== existingDoctor.profilePictureUrl
-        ) {
-          try {
-            const oldProfilePictureRef = ref(
-              storage,
-              existingDoctor.profilePictureUrl
-            );
-            await deleteObject(oldProfilePictureRef);
-            console.log("deleted old profile picture");
-          } catch (error) {
-            // The stored URL may be a legacy/external link - the new picture is
-            // already saved, so a failed cleanup must not fail the request.
-            console.error("Could not delete the old profile picture:", error.message);
-          }
-        }
-
-        // Delete the certificates the admin/doctor removed. Only URLs that were
-        // stored before and are no longer part of the list are touched, so adding
-        // a certificate never deletes the existing ones.
-        for (const oldUrl of existingDoctor.diplomasCertificatesUrls || []) {
-          if (diplomasCertificatesUrls.includes(oldUrl)) continue;
-          try {
-            await deleteObject(ref(storage, oldUrl));
-          } catch (error) {
-            console.error("Could not delete a removed certificate:", error.message);
-          }
-        }
-        console.log("deleted removed diplomas");
+        // Storage cleanup for the files this save removes (old photo, removed
+        // certificates) runs AFTER the MongoDB write below succeeds: a rejected
+        // save (duplicate email, validation) must never delete a file the stored
+        // document still references.
 
         // Update doctor data in MongoDB
         const stringFields = Object.fromEntries(
@@ -771,6 +812,27 @@ export default async function handler(req, res) {
         }
         console.log(updatedDoctor, "updated doctor");
 
+        // The document is saved: now delete the Storage objects it no longer
+        // references (never throws - a failed cleanup cannot undo the save).
+        if (
+          profilePictureFile &&
+          existingDoctor.profilePictureUrl &&
+          profilePictureUrl !== existingDoctor.profilePictureUrl
+        ) {
+          await deleteStoredFirebaseObject(
+            existingDoctor.profilePictureUrl,
+            "old profile picture"
+          );
+        }
+
+        // Certificates the admin removed: the stored URLs that are no longer in
+        // the saved list. Adding a certificate never deletes the existing ones.
+        for (const oldUrl of existingDoctor.diplomasCertificatesUrls || []) {
+          if (diplomasCertificatesUrls.includes(oldUrl)) continue;
+          await deleteStoredFirebaseObject(oldUrl, "removed certificate");
+        }
+        console.log("deleted removed diplomas");
+
         res.status(200).json({ success: true });
       });
     } catch (error) {
@@ -807,34 +869,23 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: "Doctor not found" });
       }
 
-      // Code to delete profile picture from Google Storage, if any
-      if (doctor.profilePictureUrl) {
-        const oldProfilePictureRef = ref(storage, doctor.profilePictureUrl);
-        await deleteObject(oldProfilePictureRef);
-      }
-      console.log("deleted old profile picture");
+      // Delete the doctor's files from Google Storage. Awaited one by one (an
+      // un-awaited `forEach(async …)` returned the response before the uploads
+      // were removed, so serverless could terminate mid-cleanup).
+      await deleteStoredFirebaseObject(doctor.profilePictureUrl, "profile picture");
 
-      // Iterate over the URLs of the diplomas and certificates and delete each image from Google Storage
-      doctor.diplomasCertificatesUrls.forEach(async (url) => {
-        const oldCertificateRef = ref(storage, url);
-        console.log(doctor.diplomasCertificatesUrls, "doctor diplomaster url");
-        console.log(doctor.diplomasCertificatesUrls, "doctor diplomaster url");
-        console.log(oldCertificateRef, "oldcertificate", url, "url");
-        await deleteObject(oldCertificateRef);
-      });
+      for (const url of doctor.diplomasCertificatesUrls || []) {
+        await deleteStoredFirebaseObject(url, "certificate");
+      }
 
       console.log("deleted diplomasCertificatesUrls diploamas");
 
       // Delete other associated files like doctor stamp and signature
-      if (doctor.doctorStampUrl) {
-        const oldProfilePictureRef = ref(storage, doctor.doctorStampUrl);
-        await deleteObject(oldProfilePictureRef);
-      }
-
-      if (doctor.doctorSignatureUrl) {
-        const oldProfilePictureRef = ref(storage, doctor.doctorSignatureUrl);
-        await deleteObject(oldProfilePictureRef);
-      }
+      await deleteStoredFirebaseObject(doctor.doctorStampUrl, "doctor stamp");
+      await deleteStoredFirebaseObject(
+        doctor.doctorSignatureUrl,
+        "doctor signature"
+      );
 
       console.log("deleted old doctor signature");
 

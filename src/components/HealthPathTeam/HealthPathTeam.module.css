@@ -77,12 +77,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--card-pad-y) var(--card-pad-x);
+  padding: 0;
   background-color: #ffffff;
   border: 2px solid #ffffff;
   border-radius: 20px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  /* The padding moved onto the two children (.profileLink / .bookNowWrap) so the
+     profile link covers the whole card above the CTA - a click on the old padding
+     ring would otherwise hit the card and do nothing. */
 }
 
 .teamCardInner:hover {
@@ -143,10 +146,34 @@
   -webkit-box-orient: vertical;
 }
 
+/* The whole card except the "Book Now" CTA opens the profile. The link is the
+   first child of the column and grows into the free space above the button
+   (`flex: 1`), so the tap target is the card body - the fixed card height and the
+   fixed avatar/name/service slots stay exactly as they were. */
+.profileLink {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+  padding: var(--card-pad-y) var(--card-pad-x) 0;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.profileLink:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
 .bookNowWrap {
   width: 100%;
   margin-top: auto;
-  padding-top: 12px;
+  /* Vertical padding of the card moved here (see `.teamCardInner`). */
+  padding: 12px var(--card-pad-x) var(--card-pad-y);
 }
 
 /* The shared CTA is sized for hero sections (up to 24px, nowrap). Inside a card

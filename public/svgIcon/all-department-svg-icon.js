@@ -718,6 +718,107 @@ export const NutritionistIcon = ({
   );
 };
 
+// ENT (ear, nose & throat). The ear rim is the Material "hearing" outline
+// (Apache-2.0), i.e. artwork react-icons/md already ships with this app, so it
+// keeps the filled currentColor look of the rest of this file. `scale(2)` maps
+// Material's 24px grid onto the 48px grid used by every icon here.
+export const ENTIcon = ({ className, width = 120, height = 120, ...props }) => {
+  return (
+    <svg
+      width={dimension.width}
+      height={dimension.height}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className} // Allows passing Tailwind or Bootstrap classes
+      {...props} // Pass any other SVG attributes
+    >
+      <g transform="scale(2)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M17 20c-.29 0-.56-.06-.76-.15-.71-.37-1.21-.88-1.71-2.38-.51-1.56-1.47-2.29-2.39-3-.79-.61-1.61-1.24-2.32-2.53C9.29 10.98 9 9.93 9 9c0-2.8 2.2-5 5-5s5 2.2 5 5h2c0-3.93-3.07-7-7-7S7 5.07 7 9c0 1.26.38 2.65 1.07 3.9.91 1.65 1.98 2.48 2.85 3.15.81.62 1.39 1.07 1.71 2.05.6 1.82 1.37 2.84 2.73 3.55A3.999 3.999 0 0 0 21 18h-2c0 1.1-.9 2-2 2M11.5 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0-5 0"
+          fill="currentColor" // Keeps it colorable via CSS 'color' property
+        />
+      </g>
+    </svg>
+  );
+};
+
+// Neurology: side view of the brain with its folds drawn as strokes (the fold
+// lines would be invisible as same-colour fills on top of a filled blob).
+export const NeurologyIcon = ({
+  className,
+  width = 120,
+  height = 120,
+  ...props
+}) => {
+  return (
+    <svg
+      width={dimension.width}
+      height={dimension.height}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className} // Allows passing Tailwind or Bootstrap classes
+      {...props} // Pass any other SVG attributes
+    >
+      <g
+        stroke="currentColor" // Keeps it colorable via CSS 'color' property
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M24.4 7.6C19 7.6 15 10.4 12.8 14.4 9.4 15.6 7.6 19.4 9.2 22.6 7.6 26 9.4 30 12.8 31 14 35 17.6 37.4 21.2 36.2 22.6 38.8 26 39.8 28.6 38.4 31.6 40 35.6 38.8 37.4 35.6 40.8 34.4 42.4 30.4 40.6 27.2 42.2 23.6 40.4 19.4 36.8 18.4 35.4 11.6 29.8 7.6 24.4 7.6Z" />
+        <path d="M22.8 8.6c-1.2 3.4-.8 7.2 1.2 10.2-2 3-2.4 6.8-1.2 10.2" />
+        <path d="M24 18.8c-3.8-1-7.8.8-9.4 4.4" />
+        <path d="M24 18.8c3.8-1 7.8.8 9.4 4.4" />
+        <path d="M24 29c-3.2-.8-6.6.6-8 3.6" />
+        <path d="M24 29c3.2-.8 6.6.6 8 3.6" />
+      </g>
+    </svg>
+  );
+};
+
+// Dietitian / nutritionist: a plate (ring) flanked by a fork and a knife.
+export const NutritionistDietitianIcon = ({
+  className,
+  width = 120,
+  height = 120,
+  ...props
+}) => {
+  return (
+    <svg
+      width={dimension.width}
+      height={dimension.height}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className} // Allows passing Tailwind or Bootstrap classes
+      {...props} // Pass any other SVG attributes
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M24 14.4a9.6 9.6 0 1 1 0 19.2 9.6 9.6 0 0 1 0-19.2Zm0 2.9a6.7 6.7 0 1 0 0 13.4 6.7 6.7 0 0 0 0-13.4Z"
+        fill="currentColor" // Keeps it colorable via CSS 'color' property
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6.6 13.3c0-.5.4-.9.9-.9s.9.4.9.9v7.1H6.6v-7.1ZM9.6 13.3c0-.5.4-.9.9-.9s.9.4.9.9v7.1H9.6v-7.1ZM12.6 13.3c0-.5.4-.9.9-.9s.9.4.9.9v7.1h-1.8v-7.1ZM6.6 20.4h7.8v2.4a3.9 3.9 0 0 1-7.8 0v-2.4ZM9.9 26.4h1.2v11.4a.6.6 0 0 1-1.2 0V26.4Z"
+        fill="currentColor"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M41.4 12.4c1.3 1.9 2 4.3 2 6.8 0 2.8-.9 5.3-2.4 7.3v10.3a1.2 1.2 0 0 1-2.4 0V12c1 0 2 .1 2.8.4Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 
 
 
