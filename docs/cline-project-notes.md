@@ -467,3 +467,12 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - **Marquee safety:** `draggable={false}` on the link (a native link drag would fight the strip's pointer drag) and `tabIndex={-1}` on the clone copies (they are `aria-hidden`). The existing capture-phase `handleClickCapture` already swallows the click after a drag, so a swipe never navigates.
 - Verified with `npx next lint` (0 errors) and a Playwright probe on `/`: card body → `/doctor-info` with the clicked doctor, staff card body → `/nursing-staff/<id>` with the clicked nurse, Book Now → `/appointment?doctorId=…`, drag-then-release → no navigation, Enter on a focused card → profile. The promo image modal that auto-opens on `/` covers the strip, so any click test must close it first.
 
+
+## Google Analytics 4 (`G-7HL3FQZ6QC`) — 2026-11-07
+
+- `src/components/Common/GoogleAnalytics.js` (rendered from `pages/_app.js`, right after `<PageStructuredData />`, outside `<NoSsr>`): two `next/script` `afterInteractive` tags — the `gtag.js` loader and the inline `gtag('js') / gtag('config')` init. That is the *only* GA4 code in the repo; `pages/_document.js` is untouched (raw `<script>` tags there are discouraged and render-blocking in Next).
+- **SPA page views:** GA4 only reports the URL of the initial load, so a `routeChangeComplete` handler sends `gtag("config", GA_MEASUREMENT_ID, { page_path: url })` for every client-side navigation — without it only landing pages would be counted.
+- **Skipped routes** (`SKIP_PREFIXES`): `/superAdmin`, `/marketing`, `/registerDoc`, `/meeting/` render no tag at all, so panel/meeting traffic never reaches the property.
+- Not done yet (deliberately): no `NEXT_PUBLIC_GA_ID` env indirection, **no dev/staging guard**, so `npm run dev` / staging visits do send hits to the same property; no consent gating (the project has no cookie banner); no custom events — `book_now_click` / appointment conversions are a later task.
+- Verified with `npx next lint` (0 errors) and a Playwright probe (GA requests blocked so no localhost hit was recorded): loader tag with the right ID + `window.gtag` present + initial `config` queued on `/`, a `config` with `page_path: "/about-us"` after a client-side navigation, and nothing at all on `/superAdmin/homepage`.
+

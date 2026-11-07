@@ -12,6 +12,7 @@ import { LanguageProvider } from "../src/i18n/LanguageContext";
 import LanguageToggle from "../src/components/Common/LanguageToggle";
 import SeoMetadata from "../src/marketing/components/SeoMetadata";
 import PageStructuredData from "../src/components/Common/PageStructuredData";
+import GoogleAnalytics from "../src/components/Common/GoogleAnalytics";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // TT Ramillas is the only brand typeface. This theme makes every MUI component
@@ -51,6 +52,9 @@ function MyApp({ Component, pageProps, router, ...rest }) {
       <SeoMetadata metadata={pageProps?.seoMetadata} />
       {/* Same reason: JSON-LD has to be in the HTML, not added after hydration. */}
       <PageStructuredData />
+      {/* GA4 (gtag.js). Kept outside <NoSsr> like the tags above so the loader
+          starts with the page instead of waiting for hydration. */}
+      <GoogleAnalytics />
       {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
