@@ -61,6 +61,37 @@ export function formatEducationTrainingLabel(value) {
   return parseEducationTraining(value).join(" · ");
 }
 
+// The credential sits before the institution ("MBBS - Johns Hopkins University",
+// "MD at AIIMS"); everything after the separator is the place, not the degree.
+const DEGREE_SEPARATOR = /\s+[-–—]\s+|\s+(?:from|at)\s+/i;
+
+/**
+ * Card-sized degree label: "MBBS, MD, DM".
+ *
+ * The roster cards in `HealthPathTeam` have room for exactly one short line, so
+ * only the credentials are printed (deduped, comma joined) and the institution
+ * is dropped. `formatEducationTrainingLabel` still returns the full text and is
+ * what the card puts in its `title` tooltip.
+ */
+export function formatDegreeLabel(value) {
+  const seen = new Set();
+
+  return parseEducationTraining(value)
+    .map((entry) =>
+      cleanEntry(String(entry).split(DEGREE_SEPARATOR)[0]).replace(
+        /[\s.,;·]+$/,
+        ""
+      )
+    )
+    .filter((entry) => {
+      const key = entry.toLowerCase();
+      if (!entry || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(", ");
+}
+
 /**
  * Appends the repeatable `educationTraining` fields to a FormData body — one
  * field per entry, because a comma-joined string would be ambiguous (a degree

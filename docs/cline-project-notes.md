@@ -469,6 +469,15 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - Verified with `npx next lint` (0 errors) and a Playwright probe on `/`: card body → `/doctor-info` with the clicked doctor, staff card body → `/nursing-staff/<id>` with the clicked nurse, Book Now → `/appointment?doctorId=…`, drag-then-release → no navigation, Enter on a focused card → profile. The promo image modal that auto-opens on `/` covers the strip, so any click test must close it first.
 
 
+## Expert-team cards: degree line under the speciality — 2026-11-11
+
+- `HealthPathTeam.js` now prints each doctor's **degrees** under the speciality line; the card keeps its fixed box (no `--card-h` change, CTA stays put).
+- **Source of truth:** the `degree` field no longer exists on the doctor model (see the doctor-module bullet above) — the label comes from `educationTraining` through the new `formatDegreeLabel()` in `src/customUtils/educationTraining.js` ("MBBS - Johns Hopkins University" → "MBBS"; deduped, comma joined → "MBBS, MD"). The full entry is the slot's `title` (`formatEducationTrainingLabel`).
+- **Layout safety:** `.degree` is a fixed **one-line** slot (`--degree-size`: 11.5px / 11 / 11 / 10.5 / 10 at the 1199/991/767/575 breakpoints, `height: calc(var(--degree-size) * 1.3)`, `nowrap` + `text-overflow: ellipsis`). It consumes the ~29–40px of slack that already existed between `.service` and the CTA, so long/missing degrees can never reflow a card. Staff cards render the slot empty (`\u00A0`) so doctor and nurse cards stay pixel-identical.
+- **More / Less:** `TeamCardDegree` measures the label (`scrollWidth > clientWidth + 1`, same trick as `DoctorCard`) and renders a small inline `More` button at the end of the line **only when it is truncated**; clicking it sets `expandedKeys` (a `Set` keyed by `member.key`, so all marquee copies expand together), the label wraps, `.teamCardExpanded { height: auto }` lets that one card grow downwards and the strip's content-driven height follows it. Collapsed cards keep their fixed box. The toggle is measured/re-rendered only while absent, which avoids a width/visibility feedback loop, and its click is `preventDefault` + `stopPropagation` so the card's profile `<Link>` does not open. The strip pauses while any card is expanded (touch has no hover pause).
+- Verified with `npx next lint` (0 errors) and a node probe of `formatDegreeLabel` (arrays, legacy newline/semicolon text, empty/null, duplicates).
+
+
 ## Google Analytics 4 (`G-7HL3FQZ6QC`) — 2026-11-07
 
 - `src/components/Common/GoogleAnalytics.js` (rendered from `pages/_app.js`, right after `<PageStructuredData />`, outside `<NoSsr>`): two `next/script` `afterInteractive` tags — the `gtag.js` loader and the inline `gtag('js') / gtag('config')` init. That is the *only* GA4 code in the repo; `pages/_document.js` is untouched (raw `<script>` tags there are discouraged and render-blocking in Next).

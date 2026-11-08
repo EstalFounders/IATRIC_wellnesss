@@ -14,6 +14,10 @@ import { api, booking_btn_txt, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useDoctors } from "../../customUtils/useDoctors";
 import { doctorDisplayName } from "../../utils/doctorName";
+import {
+  formatDegreeLabel,
+  formatEducationTrainingLabel,
+} from "../../customUtils/educationTraining";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import styles from "./HealthPathTeam.module.css";
 
@@ -46,6 +50,92 @@ const formatServiceOffered = (member) => {
     return oneLine(offered || member.expertise || "Doctor Consultation");
   }
   return oneLine(member.jobTitle || "Nursing Care");
+};
+
+/**
+ * Degree line for a card.
+ *
+ * Doctors keep their degrees in the repeatable `educationTraining` field (the
+ * standalone `degree` field no longer exists), so the card prints just the
+ * credentials ("MBBS, MD") in one short line - the full entry, university
+ * included, is what `degreeTitle` puts in the tooltip. Nursing staff have no
+ * degrees on file, and every card still renders the slot (with a nbsp) so the
+ * fixed card box never reflows.
+ */
+const formatDegree = (member) => {
+  if (member.type !== "doctor") return { label: "", title: "" };
+  return {
+    label: oneLine(formatDegreeLabel(member.educationTraining)),
+    title: oneLine(formatEducationTrainingLabel(member.educationTraining)),
+  };
+};
+
+/**
+ * The degree line of a card.
+ *
+ * Collapsed it is exactly one line: the label is ellipsised and the "More"
+ * toggle sits at the end of that same line, so a long degree can never change
+ * the card's height. "More" is only rendered when the label really does not fit
+ * (measured the way `DoctorCard` measures its education line); clicking it grows
+ * the card to show the full entry and turns the label into "Less".
+ *
+ * The toggle lives inside the card's profile link - the whole card is one link -
+ * so its click is default-prevented and stopped: without that it would open the
+ * profile instead of expanding the text.
+ */
+const TeamCardDegree = ({ member, expanded, onToggle, inert = false }) => {
+  const textRef = useRef(null);
+  const [overflowing, setOverflowing] = useState(false);
+
+  // Measured only while collapsed and while the toggle is still absent: the
+  // toggle takes width away from the label, so measuring with it on screen would
+  // let the two states flip each other. Re-measured on resize because the card
+  // (and therefore the available width) changes with the breakpoint.
+  useEffect(() => {
+    if (expanded || overflowing) return undefined;
+
+    const element = textRef.current;
+    if (!element) return undefined;
+
+    const measure = () =>
+      setOverflowing(element.scrollWidth > element.clientWidth + 1);
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [expanded, overflowing, member.degreeLabel]);
+
+  return (
+    <div
+      className={`${styles.degreeRow} ${
+        expanded ? styles.degreeRowExpanded : ""
+      }`}
+    >
+      <div
+        ref={textRef}
+        className={`${styles.degree} ${expanded ? styles.degreeExpanded : ""}`}
+        title={expanded ? undefined : member.degreeTitle || undefined}
+      >
+        {member.degreeLabel || "\u00A0"}
+      </div>
+      {(overflowing || expanded) && (
+        <button
+          type="button"
+          className={styles.degreeToggle}
+          aria-expanded={expanded}
+          // Copies after the first are aria-hidden and out of the tab order.
+          tabIndex={inert ? -1 : undefined}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onToggle(member.key);
+          }}
+        >
+          {expanded ? "Less" : "More"}
+        </button>
+      )}
+    </div>
+  );
 };
 
 /**
@@ -87,8 +177,13 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
   const dragRef = useRef(null); // active pointer drag
   const hoveringRef = useRef(false); // pointer resting on the strip
   const suppressClickRef = useRef(false); // swallow the click after a drag
+  const expandedRef = useRef(false); // a card is showing its full degree
   const [copies, setCopies] = useState(2);
   const [isDragging, setIsDragging] = useState(false);
+  // Cards whose degree is expanded, keyed by `member.key`: the marquee renders
+  // the roster several times, and every copy of the same person has to open and
+  // close together (otherwise the identical copies would look different).
+  const [expandedKeys, setExpandedKeys] = useState(() => new Set());
 
   // Nursing staff list - the doctors come from redux via `useDoctors`.
   useEffect(() => {
@@ -120,36 +215,48 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
   const team = useMemo(() => {
     const doctorCards = doctors
       .filter((doctor) => doctor?.isActive !== false)
-      .map((doctor) => ({
-        id: doctor._id,
-        type: "doctor",
-        name: doctorDisplayName(doctor.name) || "Doctor",
-        serviceLabel: formatServiceOffered({
+      .map((doctor) => {
+        const degree = formatDegree({ ...doctor, type: "doctor" });
+        return {
+          id: doctor._id,
           type: "doctor",
-          serviceOffered: doctor.serviceOffered,
-          expertise: doctor.expertise,
-        }),
-        profilePictureUrl: doctor.profilePictureUrl,
-        // Book this specific doctor (same deep-link as DoctorCard).
-        bookNowHref: `/appointment?doctorId=${doctor._id}`,
-        // Tapping the card (anywhere but "Book Now") opens the profile. There is
-        // no `/doctor/[id]` route: the page renders `state.allDoctorS.doctorInfo`,
-        // so the raw document is kept here and dispatched on click - exactly what
-        // DoctorCard's "View Profile" does.
-        profileHref: "/doctor-info",
-        source: doctor,
-      }));
+          // Stable identity for the expand state, shared by the marquee's copies.
+          key: `doctor-${doctor._id}`,
+          name: doctorDisplayName(doctor.name) || "Doctor",
+          serviceLabel: formatServiceOffered({
+            type: "doctor",
+            serviceOffered: doctor.serviceOffered,
+            expertise: doctor.expertise,
+          }),
+          degreeLabel: degree.label,
+          degreeTitle: degree.title,
+          profilePictureUrl: doctor.profilePictureUrl,
+          // Book this specific doctor (same deep-link as DoctorCard).
+          bookNowHref: `/appointment?doctorId=${doctor._id}`,
+          // Tapping the card (anywhere but "Book Now") opens the profile. There is
+          // no `/doctor/[id]` route: the page renders `state.allDoctorS.doctorInfo`,
+          // so the raw document is kept here and dispatched on click - exactly what
+          // DoctorCard's "View Profile" does.
+          profileHref: "/doctor-info",
+          source: doctor,
+        };
+      });
 
     const staffCards = staff
       .filter((member) => member?.isActive !== false)
       .map((member) => ({
         id: member._id,
         type: "staff",
+        key: `staff-${member._id}`,
         name: doctorDisplayName(member.name) || "Staff",
         serviceLabel: formatServiceOffered({
           type: "staff",
           jobTitle: member.jobTitle,
         }),
+        // Nurses carry no degrees, but the slot still renders (nbsp) so every
+        // card in the strip keeps the same internal rhythm.
+        degreeLabel: "",
+        degreeTitle: "",
         profilePictureUrl: member.profilePictureUrl,
         // Nurses are not individually bookable today, so "Book Now" opens the
         // nursing care service page where the booking CTA lives.
@@ -164,6 +271,18 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
 
     return [...doctorCards, ...staffCards];
   }, [doctors, staff]);
+
+  // Open / close the full degree of one card. A Set keeps several cards open at
+  // once - collapsing someone else's text when the visitor opens another one
+  // would be surprising while the strip is sliding.
+  const toggleDegree = useCallback((key) => {
+    setExpandedKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   // Card click (anywhere except the "Book Now" CTA) opens the profile. Staff are
   // handled by their Link; a doctor profile is redux driven, so the document has
@@ -272,6 +391,20 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
     return () => window.cancelAnimationFrame(frame);
   }, [team.length, copies, paint]);
 
+  // An expanded degree has to be readable, and a touch screen never fires the
+  // "pointer is over the strip" pause - so the strip holds still while any card
+  // is open, and resumes with the normal hover rules once it is collapsed again.
+  const hasExpandedCard = expandedKeys.size > 0;
+  useEffect(() => {
+    expandedRef.current = hasExpandedCard;
+
+    if (hasExpandedCard) {
+      pausedRef.current = true;
+    } else if (!hoveringRef.current && !dragRef.current) {
+      pausedRef.current = false;
+    }
+  }, [hasExpandedCard]);
+
   // Stop ticking while the strip is off-screen (long homepage, phones).
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -339,9 +472,11 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
     dragRef.current = null;
     // Back to "paused only while hovered": after a mouse drag the cursor is often
     // still on the strip, and resuming there would slide the card away from the
-    // click the visitor is about to make.
+    // click the visitor is about to make. A card that is showing its full degree
+    // keeps the strip paused.
     pausedRef.current =
-      drag.pointerType === "mouse" ? hoveringRef.current : false;
+      expandedRef.current ||
+      (drag.pointerType === "mouse" ? hoveringRef.current : false);
     if (drag.captured) setIsDragging(false);
 
     if (drag.captured) {
@@ -380,13 +515,15 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
               }}
               onMouseLeave={() => {
                 hoveringRef.current = false;
-                if (!dragRef.current) pausedRef.current = false;
+                if (!dragRef.current) {
+                  pausedRef.current = expandedRef.current;
+                }
               }}
               onFocusCapture={() => {
                 pausedRef.current = true;
               }}
               onBlurCapture={() => {
-                pausedRef.current = hoveringRef.current;
+                pausedRef.current = hoveringRef.current || expandedRef.current;
               }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
@@ -406,8 +543,12 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                   >
                     {team.map((member) => (
                       <div
-                        className={styles.teamCard}
-                        key={`${member.type}-${member.id}`}
+                        className={`${styles.teamCard} ${
+                          expandedKeys.has(member.key)
+                            ? styles.teamCardExpanded
+                            : ""
+                        }`}
+                        key={member.key}
                       >
                         <div className={styles.teamCardInner}>
                           {/* Everything above "Book Now" opens the profile: the
@@ -459,6 +600,17 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                             >
                               {member.serviceLabel}
                             </div>
+                            {/* Degree line: always rendered - doctors print their
+                                credentials here ("MBBS, MD"), everyone else keeps
+                                the slot empty - so a card with degrees and a card
+                                without occupy the exact same box. A label that
+                                does not fit gets a "More" toggle. */}
+                            <TeamCardDegree
+                              member={member}
+                              expanded={expandedKeys.has(member.key)}
+                              onToggle={toggleDegree}
+                              inert={copyIndex > 0}
+                            />
                           </Link>
 
                           <div className={styles.bookNowWrap}>

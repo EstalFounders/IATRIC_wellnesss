@@ -4,9 +4,10 @@
  * Card + strip styles for the HealthPathTeam auto-scrolling roster.
  *
  * Two rules keep the strip tidy whatever the data looks like:
- *   1. the card is a fixed box - width, height and every text slot has a fixed
- *      height - so a one-line name and a two-line name produce the exact same
- *      card and nothing shifts between people;
+ *   1. the card is a fixed box - width, height and every text slot (name,
+ *      speciality, degree) has a fixed height - so a one-line name and a
+ *      two-line name produce the exact same card and nothing shifts between
+ *      people;
  *   2. every size is a custom property on `.marquee`, so the whole card scales
  *      as one unit at each breakpoint instead of drifting out of proportion.
  *
@@ -24,6 +25,7 @@
   --avatar-size: 120px;
   --name-size: 18px;
   --service-size: 14px;
+  --degree-size: 11.5px;
   --cta-size: 16px;
 
   position: relative;
@@ -94,6 +96,18 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
+/* A card whose degree label is expanded grows downwards to fit the whole label.
+   Its neighbours keep their fixed box; the strip's own height is content driven,
+   so the taller card is never cut off by `.marquee`'s overflow. Collapsing the
+   label puts the box back. */
+.teamCardExpanded {
+  height: auto;
+}
+
+.teamCardExpanded .teamCardInner {
+  height: auto;
+}
+
 .avatar {
   position: relative;
   width: var(--avatar-size);
@@ -144,6 +158,73 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+/* Degree line, directly under the speciality. Collapsed it is one fixed line:
+   the label is ellipsised and, only when it really does not fit, a small "More"
+   toggle appears at the end of that same line - so the card height (and the CTA
+   under it) never moves on its own. Clicking "More" lets the label wrap and the
+   card grows downwards (`.teamCardExpanded`); "Less" puts it back. */
+.degreeRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  width: 100%;
+  height: calc(var(--degree-size) * 1.3);
+  margin-top: 2px;
+}
+
+/* Expanded: the full label wraps over as many lines as it needs and the toggle
+   moves under it, so nothing is squeezed. */
+.degreeRowExpanded {
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+}
+
+.degree {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--degree-size);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.degreeExpanded {
+  width: 100%;
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+}
+
+.degreeToggle {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: calc(var(--degree-size) * 0.95);
+  font-weight: 700;
+  line-height: 1.3;
+  color: #6c757d;
+  text-decoration: underline;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.degreeToggle:hover {
+  color: var(--color-primary);
+}
+
+.degreeToggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* The whole card except the "Book Now" CTA opens the profile. The link is the
@@ -199,6 +280,7 @@
     --avatar-size: 112px;
     --name-size: 17px;
     --service-size: 13px;
+    --degree-size: 11px;
     --cta-size: 15px;
   }
 }
@@ -211,6 +293,7 @@
     --avatar-size: 104px;
     --name-size: 17px;
     --service-size: 13px;
+    --degree-size: 11px;
     --cta-size: 15px;
     --card-gap: 8px;
   }
@@ -226,6 +309,7 @@
     --avatar-size: 98px;
     --name-size: 16px;
     --service-size: 12.5px;
+    --degree-size: 10.5px;
     --cta-size: 14px;
     --card-gap: 8px;
     padding: 12px 0;
@@ -250,6 +334,7 @@
     --avatar-size: 90px;
     --name-size: 15px;
     --service-size: 12px;
+    --degree-size: 10px;
     --cta-size: 13px;
   }
 
