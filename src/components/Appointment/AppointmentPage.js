@@ -95,6 +95,9 @@ const AppointmentPage = () => {
   const [mobNo, setMobNo] = useState("");
   const [serviceTypeId, setServiceTypeId] = useState();
   const [consultationType, setConsultationType] = useState("");
+  // Speciality is a required choice and also narrows the doctor list, so it is
+  // owned here (not inside the form) - the booking guard below has to see it.
+  const [speciality, setSpeciality] = useState("");
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState(false);
   const [severity, setSeverity] = useState("info");
@@ -236,6 +239,7 @@ const AppointmentPage = () => {
     email,
     mobNo,
     consultationType,
+    speciality,
     consultationOptions,
     openSnackBar,
     snackBarMessage,
@@ -255,6 +259,7 @@ const AppointmentPage = () => {
     setName,
     setEmail,
     setMobNo,
+    setSpeciality,
     // Date picks go through here: a slot picked on the previous day is not
     // bookable on the new one, and the "when" must follow the reset.
     setSelectedDate: (date) => {
@@ -592,6 +597,13 @@ const AppointmentPage = () => {
   }, [selectedSlot]);
 
   const sendWhatsAppConfirmation = () => {
+    // Checked first: "All fields are required." would not tell the patient which
+    // dropdown still needs a value.
+    if (!speciality.trim()) {
+      setSnackBarMessage("Please select a speciality.");
+      handleOpenSnackBar();
+      return;
+    }
     if (
       !name.trim() ||
       !mobNo.trim() ||

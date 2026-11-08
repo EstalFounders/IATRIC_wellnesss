@@ -85,7 +85,7 @@ const Footer4 = () => {
                       className="instagramicon"
                       title="Instagram"
                       target="blank"
-                      href="https://www.instagram.com/iatric.healthcare/"
+                      href="https://www.instagram.com/healthpath.pvt/"
                     >
                       <FaInstagram size={40} color="#ffffff" />
                       <span className="mobiletext02">Instagram</span>

@@ -73,6 +73,10 @@ async function fillAppointmentFormFields(page: Page) {
   await page.getByLabel('Mobile Number', { exact: true }).fill(TEST_MOBILE);
   // Consultation type/service is fed from the live ServiceOffered collection.
   await page.locator(`label[id="consultation-${CONSULTATION_TYPE}"]`).click();
+  // Speciality is mandatory (the booking CTA refuses the request without one) and
+  // it also narrows the doctor list, so pick the first real option - index 0 is the
+  // "Select Speciality" placeholder.
+  await page.getByLabel('Speciality', { exact: true }).selectOption({ index: 1 });
 
   return form;
 }
@@ -280,7 +284,16 @@ test.describe('Appointment booking (sandbox payment)', () => {
     });
 
     // ── 2./3. Fill the form and select consultation type, date + slot ──
-    const form = await fillAppointmentForm(page);
+    // Speciality is required: the CTA must refuse an empty form and point at the
+    // dropdown instead of opening the OTP gate.
+    const form = page.locator('form.appointment-form');
+    await form.locator('.consultation-btn').click();
+    await expect(page.getByText('Please select a speciality.').first()).toBeVisible();
+    await expect(page.locator('form.appointment-form select.is-invalid')).toHaveCount(1);
+    await expect(page.getByText('Verification Code')).toHaveCount(0);
+    await expect(form.getByLabel('Speciality', { exact: true })).toHaveValue('');
+
+    await fillAppointmentForm(page);
     await expect(page.getByRole('radio', { name: CONSULTATION_TYPE })).toBeChecked();
     await expect(page.getByRole('radio', { name: 'Choose Time' })).toBeChecked();
 
