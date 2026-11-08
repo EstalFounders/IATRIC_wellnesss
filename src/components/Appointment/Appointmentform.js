@@ -72,10 +72,14 @@ const AppointmentForm = ({
   handleConsultationChange,
 }) => {
   const [selectedSymptom, setSelectedSymptom] = useState("");
-  const [specialityFilter, setSpecialityFilter] = useState("");
+  // The chosen speciality itself lives in the parent (it is a required field, so
+  // the booking guard in AppointmentPage.js has to see it); this flag only paints
+  // the dropdown red after an attempt to book without one.
+  const [specialityError, setSpecialityError] = useState(false);
   const { t } = useLanguage();
   // Single source of truth for the speciality list (globalData slice -> SUB items).
   const { specialityNames } = useGlobalData();
+  const specialityFilter = appointmentState.speciality || "";
   const handleDescriptionChange = (e) => setter.setSymptoms(e.target.value);
 
   // ToggleButtonGroup hands us the value directly (not an event).
@@ -102,9 +106,22 @@ const AppointmentForm = ({
     handleTimeSelection({ target: { value } });
 
   const handleSpecialityChange = (e) => {
-    setSpecialityFilter(e.target.value);
+    setter.setSpeciality ? setter.setSpeciality(e.target.value) : null;
+    setSpecialityError(false);
     // Reuse the parent's handler to fall back to "Any Doctor".
     handleDoctorChoiceChange({ target: { value: DOCTOR_CHOICE_ANY } });
+  };
+
+  // A speciality is mandatory, so the attempt is stopped here (the parent's own
+  // guard stays as a second line of defence) and the dropdown is marked invalid.
+  const handleBookClick = () => {
+    if (appointmentState.isLoading) return;
+    if (!specialityFilter.trim()) {
+      setSpecialityError(true);
+      return;
+    }
+    setSpecialityError(false);
+    sendWhatsAppConfirmation();
   };
 
   const handleDoctorChange = (e) => {
@@ -443,16 +460,22 @@ const AppointmentForm = ({
                     <Form.Control
                       as="select"
                       size="sm"
+                      required
+                      aria-required="true"
+                      isInvalid={specialityError}
                       value={specialityFilter}
                       onChange={handleSpecialityChange}
                     >
-                      <option value="">{t("af.allSpecialities")}</option>
+                      <option value="">{t("af.selectSpeciality")}</option>
                       {specialityOptions.map((speciality) => (
                         <option key={speciality} value={speciality}>
                           {speciality}
                         </option>
                       ))}
                     </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {t("af.selectSpecialityError")}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
                 <Col md={6} className={styles.field}>
@@ -539,9 +562,7 @@ const AppointmentForm = ({
             <ConsultationButton
               // ConsultationButton has no `disabled` prop, so keep the
               // double-submit guard while the booking request is in flight.
-              onClick={() =>
-                appointmentState.isLoading ? null : sendWhatsAppConfirmation()
-              }
+              onClick={handleBookClick}
             >
               {appointmentState.isLoading
                 ? t("af.loading")
