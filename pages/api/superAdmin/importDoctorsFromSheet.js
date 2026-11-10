@@ -21,6 +21,7 @@ import { WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE } from "../utils/constants";
 import { getDoctorCredentialsMessageBody } from "../utils/whatsappMessageBodies";
 import { formatPhoneNumber } from "../utils/commonmethod";
 import { getConfiguredAppUrl } from "../../../src/lib/appOrigin";
+import { generateSlotsForDoctor } from "../../../src/lib/slotGeneration";
 
 const SHEET_ID =
   process.env.DOCTOR_SHEET_ID ||
@@ -259,6 +260,16 @@ export default async function handler(req, res) {
 
         const created = await Doctor.create(doctor);
         row.set("Doctor ID", String(created._id));
+
+        // Same reason as Add Doctor: nothing else writes `slots` except the
+        // 00:00 cron, so an imported doctor would stay unbookable until then.
+        // Best-effort and not awaited - the import must keep going row by row.
+        generateSlotsForDoctor(created).catch((slotError) => {
+          console.error(
+            `Slot generation failed for imported doctor ${created._id}:`,
+            slotError?.message || slotError
+          );
+        });
         try {
           await row.save();
         } catch (saveError) {
