@@ -7,7 +7,9 @@ const ViewDoctorListComp = ({ doctors }) => {
   return (
     <div className={styles["view-doctor-list-container"]}>
         {console.log("Doctors in ViewDoctorListComp:", doctors.length, ' doctors.length')}
-      {doctors ? (
+      {/* An empty array is truthy, so `doctors ?` never reached the fallback and
+          a speciality without a doctor rendered a silently blank section. */}
+      {doctors?.length ? (
         doctors.map((doctor, index) => (
           <DoctorCard doctor={doctor} index={index} key={doctor._id} />
           
