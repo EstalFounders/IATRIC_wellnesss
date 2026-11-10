@@ -473,7 +473,15 @@ const AppointmentForm = ({
                         </option>
                       ))}
                     </Form.Control>
-                    <Form.Control.Feedback type="invalid">
+                    {/* `isInvalid` already flips the Bootstrap sibling rule
+                        (`.form-control.is-invalid ~ .invalid-feedback`), but that
+                        reveal depends on the combinator alone. `d-block` states the
+                        intent explicitly and wins even if a wrapper or another
+                        stylesheet ever changes the structure. */}
+                    <Form.Control.Feedback
+                      type="invalid"
+                      className={specialityError ? "d-block" : undefined}
+                    >
                       {t("af.selectSpecialityError")}
                     </Form.Control.Feedback>
                   </Form.Group>

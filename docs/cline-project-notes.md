@@ -506,3 +506,12 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - `src/components/Common/ViewDoctorListComp.js` used `doctors ? … : <p>No doctors available</p>`, but an empty array is truthy, so a speciality without a doctor rendered a silently blank section; the guard is now `doctors?.length`.
 - Verified: `npx next lint` clean; throwaway Playwright spec (deleted) 2/2 on Desktop Chrome — Neurology renders Salman + the collapsed heading, Dentistry shows "No doctors available" with no ENT leak.
 
+
+## Speciality error invisible to Playwright in Safari (2026-11-11)
+
+- **Symptom:** `tests/appointment.spec.ts:291` ("Please select a speciality." visible after the CTA click) failed on all four Safari projects during a full `npx playwright test` run (95 passed / 4 failed), yet passed on its own and on Chromium/Firefox. The message div resolved 30× but was reported hidden.
+- **Root cause (measured, not guessed):** a probe dumping the live DOM right after the failed click showed the app was correct — the `<select>` had `form-control form-control-sm is-invalid`, the message computed `display: block` / `visibility: visible`, and its siblings measured fine (`body` 1280×2979, select 225×46, CTA 213×50) — but the message itself returned `getBoundingClientRect()` 0×0 with `offsetParent: null`. Only the *reveal via the sibling combinator* is affected, only under the 9-project parallel load, and a reload-retry loop (90 s) did not recover it: WebKit simply never built a box for that element.
+- **Fix** in `src/components/Appointment/Appointmentform.js`: the feedback also gets Bootstrap's `d-block` while `specialityError` is set, so the reveal no longer depends on `.form-control.is-invalid ~ .invalid-feedback` alone (the red border still comes from `isInvalid`). Test left untouched — the spec keeps its plain, strict `toBeVisible()` assertion.
+- **Verified:** `npx next lint` clean (pre-existing `<img>` warnings only); full matrix `npx playwright test` → **99 passed (6.0m)**.
+- Dead ends worth remembering: a React-root "detached by Fast Refresh" theory (warming `/meeting/...` in `playwright.global-setup.ts`) was tried and reverted — it did not fix the failure and the two extra unmocked warm-up visits were unnecessary. `tests/e2e/meeting-url.spec.ts` "patient: exposes the full toolset" can flake once under the same load (Mobile Safari never showed `End Call`) and passes 3/3 on its own.
+
