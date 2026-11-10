@@ -30,6 +30,7 @@ import { resizeImage } from "../../src/components/Common/ResizeImage";
 import bcrypt from "bcryptjs";
 import { generateTempPassword } from "../../src/utils/generateTempPassword";
 import Slot from "../../src/models/slots";
+import { generateSlotsForDoctor } from "../../src/lib/slotGeneration";
 import { logErrorToGoogleSheet } from "./helper";
 import {
   isResizableImage,
@@ -516,6 +517,20 @@ export default async function handler(req, res) {
 
           console.log(addedDoctor._id, "Doctor Added");
 
+          // Slots are what make the doctor bookable: the panel reads them from
+          // `slots`, and nothing else generates them except the 00:00 cron, so
+          // without this call a doctor added today has an empty calendar until
+          // the next midnight run. Deliberately not awaited - the admin must not
+          // wait for ~300 upserts, and a failure is repaired by the next cron.
+          // `generateSlotsForDoctor` is idempotent, so this cannot duplicate rows
+          // if the cron runs at the same time.
+          generateSlotsForDoctor(addedDoctor).catch((slotError) => {
+            console.error(
+              `Slot generation failed for doctor ${addedDoctor._id}:`,
+              slotError?.message || slotError
+            );
+          });
+
           // Send the doctor their login credentials over WhatsApp. Best-effort:
           // a delivery failure must never fail the doctor creation.
           try {
@@ -811,6 +826,26 @@ export default async function handler(req, res) {
           throw error;
         }
         console.log(updatedDoctor, "updated doctor");
+
+        // A moved slot window only reaches the panel through the `slots` rows,
+        // which are otherwise written by the 00:00 cron: without this the doctor
+        // keeps the old hours for up to a day. Old-window rows already generated
+        // are left alone (the cron removes them once they are in the past); the
+        // new window is added, never awaited - the panel's save must not wait for
+        // hundreds of upserts.
+        const slotWindowChanged =
+          String(existingDoctor.slotStartTime ?? "") !==
+            String(updatedDoctor.slotStartTime ?? "") ||
+          String(existingDoctor.slotEndTime ?? "") !==
+            String(updatedDoctor.slotEndTime ?? "");
+        if (slotWindowChanged) {
+          generateSlotsForDoctor(updatedDoctor).catch((slotError) => {
+            console.error(
+              `Slot generation failed for doctor ${updatedDoctor._id}:`,
+              slotError?.message || slotError
+            );
+          });
+        }
 
         // The document is saved: now delete the Storage objects it no longer
         // references (never throws - a failed cleanup cannot undo the save).

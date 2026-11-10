@@ -27,13 +27,15 @@ const STATUS_LABELS = {
   [SLOT_STATUS.PAST]: "Time passed",
 };
 
-// "7:00–9:00 AM" instead of "07:00 AM - 09:00 AM": a band label has to fit in a
+// "4:20–4:40 PM" instead of "04:20 AM - 04:40 AM": a slot label has to fit in a
 // ~105px day column, so the meridiem is printed once when both ends share it.
 const compactTime = (time) => time.replace(/^0/, "");
 
-const bandLabel = (start, end) => {
-  const from = formatTime(start).split(" ");
-  const to = formatTime(end).split(" ");
+const slotLabel = (start, end) => {
+  // `toLocaleTimeString` separates the meridiem with U+202F in recent ICU
+  // builds, which would defeat the split below and print "4:20 PM–4:40 PM".
+  const from = formatTime(start).replace(/[\u202f\u00a0]/g, " ").split(" ");
+  const to = formatTime(end).replace(/[\u202f\u00a0]/g, " ").split(" ");
   if (from.length === 2 && to.length === 2 && from[1] === to[1]) {
     return `${compactTime(from[0])}–${compactTime(to[0])} ${to[1]}`;
   }
@@ -50,19 +52,19 @@ const sameTarget = (a, b) =>
   Boolean(a && b && a.date === b.date && a.time === b.time);
 
 /**
- * The slot a band stands for, in the shape `/appointment` understands.
+ * The slot a grid entry stands for, in the shape `/appointment` understands.
  *
- * A band is a merged run of 20-minute slots, so it starts the clock at its first
- * slot: tapping "9:00–11:00 AM" books the 9:00 AM slot, and the booking form
- * preselects exactly that one.
+ * Every free/booked entry is one 20-minute slot, so tapping "4:20–4:40 PM" books
+ * the 4:20 PM slot and the booking form preselects exactly that one. The single
+ * collapsed "Time passed" entry is not selectable, so its first slot is unused.
  */
-const bandTarget = (block) => {
+const slotTarget = (block) => {
   const date = istDateOf(block.startTime);
   return {
     date,
     time: istTimeOf(block.startTime),
     dayLabel: `${isoWeekday(date)} ${isoShortDate(date)}`,
-    rangeLabel: bandLabel(block.startTime, block.endTime),
+    rangeLabel: slotLabel(block.startTime, block.endTime),
   };
 };
 
@@ -92,7 +94,7 @@ const TimetablePage = () => {
   const [week, setWeek] = useState(null);
   const [loading, setLoading] = useState(Boolean(doctorId));
   const [error, setError] = useState("");
-  // Band the patient tapped; `null` means "use the next available slot".
+  // Slot the patient tapped; `null` means "use the next available slot".
   const [picked, setPicked] = useState(null);
 
   useEffect(() => {
@@ -154,8 +156,8 @@ const TimetablePage = () => {
       : "";
   const hasAnySlot = days.some((day) => day.slots.length > 0);
 
-  // What "Book an Appointment" carries when no band was tapped: the first free
-  // band of a day that has stored `Slot` rows. Days `fetchWeekSlots` derives
+  // What "Book an Appointment" carries when no slot was tapped: the first free
+  // slot of a day that has stored `Slot` rows. Days `fetchWeekSlots` derives
   // from the doctor's window (`generated`) have no row to lock, so they would
   // land on an empty slot picker - skip them.
   const nextAvailable = useMemo(() => {
@@ -164,7 +166,7 @@ const TimetablePage = () => {
       const block = groupSlotsIntoBlocks(day.slots).find(
         (item) => item.status === SLOT_STATUS.AVAILABLE
       );
-      if (block) return bandTarget(block);
+      if (block) return slotTarget(block);
     }
     return null;
   }, [days]);
@@ -178,7 +180,7 @@ const TimetablePage = () => {
     const next = addDaysIso(weekStart, offsetWeeks * 7);
     if (next < thisMonday || next > lastMonday) return;
     setWeekStart(next);
-    // The picked band belongs to the week being left behind.
+    // The picked slot belongs to the week being left behind.
     setPicked(null);
   };
 
@@ -344,7 +346,7 @@ const TimetablePage = () => {
                         const selectable =
                           block.status === SLOT_STATUS.AVAILABLE &&
                           !day.generated;
-                        const candidate = selectable ? bandTarget(block) : null;
+                        const candidate = selectable ? slotTarget(block) : null;
                         const isTarget = sameTarget(target, candidate);
                         const blockClassName = `${styles["block"]} ${
                           styles[`block-${block.status}`]
@@ -354,11 +356,16 @@ const TimetablePage = () => {
                         const label = (
                           <>
                             <span className={styles["block-time"]}>
-                              {bandLabel(block.startTime, block.endTime)}
+                              {slotLabel(block.startTime, block.endTime)}
                             </span>
                             <span className={styles["block-meta"]}>
-                              {STATUS_LABELS[block.status]} · {block.count}{" "}
-                              {block.count === 1 ? "slot" : "slots"}
+                              {picked && isTarget
+                                ? "Selected"
+                                : !picked && isTarget
+                                ? "Next free"
+                                : block.count > 1
+                                ? `${STATUS_LABELS[block.status]} · ${block.count} slots`
+                                : STATUS_LABELS[block.status]}
                             </span>
                           </>
                         );
@@ -429,7 +436,7 @@ const TimetablePage = () => {
                     {picked ? "Selected slot" : "Next available slot"}
                   </span>
                   <strong>
-                    {target.dayLabel} · {target.rangeLabel}
+                    {target.dayLabel} · {target.rangeLabel} (20 min)
                   </strong>
                 </>
               ) : (
@@ -439,7 +446,7 @@ const TimetablePage = () => {
               )}
             </p>
             <p className={styles["foot-note"]}>
-              All timings are in IST · tap an available band to pick that slot
+              All timings are in IST · each slot is 20 minutes · tap a free slot
             </p>
           </div>
           <Link legacyBehavior href={appointmentHref}>

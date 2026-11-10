@@ -221,12 +221,33 @@
   font-weight: 700;
 }
 
+/* One row per 20-minute slot means a full day is ~33 rows (the page used to
+   print ~6 merged two-hour bands), so the column scrolls instead of stretching
+   the whole week: header and day footer stay visible, the grid keeps its size. */
 .day-body {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 6px;
+  max-height: 384px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #cfd6c3 #f4f5f0;
+}
+
+.day-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.day-body::-webkit-scrollbar-thumb {
+  background: #cfd6c3;
+  border-radius: 999px;
+}
+
+.day-body::-webkit-scrollbar-track {
+  background: #f4f5f0;
 }
 
 .block {
@@ -234,7 +255,10 @@
   width: 100%;
   flex-direction: column;
   gap: 2px;
-  padding: 7px 8px;
+  /* The day body is a scrolling flex column: without this the 33 chips shrink
+     to a few pixels each instead of overflowing into the scroll area. */
+  flex: 0 0 auto;
+  padding: 6px 8px;
   border: 0;
   border-left: 3px solid;
   border-radius: 6px;
@@ -244,15 +268,16 @@
 }
 
 .block-time {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .block-meta {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -460,6 +485,11 @@
 
   .week {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Two columns + a narrower card: keep the day column shorter on phones. */
+  .day-body {
+    max-height: 300px;
   }
 
   .foot {

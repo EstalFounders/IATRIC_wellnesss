@@ -8,92 +8,13 @@ import Payment from "../../../src/models/paymentSchema";
 import { dbConnect } from "../../../src/lib/db";
 import { appointment_status } from "../../../src/constant";
 import { releaseSlotForAppointment } from "../../../src/lib/paymentService";
-
-const generateSlotsForDoctor = async (doctor, start, numDays) => {
-  let slots = [];
-
-  // Validate required fields
-  if (!doctor.slotStartTime || !doctor.slotEndTime) {
-    console.warn(
-      `Doctor ${doctor._id} (${doctor.name}) has no slotStartTime or slotEndTime`
-    );
-    return;
-  }
-
-  const slotStartTime = new Date(doctor.slotStartTime);
-  const slotEndTime = new Date(doctor.slotEndTime);
-
-  // Get start/end times in minutes from midnight
-  const slotStartMinutes =
-    slotStartTime.getUTCHours() * 60 + slotStartTime.getUTCMinutes();
-  const slotEndMinutes =
-    slotEndTime.getUTCHours() * 60 + slotEndTime.getUTCMinutes();
-
-  // Validate time range
-  if (slotStartMinutes >= slotEndMinutes) {
-    console.warn(
-      `Invalid time range for doctor ${doctor._id}: Start (${slotStartTime}) must be before End (${slotEndTime})`
-    );
-    return;
-  }
-
-  // Generate slots for specified number of days
-  for (let i = 0; i < numDays; i++) {
-    let date = new Date(start.getTime() + i * 86400000);
-
-    // Calculate first available slot minute for today
-    let currentMinute = slotStartMinutes;
-
-    while (currentMinute < slotEndMinutes) {
-      // Create start time for this slot
-      const slotStart = new Date(
-        Date.UTC(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          Math.floor(currentMinute / 60),
-          currentMinute % 60
-        )
-      );
-
-      // Create end time (20 minutes later)
-      const slotEnd = new Date(slotStart.getTime() + 20 * 60000);
-
-      slots.push({
-        doctorId: doctor._id,
-        startTime: slotStart,
-        endTime: slotEnd,
-        date: new Date(date),
-        isBooked: false,
-      });
-
-      // Move to next 20-minute interval
-      currentMinute += 20;
-    }
-  }
-
-  // Insert only what is missing, in a single atomic upsert per slot. The old
-  // "findOne then create" pair was a race: two runs (or a run overlapping a
-  // booking) could both see "no row" and insert two rows for the same instant.
-  // The unique (doctorId, startTime) index makes the second upsert a no-op.
-  let inserted = 0;
-  for (let slot of slots) {
-    const { doctorId, startTime, ...rest } = slot;
-    // The equality keys below are copied into the inserted document by MongoDB
-    // itself, so only the remaining fields are in `$setOnInsert`.
-    const result = await Slot.updateOne(
-      { doctorId, startTime },
-      { $setOnInsert: rest },
-      { upsert: true }
-    );
-
-    if (result.upsertedCount) inserted += 1;
-  }
-
-  console.log(
-    `${slots.length} slots generated for doctor ${doctor._id} (${doctor.name}), ${inserted} new`
-  );
-};
+// The slot generator is shared with Add Doctor / the sheet import (see the
+// module header): a doctor created mid-day is bookable immediately instead of
+// waiting for this cron run.
+import {
+  generateSlotsForDoctor,
+  SLOT_WINDOW_DAYS,
+} from "../../../src/lib/slotGeneration";
 
 /**
  * Slots held by a booking whose payment was never even started would stay blocked
@@ -162,7 +83,7 @@ const performScheduledTasks = async () => {
 
   // Generate new slots for each doctor
   for (const doctor of doctors) {
-    await generateSlotsForDoctor(doctor, today, 7);
+    await generateSlotsForDoctor(doctor, today, SLOT_WINDOW_DAYS);
   }
 
   // After generating new slots, delete old slots

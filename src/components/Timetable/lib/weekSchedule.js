@@ -88,18 +88,22 @@ export const slotStatus = (slot, now = Date.now()) => {
 };
 
 /**
- * Collapses the 20-minute grid into readable bands ("09:00 am - 11:00 am,
- * Available, 6 slots"). Consecutive slots merge only when they share a status
- * and touch end-to-start, so a booked stretch always breaks the run.
+ * One entry per 20-minute slot ("4:20–4:40 PM"), i.e. the real bookable unit.
  *
- * Long live runs are split into balanced bands of at most `maxSlotsPerBlock`
- * (6 slots = 2 hours), otherwise a 15-hour day would print as one single line.
- * Elapsed time is never split: one grey "time passed" band is easier to scan.
+ * This used to merge consecutive free slots into bands of up to 6 (2 hours), so
+ * a day printed "4:20–6:20 PM": patients read that as a two-hour appointment
+ * while tapping it only booked its first 20 minutes, and the uneven split of a
+ * 33-slot day produced bands ending at :40 ("8:20–10:00 PM"). The grid now
+ * labels exactly what it books - same text as the booking form.
+ *
+ * Elapsed time is the one exception: it is never split, one grey "time passed"
+ * entry reads better than a column of dead chips. `maxSlotsPerBlock` is kept as
+ * the only knob back to a banded view.
  */
 export const groupSlotsIntoBlocks = (
   slots = [],
   now = Date.now(),
-  maxSlotsPerBlock = 6
+  maxSlotsPerBlock = 1
 ) => {
   const runs = slots.reduce((acc, slot) => {
     const status = slotStatus(slot, now);
