@@ -497,3 +497,12 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - 4 of the 320 priced rows hit the insert-only skip (name already present, e.g. `CNB Cream`, price 44), so 316 documents carry `price` on **both** sides — staging and production stay byte-identical (309,307 / 316 priced). Backfilling those prices was deliberately not done.
 - Verified: counts equal on both databases, and `curl 'https://healthpath.co.in/api/medicineInfo?medicineName=TZOLIDE&limit=2'` now answers from production (`TZOLIDE-600`, `price: 3680`) where it returned `totalCount: 0` before. Backup of the staging collection kept at `/tmp/medicines_iatric_test.archive` (58 MB).
 
+
+## Department page hid its own specialists (2026-11-10)
+
+- **Bug:** `/department-single?serviceName=…` filtered doctors with a raw `offeredService.toLowerCase().includes(service.toLowerCase())`. The DB speciality name keeps runs of spaces (`"Neurology       (Brain & Spine)"`, 7 spaces) and the URL carries it verbatim, while `doctors.serviceOffered` holds the normal spelling (`"Neurology (Brain & Spine)"`), so the substring never matched and Dr. Salman Shaikh never rendered. Live data (23 services × 9 doctors, prod `/api/superAdmin/serviceOffered` + `/api/addDoctor`) shows Neurology as the only true mismatch; every other zero-hit speciality really has no doctor.
+- **Fix** in `pages/department-single.js`: both sides now go through `matchKey()` = `normalizeDepartmentName` (the icon resolver's whitespace-collapsing normaliser) + `&` → `and` + non-alphanumerics → spaces, then a **whole-word phrase** test in both directions (department "Neurology" vs doctor "Neurology (Brain & Spine)"). Word boundaries are mandatory: a bare `includes` lets the doctor tagged `ENT` appear under Dentistry/Gastroenterology (checked: Dentistry stays empty).
+- Display heading now only collapses whitespace (`"Our Neurology (Brain & Spine) Specialists"`); it must **not** be lowercased —`normalizeDepartmentName` is for matching only, otherwise "General Physician" would print "General physician".
+- `src/components/Common/ViewDoctorListComp.js` used `doctors ? … : <p>No doctors available</p>`, but an empty array is truthy, so a speciality without a doctor rendered a silently blank section; the guard is now `doctors?.length`.
+- Verified: `npx next lint` clean; throwaway Playwright spec (deleted) 2/2 on Desktop Chrome — Neurology renders Salman + the collapsed heading, Dentistry shows "No doctors available" with no ENT leak.
+
