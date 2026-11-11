@@ -18,6 +18,7 @@ import Image from "next/image";
 import { isMobileValid } from "../../helper";
 import {
   consultationTypeNames,
+  SYSTEM_CONSULTATION_TYPES,
   toConsultationTypeEntries,
   typeKeyFor,
 } from "../../utils/consultationFee";
@@ -31,6 +32,8 @@ import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
 import { normalizeReturnPaymentStatus } from "../../lib/paymentStatus";
 import { useDoctors } from "../../customUtils/useDoctors";
+import { useGlobalData } from "../../customUtils/useGlobalData";
+import { matchesServiceOffered } from "../filterbar/filterDoctors";
 import { useDispatch, useSelector } from "react-redux";
 import {
   bookConsultationApiCall,
@@ -48,6 +51,50 @@ import { useLanguage } from "../../i18n/LanguageContext";
 const CONSULTATION_TYPE_NAMES = superAdminConsultationtype.map(
   (type) => type.name
 );
+
+const specialityKey = (value) => String(value ?? "").trim().toLowerCase();
+
+/**
+ * The speciality a doctor is filed under.
+ *
+ * `/timetable` and the "Book Consultation" doctor cards land on this page with
+ * only `?doctorId=` (plus a `date`/`time` pair), so nothing but the doctor record
+ * itself says which speciality the booking belongs to. Its `serviceOffered` is the
+ * same field the details dropdown lists, so the first entry that is an actual
+ * option there is the answer - matched case-insensitively and returned in the
+ * dropdown's casing, because a `<select>` only shows a value that equals its
+ * option text exactly.
+ *
+ * Consultation types share the same field and are skipped (they are never
+ * speciality options), as are free-text names the panel does not offer. "" means
+ * "no opinion" - the patient keeps whatever they picked or still has to pick one.
+ */
+const specialityForDoctor = (doctor, specialityNames = []) => {
+  const canonical = new Map();
+  (specialityNames || []).forEach((name) => {
+    const key = specialityKey(name);
+    if (key && !canonical.has(key)) canonical.set(key, String(name).trim());
+  });
+  if (!canonical.size) return "";
+
+  const offered = Array.isArray(doctor?.serviceOffered)
+    ? doctor.serviceOffered
+    : [];
+
+  for (const entry of offered) {
+    const name = typeof entry === "string" ? entry : entry?.name;
+    const key = specialityKey(name);
+    if (!key || !canonical.has(key)) continue;
+    // `typeKeyFor` slugs anything it does not know, so compare against the
+    // system keys instead of testing it for truthiness.
+    if (SYSTEM_CONSULTATION_TYPES.some((type) => type.key === typeKeyFor(name))) {
+      continue;
+    }
+    return canonical.get(key);
+  }
+
+  return "";
+};
 
 /**
  * Noon UTC of the user's calendar day.
@@ -145,6 +192,9 @@ const AppointmentPage = () => {
   // Services come from the globalData slice (single source of truth, serviceOffered
   // MAJOR items) - populated by getServiceOffered below / fetchBasicConfiguration.
   const services = useSelector((state) => state.globalData?.services || []);
+  // The speciality dropdown's own option list: `specialityForDoctor` only returns
+  // names that exist here, so the select always has a matching option.
+  const { specialityNames } = useGlobalData();
 
   // Consultation fees come from two levels, and the form shows the level it
   // books:
@@ -399,7 +449,49 @@ const AppointmentPage = () => {
     const first = options[0];
     setConsultationType(first ? first.name : "");
     setConsultationPrice(first ? first.fee || "" : "");
+
+    // Speciality follows the doctor. A deep link (`?doctorId=…`, e.g. the weekly
+    // timetable) arrives here with the select still empty, and this is the only
+    // moment the doctor record is at hand, so the appointment would otherwise be
+    // saved without one. A speciality the patient picked by hand is kept when the
+    // doctor offers it (the dropdown is filtered by that choice); anything else is
+    // replaced, because switching doctors means switching field.
+    const doctorSpeciality = specialityForDoctor(
+      selectedDoctor,
+      specialityNames
+    );
+
+    if (
+      doctorSpeciality &&
+      (!speciality || !matchesServiceOffered(selectedDoctor, speciality))
+    ) {
+      setSpeciality(doctorSpeciality);
+      // `serviceType` is the posted/persisted field and only mirrors the dropdown
+      // on a change event, which this programmatic pick never fires.
+      setServiceType(doctorSpeciality);
+    }
   };
+
+  /**
+   * Safety net for the speciality: the doctor roster and the speciality options
+   * hydrate independently (redux-persist first paint vs. the serviceOffered
+   * request), so a doctor preselect can land before the option list is known and
+   * leave the field empty. Fill it as soon as both sides are known - and only
+   * while it is still empty, so a value the patient picked or edited is never
+   * overwritten.
+   */
+  useEffect(() => {
+    if (speciality || !selectedDoctorId) return;
+
+    const doctor = [...filteredDoctors, ...doctors].find(
+      (item) => String(item._id) === String(selectedDoctorId)
+    );
+    const resolved = specialityForDoctor(doctor, specialityNames);
+    if (!resolved) return;
+
+    setSpeciality(resolved);
+    setServiceType(resolved);
+  }, [speciality, selectedDoctorId, doctors, filteredDoctors, specialityNames]);
 
   const handleDoctorSelection = (event) => {
     applyDoctorSelection(event.target.value);
@@ -788,6 +880,13 @@ const AppointmentPage = () => {
     const alternativeDoctorMobile =
       slot.doctorMobileNumber || knownDoctor?.mobileNumber || doctorMobileNumber || "";
     const alternativeDate = new Date(slot.startTime);
+    // A slot card can belong to a doctor other than the one on the form, and this
+    // path posts immediately - React state set here would not be part of the
+    // request. The speciality therefore travels as an override, resolved from the
+    // slot's own doctor (falls back to the patient's pick when the doctor record is
+    // not loaded or offers nothing the dropdown knows).
+    const alternativeSpeciality =
+      specialityForDoctor(knownDoctor, specialityNames) || speciality;
 
     // `appointmentTime: CHOOSE_TIME` + the explicit `selectedSlot` tell the API to
     // lock this slot instead of searching for one "now".
@@ -798,6 +897,7 @@ const AppointmentPage = () => {
       appointmentTime: CHOOSE_TIME,
       selectedSlot: slot,
       selectedDate: alternativeDate,
+      serviceType: alternativeSpeciality,
     });
 
     if (booked) {
@@ -806,6 +906,8 @@ const AppointmentPage = () => {
       setSelectedDoctorId(slotDoctorId);
       setDoctorName(alternativeDoctorName);
       setDoctorMobileNumber(alternativeDoctorMobile);
+      setSpeciality(alternativeSpeciality);
+      setServiceType(alternativeSpeciality);
       setSelectedSlot(slot);
       setSelectedDate(alternativeDate);
       setAppointmentTime(CHOOSE_TIME);
