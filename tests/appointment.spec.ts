@@ -65,6 +65,27 @@ const WHATSAPP_CONFIRMATION_API = /\/api\/helper\/whatsappConfirmationApi$/;
 const BOOK_CONSULTATION_API = /\/api\/bookConsultation\/?(\?|$)/;
 const CREATE_ORDER_API = /\/api\/payment\/create-order$/;
 const PAYMENT_STATUS_API = /\/api\/payment\/status/;
+const DOCTORS_API = /\/api\/addDoctor\/?(\?|$)/;
+const SERVICE_OFFERED_API = /\/api\/superAdmin\/serviceOffered\/?(\?|$)/;
+const SLOTS_API = /\/api\/slots\/fetchSlot/;
+
+/**
+ * Fixtures for the deep-link test: the canonical speciality list (globalData SUB
+ * items) and one doctor filed under it. The auto-fill only accepts a name the
+ * dropdown offers, so both sides have to agree here.
+ */
+const DEEP_LINK_SPECIALITY = 'Dermatology';
+
+const DEEP_LINK_DOCTOR = {
+  _id: 'e2e_deep_link_doctor',
+  name: 'Dr. Deep Link',
+  mobileNumber: '9812345670',
+  // First entry is the speciality, second is the consultation type the form books.
+  serviceOffered: [DEEP_LINK_SPECIALITY, CONSULTATION_TYPE],
+  consultationType: [{ name: CONSULTATION_TYPE, price: CONSULTATION_FEE }],
+  workDays: 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+  unavailableDates: [],
+};
 
 type CapturedWhatsApp = { method: string; body: { mobile?: string; otp?: string } };
 
@@ -80,6 +101,13 @@ async function submitContactStep(page: Page) {
   await card.locator('.consultation-btn').click();
 
   const dialog = page.getByRole('dialog');
+  // Under load a device can click while the bundle is still settling, which makes
+  // the first press a no-op. Retry the same button before giving up.
+  try {
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+  } catch {
+    await card.locator('.consultation-btn').click();
+  }
   await expect(dialog).toBeVisible();
 
   return dialog;
@@ -596,6 +624,136 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await expect.poll(() => checkoutCalls.length).toBe(1);
     expect(checkoutCalls[0].mode).toBe('sandbox');
     expect(checkoutCalls[0].options?.paymentSessionId).toBe(SANDBOX_SESSION_ID);
+  });
+
+  /**
+   * `/timetable` (and every doctor card) hands over `?doctorId=` only. Selecting
+   * that doctor must also fill the speciality - it is a mandatory field, and the
+   * appointment is stored with it (`serviceType` in the booking payload).
+   */
+  test('fills the speciality from the doctor handed over as ?doctorId and posts it', async ({
+    page,
+  }) => {
+    test.slow(); // dev-server first compile + OTP + booking
+
+    const bookingBodies: Array<Record<string, unknown>> = [];
+    const whatsappCalls: CapturedWhatsApp[] = [];
+
+    page.on('dialog', async (dialog) => {
+      await dialog.dismiss();
+    });
+
+    const context = page.context();
+
+    // Canonical speciality list: one SUB item (the dropdown option) + the MAJOR
+    // consultation type the form has to offer a tile for.
+    await context.route(SERVICE_OFFERED_API, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { name: DEEP_LINK_SPECIALITY, categoryType: 'SUB', isActive: true },
+          {
+            name: CONSULTATION_TYPE,
+            categoryType: 'MAJOR',
+            fee: CONSULTATION_FEE,
+            isActive: true,
+          },
+        ]),
+      });
+    });
+
+    // A single doctor, filed under that speciality - nothing else can fill it in.
+    await context.route(DOCTORS_API, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([DEEP_LINK_DOCTOR]),
+      });
+    });
+
+    // The `date` half of the deep link makes the page ask for that day's grid.
+    await context.route(SLOTS_API, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([]),
+      });
+    });
+
+    await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
+      const request = route.request();
+      whatsappCalls.push({
+        method: request.method(),
+        body: request.postDataJSON() as CapturedWhatsApp['body'],
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'SMS confirmation sent successfully' }),
+      });
+    });
+
+    await context.route(BOOK_CONSULTATION_API, async (route) => {
+      bookingBodies.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'Consultation booked successfully',
+          appointmentId: APPOINTMENT_ID,
+          amount: CONSULTATION_FEE,
+          consultationType: CONSULTATION_TYPE,
+        }),
+      });
+    });
+
+    await context.route(/fast2sms/i, async (route) => {
+      await route.abort('blockedbyclient');
+    });
+
+    // ── 1. Land the way the timetable does ──────────────────────────
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const deepLinkDate = `${tomorrow.getFullYear()}-${String(
+      tomorrow.getMonth() + 1
+    ).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+    await page.goto(
+      `/appointment?doctorId=${DEEP_LINK_DOCTOR._id}&date=${deepLinkDate}&time=09:00`
+    );
+    await expect(page.getByRole('heading', { name: 'Make Appointment' })).toBeVisible({
+      timeout: PAGE_READY_TIMEOUT,
+    });
+
+    // ── 2. Contact details + OTP (mocked sender, built-in test code) ─
+    await submitContactStep(page);
+    await enterOtp(page, '000000');
+    await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
+
+    const dialog = page.getByRole('dialog');
+    const specialitySelect = dialog.getByLabel('Speciality', { exact: true });
+    await expect(specialitySelect).toBeVisible();
+
+    // ── 3. Doctor and speciality both come from the URL, not from a click ──
+    await expect(dialog.getByLabel('Doctor', { exact: true })).toHaveValue(
+      DEEP_LINK_DOCTOR._id
+    );
+    await expect(specialitySelect).toHaveValue(DEEP_LINK_SPECIALITY);
+    expect(whatsappCalls).toHaveLength(1);
+
+    // ── 4. The auto-filled speciality is what the booking carries ───
+    // "Now" keeps the flow free of the (empty, mocked) slot grid.
+    await dialog.locator('label[id="when-now"]').click();
+    await dialog.getByRole('checkbox').check();
+    await dialog.locator('.consultation-btn', { hasText: 'Proceed to Pay' }).click();
+
+    await expect.poll(() => bookingBodies.length).toBe(1);
+    expect(bookingBodies[0]).toMatchObject({
+      selectedDoctorId: DEEP_LINK_DOCTOR._id,
+      patientMobNo: TEST_MOBILE,
+      serviceType: DEEP_LINK_SPECIALITY,
+    });
   });
 });
 
