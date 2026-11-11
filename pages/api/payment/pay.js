@@ -13,6 +13,7 @@ import {
   releaseSlotForAppointment,
 } from "../../../src/lib/paymentService";
 import { rateLimit } from "../../../src/lib/rateLimiter";
+import { getRequestOrigin } from "../../../src/lib/appOrigin";
 import { cacheGet, cacheSet } from "../../../src/lib/cache";
 import { logErrorToGoogleSheet } from "../helper";
 
@@ -34,6 +35,10 @@ export default async function handler(req, res) {
   }
 
   const { appointmentId, consultationType, paymentMethod } = req.body || {};
+
+  // Origin of this request: the Cashfree return_url must point back at the
+  // deployment that created the order (see resolveAppBase in src/lib/cashfree.js).
+  const requestOrigin = getRequestOrigin(req);
 
   if (!appointmentId || !consultationType) {
     return res.status(400).json({
@@ -153,6 +158,7 @@ export default async function handler(req, res) {
           consultation_type: appointment.consultationType,
         },
         customerDetails,
+        requestOrigin,
       });
 
       if (!cashfreeOrder || !cashfreeOrder.payment_session_id) {
@@ -209,6 +215,7 @@ export default async function handler(req, res) {
       orderCurrency: payment.currency || "INR",
       customerDetails,
       paymentMethod,
+      requestOrigin,
     });
 
     console.log("Cashfree Order Pay response:", {

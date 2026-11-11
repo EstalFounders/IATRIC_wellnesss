@@ -110,8 +110,15 @@ const DoctorProfilePage = ({ origin }) => {
       goBack();
     } catch (error) {
       console.error("Error saving the doctor profile:", error);
+      // A rejected upload / duplicate comes back as a message meant for the user
+      // (see pages/api/addDoctor.js); a network failure keeps the generic text.
+      const apiMessage =
+        error?.message && !/failed to fetch|networkerror|load failed/i.test(error.message)
+          ? error.message
+          : "";
       window.alert(
-        "Something went wrong while saving the profile. Please try again."
+        apiMessage ||
+          "Something went wrong while saving the profile. Please try again."
       );
     } finally {
       setSaving(false);

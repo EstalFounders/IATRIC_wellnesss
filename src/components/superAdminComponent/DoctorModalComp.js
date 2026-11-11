@@ -19,11 +19,8 @@ import { parseEducationTraining } from "../../customUtils/educationTraining";
 import { parseWorkExperience } from "../../customUtils/workExperience";
 import { parseLanguages } from "../../customUtils/languages";
 import { formatLocation } from "../../customUtils/indiaLocations";
-import {
-  fileNameFromUrl,
-  isPreviewableImage,
-  isPreviewableImageUrl,
-} from "../../customUtils/imageUpload";
+import StoredDocumentThumb from "../Common/StoredDocumentThumb";
+import { isPreviewableImage } from "../../customUtils/imageUpload";
 
 const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
   console.log(doctor, "doctor in modal");
@@ -125,14 +122,19 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Any file type is allowed; only an image can be rendered as the avatar.
+    // The picture is rendered inside an <img> everywhere (list, profile page,
+    // prescription), so a document is refused here exactly like the API does it.
+    if (!isPreviewableImage(file)) {
+      e.target.value = "";
+      alert("The profile picture must be an image (JPG, PNG or WEBP).");
+      return;
+    }
+
     setEditedDoctor({
       ...editedDoctor,
       profilePictureUrl: file,
     });
-    setProfilePicturePreview(
-      isPreviewableImage(file) ? URL.createObjectURL(file) : null
-    );
+    setProfilePicturePreview(URL.createObjectURL(file));
   };
 
   const handleDiplomasCertificatesChange = (e) => {
@@ -668,16 +670,13 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                           ) : (
                             <p className="mb-0 mt-2 fw-semibold">{entry.name}</p>
                           )
-                        ) : isPreviewableImageUrl(entry) ? (
-                          <img
-                            src={entry}
+                        ) : (
+                          <StoredDocumentThumb
+                            url={entry}
                             alt={`Diploma ${index + 1}`}
                             style={{ width: "100%", marginTop: "10px" }}
+                            chipStyle={{ marginTop: "10px" }}
                           />
-                        ) : (
-                          <p className="mb-0 mt-2 fw-semibold">
-                            {fileNameFromUrl(entry)}
-                          </p>
                         )}
                         <FaTrash
                           style={{
@@ -703,16 +702,18 @@ const DoctorModalComp = ({ show, handleClose, doctor, onSave, origin }) => {
                     onChange={handleProfilePictureChange}
                   />
                   <Form.Text className="text-muted d-block">
-                    Shown in the doctor list and on the prescription sheet. Any file
-                    type is accepted.
+                    Shown in the doctor list and on the prescription sheet. Must be
+                    an image (JPG, PNG or WEBP) - a PDF cannot be shown as a
+                    picture.
                   </Form.Text>
 
                   {profilePicturePreview && (
                     <>
-                      <img
-                        src={profilePicturePreview}
+                      <StoredDocumentThumb
+                        url={profilePicturePreview}
                         alt="Profile"
                         style={{ width: "100%", marginTop: "10px" }}
+                        chipStyle={{ marginTop: "10px" }}
                       />
                       <FaTrash
                         style={{ cursor: "pointer", marginTop: "5px" }}

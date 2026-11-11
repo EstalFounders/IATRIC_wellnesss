@@ -18,7 +18,6 @@ const appointmentSchema = new mongoose.Schema({
   },
   symptoms: {
     type: String,
-    required: true,
   },
   name: {
     type: String,

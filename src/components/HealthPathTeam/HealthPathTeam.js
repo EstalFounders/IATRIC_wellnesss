@@ -21,6 +21,40 @@ import {
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import styles from "./HealthPathTeam.module.css";
 
+/**
+ * Team-card avatar. A picture is rendered with `next/image`; a stored object that
+ * cannot be shown (a document uploaded into the picture slot on an old record, or
+ * a deleted object) falls back to the initial instead of a broken image.
+ */
+const MemberAvatar = ({ member }) => {
+  const [failed, setFailed] = useState(false);
+
+  if (member.profilePictureUrl && !failed) {
+    return (
+      <Image
+        placeholder="blur"
+        blurDataURL={imageBlurDataUrl}
+        src={member.profilePictureUrl}
+        alt={member.name}
+        fill
+        draggable={false}
+        sizes="(max-width: 575px) 92px, (max-width: 991px) 104px, 120px"
+        style={{
+          objectFit: "cover",
+          objectPosition: "center 20%",
+        }}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  return (
+    <span className={styles.avatarFallback}>
+      {(member.name || "?").charAt(0).toUpperCase()}
+    </span>
+  );
+};
+
 // Horizontal speed of the strip. Constant in px/second (not "one pass per N
 // seconds"), so the strip moves at the same pace whether the roster has 3 or 40
 // people - that is what makes it read as a continuous, calm ticker.
@@ -570,25 +604,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                             }
                           >
                             <div className={styles.avatar}>
-                              {member.profilePictureUrl ? (
-                                <Image
-                                  placeholder="blur"
-                                  blurDataURL={imageBlurDataUrl}
-                                  src={member.profilePictureUrl}
-                                  alt={member.name}
-                                  fill
-                                  draggable={false}
-                                  sizes="(max-width: 575px) 92px, (max-width: 991px) 104px, 120px"
-                                  style={{
-                                    objectFit: "cover",
-                                    objectPosition: "center 20%",
-                                  }}
-                                />
-                              ) : (
-                                <span className={styles.avatarFallback}>
-                                  {(member.name || "?").charAt(0).toUpperCase()}
-                                </span>
-                              )}
+                              <MemberAvatar member={member} />
                             </div>
 
                             <div className={styles.name} title={member.name}>

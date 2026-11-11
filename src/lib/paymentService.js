@@ -121,7 +121,31 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
 
   appointment.status = appointment_status.confirmed;
   appointment.paymentId = payment._id;
-  await appointment.save();
+  // Targeted update instead of `appointment.save()`: the loaded document may carry
+  // values that fail *full-document* validation (e.g. an appointment booked before
+  // `symptoms` became optional) and such a validation error must never stop a
+  // payment that Cashfree already captured from being confirmed. Only the fields
+  // owned here are written - `slotReleasedAt` is cleared in the same update, so the
+  // "slot handed back" marker can never survive a confirmation.
+  const confirmationUpdate = {
+    status: appointment.status,
+    paymentId: appointment.paymentId,
+    slotReleasedAt: null,
+  };
+
+  // `applyOfferToAppointment` only mutates the in-memory document, so the
+  // reconciled offer has to travel in this same write (it used to ride along on
+  // the full-document save).
+  if (appointment.amountAfterOffer != null) {
+    confirmationUpdate.amountAfterOffer = appointment.amountAfterOffer;
+    confirmationUpdate.discountAmount = appointment.discountAmount ?? 0;
+    confirmationUpdate.offerCode = appointment.offerCode ?? null;
+  }
+
+  await Appointment.updateOne(
+    { _id: appointment._id },
+    { $set: confirmationUpdate },
+  );
 
   console.log("Payment verified. Confirming appointment:", {
     appointmentId: String(appointment._id),
@@ -355,7 +379,12 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   // appointment instead of sending the same reminder twice.
   if (isNowAppointment && !messagingFailed) {
     appointment.reminderSentAt = appointment.reminderSentAt || new Date();
-    await appointment.save();
+    // Targeted update (see the confirmation write above): never let unrelated
+    // legacy fields block the reminder stamp.
+    await Appointment.updateOne(
+      { _id: appointment._id },
+      { $set: { reminderSentAt: appointment.reminderSentAt } },
+    );
   }
 
   await Notification.create({
@@ -377,7 +406,12 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   // duplicates the messages nor skips the ones that failed.
   if (!messagingFailed) {
     appointment.confirmationSentAt = new Date();
-    await appointment.save();
+    // Targeted update (see the confirmation write above): the stamp that stops the
+    // next status poll from resending must never depend on legacy field validation.
+    await Appointment.updateOne(
+      { _id: appointment._id },
+      { $set: { confirmationSentAt: appointment.confirmationSentAt } },
+    );
   }
 
   return payment;
@@ -501,8 +535,13 @@ export async function releaseSlotForAppointment({ appointmentId }) {
 
   // Marks the slot as given back, so a PAID event that arrives late re-acquires it
   // (or is flagged for a refund) instead of confirming over someone else's slot.
+  // Targeted update (see the confirmation write): full-document validation of
+  // legacy fields must never leave a released slot marked as booked.
   appointment.slotReleasedAt = new Date();
-  await appointment.save();
+  await Appointment.updateOne(
+    { _id: appointment._id },
+    { $set: { slotReleasedAt: appointment.slotReleasedAt } },
+  );
 
   console.log("Slot released for appointment:", String(appointmentId), {
     slotWasBooked: Boolean(released),

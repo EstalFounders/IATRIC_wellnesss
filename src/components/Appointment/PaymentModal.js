@@ -33,6 +33,9 @@ const PaymentModal = ({
   consultationType,
   onPaymentDone,
   onClose,
+  // Label of the primary CTA in the idle state. The booking flow's payment step
+  // passes "Pay Securely"; every other caller keeps the amount-labelled default.
+  payLabel = null,
   autoVerifyOrderId = null,
   // Terminal status handed back by the gateway in the return URL
   // (normalised: "cancelled" | "failed" | "paid" | null).
@@ -149,9 +152,30 @@ const PaymentModal = ({
       // they select their payment method (UPI / card / net banking etc.).
       // The user lands back on /payment/thankyou?appointmentId=<orderId> where
       // the thank-you page polls the backend status.
-      const appBase =
-        process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";
-      const base = appBase.endsWith("/") ? appBase : `${appBase}/`;
+      //
+      // The return URL must stay on THIS deployment: that page (and the
+      // /api/payment/status call behind it) is what finishes the booking, so a
+      // checkout started on localhost must come back to localhost instead of
+      // hopping to the configured staging host - where an older build verifies
+      // against its own schema and can refuse to confirm an otherwise paid order.
+      const appOrigin =
+        typeof window !== "undefined" && window.location?.origin
+          ? window.location.origin
+          : "";
+      const fallbackHost = String(
+        process.env.NEXT_PUBLIC_APP_URL ||
+          process.env.NEXT_PUBLIC_SITE_URL ||
+          process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL ||
+          "",
+      )
+        .trim()
+        .replace(/^https?:\/\//, "")
+        .replace(/\/+$/, "");
+      const returnUrl = appOrigin
+        ? `${appOrigin}/payment/thankyou?appointmentId={order_id}`
+        : fallbackHost
+          ? `https://${fallbackHost}/payment/thankyou?appointmentId={order_id}`
+          : "/payment/thankyou?appointmentId={order_id}";
 
       // The gateway owns the screen from here on. Flag the window so that a
       // dismissal (back button from the hosted page / closed overlay) is read as a
@@ -161,7 +185,7 @@ const PaymentModal = ({
 
       const checkoutResult = await cashfreeRef.current.checkout({
         paymentSessionId,
-        returnUrl: `https://${base}payment/thankyou?appointmentId={order_id}`,
+        returnUrl,
         redirectTarget: "_self",
       });
 
@@ -507,7 +531,7 @@ const PaymentModal = ({
               ? t("af.loading")
               : initError
               ? "Refresh & Pay Again"
-              : `Pay ${price_symbol}${amount || 0}`}
+              : payLabel || `Pay ${price_symbol}${amount || 0}`}
           </ConsultationButton>
           {initError && (
             <Typography variant="body2" color="error" mt={2}>

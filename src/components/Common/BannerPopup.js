@@ -22,9 +22,11 @@ const SHOW_MAX_WAIT_MS = 2500;
  *
  * The image comes from `initialBanner` (the marketing panel banner, read server-side
  * in pages/index.js via getStaticProps), then /api/marketing/banner/metadata, then
- * Firebase Storage, then the static values in data/popupBanner.js. When nothing is
- * configured the popup is not shown at all. An empty/failing URL renders
- * POPUP_FALLBACK_IMAGE.
+ * - ONLY when neither could be read at all - the fixed Firebase Storage object and
+ * the static values in data/popupBanner.js. When the panel answers "inactive" the
+ * popup stays closed: the panel's switch is the single source of truth, so a paused
+ * banner is never resurrected from the file already sitting in Storage. An
+ * empty/failing URL renders POPUP_FALLBACK_IMAGE.
  *
  * Performance: the image is served straight from Firebase Storage (Google's CDN) via
  * `unoptimized` - no /_next/image transform on our own VPS, which is what made the
@@ -54,21 +56,31 @@ const BannerPopup = ({ initialBanner = null }) => {
     }
 
     const loadBanner = async () => {
+      // Did the panel actually answer? Only an UNREACHABLE panel may fall back to
+      // the fixed Storage path / static config. When it answers "nothing is live"
+      // the banner is paused, and resurrecting the object already in Firebase is
+      // exactly what kept the popup on screen after it was switched off.
+      let panelAnswered = false;
+
       try {
         const response = await fetch(api.marketingBannerMetadata, {
           cache: "no-store",
         });
+        panelAnswered = response.ok;
         const data = await response.json();
 
         if (data?.found && data.banner?.url) {
           if (alive) setManagedBanner(data.banner);
           return; // panel record wins
         }
+
+        if (panelAnswered) return; // paused in the panel - stay paused
       } catch (error) {
         // offline or blocked - fall through to Firebase Storage below
       }
 
-      // Fallback: the fixed banner path in Firebase Storage (metadata/img.png).
+      // Fallback (panel unreachable only): the fixed banner path in Firebase
+      // Storage (metadata/img.png).
       const directUrl = await getBannerImageUrl();
       if (alive && directUrl) {
         setManagedBanner({ url: directUrl, alt: "HealthPath", href: "" });

@@ -3,7 +3,12 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Layouts from "../../src/layout/Layouts";
 import PageBanner from "../../src/layout/PageBanner";
-import { price_symbol, color_schema } from "../../src/constant";
+import {
+  price_symbol,
+  color_schema,
+  IS_NOW,
+  IN_TWENTY_MINUTES_NOW,
+} from "../../src/constant";
 import {
   PAYMENT_CANCELLED_MESSAGE,
   normalizeReturnPaymentStatus,
@@ -11,6 +16,53 @@ import {
 
 const MAX_ATTEMPTS = 12; // ~36s max, then show Retry instead of infinite spinner
 const POLL_INTERVAL = 3000;
+
+/**
+ * "Mon, 11 Nov, 03:30 pm IST" for the booked slot. "Now"/"in 20 minutes"
+ * bookings keep their relative wording: their stored timestamp is the moment the
+ * request was made, not a slot the patient picked.
+ */
+const formatAppointmentMoment = (booking) => {
+  if (!booking) return "";
+  if (booking.bookingMode === IS_NOW) return "Now";
+  if (booking.bookingMode === IN_TWENTY_MINUTES_NOW) return "In 20 minutes";
+  const time = booking.appointmentTime ? new Date(booking.appointmentTime) : null;
+  if (!time || Number.isNaN(time.getTime())) return "";
+  return `${time.toLocaleString("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata",
+  })} IST`;
+};
+
+const formatMobile = (mobile) => (mobile ? `+91 ${mobile}` : "—");
+
+/** One "label ..... value" line of the appointment/payment summary cards. */
+const SummaryLine = ({ label, value }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      gap: 16,
+      padding: "6px 0",
+    }}
+  >
+    <span style={{ color: "#718096", fontSize: 14 }}>{label}</span>
+    <span
+      style={{
+        color: "#1a202c",
+        fontSize: 14,
+        fontWeight: 600,
+        textAlign: "right",
+      }}
+    >
+      {value}
+    </span>
+  </div>
+);
 
 const ThankYou = () => {
   const router = useRouter();
@@ -50,6 +102,10 @@ const ThankYou = () => {
           amountAfterOffer: data.amountAfterOffer,
           discountAmount: data.discountAmount,
           offerCode: data.offerCode,
+          // What was booked (patient/doctor/slot) - answered together with the
+          // paid status, so the summary below needs no extra request. Null until
+          // the appointment exists/is confirmed.
+          booking: data.booking || null,
         });
 
         if (data.success && data.status === "PAID") {
@@ -215,6 +271,52 @@ const ThankYou = () => {
                 textAlign: "left",
               }}
             >
+              {orderInfo.booking && (
+                <div data-testid="appointment-summary">
+                  <p
+                    style={{
+                      margin: "0 0 8px",
+                      color: color_schema.green,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Your appointment
+                  </p>
+                  <SummaryLine
+                    label="Patient"
+                    value={orderInfo.booking.patientName || "—"}
+                  />
+                  <SummaryLine
+                    label="Mobile"
+                    value={formatMobile(orderInfo.booking.mobileNumber)}
+                  />
+                  <SummaryLine
+                    label="Speciality"
+                    value={orderInfo.booking.speciality || "—"}
+                  />
+                  <SummaryLine
+                    label="Doctor"
+                    value={orderInfo.booking.doctorName || "Any available doctor"}
+                  />
+                  <SummaryLine
+                    label="Consultation"
+                    value={orderInfo.booking.consultationType || "—"}
+                  />
+                  <SummaryLine
+                    label="Date & time"
+                    value={formatAppointmentMoment(orderInfo.booking) || "—"}
+                  />
+                  <div
+                    style={{
+                      borderTop: "1px solid #e2e8f0",
+                      margin: "14px 0",
+                    }}
+                  />
+                </div>
+              )}
               <div
                 style={{
                   display: "flex",

@@ -65,8 +65,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Cap local parallelism. The suite talks to a single Next dev server that compiles
+     routes on demand: every worker requesting a cold `/appointment` at once starves it
+     and the navigation blows WebKit's 90s timeout (`page.goto ... waiting until "load"`
+     at tests/appointment.spec.ts:306). The same case passes in ~47s on its own. */
+  workers: process.env.CI ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Assertion timeout (payment polling / slow device emulation) */

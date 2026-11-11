@@ -1,6 +1,7 @@
 import { dbConnect } from "../../../src/lib/db";
 import Payment from "../../../src/models/paymentSchema";
-import { payment_status } from "../../../src/constant";
+import Appointment from "../../../src/models/appointmentSchema";
+import { appointment_status, payment_status } from "../../../src/constant";
 import {
   verifyCashfreeWebhookSignature,
   getCashfreeOrderStatus,
@@ -84,8 +85,35 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, message: "Payment not found" });
     }
 
-    // Idempotency: if already PAID, do not process again
+    // Idempotency: an already-PAID payment is not processed twice - except when the
+    // confirmation never finished (crash mid-way, failed bookkeeping). Such a state
+    // is exactly what a repeated PAID event can heal, and `confirmationSentAt` is
+    // only stamped once the appointment is CONFIRMED *and* every message went out.
     if (payment.status === payment_status.PAID) {
+      const appointment = await Appointment.findById(payment.appointmentId)
+        .select("status confirmationSentAt")
+        .lean();
+
+      const needsHeal =
+        Boolean(appointment) &&
+        (appointment.status !== appointment_status.confirmed ||
+          !appointment.confirmationSentAt);
+
+      if (!appointment) {
+        console.error(
+          "Cashfree webhook: PAID payment has no appointment to confirm",
+          { orderId, appointmentId: String(payment.appointmentId || "") },
+        );
+      }
+
+      if (needsHeal) {
+        console.log(
+          "Cashfree webhook: healing incomplete confirmation for PAID payment",
+          { orderId },
+        );
+        await confirmAppointmentAfterPayment({ paymentId: payment._id });
+      }
+
       return res.status(200).json({ success: true, message: "Already processed" });
     }
 

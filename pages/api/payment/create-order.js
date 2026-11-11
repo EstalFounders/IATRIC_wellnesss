@@ -10,6 +10,7 @@ import {
   getCashfreeCheckoutMode,
 } from "../../../src/lib/cashfree";
 import { rateLimit } from "../../../src/lib/rateLimiter";
+import { getRequestOrigin } from "../../../src/lib/appOrigin";
 import { cacheGet, cacheSet } from "../../../src/lib/cache";
 import { logErrorToGoogleSheet } from "../helper";
 
@@ -19,6 +20,10 @@ export default async function handler(req, res) {
   }
 
   const { appointmentId, consultationType } = req.body || {};
+
+  // Origin of this request: the Cashfree return_url must point back at the
+  // deployment that created the order (see resolveAppBase in src/lib/cashfree.js).
+  const requestOrigin = getRequestOrigin(req);
 
   if (!appointmentId || !consultationType) {
     return res.status(400).json({
@@ -137,6 +142,7 @@ export default async function handler(req, res) {
           customerEmail: appointment.email || "patient@healthpath.co.in",
           customerPhone: String(appointment.patientMobNo || "9999999999"),
         },
+        requestOrigin,
       });
 
       if (!freshCashfreeOrder || !freshCashfreeOrder.payment_session_id) {
@@ -202,6 +208,7 @@ export default async function handler(req, res) {
         consultation_type: effectiveType,
       },
       customerDetails,
+      requestOrigin,
     });
 
     if (!cashfreeOrder || !cashfreeOrder.payment_session_id) {

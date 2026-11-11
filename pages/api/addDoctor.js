@@ -26,13 +26,21 @@ import { getDoctorCredentialsMessageBody } from "./utils/whatsappMessageBodies";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { getConfiguredAppUrl } from "../../src/lib/appOrigin";
 import fs from "fs"; // Import the fs module
-import { resizeImage } from "../../src/components/Common/ResizeImage";
+import {
+  PNG_CONTENT_TYPE,
+  PNG_EXTENSION,
+  RequiredImageError,
+  convertImageToPng,
+  isUploadRejection,
+} from "../../src/lib/convertImageToPng";
 import bcrypt from "bcryptjs";
 import { generateTempPassword } from "../../src/utils/generateTempPassword";
 import Slot from "../../src/models/slots";
 import { generateSlotsForDoctor } from "../../src/lib/slotGeneration";
 import { logErrorToGoogleSheet } from "./helper";
 import {
+  DOCUMENT_EXTENSIONS,
+  getFileExtension,
   isResizableImage,
 } from "../../src/customUtils/imageUpload";
 import {
@@ -275,26 +283,96 @@ function withNormalisedIdentityFields(doctorFields) {
 }
 
 /**
- * Reads a multiparty upload and returns `{ buffer, contentType }` ready for
- * Firebase storage. Images are resized (sharp), anything else - a PDF
- * certificate, a scanned document - is uploaded exactly as it was received; the
- * forms allow any file type, so the upload path must never assume an image.
+ * Reads one multiparty upload and returns `{ buffer, contentType, extension }`
+ * ready for Firebase Storage.
+ *
+ * Pictures (JPG/JPEG/PNG/WEBP/GIF/AVIF/TIFF/SVG) are converted to **PNG** by the
+ * shared `convertImageToPng` helper (src/lib/convertImageToPng.js), so the stored
+ * object is always `image/png` with a `.png` name whatever the browser sent.
+ * Anything else - a PDF certificate, a scanned document - is uploaded exactly as
+ * it was received: the forms allow any file type, so the upload path must never
+ * assume an image. The document keeps its own extension (`.pdf` ...), because an
+ * extension-less object cannot be told apart from a picture by the panels - that
+ * is how a PDF once ended up as a profile picture nobody could see.
+ *
+ * A corrupt / unsupported picture throws `ImageConversionError`; `rejectBadUpload`
+ * turns that into a friendly 400 for the form.
  */
 async function prepareUpload(upload, size = 700) {
   const buffer = fs.readFileSync(upload.path);
   const declaredType = String(upload.headers?.["content-type"] || "").trim();
-  const contentType = declaredType || "application/octet-stream";
 
-  if (!isResizableImage(upload)) return { buffer, contentType };
-
-  try {
-    return { buffer: await resizeImage(buffer, size, size), contentType };
-  } catch (error) {
-    // A corrupt/unsupported picture must not fail the whole save - fall back to
-    // storing the original file.
-    console.error("Could not resize the uploaded image:", error.message);
-    return { buffer, contentType };
+  if (!isResizableImage(upload)) {
+    return {
+      buffer,
+      contentType: declaredType || "application/octet-stream",
+      extension: documentExtension(upload.originalFilename || upload.path),
+    };
   }
+
+  // 700x700 cover = the shape the panels and the prescription already show; only
+  // the encoding changes (every picture ends up as a PNG).
+  const pngBuffer = await convertImageToPng(buffer, {
+    width: size,
+    height: size,
+    fit: "cover",
+  });
+
+  return {
+    buffer: pngBuffer,
+    contentType: PNG_CONTENT_TYPE,
+    extension: PNG_EXTENSION,
+  };
+}
+
+/** `.PDF` -> `.pdf`; anything unexpected -> "" (never a guess from the name). */
+function documentExtension(filename) {
+  const extension = getFileExtension(filename);
+  return DOCUMENT_EXTENSIONS.includes(extension) ? extension : "";
+}
+
+/**
+ * The profile picture, the digital signature and the stamp are rendered inside an
+ * `<img>` / `next/image` everywhere (doctor list, profile page, prescription), so a
+ * document in one of those slots can never be shown. Certified PDFs are fine for
+ * `diplomasCertificates`, which is why only these three are checked.
+ *
+ * Throws `RequiredImageError` (400) before anything is written to Storage.
+ */
+function assertImageUpload(upload, label) {
+  if (!upload || isResizableImage(upload)) return;
+  throw new RequiredImageError(label);
+}
+
+/**
+ * Converts every uploaded picture ONCE, up front, and returns a Map keyed by the
+ * multiparty file object. Doing it before anything is written to Storage means a
+ * corrupt image is rejected before a single object is created - no half-saved
+ * doctor and no orphan files to clean up.
+ */
+async function prepareUploads(uploads, size = 700) {
+  const prepared = new Map();
+  for (const upload of uploads) {
+    if (!upload) continue;
+    prepared.set(upload, await prepareUpload(upload, size));
+  }
+  return prepared;
+}
+
+/**
+ * Answers a rejected upload (a corrupt picture, or a document in an image-only
+ * slot) with the message the form shows the user. Returns true when it wrote the
+ * response - the caller must then stop.
+ */
+function rejectBadUpload(res, error) {
+  if (!isUploadRejection(error)) return false;
+
+  console.error(
+    `Rejected an uploaded file (${error.label || error.originalFormat || "unknown"}):`,
+    error.cause?.message || error.message
+  );
+  res.status(error.statusCode || 400).json({ error: error.message });
+  return true;
 }
 
 /**
@@ -400,16 +478,32 @@ export default async function handler(req, res) {
             .filter((key) => key.startsWith("diplomasCertificates"))
             .map((key) => files[key][0]); // Assuming each field has only one file
 
+          // The picture, the signature and the stamp are always rendered inside an
+          // `<img>`: a PDF in one of those slots can never be shown, so it is
+          // refused here instead of being stored as an invisible "picture".
+          assertImageUpload(profilePictureFile, "profile picture");
+          assertImageUpload(doctorSignatureFile, "digital signature");
+          assertImageUpload(doctorStampFile, "stamp");
+
+          // Every uploaded picture is converted to PNG ONCE, here, before a single
+          // object is written to Storage: a corrupt image fails the request with a
+          // friendly 400 (see the catch below) instead of leaving half an upload.
+          const preparedUploads = await prepareUploads([
+            doctorSignatureFile,
+            doctorStampFile,
+            profilePictureFile,
+            ...diplomasCertificatesFiles,
+          ]);
+
           // Ensure files.profilePicture, doctor stamp, doctor signature are defined
           let profilePictureUrl, doctorStampUrl, doctorSignatureUrl;
 
           if (doctorSignatureFile) {
+            const { buffer, contentType, extension } =
+              preparedUploads.get(doctorSignatureFile);
             const doctorSignatureRef = ref(
               storage,
-              `${doctorSignature_img_path}/${fields.name[0]}${uuidv4()}`
-            );
-            const { buffer, contentType } = await prepareUpload(
-              doctorSignatureFile
+              `${doctorSignature_img_path}/${fields.name[0]}${uuidv4()}${extension}`
             );
             const metadata = {
               contentType,
@@ -422,11 +516,12 @@ export default async function handler(req, res) {
 
           // upload doctor stamp
           if (doctorStampFile) {
+            const { buffer, contentType, extension } =
+              preparedUploads.get(doctorStampFile);
             const doctorStampRef = ref(
               storage,
-              `${doctorStamp_img_path}/${fields.name[0]}${uuidv4()}`
+              `${doctorStamp_img_path}/${fields.name[0]}${uuidv4()}${extension}`
             );
-            const { buffer, contentType } = await prepareUpload(doctorStampFile);
             const metadata = {
               contentType,
             };
@@ -438,11 +533,12 @@ export default async function handler(req, res) {
 
           // Upload profile picture
           if (profilePictureFile) {
+            const { buffer, contentType, extension } =
+              preparedUploads.get(profilePictureFile);
             const profilePictureRef = ref(
               storage,
-              `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}`
+              `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}${extension}`
             );
-            const { buffer, contentType } = await prepareUpload(profilePictureFile);
             const metadata = {
               contentType,
             };
@@ -452,15 +548,16 @@ export default async function handler(req, res) {
             profilePictureUrl = await getDownloadURL(profilePictureRef);
           }
 
-          // Upload diplomas/certificates - images are resized, documents (PDF
+          // Upload diplomas/certificates - pictures become PNG, documents (PDF
           // scans, for instance) are stored exactly as uploaded.
           const diplomasCertificatesUrls = await Promise.all(
             diplomasCertificatesFiles.map(async (certificate, index) => {
+              const { buffer, contentType, extension } =
+                preparedUploads.get(certificate);
               const certificateRef = ref(
                 storage,
-                `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
+                `${certificate_img_path}/${fields.name[0]}${uuidv4()}${extension}`
               );
-              const { buffer, contentType } = await prepareUpload(certificate);
               const metadata = {
                 contentType,
               };
@@ -556,6 +653,9 @@ export default async function handler(req, res) {
           // Assuming the rest of your code to handle the response and database operations
         } catch (error) {
           console.error("Error uploading files:", error);
+          // Corrupt or unsupported picture (a truncated JPG, a PDF in the picture
+          // slot, ...): answer with the reason so the form can show it.
+          if (rejectBadUpload(res, error)) return;
           // Duplicate that raced past the pre-check, or a rejected document:
           // answer with the friendly message instead of a generic 500.
           if (sendDoctorWriteError(res, error)) return;
@@ -655,17 +755,42 @@ export default async function handler(req, res) {
         const diplomasCertificatesFiles = Object.keys(files)
           .filter((key) => key.startsWith("diplomasCertificates"))
           .map((key) => files[key][0]); // Assuming each field has only one file
+        const doctorSignatureFile =
+          files.digitalSignature && files.digitalSignature[0];
+
+        // Every uploaded picture is converted to PNG ONCE, before anything is
+        // written to Storage. `form.parse`'s callback has no outer error boundary
+        // (an async throw would leave the request hanging), so the failure is
+        // answered right here: 400 with the reason for a bad image (or a document
+        // in the picture/signature slot), 500 otherwise.
+        let preparedUploads;
+        try {
+          assertImageUpload(profilePictureFile, "profile picture");
+          assertImageUpload(doctorSignatureFile, "digital signature");
+          preparedUploads = await prepareUploads([
+            profilePictureFile,
+            doctorSignatureFile,
+            ...diplomasCertificatesFiles,
+          ]);
+        } catch (error) {
+          console.error("Could not process the uploaded files:", error);
+          if (rejectBadUpload(res, error)) return;
+          return res
+            .status(500)
+            .json({ error: "An error occurred while processing the uploaded files." });
+        }
 
         console.log(profilePictureFile, "profile file");
         // Upload profile picture if a new one is provided
         let profilePictureUrl = existingDoctor.profilePictureUrl;
         if (profilePictureFile) {
-          // Upload profile picture
+          // Upload profile picture - always a PNG (see prepareUpload)
+          const { buffer, contentType, extension } =
+            preparedUploads.get(profilePictureFile);
           const profilePictureRef = ref(
             storage,
-            `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}`
+            `${profilePicture_img_path}/${fields.name[0]}${uuidv4()}${extension}`
           );
-          const { buffer, contentType } = await prepareUpload(profilePictureFile);
           const metadata = {
             contentType,
           };
@@ -674,6 +799,30 @@ export default async function handler(req, res) {
           // Get profile picture download URL
           profilePictureUrl = await getDownloadURL(profilePictureRef);
           console.log(profilePictureUrl, "profilePictureUrl");
+        }
+
+        // Digital signature: the edit form sends a newly picked file as the same
+        // `digitalSignature` part the Add Doctor form uses, so the upload is
+        // identical (any file type, pictures converted to PNG by `prepareUpload`).
+        // Without a file the stored signature is kept - unless the client
+        // explicitly sent `doctorSignatureUrl`, which is how the admin clears it
+        // ("" - see submitDoctorUpdate). A doctor-panel approval PUT sends neither,
+        // so the stored signature survives it untouched.
+        let doctorSignatureUrl = existingDoctor.doctorSignatureUrl;
+        if (doctorSignatureFile) {
+          const { buffer, contentType, extension } =
+            preparedUploads.get(doctorSignatureFile);
+          const doctorSignatureRef = ref(
+            storage,
+            `${doctorSignature_img_path}/${
+              fields.name?.[0] || existingDoctor.name || "doctor"
+            }${uuidv4()}${extension}`
+          );
+          await uploadBytes(doctorSignatureRef, buffer, { contentType });
+          doctorSignatureUrl = await getDownloadURL(doctorSignatureRef);
+          console.log(doctorSignatureUrl, "doctorSignatureUrl");
+        } else if (fields.doctorSignatureUrl !== undefined) {
+          doctorSignatureUrl = String(fields.doctorSignatureUrl?.[0] ?? "").trim();
         }
 
         // Certificates: the edit forms send the certificates that are kept as
@@ -693,11 +842,12 @@ export default async function handler(req, res) {
 
         const uploadedCertificateUrls = [];
         for (const certificateFile of diplomasCertificatesFiles) {
+          const { buffer, contentType, extension } =
+            preparedUploads.get(certificateFile);
           const certificateRef = ref(
             storage,
-            `${certificate_img_path}/${fields.name[0]}${uuidv4()}`
+            `${certificate_img_path}/${fields.name[0]}${uuidv4()}${extension}`
           );
-          const { buffer, contentType } = await prepareUpload(certificateFile);
           await uploadBytes(certificateRef, buffer, { contentType }); // Upload the Buffer
           uploadedCertificateUrls.push(await getDownloadURL(certificateRef));
         }
@@ -762,6 +912,9 @@ export default async function handler(req, res) {
           ...withNormalisedIdentityFields(stripRemovedDoctorFields(stringFields)),
           profilePictureUrl,
           diplomasCertificatesUrls,
+          // Placed after the spread so the resolved value wins over the raw
+          // `doctorSignatureUrl` text field this request may also carry.
+          doctorSignatureUrl,
           consultationType: parseConsultationTypes(
             fields.consultationType?.[0]
           ),
@@ -860,6 +1013,20 @@ export default async function handler(req, res) {
           );
         }
 
+        // A replaced signature: the previous Storage object is deleted only once
+        // the new URL is stored (a cleared signature has no replacement to wait
+        // for and its object is already unreferenced, so it is left alone).
+        if (
+          doctorSignatureFile &&
+          existingDoctor.doctorSignatureUrl &&
+          doctorSignatureUrl !== existingDoctor.doctorSignatureUrl
+        ) {
+          await deleteStoredFirebaseObject(
+            existingDoctor.doctorSignatureUrl,
+            "old doctor signature"
+          );
+        }
+
         // Certificates the admin removed: the stored URLs that are no longer in
         // the saved list. Adding a certificate never deletes the existing ones.
         for (const oldUrl of existingDoctor.diplomasCertificatesUrls || []) {
@@ -872,6 +1039,7 @@ export default async function handler(req, res) {
       });
     } catch (error) {
       console.error("Error updating doctor:", error);
+      if (rejectBadUpload(res, error)) return;
       if (sendDoctorWriteError(res, error)) return;
       await logErrorToGoogleSheet({
         apiName: "addDoctor - PUT",

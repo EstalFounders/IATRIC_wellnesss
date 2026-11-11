@@ -942,8 +942,9 @@ const AddDoctorForm = () => {
               <p className={styles.hint}>
                 Optional, but certificates, the picture and the signature
                 improve the prescription and the doctor profile. Any file type
-                is accepted - images are resized, documents are stored as they
-                are.
+                is accepted for the certificates; the picture and the signature
+                must be an image (JPG, PNG or WEBP) - a PDF cannot be shown as a
+                picture.
               </p>
               <Row key={uploaderKey}>
                 <Col md={4}>
@@ -963,7 +964,8 @@ const AddDoctorForm = () => {
                     <span className={styles.label}>Doctor Picture</span>
                     <ImageUploader
                       id="profilePicture"
-                      multiple={true}
+                      multiple={false}
+                      imagesOnly={true}
                       onImagesChange={handleImagesChange}
                     />
                   </div>
@@ -974,6 +976,7 @@ const AddDoctorForm = () => {
                     <ImageUploader
                       id="doctorSignature"
                       multiple={false}
+                      imagesOnly={true}
                       onImagesChange={handleImagesChange}
                     />
                   </div>

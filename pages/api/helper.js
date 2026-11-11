@@ -477,6 +477,9 @@ export const bookConsultation = async ({
     patientMobNo,
     consultationType,
     consultationprice,
+    // Carried through from the form so the appointment can store it; see
+    // bookConsultationParams in handlePostConsultation.
+    serviceType,
     appointmentTime,
     patientMeetingUrl,
     doctorMeetingUrl,
@@ -595,6 +598,10 @@ export const bookConsultation = async ({
           patientMobNo,
           consultationType,
           consultationprice,
+          // The speciality the patient picked. Stored so the confirmation
+          // summary (shown after payment, see /payment/thankyou) can display it -
+          // it is not derivable from the doctor record.
+          serviceType,
           appointmentTime,
           bookingMode: bookingMode || clientSideAppointmentTime || null,
           patientMeetingUrl: ensureHttps(patientMeetingUrl),
@@ -631,9 +638,101 @@ export const bookConsultation = async ({
   return appointment;
 };
 
+/** Column layout of the error sheet (`GOOGLE_SHEET_NAME`), in order. */
+const ERROR_LOG_HEADERS = [
+  "Timestamp",
+  "Patient Name",
+  "Mobile Number",
+  "Doctor Name",
+  "Consultation Type",
+  "Appointment Date",
+  "API Endpoint",
+  "Error Code",
+  "Error Message",
+  "Request Payload",
+  "Response Payload",
+  "Stack Trace",
+  "Environment",
+];
+
+/** Upper bound for a single Google Sheets call - logging must never stall a route. */
+const SHEET_TIMEOUT_MS = 8000;
+
+/** Rejects when `promise` does not settle within `ms`, so callers cannot hang. */
+const withTimeout = (promise, ms, label) =>
+  Promise.race([
+    promise,
+    new Promise((resolve, reject) => {
+      setTimeout(
+        () => reject(new Error(`${label} timed out after ${ms}ms`)),
+        ms,
+      );
+    }),
+  ]);
+
+/** PEM from an env var: surrounding quotes stripped, escaped "\n" made real. */
+const asPem = (value) =>
+  String(value || "")
+    .replace(/^"|"$/g, "")
+    .replace(/\\n/g, "\n")
+    .trim();
+
+/** Which credential source the sheet client used last (logged once per source). */
+let errorSheetAuthSource = "";
+
+/**
+ * Credentials for the Google Sheets client.
+ *
+ * Preferred: the Firebase service-account pair already provisioned for this app
+ * (`FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`, the same convention as
+ * `lib/firebaseAdmin.js`). It is a live key and already shares the spreadsheet.
+ *
+ * Fallback: a service-account JSON file (`GOOGLE_APPLICATION_CREDENTIALS`, else the
+ * committed `serviceAccountKey.json`), kept for key rotation. A revoked key in that
+ * file made every write fail with `invalid_grant: Invalid JWT Signature` while the
+ * caller only saw `false`, so the resolved source is reported once on first use.
+ */
+function resolveSheetServiceAccount() {
+  const envEmail = String(process.env.FIREBASE_CLIENT_EMAIL || "").trim();
+  const envKey = asPem(process.env.FIREBASE_PRIVATE_KEY);
+  if (envEmail && envKey) {
+    return {
+      email: envEmail,
+      key: envKey,
+      source: "env:FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY",
+    };
+  }
+
+  const jsonPath =
+    String(process.env.GOOGLE_APPLICATION_CREDENTIALS || "").trim() ||
+    path.join(process.cwd(), "serviceAccountKey.json");
+
+  try {
+    if (fs.existsSync(jsonPath)) {
+      const parsed = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+      if (parsed?.client_email && parsed?.private_key) {
+        return {
+          email: parsed.client_email,
+          key: asPem(parsed.private_key),
+          source: path.basename(jsonPath),
+        };
+      }
+    }
+  } catch (error) {
+    console.error(
+      "logErrorToGoogleSheet: unreadable service account file",
+      jsonPath,
+      error.message,
+    );
+  }
+
+  return null;
+}
+
 /**
  * Reusable helper to log errors to Google Sheets.
- * Uses the local serviceAccountKey.json file for authentication.
+ * Uses the Firebase service account from the environment, falling back to the local
+ * serviceAccountKey.json file.
  * Handles connection, row insertion, and error handling internally.
  * Failure to log does not throw - logs to console and returns false.
  *
@@ -653,85 +752,117 @@ export const bookConsultation = async ({
  */
 export const logErrorToGoogleSheet = async (data) => {
   try {
-    const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-    const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "ErrorLogs";
+    // `.env` values can carry a stray leading space ("GOOGLE_SHEET_ID= 1lSJE...").
+    const SPREADSHEET_ID = String(process.env.GOOGLE_SHEET_ID || "").trim();
+    const SHEET_NAME = String(process.env.GOOGLE_SHEET_NAME || "ErrorLogs").trim();
 
     if (!SPREADSHEET_ID) {
       console.error("logErrorToGoogleSheet: GOOGLE_SHEET_ID not configured");
       return false;
     }
 
-    // Load service account key from local JSON file
-    const serviceAccountPath = path.join(process.cwd(), "serviceAccountKey.json");
-    if (!fs.existsSync(serviceAccountPath)) {
-      console.error("logErrorToGoogleSheet: serviceAccountKey.json not found at", serviceAccountPath);
+    const serviceAccount = resolveSheetServiceAccount();
+    if (!serviceAccount) {
+      console.error(
+        "logErrorToGoogleSheet: no usable credentials - set FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY, or provide serviceAccountKey.json / GOOGLE_APPLICATION_CREDENTIALS",
+      );
       return false;
     }
 
-    const serviceAccountKey = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+    if (errorSheetAuthSource !== serviceAccount.source) {
+      errorSheetAuthSource = serviceAccount.source;
+      console.log(
+        "logErrorToGoogleSheet: authenticating with",
+        serviceAccount.source,
+      );
+    }
 
-    // Initialize Google Auth using the service account key file
-    // The universe_domain from the key file (googleapis.com) is used as the auth scope
     const serviceAccountAuth = new JWT({
-      email: serviceAccountKey.client_email,
-      key: serviceAccountKey.private_key,
+      email: serviceAccount.email,
+      key: serviceAccount.key,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
 
-    await doc.loadInfo();
+    await withTimeout(doc.loadInfo(), SHEET_TIMEOUT_MS, "Google Sheets loadInfo");
     let sheet = doc.sheetsByTitle[SHEET_NAME];
 
     if (!sheet) {
-      sheet = await doc.addSheet({
-        title: SHEET_NAME,
-        headerValues: [
-          "Timestamp",
-          "Patient Name",
-          "Mobile Number",
-          "Doctor Name",
-          "Consultation Type",
-          "Appointment Date",
-          "API Endpoint",
-          "Error Code",
-          "Error Message",
-          "Request Payload",
-          "Response Payload",
-          "Stack Trace",
-          "Environment",
-        ],
-      });
+      sheet = await withTimeout(
+        doc.addSheet({ title: SHEET_NAME, headerValues: ERROR_LOG_HEADERS }),
+        SHEET_TIMEOUT_MS,
+        "Google Sheets addSheet",
+      );
+    } else {
+      // google-spreadsheet v5 loads a sheet's header row lazily and throws
+      // "Header values are not yet loaded" until it is fetched. An empty tab has no
+      // header at all, and `addRow({ ... })` cannot map object keys without one, so
+      // the layout is written here - not only when the sheet is created.
+      let hasHeaders = false;
+      try {
+        await withTimeout(
+          sheet.loadHeaderRow(),
+          SHEET_TIMEOUT_MS,
+          "Google Sheets loadHeaderRow",
+        );
+        hasHeaders = Boolean(sheet.headerValues?.length);
+      } catch (headerError) {
+        hasHeaders = false;
+      }
+
+      if (!hasHeaders) {
+        await withTimeout(
+          sheet.setHeaderRow(ERROR_LOG_HEADERS),
+          SHEET_TIMEOUT_MS,
+          "Google Sheets setHeaderRow",
+        );
+      }
     }
 
-    await sheet.addRow({
-      Timestamp: new Date().toISOString(),
-      "Patient Name": data.patientName || "",
-      "Mobile Number": data.mobileNumber || "",
-      "Doctor Name": data.doctorName || "",
-      "Consultation Type": data.consultationType || "",
-      "Appointment Date": data.appointmentDate || "",
-      "API Endpoint": data.apiName || "",
-      "Error Code": data.errorCode || "",
-      "Error Message": data.errorMessage || "Unknown error",
-      "Request Payload": data.requestPayload
-        ? (typeof data.requestPayload === "string"
+    await withTimeout(
+      sheet.addRow({
+        Timestamp: new Date().toISOString(),
+        "Patient Name": data.patientName || "",
+        "Mobile Number": data.mobileNumber || "",
+        "Doctor Name": data.doctorName || "",
+        "Consultation Type": data.consultationType || "",
+        "Appointment Date": data.appointmentDate || "",
+        "API Endpoint": data.apiName || "",
+        "Error Code": data.errorCode || "",
+        "Error Message": data.errorMessage || "Unknown error",
+        "Request Payload": data.requestPayload
+          ? typeof data.requestPayload === "string"
             ? data.requestPayload
-            : JSON.stringify(data.requestPayload))
-        : "",
-      "Response Payload": data.responsePayload
-        ? (typeof data.responsePayload === "string"
+            : JSON.stringify(data.requestPayload)
+          : "",
+        "Response Payload": data.responsePayload
+          ? typeof data.responsePayload === "string"
             ? data.responsePayload
-            : JSON.stringify(data.responsePayload))
-        : "",
-      "Stack Trace": data.stackTrace || "",
-      Environment: process.env.NODE_ENV || "development",
-    });
+            : JSON.stringify(data.responsePayload)
+          : "",
+        "Stack Trace": data.stackTrace || "",
+        Environment: process.env.NODE_ENV || "development",
+      }),
+      SHEET_TIMEOUT_MS,
+      "Google Sheets addRow",
+    );
 
-    console.log("logErrorToGoogleSheet: Error logged successfully to Google Sheets");
+    console.log("logErrorToGoogleSheet: Error logged successfully to Google Sheets", {
+      apiName: data.apiName || "",
+      sheet: SHEET_NAME,
+    });
     return true;
   } catch (error) {
-    console.error("logErrorToGoogleSheet: Failed to log error to Google Sheets:", error.message);
+    // The two silent failure modes this used to hide: a revoked key and an
+    // existing tab without headers. Both now say so in the log.
+    const hint = /invalid_grant|Invalid JWT Signature/i.test(error.message || "")
+      ? " - the service account key is revoked/stale: FIREBASE_PRIVATE_KEY must belong to FIREBASE_CLIENT_EMAIL"
+      : "";
+    console.error(
+      "logErrorToGoogleSheet: Failed to log error to Google Sheets:",
+      `${error.message}${hint}`,
+    );
     // Fail silently - logging failure should not crash the application or affect API response
     return false;
   }
@@ -776,6 +907,7 @@ export async function handlePostConsultation(reqBody, res) {
     patientMobNo,
     consultationType,
     consultationprice,
+    serviceType,
   } = validation.payload;
 
   const clientSideAppointmentTime = appointmentTime;
@@ -920,6 +1052,9 @@ export async function handlePostConsultation(reqBody, res) {
       patientMobNo,
       consultationType,
       consultationprice: resolvedPrice,
+      // Forwarded to bookConsultation: the appointment document stores it, and
+      // /payment/status returns it so the success screen can show the speciality.
+      serviceType,
       appointmentTime: slot.startTime,
       status: appointment_status.open,
       patientMeetingUrl: patientMeetingUrl,

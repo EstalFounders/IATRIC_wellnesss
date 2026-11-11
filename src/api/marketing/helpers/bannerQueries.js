@@ -9,7 +9,10 @@ export const BANNER_DEFAULTS = {
   bannerUrl: "",
   altText: "HealthPath",
   href: "",
-  isActive: true,
+  // OFF unless the panel says otherwise: a document written before the switch
+  // existed has no `isActive` key, and defaulting that to "on" is what kept a
+  // paused banner showing on the homepage.
+  isActive: false,
   lastUpdated: null,
 };
 
@@ -31,9 +34,15 @@ export const getBannerConfig = async () => {
   };
 };
 
-/** True when the homepage should render the banner right now. */
+/**
+ * True when the homepage should render the banner right now.
+ *
+ * `=== true` on purpose: only the marketing panel's own switch can turn the
+ * popup on. A missing/false flag never renders it (the previous truthy check,
+ * plus the storage fallback in BannerPopup, is what kept a paused banner live).
+ */
 export const isBannerLiveNow = (banner) =>
-  Boolean(banner?.isActive && banner.bannerUrl);
+  Boolean(banner?.isActive === true && banner.bannerUrl);
 
 /** Persist the banner on the home document, creating it if the panel is empty. */
 export const saveBannerConfig = async (values, updatedBy) => {

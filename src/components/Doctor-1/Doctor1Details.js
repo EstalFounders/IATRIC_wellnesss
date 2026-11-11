@@ -1,17 +1,50 @@
 import Image from "next/image";
 import { imageBlurDataUrl } from "../../constant";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
+import {
+  documentKind,
+  isPdfUrl,
+  isPreviewableImageUrl,
+} from "../../customUtils/imageUpload";
 import { formatWorkExperienceLabel } from "../../customUtils/workExperience";
 import { formatLanguagesLabel } from "../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
 import { doctorDisplayName } from "../../utils/doctorName";
 
+/** Missing / unreadable picture: the bundled avatar instead of a broken image. */
+const FALLBACK_PHOTO = "images/doctor-1.jpg";
+
+/**
+ * A certificate stored as a PDF (or any other document) cannot be rendered by
+ * `next/image`, so it becomes a card that opens the file in a new tab. The link
+ * is the whole card, so nothing is hidden behind a tiny target.
+ */
+const documentCardStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "6px",
+  minHeight: "200px",
+  padding: "18px 14px",
+  border: "1px solid #dbe3ea",
+  borderRadius: "10px",
+  background: "#f7fafc",
+  color: "#1d4ed8",
+  textAlign: "center",
+  textDecoration: "none",
+};
+
 const Doctor1Details = () => {
   const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo) || {};
+  // A stored object can still be a document (legacy records uploaded before the
+  // API refused them) or fail to load, so the <img> needs a fallback.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const [brokenCertificates, setBrokenCertificates] = useState([]);
   const {
     name,
     expertise,
@@ -77,8 +110,13 @@ const Doctor1Details = () => {
                   width={300}
                   height={300}
                   className="img-fluid rounded-circle"
-                  src={profilePictureUrl || "images/doctor-1.jpg"}
+                  src={
+                    isPreviewableImageUrl(profilePictureUrl) && !photoFailed
+                      ? profilePictureUrl
+                      : FALLBACK_PHOTO
+                  }
                   alt="doctor-foto"
+                  onError={() => setPhotoFailed(true)}
                 />
                 {/* Doctor Info */}
                 <div className="doctor-info">
@@ -160,19 +198,52 @@ const Doctor1Details = () => {
                   </h5>
                   {/* Certificate Preview */}
                   <div className="row">
-                    {/* Certificate Image */}
-                    {diplomasCertificatesUrls.map((url, index) => (
+                    {/* Certificate Image, or a card for a PDF/document */}
+                    {(diplomasCertificatesUrls || []).map((url, index) => (
                       <div className="col-md-4" key={index}>
                         <div className="certificate-preview mb-30">
-                          <Image
-                            placeholder="blur"
-                            blurDataURL={imageBlurDataUrl}
-                            width={300}
-                            height={200}
-                            className="img-fluid"
-                            src={url}
-                            alt={`Certificate ${index + 1}`}
-                          />
+                          {documentKind(url) === "image" &&
+                          !brokenCertificates.includes(index) ? (
+                            <Image
+                              placeholder="blur"
+                              blurDataURL={imageBlurDataUrl}
+                              width={300}
+                              height={200}
+                              className="img-fluid"
+                              src={url}
+                              alt={`Certificate ${index + 1}`}
+                              onError={() =>
+                                setBrokenCertificates((previous) =>
+                                  previous.includes(index)
+                                    ? previous
+                                    : [...previous, index]
+                                )
+                              }
+                            />
+                          ) : (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={documentCardStyle}
+                            >
+                              <i
+                                className={`fas ${
+                                  isPdfUrl(url)
+                                    ? "fa-file-pdf"
+                                    : "fa-file-alt"
+                                }`}
+                                style={{ fontSize: "34px" }}
+                              />
+                              <span className="fw-semibold">
+                                Certificate {index + 1}
+                              </span>
+                              <small>
+                                {isPdfUrl(url) ? "PDF document" : "Document"} -
+                                open in a new tab
+                              </small>
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}

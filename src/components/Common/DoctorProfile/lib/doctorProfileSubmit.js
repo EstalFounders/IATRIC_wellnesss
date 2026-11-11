@@ -45,6 +45,15 @@ export const buildChangedFields = (original, edited) => {
       return;
     }
 
+    // Any other File is a newly picked digital signature (super-admin only - the
+    // doctor panel hides the documents card). It cannot travel in the JSON
+    // approval body either: the super-admin flow PUTs the multipart form, which
+    // uploads it. It still counts as a change.
+    if (isFile(edited[key])) {
+      hasChanges = true;
+      return;
+    }
+
     if (key === "consultationType") {
       const next = toConsultationTypeEntries(edited[key]);
       const current = toConsultationTypeEntries(stored[key]);
@@ -168,6 +177,22 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   if (isFile(editedDoctor.profilePictureUrl)) {
     formData.append("profilePicture", editedDoctor.profilePictureUrl);
   }
+  // Digital signature - same contract as the picture: a newly picked File goes as
+  // the `digitalSignature` part the Add Doctor form already uses (the API uploads
+  // it and deletes the replaced object), while a stored URL is only sent back as
+  // text so the field is never lost. A blank value is sent on purpose: that is
+  // how the admin removes the stored signature.
+  if (isFile(editedDoctor.doctorSignatureUrl)) {
+    formData.append(
+      "digitalSignature",
+      editedDoctor.doctorSignatureUrl,
+      editedDoctor.doctorSignatureUrl.name || "doctor-signature"
+    );
+  } else if (editedDoctor.doctorSignatureUrl !== undefined) {
+    // Only send the text when the doctor document actually carries the field: an
+    // older/cached document without it must not clear a stored signature.
+    formData.append("doctorSignatureUrl", editedDoctor.doctorSignatureUrl || "");
+  }
   formData.append("doctorType", editedDoctor.doctorType);
   formData.append("slotStartTime", editedDoctor.slotStartTime);
   formData.append("slotEndTime", editedDoctor.slotEndTime);
@@ -211,7 +236,10 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Doctor update failed (${response.status})`);
+    // The API explains a rejected upload (a corrupt image, a duplicate, ...) in
+    // `error`; keep that wording instead of a bare status code.
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `Doctor update failed (${response.status})`);
   }
 
   return response;
