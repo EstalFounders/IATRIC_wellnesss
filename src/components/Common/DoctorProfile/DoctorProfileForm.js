@@ -45,10 +45,12 @@ import { doctorDisplayName } from "../../../utils/doctorName";
 import { toConsultationTypeEntries } from "../../../utils/consultationFee";
 import { parseLanguages } from "../../../customUtils/languages";
 import {
+  displayFileNameFromUrl,
   fileNameFromUrl,
   isPreviewableImage,
   isPreviewableImageUrl,
 } from "../../../customUtils/imageUpload";
+import StoredDocumentThumb from "../StoredDocumentThumb";
 import { formatLocation } from "../../../customUtils/indiaLocations";
 import { stampDataUrl } from "../../registerDocComponent/lib/DoctorStampGenerator";
 import { buildChangedFields } from "./lib/doctorProfileSubmit";
@@ -74,11 +76,36 @@ const DoctorProfileForm = ({
   // keys are rewritten, so an untouched legacy value ("mon-sunday", a joined
   // string) still reports "no change" in the approval diff.
   const [editedDoctor, setEditedDoctor] = useState({ ...doctor });
+  // The stored picture is shown as an inline thumbnail; only an image can go into
+  // an <img>, so a PDF (or an unrecognisable extension) is listed by file name.
   const [profilePicturePreview, setProfilePicturePreview] = useState(
-    doctor.profilePictureUrl
+    isPreviewableImageUrl(doctor.profilePictureUrl)
+      ? doctor.profilePictureUrl
+      : ""
+  );
+  const [profilePictureFileName, setProfilePictureFileName] = useState(
+    doctor.profilePictureUrl &&
+      !isPreviewableImageUrl(doctor.profilePictureUrl)
+      ? fileNameFromUrl(doctor.profilePictureUrl) || "Picture on file"
+      : ""
   );
   const [diplomasCertificatesPreview, setDiplomasCertificatesPreview] =
     useState(doctor.diplomasCertificatesUrls);
+
+  // Digital signature slot (super admin only, like the other documents). An image
+  // is previewed inline and a PDF/other document is shown by file name, exactly
+  // like the Add Doctor form's uploader.
+  const [signaturePreviewUrl, setSignaturePreviewUrl] = useState(
+    isPreviewableImageUrl(doctor.doctorSignatureUrl)
+      ? doctor.doctorSignatureUrl
+      : ""
+  );
+  const [signatureFileName, setSignatureFileName] = useState(
+    doctor.doctorSignatureUrl &&
+      !isPreviewableImageUrl(doctor.doctorSignatureUrl)
+      ? fileNameFromUrl(doctor.doctorSignatureUrl) || "Signature on file"
+      : ""
+  );
 
   const [slotStartTime, setSlotStartTime] = useState(
     convertDateIntoTime(editedDoctor.slotStartTime)
@@ -164,15 +191,23 @@ const DoctorProfileForm = ({
     const file = e.target.files[0];
     if (!file) return;
 
-    // Any file type is allowed (the server resizes images and stores documents
-    // as they are); only an image can be rendered as the avatar.
+    // The picture is rendered inside an <img> everywhere (list, profile page,
+    // prescription), so a document is refused here exactly like the API does it -
+    // "any file type" only ever applied to the certificates.
+    if (!isPreviewableImage(file)) {
+      e.target.value = "";
+      window.alert(
+        "The profile picture must be an image (JPG, PNG or WEBP)."
+      );
+      return;
+    }
+
     setEditedDoctor({
       ...editedDoctor,
       profilePictureUrl: file,
     });
-    setProfilePicturePreview(
-      isPreviewableImage(file) ? URL.createObjectURL(file) : null
-    );
+    setProfilePicturePreview(URL.createObjectURL(file));
+    setProfilePictureFileName("");
   };
 
   const handleDiplomasCertificatesChange = (e) => {
@@ -193,7 +228,8 @@ const DoctorProfileForm = ({
 
   const handleDeleteProfilePicture = () => {
     setEditedDoctor({ ...editedDoctor, profilePictureUrl: "" });
-    setProfilePicturePreview(null);
+    setProfilePicturePreview("");
+    setProfilePictureFileName("");
   };
 
   const handleDeleteDiplomasCertificate = (index) => {
@@ -201,6 +237,32 @@ const DoctorProfileForm = ({
     updatedUrls.splice(index, 1);
     setEditedDoctor({ ...editedDoctor, diplomasCertificatesUrls: updatedUrls });
     setDiplomasCertificatesPreview(updatedUrls);
+  };
+
+  const handleSignatureChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // The signature is printed as an <img> on the prescription and the contract,
+    // so a document is refused here too (the API answers the same 400).
+    if (!isPreviewableImage(file)) {
+      e.target.value = "";
+      window.alert("The digital signature must be an image (JPG, PNG or WEBP).");
+      return;
+    }
+
+    // Only the File goes into the form state (`buildChangedFields` reports it as a
+    // change and `submitDoctorUpdate` uploads it); the preview stays local.
+    setEditedDoctor({ ...editedDoctor, doctorSignatureUrl: file });
+    setSignaturePreviewUrl(URL.createObjectURL(file));
+    setSignatureFileName("");
+  };
+
+  const handleDeleteSignature = () => {
+    // "" tells the API to clear the stored signature - a URL would keep it.
+    setEditedDoctor({ ...editedDoctor, doctorSignatureUrl: "" });
+    setSignaturePreviewUrl("");
+    setSignatureFileName("");
   };
 
   const handleRemoveType = (type) => {
@@ -365,6 +427,9 @@ const DoctorProfileForm = ({
               src={profilePicturePreview}
               alt="Doctor profile"
               className={styles.avatar}
+              // A document stored in the picture slot cannot be rendered; fall
+              // back to the initials instead of a broken image.
+              onError={() => setProfilePicturePreview("")}
             />
           ) : (
             <div className={styles.avatarFallback} aria-hidden="true">
@@ -761,7 +826,7 @@ const DoctorProfileForm = ({
                   <FaFileUpload /> Documents
                 </h2>
                 <Row>
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Group>
                       <Form.Label className={styles.label}>
                         Diplomas Certificates
@@ -792,16 +857,13 @@ const DoctorProfileForm = ({
                                     {entry.name}
                                   </p>
                                 )
-                              ) : isPreviewableImageUrl(entry) ? (
-                                <img
-                                  src={entry}
+                              ) : (
+                                <StoredDocumentThumb
+                                  url={entry}
                                   alt={`Diploma ${index + 1}`}
                                   className={styles.docThumb}
+                                  chipStyle={{ minHeight: "90px" }}
                                 />
-                              ) : (
-                                <p className={styles.docFileName}>
-                                  {fileNameFromUrl(entry)}
-                                </p>
                               )}
                               <FaTrash
                                 className={styles.docRemove}
@@ -815,7 +877,7 @@ const DoctorProfileForm = ({
                       </div>
                     </Form.Group>
                   </Col>
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Group>
                       <Form.Label className={styles.label}>
                         Profile Picture
@@ -827,17 +889,94 @@ const DoctorProfileForm = ({
                       />
                       <p className={styles.hint}>
                         Shown in the panel header and on the prescription sheet.
-                        Any file type is accepted.
+                        Must be an image (JPG, PNG or WEBP) - a PDF cannot be shown
+                        as a picture.
                       </p>
-                      {profilePicturePreview ? (
-                        <button
-                          type="button"
-                          className={styles.smallBtn}
-                          onClick={handleDeleteProfilePicture}
-                        >
-                          Remove picture
-                        </button>
-                      ) : null}
+                      {profilePicturePreview || profilePictureFileName ? (
+                        <div className={styles.docGrid}>
+                          <div className={styles.docThumbWrap}>
+                            {profilePicturePreview ? (
+                              <img
+                                src={profilePicturePreview}
+                                alt="Doctor profile picture"
+                                className={styles.docThumb}
+                                // A stored document can never be rendered - fall
+                                // back to the file name card.
+                                onError={() => {
+                                  setProfilePicturePreview("");
+                                  setProfilePictureFileName(
+                                    displayFileNameFromUrl(
+                                      doctor.profilePictureUrl,
+                                      "Picture on file"
+                                    )
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <p className={styles.docFileName}>
+                                {profilePictureFileName}
+                              </p>
+                            )}
+                            <FaTrash
+                              className={styles.docRemove}
+                              title="Remove picture"
+                              onClick={handleDeleteProfilePicture}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <p className={styles.hint}>No picture uploaded.</p>
+                      )}
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group>
+                      <Form.Label className={styles.label}>
+                        Digital Signature
+                      </Form.Label>
+                      <input
+                        type="file"
+                        onChange={handleSignatureChange}
+                        className={styles.fileInput}
+                      />
+                      <p className={styles.hint}>
+                        Printed next to the name on prescriptions and on the
+                        doctor contract. Must be an image (JPG, PNG or WEBP) - a PDF
+                        cannot be printed.
+                      </p>
+                      <div className={styles.docGrid}>
+                        {signaturePreviewUrl || signatureFileName ? (
+                          <div className={styles.docThumbWrap}>
+                            {signaturePreviewUrl ? (
+                              <img
+                                src={signaturePreviewUrl}
+                                alt="Doctor signature"
+                                className={styles.docThumb}
+                                onError={() => {
+                                  setSignaturePreviewUrl("");
+                                  setSignatureFileName(
+                                    displayFileNameFromUrl(
+                                      doctor.doctorSignatureUrl,
+                                      "Signature on file"
+                                    )
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <p className={styles.docFileName}>
+                                {signatureFileName}
+                              </p>
+                            )}
+                            <FaTrash
+                              className={styles.docRemove}
+                              title="Remove signature"
+                              onClick={handleDeleteSignature}
+                            />
+                          </div>
+                        ) : (
+                          <p className={styles.hint}>No signature uploaded.</p>
+                        )}
+                      </div>
                     </Form.Group>
                   </Col>
                 </Row>
@@ -848,8 +987,9 @@ const DoctorProfileForm = ({
                   <FaFileUpload /> Documents
                 </h2>
                 <p className={styles.hint}>
-                  Your photo and diploma certificates are managed by the clinic
-                  admin - ask the super admin to update them.
+                  Your photo, diploma certificates and digital signature are
+                  managed by the clinic admin - ask the super admin to update
+                  them.
                 </p>
               </div>
             )}

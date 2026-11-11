@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { getConfiguredAppUrl } from "./appOrigin";
+import { getSameSiteOrigin } from "./appOrigin";
 
 const isProductionEnv = () => {
   return (
@@ -58,6 +58,46 @@ export function getCashfreeConfig() {
   return { clientId, clientSecret };
 }
 
+/**
+ * Public base URL (`https://host/`) used for the Cashfree `return_url` and
+ * `notify_url` below.
+ *
+ * The thank-you page - and therefore the server that verifies the payment - runs
+ * on whichever deployment Cashfree redirects to, so the redirect MUST land on the
+ * deployment that created the order: a checkout started on localhost has to come
+ * back to localhost, a staging checkout to staging. `requestOrigin` (the origin of
+ * the inbound create-order/pay request) is that deployment; `getSameSiteOrigin`
+ * keeps the value an absolute http(s) origin and prefers the configured public URL
+ * when both name the same host, so a proxy that drops `x-forwarded-proto` cannot
+ * downgrade https -> http.
+ *
+ * Resolution order: request origin / configured app URL -> legacy
+ * NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL (what production is configured with
+ * today, and the only signal a host-less caller - cron, script, test - can offer)
+ * -> localhost fallback outside production.
+ */
+function resolveAppBase({ requestOrigin } = {}) {
+  const sameSite = getSameSiteOrigin({ requestOrigin });
+  if (sameSite) return `${sameSite.replace(/\/+$/, "")}/`;
+
+  const legacyHost = String(
+    process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "",
+  )
+    .trim()
+    .replace(/^https?:\/\//, "")
+    .replace(/^\/+|\/+$/g, "");
+
+  if (legacyHost) return `https://${legacyHost}/`;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Public app URL is not configured: set NEXT_PUBLIC_APP_URL (or NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL) so payment redirects stay on this domain",
+    );
+  }
+
+  return "http://localhost:3000/";
+}
+
 export async function createCashfreeOrder({
   orderId,
   amount,
@@ -66,27 +106,12 @@ export async function createCashfreeOrder({
   // tie a Cashfree order to our appointment - and to carry the offer code when
   // one is known up front - without another lookup.
   orderTags,
+  // Origin of the request that asked for this order (see resolveAppBase).
+  requestOrigin,
 }) {
   const { clientId, clientSecret } = getCashfreeConfig();
 
-  // Public host used in the return/notify URLs below - these are where Cashfree
-  // sends the patient after paying, so a localhost fallback would strand them.
-  // Resolution order: dedicated env -> configured public app URL -> dev only.
-  const appHost = (
-    process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL ||
-    getConfiguredAppUrl().replace(/^https?:\/\//, "") ||
-    (process.env.NODE_ENV === "production" ? "" : "localhost:3000")
-  )
-    .trim()
-    .replace(/^\/+|\/+$/g, "");
-
-  if (!appHost) {
-    throw new Error(
-      "Public app URL is not configured: set NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL (or NEXTAUTH_URL) so payment redirects stay on this domain"
-    );
-  }
-
-  const appBase = `${appHost}/`;
+  const appBase = resolveAppBase({ requestOrigin });
 
   const body = {
     order_id: orderId,
@@ -100,8 +125,8 @@ export async function createCashfreeOrder({
       customer_phone: customerDetails.customerPhone,
     },
     order_meta: {
-      return_url: `https://${appBase}payment/thankyou?appointmentId=${orderId}`,
-      notify_url: `https://${appBase}api/payment/webhook`,
+      return_url: `${appBase}payment/thankyou?appointmentId=${orderId}`,
+      notify_url: `${appBase}api/payment/webhook`,
     },
   };
 
@@ -143,19 +168,20 @@ export async function payCashfreeOrder({
   orderCurrency,
   customerDetails,
   paymentMethod,
+  // Origin of the request that asked for this payment (see resolveAppBase).
+  requestOrigin,
 }) {
   const { clientId, clientSecret } = getCashfreeConfig();
 
-  const baseUrl = process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL || "staging.healthpath.co.in/";
-  const appBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const appBase = resolveAppBase({ requestOrigin });
 
   const body = {
     order_id: orderId,
     order_amount: orderAmount,
     order_currency: orderCurrency || "INR",
     order_meta: {
-      return_url: `https://${appBase}payment/thankyou?appointmentId=${orderId}`,
-      notify_url: `https://${appBase}api/payment/webhook`,
+      return_url: `${appBase}payment/thankyou?appointmentId=${orderId}`,
+      notify_url: `${appBase}api/payment/webhook`,
     },
     payment_method: paymentMethod,
     customer_details: {

@@ -1,8 +1,15 @@
-import { test, expect, type BrowserContext, type Page } from '@playwright/test';
+import { test, expect, type BrowserContext, type Locator, type Page } from '@playwright/test';
 
 /**
  * Appointment booking E2E - single suite, executed on every configured device
  * project (Desktop Chrome / Firefox / WebKit, Mobile Chrome, Mobile Safari, tablets).
+ *
+ * The booking is a four-step sequence (see AppointmentPage.js `bookingStep`):
+ *   1. the page card collects name + mobile       -> "Continue"
+ *   2. OTP modal verifies the mobile number       -> "Verify"
+ *   3. appointment-details modal (speciality, doctor, date/slot + terms)
+ *                                                 -> "Proceed to Pay"
+ *   4. payment modal (summary + "Pay Securely")   -> Cashfree gateway
  *
  * Real, un-mocked parts of the app exercised here:
  *   GET  /api/superAdmin/serviceOffered  -> consultation types + fees (Audio / Video)
@@ -24,7 +31,6 @@ import { test, expect, type BrowserContext, type Page } from '@playwright/test';
 
 const TEST_NAME = 'E2E Test Patient';
 const TEST_MOBILE = '9876543210';
-const TEST_SYMPTOM = 'Fever';
 const CONSULTATION_TYPE = 'Audio';
 const CONSULTATION_FEE = 199;
 
@@ -62,30 +68,41 @@ const PAYMENT_STATUS_API = /\/api\/payment\/status/;
 
 type CapturedWhatsApp = { method: string; body: { mobile?: string; otp?: string } };
 
-/** Fills every field that does not depend on the "When" choice. */
-async function fillAppointmentFormFields(page: Page) {
-  const form = page.locator('form.appointment-form');
+/**
+ * Step 1: the page card only asks for the contact details. "Continue" runs the
+ * contact guard and opens the OTP modal (role="dialog").
+ */
+async function submitContactStep(page: Page) {
+  const card = page.locator('form.appointment-form').first();
 
   await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
-  // Bootstrap ToggleButton clips its native input (pointer-events:none), so the
-  // visible chip/segment label is the real click target — click it like a user.
-  await page.locator(`label[id="symptom-${TEST_SYMPTOM}"]`).click();
-  await page.getByLabel('Mobile Number', { exact: true }).fill(TEST_MOBILE);
-  // Consultation type/service is fed from the live ServiceOffered collection.
-  await page.locator(`label[id="consultation-${CONSULTATION_TYPE}"]`).click();
-  // Speciality is mandatory (the booking CTA refuses the request without one) and
-  // it also narrows the doctor list, so pick the first real option - index 0 is the
-  // "Select Speciality" placeholder.
-  await page.getByLabel('Speciality', { exact: true }).selectOption({ index: 1 });
+  await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill(TEST_MOBILE);
+  await card.locator('.consultation-btn').click();
 
-  return form;
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  return dialog;
 }
 
-async function fillAppointmentForm(page: Page) {
-  const form = await fillAppointmentFormFields(page);
+/** Step 3 - the fields inside the details modal that do not depend on "When". */
+async function fillAppointmentDetailsFields(dialog: Locator) {
+  // Bootstrap ToggleButton clips its native input (pointer-events:none), so the
+  // visible chip/segment label is the real click target — click it like a user.
+  // Consultation type/service is fed from the live ServiceOffered collection.
+  await dialog.locator(`label[id="consultation-${CONSULTATION_TYPE}"]`).click();
+  // Speciality is mandatory (the "Proceed to Pay" guard refuses without one) and
+  // it also narrows the doctor list, so pick the first real option - index 0 is
+  // the "Select Speciality" placeholder.
+  await dialog.getByLabel('Speciality', { exact: true }).selectOption({ index: 1 });
+}
+
+/** Step 3 - full details, including "Choose Time" + date + slot + terms. */
+async function fillAppointmentDetails(dialog: Locator) {
+  await fillAppointmentDetailsFields(dialog);
 
   // Time: "Choose Time" -> date picker + slot dropdown (locally generated slots)
-  await page.locator('label[id="when-later"]').click();
+  await dialog.locator('label[id="when-later"]').click();
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -93,19 +110,17 @@ async function fillAppointmentForm(page: Page) {
     2,
     '0'
   )}-${String(tomorrow.getDate()).padStart(2, '0')}`;
-  await form.locator('input[type="date"]').fill(tomorrowStr);
+  await dialog.locator('input[type="date"]').fill(tomorrowStr);
 
-  const slotSelect = form.locator('select[name="slot"]');
+  const slotSelect = dialog.locator('select[name="slot"]');
   await expect(slotSelect).toBeVisible();
   await slotSelect.selectOption({ index: 1 }); // index 0 is the disabled placeholder
 
-  await form.getByRole('checkbox').check();
-
-  return form;
+  await dialog.getByRole('checkbox').check();
 }
 
 async function enterOtp(page: Page, code: string) {
-  // The appointment form's Mobile Number field is also inputmode="numeric" and
+  // The appointment form's WhatsApp mobile field is also inputmode="numeric" and
   // stays in the DOM behind the popup, so scope to the 6 single-character OTP
   // boxes instead of every numeric input on the page.
   const boxes = page.locator('input[inputmode="numeric"][maxlength="1"]');
@@ -256,6 +271,8 @@ test.describe('Appointment booking (sandbox payment)', () => {
     });
 
     // Server-side payment verification - mocked as a successful sandbox payment.
+    // `booking` is what pages/api/payment/status.js answers for a PAID order; the
+    // thank-you page renders it as the appointment summary.
     await context.route(PAYMENT_STATUS_API, async (route) => {
       statusCalls.push(route.request().url());
       await route.fulfill({
@@ -267,6 +284,15 @@ test.describe('Appointment booking (sandbox payment)', () => {
           orderId: ORDER_ID,
           appointmentId: APPOINTMENT_ID,
           amount: CONSULTATION_FEE,
+          booking: {
+            patientName: TEST_NAME,
+            mobileNumber: TEST_MOBILE,
+            speciality: 'General Physician',
+            doctorName: 'Dr. E2E Sandbox',
+            consultationType: CONSULTATION_TYPE,
+            appointmentTime: new Date().toISOString(),
+            bookingMode: 'ChooseTime',
+          },
         }),
       });
     });
@@ -283,27 +309,28 @@ test.describe('Appointment booking (sandbox payment)', () => {
       timeout: PAGE_READY_TIMEOUT,
     });
 
-    // ── 2./3. Fill the form and select consultation type, date + slot ──
-    // Speciality is required: the CTA must refuse an empty form and point at the
-    // dropdown instead of opening the OTP gate.
-    const form = page.locator('form.appointment-form');
-    await form.locator('.consultation-btn').click();
-    await expect(page.getByText('Please select a speciality.').first()).toBeVisible();
-    await expect(page.locator('form.appointment-form select.is-invalid')).toHaveCount(1);
-    await expect(page.getByText('Verification Code')).toHaveCount(0);
-    await expect(form.getByLabel('Speciality', { exact: true })).toHaveValue('');
+    // ── 2. Step 1: contact details are validated before the OTP step ──
+    // An empty card must not open the OTP modal.
+    const card = page.locator('form.appointment-form').first();
+    await card.locator('.consultation-btn').click();
+    await expect(page.getByText('Please enter your name.').first()).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(whatsappCalls).toHaveLength(0);
 
-    await fillAppointmentForm(page);
-    await expect(page.getByRole('radio', { name: CONSULTATION_TYPE })).toBeChecked();
-    await expect(page.getByRole('radio', { name: 'Choose Time' })).toBeChecked();
+    // An invalid mobile number is refused with the existing 10-digit message.
+    await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
+    await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill('12345');
+    await card.locator('.consultation-btn').click();
+    await expect(
+      page.getByText('Please enter 10 digit in mobile number').first()
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
 
-    // ── 4. Book / Book Appointment ──────────────────────────────────
-    const consultButton = form.locator('.consultation-btn');
-    await expect(consultButton).toHaveText(/consult/i);
-    await consultButton.click();
+    // ── 3. Step 2: "Continue" with valid details opens the OTP modal ─
+    const dialog = await submitContactStep(page);
+    await expect(dialog.getByText('Verify your mobile number')).toBeVisible();
 
-    // ── 5./11. WhatsApp confirmation API triggered with the right payload ──
-    await expect(page.getByText('Verification Code')).toBeVisible();
+    // ── 4./11. WhatsApp confirmation API triggered with the right payload ──
     await expect.poll(() => whatsappCalls.length).toBe(1);
     expect(whatsappCalls[0].method).toBe('POST');
     expect(whatsappCalls[0].body.mobile).toBe(TEST_MOBILE);
@@ -320,21 +347,49 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await enterOtp(page, issuedOtp);
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
 
+    // ── 5. Step 3: appointment details (speciality, doctor, date, slot) ──
+    await expect(dialog.getByLabel('Speciality', { exact: true })).toBeVisible();
+
+    // The details guard refuses the request without a speciality - no booking POST.
+    await dialog.locator('.consultation-btn', { hasText: 'Proceed to Pay' }).click();
+    await expect(page.getByText('Please select a speciality.').first()).toBeVisible();
+    await expect(dialog.locator('select.is-invalid')).toHaveCount(1);
+    expect(bookingBody).toBeUndefined();
+
+    await fillAppointmentDetails(dialog);
+    await expect(dialog.getByRole('radio', { name: CONSULTATION_TYPE })).toBeChecked();
+    await expect(dialog.getByRole('radio', { name: 'Choose Time' })).toBeChecked();
+
+    // ── 6. Proceed to Pay creates the appointment (payload unchanged) ──
+    await dialog.locator('.consultation-btn', { hasText: 'Proceed to Pay' }).click();
+
     // Booking request carries the data collected on the form.
     await expect.poll(() => bookingBody?.patientMobNo).toBe(TEST_MOBILE);
     expect(bookingBody).toMatchObject({
       name: TEST_NAME,
       patientMobNo: TEST_MOBILE,
-      symptoms: TEST_SYMPTOM,
       consultationType: CONSULTATION_TYPE,
       consultationprice: CONSULTATION_FEE,
       appointmentTime: 'ChooseTime',
     });
+    // Email and "reason for consultation" are no longer collected by the flow.
+    expect(bookingBody?.symptoms).toBeUndefined();
+    expect(bookingBody?.email).toBeUndefined();
     expect(bookingBody?.selectedSlot).toBeTruthy();
+    // The speciality name must travel to the API: it is stored on the appointment
+    // and echoed by /api/payment/status so the success screen can show it.
+    expect(typeof bookingBody?.serviceType).toBe('string');
+    expect((bookingBody?.serviceType as string).length).toBeGreaterThan(0);
 
-    // ── 7. Continue to the payment gateway (sandbox) ────────────────
+    // ── 7. Step 4: the fee + secure payment only (sandbox) ─────────
+    // The appointment summary moved to the success screen: it must NOT be shown
+    // before paying anymore.
+    await expect(page.getByText('Booking Summary')).toHaveCount(0);
+    await expect(
+      page.getByText('Your appointment details will be shown once the payment is confirmed.')
+    ).toBeVisible();
     await expect(page.getByText(`Consultation Fee: ₹${CONSULTATION_FEE}`)).toBeVisible();
-    const payButton = page.locator('.consultation-btn', { hasText: 'Pay ₹' });
+    const payButton = page.locator('.consultation-btn', { hasText: 'Pay Securely' });
     await expect(payButton).toBeVisible();
     await payButton.click();
 
@@ -360,6 +415,16 @@ test.describe('Appointment booking (sandbox payment)', () => {
     expect(page.url()).toContain(`/payment/thankyou?appointmentId=${ORDER_ID}`);
     await expect(page.getByText(ORDER_ID)).toBeVisible();
     await expect(page.getByText(`₹${CONSULTATION_FEE}`)).toBeVisible();
+
+    // ── 9b. The appointment summary is shown here, after the payment ──
+    const summary = page.getByTestId('appointment-summary');
+    await expect(summary.getByText('Your appointment')).toBeVisible();
+    await expect(summary.getByText(TEST_NAME)).toBeVisible();
+    await expect(summary.getByText(`+91 ${TEST_MOBILE}`)).toBeVisible();
+    // Scoped to the summary: the header nav also links a "General Physician".
+    await expect(summary.getByText('General Physician')).toBeVisible();
+    await expect(summary.getByText('Dr. E2E Sandbox')).toBeVisible();
+    await expect(summary.getByText(CONSULTATION_TYPE).first()).toBeVisible();
 
     await expect.poll(() => statusCalls.length).toBeGreaterThan(0);
     expect(statusCalls[0]).toContain(`orderId=${ORDER_ID}`);
@@ -474,15 +539,22 @@ test.describe('Appointment booking (sandbox payment)', () => {
       timeout: PAGE_READY_TIMEOUT,
     });
 
-    const form = await fillAppointmentFormFields(page);
-    await expect(page.getByRole('radio', { name: 'Now' })).toBeChecked();
-    await form.getByRole('checkbox').check();
-    await form.locator('.consultation-btn').click();
+    const card = page.locator('form.appointment-form').first();
+    await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
+    await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill(TEST_MOBILE);
+    await card.locator('.consultation-btn').click();
+    await expect(page.getByRole('dialog')).toBeVisible();
 
     // OTP gate (mocked sender) - "000000" is the built-in test code.
-    await expect(page.getByText('Verification Code')).toBeVisible();
     await enterOtp(page, '000000');
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
+
+    // Step 3: keep the default "Now" choice, so no date/slot is needed.
+    const dialog = page.getByRole('dialog');
+    await fillAppointmentDetailsFields(dialog);
+    await expect(dialog.getByRole('radio', { name: 'Now' })).toBeChecked();
+    await dialog.getByRole('checkbox').check();
+    await dialog.locator('.consultation-btn', { hasText: 'Proceed to Pay' }).click();
 
     // The booking attempt carried the "Now" choice and no slot.
     await expect.poll(() => bookingBodies.length).toBe(1);
@@ -518,7 +590,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await expect(page.getByText(`Consultation Fee: ₹${CONSULTATION_FEE}`)).toBeVisible({
       timeout: PAGE_READY_TIMEOUT,
     });
-    await page.locator('.consultation-btn', { hasText: 'Pay ₹' }).click();
+    await page.locator('.consultation-btn', { hasText: 'Pay Securely' }).click();
 
     await expect.poll(() => createOrderBody?.appointmentId).toBe(APPOINTMENT_ID);
     await expect.poll(() => checkoutCalls.length).toBe(1);

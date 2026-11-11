@@ -80,7 +80,11 @@ const EMPTY_MESSAGE = {
 /* ── Presentational pieces ───────────────────────────────────────────────── */
 
 const DoctorAvatar = ({ doctor, name }) => {
-  if (doctor?.profilePictureUrl) {
+  // A document stored in the picture slot (legacy records) or a deleted object
+  // cannot be shown - the initials are the fallback, never a broken image.
+  const [failed, setFailed] = useState(false);
+
+  if (doctor?.profilePictureUrl && !failed) {
     return (
       <img
         className={styles.avatar}
@@ -88,6 +92,7 @@ const DoctorAvatar = ({ doctor, name }) => {
         alt=""
         width={44}
         height={44}
+        onError={() => setFailed(true)}
       />
     );
   }

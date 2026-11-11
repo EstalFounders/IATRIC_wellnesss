@@ -23,9 +23,10 @@ import {
 } from "../../utils/consultationFee";
 import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
-import WhatsappConfirmationModel from "./modal/WhatsappConfirmationModel";
+import BookingStepModal from "./modal/BookingStepModal";
+import AppointmentDetailsStep from "./AppointmentDetailsStep";
+import BookingPaymentStep from "./BookingPaymentStep";
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
-import PaymentModal from "./PaymentModal";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
 import { normalizeReturnPaymentStatus } from "../../lib/paymentStatus";
@@ -38,6 +39,7 @@ import {
 import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 // The consultation types the panel defines (src/constant.js) and the only ones
 // that are bookable, in that order. A serviceOffered row becomes an option only
@@ -67,6 +69,7 @@ const todayAtNoonUTC = () => {
 const AppointmentPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useLanguage();
   // The super-admin console books on behalf of a customer, so it gets the form
   // only - the public /appointment page keeps the marketing sections below.
   const isAdminBooking = router.asPath.includes(
@@ -88,10 +91,8 @@ const AppointmentPage = () => {
   const { doctors } = useDoctors();
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [symptoms, setSymptoms] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [mobNo, setMobNo] = useState("");
   const [serviceTypeId, setServiceTypeId] = useState();
   const [consultationType, setConsultationType] = useState("");
@@ -109,10 +110,24 @@ const AppointmentPage = () => {
   const withinBusinessHours = isWithinBusinessHours();
   const [slotEmpty, setSlotEmpty] = useState(false);
   const [noSLotAvailableMessage, setNoSLotAvailableMessage] = useState("");
-  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
+  // The booking runs as a four-step sequence and this string is the single
+  // pointer to where the patient is:
+  //   "contact" -> the card above (name + mobile)
+  //   "otp"     -> step 2, mobile verification modal
+  //   "details" -> step 3, speciality/doctor/date/time modal
+  //   "payment" -> step 4, summary + secure payment modal
+  // Every value the steps edit stays in this component, so closing or moving
+  // between steps never loses what was already typed.
+  const [bookingStep, setBookingStep] = useState("contact");
   const [timeSelection, setTimeSelection] = useState(IS_NOW);
   const [serviceType, setServiceType] = useState("");
   const [pendingPayment, setPendingPayment] = useState(null);
+  // Identifies the body of the appointment that `pendingPayment` belongs to. It
+  // lets "Proceed to Pay" reuse an appointment that was already created (the
+  // patient went Back to edit something and came forward again) instead of
+  // booking a second, duplicate appointment - and forces a fresh booking when a
+  // booking-relevant field actually changed.
+  const pendingBookingSignatureRef = useRef("");
 
   // Anchor + one-shot flag for the deep-link scroll (?doctorId=...): once the
   // doctor has been preselected, the page smooth-scrolls to the booking form.
@@ -233,10 +248,8 @@ const AppointmentPage = () => {
     selectedDate,
     filteredDoctors,
     selectedSlot,
-    symptoms,
     agreedToTerms,
     name,
-    email,
     mobNo,
     consultationType,
     speciality,
@@ -254,10 +267,8 @@ const AppointmentPage = () => {
   };
 
   const setter = {
-    setSymptoms,
     setAgreedToTerms,
     setName,
-    setEmail,
     setMobNo,
     setSpeciality,
     // Date picks go through here: a slot picked on the previous day is not
@@ -335,6 +346,8 @@ const AppointmentPage = () => {
       router.replace({ pathname: router.pathname, query: cleanQuery }, undefined, {
         shallow: true,
       });
+      // The verify-only checkout is the payment step of the sequence.
+      setBookingStep("payment");
     }
   }, [router.query]);
 
@@ -596,43 +609,100 @@ const AppointmentPage = () => {
     }
   }, [selectedSlot]);
 
-  const sendWhatsAppConfirmation = () => {
+  // Validation messages are shown in the small Alert that every step renders
+  // (the card and the modals share `openSnackBar`/`snackBarMessage`).
+  const showBookingAlert = (msg) => {
+    setSnackBarMessage(msg);
+    handleOpenSnackBar();
+  };
+
+  /**
+   * Step 1 -> Step 2: the only fields on the card are the name and the mobile
+   * number, so this guard validates exactly those before the OTP modal opens.
+   */
+  const handleContactContinue = () => {
+    if (!name.trim()) {
+      showBookingAlert(t("af.errName"));
+      return;
+    }
+    if (!mobNo.trim() || !isMobileValid(mobNo)) {
+      showBookingAlert(t("ap.errMobile"));
+      return;
+    }
+    setBookingStep("otp");
+  };
+
+  /** Step 2 -> Step 3: the mobile number is verified, nothing is booked yet. */
+  const handleOtpVerified = () => {
+    setBookingStep("details");
+  };
+
+  // Identifies what a booking POST would send. Used to decide whether the
+  // appointment already created for the payment step is still the right one.
+  const bookingSignature = () =>
+    [
+      selectedDoctorId,
+      appointmentTime,
+      consultationType,
+      selectedDate instanceof Date ? selectedDate.toISOString() : "",
+      selectedSlot?._id || "",
+      name.trim(),
+      mobNo.trim(),
+    ].join("|");
+
+  /**
+   * Step 3 -> Step 4: validates the appointment details, then creates the
+   * appointment (unchanged POST /api/consultation payload - see
+   * `consultationData` + `bookConsultation`) and opens the payment step.
+   *
+   * The payment step is opened first so the modal can show its "preparing"
+   * state while the request is in flight; a refusal puts the patient back on
+   * the details step with the server's message.
+   */
+  const handleProceedToPay = async () => {
+    if (isLoading) return;
     // Checked first: "All fields are required." would not tell the patient which
     // dropdown still needs a value.
     if (!speciality.trim()) {
-      setSnackBarMessage("Please select a speciality.");
-      handleOpenSnackBar();
+      showBookingAlert(t("af.selectSpecialityError"));
       return;
     }
-    if (
-      !name.trim() ||
-      !mobNo.trim() ||
-      !symptoms.trim() ||
-      !consultationType.trim() ||
-      appointmentTime === ""
-    ) {
-      setSnackBarMessage("All fields are required.");
-      handleOpenSnackBar();
-      return;
-    }
-    if (!isMobileValid(mobNo)) {
-      setSnackBarMessage("Please enter 10 digit in mobile number");
-      handleOpenSnackBar();
+    if (!consultationType.trim() || appointmentTime === "") {
+      showBookingAlert(t("ap.errFields"));
       return;
     }
     if (timeSelection === CHOOSE_TIME && !selectedSlot) {
-      setSnackBarMessage("Please select a time slot.");
-      handleOpenSnackBar();
+      showBookingAlert(t("ap.errSlot"));
       return;
     }
     if (!agreedToTerms) {
-      setSnackBarMessage(
-        "Please read and accept the Terms & Conditions to continue."
-      );
-      handleOpenSnackBar();
+      showBookingAlert(t("ap.errTerms"));
       return;
     }
-    setOtpConfirmationPopup(true);
+
+    const signature = bookingSignature();
+    // Already booked for exactly this input: reuse it instead of posting a
+    // second appointment (create-order is idempotent per appointment id).
+    if (
+      pendingPayment?.appointmentId &&
+      pendingBookingSignatureRef.current === signature
+    ) {
+      setBookingStep("payment");
+      return;
+    }
+
+    // Anything else is a new booking - never pay for an appointment whose
+    // doctor/slot was edited in the meantime.
+    setPendingPayment(null);
+    pendingBookingSignatureRef.current = "";
+    setBookingStep("payment");
+
+    const booked = await bookConsultation();
+    if (booked) {
+      pendingBookingSignatureRef.current = signature;
+    } else {
+      setBookingStep("details");
+    }
   };
 
   const consultationData = {
@@ -640,11 +710,9 @@ const AppointmentPage = () => {
     appointmentTime,
     selectedDate,
     selectedSlot,
-    symptoms,
     name,
     doctorName,
     doctorMobileNumber,
-    email,
     patientMobNo: mobNo,
     consultationprice,
     consultationType,
@@ -733,7 +801,7 @@ const AppointmentPage = () => {
     });
 
     if (booked) {
-      // Keep the form in sync with what was just booked before the payment modal
+      // Keep the form in sync with what was just booked before the payment step
       // takes over.
       setSelectedDoctorId(slotDoctorId);
       setDoctorName(alternativeDoctorName);
@@ -741,13 +809,13 @@ const AppointmentPage = () => {
       setSelectedSlot(slot);
       setSelectedDate(alternativeDate);
       setAppointmentTime(CHOOSE_TIME);
+      setTimeSelection(CHOOSE_TIME);
       setOpenAvailableSlotsFromServer(false);
+      // This booking was made from a slot card, not from the details step, so it
+      // gets its own signature (an edit there would force a fresh booking).
+      pendingBookingSignatureRef.current = "";
+      setBookingStep("payment");
     }
-  };
-
-  const whatsappConfrimation = () => {
-    setOtpConfirmationPopup(false);
-    bookConsultation();
   };
 
   return (
@@ -770,13 +838,7 @@ const AppointmentPage = () => {
             <AppointmentForm
               appointmentState={appointmentState}
               setter={setter}
-              doctors={doctors}
-              handleDoctorChoiceChange={handleDoctorChoiceChange}
-              handleDoctorSelection={handleDoctorSelection}
-              handleTimeSelection={handleTimeSelection}
-              handleSlotSelection={handleSlotSelection}
-              handleConsultationChange={handleConsultationChange}
-              sendWhatsAppConfirmation={sendWhatsAppConfirmation}
+              handleContactContinue={handleContactContinue}
               handleCloseSnackBar={handleCloseSnackBar}
             />
           </div>
@@ -819,6 +881,88 @@ const AppointmentPage = () => {
               <div className={styles.successText}>{message}</div>
             </div>
           </AppointmentBookingModal>
+          {/* Step 2 — OTP verification. The card above stays mounted, so the
+              name/mobile (and every other value) survive a close/back. */}
+          <BookingStepModal
+            isOpen={bookingStep === "otp"}
+            step={2}
+            onClose={() => setBookingStep("contact")}
+            title={t("af.otpTitle")}
+            subtitle={t("af.otpSubtitle")}
+          >
+            <OtpConfirmationPopup
+              mobile={mobNo}
+              showHeading={false}
+              onConfirm={handleOtpVerified}
+              onBack={() => setBookingStep("contact")}
+            />
+          </BookingStepModal>
+
+          {/* Step 3 — appointment details (speciality, doctor, date, time). */}
+          <BookingStepModal
+            isOpen={bookingStep === "details"}
+            step={3}
+            size="lg"
+            onClose={() => setBookingStep("contact")}
+            title={t("af.detailsTitle")}
+            subtitle={t("af.detailsSubtitle")}
+          >
+            <AppointmentDetailsStep
+              appointmentState={appointmentState}
+              setter={setter}
+              doctors={doctors}
+              handleDoctorChoiceChange={handleDoctorChoiceChange}
+              handleDoctorSelection={handleDoctorSelection}
+              handleTimeSelection={handleTimeSelection}
+              handleSlotSelection={handleSlotSelection}
+              handleConsultationChange={handleConsultationChange}
+              handleCloseSnackBar={handleCloseSnackBar}
+              onBack={() => setBookingStep("contact")}
+              onProceed={handleProceedToPay}
+            />
+          </BookingStepModal>
+
+          {/* Step 4 — secure payment (the booking summary is shown on /payment/thankyou). */}
+          <BookingStepModal
+            isOpen={bookingStep === "payment"}
+            step={4}
+            onClose={() => {
+              // Never drop a booking that is still being created; otherwise go
+              // back to the details step (the pending appointment is reused).
+              if (!isLoading) setBookingStep("details");
+            }}
+            title={t("af.paymentTitle")}
+            subtitle={t("af.paymentSubtitle")}
+          >
+            <BookingPaymentStep
+              appointmentState={appointmentState}
+              pendingPayment={pendingPayment}
+              isLoading={isLoading}
+              onBack={() => {
+                // Return to the details modal; the PENDING appointment is kept
+                // and reused when the input did not change (see
+                // `pendingBookingSignatureRef`).
+                if (!isLoading) setBookingStep("details");
+              }}
+              onBookAgain={() => {
+                // "Book again" on a cancelled checkout starts a fresh sequence,
+                // so the abandoned appointment is not reused by mistake.
+                if (!isLoading) {
+                  setPendingPayment(null);
+                  pendingBookingSignatureRef.current = "";
+                  setBookingStep("contact");
+                }
+              }}
+              onPaymentDone={() => {
+                setMessage(t("ap.confirmed"));
+                setBookingResponse(true);
+                setPendingPayment(null);
+                pendingBookingSignatureRef.current = "";
+                setBookingStep("contact");
+              }}
+            />
+          </BookingStepModal>
+
           <AvailableSlotsModel
             isOpen={openAvailableSlotsFromServer}
             onClose={() => setOpenAvailableSlotsFromServer(false)}
@@ -829,36 +973,6 @@ const AppointmentPage = () => {
               message={noSLotAvailableMessage}
             />
           </AvailableSlotsModel>
-          <WhatsappConfirmationModel
-            isOpen={otpConfirmationPopup}
-            onClose={() => setOtpConfirmationPopup(false)}
-          >
-            <OtpConfirmationPopup
-              mobile={mobNo}
-              onConfirm={whatsappConfrimation}
-            />
-          </WhatsappConfirmationModel>
-
-          {pendingPayment && (
-            <AppointmentBookingModal
-              isOpen={!!pendingPayment}
-              onClose={() => setPendingPayment(null)}
-            >
-              <PaymentModal
-                appointmentId={pendingPayment.appointmentId}
-                amount={pendingPayment.amount}
-                consultationType={consultationType}
-                autoVerifyOrderId={pendingPayment.autoVerifyOrderId || null}
-                initialStatus={pendingPayment.initialStatus || null}
-                onPaymentDone={() => {
-                  setMessage("Your consultation has been confirmed.");
-                  setBookingResponse(true);
-                  setPendingPayment(null);
-                }}
-                onClose={() => setPendingPayment(null)}
-              />
-            </AppointmentBookingModal>
-          )}
         </div>
         {/* End row */}
       </div>

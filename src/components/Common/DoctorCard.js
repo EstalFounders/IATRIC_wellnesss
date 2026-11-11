@@ -24,6 +24,7 @@ const DoctorCard = ({ doctor, index }) => {
   const feesLabel = formatConsultationTypePrices(doctor.consultationType);
   const [educationExpanded, setEducationExpanded] = useState(false);
   const [educationOverflowing, setEducationOverflowing] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const educationRef = useRef(null);
 
   // Measured on mount and re-measured on resize: with a one-line clamp a narrower
@@ -59,13 +60,20 @@ const DoctorCard = ({ doctor, index }) => {
             width={150}
             height={150}
             src={
-              doctor.profilePictureUrl ||
-              `https://placehold.co/100x100/EBF8FF/3498DB?text=${doctor.name.charAt(
-                0
-              )}`
+              photoFailed
+                ? `https://placehold.co/100x100/EBF8FF/3498DB?text=${doctor.name.charAt(
+                    0
+                  )}`
+                : doctor.profilePictureUrl ||
+                  `https://placehold.co/100x100/EBF8FF/3498DB?text=${doctor.name.charAt(
+                    0
+                  )}`
             }
             alt={doctor.name}
             className={styles["doctor-profile-pic"]}
+            // A document stored in the picture slot (legacy records) or a deleted
+            // object cannot be rendered - show the placeholder instead.
+            onError={() => setPhotoFailed(true)}
           />
         </div>
         <div

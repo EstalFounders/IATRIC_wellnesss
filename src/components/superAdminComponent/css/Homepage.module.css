@@ -147,13 +147,6 @@
   color: #8b2b21;
 }
 
-/* Per-row errors under the import result note. */
-.importErrors {
-  margin: 8px 0 0;
-  padding-left: 20px;
-  font-size: 0.85rem;
-}
-
 /* ── Stat tiles ─────────────────────────────────────── */
 
 .statGrid {

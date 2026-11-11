@@ -35,8 +35,6 @@ export default function HomepageComp() {
   const [isLoading, setIsLoading] = useState(true);
   const [failures, setFailures] = useState([]);
   const [foregroundNote, setForegroundNote] = useState("");
-  const [importing, setImporting] = useState(true);
-  const [importResult, setImportResult] = useState(null);
 
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
@@ -116,38 +114,6 @@ export default function HomepageComp() {
     };
   }, []);
 
-  const handleImportFromSheet = async () => {
-    setImporting(true);
-    setImportResult(null);
-    try {
-      const response = await fetch("/api/superAdmin/importDoctorsFromSheet", {
-        method: "POST",
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(
-          data?.error || `${response.status} ${response.statusText}`,
-        );
-      }
-      setImportResult({
-        ok: true,
-        message: `Imported ${data.imported ?? 0} doctor(s) from the sheet${
-          data.skipped ? `, ${data.skipped} skipped` : ""
-        }.`,
-        errors: Array.isArray(data.errors) ? data.errors : [],
-      });
-      await loadDoctors();
-    } catch (error) {
-      console.error("Import from sheet failed:", error);
-      setImportResult({
-        ok: false,
-        message: `Import failed: ${error.message || "unknown error"}`,
-      });
-    } finally {
-      setImporting(false);
-    }
-  };
-
   return (
     <div className={styles.page}>
       <HeroBand />
@@ -200,48 +166,10 @@ export default function HomepageComp() {
         <div className={styles.card}>
           <div className={styles.cardTitleRow}>
             <h2 className={styles.cardTitle}>Doctors</h2>
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                alignItems: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                type="button"
-                className={styles.ghostBtn}
-                onClick={handleImportFromSheet}
-                disabled
-                title="Sheet import is temporarily disabled"
-                style={{ font: "inherit", opacity: 0.45, cursor: "not-allowed" }}
-              >
-                Import from sheet (disabled)
-              </button>
-              <Link className={styles.ghostBtn} href="/superAdmin/addDoctor">
-                Add doctor
-              </Link>
-            </div>
+            <Link className={styles.ghostBtn} href="/superAdmin/addDoctor">
+              Add doctor
+            </Link>
           </div>
-          {importResult ? (
-            <div
-              className={`${styles.note} ${
-                importResult.ok ? styles.noteOk : styles.noteErr
-              }`}
-              role="status"
-            >
-              <span>{importResult.message}</span>
-              {importResult.errors?.length ? (
-                <ul className={styles.importErrors}>
-                  {importResult.errors.map((err, index) => (
-                    <li key={index}>
-                      <strong>{err.name}</strong> — {err.error}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ) : null}
           <RecentDoctors
             doctors={doctors}
             isLoading={isDoctorLoading}

@@ -3,11 +3,28 @@ import { useRef, useState, useEffect } from "react";
 import { api, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
+import styles from "./css/AppointmentModel.module.css";
 
-const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
+/**
+ * OTP step of the booking sequence.
+ *
+ * The verification itself is unchanged (a 6-digit code is generated in the
+ * browser, sent with `api.sendOtp`, and compared on submit). What changed is
+ * what `onConfirm` means: it used to create the appointment, now it only tells
+ * the parent that the mobile number is verified so the appointment-details step
+ * can open (AppointmentPage.js).
+ *
+ * `showHeading` is off when the host modal already prints a title/subtitle
+ * (the booking step shell does), so the code does not render two headings.
+ * `onBack` renders a "Back" action next to Verify when the step can be left.
+ */
+const OtpConfirmationPopup = ({
+  mobile,
+  onConfirm,
+  onBack,
+  showHeading = true,
+}) => {
   // Refs and state for OTP input
-  console.log("Mobile number:", mobile);
-
   const inputRefs = useRef([]);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [generatedOtp, setGeneratedOtp] = useState(null);
@@ -118,50 +135,48 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
   return (
     <div>
       <div>
-        {/* Close Button */}
+        {showHeading && (
+          <>
+            {/* Image */}
+            <div className="d-flex justify-content-center mb-3 text-center">
+              <Image
+                placeholder="blur"
+                blurDataURL={imageBlurDataUrl}
+                src="/images/company_logo.png"
+                alt="OTP"
+                className="mt-3"
+                width={250}
+                height={150}
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            </div>
+            {/* Header */}
+            <div className="text-center text-primary mb-2 h1 font-bold">
+              <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
+                {t("otp.title")}
+              </span>
+            </div>
+            <div className="text-sm text-center text-gray-600 mb-3">
+              <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
+                {t("otp.subtitle")}
+              </span>
+            </div>
+          </>
+        )}
 
-        {/* Image */}
-        <div className="flex justify-center mb-4 text-center">
-          <Image
-            placeholder="blur"
-            blurDataURL={imageBlurDataUrl}
-            src="/images/company_logo.png"
-            alt="OTP"
-            className="mt-5"
-            width={250}
-            height={150}
-          />
-        </div>
-        {/* Header */}
-        <div className="text-center text-primary mb-2 h1 font-bold">
-          <span style={{ fontSize: "2.5rem", color: "#4A90E2" }}>
-            {t("otp.title")}
-          </span>
-        </div>
-        <div className="text-sm text-center text-gray-600 mb-3">
-          <span style={{ fontStyle: "italic", color: "#7F8C8D" }}>
-            {t("otp.subtitle")}
-          </span>
-        </div>
-
-        <div className="flex justify-center gap-3 mb-4 text-center">
+        <div className={styles.otpRow}>
           {otp.map((digit, index) => (
             <input
               key={index}
               type="text"
               maxLength="1"
               inputMode="numeric"
+              aria-label={`OTP digit ${index + 1}`}
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               ref={(el) => (inputRefs.current[index] = el)}
-              className="mx-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none text-center"
-              style={{
-                width: "40px",
-                height: "50px",
-                fontSize: "22px",
-                backgroundColor: "#F9FAFB",
-              }}
+              className={styles.otpInput}
             />
           ))}
         </div>
@@ -194,7 +209,7 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
         </div>
         {error && (
           <div
-            className="text-red-500 text-center mb-4"
+            className="text-center mb-3"
             style={{
               fontSize: "1rem",
               fontWeight: "bold",
@@ -208,8 +223,13 @@ const OtpConfirmationPopup = ({ mobile, onConfirm }) => {
           </div>
         )}
         {/* Submit */}
-        <div className="text-center w-50 ml-auto mr-auto mb-3">
-          <ConsultationButton onClick={handleSubmit} className="mb-4">
+        <div className={onBack ? styles.stepActions : "text-center mt-3"}>
+          {onBack && (
+            <ConsultationButton variant="outline" onClick={onBack}>
+              {t("af.back")}
+            </ConsultationButton>
+          )}
+          <ConsultationButton onClick={handleSubmit}>
             {t("otp.verify")}
           </ConsultationButton>
         </div>

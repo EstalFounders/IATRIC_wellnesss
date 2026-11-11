@@ -28,7 +28,10 @@ const EditBannerModal = ({ show, banner, onHide, onSaved }) => {
     setError("");
     setAltText(banner?.altText || "HealthPath");
     setHref(banner?.href || "");
-    setIsActive(banner?.isActive !== false);
+    // Missing flag = paused (same rule as isBannerLiveNow on the server), so a
+    // document saved before the switch existed opens with the switch OFF and the
+    // doctor/marketing user must opt in explicitly.
+    setIsActive(banner?.isActive === true);
     setPendingFile(null);
     setUrlInput(banner?.bannerUrl || "");
     setPreview(banner?.bannerUrl || "");

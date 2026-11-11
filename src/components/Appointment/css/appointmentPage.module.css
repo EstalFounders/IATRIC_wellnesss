@@ -160,39 +160,6 @@ line-height: 30px;
   box-shadow: 0 2px 8px rgba(59, 95, 29, 0.12);
 }
 
-/* Reason for Consultation — outline pills */
-.pill {
-  border-radius: 999px !important;
-  font-size: 1rem !important;
-  line-height: 1.4 !important;
-  padding: 0.4rem 0.9rem !important;
-  border: 1px solid #e2e8f0 !important;
-  background-color: #ffffff !important;
-  color: #475569 !important;
-  margin: 0 0.4rem 0.4rem 0 !important;
-  box-shadow: none !important;
-  transition: border-color 0.15s ease, background-color 0.15s ease,
-    color 0.15s ease, box-shadow 0.15s ease;
-}
-
-/* NOTE: the site stylesheet's `.demo .btn:hover { color:#fff !important }`
-   (specificity 0,3,0) outranks a plain class, so the brand hover/selected
-   states below are intentionally over-specific to keep contrast readable. */
-.pill.pill.pill:hover:not(.pillOn) {
-  border-color: var(--color-primary) !important;
-  background-color: #ffffff !important;
-  color: var(--color-primary) !important;
-}
-
-.pillOn.pillOn.pillOn,
-.pillOn.pillOn.pillOn:hover {
-  border-color: var(--color-primary) !important;
-  background-color: #f7f8ee !important;
-  color: var(--color-primary) !important;
-  font-weight: 700 !important;
-  box-shadow: 0 0 0 2px rgba(59, 95, 29, 0.12) !important;
-}
-
 /* Consultation type / Timing — subtle outline tiles */
 .seg {
   border-radius: 10px !important;
@@ -250,44 +217,6 @@ line-height: 30px;
   box-shadow: 0 0 0 3px rgba(142, 131, 51, 0.35) !important;
 }
 
-/* Scrollable option list (Reason for Consultation) */
-.optionArea {
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.55rem 0.55rem 0.15rem 0.55rem;
-  background-color: #ffffff;
-  scrollbar-width: thin;
-}
-
-/* Pills become full-width list rows inside the scroll area */
-.pillStack {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  width: 100%;
-}
-
-.pillStack :global(.btn) {
-  text-align: left !important;
-  margin: 0 0 0.3rem 0 !important;
-}
-
-/* Keep the chips compact regardless of the template's oversized button metrics.
-   `position: relative` also keeps the (clipped) native radio inside its pill,
-   which is what makes the chip a reliable click target. */
-.pill.pill {
-  position: relative !important;
-  height: auto !important;
-  min-height: 0 !important;
-  padding: 0.4rem 0.9rem !important;
-  line-height: 1.35 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-}
-
 .seg.seg {
   position: relative !important;
   height: auto !important;
@@ -337,18 +266,114 @@ line-height: 30px;
 }
 
 /* ------------------------------------------------------------------ */
+/* Step 1 — contact-only card (name + mobile)                          */
+/* ------------------------------------------------------------------ */
+
+.stepHint {
+  margin: -0.25rem 0 0.9rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #64748b;
+}
+
+/* One field per row, at every breakpoint. Two half-width inputs made the card
+   look like a settings panel and squeezed the mobile group; a single centred
+   column keeps both controls the same width as the label/CTA and reads the
+   same on a phone, a tablet and a desktop. `gap` (not per-field margins) owns
+   the vertical rhythm, so the spacing can never drift between fields. */
+.contactFields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.stepNote {
+  margin: 0.55rem 0 0.6rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* "Continue" sits directly under the last field and spans the column. Capped
+   so it does not stretch across a wide card; the wrap keeps it centred. */
+.ctaField :global(.consultation-btn) {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 13px 24px;
+}
+
+/* Verified contact strip at the top of the appointment-details step: what the
+   patient typed on the card, with a way back to edit it. */
+.contactStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  background-color: #f7f8ee;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.contactStripText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contactStripName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  overflow-wrap: anywhere;
+}
+
+.contactStripPhone {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.contactStripEdit {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary, #3b5f1d);
+  background-color: #ffffff;
+  border: 1px solid var(--color-primary, #3b5f1d);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.contactStripEdit:hover,
+.contactStripEdit:focus-visible {
+  color: #ffffff;
+  background-color: var(--color-primary, #3b5f1d);
+  outline: none;
+}
+
+/* ------------------------------------------------------------------ */
 /* Appointment form — overall scale (wide card, tall fields)            */
 /* ------------------------------------------------------------------ */
 
 /* Card metrics live here instead of inline in `Appointmentform.js`: an inline
    `max-width` cannot be overridden by a stylesheet rule, and the form has to
-   fold back to full width once the two-column layout stops fitting. */
+   fold back to full width on phones.
+   Step 1 only holds name + mobile now, so the old 1040px (sized for the
+   two-column, doctor+slot+reason form) left a mostly empty card; 620px keeps
+   the two stacked fields a comfortable reading width on any desktop. */
 .card {
   width: 100%;
-  max-width: 1040px;
+  max-width: 620px;
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 575.98px) {
   .card {
     max-width: 100%;
   }
@@ -360,7 +385,7 @@ line-height: 30px;
 
 /* The admin console renders this form and nothing else, so the wrapper takes
    the whole area under the super-admin bar (SuperAdmin.module.css: headerInner
-   min-height 64px + 1px bottom border = 65px) and centres the 1040px card in
+   min-height 64px + 1px bottom border = 65px) and centres the contact card in
    it, instead of leaving the card at the top of an otherwise empty page. The
    card keeps its width; only the dead space below it is removed. `min-height`
    (not `height`) keeps this safe on small screens: once the card is taller than

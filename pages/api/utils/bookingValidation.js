@@ -1,12 +1,13 @@
 // pages/api/utils/bookingValidation.js
 //
 // Server-side mirror of the rules the booking form already enforces in the
-// browser (src/components/Appointment/AppointmentPage.js,
-// Appointmentform.js). The API is reachable directly, so the same rules have to
-// be re-checked here: a slot must never be locked, and an appointment must never
-// be created, on input the form itself would have refused. The rules are kept
-// deliberately identical to the client ones, so nothing the UI allows is
-// rejected here.
+// browser (src/components/Appointment/AppointmentPage.js and the step
+// components it renders: Appointmentform.js for the contact step,
+// AppointmentDetailsStep.js for the doctor/date/time step). The API is
+// reachable directly, so the same rules have to be re-checked here: a slot must
+// never be locked, and an appointment must never be created, on input the form
+// itself would have refused. The rules are kept deliberately identical to the
+// client ones, so nothing the UI allows is rejected here.
 import {
   CHOOSE_TIME,
   IN_TWENTY_MINUTES_NOW,
@@ -28,7 +29,6 @@ export const BOOKING_MODES = [IS_NOW, IN_TWENTY_MINUTES_NOW, CHOOSE_TIME];
 const MOBILE_PATTERN = /^[0-9]{10}$/;
 
 const MAX_NAME_LENGTH = 80;
-const MAX_EMAIL_LENGTH = 120;
 const MAX_SYMPTOMS_LENGTH = 1000;
 
 const asText = (value) =>
@@ -49,7 +49,6 @@ export const normalizeBookingPayload = (body = {}) => {
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, MAX_NAME_LENGTH),
-    email: asText(body.email).trim().toLowerCase().slice(0, MAX_EMAIL_LENGTH),
     patientMobNo: asText(body.patientMobNo).replace(/\s+/g, ""),
     symptoms: asText(body.symptoms).trim().slice(0, MAX_SYMPTOMS_LENGTH),
     consultationType: asText(body.consultationType).trim(),
@@ -72,10 +71,6 @@ export function validateBookingPayload(body) {
 
   if (!MOBILE_PATTERN.test(payload.patientMobNo)) {
     problems.push("Please enter 10 digit in mobile number");
-  }
-
-  if (!payload.symptoms) {
-    problems.push("Please describe the symptoms.");
   }
 
   if (!BOOKABLE_CONSULTATION_TYPES.includes(payload.consultationType)) {
