@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { color_schema } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useRouter } from "next/router";
 import { fetchBasicConfiguration } from "../ApiService/UtilService";
@@ -73,20 +72,18 @@ const Demo5Hero5 = () => {
         <div className="row d-flex align-items-center">
           {/* HERO TEXT */}
           <div className="col-md-9 col-lg-7 col-xl-6">
-            {/* Green banner + frosted-white content card (see `hero-glass-*` in
-                customStyle.css). The banner fill is no longer an inline style:
-                it needs color-mix()/backdrop-filter from CSS to stay a sharp
-                92% green, while the card below it is translucent so the hero
-                photo reads through without touching text contrast. */}
-            <div className="hero-5-strip hero-glass-strip white-color">
+            {/* Green banner + content panel (see `hero-float-*` in
+                customStyle.css). Desktop keeps the soft white veil; phones drop
+                it entirely and run white copy straight over the photo, so the
+                banner is the only surface there. The banner fill and every text
+                colour live in CSS (not inline) exactly so a breakpoint can
+                repaint them. */}
+            <div className="hero-5-strip hero-float-strip white-color">
               <div className="h2 m-0 font-weight-bold">{t("demo5.hero.provides")}</div>
             </div>
-            <div className="hero-txt hero-glass-card">
+            <div className="hero-txt hero-float-card">
               {/* Title */}
-              <h4
-                className="steelblue-color"
-                style={{ color: `${color_schema.yellow}` }}
-              >
+              <h4 className="steelblue-color">
                 <div style={{ fontSize: "1.8rem", fontWeight: "600" }}>{t("demo5.hero.bestQuality")}</div>
               </h4>
               {/* Headline: a rotating service term + a static "for you and your
@@ -99,7 +96,6 @@ const Demo5Hero5 = () => {
                   hear a stable sentence instead of a word changing every 2.5s. */}
               <h3
                 className="steelblue-color hero-rotating-heading"
-                style={{ color: "#3b5f1d" }}
                 aria-label={t("demo5.hero.title")}
               >
                 <span className="hero-rotating-words" aria-hidden="true">
@@ -121,17 +117,14 @@ const Demo5Hero5 = () => {
                 <div className="box-list-icon">
                   {/* <i className="fas fa-genderless" /> */}
                 </div>
-                <div
-                  className="h5 mx-auto steelblue-color"
-                  style={{ color: "#010101" }}
-                >
+                <div className="h5 mx-auto steelblue-color">
                   {t("demo5.hero.optimal")} ,{" "}
-                  <strong style={{ color: "#010101" }}>
+                  <strong>
                     {t("demo5.hero.anytime")}
                   </strong>{" "}
                   <br />
                   <br />
-                  <b style={{ color: "#010101" }}>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
+                  <b>{t("demo5.hero.onestopLabel")}</b>{" "}{t("demo5.hero.onestop")}
 
 
                 </div>

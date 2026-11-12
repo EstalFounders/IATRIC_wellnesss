@@ -1010,31 +1010,31 @@ background: linear-gradient(to top, var(--color-secondary), #4f4b30);
 }
 
 /* ---------------------------------------------------------------------------
-   HERO-5 GLASS CARD (#hero-5) - the "HealthPath Provides" panel.
+   HERO-5 CONTENT PANEL (#hero-5) - "HealthPath Provides"
 
-   The content box was solid white (`#hero-5 .hero-txt` in style.css). It is now
-   frosted glass: a ~72% white fill (80% on phones) plus `backdrop-filter`, which
-   blurs and saturates whatever slice of the hero photo sits behind the card. The
-   photo clearly reads through, but blurred, so the copy on top keeps its
-   contrast.
+   The content box used to be solid white (`#hero-5 .hero-txt` in style.css), then
+   frosted glass, then nothing at all. Nothing-at-all exposed the problem: the
+   hero photo is a busy clinic interior, and thin dark type over it is not
+   reliably readable. On desktop it is now a veil - a white gradient that fades
+   out towards the right edge plus a small `backdrop-filter` blur. The photo still
+   reads through (colours, the nurse, the room), and the copy sits on a calm,
+   even background. Phones do the opposite (see the < 768px block): no panel at
+   all, white copy, and a dark gradient over the photo to hold the contrast.
 
-   The banner on top keeps a 92% green fill: it must stay clearly darker than the
-   card so the header contrast the design relies on is untouched. Its fill used
-   to be an inline `backgroundColor` in Demo5Hero5.js, which CSS cannot soften -
-   hence the inline style is gone and the colour lives here.
+   The banner on top keeps its green fill - it is the label, not the panel - and
+   it used to be an inline `backgroundColor` in Demo5Hero5.js, which CSS cannot
+   soften; the colour lives here now.
 
-   Text inside is unchanged (#010101 near-black copy, brand-gold kicker). The
-   near-black copy holds >9:1 against the darkest surface the fill can produce;
-   the gold kicker gets a white halo (below) because it is the one colour that
-   cannot be darkened without leaving the brand palette.
+   Legibility comes from the veil, not from text effects: no `text-shadow` is
+   used, because a white halo under dark type only reads as an embossed glow.
+   The gold kicker keeps its brand colour - the veil is dense enough for it.
 
-   `@supports` keeps browsers without `backdrop-filter` on an almost opaque fill:
-   a 72% white over a sharp photo would hurt legibility.
-   Selectors are ID-scoped to beat `#hero-5 .hero-txt` (style.css) and the
-   `bg-blue` utility the banner used to carry.
+   Selectors are ID-scoped to beat `#hero-5 .hero-txt` (style.css, which sets the
+   white background and the 6px radius) and the `bg-blue` utility the banner
+   used to carry.
    --------------------------------------------------------------------------- */
-#hero-5 .hero-glass-strip {
-  /* Curvy corners: the banner owns the top edge, the card below is flush. */
+#hero-5 .hero-float-strip {
+  /* Curvy corners: the banner is the only painted surface left in this block. */
   -webkit-border-radius: 14px 14px 0 0;
   border-radius: 14px 14px 0 0;
   /* solid green first: browsers without color-mix() keep the opaque banner */
@@ -1045,78 +1045,160 @@ background: linear-gradient(to top, var(--color-secondary), #4f4b30);
   box-shadow: 0 10px 22px -16px rgba(16, 34, 8, 0.5);
 }
 
-#hero-5 .hero-txt.hero-glass-card {
-  /* Top-left stays square so it tucks under the banner (the banner is narrower
-     than the card, exactly like the reference); the other three corners are
-     rounder than the stock 6px. */
+#hero-5 .hero-txt.hero-float-card {
+  /* A veil, not a box: no border and no box-shadow (either would draw the
+     rectangle silhouette), and the white gradient runs out to 0 alpha at the
+     right edge, so the panel dissolves into the photo instead of ending in a
+     seam. Only the left side - which lines up with the banner above - reads as
+     an edge. */
   -webkit-border-radius: 0 14px 14px 14px;
   border-radius: 0 14px 14px 14px;
-  background-color: rgba(255, 255, 255, 0.72);
-  /* A thin white sheen on top of the fill - NOT a second 70-80% layer, which
-     would compound the alpha up to ~0.95 and hide the photo completely. The
-     effective fill is 0.72 at the bottom, ~0.77 behind the headline. */
+  background-color: transparent;
   background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.2) 0%,
-    rgba(255, 255, 255, 0.08) 55%,
+    103deg,
+    rgba(255, 255, 255, 0.86) 0%,
+    rgba(255, 255, 255, 0.74) 58%,
+    rgba(255, 255, 255, 0.4) 88%,
     rgba(255, 255, 255, 0) 100%
   );
-  /* More blur to offset the thinner fill: the photo behind the copy stays soft,
-     which is what keeps the text crisp at this opacity. */
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
-  backdrop-filter: blur(18px) saturate(145%);
-  /* Clean edge against the photo; no top border, the banner is the top edge. */
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-top: 0;
-  box-shadow:
-    0 26px 50px -20px rgba(16, 34, 8, 0.45),
-    0 2px 8px rgba(16, 34, 8, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  /* A small blur is what actually makes thin dark type crisp over a photo: it
+     removes the high-frequency detail behind the glyphs while the colours of the
+     shot still read through. Kept at 6px - a wide blur leaves a visible boundary
+     where the blurred rectangle ends. */
+  -webkit-backdrop-filter: blur(6px) saturate(125%);
+  backdrop-filter: blur(6px) saturate(125%);
+  border: 0;
+  box-shadow: none;
+  text-shadow: none;
 }
 
-/* Ghost CTA: a faint white tint keeps the keyline readable on the translucent
-   surface. `:not(:hover):not(:focus-visible)` leaves the green fill-in on hover
-   and keyboard focus exactly as it was (an ID selector would otherwise win). */
-#hero-5 .hero-glass-card .consultation-btn--outline:not(:hover):not(:focus-visible) {
-  background-color: rgba(255, 255, 255, 0.55);
+/* Copy colours live here instead of inline, because an inline `style` would beat
+   any media query. Values are the ones the JSX used to hard-code: gold kicker
+   (--color-secondary = #916f38, formerly color_schema.yellow), brand-green
+   headline and near-black body. */
+#hero-5 .hero-float-card h4,
+#hero-5 .hero-float-card h4 div {
+  color: var(--color-secondary, #916f38);
 }
 
-/* The gold kicker is the lowest-contrast text on the card, so it gets a soft
-   white halo: it lifts the local background where the blurred photo darkens and
-   keeps the letter edges crisp, without touching the brand colour. */
-#hero-5 .hero-glass-card h4 {
-  text-shadow:
-    0 0 3px rgba(255, 255, 255, 0.85),
-    0 1px 0 rgba(255, 255, 255, 0.6);
+#hero-5 .hero-float-card h3,
+#hero-5 .hero-float-card h3 span,
+#hero-5 .hero-float-card .hero-rotating-term {
+  color: var(--color-primary, #3b5f1d);
 }
 
-/* No backdrop filter => no blur, so the fill has to carry contrast on its own. */
+#hero-5 .hero-float-card .h5,
+#hero-5 .hero-float-card .h5 strong,
+#hero-5 .hero-float-card .h5 b,
+#hero-5 .hero-float-card p {
+  color: #010101;
+}
+
+/* ---------------------------------------------------------------------------
+   PHONES (< 768px) - no card, white copy straight on the photo.
+
+   The full-width card had no room for the sideways fade the desktop veil relies
+   on, and a dense white fill over the mobile crop mostly read as a grey slab. So
+   the panel paints nothing at all (no fill, no blur, no shadow, no radius) and
+   the copy turns white. Legibility comes from two things instead: a dark gradient
+   laid over the hero photo (::before, below the copy) and a soft text shadow -
+   the halo is only ever used under WHITE type, where it reads as depth rather
+   than as an emboss.
+   --------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  /* `isolation` + `z-index: -1` puts the overlay above the section's own
+     background photo but below the content, without touching the markup. */
+  #hero-5 {
+    position: relative;
+    isolation: isolate;
+  }
+
+  #hero-5::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit; /* matches the section's 20px corners */
+    pointer-events: none;
+    background-image: linear-gradient(
+      180deg,
+      rgba(10, 20, 6, 0.66) 0%,
+      rgba(10, 20, 6, 0.46) 55%,
+      rgba(10, 20, 6, 0.7) 100%
+    );
+  }
+
+  #hero-5 .hero-txt.hero-float-card {
+    background-color: transparent;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    color: #ffffff;
+    /* Inherited, so every child - kicker, headline, body - gets it for free. */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Overrides the desktop brand colours above; same-or-higher specificity, so
+     each rule targets the exact node that owns the colour. */
+  #hero-5 .hero-float-card h3,
+  #hero-5 .hero-float-card h3 span,
+  #hero-5 .hero-float-card .hero-rotating-term,
+  #hero-5 .hero-float-card h4,
+  #hero-5 .hero-float-card h4 div,
+  #hero-5 .hero-float-card .h5,
+  #hero-5 .hero-float-card .h5 strong,
+  #hero-5 .hero-float-card .h5 b,
+  #hero-5 .hero-float-card p {
+    color: #ffffff;
+  }
+
+  /* Solid "Book Now" already reads as the primary action; the ghost CTA swaps its
+     green keyline for white so it stays visible on the dark photo. */
+  #hero-5 .hero-float-card .consultation-btn--outline:not(:hover):not(:focus-visible) {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+  }
+
+  #hero-5 .hero-float-card .consultation-btn--outline:hover,
+  #hero-5 .hero-float-card .consultation-btn--outline:focus-visible {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: var(--color-primary, #3b5f1d);
+  }
+}
+
+/* No backdrop filter => no blur, so the veil alone has to carry the contrast.
+   Desktop only: phones have no veil at all (see the < 768px block above). */
 @supports not (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
-  #hero-5 .hero-glass-strip {
-    background-color: var(--color-primary, #3b5f1d);
-  }
-
-  #hero-5 .hero-txt.hero-glass-card {
-    background-color: rgba(255, 255, 255, 0.95);
-    background-image: none;
+  @media (min-width: 768px) {
+    #hero-5 .hero-txt.hero-float-card {
+      background-image: linear-gradient(
+        103deg,
+        rgba(255, 255, 255, 0.94) 0%,
+        rgba(255, 255, 255, 0.88) 60%,
+        rgba(255, 255, 255, 0.6) 88%,
+        rgba(255, 255, 255, 0.2) 100%
+      );
+    }
   }
 }
 
-/* Phones: the hero photo is cropped tighter (faces and a high-contrast stethoscope
-   land right behind the card) and a large blur costs frames, so the fill is a
-   little denser than on desktop and the blur smaller. */
-@media (max-width: 767.98px) {
-  #hero-5 .hero-txt.hero-glass-card {
-    background-color: rgba(255, 255, 255, 0.8);
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
+/* Ghost CTA: its keyline would be lost on a bright patch of the photo, so the
+   button keeps a light scrap of white - it is a control, not the panel.
+   `:not(:hover):not(:focus-visible)` leaves the green fill-in on hover and
+   keyboard focus exactly as it was (an ID selector would otherwise win).
+   Desktop only: on phones the keyline and label are white instead (see the
+   < 768px block), because there is no white surface left to sit on. */
+@media (min-width: 768px) {
+  #hero-5 .hero-float-card .consultation-btn--outline:not(:hover):not(:focus-visible) {
+    background-color: rgba(255, 255, 255, 0.55);
   }
 }
 

@@ -44,6 +44,9 @@ const Demo5 = () => {
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <HealthPathTeam />
         </AnimatedSection>
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <CommonHealthConcerns />
+        </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Services1 />
@@ -86,9 +89,7 @@ const Demo5 = () => {
         {/* <AnimatedSection animation="fadeInUp" delay={0.1}>
           <Demo5Pricing3 />
         </AnimatedSection> */}
-        <AnimatedSection animation="fadeInUp" delay={0.1}>
-          <CommonHealthConcerns />
-        </AnimatedSection>
+
         <AnimatedSection animation="fadeInUp" delay={0.2}>
           <Demo2Gallery1 />
         </AnimatedSection>
