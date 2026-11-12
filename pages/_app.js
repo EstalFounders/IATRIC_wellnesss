@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import Preloader from "../src/components/Preloader";
-import { animation } from "../src/utils";
+import { animation, scrollPageToTop } from "../src/utils";
 import "../styles/globals.css";
 import { NoSsr } from "@mui/material";
 import { wrapper } from "../src/store/store";
@@ -40,6 +40,21 @@ function MyApp({ Component, pageProps, router, ...rest }) {
       setLoader(false);
     }, 1000);
   });
+
+  // A client-side navigation must start at the top of the new page. Next.js does
+  // that for us with window.scrollTo(), which is a no-op on phones because there
+  // <body> is the page scroller (see scrollPageToTop) - so without this the next
+  // page kept the previous scroll offset. Links that carry a #hash are skipped:
+  // those are deep links and the target page scrolls the anchor into view itself.
+  useEffect(() => {
+    const handleRouteChangeComplete = (url) => {
+      if (typeof url !== "string" || url.includes("#")) return;
+      scrollPageToTop();
+    };
+    router.events.on("routeChangeComplete", handleRouteChangeComplete);
+    return () =>
+      router.events.off("routeChangeComplete", handleRouteChangeComplete);
+  }, [router.events]);
 
   return (
     <Fragment>

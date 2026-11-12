@@ -689,6 +689,13 @@
   min-width: 0;
 }
 
+/* Deep-link target for the "Book Now" CTAs (/appointment#appointment-form).
+   Leaving a little air above the card means the form heading is not flush with
+   the top edge after the smooth scroll. */
+#appointment-form {
+  scroll-margin-top: 16px;
+}
+
 .scroll-btn {
   position: absolute;
   top: 50%;

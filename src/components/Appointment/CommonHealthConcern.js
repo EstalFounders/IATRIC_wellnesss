@@ -31,7 +31,10 @@ const CommonHealthConcerns = () => {
               />
               <div className="card-body">
                 <h5 className="card-title fw-bold">{item.title}</h5>
-                <ConsultationButton variant="book-now" path="/appointment">
+                <ConsultationButton
+                  variant="book-now"
+                  path="/appointment#appointment-form"
+                >
                   {booking_btn_txt}
                 </ConsultationButton>
               </div>
