@@ -43,16 +43,20 @@ import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
 import { useLanguage } from "../../i18n/LanguageContext";
+import CommonHealthConcerns from "./CommonHealthConcern";
 
 // The consultation types the panel defines (src/constant.js) and the only ones
 // that are bookable, in that order. A serviceOffered row becomes an option only
 // when its name resolves to one of these keys; the label stays the constant name
 // because the booking API switches on exactly these values.
 const CONSULTATION_TYPE_NAMES = superAdminConsultationtype.map(
-  (type) => type.name
+  (type) => type.name,
 );
 
-const specialityKey = (value) => String(value ?? "").trim().toLowerCase();
+const specialityKey = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
 
 /**
  * The speciality a doctor is filed under.
@@ -87,7 +91,9 @@ const specialityForDoctor = (doctor, specialityNames = []) => {
     if (!key || !canonical.has(key)) continue;
     // `typeKeyFor` slugs anything it does not know, so compare against the
     // system keys instead of testing it for truthiness.
-    if (SYSTEM_CONSULTATION_TYPES.some((type) => type.key === typeKeyFor(name))) {
+    if (
+      SYSTEM_CONSULTATION_TYPES.some((type) => type.key === typeKeyFor(name))
+    ) {
       continue;
     }
     return canonical.get(key);
@@ -110,7 +116,9 @@ const specialityForDoctor = (doctor, specialityNames = []) => {
 const todayAtNoonUTC = () => {
   const now = new Date();
 
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12));
+  return new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12),
+  );
 };
 
 const AppointmentPage = () => {
@@ -120,7 +128,7 @@ const AppointmentPage = () => {
   // The super-admin console books on behalf of a customer, so it gets the form
   // only - the public /appointment page keeps the marketing sections below.
   const isAdminBooking = router.asPath.includes(
-    "/superAdmin/bookConsultationFromAdmin"
+    "/superAdmin/bookConsultationFromAdmin",
   );
   // State variables
   const [doctorChoice, setDoctorChoice] = useState("any");
@@ -206,7 +214,7 @@ const AppointmentPage = () => {
   // so only rows resolving to a type from src/constant.js are offered, in the
   // constant order.
   const activeServices = (Array.isArray(services) ? services : []).filter(
-    (service) => service && service.isActive !== false
+    (service) => service && service.isActive !== false,
   );
 
   const serviceForType = (typeName) => {
@@ -214,7 +222,9 @@ const AppointmentPage = () => {
     if (!key) return null;
     return (
       activeServices.find((service) => typeKeyFor(service.name) === key) ||
-      activeServices.find((service) => typeKeyFor(service.name).includes(key)) ||
+      activeServices.find((service) =>
+        typeKeyFor(service.name).includes(key),
+      ) ||
       null
     );
   };
@@ -225,7 +235,7 @@ const AppointmentPage = () => {
   }).filter(Boolean);
 
   const selectedDoctor = (doctors || []).find(
-    (doctor) => String(doctor._id) === String(selectedDoctorId)
+    (doctor) => String(doctor._id) === String(selectedDoctorId),
   );
 
   // A doctor's own types/prices, limited to the constant types. A type the doctor
@@ -249,11 +259,15 @@ const AppointmentPage = () => {
 
       // Keep "" (rather than 0) when nothing is priced anywhere: the tile then
       // shows just the mode name and the API resolves the stored fee.
-      return { name: typeName, fee: fee === undefined || fee === null ? "" : fee };
+      return {
+        name: typeName,
+        fee: fee === undefined || fee === null ? "" : fee,
+      };
     }).filter(Boolean);
   };
 
-  const doctorConsultationOptions = doctorConsultationOptionsFor(selectedDoctor);
+  const doctorConsultationOptions =
+    doctorConsultationOptionsFor(selectedDoctor);
 
   const consultationOptions = selectedDoctorId
     ? doctorConsultationOptions
@@ -279,7 +293,7 @@ const AppointmentPage = () => {
     if (!requested) return;
 
     const match = consultationOptions.find(
-      (option) => typeKeyFor(option.name) === typeKeyFor(requested)
+      (option) => typeKeyFor(option.name) === typeKeyFor(requested),
     );
     if (!match) return;
 
@@ -340,7 +354,7 @@ const AppointmentPage = () => {
       : new Date().toISOString();
     const doctorId = appointmentState.selectedDoctorId;
     const response = await fetch(
-      `/api/slots/fetchSlot/?doctor=${doctorId}&date=${formattedDate}`
+      `/api/slots/fetchSlot/?doctor=${doctorId}&date=${formattedDate}`,
     );
     const data = await response.json();
     if (data.success) {
@@ -369,7 +383,10 @@ const AppointmentPage = () => {
     } = router.query;
     if (typeof serviceParam === "string") {
       const matched = services.find((service) =>
-        service.name?.trim().toLowerCase().includes(serviceParam.trim().toLowerCase())
+        service.name
+          ?.trim()
+          .toLowerCase()
+          .includes(serviceParam.trim().toLowerCase()),
       );
       if (matched) {
         setServiceType(matched.name);
@@ -387,15 +404,19 @@ const AppointmentPage = () => {
         // A dismissed/failed checkout carries its status back in the URL - the
         // modal must show that instead of polling an order that stays ACTIVE.
         initialStatus: normalizeReturnPaymentStatus(
-          single(returnPaymentStatus) || single(returnStatus)
+          single(returnPaymentStatus) || single(returnStatus),
         ),
       });
       // Clean the query param so refresh doesn't re-trigger
       const cleanQuery = { ...router.query };
       delete cleanQuery.appointmentId;
-      router.replace({ pathname: router.pathname, query: cleanQuery }, undefined, {
-        shallow: true,
-      });
+      router.replace(
+        { pathname: router.pathname, query: cleanQuery },
+        undefined,
+        {
+          shallow: true,
+        },
+      );
       // The verify-only checkout is the payment step of the sequence.
       setBookingStep("payment");
     }
@@ -431,9 +452,8 @@ const AppointmentPage = () => {
     if (!selectedId) return;
     const selectedDoctor =
       filteredDoctors.find(
-        (doctor) => String(doctor._id) === String(selectedId)
-      ) ||
-      doctors.find((doctor) => String(doctor._id) === String(selectedId));
+        (doctor) => String(doctor._id) === String(selectedId),
+      ) || doctors.find((doctor) => String(doctor._id) === String(selectedId));
     if (!selectedDoctor) return;
 
     setSelectedDoctorId(selectedDoctor._id);
@@ -458,7 +478,7 @@ const AppointmentPage = () => {
     // replaced, because switching doctors means switching field.
     const doctorSpeciality = specialityForDoctor(
       selectedDoctor,
-      specialityNames
+      specialityNames,
     );
 
     if (
@@ -484,7 +504,7 @@ const AppointmentPage = () => {
     if (speciality || !selectedDoctorId) return;
 
     const doctor = [...filteredDoctors, ...doctors].find(
-      (item) => String(item._id) === String(selectedDoctorId)
+      (item) => String(item._id) === String(selectedDoctorId),
     );
     const resolved = specialityForDoctor(doctor, specialityNames);
     if (!resolved) return;
@@ -516,7 +536,8 @@ const AppointmentPage = () => {
       typeof router.query.doctorId === "string"
         ? router.query.doctorId.trim()
         : "";
-    if (!doctorIdFromQuery || !selectedDoctorId || didAutoScrollRef.current) return;
+    if (!doctorIdFromQuery || !selectedDoctorId || didAutoScrollRef.current)
+      return;
     if (String(selectedDoctorId) !== String(doctorIdFromQuery)) return;
 
     didAutoScrollRef.current = true;
@@ -564,12 +585,12 @@ const AppointmentPage = () => {
     if (deepLinkListRef.current === locallyCreatedSlots) return;
 
     const wanted = new Date(
-      `${deepLinkDate}T${deepLinkTime}:00+05:30`
+      `${deepLinkDate}T${deepLinkTime}:00+05:30`,
     ).getTime();
     if (Number.isNaN(wanted)) return;
 
     const match = locallyCreatedSlots.find(
-      (slot) => new Date(slot.startTime).getTime() === wanted
+      (slot) => new Date(slot.startTime).getTime() === wanted,
     );
     if (!match) return;
 
@@ -584,7 +605,7 @@ const AppointmentPage = () => {
   const handleConsultationChange = (event) => {
     const selectedType = event.target.value;
     const matching = consultationOptions.find(
-      (opt) => opt.name === selectedType
+      (opt) => opt.name === selectedType,
     );
     if (matching) {
       setConsultationType(matching.name);
@@ -602,8 +623,8 @@ const AppointmentPage = () => {
         (doctor) =>
           String(doctor._id) === String(selectedDoctorId) &&
           consultationTypeNames(doctor.consultationType).some(
-            (name) => typeKeyFor(name) === key
-          )
+            (name) => typeKeyFor(name) === key,
+          ),
       );
 
       if (!stillOffered) {
@@ -613,7 +634,7 @@ const AppointmentPage = () => {
         setDoctorMobileNumber("");
         setSelectedSlot("");
         const serviceMatch = serviceConsultationOptions.find(
-          (option) => typeKeyFor(option.name) === key
+          (option) => typeKeyFor(option.name) === key,
         );
         if (serviceMatch) {
           setConsultationPrice(serviceMatch.fee || "");
@@ -626,8 +647,8 @@ const AppointmentPage = () => {
     const key = typeKeyFor(selectedOption);
     const filtered = doctors.filter((doctor) =>
       consultationTypeNames(doctor.consultationType).some(
-        (name) => typeKeyFor(name) === key
-      )
+        (name) => typeKeyFor(name) === key,
+      ),
     );
     setFilteredDoctors(filtered);
   };
@@ -649,14 +670,14 @@ const AppointmentPage = () => {
       setLocallyCreatedSlots(
         (availableSlots || [])
           .filter(
-            (slot) => !slot.isBooked && new Date(slot.endTime).getTime() > now
+            (slot) => !slot.isBooked && new Date(slot.endTime).getTime() > now,
           )
           .map((slot) => ({
             _id: String(slot._id),
             startTime: slot.startTime,
             endTime: slot.endTime,
             isBooked: false,
-          }))
+          })),
       );
       return;
     }
@@ -724,7 +745,9 @@ const AppointmentPage = () => {
     setBookingStep("otp");
   };
 
-  /** Step 2 -> Step 3: the mobile number is verified, nothing is booked yet. */
+  /**
+   * Step 2 -> Step 3: the mobile number is verified, nothing is booked yet.
+   */
   const handleOtpVerified = () => {
     setBookingStep("details");
   };
@@ -842,7 +865,7 @@ const AppointmentPage = () => {
       // for a booking that was never created.
       if (!data.appointmentId) {
         setSnackBarMessage(
-          data.message || "All doctor are busy right now, No slot is available"
+          data.message || "All doctor are busy right now, No slot is available",
         );
         handleOpenSnackBar();
         return false;
@@ -871,14 +894,19 @@ const AppointmentPage = () => {
    * call and same checkout as a normal booking, with no calendar/OTP detour.
    */
   const handleBookAlternativeSlot = async (slot) => {
-    const slotDoctorId = slot.doctorId ? String(slot.doctorId) : selectedDoctorId;
+    const slotDoctorId = slot.doctorId
+      ? String(slot.doctorId)
+      : selectedDoctorId;
     const knownDoctor = [...filteredDoctors, ...doctors].find(
-      (doctor) => String(doctor._id) === slotDoctorId
+      (doctor) => String(doctor._id) === slotDoctorId,
     );
     const alternativeDoctorName =
       slot.doctorName || knownDoctor?.name || doctorName || "";
     const alternativeDoctorMobile =
-      slot.doctorMobileNumber || knownDoctor?.mobileNumber || doctorMobileNumber || "";
+      slot.doctorMobileNumber ||
+      knownDoctor?.mobileNumber ||
+      doctorMobileNumber ||
+      "";
     const alternativeDate = new Date(slot.startTime);
     // A slot card can belong to a doctor other than the one on the form, and this
     // path posts immediately - React state set here would not be part of the
@@ -952,6 +980,10 @@ const AppointmentPage = () => {
               <Demo5Doctors1 />
             </div>
           )}
+
+          <div>
+            <CommonHealthConcerns />
+          </div>
 
           {!isAdminBooking && (
             <div className="w-100 d-flex justify-content-center">

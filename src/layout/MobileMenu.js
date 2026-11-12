@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGlobalData, mergeServiceLists } from "../customUtils/useGlobalData";
 import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../customUtils/serviceLinks";
 import { demo5ServiceHighlights } from "../../data/services";
+import { resolveNavServiceIcon } from "../../public/svgIcon/nav-service-icons";
 import { color_schema } from "../constant";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage"];
@@ -74,6 +75,28 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     .filter((service) => service.label)
     .slice(0, 12);
 
+  // Accordion height is measured from the rendered list instead of guessed with
+  // a per-row constant: rows now carry an icon swatch, long names wrap to a
+  // second line and the font scales on smaller phones, so a fixed `rows * 46px`
+  // either clipped the last entry or left a visible gap under it.
+  const servicesListRef = useRef(null);
+  const [servicesListHeight, setServicesListHeight] = useState(0);
+
+  useEffect(() => {
+    const node = servicesListRef.current;
+    if (!node) return undefined;
+
+    const measure = () => setServicesListHeight(node.scrollHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, [serviceItems.length, servicesOpen]);
+
   const comingSoon = new Set(COMING_SOON_ITEMS);
 
   const closeMenu = () => setIsOpen(false);
@@ -97,6 +120,49 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     borderLeft: active ? `4px solid ${color_schema.green}` : "4px solid transparent",
     backgroundColor: active ? "#f0f7ee" : "transparent",
   });
+
+  // Same custom medical glyphs as the desktop mega-menu, in a rounded swatch.
+  const ServiceIcon = ({ label }) => {
+    const Icon = resolveNavServiceIcon(label);
+    return (
+      <span
+        aria-hidden="true"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flex: "0 0 30px",
+          width: 30,
+          height: 30,
+          borderRadius: 8,
+          backgroundColor: "rgba(59, 95, 29, 0.08)",
+          color: color_schema.green,
+        }}
+      >
+        <Icon width={18} height={18} />
+      </span>
+    );
+  };
+
+  // One icon + label row inside the accordion. `minWidth: 0` on the label lets a
+  // long DB name wrap to a second line instead of pushing past the drawer edge.
+  const serviceRowStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "9px 16px 9px 18px",
+    fontSize: "14.5px",
+    lineHeight: 1.3,
+    color: "#333",
+    cursor: "pointer",
+    borderBottom: "1px solid #f4f5f2",
+  };
+
+  const serviceLabelStyle = {
+    flex: 1,
+    minWidth: 0,
+    overflowWrap: "anywhere",
+  };
 
   return (
     <div
@@ -174,6 +240,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                     <div
                       role="button"
                       aria-expanded={servicesOpen}
+                      aria-controls="mobile-services-list"
                       aria-label="Toggle the services list"
                       onClick={() => setServicesOpen((previous) => !previous)}
                       style={{
@@ -200,17 +267,13 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
 
                     {/* Nested services (smooth accordion) */}
                     <div
+                      id="mobile-services-list"
+                      ref={servicesListRef}
                       style={{
-                        maxHeight: servicesOpen
-                          ? `${
-                              serviceItems.length * 46 +
-                              108 +
-                              46 +
-                              DOCTOR_CONSULTATION_LINKS.length * 46
-                            }px`
-                          : 0,
+                        maxHeight: servicesOpen ? `${servicesListHeight}px` : 0,
                         overflow: "hidden",
-                        transition: "max-height 0.35s ease",
+                        transition: "max-height 0.35s ease, opacity 0.3s ease",
+                        opacity: servicesOpen ? 1 : 0,
                         backgroundColor: "#fafbf8",
                       }}
                     >
@@ -232,23 +295,20 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                         <div
                           key={service.key}
                           onClick={() => handleNavigation(service.href)}
-                          style={{
-                            padding: "12px 16px 12px 30px",
-                            fontSize: "15px",
-                            color: "#333",
-                            cursor: "pointer",
-                            borderBottom: "1px solid #f4f5f2",
-                          }}
+                          style={serviceRowStyle}
                         >
-                          {service.label}
-                          {service.comingSoon ? (
-                            <span
-                              className="service-coming-soon"
-                              style={{ marginLeft: 8 }}
-                            >
-                              Coming Soon
-                            </span>
-                          ) : null}
+                          <ServiceIcon label={service.label} />
+                          <span style={serviceLabelStyle}>
+                            {service.label}
+                            {service.comingSoon ? (
+                              <span
+                                className="service-coming-soon"
+                                style={{ marginLeft: 8 }}
+                              >
+                                Coming Soon
+                              </span>
+                            ) : null}
+                          </span>
                         </div>
                       ))}
 
@@ -257,15 +317,15 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                           handleNavigation(BOOK_CONSULTATION_HREF)
                         }
                         style={{
-                          padding: "12px 16px 12px 30px",
-                          fontSize: "15px",
+                          ...serviceRowStyle,
                           fontWeight: "600",
                           color: color_schema.green,
-                          cursor: "pointer",
-                          borderBottom: "1px solid #f4f5f2",
                         }}
                       >
-                        Book Doctor Consultation
+                        <ServiceIcon label="Doctor Consultation" />
+                        <span style={serviceLabelStyle}>
+                          Book Doctor Consultation
+                        </span>
                       </div>
 
                       {DOCTOR_CONSULTATION_LINKS.map((service) => (
@@ -277,14 +337,20 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                             )
                           }
                           style={{
-                            padding: "12px 16px 12px 46px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            padding: "10px 16px 10px 60px",
                             fontSize: "14px",
                             color: "#333",
                             cursor: "pointer",
                             borderBottom: "1px solid #f4f5f2",
                           }}
                         >
-                          {service.label}
+                          <span aria-hidden="true" style={{ color: color_schema.green }}>
+                            •
+                          </span>
+                          <span style={serviceLabelStyle}>{service.label}</span>
                         </div>
                       ))}
 

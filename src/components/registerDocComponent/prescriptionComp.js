@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { Button, Col, Row } from "react-bootstrap";
 import MedicineForm from "../registerDocComponent/lib/MedicineForm";
+import RichTextEditor from "./lib/RichTextEditor";
+import { escapeAdviceHtml } from "./lib/adviceHtml";
 import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
@@ -103,8 +105,14 @@ const buildInitialFormDetails = (doctor) => ({
   knownCases: "",
   underTreatmentSince: "",
   cheifCompalaints: "",
+  // `advicesHtml` is what the rich editor produces (bold / underline / tables)
+  // and what the PDF prints; `advices` stays the plain-text mirror so every
+  // older consumer keeps working. Both are reset together by "Clear form".
   advices: "",
+  advicesHtml: "",
+  // Same pair for the Notes box, which uses the same rich editor.
   notes: "",
+  notesHtml: "",
   testAdvices: [],
   doctorStampUrl: "",
   doctorSignatureUrl: "",
@@ -252,6 +260,43 @@ const PrescriptionComp = () => {
       return { ...prev, [field]: current ? `${current}, ${value}` : value };
     });
   };
+
+  // Rich advice field -> keeps the HTML (printed on the sheet) and the plain
+  // text mirror (`advices`) in one update, so no consumer can read a stale one.
+  const handleAdviceChange = useCallback((html, text) => {
+    setUpdatedFormDetails((prevState) => ({
+      ...prevState,
+      advicesHtml: html,
+      advices: text,
+    }));
+  }, []);
+
+  // Advice presets go into the rich editor as their own line. The plain mirror is
+  // updated in the same tick, and the editor picks the new value up through its
+  // `value` prop (it only rewrites the DOM when the value really changed).
+  const insertAdvicePreset = (preset) => {
+    setUpdatedFormDetails((prev) => {
+      const plain = (prev.advices || "").trim();
+      if (plain.toLowerCase().includes(preset.toLowerCase())) return prev;
+      const html = `${prev.advicesHtml || ""}${
+        prev.advicesHtml ? "<br>" : ""
+      }${escapeAdviceHtml(preset)}`;
+      return {
+        ...prev,
+        advicesHtml: html,
+        advices: plain ? `${plain}\n${preset}` : preset,
+      };
+    });
+  };
+
+  // Rich notes field -> same contract as the advices handler above.
+  const handleNotesChange = useCallback((html, text) => {
+    setUpdatedFormDetails((prevState) => ({
+      ...prevState,
+      notesHtml: html,
+      notes: text,
+    }));
+  }, []);
 
   const addMedicineForm = () => {
     setMedicineForms((prev) => [...prev, {}]);
@@ -1084,28 +1129,26 @@ const PrescriptionComp = () => {
                 <FaStethoscope /> Diagnosis &amp; advice
               </h2>
               <p className={styles.cardHint}>
-                One advice per line - every line prints as a separate point.
+                One advice per line. Use B / U or insert a table in either box -
+                both print on the sheet exactly as they look here.
               </p>
             </div>
           </div>
           <div className={styles.cardBody}>
             <div className={styles.labelRow}>
-              <label className={styles.label} htmlFor="advices">
-                {ADVICES}
-              </label>
+              {/* Not a <label>: the advice field is a contentEditable div, which a
+                  label can't be tied to. */}
+              <span className={styles.label}>{ADVICES}</span>
               <span className={styles.counter}>
                 {(updatedFormDetails.advices || "").length}/500
               </span>
             </div>
-            <textarea
+            <RichTextEditor
               id="advices"
-              name="advices"
-              rows={4}
+              value={updatedFormDetails.advicesHtml || ""}
+              onChange={handleAdviceChange}
               maxLength={500}
-              className={styles.textarea}
               placeholder={"Take complete rest\nPlenty of fluids\nReview after 5 days"}
-              value={updatedFormDetails.advices}
-              onChange={handleOtherFormDetailsChange}
             />
             <div className={styles.chipRow}>
               {ADVICE_PRESETS.map((preset) => (
@@ -1113,7 +1156,7 @@ const PrescriptionComp = () => {
                   key={preset}
                   type="button"
                   className={styles.chip}
-                  onClick={() => appendPreset("advices", preset)}
+                  onClick={() => insertAdvicePreset(preset)}
                 >
                   <BiPlus size={12} />
                   {preset}
@@ -1122,22 +1165,18 @@ const PrescriptionComp = () => {
             </div>
             <div style={{ marginTop: "14px" }}>
               <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="notes">
-                  {NOTES}
-                </label>
+                {/* contentEditable, so a <label> can't point at it (same as above). */}
+                <span className={styles.label}>{NOTES}</span>
                 <span className={styles.counter}>
                   {(updatedFormDetails.notes || "").length}/200
                 </span>
               </div>
-              <textarea
+              <RichTextEditor
                 id="notes"
-                name="notes"
-                rows={2}
+                value={updatedFormDetails.notesHtml || ""}
+                onChange={handleNotesChange}
                 maxLength={200}
-                className={styles.textarea}
                 placeholder="Anything else to remember (optional)"
-                value={updatedFormDetails.notes}
-                onChange={handleOtherFormDetailsChange}
               />
             </div>
           </div>

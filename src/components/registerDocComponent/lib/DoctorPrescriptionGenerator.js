@@ -10,6 +10,7 @@ import { capitalize, formatData } from "../utils/helper";
 import CircleLoader from "../../circleLoader";
 import { sendPrescriptionToFirebase } from "../../../utils";
 import { stampDataUrl, drawStampOnPdf } from "./DoctorStampGenerator";
+import { hasAdviceContent, sanitizeAdviceHtml } from "./adviceHtml";
 import { doctorDisplayName } from "../../../utils/doctorName";
 import { AiOutlineGlobal } from "react-icons/ai";
 import { MdEmail, MdPhone } from "react-icons/md";
@@ -358,6 +359,23 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         .filter(Boolean)
     : [];
 
+  // The advice box is a small rich-text field (bold / underline / tables), so it
+  // is stored as `advicesHtml` and printed as HTML - html2canvas captures the
+  // sheet, so nothing has to be re-drawn for the PDF. `advices` (plain text) is
+  // still the fallback for data saved before the editor existed, and the empty
+  // tables a doctor inserted but never filled in are dropped here.
+  const adviceHtml = sanitizeAdviceHtml(data.advicesHtml || "", {
+    dropEmptyTables: true,
+  });
+  const showRichAdvice = hasAdviceContent(adviceHtml);
+
+  // The Notes box uses the same rich field, so it prints the same way (and the
+  // plain `notes` string stays the fallback for older saved data / JSON APIs).
+  const notesHtml = sanitizeAdviceHtml(data.notesHtml || "", {
+    dropEmptyTables: true,
+  });
+  const showRichNotes = hasAdviceContent(notesHtml);
+
   const BORDER = "1px solid #aaa";
   const BOLD_BORDER = "2px solid #555";
   const GREEN = color_schema.green;
@@ -372,6 +390,38 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
         fontFamily: style_schema.font_family || "TT Ramillas, serif",
       }}
     >
+      {/* Rich advice markup comes from the doctor's editor, so its table/list
+          styling lives here instead of inline styles on the injected HTML.
+          html2canvas reads the computed styles, so preview === PDF. */}
+      <style>{`
+        .rx-advice-rich p,
+        .rx-advice-rich div {
+          margin: 0;
+        }
+        .rx-advice-rich ul,
+        .rx-advice-rich ol {
+          margin: 0 0 0 18px;
+          padding: 0;
+        }
+        .rx-advice-rich table {
+          width: 100%;
+          max-width: 100%;
+          margin: 6px 0;
+          font-size: 13px;
+          border-collapse: collapse;
+          table-layout: fixed;
+        }
+        .rx-advice-rich th,
+        .rx-advice-rich td {
+          padding: 4px 6px;
+          vertical-align: top;
+          border: 1px solid #aaa;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+      `}</style>
+
+
       {/* Scaled preview wrapper */}
       <div
         style={{
@@ -670,18 +720,48 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                   the top of this file (every doctor profile prints this). */}
               <div style={{ flex: 1, paddingRight: "16px" }}>
                 <div>Advice &ndash;</div>
-                {adviceItems.map((item, i) => (
+                {showRichAdvice ? (
                   <div
-                    key={i}
-                    style={{ marginLeft: "20px", lineHeight: "1.7" }}
-                  >
-                    {item}
-                  </div>
-                ))}
-                {data.notes && (
-                  <div style={{ marginLeft: "20px", lineHeight: "1.7" }}>
-                    {data.notes}
-                  </div>
+                    className="rx-advice-rich"
+                    style={{
+                      marginLeft: "20px",
+                      lineHeight: "1.7",
+                      // A long unbroken word or a wide table can never push the
+                      // sheet past A4 - it wraps/shrinks inside this column.
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                    // Sanitised above: whitelist-only markup, no styles/handlers.
+                    dangerouslySetInnerHTML={{ __html: adviceHtml }}
+                  />
+                ) : (
+                  adviceItems.map((item, i) => (
+                    <div
+                      key={i}
+                      style={{ marginLeft: "20px", lineHeight: "1.7" }}
+                    >
+                      {item}
+                    </div>
+                  ))
+                )}
+                {showRichNotes ? (
+                  <div
+                    className="rx-advice-rich"
+                    style={{
+                      marginLeft: "20px",
+                      lineHeight: "1.7",
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                    // Sanitised above, exactly like the advice block.
+                    dangerouslySetInnerHTML={{ __html: notesHtml }}
+                  />
+                ) : (
+                  data.notes && (
+                    <div style={{ marginLeft: "20px", lineHeight: "1.7" }}>
+                      {data.notes}
+                    </div>
+                  )
                 )}
                 <div style={{ marginTop: "8px" }}>
                   Test advices &ndash;&nbsp;
