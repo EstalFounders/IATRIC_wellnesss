@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { handleServiceClick } from "../../components/Common/commonMethod";
 import { demo5ServiceHighlights } from "../../../data/services";
+import { resolveNavServiceIcon } from "../../../public/svgIcon/nav-service-icons";
 import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
 import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../../customUtils/serviceLinks";
 
@@ -65,6 +66,17 @@ const Header1 = ({ scrollToContact }) => {
     [globalServices]
   );
 
+  // Icon column shared by both mega-menus: a rounded swatch holding a custom
+  // medical glyph (`currentColor`, so it follows the brand green).
+  const NavServiceIcon = ({ label }) => {
+    const Icon = resolveNavServiceIcon(label);
+    return (
+      <span className="nav-service-icon" aria-hidden="true">
+        <Icon />
+      </span>
+    );
+  };
+
   // One row of the Services mega-menu. The merged lab service always shows its
   // single name plus the Coming Soon tag, whatever alias the DB row carries
   // ("Labtest" today), and always links to the canonical URL.
@@ -77,16 +89,42 @@ const Header1 = ({ scrollToContact }) => {
     );
 
     return (
-      <li key={`${label}-${index}`}>
+      <li key={`${label}-${index}`} className="nav-service-item">
         <Link legacyBehavior href={href}>
-          <a>
-            {label}
-            {comingSoon ? ` - ${t("common.comingSoon")}` : ""}
+          <a className="nav-service-link">
+            <NavServiceIcon label={label} />
+            <span className="nav-service-label">
+              {label}
+              {comingSoon && (
+                <span className="nav-service-tag">
+                  {t("common.comingSoon")}
+                </span>
+              )}
+            </span>
           </a>
         </Link>
       </li>
     );
   };
+
+  // One row of the Our Speciality mega-menu: same icon + label layout, but the
+  // row runs the existing search/redirect handler instead of a link.
+  const renderSpeciality = (name, index) => (
+    <li key={name} className="nav-service-item">
+      <a
+        href="#"
+        className="nav-service-link"
+        onClick={(e) => {
+          e.preventDefault();
+          handleServiceClick(name, index, router);
+        }}
+      >
+        <NavServiceIcon label={name} />
+        <span className="nav-service-label">{name}</span>
+      </a>
+    </li>
+  );
+
   const hiddenRoutes = ["/appointment", "/some-other-route"];
 
   const [medicineCartItems, setMedicineCartItems] = useState(getMedicineCartItems());
@@ -194,37 +232,8 @@ const Header1 = ({ scrollToContact }) => {
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title">{t("footer.quickLinks")}:</li>
-                            {specialityNames.slice(0, 6).map((name, index) => (
-                              <li key={name}>
-                                <a
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleServiceClick(name, index, router);
-                                  }}
-                                >
-                                  {name}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            {specialityNames.slice(6).map((name, index) => (
-                              <li key={name}>
-                                <a
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleServiceClick(name, index + 6, router);
-                                  }}
-                                >
-                                  {name}
-                                </a>
-                              </li>
-                            ))}
+                          <ul className="col-12 nav-service-grid">
+                            {specialityNames.map(renderSpeciality)}
                           </ul>
                         </div>
                       </div>
@@ -237,18 +246,23 @@ const Header1 = ({ scrollToContact }) => {
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title">{t("footer.quickLinks")}:</li>
-                            {navServices
-                              .slice(0, 4)
-                              .filter((service) => !isConsultationRow(service))
-                              .map(renderNavService)}
+                          <ul className="col-12 nav-service-grid">
+                            {navServices.filter(
+                              (service) => !isConsultationRow(service)
+                            ).map(renderNavService)}
                             {/* Book Doctor Consultation + its three sub-pointers */}
-                            <li className="has-sub">
+                            <li className="nav-service-group">
                               <Link legacyBehavior href={BOOK_CONSULTATION_HREF}>
-                                <a>{t("nav.bookDoctorConsultation")}</a>
+                                <a className="nav-service-link">
+                                  <NavServiceIcon
+                                    label={t("nav.bookDoctorConsultation")}
+                                  />
+                                  <span className="nav-service-label">
+                                    {t("nav.bookDoctorConsultation")}
+                                  </span>
+                                </a>
                               </Link>
-                              <ul className="sub-link-list">
+                              <ul className="nav-service-sublinks">
                                 {DOCTOR_CONSULTATION_LINKS.map((link) => (
                                   <li key={link.type}>
                                     <Link
@@ -261,15 +275,6 @@ const Header1 = ({ scrollToContact }) => {
                                 ))}
                               </ul>
                             </li>
-                          </ul>
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            {navServices
-                              .slice(4)
-                              .filter((service) => !isConsultationRow(service))
-                              .map((service, index) =>
-                                renderNavService(service, index + 4)
-                              )}
                           </ul>
                         </div>
                       </div>

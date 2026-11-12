@@ -90,113 +90,94 @@
    <ConsultationButton variant="book-now" | isBlinking>; every other button keeps
    its original styling. Company green = 59, 95, 29 (#3b5f1d), gold = #8e8333.
 
-   Three layers keep it eye-catching but not cheap:
-   - `consultationBtnPulse` (box-shadow only): a ring that expands outwards and
-     fades, plus a soft halo that brightens and dies. The label itself never
-     changes opacity - fading the text is what makes a blinking button look
-     spammy and hurts legibility.
-   - `consultationBtnBlink`: the surface itself strobes between the brand green
-     and a lighter green (hard 50/50 square wave) with a brighter keyline - this
-     is the "blink". Only the fill/border change, never the label, so the text
-     stays fully readable in every phase.
-   - `consultationBtnZoom`: the button itself grows and shrinks (`scale`) so it
-     "pops" in size, from small to large. It uses the standalone `scale`
-     property instead of `transform`, which leaves `translate` free for the
-     hover lift - the two then compose instead of overriding each other. */
+   Two layers, deliberately subtle:
+   - `consultationBtnPulse` (box-shadow only): a soft ring that expands a little
+     and fades, plus a faint halo. The label itself never changes opacity -
+     fading the text is what makes a blinking button look spammy and hurts
+     legibility.
+   - `consultationBtnZoom`: a gentle breathe (`scale` 0.97 -> 1.03). It uses the
+     standalone `scale` property instead of `transform`, which leaves
+     `translate` free for the hover lift - the two then compose instead of
+     overriding each other.
+
+   The old strobe between two greens (`consultationBtnBlink`) and the strong
+   0.78 -> 1.22 zoom were removed: at 56% size swing plus a 1.2s colour flash the
+   CTA read as a banner ad rather than a button. */
 @keyframes consultationBtnPulse {
   0% {
     box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.4),
-      0 0 0 0 rgba(59, 95, 29, 0.55),
-      0 0 10px 2px rgba(59, 95, 29, 0.4);
+      0 2px 4px rgba(0, 0, 0, 0.35),
+      0 0 0 0 rgba(59, 95, 29, 0.4),
+      0 0 8px 1px rgba(59, 95, 29, 0.28);
   }
   70% {
     box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.4),
-      0 0 0 9px rgba(59, 95, 29, 0),
-      0 0 18px 8px rgba(59, 95, 29, 0);
+      0 2px 4px rgba(0, 0, 0, 0.35),
+      0 0 0 5px rgba(59, 95, 29, 0),
+      0 0 12px 4px rgba(59, 95, 29, 0);
   }
   100% {
     box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 2px 4px rgba(0, 0, 0, 0.35),
       0 0 0 0 rgba(59, 95, 29, 0),
-      0 0 10px 2px rgba(59, 95, 29, 0);
-  }
-}
-
-@keyframes consultationBtnBlink {
-  /* Hard 50/50 square wave = a real blink, not a slow fade. A 1.2s cycle is
-     0.83 flashes/second, i.e. inside the WCAG 2.3.1 limit (max 3 per second).
-     Both phases keep the white label readable (#3b5f1d = 7.2:1, #4a7c22 =
-     4.98:1); the brighter keyline is what makes the "pop" obvious. */
-  0%,
-  49.99% {
-    background-color: var(--color-primary); /* company green */
-    border-color: var(--color-primary);
-  }
-  50%,
-  100% {
-    background-color: #4a7c22; /* lighter green flash */
-    border-color: #6fbf35;
+      0 0 8px 1px rgba(59, 95, 29, 0);
   }
 }
 
 @keyframes consultationBtnZoom {
-  /* Zoom in / zoom out: small -> large -> small, in step with the 2.2s glow so
-     the button growing and the ring expanding read as one "heartbeat".
-     A short hold at each end (18%/40%/60%/82%) matters for two reasons: the
+  /* Zoom in / zoom out: 0.97 -> 1.03 -> 0.97 in 1.4s, i.e. a ~6% size swing - a
+     breathe you notice in the corner of your eye, not a bounce.
+     The short holds at each end (20%/45%/55%/80%) matter for two reasons: the
      button is not permanently in motion, and an always-moving element fails
      Playwright's "element is stable" actionability check - without the holds,
      every hover/click on the CTA in the e2e suite would time out. */
   0%,
-  18% {
-    scale: var(--cta-zoom-min, 0.78); /* rest: small */
+  20% {
+    scale: var(--cta-zoom-min, 0.97); /* rest size */
   }
-  40%,
-  60% {
-    scale: var(--cta-zoom-max, 1.22); /* peak: large */
+  45%,
+  55% {
+    scale: var(--cta-zoom-max, 1.03); /* peak */
   }
-  82%,
+  80%,
   100% {
-    scale: var(--cta-zoom-min, 0.78); /* back to rest */
+    scale: var(--cta-zoom-min, 0.97); /* back to rest */
   }
 }
 
 .consultation-btn--book-now {
-  /* Zoom range: how small it rests and how large it grows. Defaults are a strong
-     but still readable pulse (0.78 -> 1.22 = a 56% size swing; the 16px label
-     stays >= 12px and 7:1 contrast at the small end). For a dramatic
-     "grows out of nowhere" CTA set --cta-zoom-min: 0.6; --cta-zoom-max: 1.35.
-     Anything past ~1.4 in the header reaches the neighbouring nav item
-     (the zoomed button paints on top thanks to z-index below).
+  /* Zoom range: how small it rests and how large it grows. Defaults are a small
+     breathe (0.97 -> 1.03 = a 6% size swing) so the CTA draws the eye without
+     looking like an advert. For a more noticeable pulse set
+     --cta-zoom-min: 0.94; --cta-zoom-max: 1.06. Anything past ~1.15 in the
+     header reaches the neighbouring nav item (the zoomed button paints on top
+     thanks to z-index below).
      Override per placement, e.g. `header .consultation-btn--book-now {
-     --cta-zoom-max: 1.25 }`. */
-  --cta-zoom-min: 0.78;
-  --cta-zoom-max: 1.22;
+     --cta-zoom-max: 1.06 }`. */
+  --cta-zoom-min: 0.97;
+  --cta-zoom-max: 1.03;
 
   position: relative;
   z-index: 1; /* the zoomed button paints above its neighbours */
   translate: 0 0;
   scale: var(--cta-zoom-min); /* start size; the zoom animation takes over */
-  /* Three independent clocks: glow 2.2s, blink 1.2s, zoom 2.2s. */
-  animation: consultationBtnPulse 2.2s ease-out infinite,
-    consultationBtnBlink 1.2s linear infinite,
-    consultationBtnZoom 2.2s ease-in-out infinite;
+  /* Two independent clocks: glow 2.4s, zoom 1.4s (the zoom is the "beat", the
+     glow rides along more slowly so the two never look mechanically synced). */
+  animation: consultationBtnPulse 2.4s ease-out infinite,
+    consultationBtnZoom 1.4s ease-in-out infinite;
   /* translate/filter are transitioned here (this replaces the base transition).
-     The animations own background/border/box-shadow/scale, so hover feedback
-     uses the lift + brightness + a faster clock instead of colours - it can
-     never fight them. */
+     The animations own box-shadow/scale, so hover feedback uses the lift +
+     brightness + a faster clock instead of colours - it can never fight them. */
   transition: translate 0.18s ease, filter 0.2s ease;
 }
 
-/* Hover: the glow, blink and zoom all run ~2x faster, the button lifts and
-   brightens, so the feedback is immediate and obviously interactive.
-   brightness() works in every blink phase, unlike a background-color change
-   (the animation owns that while it runs). */
+/* Hover: both clocks speed up, the button lifts and brightens, so the feedback
+   is immediate and obviously interactive. brightness() cannot be overridden by
+   the keyframes (they only touch box-shadow/scale), so it always shows. */
 .consultation-btn--book-now:hover {
   filter: brightness(1.12) saturate(1.05);
   translate: 0 -2px; /* `translate`, so it composes with the `scale` zoom */
-  animation-duration: 1.1s;
+  animation-duration: 1.8s, 0.9s; /* pulse, zoom - matches the order above */
 }
 
 /* Press feedback (also cancels the hover lift). */
@@ -975,6 +956,171 @@ background: linear-gradient(to top, var(--color-secondary), #4f4b30);
 }
 
 /* ---------------------------------------------------------------------------
+   HERO ROTATING HEADLINE (#hero-5 h3) - "<term> for you and your loved ones" where
+   only the leading term swaps (2.5s, see Demo5Hero5.js).
+
+   `.hero-rotating-words` is an inline-grid that stacks every term in ONE cell, so
+   the cell is exactly as wide and tall as the longest term ("Doctor
+   consultation"). The suffix and the paragraph below therefore never move, and
+   the fade only plays on the term - the sentence as a whole stays put.
+   --------------------------------------------------------------------------- */
+.hero-rotating-words {
+  display: inline-grid;
+  vertical-align: bottom; /* keeps the cell on the text baseline */
+  max-width: 100%;
+}
+
+.hero-rotating-heading {
+  /* The suffix sits on its own line(s) below the term; `balance` splits it into
+     even lines ("for you and / your loved ones") instead of leaving one orphan word
+     on the last line. Ignored by older browsers, which just wrap normally. */
+  text-wrap: balance;
+}
+
+.hero-rotating-term {
+  grid-area: 1 / 1; /* every term shares the same cell => size = largest term */
+  /* top-aligned: a one-line term stays put instead of bobbing down when the
+     reserved two-line cell (small screens) is taller than the term itself */
+  align-self: start;
+  color: var(--color-primary, #3b5f1d); /* brand green, same as the h3 */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-rotating-term.is-active {
+  opacity: 1;
+  animation: heroTermIn 0.4s ease-out both;
+}
+
+@keyframes heroTermIn {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rotating-term.is-active {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   HERO-5 GLASS CARD (#hero-5) - the "HealthPath Provides" panel.
+
+   The content box was solid white (`#hero-5 .hero-txt` in style.css). It is now
+   frosted glass: a ~72% white fill (80% on phones) plus `backdrop-filter`, which
+   blurs and saturates whatever slice of the hero photo sits behind the card. The
+   photo clearly reads through, but blurred, so the copy on top keeps its
+   contrast.
+
+   The banner on top keeps a 92% green fill: it must stay clearly darker than the
+   card so the header contrast the design relies on is untouched. Its fill used
+   to be an inline `backgroundColor` in Demo5Hero5.js, which CSS cannot soften -
+   hence the inline style is gone and the colour lives here.
+
+   Text inside is unchanged (#010101 near-black copy, brand-gold kicker). The
+   near-black copy holds >9:1 against the darkest surface the fill can produce;
+   the gold kicker gets a white halo (below) because it is the one colour that
+   cannot be darkened without leaving the brand palette.
+
+   `@supports` keeps browsers without `backdrop-filter` on an almost opaque fill:
+   a 72% white over a sharp photo would hurt legibility.
+   Selectors are ID-scoped to beat `#hero-5 .hero-txt` (style.css) and the
+   `bg-blue` utility the banner used to carry.
+   --------------------------------------------------------------------------- */
+#hero-5 .hero-glass-strip {
+  /* Curvy corners: the banner owns the top edge, the card below is flush. */
+  -webkit-border-radius: 14px 14px 0 0;
+  border-radius: 14px 14px 0 0;
+  /* solid green first: browsers without color-mix() keep the opaque banner */
+  background-color: var(--color-primary, #3b5f1d);
+  background-color: color-mix(in srgb, var(--color-primary, #3b5f1d) 92%, transparent);
+  -webkit-backdrop-filter: blur(6px) saturate(125%);
+  backdrop-filter: blur(6px) saturate(125%);
+  box-shadow: 0 10px 22px -16px rgba(16, 34, 8, 0.5);
+}
+
+#hero-5 .hero-txt.hero-glass-card {
+  /* Top-left stays square so it tucks under the banner (the banner is narrower
+     than the card, exactly like the reference); the other three corners are
+     rounder than the stock 6px. */
+  -webkit-border-radius: 0 14px 14px 14px;
+  border-radius: 0 14px 14px 14px;
+  background-color: rgba(255, 255, 255, 0.72);
+  /* A thin white sheen on top of the fill - NOT a second 70-80% layer, which
+     would compound the alpha up to ~0.95 and hide the photo completely. The
+     effective fill is 0.72 at the bottom, ~0.77 behind the headline. */
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  /* More blur to offset the thinner fill: the photo behind the copy stays soft,
+     which is what keeps the text crisp at this opacity. */
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+  /* Clean edge against the photo; no top border, the banner is the top edge. */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 0;
+  box-shadow:
+    0 26px 50px -20px rgba(16, 34, 8, 0.45),
+    0 2px 8px rgba(16, 34, 8, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Ghost CTA: a faint white tint keeps the keyline readable on the translucent
+   surface. `:not(:hover):not(:focus-visible)` leaves the green fill-in on hover
+   and keyboard focus exactly as it was (an ID selector would otherwise win). */
+#hero-5 .hero-glass-card .consultation-btn--outline:not(:hover):not(:focus-visible) {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+/* The gold kicker is the lowest-contrast text on the card, so it gets a soft
+   white halo: it lifts the local background where the blurred photo darkens and
+   keeps the letter edges crisp, without touching the brand colour. */
+#hero-5 .hero-glass-card h4 {
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* No backdrop filter => no blur, so the fill has to carry contrast on its own. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  #hero-5 .hero-glass-strip {
+    background-color: var(--color-primary, #3b5f1d);
+  }
+
+  #hero-5 .hero-txt.hero-glass-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    background-image: none;
+  }
+}
+
+/* Phones: the hero photo is cropped tighter (faces and a high-contrast stethoscope
+   land right behind the card) and a large blur costs frames, so the fill is a
+   little denser than on desktop and the blur smaller. */
+@media (max-width: 767.98px) {
+  #hero-5 .hero-txt.hero-glass-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    DEMO-2 GALLERY (#gallery-1) - the whole tile is one link.
 
    Every photo routes to the booking flow, so the anchor that used to be nothing
@@ -1506,37 +1652,133 @@ h2.steelblue-color,
   background-color: var(--color-primary);
 }
 
-/* Services mega-menu: the "Book Doctor Consultation" group with its three
-   sub-pointers (Audio / Video / Clinic). menu.css has no nested-list styling,
-   so the sub-items are indented, smaller and dotted. */
-.link-list li.has-sub > a {
-  padding-bottom: 6px;
-}
-
-.link-list .sub-link-list {
+/* Header mega-menus ("Services" / "Our Speciality"): one icon + label row per
+   entry, laid out as a responsive grid. The desktop panel still opens through
+   the plain CSS hover trigger (dropdown-effects/fade-down.css), the mobile
+   drawer handles tap-to-expand in layout/MobileMenu.js.
+   menu.css targets `.link-list` rows with 15px/400 and
+   `.wsmenu>.wsmenu-list>li a` with 17px/600, so every value is re-declared here
+   under the header id to win the cascade. */
+#header .nav-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 18px;
+  margin: 0;
+  padding: 0;
   list-style: none;
-  margin: 0 0 12px;
-  padding: 0 0 0 14px;
 }
 
-.link-list .sub-link-list > li {
-  border-bottom: 1px dotted #dcdcdc;
+#header .nav-service-grid > .nav-service-item {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
 }
 
-.link-list .sub-link-list > li:last-child {
-  border-bottom: none;
+#header .nav-service-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #4a4a4a;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, padding 0.2s ease;
 }
 
-.link-list .sub-link-list > li > a {
-  display: block;
-  padding: 8px 0;
-  font-size: 13px;
-  line-height: 1.3;
-  color: #565656;
-}
-
-.link-list .sub-link-list > li > a:hover {
+#header .nav-service-link:hover,
+#header .nav-service-link:focus-visible {
   color: var(--color-primary);
+  background-color: #f2f7ec;
+  padding-left: 14px;
 }
+
+/* Rounded swatch holding the custom medical glyph. */
+#header .nav-service-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background-color: rgba(59, 95, 29, 0.09);
+  color: var(--color-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#header .nav-service-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+#header .nav-service-link:hover .nav-service-icon,
+#header .nav-service-link:focus-visible .nav-service-icon {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Long DB names wrap inside the column instead of overflowing the panel. */
+#header .nav-service-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#header .nav-service-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* "Book Doctor Consultation" spans both columns and carries its three
+   consultation types as pills under the label. */
+#header .nav-service-group {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #eef0ea;
+  list-style: none;
+}
+
+#header .nav-service-sublinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 0 56px;
+  padding: 0;
+  list-style: none;
+}
+
+#header .nav-service-sublinks > li > a {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid #e2e8d8;
+  border-radius: 999px;
+  color: #565656;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+#header .nav-service-sublinks > li > a:hover,
+#header .nav-service-sublinks > li > a:focus-visible {
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 
 

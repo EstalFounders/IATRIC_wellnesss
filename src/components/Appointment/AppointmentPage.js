@@ -724,7 +724,9 @@ const AppointmentPage = () => {
     setBookingStep("otp");
   };
 
-  /** Step 2 -> Step 3: the mobile number is verified, nothing is booked yet. */
+  /**
+   * Step 2 -> Step 3: the mobile number is verified, nothing is booked yet.
+   */
   const handleOtpVerified = () => {
     setBookingStep("details");
   };
