@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
+import { scrollToAnchor } from "../../utils";
 
 /**
  * Shared call-to-action button.
@@ -33,7 +34,19 @@ export const ConsultationButton = ({
       onClick(e);
       return;
     }
-    router.push(path || "");
+    const target = path || "";
+    // Deep link to a section of the *current* page (e.g. "/appointment#appointment-form"
+    // tapped from the health-concern cards while already on /appointment): pushing
+    // the same route does nothing, and Next's scroll-to-top cannot reset the
+    // <body> scroller on phones, so the tap used to look completely dead. Scroll
+    // the anchor ourselves and keep the URL in sync without a history entry.
+    const [targetPath, hash] = target.split("#");
+    if (hash && targetPath.split("?")[0] === router.pathname) {
+      scrollToAnchor(hash);
+      router.replace(target, undefined, { shallow: true });
+      return;
+    }
+    router.push(target);
   };
 
   const isBookNow = isBlinking || variant === "book-now" || variant === "blink";

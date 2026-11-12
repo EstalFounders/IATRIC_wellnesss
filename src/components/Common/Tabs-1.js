@@ -7,12 +7,10 @@ import {
   booking_btn_txt,
   callToBook,
   color_schema,
-  serviceOffered,
   imageBlurDataUrl
 } from "../../constant";
 import { handleServiceClick } from "./commonMethod";
 import { ConsultationButton } from "./commonUi";
-import CalltoBookPopup from "./CalltoBookPopup";
 import { useLanguage } from "../../i18n/LanguageContext";
 import {
   getServiceAsset,
@@ -65,7 +63,6 @@ const ServicesTabs = () => {
   const servicesPerPage = 4;
   const router = useRouter();
   const { t, lang } = useLanguage();
-  const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
 
   const totalPages = Math.ceil(services.length / servicesPerPage);
 
@@ -75,18 +72,6 @@ const ServicesTabs = () => {
     indexOfFirstService,
     indexOfLastService
   );
-
-  const handleOpenCalltoBookDialog = () => {
-    setIsCalltoBookDialog(true);
-  };
-  const handleCloseCalltoBookDialog = () => {
-    setIsCalltoBookDialog(false);
-  };
-
-  const handleCalltoBookPopupSubmit = (mobNo) => {
-    setMobNo(mobNo);
-    setOtpConfirmationPopup(true);
-  };
 
   const handleNextPage = () => {
     setCurrentPage((prev) => {
@@ -273,17 +258,17 @@ const ServicesTabs = () => {
                     {renderDescription(service)}
                   </div>
 
-                  {/* Call to Book Button */}
+                  {/* Call to Book Button — books THIS speciality. The appointment
+                      page reads `?speciality=` and preselects it in the details
+                      step (and filters the doctor list by it); the hash scrolls
+                      the booking form into view on phones. */}
                   <div className="mt-4 w-100">
                     <div className="w-50 mx-auto mx-lg-0">
                       <ConsultationButton
                         variant={"book-now"}
-                        path={"/appointment"}
-                        onClick={() =>
-                          handleOpenCalltoBookDialog(
-                            serviceOffered.consultation
-                          )
-                        }
+                        path={`/appointment?speciality=${encodeURIComponent(
+                          service.name
+                        )}#appointment-form`}
                       >
                         {booking_btn_txt}
                       </ConsultationButton>
@@ -294,11 +279,6 @@ const ServicesTabs = () => {
             ))}
         </div>
       </div>
-      <CalltoBookPopup
-        show={isCalltoBookDialog}
-        onClose={handleCloseCalltoBookDialog}
-        onSubmit={handleCalltoBookPopupSubmit}
-      />
     </section>
   );
 };

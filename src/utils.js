@@ -35,6 +35,26 @@ export const stickyNav = () => {
   }
 };
 
+// The mobile-menu stylesheet (public/css/menu.css, max-width: 991px) sets
+// `html { overflow: hidden }` and `body { overflow-y: auto }`, so on phones the
+// page scroller is <body>, not the window. Anything that only calls
+// window.scrollTo() - including Next.js' own scroll-to-top on navigation - is a
+// no-op there, which is why a new page used to keep the previous scroll offset.
+export const scrollPageToTop = () => {
+  if (typeof window === "undefined") return;
+  window.scrollTo(0, 0);
+  if (document.body) document.body.scrollTop = 0;
+};
+
+// scrollIntoView() walks every ancestor scroll container, so it also works when
+// <body> is the scroller. `hash` may be passed with or without the leading "#".
+export const scrollToAnchor = (hash, behavior = "smooth") => {
+  if (typeof document === "undefined") return;
+  const id = String(hash || "").replace(/^#/, "");
+  const target = id && document.getElementById(id);
+  if (target) target.scrollIntoView({ behavior, block: "start" });
+};
+
 export const aTagClick = () => {
   const aTag = document.querySelectorAll("[href='#']");
   for (let i = 0; i < aTag.length; i++) {

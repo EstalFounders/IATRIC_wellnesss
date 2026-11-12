@@ -44,6 +44,7 @@ import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
 import { useLanguage } from "../../i18n/LanguageContext";
 import CommonHealthConcerns from "./CommonHealthConcern";
+import { scrollToAnchor } from "../../utils";
 
 // The consultation types the panel defines (src/constant.js) and the only ones
 // that are bookable, in that order. A serviceOffered row becomes an option only
@@ -529,6 +530,36 @@ const AppointmentPage = () => {
     applyDoctorSelection(doctorIdFromQuery);
   }, [router.query.doctorId, doctors]);
 
+  // Pre-select the speciality passed in the URL (?speciality=<name>), e.g. the
+  // "Book Now" CTA on a service tab (`Tabs1`). The value has to equal an option
+  // of the details dropdown exactly, so it is resolved against `specialityNames`
+  // (that list supplies the options) and consultation types - which also appear
+  // there but are not specialities - are skipped. Only an empty field is filled:
+  // a speciality the patient picked, or one derived from `?doctorId=`, wins.
+  useEffect(() => {
+    const requested =
+      typeof router.query.speciality === "string"
+        ? router.query.speciality.trim()
+        : "";
+    if (!requested || speciality) return;
+
+    const isConsultationType = SYSTEM_CONSULTATION_TYPES.some(
+      (type) => type.key === typeKeyFor(requested),
+    );
+    if (isConsultationType) return;
+
+    const key = specialityKey(requested);
+    const match = (specialityNames || []).find(
+      (name) => specialityKey(name) === key,
+    );
+    if (!match) return;
+
+    setSpeciality(match);
+    // `serviceType` is the posted/persisted field and only mirrors the dropdown
+    // on a change event, which this programmatic pick never fires.
+    setServiceType(match);
+  }, [router.query.speciality, specialityNames, speciality]);
+
   // Once the deep-linked doctor has actually been preselected, smooth-scroll to
   // the booking form so the user does not have to scroll manually after landing.
   useEffect(() => {
@@ -546,6 +577,20 @@ const AppointmentPage = () => {
       block: "start",
     });
   }, [router.query.doctorId, selectedDoctorId]);
+
+  // Deep link to the booking form (`/appointment#appointment-form`, e.g. the "Book
+  // Now" CTA on the health-concern cards). The browser's own hash scrolling is not
+  // reliable here because <body> is the page scroller on phones (see
+  // scrollPageToTop in src/utils), so the target is scrolled into view explicitly
+  // once the page has painted. `block: "start"` + `scroll-margin-top` keep the
+  // card's top edge just inside the viewport.
+  useEffect(() => {
+    if (router.asPath.split("#")[1] !== "appointment-form") return;
+    const frame = requestAnimationFrame(() =>
+      scrollToAnchor("appointment-form"),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [router.asPath]);
 
   const handleTimeSelection = (event) => {
     const timeChoice = event.target.value;
@@ -962,6 +1007,7 @@ const AppointmentPage = () => {
               card sized to its content and a long line (e.g. the "no doctor for
               this speciality" hint) widened the whole form. */}
           <div
+            id="appointment-form"
             ref={appointmentFormRef}
             className="w-100 d-flex justify-content-center"
           >
