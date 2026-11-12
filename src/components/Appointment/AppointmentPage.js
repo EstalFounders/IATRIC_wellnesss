@@ -981,7 +981,11 @@ const AppointmentPage = () => {
             </div>
           )}
 
-          <div>
+          {/* Same flex-item trap as the form wrapper above: this is a direct child
+              of the row, so without an explicit width AND a shrinkable min-width
+              it sizes to the card strip's max-content, the strip's own
+              `overflow-x:auto` never overflows and phones cannot swipe it. */}
+          <div className="w-100 appointment-concerns-wrap">
             <CommonHealthConcerns />
           </div>
 

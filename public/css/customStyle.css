@@ -680,6 +680,15 @@
   display: none;
 }
 
+/* Card strips that live in a Bootstrap `.row` (e.g. /appointment) need an
+   explicit width and a shrinkable min-width: a plain flex item is sized to the
+   strip's max-content, so `overflow-x:auto` on the strip never overflows and
+   `#page{overflow:hidden}` silently clips the trailing cards on phones. */
+.appointment-concerns-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
 .scroll-btn {
   position: absolute;
   top: 50%;
