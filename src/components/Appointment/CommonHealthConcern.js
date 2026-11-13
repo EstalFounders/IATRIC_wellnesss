@@ -8,12 +8,14 @@ import { booking_btn_txt } from "../../constant";
 const CommonHealthConcerns = () => {
   const { t } = useLanguage();
   return (
-    <div className="container py-5 health-concerns">
-      <h3 className="h3-md text-dark text-center">
-        {t("chc.title")}
-      </h3>
-      <div className="text-muted text-center text-md-start mb-4">
-        {t("chc.sub")}
+    <div className="container py-5 health-concerns m-section">
+      <div className="m-section-head">
+        <h3 className="h3-md text-dark text-center m-section-title">
+          {t("chc.title")}
+        </h3>
+        <div className="text-muted text-center text-md-start mb-md-4 m-section-sub">
+          {t("chc.sub")}
+        </div>
       </div>
       <div className="row">
         {/* Phones (<768px): the horizontal slider below is replaced by a compact

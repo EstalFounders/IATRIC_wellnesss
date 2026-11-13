@@ -1,5 +1,6 @@
 import {
   WHATSAPP_CONFIRMATION_TEMPLATE,
+  WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
   WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
   WHATSAPP_PRESCRIPTION_TEMPLATE,
@@ -80,6 +81,24 @@ export function buildWhatsAppPayload(template, body) {
           // re-cased (`capitalize` rewrites the doctor's own spelling), never
           // stripped of "Dr"/"Dr." and never prefixed with it either.
           doctorDisplayName(body.doctor_name),
+          orDash(body.appointment_date),
+          orDash(body.appointment_time),
+          body.consultation_type,
+        ].join("|"),
+      };
+    case WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR:
+      return {
+        // The SAME approved template id as the patient confirmation - only the
+        // first two variables are swapped, exactly like the reminder pair, so
+        // the doctor reads "Hello <doctor>, consultation with <patient> ..."
+        // instead of the patient-addressed copy of their own appointment.
+        message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
+        variables_values: [
+          // {{1}} the doctor themselves, verbatim as stored in `doctors.name`
+          // (see the "never re-case a doctor name" note above).
+          doctorDisplayName(body.doctor_name),
+          // {{2}} the patient they are seeing.
+          capitalize(body.patient_name),
           orDash(body.appointment_date),
           orDash(body.appointment_time),
           body.consultation_type,

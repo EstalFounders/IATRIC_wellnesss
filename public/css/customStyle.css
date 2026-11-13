@@ -1986,15 +1986,16 @@ h2.steelblue-color,
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-width: 100%;
+  /* One title size for all three grids (concerns + both service sections) so a
+     name never looks oversized in one block and tiny in the next. Two lines are
+     always reserved (min-height = 2 x line-height), so a one-line name and a
+     two-line name still produce exactly the same tile height. */
   font-size: 13px;
   font-weight: 700;
   line-height: 1.25;
+  min-height: 2.5em;
   white-space: normal;
   color: var(--color-primary);
-}
-
-.m-tile--service .m-tile-title {
-  font-size: 12px;
 }
 
 .m-tile-icon {
@@ -2011,25 +2012,27 @@ h2.steelblue-color,
   color: var(--color-secondary);
 }
 
-/* "Coming soon" flag, shrunk down to fit the tile. */
+/* "Coming soon" flag, shrunk down to fit the tile. Same type box as the gold
+   "Book Now" pill so the two never look like different scales. */
 .m-tile-badge {
   display: inline-block;
   max-width: 100%;
-  padding: 0 6px;
+  padding: 1px 8px;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 999px;
   background-color: var(--color-secondary);
   color: #ffffff;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.4;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Small gold "Book Now" affordance on the health-concern tiles. */
+/* Small gold "Book Now" affordance on the health-concern tiles. Same box as the
+   "coming soon" pill below, so the two read as one family. */
 .m-tile-cta {
   display: inline-block;
   max-width: 100%;
@@ -2040,6 +2043,7 @@ h2.steelblue-color,
   color: var(--color-secondary);
   font-size: 10px;
   font-weight: 700;
+  line-height: 1.4;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-overflow: ellipsis;
@@ -2047,15 +2051,15 @@ h2.steelblue-color,
 }
 
 /* Health-concern tiles: the card photo is kept, but as a compact thumbnail on
-   the left (title + "Book Now" pill on the right), so the grid stays short. */
+   the left (title + "Book Now" pill on the right), so the grid stays short.
+   Only the direction/alignment differ from a service tile - padding, min-height,
+   gap and radius stay on the shared `.m-tile` box so both sections line up. */
 .m-tile-grid--concerns .m-tile,
 .m-tile-grid--concerns .consultation-btn.m-tile {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  min-height: 68px;
-  padding: 7px 8px;
   text-align: left;
 }
 
@@ -2070,17 +2074,21 @@ h2.steelblue-color,
   background-color: rgba(59, 95, 29, 0.08);
 }
 
+/* Service tiles: one fixed height for both service grids. The tallest possible
+   content is icon (34px) + 6px + two title lines (2.5em of 13px = 32.5px) + 6px
+   + a "coming soon" pill (~17px) + 10px padding top and bottom ~= 117px, so
+   reserving 118px gives every tile the same height whether it carries the pill
+   or not (and keeps Demo5Services1 and Demo5Services2 rows identical). */
+.m-tile--service {
+  min-height: 118px;
+}
+
 .m-tile-body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
   min-width: 0;
-}
-
-/* Narrower text column next to the thumbnail -> slightly smaller title. */
-.m-tile-grid--concerns .m-tile-title {
-  font-size: 12px;
 }
 
 /* Very narrow phones (<=359px): shrink the thumbnail/gaps so the gold
@@ -2102,36 +2110,57 @@ h2.steelblue-color,
   .m-tile-grid--concerns .m-tile-cta {
     padding: 1px 6px;
     letter-spacing: 0;
-    font-size: 9px;
   }
 }
 
-/* Phones: tighten the section chrome around the grids and centre the headings
-   (desktop keeps the original spacing - these rules are inside the media query). */
+/* --------------------------------------------------------------------------
+   Phones (<768px): one shared type/spacing scale for the three tile sections
+   --------------------------------------------------------------------------
+   CommonHealthConcerns, Demo5Services1 and Demo5Services2 each carry
+   `.m-section`, and their heading block carries `.m-section-head` /
+   `.m-section-title` / `.m-section-sub`. The scale mirrors the section above
+   them (HealthPathTeam), whose heading is `.section-title .h1`: 2.5rem, weight
+   700, line-height 1.2, 0.5rem under the heading. Sections are then separated
+   by the same 2rem + 2rem rhythm, so the page reads as one stack of equal
+   blocks. Everything here is inside the phone breakpoint, so desktop font
+   sizes, spacing and colours are untouched.
+   -------------------------------------------------------------------------- */
 @media (max-width: 767.98px) {
+  /* Uniform vertical rhythm: 2rem above and below every block. */
+  .m-section {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
   /* `!important` only here: Bootstrap's `py-5` utility is `!important` itself. */
-  .health-concerns {
+  .health-concerns.m-section {
     padding-top: 2rem !important;
     padding-bottom: 2rem !important;
   }
 
-  .health-concerns .h3-md {
-    font-size: 1.35rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .services-section--tile-grid {
-    padding-bottom: 2.5rem;
-  }
-
-  .services-section--tile-grid .section-title {
-    margin-bottom: 1rem;
+  /* Gap between the heading block and the grid below. Matched to the reference
+     section above (`.section-title` -> 40px on phones); `.m-section` in the
+     selector keeps this ahead of the theme's `.section-title` rule. */
+  .m-section .m-section-head {
+    margin-bottom: 40px;
     text-align: center;
   }
 
-  .services-section--tile-grid .section-title .h1 {
-    font-size: 1.5rem;
-    line-height: 1.25;
+  /* Section heading: same size/weight/leading as the reference section above. */
+  .m-section .m-section-title {
+    margin: 0 0 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.25px;
+  }
+
+  /* Description line (only the concerns section has one). */
+  .m-section .m-section-sub {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #6c757d;
   }
 
   /* Belt and braces: the marquees are display:none on phones, this stops their

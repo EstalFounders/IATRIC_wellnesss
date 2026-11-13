@@ -19,6 +19,7 @@ import {
 import { sendWhatsAppConfirmation } from "../../pages/api/lib/communication";
 import {
   WHATSAPP_CONFIRMATION_TEMPLATE,
+  WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
   WHATSAPP_REMINDER_TEMPLATE_PATIENT,
   WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
 } from "../../pages/api/utils/constants";
@@ -182,7 +183,10 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     doctorNumber: doctorWhatsAppNumber,
     patientMobileRaw: patientMobileNo,
     doctorMobileRaw: doctorMobileNo,
-    template: WHATSAPP_CONFIRMATION_TEMPLATE,
+    patientTemplate: WHATSAPP_CONFIRMATION_TEMPLATE,
+    // Same approved template id, variables swapped (doctor | patient | date |
+    // time | type) so the doctor does not receive the patient's copy.
+    doctorTemplate: WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
     templateId: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
     confirmMessageBody,
   });
@@ -228,8 +232,11 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     try {
       await sendWhatsAppConfirmation(
         doctorWhatsAppNumber,
+        // Same body object as the patient send: `buildWhatsAppPayload` swaps
+        // {{1}}/{{2}} for this template key, so the doctor reads their own name
+        // first and the patient's second (mirrors the reminder pair).
         confirmMessageBody,
-        WHATSAPP_CONFIRMATION_TEMPLATE,
+        WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
       );
     } catch (waErr) {
       messagingFailed = true;
@@ -249,6 +256,7 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
           doctorNumber: doctorWhatsAppNumber,
           templateId: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
           phoneNumberId: process.env.FASTSMS_WA_PHONE_NUMBER_ID,
+          doctorTemplate: WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
           confirmMessageBody,
         },
       });

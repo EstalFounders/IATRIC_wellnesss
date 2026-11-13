@@ -2,6 +2,11 @@
 export const WHATSAPP_REMINDER_TEMPLATE_PATIENT = "consultation_reminder_patient";
 export const WHATSAPP_REMINDER_TEMPLATE_DOCTOR = "consultation_reminder_doctor";
 export const WHATSAPP_CONFIRMATION_TEMPLATE = "booking_confirmation";
+// Same approved template as the patient confirmation
+// (FASTSMS_WA_TEMPLATE_BOOKING_ID); only the variable order is swapped so the
+// doctor reads "Hello <doctor>, consultation with <patient> ..." - same pattern
+// as WHATSAPP_REMINDER_TEMPLATE_DOCTOR. See smsTemplates.js.
+export const WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR = "booking_confirmation_doctor";
 export const WHATSAPP_PRESCRIPTION_TEMPLATE = "patient_prescription";
 export const WHATSAPP_INVOICE_TEMPLATE = "consultation_invoice";
 export const WHATSAPP_NUMBER_CONFIRMATION = "number_confirmation";

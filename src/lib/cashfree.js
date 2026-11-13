@@ -310,30 +310,96 @@ export async function createCashfreeRefund({ orderId, refundAmount, refundNote }
   return data;
 }
 
+/** Constant-time compare that tolerates different lengths instead of throwing. */
+const safeEqual = (received, computed) => {
+  const a = Buffer.from(String(received || ""), "utf8");
+  const b = Buffer.from(String(computed || ""), "utf8");
+  // `crypto.timingSafeEqual` throws "Input buffers must have the same byte
+  // length" on a length mismatch, which a bogus/foreign signature always is.
+  if (a.length === 0 || a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+};
+
+// Reported once per process: a placeholder secret rejects every webhook, and the
+// operator needs to see that instead of a per-request failure log.
+let warnedAboutSecret = false;
+
+const readWebhookSecret = () => {
+  const secret = process.env.CASHFREE_WEBHOOK_SECRET;
+  if (!secret || /^<.*>$/.test(secret.trim())) {
+    if (!warnedAboutSecret) {
+      warnedAboutSecret = true;
+      console.error(
+        "CASHFREE_WEBHOOK_SECRET is not configured (or is still the placeholder). " +
+          "Every Cashfree webhook will be rejected until the real secret from the " +
+          "Cashfree dashboard is set on the server."
+      );
+    }
+    return "";
+  }
+  return secret;
+};
+
 /**
- * Verifies the Cashfree webhook signature using HMAC SHA-256 as described
- * in Cashfree's official webhook documentation.
+ * Verifies a Cashfree webhook signature (HMAC SHA-256, API version 2023-08-01).
+ *
+ * Cashfree signs `x-webhook-timestamp + rawBody` and sends the digest
+ * **base64-encoded** in `x-webhook-signature`. This used to compute
+ * `HMAC(rawBody)` as hex and hand both values to `crypto.timingSafeEqual`, which
+ * threw `RangeError: Input buffers must have the same byte length` (64-byte hex
+ * vs 44-byte base64) - the webhook answered 500 on every delivery.
+ *
+ * The body-only and hex forms are still accepted so an integration configured
+ * against the older scheme keeps working; each candidate is an HMAC of data we
+ * received with our own secret, so accepting them does not weaken the check.
+ * Never throws - an unverifiable payload is simply `false`.
  */
-export function verifyCashfreeWebhookSignature({ rawBody, signature }) {
-  if (!process.env.CASHFREE_WEBHOOK_SECRET) {
-    console.error("CASHFREE_WEBHOOK_SECRET is not configured");
+export function verifyCashfreeWebhookSignature({ rawBody, signature, timestamp }) {
+  try {
+    const secret = readWebhookSecret();
+    if (!secret || !rawBody || !signature) return false;
+
+    const body = Buffer.isBuffer(rawBody)
+      ? rawBody
+      : Buffer.from(String(rawBody), "utf8");
+    const received = String(signature).trim();
+    // Cashfree sends "ts=...,v1=..." style values on some endpoints; keep the
+    // base64 payload itself when the header is prefixed.
+    const receivedSignature = received.includes(",")
+      ? received
+          .split(",")
+          .map((part) => part.split("=").pop().trim())
+          .filter(Boolean)
+          .pop()
+      : received;
+
+    const digest = (payload) =>
+      crypto.createHmac("sha256", secret).update(payload).digest();
+
+    const signedBody = timestamp
+      ? Buffer.concat([Buffer.from(String(timestamp), "utf8"), body])
+      : null;
+
+    const candidates = [];
+    if (signedBody) {
+      const hmac = digest(signedBody);
+      candidates.push(hmac.toString("base64"), hmac.toString("hex"));
+    }
+    const bodyHmac = digest(body);
+    candidates.push(bodyHmac.toString("base64"), bodyHmac.toString("hex"));
+
+    const haystack = new Set(candidates.map((value) => value.toLowerCase()));
+    const needle = String(receivedSignature).toLowerCase();
+
+    for (const candidate of haystack) {
+      if (safeEqual(needle, candidate)) return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(
+      "Cashfree webhook signature verification error:",
+      error?.message || error
+    );
     return false;
   }
-
-  if (!rawBody || !signature) {
-    return false;
-  }
-
-  const expected = crypto
-    .createHmac("sha256", process.env.CASHFREE_WEBHOOK_SECRET)
-    .update(rawBody)
-    .digest("hex");
-
-  const actual = String(signature).toLowerCase();
-  const expectedHmac = expected.toLowerCase();
-
-  return crypto.timingSafeEqual(
-    Buffer.from(actual, "utf8"),
-    Buffer.from(expectedHmac, "utf8")
-  );
 }

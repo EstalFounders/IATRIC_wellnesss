@@ -175,11 +175,11 @@ const Demo5Services2 = () => {
   };
 
   return (
-    <section className="services-section services-section--speciality services-section--tile-grid pb-70">
+    <section className="services-section services-section--speciality services-section--tile-grid pb-70 m-section">
       <div className="container">
         <div className="row">
-          <div className="col-lg-10 offset-lg-1 section-title">
-            <div className="font-weight-bold h1 text-uppercase">{t("demo5.services2.heading")}</div>
+          <div className="col-lg-10 offset-lg-1 section-title m-section-head">
+            <div className="font-weight-bold h1 text-uppercase m-section-title">{t("demo5.services2.heading")}</div>
           </div>
         </div>
         {/* Phones (<768px): the auto-rotating marquee below is replaced by a
