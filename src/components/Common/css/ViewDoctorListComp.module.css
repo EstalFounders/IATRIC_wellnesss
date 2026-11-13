@@ -1,20 +1,24 @@
 /* ViewDoctorListComp.module.css */
 
+/* Every doctor matching the speciality must be VISIBLE, not queued off-screen.
+   This used to be one non-wrapping row with `overflow-x: auto`, so a speciality
+   with 7 doctors rendered card #1 plus a thin horizontal scrollbar (and exactly
+   one card per screen at <=576px) - which reads as "only one doctor". The row
+   now wraps into as many lines as it needs and the page scrolls vertically. */
 .view-doctor-list-container {
-    /* width: 100%; */
-  height: 100%;
-  overflow-y: auto; /* if needed */
-  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  height: auto;
   box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    gap: 1.5rem;
-    padding: 2rem;
-    /* background-color: #f8f9fb; */
-    border-radius: 10px;
-    overflow-x: auto; /* Enable horizontal scrolling */
-    max-height: 100%; /* Optional: Limit the height */
-    scrollbar-width: thin; /* For Firefox */
+  gap: 1.5rem;
+  padding: 2rem;
+  /* background-color: #f8f9fb; */
+  border-radius: 10px;
+  scrollbar-width: thin; /* For Firefox */
     
   }
   
@@ -28,7 +32,8 @@
     flex: 1 1 280px;
     max-width: 340px;
     box-sizing: border-box;
-    margin: 0px 10px 0 10px;
+    /* spacing comes from the container `gap` now that the row wraps */
+    margin: 0;
     padding: 1.25rem;
     text-align: center;
     background-color: #ffffff;
@@ -229,22 +234,22 @@
   }
 
   /* Small screens: one card per row so the fixed photo + nowrap booking
-     button never overflow the viewport. The card keeps a 16px gutter on each
-     side instead of sitting edge-to-edge; the gutters are folded into the
-     flex-basis (100% - 32px) so a single card spans exactly one screen and the
-     scroll row never overflows horizontally. */
+     button never overflow the viewport. The cards stack vertically (the row
+     wraps), so every doctor is reachable by scrolling down - the gutters are
+     folded into the flex-basis (100% - 32px) and `justify-content: center`
+     centres the card with 16px on each side. */
   @media (max-width: 576px) {
     .view-doctor-list-container {
       width: 100%;
-      padding: 12px 0;
-      gap: 0;
+      padding: 0;
+      gap: 1rem;
     }
 
     .new-doctor-card {
       flex: 0 0 calc(100% - 32px);
       width: calc(100% - 32px);
       max-width: calc(100% - 32px);
-      margin: 0 16px;
+      margin: 0;
     }
   }
   

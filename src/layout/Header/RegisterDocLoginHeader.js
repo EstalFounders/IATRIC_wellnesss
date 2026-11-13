@@ -4,6 +4,7 @@ import Image from "next/image";
 import Navbar from "../../components/registerDocComponent/NavBarComponent/Navbar";
 import RightSideMenu from "../../components/registerDocComponent/NavBarComponent/RightSideMenu";
 import { doctor_info_local_storage, api, single_call, imageBlurDataUrl } from "../../constant";
+import { safeJsonParse } from "../../utils";
 import { signOut } from "next-auth/react";
 import Preloader from "../../components/Preloader";
 import LeaveRequestModel from "../../components/registerDocComponent/model/LeaveRequestModel";
@@ -13,8 +14,8 @@ const RegisterDocLoginHeader = () => {
   const [manageSlotsModelShow, setManageSlotsModelShow] = useState(false);
   const [leaveRequestModelShow, setLeaveRequestModelShow] = useState(false);
   const [loader, setLoader] = useState(false);
-  const DoctorInfo = JSON.parse(
-    sessionStorage.getItem(doctor_info_local_storage)
+  const DoctorInfo = safeJsonParse(
+    sessionStorage.getItem(doctor_info_local_storage),
   );
 
   const [doctorStatus, setDoctorStatus] = useState(

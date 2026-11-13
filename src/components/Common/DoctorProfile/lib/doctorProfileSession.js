@@ -8,13 +8,14 @@
 // failure handling cannot drift: an unreadable / missing blob returns null and
 // the page renders its "please sign in again" state instead of crashing.
 import { doctor_info_local_storage } from "../../../../constant";
+import { safeJsonParse } from "../../../../utils";
 
 /** The logged-in doctor from the panel session, or null. */
 export function readSessionDoctor() {
   if (typeof window === "undefined") return null;
 
   try {
-    const stored = JSON.parse(sessionStorage.getItem(doctor_info_local_storage));
+    const stored = safeJsonParse(sessionStorage.getItem(doctor_info_local_storage));
     // `stored.user` is the doctor document the NextAuth session callback stored;
     // a few older sessions stored the doctor document itself, so accept both.
     const doctor = stored?.user || stored;

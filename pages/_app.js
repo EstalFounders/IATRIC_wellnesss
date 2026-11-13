@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Preloader from "../src/components/Preloader";
 import { animation, scrollPageToTop } from "../src/utils";
 import "../styles/globals.css";
@@ -13,6 +13,8 @@ import LanguageToggle from "../src/components/Common/LanguageToggle";
 import SeoMetadata from "../src/marketing/components/SeoMetadata";
 import PageStructuredData from "../src/components/Common/PageStructuredData";
 import GoogleAnalytics from "../src/components/Common/GoogleAnalytics";
+import ClientErrorReporter from "../src/components/Common/ClientErrorReporter";
+import ErrorBoundary from "../src/components/Common/ErrorBoundary";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // TT Ramillas is the only brand typeface. This theme makes every MUI component
@@ -23,8 +25,14 @@ const brandTheme = createTheme({
 
 function MyApp({ Component, pageProps, router, ...rest }) {
   const [loader, setLoader] = useState(true);
-  const { store, props } = wrapper.useWrappedStore(rest);
-  const persistor = persistStore(store);
+  // `useWrappedStore` reads the page props off the object it is given; it used to
+  // receive `...rest`, from which `pageProps` had already been destructured away.
+  // The result was that `props.pageProps` was always undefined, so every page got
+  // *no* props - including `pages/_error.js`, which could not read its statusCode.
+  const { store, props } = wrapper.useWrappedStore({ ...rest, pageProps });
+  // persistStore() registers listeners and starts rehydrating: running it on every
+  // render created one persistor per state change (and leaked the old ones).
+  const persistor = useMemo(() => persistStore(store), [store]);
 
   // The meeting room is a standalone, full-screen call UI. Its control bar sits in
   // the bottom-right corner on phones - exactly where the floating widget (fixed,
@@ -34,12 +42,16 @@ function MyApp({ Component, pageProps, router, ...rest }) {
   const isMeetingRoom =
     typeof router?.pathname === "string" && router.pathname.startsWith("/meeting/");
 
+  // Used to run after *every* render (the effect had no dependency list), so each
+  // state change cleared and re-armed the 1s timer - the preloader only ever
+  // disappeared once nothing else re-rendered. Both calls are one-shot boot work.
   useEffect(() => {
     animation();
     const timer = setTimeout(() => {
       setLoader(false);
     }, 1000);
-  });
+    return () => clearTimeout(timer);
+  }, []);
 
   // A client-side navigation must start at the top of the new page. Next.js does
   // that for us with window.scrollTo(), which is a no-op on phones because there
@@ -70,14 +82,21 @@ function MyApp({ Component, pageProps, router, ...rest }) {
       {/* GA4 (gtag.js). Kept outside <NoSsr> like the tags above so the loader
           starts with the page instead of waiting for hydration. */}
       <GoogleAnalytics />
+      {/* Window `error` / `unhandledrejection` / Next's `routeChangeError`. Renders
+          nothing; mounted here so a crash on any page is reported. */}
+      <ClientErrorReporter />
       {loader && <Preloader />}
       <NoSsr>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <LanguageProvider>
               <ThemeProvider theme={brandTheme}>
-                <Component {...props.pageProps} />
-                <SeoMetadata metadata={pageProps?.seoMetadata} />
+                {/* A boundary keeps the app shell alive when one page throws, and
+                    the `key` remounts it on navigation so the next page still
+                    has a chance to render. */}
+                <ErrorBoundary key={router.pathname}>
+                  <Component {...props.pageProps} />
+                </ErrorBoundary>
                 {!isMeetingRoom && <LanguageToggle />}
               </ThemeProvider>
             </LanguageProvider>

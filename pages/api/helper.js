@@ -33,6 +33,27 @@ import {
   doctorFee,
   resolveBookingConsultationPrice,
 } from "./utils/consultationPricing";
+// The tolerance rules for "does this doctor cover this speciality" live in one
+// place and are reused here so an "Any Doctor" booking is scoped to exactly the
+// doctors the dropdown offered.
+import { matchesServiceOffered } from "../../src/components/filterbar/filterDoctors";
+import { SYSTEM_CONSULTATION_TYPES, typeKeyFor } from "../../src/utils/consultationFee";
+
+/**
+ * The speciality an "Any Doctor" search must be limited to. Returns "" when
+ * there is nothing to filter on, which keeps the old search behaviour: an empty
+ * value, and a legacy booking that posts the consultation type ("Video") as
+ * `serviceType`, must not exclude every doctor.
+ */
+const specialityFilterOf = (serviceType) => {
+  const value = typeof serviceType === "string" ? serviceType.trim() : "";
+  if (!value) return "";
+
+  const isConsultationType = SYSTEM_CONSULTATION_TYPES.some(
+    (type) => type.key === typeKeyFor(value),
+  );
+  return isConsultationType ? "" : value;
+};
 
 // consultationType is stored as `[{ name, price }]` (legacy string entries also
 // possible), so a type search must match both shapes.
@@ -119,6 +140,7 @@ export async function findAvailableDoctorForNow(
   res,
   floorTime,
   bookingPrice,
+  serviceType,
 ) {
   await dbConnect();
 
@@ -143,16 +165,32 @@ export async function findAvailableDoctorForNow(
   console.log("Searching slots from:", nextSlotTime);
 
   // Step 1: Get all company doctors
-  const companyDoctors = await Doctor.find({
-    ...consultationTypeMatch(genericConsultationType),
-    doctorType: "Company",
-  });
+  const speciality = specialityFilterOf(serviceType);
+  const matchesSpeciality = (doctor) =>
+    !speciality || matchesServiceOffered(doctor, speciality);
+
+  const companyDoctors = (
+    await Doctor.find({
+      ...consultationTypeMatch(genericConsultationType),
+      doctorType: "Company",
+    })
+  ).filter(matchesSpeciality);
 
   // Step 2: Get all non-company doctors (excluding company ones)
-  const nonCompanyDoctors = await Doctor.find({
-    ...consultationTypeMatch(genericConsultationType),
-    doctorType: "Individual",
-  });
+  const nonCompanyDoctors = (
+    await Doctor.find({
+      ...consultationTypeMatch(genericConsultationType),
+      doctorType: "Individual",
+    })
+  ).filter(matchesSpeciality);
+
+  // A speciality nobody covers is a data question, not a search failure - say so
+  // instead of quietly returning the generic "no slots" answer.
+  if (speciality && companyDoctors.length + nonCompanyDoctors.length === 0) {
+    console.log(
+      `No doctor offers "${speciality}" for ${genericConsultationType}; the "Any Doctor" search has no candidate.`,
+    );
+  }
 
   // Every candidate doctor that still has at least one free slot from the
   // search floor onwards.
@@ -251,6 +289,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   genericConsultationType,
   slot,
   bookingPrice,
+  serviceType,
 ) {
   await dbConnect();
 
@@ -319,10 +358,16 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   }
 
   // Step 1: Find company doctors
-  let companyDoctors = await Doctor.find({
-    ...consultationTypeMatch(genericConsultationType),
-    doctorType: "Company",
-  });
+  const speciality = specialityFilterOf(serviceType);
+  const matchesSpeciality = (doctor) =>
+    !speciality || matchesServiceOffered(doctor, speciality);
+
+  let companyDoctors = (
+    await Doctor.find({
+      ...consultationTypeMatch(genericConsultationType),
+      doctorType: "Company",
+    })
+  ).filter(matchesSpeciality);
 
   let result = await findDoctorWithSlot(preferWithinBudget(companyDoctors));
   if (result) {
@@ -330,10 +375,18 @@ export async function findAvailableDoctorForSpecificTimeSlot(
   }
 
   // Step 2: If no company doctor is available, find non-company doctors
-  let nonCompanyDoctors = await Doctor.find({
-    ...consultationTypeMatch(genericConsultationType),
-    doctorType: { $ne: "Individual" },
-  });
+  let nonCompanyDoctors = (
+    await Doctor.find({
+      ...consultationTypeMatch(genericConsultationType),
+      doctorType: { $ne: "Individual" },
+    })
+  ).filter(matchesSpeciality);
+
+  if (speciality && companyDoctors.length + nonCompanyDoctors.length === 0) {
+    console.log(
+      `No doctor offers "${speciality}" for ${genericConsultationType}; the "Any Doctor" search has no candidate.`,
+    );
+  }
 
   result = await findDoctorWithSlot(preferWithinBudget(nonCompanyDoctors));
   if (result) {
@@ -974,6 +1027,7 @@ export async function handlePostConsultation(reqBody, res) {
         res,
         nowSlotFloor,
         consultationprice,
+        serviceType,
       );
       console.log(result, "result 97");
 
@@ -1011,8 +1065,22 @@ export async function handlePostConsultation(reqBody, res) {
         genericConsultationType,
         selectedSlot,
         consultationprice,
+        serviceType,
       );
       console.log(result, "result 111");
+      // Strictly scoped to the patient's speciality, this search can legitimately
+      // come back with nobody free (`""`). Reading `.doctor` off that answered 500;
+      // the error below uses the same handled path as the rest of the handler.
+      if (!result || !result.doctor) {
+        const noDoctor = new Error("No available doctors at the selected time");
+        // Said in the patient's words: "everyone is busy" would be wrong when the
+        // real reason is that nobody covers the chosen speciality.
+        const missingSpeciality = specialityFilterOf(serviceType);
+        if (missingSpeciality) {
+          noDoctor.patientMessage = `No doctor is available for ${missingSpeciality} at this time. Please choose another speciality or time.`;
+        }
+        throw noDoctor;
+      }
       docName = result.doctor.name;
       doctorMobileNo = result.doctor.mobileNumber;
       doctorId = result.doctor;
@@ -1119,6 +1187,11 @@ export async function handlePostConsultation(reqBody, res) {
       await session.abortTransaction();
     }
     console.error("Booking error:", error);
+    // A refusal that already knows how to say it to the patient wins over the
+    // generic "everyone is busy" (see the speciality-scoped search above).
+    const failureMessage =
+      error?.patientMessage ||
+      "All doctor are busy right now, No slot is available";
     // Log error to Google Sheets with full context
     await logErrorToGoogleSheet({
       apiName: "bookConsultation - POST",
@@ -1143,11 +1216,11 @@ export async function handlePostConsultation(reqBody, res) {
         consultationprice,
       },
       responsePayload: {
-        message: "All doctor are busy right now, No slot is available",
+        message: failureMessage,
       },
     });
     res.status(200).json({
-      message: "All doctor are busy right now, No slot is available",
+      message: failureMessage,
     });
   } finally {
     // Runs for every exit path (including the early `return`s that hand the

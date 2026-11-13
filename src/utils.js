@@ -6,6 +6,27 @@ import {
 import { storage } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * `JSON.parse` for values that come back from storage or the URL. An unreadable
+ * blob there is normal (older build wrote another shape, another tab cleared it,
+ * private mode quota) and must never take a page down - a bare `JSON.parse` throws
+ * `SyntaxError: Unexpected token u in JSON at position 0` for a missing key,
+ * because `getItem` returned `null` and got stringified into "null"... only
+ * `JSON.parse(null)` returns null, an empty string or a half-written value throws.
+ *
+ * @param {*} raw - the raw string (or anything else) to parse
+ * @param {*} [fallback] - returned when parsing fails; defaults to null
+ */
+export const safeJsonParse = (raw, fallback = null) => {
+  if (typeof raw !== "string" || !raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed === null || parsed === undefined ? fallback : parsed;
+  } catch {
+    return fallback;
+  }
+};
+
 export const animation = () => {
   if (typeof window !== "undefined") {
     try {

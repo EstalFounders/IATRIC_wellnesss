@@ -17,11 +17,18 @@ export const GA_MEASUREMENT_ID = "G-7HL3FQZ6QC";
 
 // Internal screens must not pollute the property: the super-admin / marketing
 // panels and the doctor register flow, plus the full-screen meeting room.
-const SKIP_PREFIXES = ["/superAdmin", "/marketing", "/registerDoc", "/meeting/"];
+// Exported because the client error reporter (src/lib/clientError.js) has to skip
+// exactly the same routes when it sends its GA events.
+export const GA_SKIP_PREFIXES = [
+  "/superAdmin",
+  "/marketing",
+  "/registerDoc",
+  "/meeting/",
+];
 
 const GoogleAnalytics = () => {
   const router = useRouter();
-  const skipped = SKIP_PREFIXES.some((prefix) =>
+  const skipped = GA_SKIP_PREFIXES.some((prefix) =>
     (router.pathname || "").startsWith(prefix)
   );
 
