@@ -74,10 +74,11 @@ const ICON_BY_NAME = {
 };
 
 // Falls back to the doctor-consultation icon so no card is ever icon-less.
-const renderServiceIcon = (name) =>
+// `size` is overridable because the phone grid uses the same icon at 34px.
+const renderServiceIcon = (name, size = 70) =>
   React.createElement(
     ICON_BY_NAME[String(name || "").toLowerCase()] || GeneralPhysician,
-    { size: 70 }
+    { size }
   );
 
 const Demo5Services1 = () => {
@@ -176,7 +177,7 @@ const Demo5Services1 = () => {
   };
 
   return (
-    <section className="services-section pb-70">
+    <section className="services-section services-section--tile-grid pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
@@ -184,7 +185,39 @@ const Demo5Services1 = () => {
           </div>
         </div>
 
-        <div className="row">
+        {/* Phones (<768px): the auto-rotating marquee below is replaced by a
+            compact 3-column tile grid so every service is visible at once.
+            Tiles call the same handleClick, so routing is identical. */}
+        <div className="row d-md-none">
+          <div className="col-12">
+            <div className="m-tile-grid m-tile-grid--services">
+              {highlights.map((item, index) => {
+                const title = serviceTitle(item);
+                return (
+                  <button
+                    type="button"
+                    key={`${item.nameId || item.name || item.title || "service"}-m-${index}`}
+                    className="m-tile m-tile--service"
+                    onClick={() => handleClick(item)}
+                  >
+                    <span className="m-tile-icon">
+                      {renderServiceIcon(item.name, 34)}
+                    </span>
+                    <span className="m-tile-title">{title}</span>
+                    {isComingSoonService(item.name || item.title) ? (
+                      <span className="m-tile-badge">
+                        {t("common.comingSoon")}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Tablet/desktop (>=768px): unchanged marquee (drag, pause, clones). */}
+        <div className="row d-none d-md-block">
           <section className="services-wrapper col-lg-12">
             <div
               className="services-marquee"

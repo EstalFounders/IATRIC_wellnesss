@@ -159,7 +159,7 @@ const Demo5Services2 = () => {
     handleServiceClick(item.name, index, router);
   };
 
-  const renderIcon = (name, index) => {
+  const renderIcon = (name, index, size = 80) => {
     // exact name -> keyword resolver -> generic stethoscope, so a new speciality
     // in the DB can never leave a card without an icon.
     const Icon =
@@ -168,21 +168,47 @@ const Demo5Services2 = () => {
       FaStethoscope;
     return (
       <Icon
-        size={80}
+        size={size}
         color={hoveredIndex === index ? "#fafafa" : color_schema.green}
       />
     );
   };
 
   return (
-    <section className="services-section services-section--speciality pb-70">
+    <section className="services-section services-section--speciality services-section--tile-grid pb-70">
       <div className="container">
         <div className="row">
           <div className="col-lg-10 offset-lg-1 section-title">
             <div className="font-weight-bold h1 text-uppercase">{t("demo5.services2.heading")}</div>
           </div>
         </div>
-        <div className="row">
+        {/* Phones (<768px): the auto-rotating marquee below is replaced by a
+            compact 3-column tile grid so every speciality is visible at once.
+            Tiles reuse handleClick -> identical /department-single routing. */}
+        <div className="row d-md-none">
+          <div className="col-12">
+            <div className="m-tile-grid m-tile-grid--services">
+              {speciality.map((item, index) => (
+                <button
+                  type="button"
+                  key={`${item.name || "speciality"}-m-${index}`}
+                  className="m-tile m-tile--service"
+                  onClick={() => handleClick(item, index)}
+                >
+                  <span className="m-tile-icon">
+                    {renderIcon(item.name, -1, 34)}
+                  </span>
+                  <span className="m-tile-title">
+                    {t(`service.${item.name}`, item.name)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tablet/desktop (>=768px): unchanged marquee (drag, pause, clones). */}
+        <div className="row d-none d-md-block">
           <section className="col-lg-12">
             <div
               className="services-marquee"

@@ -1880,3 +1880,264 @@ h2.steelblue-color,
 
 
 
+
+
+/* ==========================================================================
+   Phone layouts (<768px) for the "see everything at once" sections
+   --------------------------------------------------------------------------
+   CommonHealthConcerns (horizontal slider), Demo5Services1 (right-scrolling
+   marquee) and Demo5Services2 (left-scrolling marquee) all hide their
+   carousel on phones and render every item at once as `.m-tile` tiles inside a
+   `.m-tile-grid`. The switch is done in JSX with Bootstrap display utilities
+   (`d-md-none` for the grid, `d-none d-md-block` for the carousel), so tablet
+   and desktop markup/CSS are untouched.
+
+   Tiles are used on two element types: a native <button> (the two service
+   sections) and <ConsultationButton> (the concerns, which reuses the shared
+   CTA so its click/anchor-scroll behaviour stays identical). Both are reset to
+   the same box here; `.consultation-btn.m-tile` is a compound selector on
+   purpose so it outranks the shared .consultation-btn rules without needing
+   !important.
+   ========================================================================== */
+.m-tile-grid {
+  display: grid;
+  gap: 10px;
+}
+
+/* 8 concerns, long question titles -> 2 columns. */
+.m-tile-grid--concerns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Icon + name tiles are short -> 3 columns keeps the block compact. */
+.m-tile-grid--services {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Very narrow phones (<=359px): 3 columns would squeeze the names too hard. */
+@media (max-width: 359.98px) {
+  .m-tile-grid--services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.m-tile,
+.consultation-btn.m-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 84px;
+  margin: 0;
+  padding: 10px 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: break-word;
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid rgba(59, 95, 29, 0.16);
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(1, 1, 1, 0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease, background-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  /* No pulsing/zooming inside the grid - 20+ animated tiles would be noise. */
+  animation: none;
+}
+
+/* Touch feedback. `.consultation-btn.m-tile:<state>` outranks the shared
+   .consultation-btn--outline:<state> rules, so a concern tile never flips to a
+   solid green block after a tap (sticky :hover on touch devices). */
+.m-tile:hover,
+.m-tile:focus-visible,
+.consultation-btn.m-tile:hover,
+.consultation-btn.m-tile:focus-visible {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border-color: var(--color-secondary);
+  box-shadow: 0 3px 10px rgba(1, 1, 1, 0.1);
+}
+
+.m-tile:active,
+.consultation-btn.m-tile:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 3px rgba(1, 1, 1, 0.08);
+}
+
+.m-tile:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Titles: two lines max, then ellipsis, so every tile in a row stays the same
+   height even with names like "Neurology (Brain & Spine)". */
+.m-tile-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: normal;
+  color: var(--color-primary);
+}
+
+.m-tile--service .m-tile-title {
+  font-size: 12px;
+}
+
+.m-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: var(--color-secondary);
+}
+
+.m-tile-icon svg {
+  width: 34px;
+  height: 34px;
+  color: var(--color-secondary);
+}
+
+/* "Coming soon" flag, shrunk down to fit the tile. */
+.m-tile-badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0 6px;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Small gold "Book Now" affordance on the health-concern tiles. */
+.m-tile-cta {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-secondary);
+  border-radius: 999px;
+  color: var(--color-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Health-concern tiles: the card photo is kept, but as a compact thumbnail on
+   the left (title + "Book Now" pill on the right), so the grid stays short. */
+.m-tile-grid--concerns .m-tile,
+.m-tile-grid--concerns .consultation-btn.m-tile {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 68px;
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.m-tile-img {
+  display: block;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 9px;
+  object-fit: cover;
+  /* Warm placeholder tone, so a slow/404 photo still leaves a tidy tile. */
+  background-color: rgba(59, 95, 29, 0.08);
+}
+
+.m-tile-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Narrower text column next to the thumbnail -> slightly smaller title. */
+.m-tile-grid--concerns .m-tile-title {
+  font-size: 12px;
+}
+
+/* Very narrow phones (<=359px): shrink the thumbnail/gaps so the gold
+   "BOOK NOW" pill next to it is never truncated. Declared after the base
+   .m-tile-img/.m-tile-cta rules so it actually wins (same specificity). */
+@media (max-width: 359.98px) {
+  .m-tile-grid--concerns .m-tile,
+  .m-tile-grid--concerns .consultation-btn.m-tile {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .m-tile-img {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+  }
+
+  .m-tile-grid--concerns .m-tile-cta {
+    padding: 1px 6px;
+    letter-spacing: 0;
+    font-size: 9px;
+  }
+}
+
+/* Phones: tighten the section chrome around the grids and centre the headings
+   (desktop keeps the original spacing - these rules are inside the media query). */
+@media (max-width: 767.98px) {
+  /* `!important` only here: Bootstrap's `py-5` utility is `!important` itself. */
+  .health-concerns {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .health-concerns .h3-md {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .services-section--tile-grid {
+    padding-bottom: 2.5rem;
+  }
+
+  .services-section--tile-grid .section-title {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .services-section--tile-grid .section-title .h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  /* Belt and braces: the marquees are display:none on phones, this stops their
+     keyframes from ticking at all if one is ever shown again. */
+  .services-section--tile-grid .services-track,
+  .services-section--tile-grid .services-track-rtl {
+    animation: none;
+  }
+}

@@ -27,6 +27,7 @@ export const ConsultationButton = ({
   color,
   variant,
   isBlinking = false,
+  className: extraClassName,
 }) => {
   const router = useRouter();
   const handleClick = (e) => {
@@ -57,10 +58,13 @@ export const ConsultationButton = ({
 
   // Base class + optional modifiers. For every existing instance the join still
   // produces exactly the original "consultation-btn", so nothing else changes.
+  // `className` lets a caller restyle a single instance (e.g. the phone-only
+  // health-concern tiles) without touching the shared button CSS.
   const className = [
     "consultation-btn",
     isBookNow && "consultation-btn--book-now",
     isOutline && "consultation-btn--outline",
+    extraClassName,
   ]
     .filter(Boolean)
     .join(" ");
