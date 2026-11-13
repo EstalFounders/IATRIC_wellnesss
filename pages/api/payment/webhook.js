@@ -18,13 +18,16 @@ export const config = {
   },
 };
 
+// Cashfree signs the raw bytes of the body, so the stream is collected as
+// Buffers: `data += chunk` decodes each chunk on its own and a multi-byte
+// character split across two chunks would change the bytes we then HMAC.
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
-    let data = "";
+    const chunks = [];
     req.on("data", (chunk) => {
-      data += chunk;
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     });
-    req.on("end", () => resolve(data));
+    req.on("end", () => resolve(Buffer.concat(chunks)));
     req.on("error", reject);
   });
 }
@@ -38,10 +41,12 @@ export default async function handler(req, res) {
     const rawBody = await readRawBody(req);
     const signature =
       req.headers["x-webhook-signature"] || req.headers["x-cashfree-signature"];
+    const timestamp = req.headers["x-webhook-timestamp"];
 
     const signatureValid = verifyCashfreeWebhookSignature({
       rawBody,
       signature,
+      timestamp,
     });
     if (!signatureValid) {
       // Diagnostic: surface WHY verification failed so the operator can fix it.
@@ -56,13 +61,14 @@ export default async function handler(req, res) {
           {
             xWebhookSignature: req.headers["x-webhook-signature"] || "(missing)",
             xCashfreeSignature: req.headers["x-cashfree-signature"] || "(missing)",
+            xWebhookTimestamp: timestamp || "(missing)",
           }
         );
       }
       return res.status(401).json({ success: false, message: "Invalid signature" });
     }
 
-    const payload = JSON.parse(rawBody);
+    const payload = JSON.parse(rawBody.toString("utf8"));
     console.log("Cashfree webhook received", {
       type: payload?.type || payload?.event || "unknown",
       orderId: payload?.data?.order?.order_id || payload?.order_id,
