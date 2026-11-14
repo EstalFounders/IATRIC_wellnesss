@@ -5,6 +5,7 @@ import {
   price_symbol,
 } from "../../../constant";
 import styles from "../css/DoctorEarnings.module.css"; // Import CSS module
+import { safeJsonParse } from "../../../utils";
 import { BiRupee } from "react-icons/bi";
 import { useSelector } from "react-redux";
 
@@ -34,8 +35,9 @@ const DoctorEarnings = () => {
   );
   const [timeframe, setTimeframe] = useState("month"); // Default: This month
 
-  const doctorInfo = JSON.parse(
-    sessionStorage.getItem(doctor_info_local_storage) || "{}"
+  const doctorInfo = safeJsonParse(
+    sessionStorage.getItem(doctor_info_local_storage),
+    {},
   );
   const doctorId = doctorInfo?.user?._id;
 

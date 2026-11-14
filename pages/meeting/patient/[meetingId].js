@@ -6,8 +6,17 @@ import { color_schema } from "../../../src/constant";
 
 export default function PatientMeetingPage() {
   const router = useRouter();
-  const pathSegments = window.location.pathname.split("/");
-  const meetingId = pathSegments[pathSegments.length - 1];
+  // `window.location.pathname` in the render body crashed the page on the server
+  // and, because the value only exists after hydration, differed between the
+  // server and client markup. `router.query` (same source the doctor page uses)
+  // is available on both sides and keeps working for the dynamic segment.
+  const queryMeetingId = router.query?.meetingId;
+  const meetingId =
+    typeof queryMeetingId === "string"
+      ? queryMeetingId
+      : Array.isArray(queryMeetingId)
+        ? queryMeetingId[0]
+        : "";
   const [consultation, setConsultation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

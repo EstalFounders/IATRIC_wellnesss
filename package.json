@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test:e2e": "playwright test",
+    "test:crawl": "playwright test tests/e2e/site-crawler.spec.ts --project=\"Desktop Chrome\"",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "lint": "next lint",

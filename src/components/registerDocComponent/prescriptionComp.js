@@ -10,6 +10,7 @@ import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DocPrescriptionGeneratePdf from "../registerDocComponent/lib/DoctorPrescriptionGenerator";
 import { api, appointment_status, doctor_info_local_storage } from "../../constant";
+import { safeJsonParse } from "../../utils";
 import { doctorDisplayName } from "../../utils/doctorName";
 import bcrypt from "bcryptjs";
 import DoctorPasswordPopup from "../registerDocComponent/lib/DoctorPasswordPopup";
@@ -136,9 +137,15 @@ const PrescriptionComp = () => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [medicineForms, setMedicineForms] = useState([]);
   const [showPasswordPopup, setPasswordPopup] = useState(false);
-  const doctorInfo = JSON.parse(
-    sessionStorage.getItem(doctor_info_local_storage),
-  );
+  // The panel session is written by the auth callback. A missing or half-written
+  // blob used to throw here (`JSON.parse(null)` / invalid JSON) and took the whole
+  // prescription screen down, so read it defensively and fall back to an empty
+  // doctor - the form then renders with empty header fields instead of crashing.
+  const doctorInfo = {
+    user:
+      safeJsonParse(sessionStorage.getItem(doctor_info_local_storage), {})
+        ?.user || {},
+  };
   const [doctors, setDoctors] = useState(doctorInfo.user);
 
   const appointments = useSelector((state) => state.appointment.appointments);

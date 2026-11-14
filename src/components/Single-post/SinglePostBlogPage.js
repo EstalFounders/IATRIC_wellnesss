@@ -692,7 +692,7 @@ const SinglePostBlogPage = () => {
                 auctor at tempus feugiat dolor lacinia cursus nulla vitae massa
               </p>
               {/* Button */}
-              <Link legacyBehavior href="/about">
+              <Link legacyBehavior href="/timetable">
                 <a className="btn btn-blue blue-hover mt-10">View Timetable</a>
               </Link>
             </div>

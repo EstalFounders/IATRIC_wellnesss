@@ -184,6 +184,10 @@ const AppointmentPage = () => {
   // booking a second, duplicate appointment - and forces a fresh booking when a
   // booking-relevant field actually changed.
   const pendingBookingSignatureRef = useRef("");
+  // Every slot fetch is stamped with the request it belongs to. A slow reply that
+  // arrives after the patient already switched doctor/date is dropped instead of
+  // repopulating the list with rows that belong to the previous choice.
+  const slotsRequestRef = useRef(0);
 
   // Anchor + one-shot flag for the deep-link scroll (?doctorId=...): once the
   // doctor has been preselected, the page smooth-scrolls to the booking form.
@@ -350,19 +354,33 @@ const AppointmentPage = () => {
 
   // All functions that use state, update to use appointmentState
   const fetchSlots = async () => {
+    const requestId = slotsRequestRef.current + 1;
+    slotsRequestRef.current = requestId;
     const formattedDate = appointmentState.selectedDate
       ? appointmentState.selectedDate.toISOString()
       : new Date().toISOString();
     const doctorId = appointmentState.selectedDoctorId;
+    // Drop the previous doctor's/day's times immediately: keeping them on screen
+    // until the reply lands is what let a stale row be picked and posted.
+    setAvailableSlots([]);
     const response = await fetch(
       `/api/slots/fetchSlot/?doctor=${doctorId}&date=${formattedDate}`,
     );
     const data = await response.json();
+    // Out-of-order reply: a newer fetch has started since this one was sent.
+    if (slotsRequestRef.current !== requestId) return;
     if (data.success) {
-      setAvailableSlots(data.data);
-      {
-        data.data.length == 0 ? setSlotEmpty(true) : setSlotEmpty(false);
-      }
+      const rows = Array.isArray(data.data) ? data.data : [];
+      // Stamp every row with the doctor/day it was fetched for, so the rendered
+      // list can be checked against the form instead of trusting fetch timing.
+      setAvailableSlots(
+        rows.map((slot) => ({
+          ...slot,
+          doctorId: String(slot.doctorId || doctorId || ""),
+          slotDate: formattedDate,
+        })),
+      );
+      setSlotEmpty(rows.length === 0);
     } else {
       setAvailableSlots([]);
     }
@@ -444,6 +462,8 @@ const AppointmentPage = () => {
       const first = serviceConsultationOptions[0];
       setConsultationType(first ? first.name : "");
       setConsultationPrice(first ? first.fee || "" : "");
+      // `serviceType` (the posted/stored copy) needs no reset here: the effect
+      // below re-syncs it from `speciality`, which is what the dropdown shows.
     }
     setShowDatePicker(timeSelection === CHOOSE_TIME && choice === "any");
   };
@@ -560,6 +580,19 @@ const AppointmentPage = () => {
     setServiceType(match);
   }, [router.query.speciality, specialityNames, speciality]);
 
+  /**
+   * The dropdown owns the speciality; `serviceType` is only the copy that gets
+   * posted and stored. Every programmatic path (URL param, doctor preselect, "Any
+   * Doctor" reset) has to leave the two identical - otherwise the appointment is
+   * saved with a speciality the patient is not looking at, and the "Any Doctor"
+   * search on the server is scoped to that leftover value. `?service=` (legacy,
+   * serviceType only) keeps working because an empty speciality is never touched.
+   */
+  useEffect(() => {
+    if (!speciality) return;
+    if (serviceType !== speciality) setServiceType(speciality);
+  }, [speciality, serviceType]);
+
   // Once the deep-linked doctor has actually been preselected, smooth-scroll to
   // the booking form so the user does not have to scroll manually after landing.
   useEffect(() => {
@@ -647,6 +680,25 @@ const AppointmentPage = () => {
     setSelectedSlot(slot);
   };
 
+  /**
+   * A fetched slot row carries the doctor and the day it was fetched for (added in
+   * `fetchSlots`). Rows generated in the browser ("Any Doctor" grid, the weekly
+   * timetable deep link) carry no stamp and are left to the server's own checks.
+   */
+  const slotMatchesForm = (slot) => {
+    if (!slot || typeof slot !== "object") return true;
+    if (
+      slot.doctorId &&
+      selectedDoctorId &&
+      String(slot.doctorId) !== String(selectedDoctorId)
+    ) {
+      return false;
+    }
+    const formDate = selectedDate instanceof Date ? selectedDate.toISOString() : "";
+    if (slot.slotDate && formDate && slot.slotDate !== formDate) return false;
+    return true;
+  };
+
   const handleConsultationChange = (event) => {
     const selectedType = event.target.value;
     const matching = consultationOptions.find(
@@ -712,16 +764,26 @@ const AppointmentPage = () => {
     // the slot picked on the timetable could not be listed - or booked - here.
     if (selectedDoctorId) {
       const now = Date.now();
+      const formDate = selectedDate instanceof Date ? selectedDate.toISOString() : "";
       setLocallyCreatedSlots(
         (availableSlots || [])
           .filter(
-            (slot) => !slot.isBooked && new Date(slot.endTime).getTime() > now,
+            (slot) =>
+              !slot.isBooked &&
+              new Date(slot.endTime).getTime() > now &&
+              // Only rows fetched for *this* doctor and *this* day; a row left
+              // over from the previous choice must never be selectable.
+              (!slot.doctorId ||
+                String(slot.doctorId) === String(selectedDoctorId)) &&
+              (!slot.slotDate || !formDate || slot.slotDate === formDate),
           )
           .map((slot) => ({
             _id: String(slot._id),
             startTime: slot.startTime,
             endTime: slot.endTime,
             isBooked: false,
+            doctorId: slot.doctorId,
+            slotDate: slot.slotDate,
           })),
       );
       return;
@@ -832,6 +894,19 @@ const AppointmentPage = () => {
       return;
     }
     if (timeSelection === CHOOSE_TIME && !selectedSlot) {
+      showBookingAlert(t("ap.errSlot"));
+      return;
+    }
+    // The slot must still belong to the doctor and the day shown on the form. A
+    // doctor/date switch can leave a row from the previous fetch selected, and
+    // posting it would try to lock another doctor's slot (or the wrong day) for
+    // the fee on screen - the server then answers "slot already booked".
+    if (
+      timeSelection === CHOOSE_TIME &&
+      selectedSlot &&
+      !slotMatchesForm(selectedSlot)
+    ) {
+      setSelectedSlot("");
       showBookingAlert(t("ap.errSlot"));
       return;
     }
