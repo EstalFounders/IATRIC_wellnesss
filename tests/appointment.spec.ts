@@ -14,7 +14,7 @@ import { test, expect, type BrowserContext, type Locator, type Page } from '@pla
  * Real, un-mocked parts of the app exercised here:
  *   GET  /api/superAdmin/serviceOffered  -> consultation types + fees (Audio / Video)
  *   GET  /api/addDoctor                  -> doctor list
- *   the whole appointment page flow, client-side OTP gate, Cashfree `load({mode:'sandbox'})`
+ *   the whole appointment page flow, server-side OTP API contract, Cashfree `load({mode:'sandbox'})`
  *   + `checkout()` call, /payment/thankyou status polling and the appointment
  *   confirmation modal.
  *
@@ -39,15 +39,8 @@ const SANDBOX_SESSION_ID = 'sandbox_e2e_payment_session';
 const ORDER_ID = 'HP_E2E_SANDBOX_ORDER_1';
 const APPOINTMENT_ID = 'e2e_appointment_0001';
 
-/**
- * OTP note: the appointment OTP screen validates the code client-side
- * (src/components/Appointment/OtpConfirmationPopup.js:104) and accepts only the OTP it just
- * generated (or the built-in "000000" test code). The requested test OTP "111000" is not
- * accepted by the current implementation, so the suite enters it first and asserts the
- * rejection, then completes the flow with the OTP the app actually issued - captured from
- * the intercepted WhatsApp confirmation API request (no bypass needed).
- */
 const REJECTED_TEST_OTP = '111000';
+const VALID_TEST_OTP = '654321';
 
 /**
  * First-paint budget for a cold page load. The whole app body is rendered on the client
@@ -87,7 +80,51 @@ const DEEP_LINK_DOCTOR = {
   unavailableDates: [],
 };
 
-type CapturedWhatsApp = { method: string; body: { mobile?: string; otp?: string } };
+type CapturedWhatsApp = {
+  method: string;
+  body: { action?: string; mobile?: string; name?: string; otp?: string };
+};
+type CapturedOtpVerification = {
+  action?: string;
+  mobile?: string;
+  name?: string;
+  otp?: string;
+};
+
+async function mockOtpApi(
+  context: BrowserContext,
+  sendCalls: CapturedWhatsApp[],
+  verificationCalls: CapturedOtpVerification[] = []
+) {
+  await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
+    const request = route.request();
+    const body = request.postDataJSON() as CapturedOtpVerification;
+    if (body.action === 'verify') {
+      verificationCalls.push(body);
+      const valid = body.otp === VALID_TEST_OTP;
+      await route.fulfill({
+        status: valid ? 200 : 400,
+        contentType: 'application/json',
+        body: JSON.stringify(
+          valid
+            ? { success: true, message: 'OTP verified' }
+            : { error: 'Invalid or expired OTP' }
+        ),
+      });
+      return;
+    }
+
+    sendCalls.push({
+      method: request.method(),
+      body: body as CapturedWhatsApp['body'],
+    });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'OTP sent successfully' }),
+    });
+  });
+}
 
 /**
  * Step 1: the page card only asks for the contact details. "Continue" runs the
@@ -235,17 +272,12 @@ test.describe('Appointment booking (sandbox payment)', () => {
     test.slow(); // dev-server first compile + full booking flow
 
     // ── Observability ────────────────────────────────────────────────
-    const dialogs: string[] = [];
     const whatsappCalls: CapturedWhatsApp[] = [];
+    const verificationCalls: CapturedOtpVerification[] = [];
     let bookingBody: Record<string, unknown> | undefined;
     let createOrderBody: Record<string, unknown> | undefined;
     const statusCalls: string[] = [];
     const checkoutCalls: Array<{ mode?: string; options?: Record<string, unknown> }> = [];
-
-    page.on('dialog', async (dialog) => {
-      dialogs.push(`${dialog.type()}: ${dialog.message()}`);
-      await dialog.dismiss();
-    });
 
     const context = page.context();
     await stubCashfreeCheckout(context, checkoutCalls);
@@ -253,18 +285,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
     // ── Mocked boundaries (context level, so a second page is covered too) ──
     // WhatsApp confirmation API (the OTP/WhatsApp sender). Mocked + asserted so that no
     // real WhatsApp message can leave the system during the test run.
-    await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
-      const request = route.request();
-      whatsappCalls.push({
-        method: request.method(),
-        body: request.postDataJSON() as CapturedWhatsApp['body'],
-      });
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'SMS confirmation sent successfully' }),
-      });
-    });
+    await mockOtpApi(context, whatsappCalls, verificationCalls);
 
     // Local booking API (persists the appointment) - mocked for deterministic,
     // side-effect free runs; the outgoing payload is still asserted below.
@@ -362,18 +383,30 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await expect.poll(() => whatsappCalls.length).toBe(1);
     expect(whatsappCalls[0].method).toBe('POST');
     expect(whatsappCalls[0].body.mobile).toBe(TEST_MOBILE);
-    expect(whatsappCalls[0].body.otp).toMatch(/^\d{6}$/);
-    const issuedOtp = whatsappCalls[0].body.otp as string;
+    expect(whatsappCalls[0].body.action).toBe('send');
+    expect(whatsappCalls[0].body.otp).toBeUndefined();
 
-    // ── 6. OTP: "111000" is rejected by the current OTP gate ────────
+    // ── 6. The server rejects an incorrect OTP ─────────────────────
     await enterOtp(page, REJECTED_TEST_OTP);
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
-    await expect.poll(() => dialogs.length).toBeGreaterThan(0);
-    expect(dialogs[dialogs.length - 1]).toContain('Invalid OTP entered.');
+    await expect(dialog.getByText('Invalid or expired OTP')).toBeVisible();
+    expect(verificationCalls[0]).toMatchObject({
+      action: 'verify',
+      mobile: TEST_MOBILE,
+      name: TEST_NAME,
+      otp: REJECTED_TEST_OTP,
+    });
 
-    // ...then verify with the OTP the app issued (message shown on WhatsApp).
-    await enterOtp(page, issuedOtp);
+    // ...then verify with a code accepted by the mocked server API.
+    await enterOtp(page, VALID_TEST_OTP);
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
+    await expect.poll(() => verificationCalls.length).toBe(2);
+    expect(verificationCalls[1]).toMatchObject({
+      action: 'verify',
+      mobile: TEST_MOBILE,
+      name: TEST_NAME,
+      otp: VALID_TEST_OTP,
+    });
 
     // ── 5. Step 3: appointment details (speciality, doctor, date, slot) ──
     await expect(dialog.getByLabel('Speciality', { exact: true })).toBeVisible();
@@ -501,18 +534,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await stubCashfreeCheckout(context, checkoutCalls);
 
     // ── Mocked boundaries ───────────────────────────────────────────
-    await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
-      const request = route.request();
-      whatsappCalls.push({
-        method: request.method(),
-        body: request.postDataJSON() as CapturedWhatsApp['body'],
-      });
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'SMS confirmation sent successfully' }),
-      });
-    });
+    await mockOtpApi(context, whatsappCalls);
 
     // Booking API: the "Now" attempt finds nothing free today and answers with the
     // 3 next available slots; the follow-up "Book" creates the appointment.
@@ -573,8 +595,8 @@ test.describe('Appointment booking (sandbox payment)', () => {
     await card.locator('.consultation-btn').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 
-    // OTP gate (mocked sender) - "000000" is the built-in test code.
-    await enterOtp(page, '000000');
+    // OTP gate (mocked send and verification API).
+    await enterOtp(page, VALID_TEST_OTP);
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
 
     // Step 3: keep the default "Now" choice, so no date/slot is needed.
@@ -681,18 +703,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
       });
     });
 
-    await context.route(WHATSAPP_CONFIRMATION_API, async (route) => {
-      const request = route.request();
-      whatsappCalls.push({
-        method: request.method(),
-        body: request.postDataJSON() as CapturedWhatsApp['body'],
-      });
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'SMS confirmation sent successfully' }),
-      });
-    });
+    await mockOtpApi(context, whatsappCalls);
 
     await context.route(BOOK_CONSULTATION_API, async (route) => {
       bookingBodies.push(route.request().postDataJSON() as Record<string, unknown>);
@@ -726,9 +737,9 @@ test.describe('Appointment booking (sandbox payment)', () => {
       timeout: PAGE_READY_TIMEOUT,
     });
 
-    // ── 2. Contact details + OTP (mocked sender, built-in test code) ─
+    // ── 2. Contact details + OTP (mocked send and verification API) ─
     await submitContactStep(page);
-    await enterOtp(page, '000000');
+    await enterOtp(page, VALID_TEST_OTP);
     await page.locator('.consultation-btn', { hasText: 'Verify' }).click();
 
     const dialog = page.getByRole('dialog');
@@ -756,4 +767,3 @@ test.describe('Appointment booking (sandbox payment)', () => {
     });
   });
 });
-
