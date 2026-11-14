@@ -1151,6 +1151,7 @@ const AppointmentPage = () => {
           >
             <OtpConfirmationPopup
               mobile={mobNo}
+              name={name}
               showHeading={false}
               onConfirm={handleOtpVerified}
               onBack={() => setBookingStep("contact")}
