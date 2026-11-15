@@ -8,7 +8,7 @@ import {
   FaMapMarkedAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
-import { address, contact_no, email, facebook_page_url, Linkdn_url } from "../../constant";
+import { address, contact_no, email, Linkdn_url } from "../../constant";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -74,7 +74,7 @@ const Footer4 = () => {
                       className="facebookicon"
                       title="Facebook"
                       target="blank"
-                      href={facebook_page_url}
+                      href="https://www.facebook.com/profile.php?id=61591711448902"
                     >
                       <FaFacebook size={40} color="#ffffff" />
                       <span className="mobiletext02">Facebook</span>

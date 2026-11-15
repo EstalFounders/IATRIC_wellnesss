@@ -238,6 +238,35 @@ export const DentistryNavIcon = (props) => (
   </NavIcon>
 );
 
+export const AboutNavIcon = (props) => (
+  <NavIcon {...props}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 11v5M12 8h.01" />
+  </NavIcon>
+);
+
+export const FaqNavIcon = (props) => (
+  <NavIcon {...props}>
+    <path d="M4 5.5h16v11H9l-5 3v-14Z" />
+    <path d="M9.6 9.2a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.8 1.3-1.8 2.6M12 15.9h.01" />
+  </NavIcon>
+);
+
+export const TeamNavIcon = (props) => (
+  <NavIcon {...props}>
+    <circle cx="9" cy="8" r="2.6" />
+    <path d="M3.8 19v-1.3a5.2 5.2 0 0 1 10.4 0V19" />
+    <path d="M15.2 5.8a2.5 2.5 0 0 1 0 4.8M16 14a4.2 4.2 0 0 1 4.2 4.2V19" />
+  </NavIcon>
+);
+
+export const PrivacyNavIcon = (props) => (
+  <NavIcon {...props}>
+    <rect x="4.3" y="10" width="15.4" height="10.2" rx="2" />
+    <path d="M8 10V7.3a4 4 0 0 1 8 0V10M12 14v2.5" />
+  </NavIcon>
+);
+
 // Fallback for anything the keyword map does not know (new DB services and
 // specialities should still show a medical mark instead of an empty slot).
 export const SpecialityNavIcon = (props) => (
@@ -253,6 +282,10 @@ export const SpecialityNavIcon = (props) => (
 // the specific services (ICU, ECG, X-Ray, ...) sit above the generic ones, and
 // every rule is checked before falling back to SpecialityNavIcon.
 const ICON_RULES = [
+  { pattern: /\b(about us|about)\b/, icon: AboutNavIcon },
+  { pattern: /\b(faq|frequently asked questions)\b/, icon: FaqNavIcon },
+  { pattern: /\b(join us|team|careers|career)\b/, icon: TeamNavIcon },
+  { pattern: /\b(privacy|policy|security)\b/, icon: PrivacyNavIcon },
   { pattern: /\b(ambulance|ems|emergency transport)\b/, icon: AmbulanceNavIcon },
   {
     pattern: /\b(medicine\w*|pharmac\w*|pill\w*|tablet\w*|drug\w*|delivery)\b/,

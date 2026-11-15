@@ -12,6 +12,7 @@ import {
 } from "./filterDoctors";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const SHOW_ALL_FILTERS = false;
 
 /**
  * Search + filter bar for the public doctor listing.
@@ -165,41 +166,45 @@ const FilterBar = ({
 
         <div className={styles.controls}>
           <FilterDropdown
-            label={t("doctors.filterSort", "Sort")}
-            value={filters.sort}
-            options={sortOptions}
-            onChange={(value) => onChange("sort", value)}
-          />
-          <FilterDropdown
-            label={t("doctors.filterSpeciality", "Speciality")}
+            label={t("doctors.filterSpeciality", "Specialty")}
             value={filters.speciality}
             options={specialityOptions}
             onChange={(value) => onChange("speciality", value)}
           />
-          <FilterDropdown
-            label={t("doctors.filterLocation", "Location")}
-            value={filters.location}
-            options={locationOptions}
-            onChange={(value) => onChange("location", value)}
-          />
-          <FilterDropdown
-            label={t("doctors.filterAvailability", "Availability")}
-            value={filters.availability}
-            options={availabilityOptions}
-            onChange={(value) => onChange("availability", value)}
-          />
-          <FilterDropdown
-            label={t("doctors.filterConsultationType", "Consultation Type")}
-            value={filters.consultation}
-            options={consultationOptions}
-            onChange={(value) => onChange("consultation", value)}
-          />
-          <FilterDropdown
-            label={t("doctors.filterGender", "Gender")}
-            value={filters.gender}
-            options={genderOptions}
-            onChange={(value) => onChange("gender", value)}
-          />
+          {SHOW_ALL_FILTERS && (
+            <>
+              <FilterDropdown
+                label={t("doctors.filterSort", "Sort")}
+                value={filters.sort}
+                options={sortOptions}
+                onChange={(value) => onChange("sort", value)}
+              />
+              <FilterDropdown
+                label={t("doctors.filterLocation", "Location")}
+                value={filters.location}
+                options={locationOptions}
+                onChange={(value) => onChange("location", value)}
+              />
+              <FilterDropdown
+                label={t("doctors.filterAvailability", "Availability")}
+                value={filters.availability}
+                options={availabilityOptions}
+                onChange={(value) => onChange("availability", value)}
+              />
+              <FilterDropdown
+                label={t("doctors.filterConsultationType", "Consultation Type")}
+                value={filters.consultation}
+                options={consultationOptions}
+                onChange={(value) => onChange("consultation", value)}
+              />
+              <FilterDropdown
+                label={t("doctors.filterGender", "Gender")}
+                value={filters.gender}
+                options={genderOptions}
+                onChange={(value) => onChange("gender", value)}
+              />
+            </>
+          )}
         </div>
 
         {totalCount > 0 && (

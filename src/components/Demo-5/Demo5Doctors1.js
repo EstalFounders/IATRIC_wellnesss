@@ -11,9 +11,9 @@ const DoctorsSection = () => {
 
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
-      <div className="container h5 box-list grey-color">
+      <div className="container h5">
         {/* SECTION TITLE */}
-        <div className="row">
+        <div className="row box-list grey-color">
           <div className="col-lg-10 offset-lg-1 section-title">
             {/* Title */}
             <span className="section-id blue-color">
