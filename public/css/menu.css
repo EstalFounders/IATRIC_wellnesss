@@ -410,7 +410,7 @@ video {
 
 .wsmenu>.wsmenu-list>li>ul.sub-menu {
     position: absolute;
-    top: 75px;
+    top: 100%;
     z-index: 1000;
     margin: 0px;
     padding: 0px;
@@ -568,7 +568,7 @@ video {
     width: 100%;
     left: 0px;
     position: absolute;
-    top: 111px;
+    top: 100%;
     color: #000;
     z-index: 1000;
     margin: 0px;
