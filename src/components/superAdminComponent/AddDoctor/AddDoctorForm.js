@@ -37,6 +37,7 @@ import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
 import { fetchAllDoctors } from "../../../store/slices/bookingWebsite/allDoctorsPageSlice.js";
+import { formatDoctorNameForAdd } from "../../../utils/doctorName.js";
 /**
  * Fields that MUST be filled to register a doctor. Everything else on this form
  * (gender, education + training, price, doctor share, picture /
@@ -316,6 +317,13 @@ const AddDoctorForm = () => {
     }
   };
 
+  const handleDoctorNameBlur = () => {
+    setDoctorDetails((previous) => ({
+      ...previous,
+      name: formatDoctorNameForAdd(previous.name),
+    }));
+  };
+
   /**
    * Asks the API whether the value of `name` is still free. Runs on blur so the
    * admin is warned before submitting, without a request per keystroke.
@@ -427,7 +435,12 @@ const AddDoctorForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("name", doctorDetails.name);
+    const formattedDoctorName = formatDoctorNameForAdd(doctorDetails.name);
+    setDoctorDetails((previous) => ({
+      ...previous,
+      name: formattedDoctorName,
+    }));
+    formData.append("name", formattedDoctorName);
     formData.append("email", doctorDetails.email);
     formData.append("gender", doctorDetails.gender);
     formData.append("mobileNumber", doctorDetails.mobileNumber);
@@ -537,6 +550,7 @@ const AddDoctorForm = () => {
                       name="name"
                       value={doctorDetails.name}
                       onChange={handleChange}
+                      onBlur={handleDoctorNameBlur}
                       required
                     />
                   </label>

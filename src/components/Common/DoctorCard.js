@@ -11,133 +11,187 @@ import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
 
+const DoctorCardText = ({
+  label,
+  showLabel = true,
+  value,
+  valueClassName = "",
+  detailClassName = "",
+  bounded = false,
+  expandable = false,
+  onExpandedChange,
+}) => {
+  const textRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    const element = textRef.current;
+    if (!element || !expandable || expanded) return undefined;
+
+    const measure = () =>
+      setOverflows(element.scrollHeight > element.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [expandable, expanded, value]);
+
+  const isClamped = bounded && (!expandable || !expanded);
+  const toggleExpanded = () => {
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
+
+  return (
+    <div
+      className={`${styles["doctor-detail"]} ${
+        bounded ? styles["doctor-detail--bounded"] : ""
+      } ${detailClassName}`}
+    >
+      {showLabel && (
+        <span className={styles["doctor-detail-label"]}>{label}</span>
+      )}
+      <p
+        ref={textRef}
+        title={value || undefined}
+        className={`${styles["doctor-detail-value"]} ${valueClassName} ${
+          isClamped ? styles["doctor-text--clamped"] : ""
+        }`}
+      >
+        {value}
+      </p>
+      {expandable && overflows && (
+        <button
+          type="button"
+          className={styles["education-more-btn"]}
+          onClick={toggleExpanded}
+          aria-expanded={expanded}
+        >
+          {expanded
+            ? t("doctor.showLess", "Show less")
+            : t("doctor.showMore", "More")}
+        </button>
+      )}
+    </div>
+  );
+};
+
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { t } = useLanguage();
 
-  // Education line: clamped to exactly one line so every card in the grid keeps
-  // the same height; a "More"/"Show less" toggle reveals the rest only when the
-  // text overflows (the button keeps its row even when hidden, so two cards side
-  // by side stay aligned).
+  // Keep the displayed summary to two lines so card rows stay aligned.
   const educationLabel = formatEducationTrainingLabel(doctor.educationTraining);
   const feesLabel = formatConsultationTypePrices(doctor.consultationType);
   const [educationExpanded, setEducationExpanded] = useState(false);
-  const [educationOverflowing, setEducationOverflowing] = useState(false);
+  const services = Array.isArray(doctor.serviceOffered)
+    ? doctor.serviceOffered
+        .map((service) =>
+          typeof service === "string"
+            ? service.trim()
+            : String(service?.name || "").trim()
+        )
+        .filter(Boolean)
+    : [];
+  const specialtyLabel =
+    services.join(" · ") ||
+    String(doctor.speciality || doctor.expertise || "").trim();
+  const doctorName =
+    doctorDisplayName(doctor.name) || t("doctor.nameFallback", "Doctor");
   const [photoFailed, setPhotoFailed] = useState(false);
-  const educationRef = useRef(null);
 
-  // Measured on mount and re-measured on resize: with a one-line clamp a narrower
-  // card can overflow where a wider one does not, so the toggle has to follow the
-  // real width. Nothing is measured while expanded (the text is not clamped then).
-  useEffect(() => {
-    if (educationExpanded) return undefined;
-    const el = educationRef.current;
-    if (!el) return undefined;
-
-    const measure = () =>
-      setEducationOverflowing(el.scrollHeight > el.clientHeight + 1);
-
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [educationLabel, educationExpanded]);
-
-  const handleViewProfile = (doctor) => {
-    console.log("Doctor ID in handleview profile:", doctor);
+  const handleViewProfile = () => {
     const { doctorSignatureUrl, doctorStampUrl, ...filteredDoctor } = doctor;
     dispatch(setDoctorInfo(filteredDoctor));
     router.push(`/doctor-info`);
   };
+
   return (
-    <div key={index} className={styles["new-doctor-card"]}>
-      {/* Photo + view profile */}
+    <article
+      key={index}
+      className={`${styles["new-doctor-card"]} ${
+        educationExpanded
+          ? styles["new-doctor-card--education-expanded"]
+          : ""
+      }`}
+      aria-label={doctorName}
+    >
       <div className={styles["doctor-profile-pic-container"]}>
-        <div className="d-flex justify-content-center align-items-center">
-          <Image
-            placeholder="blur"
-            blurDataURL={imageBlurDataUrl}
-            width={150}
-            height={150}
-            src={
-              photoFailed
-                ? `https://placehold.co/100x100/EBF8FF/3498DB?text=${doctor.name.charAt(
-                    0
-                  )}`
-                : doctor.profilePictureUrl ||
-                  `https://placehold.co/100x100/EBF8FF/3498DB?text=${doctor.name.charAt(
-                    0
-                  )}`
-            }
-            alt={doctor.name}
-            className={styles["doctor-profile-pic"]}
-            // A document stored in the picture slot (legacy records) or a deleted
-            // object cannot be rendered - show the placeholder instead.
-            onError={() => setPhotoFailed(true)}
+        <Image
+          placeholder="blur"
+          blurDataURL={imageBlurDataUrl}
+          fill
+          sizes="(max-width: 576px) 90vw, (max-width: 991px) 40vw, 320px"
+          src={
+            photoFailed || !doctor.profilePictureUrl
+              ? `https://placehold.co/640x480/edf3e6/3b5f1d?text=${encodeURIComponent(
+                  doctorName.charAt(0)
+                )}`
+              : doctor.profilePictureUrl
+          }
+          alt={doctorName}
+          className={styles["doctor-profile-pic"]}
+          onError={() => setPhotoFailed(true)}
+        />
+      </div>
+
+      <div className={styles["doctor-primary-info"]}>
+        <div className={styles["doctor-heading"]}>
+          <h2 className={styles["new-doctor-name"]}>{doctorName}</h2>
+          <DoctorCardText
+            label={t("doctor.specialtyLabel", "Specialty")}
+            showLabel={false}
+            value={specialtyLabel || t("doctor.specialtyNotListed", "Specialty not listed")}
+            valueClassName={styles["doctor-speciality"]}
+            bounded
           />
         </div>
-        <div
-          className={styles["view-profile-link"]}
-          onClick={() => handleViewProfile(doctor)}
-          style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
-        >
-          {t("doctor.viewProfile")}
+
+        <div className={styles["doctor-details"]}>
+          <DoctorCardText
+            label={t("doctor.qualifications", "Qualifications")}
+            showLabel={false}
+            value={educationLabel || t("doctor.notListed", "Not listed")}
+            detailClassName={styles["doctor-qualification-detail"]}
+            bounded
+            expandable
+            onExpandedChange={setEducationExpanded}
+          />
+          <DoctorCardText
+            label={t("doctor.consultationFee", "Consultation fee")}
+            value={feesLabel || t("doctor.feeNotListed", "Fee details not listed")}
+            valueClassName={styles["doctor-fees"]}
+            detailClassName={styles["doctor-fee-detail"]}
+            bounded
+          />
         </div>
       </div>
 
-      {/* Info */}
-      <div className={styles["doctor-primary-info"]}>
-        <h2 className={styles["new-doctor-name"]}>
-          {doctorDisplayName(doctor.name)}
-        </h2>
-        <p
-          className={`${styles["doctor-text"]} ${styles["doctor-text--single"]} ${styles["doctor-speciality"]}`}
-        >
-          {doctor.speciality || "\u00A0"}
-        </p>
-        {/* Always rendered: the slot (one line + the toggle row) is identical on
-            every card, so cards with 1 degree and cards with 5 line up. */}
-        <div className={styles["doctor-education"]}>
-          <p
-            ref={educationRef}
-            className={`${styles["doctor-text"]} ${
-              educationExpanded ? "" : styles["doctor-text--clamped"]
-            }`}
-          >
-            {educationLabel || "\u00A0"}
-          </p>
-          <button
-            type="button"
-            className={`${styles["education-more-btn"]} ${
-              educationOverflowing ? "" : styles["education-more-btn--hidden"]
-            }`}
-            onClick={() => setEducationExpanded((prev) => !prev)}
-            aria-hidden={!educationOverflowing}
-            tabIndex={educationOverflowing ? 0 : -1}
-          >
-            {educationExpanded ? "Show less" : "More"}
-          </button>
-        </div>
-        <p
-          className={`${styles["doctor-text"]} ${styles["doctor-text--single"]} ${styles["doctor-fees"]}`}
-        >
-          {feesLabel || "\u00A0"}
-        </p>
-        <div className={styles["patient-stories"]}>
-          <div className={styles["availability-info"]}>
-            <span className={styles["calendar-icon"]}>📅</span>{" "}
-            {t("doctor.availableToday")}
-          </div>
-        </div>
-      </div>
-
-      {/* Footer button */}
       <div className={styles["doctor-booking-section"]}>
-        <ConsultationButton path={`/appointment?doctorId=${doctor._id}`}>
+        <ConsultationButton
+          path={`/appointment?doctorId=${doctor._id}`}
+          className={styles["book-button"]}
+        >
           {t("doctor.bookConsultation")}
         </ConsultationButton>
+        <button
+          type="button"
+          className={styles["profile-button"]}
+          onClick={handleViewProfile}
+        >
+          {t("doctor.viewProfile")}
+        </button>
       </div>
-    </div>
+    </article>
   );
 };
 

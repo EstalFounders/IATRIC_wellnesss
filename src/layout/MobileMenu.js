@@ -5,6 +5,8 @@ import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabSe
 import { demo5ServiceHighlights } from "../../data/services";
 import { resolveNavServiceIcon } from "../../public/svgIcon/nav-service-icons";
 import { color_schema } from "../constant";
+import { PAGE_MENU_ITEMS } from "./navigationItems";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage"];
 
@@ -21,8 +23,10 @@ const DOCTOR_CONSULTATION_LINKS = [
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
+  const { t } = useLanguage();
   const { services } = useGlobalData();
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
 
   // Merge with the static service highlights exactly like the desktop Services
   // mega-menu (Header1) so every entry carries its canonical title + content key.
@@ -35,16 +39,11 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
 
   const menuItems = [
     { label: "Home", href: "/", icon: "🏠" },
-    { label: "About Us", href: "/about-us", icon: "ℹ️" },
     // "Services" expands in place instead of navigating (see the accordion below).
     { label: "Services", href: "/all-services", icon: "🏥", expandable: true },
-    { label: "Book Consultation", href: "/appointment", icon: "📅" },
+    { label: "Pages", href: "#pages", icon: "📄", expandable: true, pages: true },
     { label: "Lab Tests", href: "/labTest/homepage", icon: "🧪" },
-    { label: "FAQ", href: "/faqs", icon: "❓" },
-    { label: "All Doctors", href: "/all-doctors", icon: "👨‍⚕️" },
     { label: "Contact Us", href: "/contacts-2", icon: "☎️" },
-    { label: "Join Us", href: "/join-us", icon: "👥" },
-    { label: "Privacy Policy", href: "/privacy-policy", icon: "🔒" },
   ];
 
   // Services shown inside the drawer (DB list when available, static fallback
@@ -81,6 +80,8 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   // either clipped the last entry or left a visible gap under it.
   const servicesListRef = useRef(null);
   const [servicesListHeight, setServicesListHeight] = useState(0);
+  const pagesListRef = useRef(null);
+  const [pagesListHeight, setPagesListHeight] = useState(0);
 
   useEffect(() => {
     const node = servicesListRef.current;
@@ -96,6 +97,21 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
       window.removeEventListener("orientationchange", measure);
     };
   }, [serviceItems.length, servicesOpen]);
+
+  useEffect(() => {
+    const node = pagesListRef.current;
+    if (!node) return undefined;
+
+    const measure = () => setPagesListHeight(node.scrollHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, [pagesOpen]);
 
   const comingSoon = new Set(COMING_SOON_ITEMS);
 
@@ -231,18 +247,29 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
             }}
           >
             {menuItems.map((item) => {
-              const active = isActive(item.href);
+              const active = item.pages
+                ? PAGE_MENU_ITEMS.some((page) => router.pathname === page.href)
+                : isActive(item.href);
 
               if (item.expandable) {
+                const isPagesItem = item.pages;
+                const isExpanded = isPagesItem ? pagesOpen : servicesOpen;
+                const listRef = isPagesItem ? pagesListRef : servicesListRef;
+                const listHeight = isPagesItem ? pagesListHeight : servicesListHeight;
+                const toggleExpanded = () =>
+                  isPagesItem
+                    ? setPagesOpen((previous) => !previous)
+                    : setServicesOpen((previous) => !previous);
+
                 return (
                   <li key={item.href} style={{ borderBottom: "1px solid #f0f0f0" }}>
                     {/* Tap toggles the nested list - it never navigates or closes. */}
                     <div
                       role="button"
-                      aria-expanded={servicesOpen}
-                      aria-controls="mobile-services-list"
-                      aria-label="Toggle the services list"
-                      onClick={() => setServicesOpen((previous) => !previous)}
+                      aria-expanded={isExpanded}
+                      aria-controls={isPagesItem ? "mobile-pages-list" : "mobile-services-list"}
+                      aria-label={`Toggle the ${(isPagesItem ? t("nav.pages") : item.label).toLowerCase()} list`}
+                      onClick={toggleExpanded}
                       style={{
                         ...rowStyle(active),
                         display: "flex",
@@ -251,12 +278,12 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                       }}
                     >
                       <span>
-                        {item.icon} {item.label}
+                        {item.icon} {isPagesItem ? t("nav.pages") : item.label}
                       </span>
                       <span
                         style={{
                           transition: "transform 0.3s ease",
-                          transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
                           fontSize: "12px",
                           color: color_schema.green,
                         }}
@@ -265,20 +292,22 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                       </span>
                     </div>
 
-                    {/* Nested services (smooth accordion) */}
+                    {/* Nested menu (smooth accordion) */}
                     <div
-                      id="mobile-services-list"
-                      ref={servicesListRef}
+                      id={isPagesItem ? "mobile-pages-list" : "mobile-services-list"}
+                      ref={listRef}
                       style={{
-                        maxHeight: servicesOpen ? `${servicesListHeight}px` : 0,
+                        maxHeight: isExpanded ? `${listHeight}px` : 0,
                         overflow: "hidden",
                         transition: "max-height 0.35s ease, opacity 0.3s ease",
-                        opacity: servicesOpen ? 1 : 0,
+                        opacity: isExpanded ? 1 : 0,
                         backgroundColor: "#fafbf8",
                       }}
                     >
                       <div
-                        onClick={() => setServicesOpen(false)}
+                        onClick={() =>
+                          isPagesItem ? setPagesOpen(false) : setServicesOpen(false)
+                        }
                         style={{
                           padding: "12px 16px",
                           fontSize: "14px",
@@ -291,7 +320,16 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                         ← Back to main menu
                       </div>
 
-                      {serviceItems.map((service) => (
+                      {isPagesItem ? PAGE_MENU_ITEMS.map((page) => (
+                        <div
+                          key={page.href}
+                          onClick={() => handleNavigation(page.href)}
+                          style={serviceRowStyle}
+                        >
+                          <ServiceIcon label={page.iconLabel} />
+                          <span style={serviceLabelStyle}>{t(page.labelKey)}</span>
+                        </div>
+                      )) : serviceItems.map((service) => (
                         <div
                           key={service.key}
                           onClick={() => handleNavigation(service.href)}
@@ -312,60 +350,64 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                         </div>
                       ))}
 
-                      <div
-                        onClick={() =>
-                          handleNavigation(BOOK_CONSULTATION_HREF)
-                        }
-                        style={{
-                          ...serviceRowStyle,
-                          fontWeight: "600",
-                          color: color_schema.green,
-                        }}
-                      >
-                        <ServiceIcon label="Doctor Consultation" />
-                        <span style={serviceLabelStyle}>
-                          Book Doctor Consultation
-                        </span>
-                      </div>
+                      {!isPagesItem && (
+                        <>
+                          <div
+                            onClick={() =>
+                              handleNavigation(BOOK_CONSULTATION_HREF)
+                            }
+                            style={{
+                              ...serviceRowStyle,
+                              fontWeight: "600",
+                              color: color_schema.green,
+                            }}
+                          >
+                            <ServiceIcon label="Doctor Consultation" />
+                            <span style={serviceLabelStyle}>
+                              Book Doctor Consultation
+                            </span>
+                          </div>
 
-                      {DOCTOR_CONSULTATION_LINKS.map((service) => (
-                        <div
-                          key={`consultation-${service.type}`}
-                          onClick={() =>
-                            handleNavigation(
-                              `${BOOK_CONSULTATION_HREF}&type=${service.type}`
-                            )
-                          }
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                            padding: "10px 16px 10px 60px",
-                            fontSize: "14px",
-                            color: "#333",
-                            cursor: "pointer",
-                            borderBottom: "1px solid #f4f5f2",
-                          }}
-                        >
-                          <span aria-hidden="true" style={{ color: color_schema.green }}>
-                            •
-                          </span>
-                          <span style={serviceLabelStyle}>{service.label}</span>
-                        </div>
-                      ))}
+                          {DOCTOR_CONSULTATION_LINKS.map((service) => (
+                            <div
+                              key={`consultation-${service.type}`}
+                              onClick={() =>
+                                handleNavigation(
+                                  `${BOOK_CONSULTATION_HREF}&type=${service.type}`
+                                )
+                              }
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                padding: "10px 16px 10px 60px",
+                                fontSize: "14px",
+                                color: "#333",
+                                cursor: "pointer",
+                                borderBottom: "1px solid #f4f5f2",
+                              }}
+                            >
+                              <span aria-hidden="true" style={{ color: color_schema.green }}>
+                                •
+                              </span>
+                              <span style={serviceLabelStyle}>{service.label}</span>
+                            </div>
+                          ))}
 
-                      <div
-                        onClick={() => handleNavigation("/all-services")}
-                        style={{
-                          padding: "12px 16px 12px 30px",
-                          fontSize: "15px",
-                          fontWeight: "700",
-                          color: color_schema.green,
-                          cursor: "pointer",
-                        }}
-                      >
-                        All Services →
-                      </div>
+                          <div
+                            onClick={() => handleNavigation("/all-services")}
+                            style={{
+                              padding: "12px 16px 12px 30px",
+                              fontSize: "15px",
+                              fontWeight: "700",
+                              color: color_schema.green,
+                              cursor: "pointer",
+                            }}
+                          >
+                            All Services →
+                          </div>
+                        </>
+                      )}
                     </div>
                   </li>
                 );
