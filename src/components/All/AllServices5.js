@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const AllServices5 = () => {
     return (
@@ -29,11 +30,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #1 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/pediatrics_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/pediatrics_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -52,11 +49,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #2 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/neurology_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/neurology_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -75,11 +68,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #3 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/hematology_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/hematology_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -98,11 +87,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #4 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/x-ray_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/x-ray_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -121,11 +106,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #5 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/cardiology_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/cardiology_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -144,11 +125,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #6 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/mri_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/mri_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -167,11 +144,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #7 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/laboratory_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/laboratory_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}
@@ -190,11 +163,7 @@ const AllServices5 = () => {
                             {/* SERVICE BOX #8 */}
                             <div className="sbox-5">
                                 {/* Image */}
-                                <img
-                                    className="img-fluid"
-                                    src="images/emergency_help_700x700.jpg"
-                                    alt="content-image"
-                                />
+                                <Image src="/images/emergency_help_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 {/* Text */}
                                 <div className="sbox-5-txt">
                                     {/* Title */}

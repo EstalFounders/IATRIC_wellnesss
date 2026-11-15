@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllAbout6 = () => {
   return (
@@ -56,11 +57,7 @@ const AllAbout6 = () => {
               className="about-img text-center wow fadeInUp"
               data-wow-delay="0.6s"
             >
-              <img
-                className="img-fluid"
-                src="images/image-02.png"
-                alt="about-image"
-              />
+              <Image src="/images/image-02.png" alt="about-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
         </div>

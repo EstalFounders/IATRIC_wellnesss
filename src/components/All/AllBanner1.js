@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const AllBanner1 = () => {
     return (
@@ -18,61 +19,37 @@ const AllBanner1 = () => {
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-1.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-1.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-2.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-2.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-3.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-3.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-4.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-4.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-5.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-5.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* BRAND LOGO IMAGE */}
                     <div className="col-sm-4 col-lg-2">
                         <div className="brand-logo">
-                            <img
-                                className="img-fluid"
-                                src="images/brand-6.png"
-                                alt="brand-logo"
-                            />
+                            <Image src="/images/brand-6.png" alt="brand-logo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                 </div>

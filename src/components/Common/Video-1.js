@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import Popup from "../Popup";
+import Image from "next/image";
 
 const Video1 = () => {
   const [video, setVideo] = useState(false);
@@ -75,11 +76,7 @@ const Video1 = () => {
                     </div>
                   </div>
                   {/* Preview */}
-                  <img
-                    className="img-fluid"
-                    src="images/video-1.png"
-                    alt="video-photo"
-                  />
+                  <Image src="/images/video-1.png" alt="video-photo" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 </a>
               </Link>
             </div>

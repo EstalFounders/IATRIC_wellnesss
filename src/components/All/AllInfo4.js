@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const AllInfo4 = () => {
     return (
@@ -13,11 +14,7 @@ const AllInfo4 = () => {
                                 className="info-4-img text-center wow fadeInUp"
                                 data-wow-delay="0.6s"
                             >
-                                <img
-                                    className="img-fluid"
-                                    src="images/chief_doctor_700x800.jpg"
-                                    alt="info-image"
-                                />
+                                <Image src="/images/chief_doctor_700x800.jpg" alt="info-image" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
                             </div>
                         </div>
                         {/* INFO TEXT */}
@@ -61,13 +58,7 @@ const AllInfo4 = () => {
                                     </p>
                                     {/* Singnature Image */}
                                     {/* Recommended sizes for Retina Ready displays is 400x68px; */}
-                                    <img
-                                        className="img-fluid"
-                                        src="images/signature.png"
-                                        width={200}
-                                        height={34}
-                                        alt="signature-image"
-                                    />
+                                    <Image src="/images/signature.png" alt="signature-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                                 </div>
                             </div>
                         </div>
@@ -177,11 +168,7 @@ const AllInfo4 = () => {
                                 className="info-4-img text-center wow fadeInUp"
                                 data-wow-delay="0.6s"
                             >
-                                <img
-                                    className="img-fluid"
-                                    src="images/emergency_help_700x800.jpg"
-                                    alt="info-image"
-                                />
+                                <Image src="/images/emergency_help_700x800.jpg" alt="info-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                             </div>
                         </div>
                     </div>

@@ -13,7 +13,7 @@ const AllDoctors = () => {
   return (
     <Layouts>
       <PageBanner pageTitle="Meet the Doctors" />
-      <h1 style={{ display: 'none' }}>
+      <h1 className="sr-only">
         Top Doctors for Online & In-Clinic Medical Consultations
       </h1>
       <AllDoctorsDoctors3 />

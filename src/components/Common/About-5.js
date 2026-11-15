@@ -45,13 +45,7 @@ const About5 = () => {
                 {/* <p className="p-small mb-15">Randon Pexon, Head of Clinic</p> */}
                 {/* Singnature Image */}
                 {/* Recommended sizes for Retina Ready displays is 400x68px; */}
-                {/* <img
-                  className="img-fluid"
-                  src="images/signature.png"
-                  width={200}
-                  height={34}
-                  alt="signature-image"
-                /> */}
+                {/* <Image src="/images/signature.png" alt="signature-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" /> */}
               </div>
               <div className="mt-5 mr-auto">
                 <div className="w-50">

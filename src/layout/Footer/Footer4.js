@@ -15,6 +15,7 @@ import PopupDialog from "../../components/Common/PopupDialog";
 import { useRouter } from "next/router";
 import { MdEmail } from "react-icons/md";
 import { FaPhoneVolume } from "react-icons/fa6";
+import Image from "next/image";
 
 const Footer4 = () => {
   const router = useRouter();
@@ -47,12 +48,7 @@ const Footer4 = () => {
             <div className="footer-info mb-40">
               {/* Footer Logo */}
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
-              <img
-                src="/images/logo-grey.png"
-                width={200}
-                height={60}
-                alt="footer-logo"
-              />
+              <Image src="/images/logo-grey.png" alt="footer-logo" width={400} height={300} priority={false} loading="lazy" />
               {/* Text */}
               <div
                 className="p-sm mt-20"

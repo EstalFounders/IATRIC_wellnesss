@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllBanner2 = () => {
   return (
@@ -10,11 +11,7 @@ const AllBanner2 = () => {
             {/* CALL TO ACTION IMAGE */}
             <div className="col-lg-5">
               <div className="banner-2-img">
-                <img
-                  className="img-fluid"
-                  src="images/image-05.png"
-                  alt="banner-image"
-                />
+                <Image src="/images/image-05.png" alt="banner-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </div>
             </div>
             {/* BANNER TEXT */}

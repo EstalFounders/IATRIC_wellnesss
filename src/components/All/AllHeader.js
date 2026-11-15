@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllHeader = () => {
   return (
@@ -12,12 +13,7 @@ const AllHeader = () => {
           </a>
         </Link>
         <span className="smllogo">
-          <img
-            src="images/logo.png"
-            width={180}
-            height={40}
-            alt="mobile-logo"
-          />
+          <Image src="/images/logo.png" alt="mobile-logo" width={400} height={300} priority={false} loading="lazy" />
         </span>
         <Link legacyBehavior href="#">
           <a
@@ -84,12 +80,7 @@ const AllHeader = () => {
                 }}
                 href="#hero-1"
               >
-                <img
-                  src="images/logo.png"
-                  width={180}
-                  height={40}
-                  alt="header-logo"
-                />
+                <Image src="/images/logo.png" alt="header-logo" width={400} height={300} priority={false} loading="lazy" />
               </a>
             </Link>
           </div>
@@ -374,10 +365,7 @@ const AllHeader = () => {
                         <h3 className="title">Featured News:</h3>
                         {/* Image */}
                         <div className="fluid-width-video-wrapper">
-                          <img
-                            src="images/blog/featured-news.jpg"
-                            alt="featured-news"
-                          />
+                          <Image src="/images/blog/featured-news.jpg" alt="featured-news" width={400} height={300} priority={false} loading="lazy" />
                         </div>
                         {/* Text */}
                         <h5 className="h5-xs">
@@ -399,11 +387,7 @@ const AllHeader = () => {
                           {/* Post #1 */}
                           <li className="clearfix d-flex align-items-center">
                             {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-1.jpg"
-                              alt="blog-post-preview"
-                            />
+                            <Image src="/images/blog/latest-post-1.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                             {/* Text */}
                             <div className="post-summary">
                               <Link legacyBehavior href="/single-post">
@@ -418,11 +402,7 @@ const AllHeader = () => {
                           {/* Post #2 */}
                           <li className="clearfix d-flex align-items-center">
                             {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-2.jpg"
-                              alt="blog-post-preview"
-                            />
+                            <Image src="/images/blog/latest-post-2.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                             {/* Text */}
                             <div className="post-summary">
                               <Link legacyBehavior href="/single-post">
@@ -437,11 +417,7 @@ const AllHeader = () => {
                           {/* Post #3 */}
                           <li className="clearfix d-flex align-items-center">
                             {/* Image */}
-                            <img
-                              className="img-fluid"
-                              src="images/blog/latest-post-3.jpg"
-                              alt="blog-post-preview"
-                            />
+                            <Image src="/images/blog/latest-post-3.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                             {/* Text */}
                             <div className="post-summary">
                               <Link legacyBehavior href="/single-post">

@@ -12,7 +12,7 @@ const Appointment = () => {
   return (
     <Layouts>
       <PageBanner pageTitle="Appointment" compact />
-      <h1 style={{ display: 'none' }}>Book Medical Appointment Online</h1>
+      <h1 className="sr-only">Book Medical Appointment Online</h1>
       <AppointmentPage />
     </Layouts>
   );

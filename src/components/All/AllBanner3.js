@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { contact_no } from "../../constant";
+import Image from "next/image";
 
 const AllBanner3 = () => {
   return (
@@ -38,11 +39,7 @@ const AllBanner3 = () => {
           {/* BANNER IMAGE */}
           <div className="col-lg-7">
             <div className="banner-3-img">
-              <img
-                className="img-fluid"
-                src="images/image-06.png"
-                alt="banner-image"
-              />
+              <Image src="/images/image-06.png" alt="banner-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
         </div>

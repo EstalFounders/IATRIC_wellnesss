@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { email } from "../../constant";
+import Image from "next/image";
 
 const Doctor2Details = () => {
   return (
@@ -14,11 +15,7 @@ const Doctor2Details = () => {
           <div className="col-md-5 col-xl-5">
             <div className="doctor-photo mb-30 text-center">
               {/* Photo */}
-              <img
-                className="img-fluid"
-                src="images/doctor-5.jpg"
-                alt="doctor-foto"
-              />
+              <Image src="/images/doctor-5.jpg" alt="doctor-foto" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <p className="mt-30">
                 Etiam sapien sem magna at vitae pulvinar congue augue egestas
@@ -144,11 +141,7 @@ const Doctor2Details = () => {
                           className="image-link"
                           href="images/certificate-1.png"
                         >
-                          <img
-                            className="img-fluid"
-                            src="images/certificate-1.png"
-                            alt="certificate-image"
-                          />
+                          <Image src="/images/certificate-1.png" alt="certificate-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </a>
                       </Link>
                     </div>
@@ -164,11 +157,7 @@ const Doctor2Details = () => {
                           className="image-link"
                           href="images/certificate-2.png"
                         >
-                          <img
-                            className="img-fluid"
-                            src="images/certificate-2.png"
-                            alt="certificate-image"
-                          />
+                          <Image src="/images/certificate-2.png" alt="certificate-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </a>
                       </Link>
                     </div>
@@ -184,11 +173,7 @@ const Doctor2Details = () => {
                           className="image-link"
                           href="images/certificate-3.png"
                         >
-                          <img
-                            className="img-fluid"
-                            src="images/certificate-3.png"
-                            alt="certificate-image"
-                          />
+                          <Image src="/images/certificate-3.png" alt="certificate-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </a>
                       </Link>
                     </div>
@@ -204,11 +189,7 @@ const Doctor2Details = () => {
                           className="image-link"
                           href="images/certificate-4.png"
                         >
-                          <img
-                            className="img-fluid"
-                            src="images/certificate-4.png"
-                            alt="certificate-image"
-                          />
+                          <Image src="/images/certificate-4.png" alt="certificate-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </a>
                       </Link>
                     </div>
@@ -224,11 +205,7 @@ const Doctor2Details = () => {
                           className="image-link"
                           href="images/certificate-5.png"
                         >
-                          <img
-                            className="img-fluid"
-                            src="images/certificate-5.png"
-                            alt="certificate-image"
-                          />
+                          <Image src="/images/certificate-5.png" alt="certificate-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </a>
                       </Link>
                     </div>

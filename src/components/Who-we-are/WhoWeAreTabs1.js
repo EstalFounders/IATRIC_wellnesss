@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const WhoWeAreTabs1 = () => {
   return (
@@ -62,11 +63,7 @@ const WhoWeAreTabs1 = () => {
                   {/* TAB-1 IMAGE */}
                   <div className="col-lg-6">
                     <div className="tab-img">
-                      <img
-                        className="img-fluid"
-                        src="images/pediatrics_700x700.jpg"
-                        alt="tab-image"
-                      />
+                      <Image src="/images/pediatrics_700x700.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                     </div>
                   </div>
                   {/* TAB-1 TEXT */}
@@ -166,11 +163,7 @@ const WhoWeAreTabs1 = () => {
                   {/* TAB-2 IMAGE */}
                   <div className="col-lg-6">
                     <div className="tab-imgs">
-                      <img
-                        className="img-fluid"
-                        src="images/hematology_700x700.jpg"
-                        alt="tab-image"
-                      />
+                      <Image src="/images/hematology_700x700.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                     </div>
                   </div>
                   {/* TAB-2 TEXT */}
@@ -270,11 +263,7 @@ const WhoWeAreTabs1 = () => {
                   {/* TAB-3 IMAGE */}
                   <div className="col-lg-6">
                     <div className="tab-img">
-                      <img
-                        className="img-fluid"
-                        src="images/mri_700x700.jpg"
-                        alt="tab-image"
-                      />
+                      <Image src="/images/mri_700x700.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                     </div>
                   </div>
                   {/* TAB-3 TEXT */}
@@ -374,11 +363,7 @@ const WhoWeAreTabs1 = () => {
                   {/* TAB-4 IMAGE */}
                   <div className="col-lg-6">
                     <div className="tab-img">
-                      <img
-                        className="img-fluid"
-                        src="images/x-ray_700x700.jpg"
-                        alt="tab-image"
-                      />
+                      <Image src="/images/x-ray_700x700.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                     </div>
                   </div>
                   {/* TAB-4 TEXT */}

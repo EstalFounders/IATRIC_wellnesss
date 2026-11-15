@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const AllServices6 = () => {
     return (
@@ -66,11 +67,7 @@ const AllServices6 = () => {
                             className="sbox-6-img mb-40 text-center wow fadeInUp"
                             data-wow-delay="0.8s"
                         >
-                            <img
-                                className="img-fluid"
-                                src="images/tooth.png"
-                                alt="services-image"
-                            />
+                            <Image src="/images/tooth.png" alt="services-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                     {/* RIGHT SIDE CONTENT */}
