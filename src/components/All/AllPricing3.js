@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const AllPricing3 = () => {
     return (
@@ -77,11 +78,7 @@ const AllPricing3 = () => {
                             className="pricing-img wow fadeInUp"
                             data-wow-delay="0.6s"
                         >
-                            <img
-                                className="img-fluid"
-                                src="images/image-04.jpeg"
-                                alt="pricing-image"
-                            />
+                            <Image src="/images/image-04.jpeg" alt="pricing-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                         </div>
                     </div>
                 </div>

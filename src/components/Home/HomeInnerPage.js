@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { demoInnerPageProps } from "../../sliderProps";
@@ -30,10 +31,14 @@ const HomeInnerPage = () => {
                 {/* ABOUT */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/about.jpg"
+                      src="/images/about.jpg"
                       alt="about-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -50,10 +55,14 @@ const HomeInnerPage = () => {
                 {/* WHO WE ARE */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/who-we-are.jpg"
+                      src="/images/who-we-are.jpg"
                       alt="who-we-are-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -70,10 +79,14 @@ const HomeInnerPage = () => {
                 {/* ALL SERVICES */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/services.jpg"
+                      src="/images/services.jpg"
                       alt="services-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -90,10 +103,14 @@ const HomeInnerPage = () => {
                 {/* SERVICE #1 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/service-1.jpg"
-                      alt="service-preview"
+                      src="/images/service-1.jpg"
+                      alt="Service Single preview - Page 1"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -112,10 +129,14 @@ const HomeInnerPage = () => {
                 {/* SERVICE #2 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/service-2.jpg"
-                      alt="service-preview"
+                      src="/images/service-2.jpg"
+                      alt="Service Single preview - Page 2"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -134,10 +155,14 @@ const HomeInnerPage = () => {
                 {/* ALL DEPARTMENTS */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/departments.jpg"
-                      alt="departments-preview"
+                      src="/images/departments.jpg"
+                      alt="All Departments page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -154,10 +179,14 @@ const HomeInnerPage = () => {
                 {/* DEPARTMENT SINGLE */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/department-single.jpg"
-                      alt="department-single-preview"
+                      src="/images/department-single.jpg"
+                      alt="Department Single page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -174,10 +203,14 @@ const HomeInnerPage = () => {
                 {/* ALL DOCTORS */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/doctors.jpg"
-                      alt="doctors-preview"
+                      src="/images/doctors.jpg"
+                      alt="All Doctors page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -194,10 +227,14 @@ const HomeInnerPage = () => {
                 {/* DOCTOR #1 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/doctor-1.jpg"
-                      alt="doctor-preview"
+                      src="/images/doctor-1.jpg"
+                      alt="Doctor Details preview - Page 1"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -216,10 +253,14 @@ const HomeInnerPage = () => {
                 {/* DOCTOR #2 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/doctor-2.jpg"
-                      alt="doctor-preview"
+                      src="/images/doctor-2.jpg"
+                      alt="Doctor Details preview - Page 2"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -238,10 +279,14 @@ const HomeInnerPage = () => {
                 {/* PRICING #1 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/pricing-1.jpg"
-                      alt="pricing-preview"
+                      src="/images/pricing-1.jpg"
+                      alt="Pricing page preview - Page 1"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -260,10 +305,14 @@ const HomeInnerPage = () => {
                 {/* PRICING #2 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/pricing-2.jpg"
-                      alt="pricing-preview"
+                      src="/images/pricing-2.jpg"
+                      alt="Pricing page preview - Page 2"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -282,10 +331,14 @@ const HomeInnerPage = () => {
                 {/* TIMETABLE */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/timetable.jpg"
-                      alt="timetable-preview"
+                      src="/images/timetable.jpg"
+                      alt="Timetable page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -302,10 +355,14 @@ const HomeInnerPage = () => {
                 {/* APPOINTMENT */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/appointment.jpg"
-                      alt="about-preview"
+                      src="/images/appointment.jpg"
+                      alt="Make an Appointment page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -322,10 +379,14 @@ const HomeInnerPage = () => {
                 {/* BLOG LISTING */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/blog-listing.jpg"
-                      alt="blog-listing-preview"
+                      src="/images/blog-listing.jpg"
+                      alt="Blog Listing page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -342,10 +403,14 @@ const HomeInnerPage = () => {
                 {/* SINGLE POST */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/single-post.jpg"
-                      alt="single-post-preview"
+                      src="/images/single-post.jpg"
+                      alt="Single Post page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -362,10 +427,14 @@ const HomeInnerPage = () => {
                 {/* GALLERY */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/gallery.jpg"
-                      alt="gallery-preview"
+                      src="/images/gallery.jpg"
+                      alt="Gallery page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -382,10 +451,14 @@ const HomeInnerPage = () => {
                 {/* FAQs */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/faqs.jpg"
-                      alt="faqs-preview"
+                      src="/images/faqs.jpg"
+                      alt="FAQs page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -402,10 +475,14 @@ const HomeInnerPage = () => {
                 {/* TERMS & PRIVACY */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/terms.jpg"
-                      alt="terms-preview"
+                      src="/images/terms.jpg"
+                      alt="Terms page preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -422,10 +499,14 @@ const HomeInnerPage = () => {
                 {/* CONTACTS #1 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/contacts-1.jpg"
-                      alt="contacts-preview"
+                      src="/images/contacts-1.jpg"
+                      alt="Contacts page preview - Page 1"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -444,10 +525,14 @@ const HomeInnerPage = () => {
                 {/* CONTACTS #2 */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/contacts-2.jpg"
-                      alt="contacts-preview"
+                      src="/images/contacts-2.jpg"
+                      alt="Contacts page preview - Page 2"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">

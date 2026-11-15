@@ -13,6 +13,7 @@ const AllServices = () => {
   return (
     <Layouts>
       <PageBanner pageTitle="Our Services" />
+      <h1 className="sr-only">Healthcare Services at HealthPath</h1>
       <AllServicesTabs2 />
       <Banner5 />
     </Layouts>

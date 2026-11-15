@@ -13,6 +13,9 @@ const AllDoctors = () => {
   return (
     <Layouts>
       <PageBanner pageTitle="Meet the Doctors" />
+      <h1 className="sr-only">
+        Top Doctors for Online & In-Clinic Medical Consultations
+      </h1>
       <AllDoctorsDoctors3 />
       {/* <Statistic1 /> */}
     </Layouts>

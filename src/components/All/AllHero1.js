@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllHero1 = () => {
   return (
@@ -28,11 +29,7 @@ const AllHero1 = () => {
           {/* HERO IMAGE */}
           <div className="col-md-4 col-lg-5 col-xl-6">
             <div className="hero-1-img text-center">
-              <img
-                className="img-fluid"
-                src="images/hero-1-img.png"
-                alt="hero-image"
-              />
+              <Image src="/images/hero-1-img.png" alt="hero-image" width={1200} height={600} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
         </div>

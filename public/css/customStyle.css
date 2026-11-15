@@ -1780,8 +1780,8 @@ h2.steelblue-color,
   padding: 8px 10px;
   border-radius: 10px;
   color: #4a4a4a;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1.35;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease, padding 0.2s ease;
@@ -2169,4 +2169,17 @@ h2.steelblue-color,
   .services-section--tile-grid .services-track-rtl {
     animation: none;
   }
+}
+
+/* Screen reader only - for SEO H1 tags */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

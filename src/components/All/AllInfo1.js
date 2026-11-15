@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllInfo1 = () => {
   return (
@@ -12,11 +13,7 @@ const AllInfo1 = () => {
               className="info-1-img text-center mb-40 wow fadeInUp"
               data-wow-delay="0.6s"
             >
-              <img
-                className="img-fluid"
-                src="images/image-11.png"
-                alt="info-image"
-              />
+              <Image src="/images/image-11.png" alt="info-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
           {/* TEXT BLOCK */}

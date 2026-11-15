@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllGallery3 = () => {
   return (
@@ -26,11 +27,7 @@ const AllGallery3 = () => {
               <div className="gallery-item dental">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-9.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-9.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -50,11 +47,7 @@ const AllGallery3 = () => {
               <div className="gallery-item pediatric">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-10.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-10.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -74,11 +67,7 @@ const AllGallery3 = () => {
               <div className="gallery-item cardiology">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-11.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-11.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -98,11 +87,7 @@ const AllGallery3 = () => {
               <div className="gallery-item pediatric">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-12.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-12.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -122,11 +107,7 @@ const AllGallery3 = () => {
               <div className="gallery-item dental">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-13.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-13.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -146,11 +127,7 @@ const AllGallery3 = () => {
               <div className="gallery-item cardiology">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-14.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-14.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -170,11 +147,7 @@ const AllGallery3 = () => {
               <div className="gallery-item pediatric">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-15.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-15.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -194,11 +167,7 @@ const AllGallery3 = () => {
               <div className="gallery-item cardiology">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-16.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-16.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -218,11 +187,7 @@ const AllGallery3 = () => {
               <div className="gallery-item dental">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-17.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-17.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -242,11 +207,7 @@ const AllGallery3 = () => {
               <div className="gallery-item pediatric">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-18.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-18.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -266,11 +227,7 @@ const AllGallery3 = () => {
               <div className="gallery-item cardiology">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-19.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-19.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">
@@ -290,11 +247,7 @@ const AllGallery3 = () => {
               <div className="gallery-item dental">
                 <div className="hover-overlay">
                   {/* Gallery Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/gallery/image-20.jpg"
-                    alt="galley-image"
-                  />
+                  <Image src="/images/gallery/image-20.jpg" alt="galley-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   <div className="item-overlay" />
                   {/* Image Zoom */}
                   <div className="image-zoom">

@@ -35,3 +35,24 @@ export const doctorDisplayName = (name) =>
     .replace(/\s+/g, " ")
     .trim();
 
+/**
+ * Normalizes a name entered in the SuperAdmin add-doctor form.
+ * The form stores the doctor title with the name, so this enforces `Dr.`
+ * and capitalizes the first letter of each name word without changing the
+ * remaining letter casing.
+ *
+ * @param {string} name raw form input
+ * @returns {string}
+ */
+export const formatDoctorNameForAdd = (name) => {
+  const normalizedName = doctorDisplayName(name);
+  if (!normalizedName) return "";
+
+  const nameWithoutTitle = normalizedName.replace(/^dr(?:\.|\s|$)\s*/i, "");
+  const capitalizedName = nameWithoutTitle
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  return capitalizedName ? `Dr. ${capitalizedName}` : "Dr.";
+};

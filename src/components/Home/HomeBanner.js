@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const HomeBanner = () => {
   return (
@@ -16,11 +17,7 @@ const HomeBanner = () => {
                   animationName: "fadeInUp",
                 }}
               >
-                <img
-                  className="img-fluid"
-                  src="/demo/images/banner-1.png"
-                  alt="banner-image"
-                />
+                <Image src="/demo/images/banner-1.png" alt="banner-image" width={1200} height={600} priority={false} loading="lazy" className="img-fluid" />
               </div>
             </div>
             <div className="col-lg-6">

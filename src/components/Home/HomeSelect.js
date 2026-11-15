@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const HomeSelect = () => {
   return (
@@ -13,11 +14,7 @@ const HomeSelect = () => {
               data-wow-delay="0.4s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-1.jpg"
-                  alt="layout-1-preview"
-                />
+                <Image src="/images/layout-1.jpg" alt="layout-1-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-1">
@@ -38,11 +35,7 @@ const HomeSelect = () => {
               data-wow-delay="0.6s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-2.jpg"
-                  alt="layout-2-preview"
-                />
+                <Image src="/images/layout-2.jpg" alt="layout-2-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-2">
@@ -63,11 +56,7 @@ const HomeSelect = () => {
               data-wow-delay="0.8s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-3.jpg"
-                  alt="layout-3-preview"
-                />
+                <Image src="/images/layout-3.jpg" alt="layout-3-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-3">
@@ -88,11 +77,7 @@ const HomeSelect = () => {
               data-wow-delay="0.4s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-4.jpg"
-                  alt="layout-4-preview"
-                />
+                <Image src="/images/layout-4.jpg" alt="layout-4-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-4">
@@ -113,11 +98,7 @@ const HomeSelect = () => {
               data-wow-delay="0.6s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-5.jpg"
-                  alt="layout-5-preview"
-                />
+                <Image src="/images/layout-5.jpg" alt="layout-5-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-5">
@@ -138,11 +119,7 @@ const HomeSelect = () => {
               data-wow-delay="0.8s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-6.jpg"
-                  alt="layout-6-preview"
-                />
+                <Image src="/images/layout-6.jpg" alt="layout-6-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-6">
@@ -163,11 +140,7 @@ const HomeSelect = () => {
               data-wow-delay="0.4s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-7.jpg"
-                  alt="layout-7-preview"
-                />
+                <Image src="/images/layout-7.jpg" alt="layout-7-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-7">
@@ -188,11 +161,7 @@ const HomeSelect = () => {
               data-wow-delay="0.6s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-008.jpg"
-                  alt="layout-8-preview"
-                />
+                <Image src="/images/layout-008.jpg" alt="layout-8-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-8">
@@ -213,11 +182,7 @@ const HomeSelect = () => {
               data-wow-delay="0.8s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-9.jpg"
-                  alt="layout-9-preview"
-                />
+                <Image src="/images/layout-9.jpg" alt="layout-9-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-9">
@@ -238,11 +203,7 @@ const HomeSelect = () => {
               data-wow-delay="0.4s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-10.jpg"
-                  alt="layout-10-preview"
-                />
+                <Image src="/images/layout-10.jpg" alt="layout-10-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-10">
@@ -263,11 +224,7 @@ const HomeSelect = () => {
               data-wow-delay="0.6s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-11.jpg"
-                  alt="layout-11-preview"
-                />
+                <Image src="/images/layout-11.jpg" alt="layout-11-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-11">
@@ -288,11 +245,7 @@ const HomeSelect = () => {
               data-wow-delay="0.8s"
             >
               <div className="hover-overlay">
-                <img
-                  className="img-fluid"
-                  src="images/layout-12.jpg"
-                  alt="layout-12-preview"
-                />
+                <Image src="/images/layout-12.jpg" alt="layout-12-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay">
                   <div className="overlay-content">
                     <Link legacyBehavior href="/demo-12">

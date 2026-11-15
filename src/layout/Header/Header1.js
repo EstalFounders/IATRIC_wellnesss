@@ -8,7 +8,6 @@ import {
   booking_btn_txt,
   color_schema,
   contact_no,
-  facebook_page_url,
   instagram_page_url,
   Linkdn_url,
   imageBlurDataUrl
@@ -29,6 +28,7 @@ import { demo5ServiceHighlights } from "../../../data/services";
 import { resolveNavServiceIcon } from "../../../public/svgIcon/nav-service-icons";
 import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
 import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../../customUtils/serviceLinks";
+import { PAGE_MENU_ITEMS } from "../navigationItems";
 
 // Quick Links > "Book Doctor Consultation": every pointer opens the booking form
 // with the consultation type preselected (AppointmentPage reads ?type=...).
@@ -178,7 +178,7 @@ const Header1 = ({ scrollToContact }) => {
           <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
             <Link legacyBehavior href="/appointment">
               <a aria-label="Book an appointment" style={{ display: "flex", alignItems: "center" }}>
-                <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+                <Image src="/images/logo.png" alt="mobile-logo" width={400} height={300} priority={false} loading="lazy" style={{ objectFit: "contain" }} />
               </a>
             </Link>
           </span>
@@ -207,7 +207,7 @@ const Header1 = ({ scrollToContact }) => {
           <div className="headertopright">
             <a className="linkedinicon" title="Linkedin" target="blank" href={Linkdn_url}><FaLinkedin size={25} /><span className="mobiletext02">Linkedin</span></a>
             <a className="instagramicon" title="Instagram" target="blank" href={instagram_page_url}><FaInstagram size={25} /><span className="mobiletext02">Instagram</span></a>
-            <a className="facebookicon" title="Facebook" target="blank" href={facebook_page_url}><FaFacebook size={25} /><span className="mobiletext02">Facebook</span></a>
+            <a className="facebookicon" title="Facebook" target="blank" href="https://www.facebook.com/profile.php?id=61591711448902"><FaFacebook size={25} /><span className="mobiletext02">Facebook</span></a>
           </div>
         </div>
       </div>
@@ -286,21 +286,19 @@ const Header1 = ({ scrollToContact }) => {
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title">{t("footer.quickLinks")}:</li>
-                            <li><Link legacyBehavior href="/about-us"><a>{t("nav.aboutUs")}</a></Link></li>
-                            <li><Link legacyBehavior href="/appointment"><a>{t("nav.bookConsultation")}</a></Link></li>
-                            <li><Link legacyBehavior href="/privacy-policy"><a>{t("footer.privacy")}</a></Link></li>
-                          </ul>
-                          <ul className="col-lg-6 col-md-12 col-xs-12 link-list">
-                            <li className="title" style={{ visibility: "hidden" }}>{t("footer.quickLinks")}:</li>
-                            <li>
-                              <Link legacyBehavior href="/faqs">
-                                <a>{t("nav.faq")}</a>
-                              </Link>
-                            </li>
-                            <li><Link legacyBehavior href="/all-doctors"><a>{t("nav.allDoctors")}</a></Link></li>
-                            <li><Link legacyBehavior href="/join-us"><a>{t("nav.joinUs")}</a></Link></li>
+                          <ul className="col-12 nav-service-grid">
+                            {PAGE_MENU_ITEMS.map((item) => (
+                              <li key={item.href} className="nav-service-item">
+                                <Link legacyBehavior href={item.href}>
+                                  <a className="nav-service-link">
+                                    <NavServiceIcon label={item.iconLabel} />
+                                    <span className="nav-service-label">
+                                      {t(item.labelKey)}
+                                    </span>
+                                  </a>
+                                </Link>
+                              </li>
+                            ))}
                           </ul>
                         </div>
                       </div>

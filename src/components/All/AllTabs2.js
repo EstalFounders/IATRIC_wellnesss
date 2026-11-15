@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllTabs2 = () => {
   return (
@@ -76,11 +77,7 @@ const AllTabs2 = () => {
                 </p>
                 {/* Image */}
                 <div className="tab-img">
-                  <img
-                    className="img-fluid"
-                    src="images/pediatrics_1000x500.jpg"
-                    alt="tab-image"
-                  />
+                  <Image src="/images/pediatrics_1000x500.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 </div>
                 {/* Text */}
                 <p>
@@ -180,11 +177,7 @@ const AllTabs2 = () => {
                 </p>
                 {/* Image */}
                 <div className="tab-img">
-                  <img
-                    className="img-fluid"
-                    src="images/hematology_1000x500.jpg"
-                    alt="tab-image"
-                  />
+                  <Image src="/images/hematology_1000x500.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 </div>
                 {/* Text */}
                 <p>
@@ -284,11 +277,7 @@ const AllTabs2 = () => {
                 </p>
                 {/* Image */}
                 <div className="tab-img">
-                  <img
-                    className="img-fluid"
-                    src="images/mri_1000x500.jpg"
-                    alt="tab-image"
-                  />
+                  <Image src="/images/mri_1000x500.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 </div>
                 {/* Text */}
                 <p>
@@ -388,11 +377,7 @@ const AllTabs2 = () => {
                 </p>
                 {/* Image */}
                 <div className="tab-img">
-                  <img
-                    className="img-fluid"
-                    src="images/x-ray_1000x500.jpg"
-                    alt="tab-image"
-                  />
+                  <Image src="/images/x-ray_1000x500.jpg" alt="tab-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                 </div>
                 {/* Text */}
                 <p>

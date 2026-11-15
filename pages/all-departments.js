@@ -14,6 +14,7 @@ const AllDepartments = () => {
   return (
     <Layouts>
       <PageBanner pageTitle="Our Departments" />
+      <h1 className="sr-only">Medical Specialties & Departments</h1>
       <About5 />
       <AllDepartmentServices7 />
       <Banner5 />

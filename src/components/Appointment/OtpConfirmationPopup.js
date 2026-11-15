@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { api, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -8,11 +8,8 @@ import styles from "./css/AppointmentModel.module.css";
 /**
  * OTP step of the booking sequence.
  *
- * The verification itself is unchanged (a 6-digit code is generated in the
- * browser, sent with `api.sendOtp`, and compared on submit). What changed is
- * what `onConfirm` means: it used to create the appointment, now it only tells
- * the parent that the mobile number is verified so the appointment-details step
- * can open (AppointmentPage.js).
+ * OTPs are sent and verified by the server; a successful verification also logs
+ * the patient's contact details before the appointment-details step can open.
  *
  * `showHeading` is off when the host modal already prints a title/subtitle
  * (the booking step shell does), so the code does not render two headings.
@@ -20,6 +17,7 @@ import styles from "./css/AppointmentModel.module.css";
  */
 const OtpConfirmationPopup = ({
   mobile,
+  name,
   onConfirm,
   onBack,
   showHeading = true,
@@ -27,19 +25,11 @@ const OtpConfirmationPopup = ({
   // Refs and state for OTP input
   const inputRefs = useRef([]);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [generatedOtp, setGeneratedOtp] = useState(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState("");
-  // Guard against a double click on "Verify": the booking POST is fired from
-  // `onConfirm`, and two clicks used to start two bookings (the second one then
-  // hit "slot already booked").
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { t } = useLanguage();
-
-  // Generate OTP and send on load
-  useEffect(() => {
-    generateAndSendOtp();
-  },[]);
 
   // Countdown timer for resend button
   useEffect(() => {
@@ -52,29 +42,34 @@ const OtpConfirmationPopup = ({
     }
   }, [resendCooldown]);
 
-  const generateOtp = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-
-  const generateAndSendOtp = async () => {
-    const newOtp = generateOtp();
-    setGeneratedOtp(newOtp);
+  const generateAndSendOtp = useCallback(async () => {
+    setError("");
+    setIsSending(true);
     setResendCooldown(30); // 30-second cooldown
-    console.log("Generated OTP:", newOtp);
 
     try {
       const res = await fetch(api.sendOtp, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, otp: newOtp }),
+        body: JSON.stringify({ action: "send", mobile }),
       });
       const data = await res.json();
-      console.log("OTP sent response:", data);
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Unable to send OTP");
+      }
     } catch (error) {
       setError(error.message);
+      setResendCooldown(0);
       console.error("Failed to send OTP", error);
+    } finally {
+      setIsSending(false);
     }
-  };
+  }, [mobile]);
+
+  // Request the OTP on load; the server generates and stores it.
+  useEffect(() => {
+    generateAndSendOtp();
+  }, [generateAndSendOtp]);
 
   const handleChange = (value, index) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -116,19 +111,36 @@ const OtpConfirmationPopup = ({
     }
   };
 
-  const handleSubmit = () => {
-    if (isSubmitting) return;
+  const handleSubmit = async () => {
+    if (isSubmitting || isSending) return;
     const enteredCode = otp.join("");
     if (enteredCode.length !== 6) {
-      alert(t("otp.errDigits"));
+      setError(t("otp.errDigits"));
       return; 
     }
-    if (enteredCode === "000000" || enteredCode === generatedOtp) {
-      console.log("OTP verified successfully:", enteredCode);
-      setIsSubmitting(true);
-      onConfirm(); // Proceed
-    } else {
-      alert(t("otp.errInvalid"));
+
+    setError("");
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(api.sendOtp, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify",
+          mobile,
+          name,
+          otp: enteredCode,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.message || t("otp.errInvalid"));
+      }
+      onConfirm();
+    } catch (error) {
+      setError(error.message);
+      console.error("Failed to verify OTP", error);
+      setIsSubmitting(false);
     }
   };
 
@@ -193,7 +205,7 @@ const OtpConfirmationPopup = ({
                 : "text-primary hover:underline"
             }`}
             onClick={generateAndSendOtp}
-            disabled={resendCooldown > 0}
+            disabled={resendCooldown > 0 || isSending}
             style={{
               fontSize: "1rem",
               padding: "5px 10px",
@@ -230,7 +242,7 @@ const OtpConfirmationPopup = ({
             </ConsultationButton>
           )}
           <ConsultationButton onClick={handleSubmit}>
-            {t("otp.verify")}
+            {isSubmitting ? "Verifying..." : t("otp.verify")}
           </ConsultationButton>
         </div>
       </div>

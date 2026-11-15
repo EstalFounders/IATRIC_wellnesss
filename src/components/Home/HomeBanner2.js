@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const HomeBanner2 = () => {
   return (
@@ -10,11 +11,7 @@ const HomeBanner2 = () => {
             {/* IMAGE */}
             <div className="col-lg-6">
               <div className="banner-img">
-                <img
-                  className="img-fluid"
-                  src="images/banner-2.png"
-                  alt="banner-image"
-                />
+                <Image src="/images/banner-2.png" alt="banner-image" width={1200} height={600} priority={false} loading="lazy" className="img-fluid" />
               </div>
             </div>
             {/* TEXT*/}

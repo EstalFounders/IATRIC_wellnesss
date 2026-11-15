@@ -11,6 +11,7 @@ import {
 import Preloader from "../../Preloader";
 import { sendInvoiceToFirebase } from "../../../utils";
 import { priceToWords } from "../utility/helper";
+import Image from "next/image";
 
 const GenerateInvoiceImage = ({ request, onClose }) => {
   console.log("request", request);
@@ -114,12 +115,7 @@ const GenerateInvoiceImage = ({ request, onClose }) => {
             <h1 className="display-3">INVOICE</h1>
           </div>
           <div className="col-md-4 d-flex align-items-center justify-content-center">
-            <img
-              src="/images/invoicelogo.png"
-              alt="Logo"
-              height={150}
-              width={150}
-            />
+            <Image src="/images/invoicelogo.png" alt="Logo" width={400} height={300} priority={false} loading="lazy" />
           </div>
         </div>
 

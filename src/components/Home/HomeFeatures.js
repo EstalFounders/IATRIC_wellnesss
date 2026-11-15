@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const HomeFeatures = () => {
     return (
@@ -26,10 +27,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/layouts.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/layouts.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">
                                     Built with Bootstrap 4.x
                                 </h5>
@@ -42,10 +40,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/responsive.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/responsive.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">
                                     Responsive &amp; Retina Ready
                                 </h5>
@@ -58,10 +53,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/seo.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/seo.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">SEO Optimized</h5>
                                 <p>Optimized for search engines</p>
                             </div>
@@ -72,10 +64,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/browser.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/browser.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">
                                     Cross Browser Compatibility
                                 </h5>
@@ -88,10 +77,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/speed.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/speed.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Optimized for Speed</h5>
                                 <p>Optimized for the best performance</p>
                             </div>
@@ -102,10 +88,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/font.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/font.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Advanced Typography</h5>
                                 <p>More than 800 Google fonts</p>
                             </div>
@@ -116,10 +99,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/settings.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/settings.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Easy to Customization</h5>
                                 <p>We commented every section</p>
                             </div>
@@ -130,10 +110,7 @@ const HomeFeatures = () => {
                                 className="fbox icon-md wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/blocks.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/blocks.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">
                                     70+ Stunning Shortcodes
                                 </h5>
@@ -146,10 +123,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/menu.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/menu.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Mega Menu</h5>
                                 <p>Custom Mega Menu plugin inside</p>
                             </div>
@@ -160,10 +134,7 @@ const HomeFeatures = () => {
                                 className="fbox wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/calendar.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/calendar.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Timetable</h5>
                                 <p>Fully responsive timetable inside</p>
                             </div>
@@ -174,10 +145,7 @@ const HomeFeatures = () => {
                                 className="fbox icon-md wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/medical.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/medical.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Medical icons</h5>
                                 <p>Images and Font Icon Support</p>
                             </div>
@@ -188,10 +156,7 @@ const HomeFeatures = () => {
                                 className="fbox icon-md wow fadeInUp"
                                 data-wow-delay="0.4s"
                             >
-                                <img
-                                    src="images/icons/booking.png"
-                                    alt="feature-icon"
-                                />
+                                <Image src="/images/icons/booking.png" alt="feature-icon" width={400} height={300} priority={false} loading="lazy" />
                                 <h5 className="h5-sm">Online Booking</h5>
                                 <p>Working PHP Feedback Forms</p>
                             </div>

@@ -921,6 +921,77 @@ export const logErrorToGoogleSheet = async (data) => {
   }
 };
 
+export const logAppointmentContactToGoogleSheet = async ({ name, mobileNumber }) => {
+  const spreadsheetId = "1lSJE0rSgUw5Nrn7u4lduom8x-QCFZTDGE5QRU47r1fk";
+  const worksheetId = "1202583281";
+  const serviceAccount = resolveSheetServiceAccount();
+  if (!serviceAccount) {
+    throw new Error("Google Sheets credentials are not configured");
+  }
+
+  const auth = new JWT({
+    email: serviceAccount.email,
+    key: serviceAccount.key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  const doc = new GoogleSpreadsheet(spreadsheetId, auth);
+  await withTimeout(doc.loadInfo(), SHEET_TIMEOUT_MS, "Google Sheets loadInfo");
+
+  const sheet = doc.sheetsById[worksheetId];
+  if (!sheet) {
+    throw new Error(`Google Sheets tab ${worksheetId} was not found`);
+  }
+
+  let hasHeaders = false;
+  try {
+    await withTimeout(
+      sheet.loadHeaderRow(),
+      SHEET_TIMEOUT_MS,
+      "Google Sheets loadHeaderRow",
+    );
+    hasHeaders = Boolean(sheet.headerValues?.length);
+  } catch {
+    hasHeaders = false;
+  }
+
+  if (!hasHeaders) {
+    await withTimeout(
+      sheet.setHeaderRow(["Name", "Mobile Number"]),
+      SHEET_TIMEOUT_MS,
+      "Google Sheets setHeaderRow",
+    );
+  }
+
+  const headerByKey = new Map(
+    sheet.headerValues.map((header) => [
+      String(header).trim().toLowerCase().replace(/[^a-z]/g, ""),
+      header,
+    ]),
+  );
+  const nameHeader = headerByKey.get("name") || headerByKey.get("patientname");
+  const mobileHeader =
+    headerByKey.get("mobilenumber") ||
+    headerByKey.get("mobileno") ||
+    headerByKey.get("mobile") ||
+    headerByKey.get("phonenumber") ||
+    headerByKey.get("phone");
+
+  if (!nameHeader || !mobileHeader) {
+    throw new Error(
+      "The selected Google Sheets tab must have Name and Mobile Number columns",
+    );
+  }
+
+  await withTimeout(
+    sheet.addRow({
+      [nameHeader]: name,
+      [mobileHeader]: mobileNumber,
+    }),
+    SHEET_TIMEOUT_MS,
+    "Google Sheets addRow",
+  );
+};
+
 /**
  * Handles the entire POST business logic for booking a consultation.
  * Extracted from bookConsultation.js to keep the API route as a thin HTTP shell.
