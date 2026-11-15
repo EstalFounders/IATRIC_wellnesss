@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { demoInnerPageProps } from "../../sliderProps";
@@ -30,10 +31,14 @@ const HomeInnerPage = () => {
                 {/* ABOUT */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/about.jpg"
+                      src="/images/about.jpg"
                       alt="about-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -50,10 +55,14 @@ const HomeInnerPage = () => {
                 {/* WHO WE ARE */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/who-we-are.jpg"
+                      src="/images/who-we-are.jpg"
                       alt="who-we-are-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">
@@ -70,10 +79,14 @@ const HomeInnerPage = () => {
                 {/* ALL SERVICES */}
                 <SwiperSlide className="select_link ip-box">
                   <div className="hover-overlay">
-                    <img
+                    <Image
                       className="img-fluid"
-                      src="images/services.jpg"
+                      src="/images/services.jpg"
                       alt="services-preview"
+                      width={400}
+                      height={300}
+                      priority={false}
+                      loading="lazy"
                     />
                     <div className="item-overlay">
                       <div className="overlay-content">

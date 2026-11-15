@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /superAdmin/
+Disallow: /registerDoc/
+Disallow: /marketing/
+Disallow: /api/
+Disallow: /payment/
+Disallow: /labTest/
+Disallow: /meeting/
+Disallow: /_next/
+
+Sitemap: https://healthpath.co.in/sitemap.xml
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /

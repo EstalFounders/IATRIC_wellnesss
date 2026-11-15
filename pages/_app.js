@@ -74,6 +74,11 @@ function MyApp({ Component, pageProps, router, ...rest }) {
         <title>Health Path</title>
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
+        {(() => {
+          const PRIVATE = ['/superAdmin', '/registerDoc', '/marketing', '/payment/thankyou', '/labTest', '/meeting'];
+          return PRIVATE.some(r => router?.pathname?.startsWith(r)) ? 
+            <meta name="robots" content="noindex, nofollow" /> : null;
+        })()}
       </Head>
       {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
       <SeoMetadata metadata={pageProps?.seoMetadata} />

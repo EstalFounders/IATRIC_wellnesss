@@ -20,6 +20,67 @@ const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://www.healthpath.co.in"
 ).replace(/\/$/, "");
 
+const physicianSchema = (doctorId, doctorName, specialty, educationTraining, languages) => ({
+  "@context": "https://schema.org",
+  "@type": "Physician",
+  "@id": `${SITE_URL}/doctor-info?doctorId=${doctorId}#physician`,
+  "name": doctorName,
+  "url": `${SITE_URL}/doctor-info?doctorId=${doctorId}`,
+  "medicalSpecialty": specialty || "General Practice",
+  "qualifications": educationTraining?.map(edu => ({
+    "@type": "EducationalOccupationalCredential",
+    "name": edu
+  })) || [],
+  "knowsLanguage": languages || ["English", "Hindi"],
+  "areaServed": {
+    "@type": "Country",
+    "name": "India"
+  }
+});
+
+const blogPostSchema = (post) => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": `${SITE_URL}/our-blog/${post.slug}#article`,
+      "headline": post.title,
+      "image": post.thumbnail || `${SITE_URL}/images/logo.png`,
+      "datePublished": post.createdAt,
+      "dateModified": post.updatedAt,
+      "author": {
+        "@type": "Person",
+        "name": post.author || "HealthPath"
+      },
+      "description": post.metaDescription || post.title,
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${SITE_URL}/our-blog/${post.slug}#breadcrumb`,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": `${SITE_URL}/`
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": `${SITE_URL}/our-blog`
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": post.title,
+          "item": `${SITE_URL}/our-blog/${post.slug}`
+        }
+      ]
+    }
+  ]
+});
+
 // The /faqs copy lives in data/faqs.js, so its FAQPage schema is generated from
 // the same source and can never drift from the answers users actually see.
 const faqStructuredData = () => ({
@@ -215,7 +276,17 @@ const STRUCTURED_DATA = {
  * service-details.js and department-single.js), which is what puts their FAQPage
  * schema in the first HTML.
  */
-export const resolveStructuredData = (pathname, query = {}) => {
+export const resolveStructuredData = (pathname, query = {}, doctorData = null) => {
+  if (pathname === "/doctor-info" && doctorData) {
+    return physicianSchema(
+      doctorData._id,
+      doctorData.name,
+      doctorData.serviceOffered?.[0],
+      doctorData.educationTraining,
+      doctorData.languages
+    );
+  }
+
   if (pathname === "/service-details") {
     // Same two-step the page uses (ServiceDetailsComponent): the `Service` key
     // first, then the human name, so a URL that carries only one of them still
@@ -228,14 +299,20 @@ export const resolveStructuredData = (pathname, query = {}) => {
     return topicStructuredData(query?.serviceName, "/department-single");
   }
 
+  if (pathname === "/our-blog/[slug]" && query.slug) {
+    // Blog schema would be resolved here with postData from SSR/SSG
+    // For now, returning null as blog posts need to be fetched
+    return null;
+  }
+
   return STRUCTURED_DATA[pathname] || null;
 };
 
-const PageStructuredData = () => {
+const PageStructuredData = ({ doctorData = null }) => {
   // `query` is only populated on the server for request-rendered routes - see
   // resolveStructuredData() above.
   const { pathname, query } = useRouter();
-  const jsonLd = resolveStructuredData(pathname, query);
+  const jsonLd = resolveStructuredData(pathname, query, doctorData);
 
   if (!jsonLd) return null;
 
