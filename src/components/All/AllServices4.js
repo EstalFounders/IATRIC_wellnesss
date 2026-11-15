@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllServices4 = () => {
   return (
@@ -23,11 +24,7 @@ const AllServices4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="sbox-4 wow fadeInUp" data-wow-delay="0.4s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/cardiology_700x700.jpg"
-                alt="content-image"
-              />
+              <Image src="/images/cardiology_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
@@ -46,11 +43,7 @@ const AllServices4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="sbox-4 wow fadeInUp" data-wow-delay="0.6s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/mri_700x700.jpg"
-                alt="content-image"
-              />
+              <Image src="/images/mri_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
@@ -69,11 +62,7 @@ const AllServices4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="sbox-4 wow fadeInUp" data-wow-delay="0.8s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/pediatrics_700x700.jpg"
-                alt="content-image"
-              />
+              <Image src="/images/pediatrics_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">
@@ -92,11 +81,7 @@ const AllServices4 = () => {
           <div className="col-md-6 col-lg-3">
             <div className="sbox-4 wow fadeInUp" data-wow-delay="1s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/emergency_help_700x700.jpg"
-                alt="content-image"
-              />
+              <Image src="/images/emergency_help_700x700.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="sbox-4-txt">
                 <h5 className="h5-md steelblue-color">

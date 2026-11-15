@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllDoctors1 = () => {
   return (
@@ -26,11 +27,7 @@ const AllDoctors1 = () => {
               {/* Doctor Photo */}
               <div className="hover-overlay text-center">
                 {/* Photo */}
-                <img
-                  className="img-fluid"
-                  src="images/doctor-1.jpg"
-                  alt="doctor-foto"
-                />
+                <Image src="/images/doctor-1.jpg" alt="doctor-foto" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay" />
                 {/* Profile Link */}
                 <div className="profile-link">
@@ -59,11 +56,7 @@ const AllDoctors1 = () => {
               {/* Doctor Photo */}
               <div className="hover-overlay text-center">
                 {/* Photo */}
-                <img
-                  className="img-fluid"
-                  src="images/doctor-2.jpg"
-                  alt="doctor-foto"
-                />
+                <Image src="/images/doctor-2.jpg" alt="doctor-foto" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay" />
                 {/* Profile Link */}
                 <div className="profile-link">
@@ -92,11 +85,7 @@ const AllDoctors1 = () => {
               {/* Doctor Photo */}
               <div className="hover-overlay text-center">
                 {/* Photo */}
-                <img
-                  className="img-fluid"
-                  src="images/doctor-3.jpg"
-                  alt="doctor-foto"
-                />
+                <Image src="/images/doctor-3.jpg" alt="doctor-foto" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay" />
                 {/* Profile Link */}
                 <div className="profile-link">
@@ -125,11 +114,7 @@ const AllDoctors1 = () => {
               {/* Doctor Photo */}
               <div className="hover-overlay text-center">
                 {/* Photo */}
-                <img
-                  className="img-fluid"
-                  src="images/doctor-4.jpg"
-                  alt="doctor-foto"
-                />
+                <Image src="/images/doctor-4.jpg" alt="doctor-foto" width={300} height={300} priority={false} loading="lazy" className="img-fluid" />
                 <div className="item-overlay" />
                 {/* Profile Link */}
                 <div className="profile-link">

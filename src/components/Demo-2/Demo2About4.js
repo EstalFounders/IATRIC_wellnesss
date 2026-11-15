@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const Demo2About4 = () => {
   return (
@@ -10,11 +11,7 @@ const Demo2About4 = () => {
           <div className="col-lg-4">
             <div className="abox-4 mb-40 wow fadeInUp" data-wow-delay="0.4s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/quality_care_800x600.jpg"
-                alt="about-image"
-              />
+              <Image src="/images/quality_care_800x600.jpg" alt="about-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="abox-4-txt">
                 {/* Title */}
@@ -36,11 +33,7 @@ const Demo2About4 = () => {
           <div className="col-lg-4">
             <div className="abox-4 mb-40 wow fadeInUp" data-wow-delay="0.6s">
               {/* Image */}
-              <img
-                className="img-fluid"
-                src="images/emergency_help_800x600.jpg"
-                alt="about-image"
-              />
+              <Image src="/images/emergency_help_800x600.jpg" alt="about-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               {/* Text */}
               <div className="abox-4-txt">
                 {/* Title */}

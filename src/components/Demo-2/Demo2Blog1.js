@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const Demo2Blog1 = () => {
   return (
@@ -27,11 +28,7 @@ const Demo2Blog1 = () => {
             <div className="blog-post wow fadeInUp" data-wow-delay="0.4s">
               {/* BLOG POST IMAGE */}
               <div className="blog-post-img">
-                <img
-                  className="img-fluid"
-                  src="images/blog/post-1-img.jpg"
-                  alt="blog-post-image"
-                />
+                <Image src="/images/blog/post-1-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </div>
               {/* BLOG POST TITLE */}
               <div className="blog-post-txt">
@@ -61,11 +58,7 @@ const Demo2Blog1 = () => {
             <div className="blog-post wow fadeInUp" data-wow-delay="0.6s">
               {/* BLOG POST IMAGE */}
               <div className="blog-post-img">
-                <img
-                  className="img-fluid"
-                  src="images/blog/post-2-img.jpg"
-                  alt="blog-post-image"
-                />
+                <Image src="/images/blog/post-2-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </div>
               {/* BLOG POST TEXT */}
               <div className="blog-post-txt">
@@ -95,11 +88,7 @@ const Demo2Blog1 = () => {
             <div className="blog-post wow fadeInUp" data-wow-delay="0.8s">
               {/* BLOG POST IMAGE */}
               <div className="blog-post-img">
-                <img
-                  className="img-fluid"
-                  src="images/blog/post-3-img.jpg"
-                  alt="blog-post-image"
-                />
+                <Image src="/images/blog/post-3-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </div>
               {/* BLOG POST TEXT */}
               <div className="blog-post-txt">

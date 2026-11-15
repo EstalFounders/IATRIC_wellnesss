@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const AllGallery2 = () => {
   return (
@@ -24,11 +25,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-1.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-1.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -47,11 +44,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-2.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-2.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -70,11 +63,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-3.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-3.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -93,11 +82,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-4.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-4.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -116,11 +101,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-5.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-5.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -139,11 +120,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-6.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-6.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -162,11 +139,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-7.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-7.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">
@@ -185,11 +158,7 @@ const AllGallery2 = () => {
           <div className="col-md-6 col-lg-3 gallery-item">
             <div className="hover-overlay">
               {/* Gallery Image */}
-              <img
-                className="img-fluid"
-                src="images/gallery/image-8.jpg"
-                alt="gallery-image"
-              />
+              <Image src="/images/gallery/image-8.jpg" alt="gallery-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               <div className="item-overlay" />
               {/* Image Zoom */}
               <div className="image-zoom">

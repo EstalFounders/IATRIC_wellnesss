@@ -505,11 +505,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 // padding: "14px 0 14px 0",
               }}
             >
-              <img
-                src="/images/Doctor/prescriptionlogo.jpg"
-                alt="HealthPath Logo"
-                style={{ width: "180px", mixBlendMode: "multiply" }}
-              />
+              <Image src="/images/Doctor/prescriptionlogo.jpg" alt="HealthPath Logo" width={400} height={300} priority={false} loading="lazy" style={{ width: "180px", mixBlendMode: "multiply" }} />
               <div style={{ textAlign: "right", lineHeight: "1.5" }}>
                 <div
                   style={{ fontSize: "16px", fontWeight: 700, color: "#111" }}
@@ -592,11 +588,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 5. RX ICON ROW
             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
             <div style={{ marginTop: "8px", marginBottom: "4px" }}>
-              <img
-                src="/images/Doctor/RXIcon.png"
-                alt="Rx"
-                style={{ width: "34px", mixBlendMode: "multiply" }}
-              />
+              <Image src="/images/Doctor/RXIcon.png" alt="Rx" width={400} height={300} priority={false} loading="lazy" style={{ width: "34px", mixBlendMode: "multiply" }} />
             </div>
 
             {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

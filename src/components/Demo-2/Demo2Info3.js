@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const Demo2Info3 = () => {
   return (
@@ -9,11 +10,7 @@ const Demo2Info3 = () => {
           {/* INFO IMAGE */}
           <div className="col-lg-6">
             <div className="info-3-img text-center">
-              <img
-                className="img-fluid"
-                src="images/medical_complex_700x700.jpg"
-                alt="info-image"
-              />
+              <Image src="/images/medical_complex_700x700.jpg" alt="info-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
           {/* INFO TEXT */}

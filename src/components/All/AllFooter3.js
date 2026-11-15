@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { email } from "../../constant";
+import Image from "next/image";
 
 const AllFooter3 = () => {
   return (
@@ -13,12 +14,7 @@ const AllFooter3 = () => {
             <div className="footer-info mb-40">
               {/* Footer Logo */}
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
-              <img
-                src="images/footer-logo.png"
-                width={180}
-                height={40}
-                alt="footer-logo"
-              />
+              <Image src="/images/footer-logo.png" alt="footer-logo" width={400} height={300} priority={false} loading="lazy" />
               {/* Text */}
               <p className="p-sm mt-20">
                 Aliquam orci nullam tempor sapien gravida donec an enim ipsum

@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const HomeHero = () => {
     return (
@@ -7,11 +8,7 @@ const HomeHero = () => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="hero-txt text-center">
-                            <img
-                                className="img-fluid title-img"
-                                src="images/hero-logo.png"
-                                alt="title-image"
-                            />
+                            <Image src="/images/hero-logo.png" alt="title-image" width={1200} height={600} priority={false} loading="lazy" className="img-fluid title-img" />
                             <h3>
                                 Complete Medical &amp; Medical Health Landing
                                 Page

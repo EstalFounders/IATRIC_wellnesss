@@ -178,7 +178,7 @@ const Header1 = ({ scrollToContact }) => {
           <span className="smllogo" style={{ display: "flex", alignItems: "center" }}>
             <Link legacyBehavior href="/appointment">
               <a aria-label="Book an appointment" style={{ display: "flex", alignItems: "center" }}>
-                <img src="/images/logo.png" width={140} height={42} alt="mobile-logo" style={{ objectFit: "contain" }} />
+                <Image src="/images/logo.png" alt="mobile-logo" width={400} height={300} priority={false} loading="lazy" style={{ objectFit: "contain" }} />
               </a>
             </Link>
           </span>

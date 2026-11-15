@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const Service1Page = () => {
   return (
@@ -35,11 +36,7 @@ const Service1Page = () => {
         <div className="row">
           <div className="col-md-12">
             <div className="content-block-img text-center">
-              <img
-                className="img-fluid"
-                src="images/mri_1000x500.jpg"
-                alt="content-image"
-              />
+              <Image src="/images/mri_1000x500.jpg" alt="content-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
             </div>
           </div>
         </div>

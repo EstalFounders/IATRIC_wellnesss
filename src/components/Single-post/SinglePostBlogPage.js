@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { contact_no } from "../../constant";
+import Image from "next/image";
 
 const SinglePostBlogPage = () => {
   return (
@@ -12,11 +13,7 @@ const SinglePostBlogPage = () => {
             <div className="single-blog-post pr-30">
               {/* BLOG POST IMAGE */}
               <div className="blog-post-img mb-40">
-                <img
-                  className="img-fluid"
-                  src="images/blog/post-4-img.jpg"
-                  alt="blog-post-image"
-                />
+                <Image src="/images/blog/post-4-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </div>
               {/* BLOG POST TEXT */}
               <div className="sblog-post-txt">
@@ -217,7 +214,7 @@ const SinglePostBlogPage = () => {
               {/* ABOUT POST AUTHOR */}
               <div className="author-senoff">
                 {/* Avatar */}
-                <img src="images/review-author-4.jpg" alt="author-avatar" />
+                <Image src="/images/review-author-4.jpg" alt="author-avatar" width={400} height={300} priority={false} loading="lazy" />
                 {/* Text */}
                 <div className="author-senoff-txt">
                   {/* Title */}
@@ -244,11 +241,7 @@ const SinglePostBlogPage = () => {
                     <div className="blog-post">
                       {/* BLOG POST IMAGE */}
                       <div className="blog-post-img">
-                        <img
-                          className="img-fluid"
-                          src="images/blog/post-2-img.jpg"
-                          alt="blog-post-image"
-                        />
+                        <Image src="/images/blog/post-2-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                       </div>
                       {/* BLOG POST TEXT */}
                       <div className="blog-post-txt">
@@ -278,11 +271,7 @@ const SinglePostBlogPage = () => {
                     <div className="blog-post">
                       {/* BLOG POST IMAGE */}
                       <div className="blog-post-img">
-                        <img
-                          className="img-fluid"
-                          src="images/blog/post-3-img.jpg"
-                          alt="blog-post-image"
-                        />
+                        <Image src="/images/blog/post-3-img.jpg" alt="blog-post-image" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                       </div>
                       {/* BLOG POST TEXT */}
                       <div className="blog-post-txt">
@@ -318,11 +307,7 @@ const SinglePostBlogPage = () => {
                 {/* COMMENT #1 */}
                 <div className="media mt-50">
                   {/* Comment-1 Avatar */}
-                  <img
-                    className="mr-3"
-                    src="images/post-author-1.jpg"
-                    alt="comment-avatar"
-                  />
+                  <Image src="/images/post-author-1.jpg" alt="comment-avatar" width={400} height={300} priority={false} loading="lazy" className="mr-3" />
                   <div className="media-body">
                     {/* Comment-1 Meta */}
                     <div className="comment-meta">
@@ -353,10 +338,7 @@ const SinglePostBlogPage = () => {
                     <div className="media mt-3">
                       {/* Comment-2 Avatar */}
                       <a href="#" className="pr-3">
-                        <img
-                          src="images/post-author-2.jpg"
-                          alt="comment-avatar"
-                        />
+                        <Image src="/images/post-author-2.jpg" alt="comment-avatar" width={400} height={300} priority={false} loading="lazy" />
                       </a>
                       <div className="media-body">
                         {/* Comment-2 Meta */}
@@ -397,11 +379,7 @@ const SinglePostBlogPage = () => {
                 {/* COMMENT #3 */}
                 <div className="media mt-40">
                   {/* Comment-4 Avatar */}
-                  <img
-                    className="mr-3"
-                    src="images/post-author-3.jpg"
-                    alt="comment-avatar"
-                  />
+                  <Image src="/images/post-author-3.jpg" alt="comment-avatar" width={400} height={300} priority={false} loading="lazy" className="mr-3" />
                   <div className="media-body">
                     {/* Comment-4 Meta */}
                     <div className="comment-meta">
@@ -435,11 +413,7 @@ const SinglePostBlogPage = () => {
                 {/* COMMENT #4 */}
                 <div className="media mt-40">
                   {/* Comment-4 Avatar */}
-                  <img
-                    className="mr-3"
-                    src="images/post-author-4.jpg"
-                    alt="comment-avatar"
-                  />
+                  <Image src="/images/post-author-4.jpg" alt="comment-avatar" width={400} height={300} priority={false} loading="lazy" className="mr-3" />
                   <div className="media-body">
                     {/* Comment-4 Meta */}
                     <div className="comment-meta">
@@ -606,11 +580,7 @@ const SinglePostBlogPage = () => {
                 {/* Popular post #1 */}
                 <li className="clearfix d-flex align-items-center">
                   {/* Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/blog/latest-post-1.jpg"
-                    alt="blog-post-preview"
-                  />
+                  <Image src="/images/blog/latest-post-1.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   {/* Text */}
                   <div className="post-summary">
                     <Link legacyBehavior href="/single-post">
@@ -622,11 +592,7 @@ const SinglePostBlogPage = () => {
                 {/* Popular post #2 */}
                 <li className="clearfix d-flex align-items-center">
                   {/* Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/blog/latest-post-2.jpg"
-                    alt="blog-post-preview"
-                  />
+                  <Image src="/images/blog/latest-post-2.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   {/* Text */}
                   <div className="post-summary">
                     <Link legacyBehavior href="/single-post">
@@ -638,11 +604,7 @@ const SinglePostBlogPage = () => {
                 {/* Popular post #3 */}
                 <li className="clearfix d-flex align-items-center">
                   {/* Image */}
-                  <img
-                    className="img-fluid"
-                    src="images/blog/latest-post-3.jpg"
-                    alt="blog-post-preview"
-                  />
+                  <Image src="/images/blog/latest-post-3.jpg" alt="blog-post-preview" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
                   {/* Text */}
                   <div className="post-summary">
                     <Link legacyBehavior href="/single-post">
@@ -700,11 +662,7 @@ const SinglePostBlogPage = () => {
             {/* IMAGE WIDGET */}
             <div className="image-widget sidebar-div">
               <a href="#">
-                <img
-                  className="img-fluid"
-                  src="images/blog/image-widget.jpg"
-                  alt="image-widget"
-                />
+                <Image src="/images/blog/image-widget.jpg" alt="image-widget" width={400} height={300} priority={false} loading="lazy" className="img-fluid" />
               </a>
             </div>
           </aside>
