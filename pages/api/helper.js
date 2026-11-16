@@ -173,6 +173,7 @@ export async function findAvailableDoctorForNow(
     await Doctor.find({
       ...consultationTypeMatch(genericConsultationType),
       doctorType: "Company",
+      isActive: { $ne: false },
     })
   ).filter(matchesSpeciality);
 
@@ -181,6 +182,7 @@ export async function findAvailableDoctorForNow(
     await Doctor.find({
       ...consultationTypeMatch(genericConsultationType),
       doctorType: "Individual",
+      isActive: { $ne: false },
     })
   ).filter(matchesSpeciality);
 
@@ -366,6 +368,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
     await Doctor.find({
       ...consultationTypeMatch(genericConsultationType),
       doctorType: "Company",
+      isActive: { $ne: false },
     })
   ).filter(matchesSpeciality);
 
@@ -379,6 +382,7 @@ export async function findAvailableDoctorForSpecificTimeSlot(
     await Doctor.find({
       ...consultationTypeMatch(genericConsultationType),
       doctorType: { $ne: "Individual" },
+      isActive: { $ne: false },
     })
   ).filter(matchesSpeciality);
 
@@ -467,6 +471,11 @@ export const checkNbookSelectedDoctorForNow = async (
     throw new Error("Doctor not found");
   }
 
+  // Inactive doctors must not be bookable, even when a stale client sends one.
+  if (doctor.isActive === false) {
+    throw new Error("Doctor is not available for booking");
+  }
+
   // Step 2: Find free slots for this doctor from the search floor onwards. A few
   // extra rows are fetched so the fallback below can still offer
   // FALLBACK_SLOT_LIMIT slots after the same-day ones are dropped.
@@ -542,6 +551,16 @@ export const bookConsultation = async ({
     clientSideAppointmentTime,
     bookingMode,
   } = bookConsultationParams;
+
+  // Inactive doctors cannot be booked, even via a direct API call.
+  if (doctorId) {
+    const activeDoctor = await Doctor.findById(doctorId)
+      .select("isActive")
+      .lean();
+    if (!activeDoctor || activeDoctor.isActive === false) {
+      throw new Error("Doctor is not available for booking");
+    }
+  }
 
   console.log(slot, "slot", doctorId, "doctor id");
   // Every write below runs inside the caller's transaction when there is one, so

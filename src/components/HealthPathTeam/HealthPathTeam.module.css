@@ -362,3 +362,72 @@
     transform: none;
   }
 }
+
+/* Wrapper that anchors the Left/Right fast-scroll controls to the strip. */
+.scroller {
+  position: relative;
+  width: 100%;
+}
+
+/* Left / Right fast-scroll controls. Positioned over the strip's edges and
+   themed with the brand green + gold. */
+.scrollButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.scrollButton:hover {
+  background-color: var(--color-secondary);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.scrollButton:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.scrollButton:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.scrollButtonLeft {
+  left: 0.3rem;
+  margin-left: -7%;
+}
+
+.scrollButtonRight {
+  right: 0.3rem;
+  margin-right: -7%;
+}
+
+/* Keep the controls from crowding the cards on small screens. */
+@media (max-width: 575px) {
+  .scrollButton {
+    width: 38px;
+    height: 38px;
+  }
+
+  .scrollButtonLeft {
+    left: 0.2rem;
+  }
+
+  .scrollButtonRight {
+    right: 0.2rem;
+  }
+}

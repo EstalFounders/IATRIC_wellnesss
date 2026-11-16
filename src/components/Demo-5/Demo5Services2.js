@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import { useRouter } from "next/router";
 import { useLanguage } from "../../i18n/LanguageContext";
 import {
@@ -159,6 +160,14 @@ const Demo5Services2 = () => {
     handleServiceClick(item.name, index, router);
   };
 
+  // Left/Right quick-scroll buttons (same as the common-health-concern strip).
+  const scroll = (direction) => {
+    const el = marqueeRef.current;
+    if (!el) return;
+    const amount = direction === "left" ? -300 : 300;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+  };
+
   const renderIcon = (name, index, size = 80) => {
     // exact name -> keyword resolver -> generic stethoscope, so a new speciality
     // in the DB can never leave a card without an icon.
@@ -210,9 +219,10 @@ const Demo5Services2 = () => {
         {/* Tablet/desktop (>=768px): unchanged marquee (drag, pause, clones). */}
         <div className="row d-none d-md-block">
           <section className="col-lg-12">
-            <div
-              className="services-marquee"
-              ref={marqueeRef}
+            <div style={{ position: "relative", width: "100%" }}>
+              <div
+                className="services-marquee"
+                ref={marqueeRef}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={(e) => {
                 setIsPaused(false);
@@ -242,6 +252,22 @@ const Demo5Services2 = () => {
                   </div>
                 ))}
               </div>
+            </div>
+
+              <button
+                className="scroll-btn left"
+                onClick={() => scroll("left")}
+                aria-label="Scroll Left"
+              >
+                <BiChevronLeft size={24} />
+              </button>
+              <button
+                className="scroll-btn right"
+                onClick={() => scroll("right")}
+                aria-label="Scroll Right"
+              >
+                <BiChevronRight size={24} />
+              </button>
             </div>
           </section>
         </div>

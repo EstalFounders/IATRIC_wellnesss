@@ -64,12 +64,10 @@ const JoinUs = () => {
       setLoading(false);
       return;
     }
-    const res = await sendUserQuery(formData);
-    
+    try {
+      await sendUserQuery(formData);
 
-    if (res.ok) {
       setIsSuccess(true);
-      setLoading(false);
       setError("Application submitted successfully");
       setFormData({
         name: "",
@@ -78,8 +76,10 @@ const JoinUs = () => {
         applying_for: "",
         message: "",
       });
-    } else {
+    } catch (err) {
+      setIsSuccess(false);
       setError("Failed to submit. Please try again later.");
+    } finally {
       setLoading(false);
     }
   };

@@ -147,7 +147,9 @@ const AppointmentDetailsStep = ({
   const consultationOptions = appointmentState.consultationOptions || [];
 
   // Doctor list supplied by the parent (already fetched from /api/addDoctor).
-  const doctorOptions = Array.isArray(doctors) ? doctors : [];
+  const doctorOptions = (Array.isArray(doctors) ? doctors : []).filter(
+    (doctor) => doctor.isActive !== false,
+  );
   const scopedDoctors = appointmentState.filteredDoctors?.length
     ? appointmentState.filteredDoctors
     : doctorOptions;

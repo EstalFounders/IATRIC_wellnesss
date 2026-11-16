@@ -742,11 +742,14 @@ const AppointmentPage = () => {
 
   const filterDoctors = (selectedOption) => {
     const key = typeKeyFor(selectedOption);
-    const filtered = doctors.filter((doctor) =>
-      consultationTypeNames(doctor.consultationType).some(
-        (name) => typeKeyFor(name) === key,
-      ),
-    );
+    // Only active doctors are bookable.
+    const filtered = doctors
+      .filter((doctor) => doctor.isActive !== false)
+      .filter((doctor) =>
+        consultationTypeNames(doctor.consultationType).some(
+          (name) => typeKeyFor(name) === key,
+        ),
+      );
     setFilteredDoctors(filtered);
   };
 
