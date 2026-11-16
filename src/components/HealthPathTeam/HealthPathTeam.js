@@ -70,6 +70,20 @@ const oneLine = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
 /** Keep `value` inside [0, max) - used to wrap the marquee offset. */
 const wrapOffset = (value, max) => (max > 0 ? ((value % max) + max) % max : 0);
 
+/** Cubic ease-in-out for the Left/Right fast-scroll buttons. */
+const easeInOutCubic = (t) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+/** Fisher-Yates shuffle (returns a new array). */
+const shuffle = (items) => {
+  const result = [...(items || [])];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+};
+
 /**
  * "Service offered" line for a card.
  *
@@ -212,6 +226,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
   const hoveringRef = useRef(false); // pointer resting on the strip
   const suppressClickRef = useRef(false); // swallow the click after a drag
   const expandedRef = useRef(false); // a card is showing its full degree
+  const scrollAnimationRef = useRef(null); // in-flight button-driven scroll
   const [copies, setCopies] = useState(2);
   const [isDragging, setIsDragging] = useState(false);
   // Cards whose degree is expanded, keyed by `member.key`: the marquee renders
@@ -303,7 +318,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
         source: member,
       }));
 
-    return [...doctorCards, ...staffCards];
+    return shuffle([...doctorCards, ...staffCards]);
   }, [doctors, staff]);
 
   // Open / close the full degree of one card. A Set keeps several cards open at
@@ -526,6 +541,67 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
     event.stopPropagation();
   };
 
+  // Left / Right controls: smoothly nudge the strip by a responsive step in the
+  // chosen direction. The strip loops (the offset wraps), so there is no start
+  // or end to disable at. The auto-scroll is paused for the nudge and resumes
+  // afterwards only if it was running before (not hovered, no expanded card, not
+  // mid-drag).
+  const animateScrollBy = useCallback(
+    (direction) => {
+      const viewport = viewportRef.current;
+      const step = Math.round((viewport?.clientWidth || 560) * 0.6);
+
+      // Reduced motion turns the strip into a native horizontal scroller (see the
+      // CSS `@media (prefers-reduced-motion: reduce)` fallback), so use the native
+      // scroll there instead of animating the transform.
+      if (
+        typeof window !== "undefined" &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        viewport?.scrollBy({ left: direction * step, behavior: "smooth" });
+        return;
+      }
+
+      const copyWidth = copyWidthRef.current;
+      if (!copyWidth) return;
+
+      // A new click supersedes any animation still in flight.
+      if (scrollAnimationRef.current) {
+        window.cancelAnimationFrame(scrollAnimationRef.current);
+        scrollAnimationRef.current = null;
+      }
+
+      const shouldResume =
+        !hoveringRef.current && !expandedRef.current && !dragRef.current;
+
+      // Hold the strip still while the nudge animates.
+      pausedRef.current = true;
+
+      const startOffset = offsetRef.current;
+      const delta = direction * step;
+      const duration = 450;
+      const startTime = performance.now();
+
+      const tick = (time) => {
+        const progress = Math.min((time - startTime) / duration, 1);
+        const eased = easeInOutCubic(progress);
+        offsetRef.current = wrapOffset(startOffset + delta * eased, copyWidth);
+        paint();
+
+        if (progress < 1) {
+          scrollAnimationRef.current = window.requestAnimationFrame(tick);
+        } else {
+          scrollAnimationRef.current = null;
+          if (shouldResume) pausedRef.current = false;
+        }
+      };
+
+      scrollAnimationRef.current = window.requestAnimationFrame(tick);
+    },
+    [paint]
+  );
+
   if (staffLoading || doctorsLoading) return null;
   if (!team.length) return null;
 
@@ -540,9 +616,10 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
 
         <div className="row">
           <section className="services-wrapper col-lg-12">
-            <div
-              className={`${styles.marquee} ${isDragging ? styles.dragging : ""}`}
-              ref={viewportRef}
+            <div className={styles.scroller}>
+              <div
+                className={`${styles.marquee} ${isDragging ? styles.dragging : ""}`}
+                ref={viewportRef}
               onMouseEnter={() => {
                 hoveringRef.current = true;
                 pausedRef.current = true;
@@ -640,6 +717,49 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                   </div>
                 ))}
               </div>
+            </div>
+
+              <button
+                type="button"
+                className={`${styles.scrollButton} ${styles.scrollButtonLeft}`}
+                onClick={() => animateScrollBy(-1)}
+                aria-label="Scroll team left"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.scrollButton} ${styles.scrollButtonRight}`}
+                onClick={() => animateScrollBy(1)}
+                aria-label="Scroll team right"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
             </div>
           </section>
         </div>
