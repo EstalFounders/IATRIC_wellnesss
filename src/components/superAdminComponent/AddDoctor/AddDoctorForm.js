@@ -462,8 +462,14 @@ const AddDoctorForm = () => {
     formData.append("locationCity", location.city || "");
     formData.append("profilePicture", profilePicture);
     formData.append("doctorType", doctorDetails.doctorType);
-    formData.append("slotStartTime", doctorDetails.slotStartTime);
-    formData.append("slotEndTime", doctorDetails.slotEndTime);
+    formData.append(
+      "slotStartTime",
+      doctorDetails.slotStartTime || convertTimeIntoDate(slotStartTime),
+    );
+    formData.append(
+      "slotEndTime",
+      doctorDetails.slotEndTime || convertTimeIntoDate(slotEndTime),
+    );
     formData.append("doctorShare", doctorDetails.doctorShare);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
