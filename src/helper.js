@@ -50,6 +50,10 @@ export const convertDateIntoTime = (dateString) => {
   // Create a Date object from the string
   const date = new Date(dateString);
 
+  // Empty/invalid input has no usable time - return "" so an `<input type="time">`
+  // renders empty instead of "NaN:NaN".
+  if (Number.isNaN(date.getTime())) return "";
+
   // Extract the hours and minutes
   const hours = date.getHours().toString().padStart(2, "0"); // Ensure two digits
   const minutes = date.getMinutes().toString().padStart(2, "0"); // Ensure two digits

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
@@ -8,6 +8,17 @@ import { ConsultationButton } from "../Common/commonUi";
 const DoctorsSection = () => {
   // Shared redux roster (cache first, API only when empty).
   const { doctors } = useDoctors();
+
+  // Show a fresh random 3 doctors on each load (stable across re-renders until
+  // the roster changes).
+  const featuredDoctors = useMemo(() => {
+    const shuffled = [...doctors];
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, 3);
+  }, [doctors]);
 
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
@@ -49,7 +60,7 @@ const DoctorsSection = () => {
         {/* END SECTION TITLE */}
         <div className="row d-flex justify-content-center">
           {/* Map over the array of doctors to render each doctor component */}
-          {doctors.slice(0, 3).map((doctor, index) => (
+          {featuredDoctors.map((doctor, index) => (
             <DoctorCard key={index} doctor={doctor} />
           ))}
         </div>

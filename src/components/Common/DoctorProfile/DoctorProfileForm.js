@@ -108,10 +108,10 @@ const DoctorProfileForm = ({
   );
 
   const [slotStartTime, setSlotStartTime] = useState(
-    convertDateIntoTime(editedDoctor.slotStartTime)
+    convertDateIntoTime(editedDoctor.slotStartTime) || "09:00"
   );
   const [slotEndTime, setSlotEndTime] = useState(
-    convertDateIntoTime(editedDoctor.slotEndTime)
+    convertDateIntoTime(editedDoctor.slotEndTime) || "21:00"
   );
 
   const [selectedTypes, setSelectedTypes] = useState(() =>
