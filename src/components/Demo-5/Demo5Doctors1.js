@@ -31,6 +31,7 @@ const DoctorsSection = () => {
     return () => clearInterval(id);
   }, [doctors.length]);
 
+  
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
       <div className="container h5">
