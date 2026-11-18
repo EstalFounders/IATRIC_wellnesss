@@ -19,6 +19,7 @@ import {
   formatEducationTrainingLabel,
 } from "../../customUtils/educationTraining";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
+import { formatConsultationTypePrices } from "../../utils/consultationFee";
 import styles from "./HealthPathTeam.module.css";
 
 /**
@@ -279,6 +280,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
           }),
           degreeLabel: degree.label,
           degreeTitle: degree.title,
+          feeLabel: formatConsultationTypePrices(doctor.consultationType),
           profilePictureUrl: doctor.profilePictureUrl,
           // Book this specific doctor (same deep-link as DoctorCard).
           bookNowHref: `/appointment?doctorId=${doctor._id}`,
@@ -306,6 +308,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
         // card in the strip keeps the same internal rhythm.
         degreeLabel: "",
         degreeTitle: "",
+        feeLabel: "",
         profilePictureUrl: member.profilePictureUrl,
         // Nurses are not individually bookable today, so "Book Now" opens the
         // nursing care service page where the booking CTA lives.
@@ -704,6 +707,7 @@ const HealthPathTeam = ({ heading = "Our HealthPath Experts" }) => {
                               onToggle={toggleDegree}
                               inert={copyIndex > 0}
                             />
+                            <div className={styles.fee}>{member.feeLabel}</div>
                           </Link>
 
                           <div className={styles.bookNowWrap}>

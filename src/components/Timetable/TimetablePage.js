@@ -242,10 +242,6 @@ const TimetablePage = () => {
                     {hoursLabel}
                   </span>
                 ) : null}
-                <span className={styles["fact"]}>
-                  <i className="fas fa-hourglass-half" aria-hidden="true" />
-                  20 min per consultation
-                </span>
               </div>
             </div>
 

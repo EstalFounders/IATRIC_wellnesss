@@ -41,6 +41,13 @@ const serviceMatches = (offeredService, serviceKey) => {
   );
 };
 
+// Card names that differ from the doctor's stored speciality spelling.
+const SPECIALITY_ALIASES = {
+  "general medicine": "general physician",
+  paediatrics: "pediatrics",
+  dermatology: "dermatologist",
+};
+
 const DepartmentSingle = () => {
   const { doctors } = useDoctors();
   let filterDoctors;
@@ -56,11 +63,14 @@ const DepartmentSingle = () => {
         .replace(/\b\w/, (char) => char.toUpperCase())
     : "Department";
 
-  filterDoctors = doctors.filter((doctor) =>
-    (doctor.serviceOffered || []).some((offeredService) =>
-      serviceMatches(offeredService, matchKey(service))
-    )
-  );
+  filterDoctors = doctors.filter((doctor) => {
+    const keys = [matchKey(service)];
+    const alias = SPECIALITY_ALIASES[keys[0]];
+    if (alias) keys.push(matchKey(alias));
+    return (doctor.serviceOffered || []).some((offeredService) =>
+      keys.some((key) => serviceMatches(offeredService, key))
+    );
+  });
 
   useEffect(() => {
     if (!service) {

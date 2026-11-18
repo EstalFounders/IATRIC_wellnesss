@@ -1,25 +1,24 @@
-import { getSeoStaticProps } from "../src/api/marketing/helpers/seoServer";
-
-// Marketing panel SEO: tags are part of the built HTML (60s refresh).
-export const getStaticProps = () => getSeoStaticProps("/all-departments");
-
-
-import AllDepartmentServices7 from "../src/components/All-departments/AllDepartmentServices7";
-import About5 from "../src/components/Common/About-5";
-import Banner5 from "../src/components/Common/Banner-5";
 import Layouts from "../src/layout/Layouts";
 import PageBanner from "../src/layout/PageBanner";
+import AllSpecialityCards, {
+  DEFAULT_SPECIALITIES,
+} from "../src/components/All/AllSpecialityCards";
 
-const AllDepartments = () => {
+export default function AllDepartments() {
   return (
     <Layouts>
-      <PageBanner pageTitle="Our Departments" />
-      <h1 className="sr-only">Medical Specialties & Departments</h1>
-      <About5 />
-      <AllDepartmentServices7 />
-      <Banner5 />
+      <PageBanner pageTitle="All Departments" />
+      <section className="departments-body">
+        <div className="container py-5">
+          <AllSpecialityCards
+            specialities={DEFAULT_SPECIALITIES}
+            showSearch
+            showHeading
+            heading="Browse by Speciality"
+            subHeading="Every card below is a department you can consult online or in-clinic. Use the search box to jump straight to a speciality."
+          />
+        </div>
+      </section>
     </Layouts>
   );
-};
-
-export default AllDepartments;
+}
