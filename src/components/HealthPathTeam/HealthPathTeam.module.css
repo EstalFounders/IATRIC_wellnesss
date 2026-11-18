@@ -227,6 +227,22 @@
   border-radius: 4px;
 }
 
+/* Consultation fee line, under the degree. Always rendered (empty for staff) so
+   every card keeps the same rhythm. */
+.fee {
+  width: 100%;
+  height: calc(var(--degree-size) * 1.3);
+  margin-top: 2px;
+  font-size: var(--degree-size);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  color: #916f38;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* The whole card except the "Book Now" CTA opens the profile. The link is the
    first child of the column and grows into the free space above the button
    (`flex: 1`), so the tap target is the card body - the fixed card height and the

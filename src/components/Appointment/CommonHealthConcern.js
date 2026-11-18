@@ -13,9 +13,6 @@ const CommonHealthConcerns = () => {
         <h3 className="h3-md text-dark text-center m-section-title">
           {t("chc.title")}
         </h3>
-        <div className="text-muted text-center text-md-start mb-md-4 m-section-sub">
-          {t("chc.sub")}
-        </div>
       </div>
       <div className="row">
         {/* Phones (<768px): the horizontal slider below is replaced by a compact

@@ -7,6 +7,35 @@ import {
   useGlobalData,
 } from "../../customUtils/useGlobalData";
 
+// Word-phrase + alias matching shared with department-single.js, so a card named
+// "General Medicine" / "Gynaecology" resolves to the stored speciality
+// "General Physician" / "Gynaecology & Obstetrics" exactly like the homepage.
+const matchKey = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const wordPhraseIn = (haystack, needle) =>
+  new RegExp(`(^| )${escapeRegex(needle)}( |$)`).test(haystack);
+
+const namesMatch = (left, right) => {
+  const a = matchKey(left);
+  const b = matchKey(right);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  return wordPhraseIn(a, b) || wordPhraseIn(b, a);
+};
+
+const SPECIALITY_ALIASES = {
+  "general medicine": "general physician",
+  paediatrics: "pediatrics",
+  dermatology: "dermatologist",
+};
+
 const DepartmentPage = ({ serviceName, id }) => {
   // Single source of truth: globalData slice speciality list (falls back to the
   // static servicesData list), matched by name/slug first, static id second.
@@ -17,15 +46,16 @@ const DepartmentPage = ({ serviceName, id }) => {
   );
 
   const departmentDetails = serviceInfo.find((service) => {
-    const target = String(serviceName || "").toLowerCase();
-    const sameName = String(service.name || "").toLowerCase() === target;
+    const alias = SPECIALITY_ALIASES[matchKey(serviceName)];
+    const sameName = namesMatch(service.name, serviceName);
+    const sameAlias = alias ? namesMatch(service.name, alias) : false;
     const sameSlug =
       slugifyService(service.name) === slugifyService(serviceName);
     const sameId =
       id !== undefined &&
       service.id !== undefined &&
       String(service.id) === String(id);
-    return sameName || sameSlug || sameId;
+    return sameName || sameAlias || sameSlug || sameId;
   });
 
   if (!departmentDetails) {

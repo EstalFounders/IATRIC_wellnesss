@@ -1,24 +1,35 @@
 import Link from "next/link";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
 import { ConsultationButton } from "../Common/commonUi";
 
+const ROTATE_INTERVAL_MS = 5000;
+
 const DoctorsSection = () => {
   // Shared redux roster (cache first, API only when empty).
   const { doctors } = useDoctors();
+  const [startIndex, setStartIndex] = useState(0);
 
-  // Show a fresh random 3 doctors on each load (stable across re-renders until
-  // the roster changes).
+  // Rotate through the whole roster, 3 at a time, wrapping around.
   const featuredDoctors = useMemo(() => {
-    const shuffled = [...doctors];
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    if (!doctors.length) return [];
+    const count = 3;
+    const next = [];
+    for (let i = 0; i < count; i += 1) {
+      next.push(doctors[(startIndex + i) % doctors.length]);
     }
-    return shuffled.slice(0, 3);
-  }, [doctors]);
+    return next;
+  }, [doctors, startIndex]);
+
+  useEffect(() => {
+    if (doctors.length <= 3) return undefined;
+    const id = setInterval(() => {
+      setStartIndex((previous) => (previous + 3) % doctors.length);
+    }, ROTATE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [doctors.length]);
 
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
