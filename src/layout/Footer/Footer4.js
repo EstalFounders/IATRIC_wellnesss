@@ -48,7 +48,7 @@ const Footer4 = () => {
             <div className="footer-info mb-40">
               {/* Footer Logo */}
               {/* For Retina Ready displays take a image with double the amount of pixels that your image will be displayed (e.g 360 x 80  pixels) */}
-              <Image src="/images/logo-grey.png" alt="footer-logo" width={400} height={300} priority={false} loading="lazy" />
+              <Image src="/images/logo-grey.png" alt="footer-logo" width={200} height={60} priority={false} loading="lazy" />
               {/* Text */}
               <div
                 className="p-sm mt-20"
