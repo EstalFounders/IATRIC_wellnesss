@@ -134,7 +134,7 @@ async function submitContactStep(page: Page) {
   const card = page.locator('form.appointment-form').first();
 
   await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
-  await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill(TEST_MOBILE);
+  await page.getByLabel('WhatsApp Number', { exact: true }).fill(TEST_MOBILE);
   await card.locator('.consultation-btn').click();
 
   const dialog = page.getByRole('dialog');
@@ -368,7 +368,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
 
     // An invalid mobile number is refused with the existing 10-digit message.
     await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
-    await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill('12345');
+    await page.getByLabel('WhatsApp Number', { exact: true }).fill('12345');
     await card.locator('.consultation-btn').click();
     await expect(
       page.getByText('Please enter 10 digit in mobile number').first()
@@ -591,7 +591,7 @@ test.describe('Appointment booking (sandbox payment)', () => {
 
     const card = page.locator('form.appointment-form').first();
     await page.getByLabel('Name', { exact: true }).fill(TEST_NAME);
-    await page.getByLabel('WhatsApp Mobile Number', { exact: true }).fill(TEST_MOBILE);
+    await page.getByLabel('WhatsApp Number', { exact: true }).fill(TEST_MOBILE);
     await card.locator('.consultation-btn').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 

@@ -15,11 +15,62 @@ import {
   sendWhatsAppMessage,
 } from "./lib/communication";
 import Appointment from "../../src/models/appointmentSchema";
+import Prescription from "../../src/models/prescriptionSchema";
 import mongoose from "mongoose";
 import { dbConnect } from "../../src/lib/db";
 import { WHATSAPP_PRESCRIPTION_TEMPLATE } from "./utils/constants";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { logErrorToGoogleSheet } from "./helper";
+
+const text = (value) => (value === undefined || value === null ? "" : String(value).trim());
+const asList = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+const validId = (value) => value && mongoose.Types.ObjectId.isValid(value);
+
+// Maps the prescription form payload to the Prescription schema.
+function buildPrescriptionDoc(details, appointmentId, prescriptionUrl) {
+  const age = Number(details.patientAge);
+  const doc = {
+    doctorName: text(details.doctorName),
+    doctorPhone: text(details.doctorPhone),
+    doctorRegistrationNo: text(details.doctorRegistrationNo),
+    doctorSpeciality: text(details.doctorSpeciality),
+    doctorStampUrl: text(details.doctorStampUrl),
+    doctorSignatureUrl: text(details.doctorSignatureUrl),
+    patientName: text(details.patientName),
+    patientGender: text(details.patientGender),
+    patientPhone: text(details.patientPhone),
+    chiefComplaints: asList(details.chiefComplaints),
+    diagnosis: text(details.diagnosis),
+    medicalHistory: asList(details.medicalHistory),
+    allergies: asList(details.allergies),
+    advice: text(details.advice),
+    notes: text(details.notes),
+    prescriptionPdfUrl: prescriptionUrl,
+    medicines: (Array.isArray(details.medicines) ? details.medicines : [])
+      .filter((med) => text(med?.medicineName))
+      .map((med) => {
+        const quantity = Number(med.quantity);
+        return {
+          medicineName: text(med.medicineName),
+          dosage: [text(med.dosage), text(med.unit)].filter(Boolean).join(" ") || "NA",
+          frequency:
+            [text(med.noOfTimes) && `${text(med.noOfTimes)} times daily`, text(med.medicationSchedule), text(med.time)]
+              .filter(Boolean)
+              .join(" ") || text(med.frequency) || "NA",
+          duration: text(med.days) ? `${text(med.days)} days` : "NA",
+          notes: text(med.medicineGeneric),
+          ...(Number.isFinite(quantity) && text(med.quantity) ? { quantity } : {}),
+        };
+      }),
+    tests: asList(details.tests).length ? [{ testName: asList(details.tests) }] : [],
+    updatedAt: new Date(),
+  };
+  if (Number.isFinite(age) && text(details.patientAge)) doc.patientAge = age;
+  if (validId(details.doctorId)) doc.doctorId = details.doctorId;
+  if (validId(details.patientId)) doc.patientId = details.patientId;
+  if (validId(appointmentId)) doc.appointmentId = appointmentId;
+  return doc;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -30,7 +81,7 @@ export default async function handler(req, res) {
 
     // Destructure explicit fields from req.body to safely use as lookups or fallbacks
     // patientNo is sent from the frontend (dynamic mobile input); patientMobNo from DB lookup
-    const { prescriptionUrl, appointmentId, name, patientNo, patientMobNo } = req.body;
+    const { prescriptionUrl, appointmentId, name, patientNo, patientMobNo, prescriptionDetails } = req.body;
 
     console.log("prescriptionUrl", prescriptionUrl, "appointmentId", appointmentId);
 
@@ -46,6 +97,32 @@ export default async function handler(req, res) {
         },
         { new: true }
       );
+    }
+
+    // Store the prescription details. Kept separate so a failure here never blocks sending.
+    if (prescriptionDetails && typeof prescriptionDetails === "object") {
+      try {
+        const doc = buildPrescriptionDoc(prescriptionDetails, appointmentId, prescriptionUrl);
+        if (doc.appointmentId) {
+          // Upsert so re-sending the same appointment's prescription doesn't create duplicates.
+          await Prescription.findOneAndUpdate(
+            { appointmentId: doc.appointmentId },
+            { $set: doc, $setOnInsert: { createdAt: new Date() } },
+            { upsert: true }
+          );
+        } else {
+          await Prescription.create([doc], { validateBeforeSave: false });
+        }
+      } catch (saveError) {
+        console.error("Failed to store prescription details:", saveError);
+        await logErrorToGoogleSheet({
+          apiName: "prescription - store details",
+          errorMessage: saveError.message || "Failed to store prescription",
+          errorCode: "500",
+          stackTrace: saveError.stack,
+          requestPayload: { appointmentId, name },
+        });
+      }
     }
 
     // 2. WhatsApp Notification Flow

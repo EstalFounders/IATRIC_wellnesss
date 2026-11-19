@@ -107,7 +107,7 @@ const JoinUs = () => {
             <div className="contact-box mb-40">
               <h2 className="text-dark">Contact Us</h2>
               <hr />
-              <h5>Sector 57, Gurgaon Haryana-122003</h5>
+              <h5>Gurgaon Haryana-122003</h5>
               <h5>
                 <FaPhoneAlt />{" "}
                 <Link legacyBehavior href="#">

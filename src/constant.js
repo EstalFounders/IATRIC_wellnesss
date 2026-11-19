@@ -217,7 +217,7 @@ export const serviceCategoryType = {
 export const CHOOSE_TIME = "ChooseTime";
 export const IS_NOW = "Now";
 
-export const address = "Sector 57 , Gurgaon, Haryana-122003";
+export const address = "Gurgaon, Haryana-122003";
 export const facebook_page_url =
   "https://www.facebook.com/profile.php?id=61575112443781";
 export const instagram_page_url =

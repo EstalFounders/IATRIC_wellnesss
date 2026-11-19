@@ -82,6 +82,13 @@ const doctorSchema = new Schema({
       message: "Work experience is required",
     },
   },
+  totalyearofexperience: {
+    // Total years of experience as a plain number (e.g. 15), kept separate from
+    // the repeatable `workExperience` entries which may be free text.
+    type: Number,
+    required: false,
+    default: 0,
+  },
   consultationType: {
     // Array of `{ name, price }` entries; legacy string entries are tolerated
     // by every reader (see consultationTypeName in src/utils/consultationFee.js).

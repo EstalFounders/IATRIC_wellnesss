@@ -26,7 +26,7 @@ import AvailableSlotsModel from "./modal/AvailableSlotsModel";
 import AvailableSlots from "./AvailableSlots";
 import BookingStepModal from "./modal/BookingStepModal";
 import AppointmentDetailsStep from "./AppointmentDetailsStep";
-import BookingPaymentStep from "./BookingPaymentStep";
+
 import OtpConfirmationPopup from "./OtpConfirmationPopup";
 import { IS_NOW } from "../../../pages/api/utils/constants";
 import AppointmentForm from "./Appointmentform";
@@ -39,6 +39,7 @@ import {
   bookConsultationApiCall,
   getServiceOffered,
 } from "../ApiService/BookConsultationApiCall";
+import { load } from "@cashfreepayments/cashfree-js";
 import Demo5Doctors1 from "../../components/Demo-5/Demo5Doctors1";
 import HowItWorks from "./common/HowItsWorks";
 import FaqSection from "./common/FAQComponent";
@@ -436,8 +437,9 @@ const AppointmentPage = () => {
           shallow: true,
         },
       );
-      // The verify-only checkout is the payment step of the sequence.
-      setBookingStep("payment");
+      // The verify-only checkout - redirect to thankyou page for verification.
+      const returnUrl = `${window.location.origin}/payment/thankyou?appointmentId=${appointmentIdFromReturn}`;
+      window.location.href = returnUrl;
     }
   }, [router.query]);
 
@@ -993,14 +995,77 @@ const AppointmentPage = () => {
         handleOpenSnackBar();
         return false;
       }
-      // Payment gate: the appointment is PENDING until payment is verified by
-      // the backend. Open the payment modal.
-      setPendingPayment({
-        appointmentId: data.appointmentId,
-        amount: data.amount,
-        consultationType,
-      });
-      return true;
+      // Payment gate: create Cashfree order and redirect via the official SDK.
+      try {
+        const orderResponse = await fetch("/api/payment/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            appointmentId: data.appointmentId,
+            amount: data.amount,
+            consultationType,
+          }),
+        });
+        const orderData = await orderResponse.json();
+
+        if (!orderData.paymentSessionId) {
+          console.error("create-order returned no payment session", orderData);
+          setSnackBarMessage(t("ap.paymentError") || "Failed to initiate payment. Please try again.");
+          handleOpenSnackBar();
+          return false;
+        }
+
+        // Load the Cashfree SDK (same flow as PaymentModal.handlePay). The mode
+        // comes from the server that minted the session so it always targets the
+        // same environment.
+        const mode =
+          orderData.checkoutMode ||
+          (process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT &&
+          process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT.toUpperCase() === "PRODUCTION"
+            ? "production"
+            : "sandbox");
+        const cashfree = await load({ mode });
+
+        const appOrigin =
+          typeof window !== "undefined" && window.location?.origin
+            ? window.location.origin
+            : "";
+        const fallbackHost = String(
+          process.env.NEXT_PUBLIC_APP_URL ||
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            process.env.NEXT_PUBLIC_DEVELOPMENT_PRODUCTION_URL ||
+            "",
+        )
+          .trim()
+          .replace(/^https?:\/\//, "")
+          .replace(/\/+$/, "");
+        const returnUrl = appOrigin
+          ? `${appOrigin}/payment/thankyou?appointmentId={order_id}`
+          : fallbackHost
+            ? `https://${fallbackHost}/payment/thankyou?appointmentId={order_id}`
+            : "/payment/thankyou?appointmentId={order_id}";
+
+        const checkoutResult = await cashfree.checkout({
+          paymentSessionId: orderData.paymentSessionId,
+          returnUrl,
+          redirectTarget: "_self",
+        });
+
+        const checkoutError = String(checkoutResult?.error || "").toLowerCase();
+        if (checkoutError) {
+          console.error("Cashfree checkout error:", checkoutError);
+          setSnackBarMessage(t("ap.paymentError") || "Failed to initiate payment. Please try again.");
+          handleOpenSnackBar();
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error("Failed to create Cashfree order:", err);
+      }
+      // Cashfree order creation failed - show error and let user retry
+      setSnackBarMessage(t("ap.paymentError") || "Failed to initiate payment. Please try again.");
+      handleOpenSnackBar();
+      return false;
     } catch (err) {
       console.error("Booking failed:", err);
       setSnackBarMessage("An error occurred. Please try again.");
@@ -1148,6 +1213,7 @@ const AppointmentPage = () => {
           <BookingStepModal
             isOpen={bookingStep === "otp"}
             step={2}
+            totalSteps={3}
             onClose={() => setBookingStep("contact")}
             title={t("af.otpTitle")}
             subtitle={t("af.otpSubtitle")}
@@ -1165,6 +1231,7 @@ const AppointmentPage = () => {
           <BookingStepModal
             isOpen={bookingStep === "details"}
             step={3}
+            totalSteps={3}
             size="lg"
             onClose={() => setBookingStep("contact")}
             title={t("af.detailsTitle")}
@@ -1182,47 +1249,6 @@ const AppointmentPage = () => {
               handleCloseSnackBar={handleCloseSnackBar}
               onBack={() => setBookingStep("contact")}
               onProceed={handleProceedToPay}
-            />
-          </BookingStepModal>
-
-          {/* Step 4 — secure payment (the booking summary is shown on /payment/thankyou). */}
-          <BookingStepModal
-            isOpen={bookingStep === "payment"}
-            step={4}
-            onClose={() => {
-              // Never drop a booking that is still being created; otherwise go
-              // back to the details step (the pending appointment is reused).
-              if (!isLoading) setBookingStep("details");
-            }}
-            title={t("af.paymentTitle")}
-            subtitle={t("af.paymentSubtitle")}
-          >
-            <BookingPaymentStep
-              appointmentState={appointmentState}
-              pendingPayment={pendingPayment}
-              isLoading={isLoading}
-              onBack={() => {
-                // Return to the details modal; the PENDING appointment is kept
-                // and reused when the input did not change (see
-                // `pendingBookingSignatureRef`).
-                if (!isLoading) setBookingStep("details");
-              }}
-              onBookAgain={() => {
-                // "Book again" on a cancelled checkout starts a fresh sequence,
-                // so the abandoned appointment is not reused by mistake.
-                if (!isLoading) {
-                  setPendingPayment(null);
-                  pendingBookingSignatureRef.current = "";
-                  setBookingStep("contact");
-                }
-              }}
-              onPaymentDone={() => {
-                setMessage(t("ap.confirmed"));
-                setBookingResponse(true);
-                setPendingPayment(null);
-                pendingBookingSignatureRef.current = "";
-                setBookingStep("contact");
-              }}
             />
           </BookingStepModal>
 

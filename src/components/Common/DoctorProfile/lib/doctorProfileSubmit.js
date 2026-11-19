@@ -2,7 +2,8 @@
 // Submit helpers behind the dedicated doctor profile pages
 // (pages/registerDoc/profile.js and pages/superAdmin/doctorProfile.js).
 //
-// These flows used to live in the "Edit Doctor Details" popup (DoctorModalComp),
+// These flows used to live in the legacy "Edit Doctor Details" popup
+// (DoctorModalComp, now removed),
 // its doctor-panel entry point (RegisterDocLoginHeader) and the super-admin list
 // (RecentDoctors/DocItemCards). They are kept React-free and store-free so both
 // pages share one implementation and the payloads stay unit-testable.
@@ -166,6 +167,10 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   // list on the API side.
   appendEducationTraining(formData, editedDoctor.educationTraining);
   appendWorkExperience(formData, editedDoctor.workExperience);
+  formData.append(
+    "totalyearofexperience",
+    editedDoctor.totalyearofexperience ?? 0
+  );
   formData.append("consultationType", JSON.stringify(editedDoctor.consultationType || []));
   formData.append(
     "serviceOffered",
