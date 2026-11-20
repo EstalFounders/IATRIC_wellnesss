@@ -7,10 +7,11 @@ import { useDispatch } from "react-redux";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { ConsultationButton } from "./commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { fmt } from "../../i18n/format";
 import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
-import { formatDegreeLabel } from "../../customUtils/educationTraining";
-import { formatWorkExperienceLabel } from "../../customUtils/workExperience";
+import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
+import { parseTotalYearsOfExperience } from "../../customUtils/workExperience";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
@@ -34,8 +35,18 @@ const DoctorCard = ({ doctor, index }) => {
     services.join(" · ") ||
     t("doctor.specialtyNotListed", "Specialty not listed");
 
-  const experienceLabel = formatWorkExperienceLabel(doctor.workExperience);
-  const qualificationsLabel = formatDegreeLabel(doctor.educationTraining);
+  // Total years of experience (numeric field). The free-text `workExperience`
+  // entries stay on the profile page; the card prints the one number.
+  const totalYears = parseTotalYearsOfExperience(doctor.totalyearofexperience);
+  const yearsLabel =
+    totalYears === 1
+      ? t("doctor.experienceYear", "1 year")
+      : fmt(t("doctor.experienceYears", "{n} years"), { n: totalYears });
+  // Full entries with the institutions ("MBBS - AIIMS · MD - CMC Vellore"), not
+  // the credential-only `formatDegreeLabel` used by the one-line roster cards in
+  // `HealthPathTeam` - the card clamps to two lines and keeps the full string in
+  // the `title` tooltip.
+  const qualificationsLabel = formatEducationTrainingLabel(doctor.educationTraining);
 
   const feesLabel = formatConsultationTypePrices(doctor.consultationType);
   const hasFee = Boolean(
@@ -47,20 +58,23 @@ const DoctorCard = ({ doctor, index }) => {
 
   const [photoFailed, setPhotoFailed] = useState(false);
 
-  // "More" toggle for long work-experience text (clamped to two lines by default).
-  const [experienceExpanded, setExperienceExpanded] = useState(false);
-  const [experienceClamped, setExperienceClamped] = useState(false);
-  const experienceTextRef = useRef(null);
+  // "More / Less" toggle for the education line (clamped to two lines by default,
+  // so a long list of credentials does not push the rest of the card around).
+  const [educationExpanded, setEducationExpanded] = useState(false);
+  const [educationClamped, setEducationClamped] = useState(false);
+  const educationRef = useRef(null);
 
   useEffect(() => {
-    const el = experienceTextRef.current;
-    if (!el || experienceExpanded) return;
-    setExperienceClamped(el.scrollHeight > el.clientHeight);
-  }, [experienceLabel, experienceExpanded]);
+    const el = educationRef.current;
+    if (!el || educationExpanded) return;
+    setEducationClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [qualificationsLabel, educationExpanded]);
 
-  const toggleExperience = (event) => {
+  const toggleEducation = (event) => {
+    // The whole card is a link: keep the toggle from opening the profile.
+    event.preventDefault();
     event.stopPropagation();
-    setExperienceExpanded((previous) => !previous);
+    setEducationExpanded((previous) => !previous);
   };
 
   const handleViewProfile = () => {
@@ -114,34 +128,40 @@ const DoctorCard = ({ doctor, index }) => {
       <p className={styles["doctor-specialty"]}>{designation}</p>
 
       {qualificationsLabel && (
-        <p className={styles["doctor-qualifications"]}>{qualificationsLabel}</p>
-      )}
-
-      {experienceLabel && (
         <>
           <p
-            ref={experienceTextRef}
+            ref={educationRef}
             className={
-              experienceExpanded
-                ? `${styles["doctor-experience"]} ${styles["doctor-experience--expanded"]}`
-                : styles["doctor-experience"]
+              educationExpanded
+                ? `${styles["doctor-qualifications"]} ${styles["doctor-qualifications--expanded"]}`
+                : styles["doctor-qualifications"]
             }
+            title={qualificationsLabel}
           >
-            {t("doctor.experienceLabel", "Experience")}: {experienceLabel}
+            {qualificationsLabel}
           </p>
-          {(experienceClamped || experienceExpanded) && (
+          {(educationClamped || educationExpanded) && (
             <button
               type="button"
               className={styles["doctor-more-btn"]}
-              onClick={toggleExperience}
-              aria-expanded={experienceExpanded}
+              onClick={toggleEducation}
+              aria-expanded={educationExpanded}
             >
-              {experienceExpanded
+              {educationExpanded
                 ? t("doctor.showLess", "Show less")
                 : t("doctor.showMore", "More")}
             </button>
           )}
         </>
+      )}
+
+      {totalYears > 0 && (
+        <p className={styles["doctor-experience"]}>
+          <span className={styles["doctor-experience-label"]}>
+            {t("doctor.experienceLabel", "Experience")}:
+          </span>{" "}
+          {yearsLabel}
+        </p>
       )}
 
       <p className={hasFee ? styles["doctor-fee"] : styles["doctor-fee-muted"]}>

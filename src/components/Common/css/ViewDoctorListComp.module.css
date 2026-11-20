@@ -108,27 +108,10 @@
   -webkit-line-clamp: 2;
 }
 
-.doctor-experience--expanded {
-  display: block;
-  -webkit-line-clamp: unset;
-}
-
-.doctor-more-btn {
-  margin: 0 0 0.15rem;
-  padding: 0;
-  color: #3b5f1d;
-  font-size: 0.78rem;
+/* Only the label is bold: the value (`7 years`) keeps the row's regular weight. */
+.doctor-experience-label {
+  color: #4b5563;
   font-weight: 700;
-  line-height: 1;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.doctor-more-btn:focus-visible {
-  outline: 3px solid rgba(145, 111, 56, 0.35);
-  outline-offset: 2px;
 }
 
 .doctor-qualifications {
@@ -141,6 +124,44 @@
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+/* Expanded by the More toggle: drop the clamp and let the card grow. */
+.doctor-qualifications--expanded {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+/* Inline text-style toggle, centered under the clamped education line. */
+.doctor-more-btn {
+  margin: 0 0 0.35rem;
+  padding: 0;
+  color: #3b5f1d;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* No UA ring on mouse focus; keyboard users still get a visible green ring. */
+.doctor-more-btn:focus {
+  outline: none;
+}
+
+.doctor-more-btn:hover,
+.doctor-more-btn:focus-visible {
+  color: #2f4a17;
+}
+
+.doctor-more-btn:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid #3b5f1d;
+  outline-offset: 3px;
 }
 
 .doctor-fee {
