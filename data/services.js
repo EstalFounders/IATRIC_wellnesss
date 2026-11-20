@@ -298,7 +298,7 @@ export const servicesData = [
     id: 12,
     key: "tab-13",
     name: "Nutritionist",
-    image: "/images/commonHealth/lose-weight.jpg",
+    image: "/images/commonHealth/lose-weight.png",
     subheading: "Eat Right, Live Well",
     description:
       "Our Nutritionists and Dietitians build practical eating plans around your health goals - weight management, diabetes, thyroid and PCOS, heart health, pregnancy and child nutrition.",
