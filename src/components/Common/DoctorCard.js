@@ -7,11 +7,9 @@ import { useDispatch } from "react-redux";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { ConsultationButton } from "./commonUi";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { fmt } from "../../i18n/format";
 import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
-import { parseTotalYearsOfExperience } from "../../customUtils/workExperience";
 
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
@@ -35,13 +33,6 @@ const DoctorCard = ({ doctor, index }) => {
     services.join(" · ") ||
     t("doctor.specialtyNotListed", "Specialty not listed");
 
-  // Total years of experience (numeric field). The free-text `workExperience`
-  // entries stay on the profile page; the card prints the one number.
-  const totalYears = parseTotalYearsOfExperience(doctor.totalyearofexperience);
-  const yearsLabel =
-    totalYears === 1
-      ? t("doctor.experienceYear", "1 year")
-      : fmt(t("doctor.experienceYears", "{n} years"), { n: totalYears });
   // Full entries with the institutions ("MBBS - AIIMS · MD - CMC Vellore"), not
   // the credential-only `formatDegreeLabel` used by the one-line roster cards in
   // `HealthPathTeam` - the card clamps to two lines and keeps the full string in
@@ -153,15 +144,6 @@ const DoctorCard = ({ doctor, index }) => {
             </button>
           )}
         </>
-      )}
-
-      {totalYears > 0 && (
-        <p className={styles["doctor-experience"]}>
-          <span className={styles["doctor-experience-label"]}>
-            {t("doctor.experienceLabel", "Experience")}:
-          </span>{" "}
-          {yearsLabel}
-        </p>
       )}
 
       <p className={hasFee ? styles["doctor-fee"] : styles["doctor-fee-muted"]}>

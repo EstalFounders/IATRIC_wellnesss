@@ -5,6 +5,7 @@ import Prescription from "../../src/models/prescriptionSchema";
 import Appointment from "../../src/models/appointmentSchema";
 import mongoose from "mongoose"; 
 import { logErrorToGoogleSheet } from "./helper";
+import { syncDoctorDetailsSheet } from "../../src/lib/doctorSheetSync";
 
 
 // --- sub-handlers ---
@@ -159,6 +160,57 @@ async function getPrescription(req, res) {
   }
 }
 
+/**
+ * POST /api/helperApi?action=syncDoctorSheet
+ *
+ * Append-only sync of the doctors + nursing-staff collections into the "Doctor
+ * Details" sheet: reads the sheet headers + existing names, then appends every
+ * doctor / staff member that is not there yet. Existing rows are never touched.
+ * Called by the nightly cron `doctorSheetSync` (src/cron/jobs.js); `?dryRun=1`
+ * reports without writing.
+ */
+async function syncDoctorSheet(req, res) {
+  // Optional guard: enforced only when CRON_SECRET is set, so a deployment that
+  // never sets it keeps working. The cron sends it (src/cron/scheduler.js).
+  const secret = String(process.env.CRON_SECRET || "").trim();
+  if (secret && String(req.headers["x-cron-secret"] || "").trim() !== secret) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const dryRun = ["1", "true"].includes(
+    String(req.query?.dryRun || "").toLowerCase()
+  );
+
+  try {
+    const report = await syncDoctorDetailsSheet({ apply: !dryRun });
+    console.log(
+      "[SHEET] helperApi - syncDoctorSheet:",
+      JSON.stringify({
+        dryRun,
+        sheetRows: report.sheetRows,
+        dbDoctors: report.dbDoctors,
+        dbStaff: report.dbStaff,
+        matched: report.matched,
+        appended: report.appended.length,
+        appendedDoctors: report.appendedDoctors,
+        appendedStaff: report.appendedStaff,
+        failed: report.errors.length,
+      })
+    );
+    res.status(200).json({ success: true, dryRun, ...report });
+  } catch (error) {
+    console.error("Error syncing doctor sheet:", error);
+    await logErrorToGoogleSheet({
+      apiName: "helperApi - syncDoctorSheet",
+      errorMessage: error.message || "Failed to sync doctor sheet",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { dryRun },
+    });
+    res.status(500).json({ error: "Internal server error", message: error.message });
+  }
+}
+
 // --- main handler (single default export) ---
 
 export default async function handler(req, res) {
@@ -170,6 +222,10 @@ export default async function handler(req, res) {
 
   if (req.method === "GET" && action === "getPrescription") {
     return getPrescription(req, res);
+  }
+
+  if (req.method === "POST" && action === "syncDoctorSheet") {
+    return syncDoctorSheet(req, res);
   }
 
   res.status(400).json({ error: "Invalid action or method" });
