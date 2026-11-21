@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { FaEdit, FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import DoctorModalComp from "../../DoctorModalComp";
 import { api, consultation } from "../../../../constant";
 import Preloader from "../../../Preloader";
 import SuperAdminModel from "../../model/SuperAdminModel";
@@ -129,13 +128,6 @@ const ItemCards = ({
           )} */}
         </Col>
       </Row>
-      {/* <DoctorModalComp
-        show={showModal}
-        handleClose={handleCloseModal}
-        doctor={doctor}
-        onSave={handleSaveDoctor}
-      /> */}
-
       {loader && <Preloader />}
       <SuperAdminModel isOpen={showModal} onClose={() => setShowModal(false)}>
         <div className="mt-2">

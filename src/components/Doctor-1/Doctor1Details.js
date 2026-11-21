@@ -14,6 +14,7 @@ import { formatWorkExperienceLabel } from "../../customUtils/workExperience";
 import { formatLanguagesLabel } from "../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
 import { doctorDisplayName } from "../../utils/doctorName";
+import { formatConsultationTypePrices } from "../../utils/consultationFee";
 
 /** Missing / unreadable picture: the bundled avatar instead of a broken image. */
 const FALLBACK_PHOTO = "images/doctor-1.jpg";
@@ -60,7 +61,12 @@ const Doctor1Details = () => {
     serviceOffered,
     slotStartTime,
     slotEndTime,
+    consultationType,
   } = doctorInfo;
+
+  const feesLabel =
+    formatConsultationTypePrices(consultationType) ||
+    (price ? `₹${price}` : "");
 
   console.log("Doctor Info: in doctor details page", doctorInfo);
 
@@ -132,6 +138,10 @@ const Doctor1Details = () => {
                             </span>
                           ))}
                         </td>
+                      </tr>
+                      <tr>
+                        <td>Consultation Fee</td>
+                        <td>{feesLabel || "Not provided"}</td>
                       </tr>
                       <tr>
                         <td>Language(s)</td>

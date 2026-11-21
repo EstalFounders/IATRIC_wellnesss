@@ -1,5 +1,4 @@
 // cron-jobs.js
-import cron from "node-cron";
 import mongoose from "mongoose";
 import Doctor from "../../../src/models/doctorModel";
 import Slot from "../../../src/models/slots";

@@ -1,14 +1,38 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
+import cardStyles from "../Common/css/ViewDoctorListComp.module.css";
 import { ConsultationButton } from "../Common/commonUi";
+
+const ROTATE_INTERVAL_MS = 5000;
 
 const DoctorsSection = () => {
   // Shared redux roster (cache first, API only when empty).
   const { doctors } = useDoctors();
+  const [startIndex, setStartIndex] = useState(0);
 
+  // Rotate through the whole roster, 3 at a time, wrapping around.
+  const featuredDoctors = useMemo(() => {
+    if (!doctors.length) return [];
+    const count = 3;
+    const next = [];
+    for (let i = 0; i < count; i += 1) {
+      next.push(doctors[(startIndex + i) % doctors.length]);
+    }
+    return next;
+  }, [doctors, startIndex]);
+
+  useEffect(() => {
+    if (doctors.length <= 3) return undefined;
+    const id = setInterval(() => {
+      setStartIndex((previous) => (previous + 3) % doctors.length);
+    }, ROTATE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [doctors.length]);
+
+  
   return (
     <section id="doctors-1" className="wide-40 doctors-section division">
       <div className="container h5">
@@ -47,9 +71,9 @@ const DoctorsSection = () => {
           </div>
         </div>
         {/* END SECTION TITLE */}
-        <div className="row d-flex justify-content-center">
+        <div className={cardStyles["doctor-grid"]}>
           {/* Map over the array of doctors to render each doctor component */}
-          {doctors.slice(0, 3).map((doctor, index) => (
+          {featuredDoctors.map((doctor, index) => (
             <DoctorCard key={index} doctor={doctor} />
           ))}
         </div>

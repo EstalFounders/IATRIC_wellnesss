@@ -84,6 +84,7 @@ const EMPTY_DOCTOR = {
   overview: "",
   location: { state: "", city: "" },
   workExperience: "",
+  totalyearofexperience: "",
   consultationType: "",
   serviceOffered: "",
   doctorType: DoctorType.individual,
@@ -454,6 +455,7 @@ const AddDoctorForm = () => {
     // One field per entry; a blank field clears the list on the API side.
     appendEducationTraining(formData, educationItems);
     appendWorkExperience(formData, workExperienceItems);
+    formData.append("totalyearofexperience", doctorDetails.totalyearofexperience);
     formData.append("consultationType", JSON.stringify(selectedTypes));
     formData.append("serviceOffered", selectedService.join(","));
     formData.append("digitalSignature", doctorSignature);
@@ -462,8 +464,14 @@ const AddDoctorForm = () => {
     formData.append("locationCity", location.city || "");
     formData.append("profilePicture", profilePicture);
     formData.append("doctorType", doctorDetails.doctorType);
-    formData.append("slotStartTime", doctorDetails.slotStartTime);
-    formData.append("slotEndTime", doctorDetails.slotEndTime);
+    formData.append(
+      "slotStartTime",
+      doctorDetails.slotStartTime || convertTimeIntoDate(slotStartTime),
+    );
+    formData.append(
+      "slotEndTime",
+      doctorDetails.slotEndTime || convertTimeIntoDate(slotEndTime),
+    );
     formData.append("doctorShare", doctorDetails.doctorShare);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
@@ -685,6 +693,23 @@ const AddDoctorForm = () => {
                       error={workExperienceError}
                     />
                   </div>
+                </Col>
+                <Col md={6}>
+                  <label className={styles.field}>
+                    <span className={styles.label}>
+                      Total Years of Experience
+                    </span>
+                    <input
+                      className={styles.input}
+                      type="number"
+                      min="0"
+                      step="1"
+                      inputMode="numeric"
+                      name="totalyearofexperience"
+                      value={doctorDetails.totalyearofexperience}
+                      onChange={handleChange}
+                    />
+                  </label>
                 </Col>
                 <Col md={12}>
                   <label className={styles.field}>

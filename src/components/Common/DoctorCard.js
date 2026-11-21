@@ -89,10 +89,10 @@ const DoctorCard = ({ doctor, index }) => {
   const dispatch = useDispatch();
   const { t } = useLanguage();
 
-  // Keep the displayed summary to two lines so card rows stay aligned.
-  const educationLabel = formatEducationTrainingLabel(doctor.educationTraining);
-  const feesLabel = formatConsultationTypePrices(doctor.consultationType);
-  const [educationExpanded, setEducationExpanded] = useState(false);
+  const doctorName = doctorDisplayName(doctor.name);
+
+  // Specialty — the doctor's offered services (the speciality names used across
+  // the site), joined into a short list.
   const services = Array.isArray(doctor.serviceOffered)
     ? doctor.serviceOffered
         .map((service) =>
@@ -102,12 +102,44 @@ const DoctorCard = ({ doctor, index }) => {
         )
         .filter(Boolean)
     : [];
-  const specialtyLabel =
+  const designation =
     services.join(" · ") ||
-    String(doctor.speciality || doctor.expertise || "").trim();
-  const doctorName =
-    doctorDisplayName(doctor.name) || t("doctor.nameFallback", "Doctor");
+    t("doctor.specialtyNotListed", "Specialty not listed");
+
+  // Full entries with the institutions ("MBBS - AIIMS · MD - CMC Vellore"), not
+  // the credential-only `formatDegreeLabel` used by the one-line roster cards in
+  // `HealthPathTeam` - the card clamps to two lines and keeps the full string in
+  // the `title` tooltip.
+  const qualificationsLabel = formatEducationTrainingLabel(doctor.educationTraining);
+
+  const feesLabel = formatConsultationTypePrices(doctor.consultationType);
+  const hasFee = Boolean(
+    feesLabel && feesLabel !== "Free" && !feesLabel.includes("₹0")
+  );
+  const feeText = hasFee
+    ? feesLabel
+    : t("doctor.feeNotListed", "Fee details not listed");
+
   const [photoFailed, setPhotoFailed] = useState(false);
+
+  // "More / Less" toggle for the education line (clamped to two lines by default,
+  // so a long list of credentials does not push the rest of the card around).
+  const [educationExpanded, setEducationExpanded] = useState(false);
+  const [educationClamped, setEducationClamped] = useState(false);
+  const educationRef = useRef(null);
+
+  useEffect(() => {
+    const el = educationRef.current;
+    if (!el || educationExpanded) return;
+    setEducationClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [qualificationsLabel, educationExpanded]);
+
+  const toggleEducation = (event) => {
+    // The whole card is a link: keep the toggle from opening the profile.
+    event.preventDefault();
+    event.stopPropagation();
+    setEducationExpanded((previous) => !previous);
+  };
 
   const handleViewProfile = () => {
     const { doctorSignatureUrl, doctorStampUrl, ...filteredDoctor } = doctor;
@@ -115,81 +147,103 @@ const DoctorCard = ({ doctor, index }) => {
     router.push(`/doctor-info`);
   };
 
+  const handleCardKeyDown = (event) => {
+    if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") {
+      return;
+    }
+    // Only react when the card itself is focused, not a nested control.
+    if (event.target !== event.currentTarget) return;
+    event.preventDefault();
+    handleViewProfile();
+  };
+
+  const bookPath = `/appointment?doctorId=${doctor._id}`;
+
   return (
     <article
       key={index}
-      className={`${styles["new-doctor-card"]} ${
-        educationExpanded
-          ? styles["new-doctor-card--education-expanded"]
-          : ""
-      }`}
-      aria-label={doctorName}
+      className={styles["doctor-card"]}
+      onClick={handleViewProfile}
+      onKeyDown={handleCardKeyDown}
+      role="link"
+      tabIndex={0}
+      aria-label={`${t("doctor.viewProfile", "View Profile")}: ${doctorName}`}
     >
-      <div className={styles["doctor-profile-pic-container"]}>
+      <div className={styles["doctor-avatar"]}>
         <Image
           placeholder="blur"
           blurDataURL={imageBlurDataUrl}
           fill
-          sizes="(max-width: 576px) 90vw, (max-width: 991px) 40vw, 320px"
+          sizes="96px"
           src={
             photoFailed || !doctor.profilePictureUrl
-              ? `https://placehold.co/640x480/edf3e6/3b5f1d?text=${encodeURIComponent(
+              ? `https://placehold.co/640x640/edf3e6/3b5f1d?text=${encodeURIComponent(
                   doctorName.charAt(0)
                 )}`
               : doctor.profilePictureUrl
           }
           alt={doctorName}
-          className={styles["doctor-profile-pic"]}
+          className={styles["doctor-avatar-img"]}
           onError={() => setPhotoFailed(true)}
         />
       </div>
 
-      <div className={styles["doctor-primary-info"]}>
-        <div className={styles["doctor-heading"]}>
-          <h2 className={styles["new-doctor-name"]}>{doctorName}</h2>
-          <DoctorCardText
-            label={t("doctor.specialtyLabel", "Specialty")}
-            showLabel={false}
-            value={specialtyLabel || t("doctor.specialtyNotListed", "Specialty not listed")}
-            valueClassName={styles["doctor-speciality"]}
-            bounded
-          />
-        </div>
+      <h2 className={styles["doctor-name"]}>{doctorName}</h2>
+      <p className={styles["doctor-specialty"]}>{designation}</p>
 
-        <div className={styles["doctor-details"]}>
-          <DoctorCardText
-            label={t("doctor.qualifications", "Qualifications")}
-            showLabel={false}
-            value={educationLabel || t("doctor.notListed", "Not listed")}
-            detailClassName={styles["doctor-qualification-detail"]}
-            bounded
-            expandable
-            onExpandedChange={setEducationExpanded}
-          />
-          <DoctorCardText
-            label={t("doctor.consultationFee", "Consultation fee")}
-            value={feesLabel || t("doctor.feeNotListed", "Fee details not listed")}
-            valueClassName={styles["doctor-fees"]}
-            detailClassName={styles["doctor-fee-detail"]}
-            bounded
-          />
-        </div>
-      </div>
+      {qualificationsLabel && (
+        <>
+          <p
+            ref={educationRef}
+            className={
+              educationExpanded
+                ? `${styles["doctor-qualifications"]} ${styles["doctor-qualifications--expanded"]}`
+                : styles["doctor-qualifications"]
+            }
+            title={qualificationsLabel}
+          >
+            {qualificationsLabel}
+          </p>
+          {(educationClamped || educationExpanded) && (
+            <button
+              type="button"
+              className={styles["doctor-more-btn"]}
+              onClick={toggleEducation}
+              aria-expanded={educationExpanded}
+            >
+              {educationExpanded
+                ? t("doctor.showLess", "Show less")
+                : t("doctor.showMore", "More")}
+            </button>
+          )}
+        </>
+      )}
 
-      <div className={styles["doctor-booking-section"]}>
+      <p className={hasFee ? styles["doctor-fee"] : styles["doctor-fee-muted"]}>
+        {feeText}
+      </p>
+
+      <div className={styles["doctor-card-footer"]}>
         <ConsultationButton
-          path={`/appointment?doctorId=${doctor._id}`}
+          path={bookPath}
           className={styles["book-button"]}
+          onClick={(event) => {
+            event.stopPropagation();
+            router.push(bookPath);
+          }}
         >
           {t("doctor.bookConsultation")}
         </ConsultationButton>
-        <button
-          type="button"
+        <ConsultationButton
+          variant="outline"
           className={styles["profile-button"]}
-          onClick={handleViewProfile}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleViewProfile();
+          }}
         >
-          {t("doctor.viewProfile")}
-        </button>
+          {t("doctor.viewProfile", "View Profile")}
+        </ConsultationButton>
       </div>
     </article>
   );

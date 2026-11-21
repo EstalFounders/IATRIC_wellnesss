@@ -3,8 +3,8 @@
 //   * pages/registerDoc/profile.js      - doctor panel -> "Your Profile"
 //   * pages/superAdmin/doctorProfile.js - super admin -> pencil on the doctor list
 //
-// It replaces the "Edit Doctor Details" popup (DoctorModalComp, kept in the repo
-// for rollback): same fields, same validation, same approval semantics - only the
+// It replaces the legacy "Edit Doctor Details" popup (DoctorModalComp, now
+// removed): same fields, same validation, same approval semantics - only the
 // presentation changed into a page (section cards, a live stamp preview and a
 // sticky action bar). The field `name`s are unchanged, so the diff/PUT payloads
 // are identical to the ones the popup produced.
@@ -108,10 +108,10 @@ const DoctorProfileForm = ({
   );
 
   const [slotStartTime, setSlotStartTime] = useState(
-    convertDateIntoTime(editedDoctor.slotStartTime)
+    convertDateIntoTime(editedDoctor.slotStartTime) || "09:00"
   );
   const [slotEndTime, setSlotEndTime] = useState(
-    convertDateIntoTime(editedDoctor.slotEndTime)
+    convertDateIntoTime(editedDoctor.slotEndTime) || "21:00"
   );
 
   const [selectedTypes, setSelectedTypes] = useState(() =>
@@ -185,6 +185,14 @@ const DoctorProfileForm = ({
     } else {
       setEditedDoctor({ ...editedDoctor, [name]: value });
     }
+  };
+
+  const handleTotalYearsChange = (e) => {
+    const value = e.target.value;
+    setEditedDoctor({
+      ...editedDoctor,
+      totalyearofexperience: value === "" ? "" : Number(value),
+    });
   };
 
   const handleProfilePictureChange = (e) => {
@@ -595,6 +603,22 @@ const DoctorProfileForm = ({
                     <WorkExperienceInput
                       value={workExperienceItems}
                       onChange={handleWorkExperienceChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className={styles.label}>
+                      Total Years of Experience
+                    </Form.Label>
+                    <Form.Control
+                      type="number"
+                      min="0"
+                      step="1"
+                      inputMode="numeric"
+                      name="totalyearofexperience"
+                      value={editedDoctor.totalyearofexperience ?? ""}
+                      onChange={handleTotalYearsChange}
                     />
                   </Form.Group>
                 </Col>

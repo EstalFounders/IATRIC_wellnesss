@@ -2,7 +2,7 @@ const { createServer } = require("http");
 const { parse } = require("url");
 const next = require("next");
 const { Server } = require("socket.io");
-const cron = require("node-cron");
+const { startCronJobs } = require("./src/cron/scheduler");
 const http = require("http");
 
 // Redis-backed Socket.IO adapter (optional).
@@ -245,50 +245,12 @@ app.prepare().then(() => {
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
 
-    // ──────────────────────────────────────────────
-    // CRON JOB 1: Generate slots every day at midnight
-    // ──────────────────────────────────────────────
-    cron.schedule("0 0 * * *", async () => {
-      console.log("[CRON] Starting daily slot generation...");
-      try {
-        // Must be /api/lib/runCronJob: /api/lib/cron-jobs is the task module the
-        // route imports (it never touches `res`), so POSTing straight to it left
-        // the request hanging - the log reported "failed" even on a good run.
-        const response = await fetch(
-          `http://${hostname}:${port}/api/lib/runCronJob`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            // The run walks each doctor day by day and takes minutes.
-            signal: AbortSignal.timeout(15 * 60 * 1000),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status} ${response.statusText}`);
-        }
-
-        console.log("[CRON] Slot generation completed successfully.");
-      } catch (err) {
-        console.error("[CRON] Slot generation failed:", err);
-      }
-    });
-
-    // ─────────────────────────────────────────────────────────────
-    // CRON JOB 2: Consultation reminders every 20 min, 9 AM – 11:59 PM
-    // ─────────────────────────────────────────────────────────────
-    cron.schedule("0,20,40 9-23 * * *", async () => {
-      console.log("[CRON] Starting consultation reminder check...");
-      try {
-        await fetch(`http://${hostname}:${port}/api/lib/sendConsultationReminder`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-        console.log("[CRON] Consultation reminders processed successfully.");
-      } catch (err) {
-        console.error("[CRON] Consultation reminder failed:", err);
-      }
-    });
+    // ─────────────────────────────────────────────
+    // CRON JOBS
+    // Registry + scheduling live in src/cron: add a job in
+    // src/cron/jobs.js and enable/disable it with its env flag in .env.
+    // ─────────────────────────────────────────────
+    startCronJobs({ hostname, port });
 
     // LOG MONITOR: import PM2 logs into MongoDB when enabled
     if (process.env.LOG_MONITOR_ENABLED === "true") {

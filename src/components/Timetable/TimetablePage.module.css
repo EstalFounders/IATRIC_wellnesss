@@ -228,8 +228,8 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 6px;
-  max-height: 384px;
+  gap: 8px;
+  max-height: 460px;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 10px;
@@ -258,7 +258,7 @@
   /* The day body is a scrolling flex column: without this the 33 chips shrink
      to a few pixels each instead of overflowing into the scroll area. */
   flex: 0 0 auto;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border: 0;
   border-left: 3px solid;
   border-radius: 6px;
@@ -268,7 +268,7 @@
 }
 
 .block-time {
-  font-size: 0.74rem;
+  font-size: 0.85rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -277,7 +277,7 @@
 }
 
 .block-meta {
-  font-size: 0.66rem;
+  font-size: 0.76rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

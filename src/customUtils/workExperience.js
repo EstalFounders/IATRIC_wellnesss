@@ -64,6 +64,18 @@ export function formatWorkExperienceLabel(value) {
 }
 
 /**
+ * `totalyearofexperience` is a plain number on the doctor document (legacy rows
+ * still carry the schema default `0` until `scripts/backfillTotalYearOfExperience.js`
+ * runs). Normalises anything the DB or a form can hold to a whole number:
+ * `"15"` / `15` → `15`, while `""`, `null`, `undefined`, `NaN` and negatives → `0`,
+ * so a card can hide the line instead of printing "Experience: 0".
+ */
+export function parseTotalYearsOfExperience(value) {
+  const years = Number(value);
+  return Number.isFinite(years) && years > 0 ? Math.floor(years) : 0;
+}
+
+/**
  * Appends the repeatable `workExperience` fields to a FormData body — one field
  * per entry, because a comma-joined string would be ambiguous (an entry can
  * contain a comma). When nothing is left, one empty field is appended on

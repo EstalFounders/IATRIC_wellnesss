@@ -7,6 +7,7 @@ import { resolveNavServiceIcon } from "../../public/svgIcon/nav-service-icons";
 import { color_schema } from "../constant";
 import { PAGE_MENU_ITEMS } from "./navigationItems";
 import { useLanguage } from "../i18n/LanguageContext";
+import { handleServiceClick } from "../components/Common/commonMethod";
 
 const COMING_SOON_ITEMS = ["/labTest/homepage"];
 
@@ -24,9 +25,10 @@ const DOCTOR_CONSULTATION_LINKS = [
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
   const { t } = useLanguage();
-  const { services } = useGlobalData();
+  const { services, specialityNames } = useGlobalData();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [pagesOpen, setPagesOpen] = useState(false);
+  const [specialityOpen, setSpecialityOpen] = useState(false);
 
   // Merge with the static service highlights exactly like the desktop Services
   // mega-menu (Header1) so every entry carries its canonical title + content key.
@@ -39,6 +41,15 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
 
   const menuItems = [
     { label: "Home", href: "/", icon: "🏠" },
+    // "Our Speciality" mirrors the desktop mega-menu (Header1) as an in-place
+    // accordion; each entry opens the same department page.
+    {
+      label: t("nav.ourSpeciality"),
+      href: "#speciality",
+      icon: "🩺",
+      expandable: true,
+      speciality: true,
+    },
     // "Services" expands in place instead of navigating (see the accordion below).
     { label: "Services", href: "/all-services", icon: "🏥", expandable: true },
     { label: "Pages", href: "#pages", icon: "📄", expandable: true, pages: true },
@@ -82,6 +93,8 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
   const [servicesListHeight, setServicesListHeight] = useState(0);
   const pagesListRef = useRef(null);
   const [pagesListHeight, setPagesListHeight] = useState(0);
+  const specialityListRef = useRef(null);
+  const [specialityListHeight, setSpecialityListHeight] = useState(0);
 
   useEffect(() => {
     const node = servicesListRef.current;
@@ -113,12 +126,34 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
     };
   }, [pagesOpen]);
 
+  useEffect(() => {
+    const node = specialityListRef.current;
+    if (!node) return undefined;
+
+    const measure = () => setSpecialityListHeight(node.scrollHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, [specialityNames.length, specialityOpen]);
+
   const comingSoon = new Set(COMING_SOON_ITEMS);
 
   const closeMenu = () => setIsOpen(false);
 
   const handleNavigation = (href) => {
     router.push(href);
+    closeMenu();
+  };
+
+  // Same handler as the desktop "Our Speciality" mega-menu rows (Header1), plus
+  // closing the mobile drawer afterwards.
+  const handleSpecialityNavigation = (name, index) => {
+    handleServiceClick(name, index, router);
     closeMenu();
   };
 
@@ -190,7 +225,9 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
         left: 0,
         width: "100%",
         height: "100vh",
-        zIndex: 400,
+        // The mobile header (`.wsmobileheader`) is fixed at z-index 10002, so the
+        // drawer must sit above it - otherwise the header logo overlaps the menu.
+        zIndex: 10003,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         display: isOpen ? "flex" : "none",
         flexDirection: "column",
@@ -207,7 +244,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           height: "100vh",
           backgroundColor: "#ffffff",
           overflowY: "auto",
-          zIndex: 401,
+          zIndex: 10004,
           display: "flex",
           flexDirection: "column",
         }}
@@ -254,13 +291,27 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
 
               if (item.expandable) {
                 const isPagesItem = item.pages;
-                const isExpanded = isPagesItem ? pagesOpen : servicesOpen;
-                const listRef = isPagesItem ? pagesListRef : servicesListRef;
-                const listHeight = isPagesItem ? pagesListHeight : servicesListHeight;
-                const toggleExpanded = () =>
-                  isPagesItem
-                    ? setPagesOpen((previous) => !previous)
-                    : setServicesOpen((previous) => !previous);
+                const isSpecialityItem = item.speciality;
+                const isExpanded = isPagesItem
+                  ? pagesOpen
+                  : isSpecialityItem
+                  ? specialityOpen
+                  : servicesOpen;
+                const listRef = isPagesItem
+                  ? pagesListRef
+                  : isSpecialityItem
+                  ? specialityListRef
+                  : servicesListRef;
+                const listHeight = isPagesItem
+                  ? pagesListHeight
+                  : isSpecialityItem
+                  ? specialityListHeight
+                  : servicesListHeight;
+                const toggleExpanded = () => {
+                  if (isPagesItem) setPagesOpen((previous) => !previous);
+                  else if (isSpecialityItem) setSpecialityOpen((previous) => !previous);
+                  else setServicesOpen((previous) => !previous);
+                };
 
                 return (
                   <li key={item.href} style={{ borderBottom: "1px solid #f0f0f0" }}>
@@ -268,7 +319,13 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                     <div
                       role="button"
                       aria-expanded={isExpanded}
-                      aria-controls={isPagesItem ? "mobile-pages-list" : "mobile-services-list"}
+                      aria-controls={
+                        isPagesItem
+                          ? "mobile-pages-list"
+                          : isSpecialityItem
+                          ? "mobile-speciality-list"
+                          : "mobile-services-list"
+                      }
                       aria-label={`Toggle the ${(isPagesItem ? t("nav.pages") : item.label).toLowerCase()} list`}
                       onClick={toggleExpanded}
                       style={{
@@ -295,7 +352,13 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
 
                     {/* Nested menu (smooth accordion) */}
                     <div
-                      id={isPagesItem ? "mobile-pages-list" : "mobile-services-list"}
+                      id={
+                        isPagesItem
+                          ? "mobile-pages-list"
+                          : isSpecialityItem
+                          ? "mobile-speciality-list"
+                          : "mobile-services-list"
+                      }
                       ref={listRef}
                       style={{
                         maxHeight: isExpanded ? `${listHeight}px` : 0,
@@ -306,9 +369,11 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                       }}
                     >
                       <div
-                        onClick={() =>
-                          isPagesItem ? setPagesOpen(false) : setServicesOpen(false)
-                        }
+                        onClick={() => {
+                          if (isPagesItem) setPagesOpen(false);
+                          else if (isSpecialityItem) setSpecialityOpen(false);
+                          else setServicesOpen(false);
+                        }}
                         style={{
                           padding: "12px 16px",
                           fontSize: "14px",
@@ -321,37 +386,50 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
                         ← Back to main menu
                       </div>
 
-                      {isPagesItem ? PAGE_MENU_ITEMS.map((page) => (
-                        <div
-                          key={page.href}
-                          onClick={() => handleNavigation(page.href)}
-                          style={serviceRowStyle}
-                        >
-                          <ServiceIcon label={page.iconLabel} />
-                          <span style={serviceLabelStyle}>{t(page.labelKey)}</span>
-                        </div>
-                      )) : serviceItems.map((service) => (
-                        <div
-                          key={service.key}
-                          onClick={() => handleNavigation(service.href)}
-                          style={serviceRowStyle}
-                        >
-                          <ServiceIcon label={service.label} />
-                          <span style={serviceLabelStyle}>
-                            {service.label}
-                            {service.comingSoon ? (
-                              <span
-                                className="service-coming-soon"
-                                style={{ marginLeft: 8 }}
-                              >
-                                Coming Soon
+                      {isSpecialityItem
+                        ? specialityNames.map((name, index) => (
+                            <div
+                              key={name}
+                              onClick={() => handleSpecialityNavigation(name, index)}
+                              style={serviceRowStyle}
+                            >
+                              <ServiceIcon label={name} />
+                              <span style={serviceLabelStyle}>{name}</span>
+                            </div>
+                          ))
+                        : isPagesItem
+                        ? PAGE_MENU_ITEMS.map((page) => (
+                            <div
+                              key={page.href}
+                              onClick={() => handleNavigation(page.href)}
+                              style={serviceRowStyle}
+                            >
+                              <ServiceIcon label={page.iconLabel} />
+                              <span style={serviceLabelStyle}>{t(page.labelKey)}</span>
+                            </div>
+                          ))
+                        : serviceItems.map((service) => (
+                            <div
+                              key={service.key}
+                              onClick={() => handleNavigation(service.href)}
+                              style={serviceRowStyle}
+                            >
+                              <ServiceIcon label={service.label} />
+                              <span style={serviceLabelStyle}>
+                                {service.label}
+                                {service.comingSoon ? (
+                                  <span
+                                    className="service-coming-soon"
+                                    style={{ marginLeft: 8 }}
+                                  >
+                                    Coming Soon
+                                  </span>
+                                ) : null}
                               </span>
-                            ) : null}
-                          </span>
-                        </div>
-                      ))}
+                            </div>
+                          ))}
 
-                      {!isPagesItem && (
+                      {!isPagesItem && !isSpecialityItem && (
                         <>
                           <div
                             onClick={() =>

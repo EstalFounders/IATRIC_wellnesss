@@ -594,6 +594,8 @@ export default async function handler(req, res) {
             // comma-joined `stringFields` spread.
             educationTraining: parseEducationTraining(fields.educationTraining),
             workExperience: parseWorkExperience(fields.workExperience),
+            totalyearofexperience:
+              Number(fields.totalyearofexperience?.[0]) || 0,
             // Repeatable field as well: one entry per appended `formData.append`
             // ("English", "Hindi"), never the comma-joined `stringFields` value.
             language: parseLanguages(fields.language),
@@ -957,6 +959,12 @@ export default async function handler(req, res) {
         // doctor-panel approval PUT never sends this field).
         if (fields.workExperience !== undefined) {
           updateData.workExperience = parseWorkExperience(fields.workExperience);
+        }
+        // Total years of experience (numeric). Only touched when the client
+        // sends it; a blank value resets it to 0.
+        if (fields.totalyearofexperience !== undefined) {
+          updateData.totalyearofexperience =
+            Number(fields.totalyearofexperience?.[0]) || 0;
         }
         // The generic field spread above would copy a submitted password into
         // the document as plain text. Hash a new password, or drop the field so

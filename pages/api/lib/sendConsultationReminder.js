@@ -4,7 +4,7 @@ import Appointment from "../../../src/models/appointmentSchema";
 import Slot from "../../../src/models/slots";
 import { appointment_status } from "../../../src/constant";
 import Doctor from "../../../src/models/doctorModel";
-import { sendWhatsAppConfirmation } from "./communication";
+import { sendWhatsAppWithRetry } from "./communication";
 import {
   WHATSAPP_CONFIRMATION_TEMPLATE,
   WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
@@ -101,18 +101,35 @@ export default async function handler(req, res) {
 
       // One failing appointment must not stop the reminders of the others: each
       // pair is sent on its own and only stamped once both messages went out, so
-      // the next run retries a partial send without duplicating it.
+      // the next run retries a partial send without duplicating it. Each send is
+      // itself retried 3 times back-to-back, and the support number is alerted
+      // when those attempts fail too (sendWhatsAppWithRetry).
       try {
-        await sendWhatsAppConfirmation(
+        const patientSend = await sendWhatsAppWithRetry(
           formatPhoneNumber(patientMobNo.toString()),
           reminderMessageBodyPateint,
-          WHATSAPP_REMINDER_TEMPLATE_PATIENT
+          WHATSAPP_REMINDER_TEMPLATE_PATIENT,
+          {
+            label: "Patient consultation reminder",
+            appointmentId: String(appointment._id),
+          }
         );
-        await sendWhatsAppConfirmation(
+        if (!patientSend.sent) {
+          throw patientSend.lastError || new Error("WhatsApp send failed");
+        }
+
+        const doctorSend = await sendWhatsAppWithRetry(
           formatPhoneNumber(doctorMobNo.toString()),
           reminderMessageBodyDoctor,
-          WHATSAPP_REMINDER_TEMPLATE_DOCTOR
+          WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
+          {
+            label: "Doctor consultation reminder",
+            appointmentId: String(appointment._id),
+          }
         );
+        if (!doctorSend.sent) {
+          throw doctorSend.lastError || new Error("WhatsApp send failed");
+        }
 
         appointment.reminderSentAt = new Date();
         await appointment.save();

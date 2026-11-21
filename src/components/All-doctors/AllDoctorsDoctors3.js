@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import FilterBar from "../filterbar/filterbar";
 import listStyles from "../filterbar/css/filterBar.module.css";
 import DoctorCard from "../Common/DoctorCard";
+import cardStyles from "../Common/css/ViewDoctorListComp.module.css";
 import { useDoctors } from "../../customUtils/useDoctors";
 import { useGlobalData } from "../../customUtils/useGlobalData";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -64,7 +65,7 @@ const AllDoctorsDoctors3 = () => {
       </div>
 
       <div className="container">
-        <div className="row mt-4 d-flex justify-content-center">
+        <div className={`${cardStyles["doctor-grid"]} mt-4`}>
           {filteredDoctors.map((doctor, index) => (
             <DoctorCard
               key={doctor._id || doctor.email || index}

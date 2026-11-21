@@ -31,7 +31,7 @@ export const blog_img_folder = `${METADATA_ROOT}/blogImg`;
 export const service_img_folder = `${IMAGES_ROOT}/serviceImg`;
 
 export const storage_bucket_url = "gs://iatrichealthcare-998f5.appspot.com";
-export const contact_no = "+91 78959 59925";
+export const contact_no = "+91 84485 59925";
 export const email = "customercare@healthpath.co.in";
 // Staff / doctor support helpline. Used ONLY by the doctor panel and the team's
 // HR/document correspondence - everything a patient sees (site, prescription,
@@ -217,7 +217,7 @@ export const serviceCategoryType = {
 export const CHOOSE_TIME = "ChooseTime";
 export const IS_NOW = "Now";
 
-export const address = "Sector 57 , Gurgaon, Haryana-122003";
+export const address = "Gurgaon, Haryana-122003";
 export const facebook_page_url =
   "https://www.facebook.com/profile.php?id=61575112443781";
 export const instagram_page_url =
