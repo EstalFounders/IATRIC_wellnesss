@@ -11,6 +11,79 @@ import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
 import { formatEducationTrainingLabel } from "../../customUtils/educationTraining";
 
+const DoctorCardText = ({
+  label,
+  showLabel = true,
+  value,
+  valueClassName = "",
+  detailClassName = "",
+  bounded = false,
+  expandable = false,
+  onExpandedChange,
+}) => {
+  const textRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    const element = textRef.current;
+    if (!element || !expandable || expanded) return undefined;
+
+    const measure = () =>
+      setOverflows(element.scrollHeight > element.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [expandable, expanded, value]);
+
+  const isClamped = bounded && (!expandable || !expanded);
+  const toggleExpanded = () => {
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
+
+  return (
+    <div
+      className={`${styles["doctor-detail"]} ${
+        bounded ? styles["doctor-detail--bounded"] : ""
+      } ${detailClassName}`}
+    >
+      {showLabel && (
+        <span className={styles["doctor-detail-label"]}>{label}</span>
+      )}
+      <p
+        ref={textRef}
+        title={value || undefined}
+        className={`${styles["doctor-detail-value"]} ${valueClassName} ${
+          isClamped ? styles["doctor-text--clamped"] : ""
+        }`}
+      >
+        {value}
+      </p>
+      {expandable && overflows && (
+        <button
+          type="button"
+          className={styles["education-more-btn"]}
+          onClick={toggleExpanded}
+          aria-expanded={expanded}
+        >
+          {expanded
+            ? t("doctor.showLess", "Show less")
+            : t("doctor.showMore", "More")}
+        </button>
+      )}
+    </div>
+  );
+};
+
 const DoctorCard = ({ doctor, index }) => {
   const router = useRouter();
   const dispatch = useDispatch();
