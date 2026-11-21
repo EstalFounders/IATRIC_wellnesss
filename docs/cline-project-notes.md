@@ -697,6 +697,23 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 ## Cron sheet sync now covers nursing staff - 2026-11-21
 
 - `src/lib/doctorSheetSync.js` reads `doctors` **and** `staffs`: new `STAFF_PROJECTION` (`name`, `jobTitle`, `education`, `profilePictureUrl`) + exported `staffSheetPayload()` mapping to the same columns as the manual script (B = jobTitle, C = education, D = photo). Doctors are merged first, so on a name collision a doctor wins and the duplicate is logged with its `kind`.
+
+## Dashboard earnings = money actually received - 2026-11-21
+
+- Rule everywhere: a consultation counts only when its payment is `PAID`; `PENDING`/`OPEN` bookings, failed payments and refunded ones (`REFUNDED` / `REFUND_PENDING`) are excluded. The booking status is *not* the gate, so a paid consultation keeps counting after it is marked `COMPLETED`.
+- Amount per consultation = `amountAfterOffer ?? payment.amount ?? consultationprice` (Cashfree offers are applied on hosted checkout, so the stored prices stay at the list price - refund.js uses the same fallback chain).
+- Super admin home tile: `src/components/superAdminComponent/utility/helper.js` `calculateTotalIncome` now returns `{ totatIncome, consultationIncome, labTestIncome }` (historical key kept), reads the populated `paymentId.status` from `GET /api/bookConsultation`, and lab tests count only when `paymentStatus === "paid"` (the old `completed`-but-unpaid branch was dropped). `StatTiles` hint is "Paid consultations + paid lab tests".
+- Doctor panel: `pages/api/registerDoc/doctorEarnings.js` resolves payments via `Payment.appointmentId` **and** `appointment.paymentId` (legacy/manual rows), sums collected amounts for all-time / timeframe / avg / per-date, and `timeframe=today` now means "from start of today" (it used to compare `appointmentTime` to `new Date()` for equality, so it never matched).
+- Verified on IATRIC: 2 appointments -> old ₹1200, new ₹500 (1 PAID completed @ ₹500, 1 PENDING unpaid @ ₹700 ignored); `doctorEarnings` returns allTime 500 / year 500 / today 0 / unknown doctor zeros / missing doctorId 400. `npx next lint` clean (warnings only).
+
+
+## Medicine catalogue seed - 2026-11-21
+
+- 5 medicines upserted into the `medicines` collection (mongoose model `Medicine` in `src/models/medicineInfo.js`; note the collection is `medicines`, not `medicineInfo`) in **both** databases: prod `IATRIC` (`.env.production`) and test `IATRIC_test` (`.env`). Each went from 309348 -> 309353 documents (`inserted 5, updated 0`), a second run reports `inserted 0 / unchanged 5` -> idempotent, matched on the exact `name`.
+- Stored docs are `{ name, salt, price }` only (no `type` / `Is_discontinued` / `pack_size_label`, unlike part of the scraped corpus). `Shelcal - HD …` keeps `price: null`; `Minded Max Tablet` has no clash with the existing `Minded 15mg Tablet` / `Minded 7.5 Tablet`.
+- The `Mgd3 Tablet … | Supports Bone Heal...` row was truncated in the source list and was stored as `Mgd3 Tablet with Magnesium Glycine & Vitamin D3 | Supports Bone Health`.
+- Rollback: `db.medicines.deleteMany({ name: { $in: [<the 5 names>] } })` in each database.
+
 - Report gained `dbStaff`, `appendedDoctors`, `appendedStaff` (existing keys like `dbDoctors`, `matched`, `appended` unchanged); append log lines now say `appended doctor|staff …`, and `pages/api/helperApi.js` logs `dbStaff` / `appendedStaff` too. Still append-only - no updates, no deletes, no invented columns.
 - **Dry run 2026-11-21** via the local dev server (`POST /api/helperApi?action=syncDoctorSheet&dryRun=1`, same `IATRIC` DB as `.env.production`): `sheetRows: 27`, `dbDoctors: 19`, `dbStaff: 5`, `matched: 23`, `sheetOnlyRows: 4` (down from 8 - the four nurses now match), `appended: ["Pawan Kumar Soni"]` (`appendedDoctors: 0`, `appendedStaff: 1`), `errors: []`, 2.2 s. Not applied yet: a real run appends that one nurse row (row 28).
 
@@ -704,4 +721,21 @@ Read this **only when the task touches these areas**. It is deliberately a norma
 - `--card-h` grew by 12px per breakpoint (368 / 356 / 340 / 328 / 314). The card body is a fixed-height flex column whose slots had ~2px slack; without the bump the 2-line service slot would push into the `Book Now` wrap.
 - Doctor and nursing cards share the same `.teamCard` / `.service` / `.degreeRow` / `.fee` classes, so one change covers both; nurse cards simply have empty education/fee slots (job title lives in `.service`).
 - Verified against the running dev server (`:3000` `/demo-5`) with Playwright: computed sizes 16/13/13px @1440, 15/12.5/12.5 @900, 13.5/11.5/11.5 @390, `scrollHeight - clientHeight = 0` for both the card and `.profileLink` (no overlap with the CTA), service clamp still 2 lines. Nursing card checked with a stubbed `GET /api/staff` (staging returns no staff). `npx next lint` exit 0.
+
+## Pending bookings queue on the super-admin home - 2026-11-21
+
+- `src/components/superAdminComponent/Homepage/PendingApprovals.js` has a third row, "Pending bookings". It counts `state.superAdminHomePage.allAppointments` (already dispatched by `HomepageComp` from `GET /api/bookConsultation`, so no new request) where `status === appointment_status.pending` (= `"PENDING"`, the same bucket the consultations page labels "Pending"). It shows `-` while the home page is loading, because that slice is persisted and would otherwise flash the previous count. `HomepageComp` now passes `isLoading` down.
+- The row opens `/superAdmin/consultationBooked?filter=PENDING` instead of a new page. `ConsultationBooked.js` now reads `router.query.filter` (case-insensitive, unknown values fall back to `TOTAL`) to preselect the tile, both in the lazy `useState` initialiser (no flash on first paint) and in a `useEffect` keyed on `router.isReady` / the param, so clicking the row again while the page is open re-applies the filter. Tile clicks also `router.replace(..., { shallow: true, scroll: false })`, keeping the URL shareable without re-fetching.
+- Legacy `OPEN` bookings are **not** counted as pending (they mean "accepted/ongoing" for the reminder cron), and lab-test bookings are out of scope for this row.
+- Current data (`.env` DB `IATRIC`): 2 appointments, 1 `PENDING` -> the tile shows `1`. `npx next lint` exit 0; `/superAdmin/homepage`, `/superAdmin/consultationBooked?filter=PENDING` and `?filter=bogus` all compile and return 200 (SSR output is auth-gated client-side, so only compilation was checkable without a login).
+
+## WhatsApp retry (3 instant attempts) + support alert - 2026-11-21
+
+- `pages/api/lib/communication.js` now owns the retry policy: `sendWhatsAppWithRetry(number, body, template, { label, appointmentId })` attempts the send `WHATSAPP_SEND_ATTEMPTS` (3) times back-to-back with **no wait**, and treats a Fast2SMS `{ return: false }` (or `status_code >= 400`) reply as a failure, not just a thrown error. It never throws; it returns `{ sent, attempts, lastError }`.
+- After the 3rd failure it calls `sendWhatsAppFailureAlert`, which sends the **generic 8-variable template** (`FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID`, new body key `WHATSAPP_DELIVERY_FAILURE_ALERT_TEMPLATE` -> `"whatsapp_delivery_failure_admin"` in `smsTemplates.js`) to `SUPPORT_NOTIFICATION_PHONE_NUMBER` (8130654581). Body built by `getWhatsAppFailureAlertBody` in `utils/whatsappMessageBodies.js`: who, recipient, last error, appointment id, IST failed-at time (pipes are replaced with `/` so an error message can't break the variable separator).
+- Call sites switched to the wrapper: the 4 sends in `src/lib/paymentService.js` (patient/doctor confirmation + the "Now" meeting-link reminders) and both reminder sends in `pages/api/lib/sendConsultationReminder.js`. They keep their old bookkeeping by throwing `lastError` when `sent === false`, so `messagingFailed`/`confirmationSentAt`/`reminderSentAt` and the Google-Sheet error log still behave as before. Reminder/confirmation sends stay awaited, so a provider outage adds up to 3 failed HTTP calls to those requests (only on failure).
+- Not yet routed through the wrapper: prescription, invoice, OTP, addDoctor credentials, forgot-password, userQuery/callback senders (they still call `sendWhatsAppConfirmation` directly).
+- Verified on a throwaway API route (deleted afterwards) with a deliberately invalid Fast2SMS token: exactly `attempt 1/3`, `2/3`, `3/3` logged with no delay, `retry.attempts = 3`, `retry.sent = false`, error `Unauthorized`, then one alert attempt with 8 pipe-separated variables and `message_id 40371`; nothing was delivered to a real number. `npx next lint` exit 0.
+
+
 

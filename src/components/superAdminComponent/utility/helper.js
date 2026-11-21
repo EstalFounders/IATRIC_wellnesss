@@ -1,31 +1,49 @@
-import { labTest_payment_status, labTest_status } from "../../../constant";
+import { labTest_payment_status, payment_status } from "../../../constant";
+
+// What was actually collected for a consultation.
+// Cashfree offers are picked by the patient on the hosted checkout, i.e. after the
+// order was created for the full fee, so `consultationprice` and `payment.amount`
+// both stay at the list price. `amountAfterOffer` (written once the payment is
+// reconciled) is the money that really arrived and therefore wins.
+const collectedConsultationAmount = (appointment) => {
+  if (appointment.amountAfterOffer != null) {
+    return Number(appointment.amountAfterOffer) || 0;
+  }
+  const paymentAmount = Number(appointment.paymentId?.amount);
+  if (Number.isFinite(paymentAmount) && paymentAmount > 0) return paymentAmount;
+  return Number(appointment.consultationprice) || 0;
+};
+
+// Only paid bookings count as income. `GET /api/bookConsultation` populates
+// `paymentId` with `status`/`amount`, so the payment decides - not the booking
+// status: a consultation keeps counting after it is marked COMPLETED, and a
+// refunded payment (REFUNDED / REFUND_PENDING) drops out even though the
+// appointment row still says CONFIRMED.
+const isPaidConsultation = (appointment) =>
+  appointment?.paymentId?.status === payment_status.PAID;
 
 export const calculateTotalIncome = (appointments, labTests) => {
-  let totatIncome = 0;
+  let consultationIncome = 0;
+  let labTestIncome = 0;
 
-  // Initialize totals
-  let totalPrice = 0;
-  let price = 0;
-
-  // Sum up appointments
-  appointments.forEach((item) => {
-    price += item.consultationprice || 0;
+  (Array.isArray(appointments) ? appointments : []).forEach((item) => {
+    if (!isPaidConsultation(item)) return;
+    consultationIncome += collectedConsultationAmount(item);
   });
 
-  // Sum up lab tests
-  labTests.forEach((item) => {
-    if (
-      item.paymentStatus === labTest_payment_status.PAID ||
-      item.bookingStatus === labTest_status.completed
-    ) {
-      totalPrice += item.totalPrice || 0;
-    }
+  // Lab tests: money received only. A completed-but-unpaid test is a receivable,
+  // not income, so the old `|| bookingStatus === completed` branch is gone.
+  (Array.isArray(labTests) ? labTests : []).forEach((item) => {
+    if (item?.paymentStatus !== labTest_payment_status.PAID) return;
+    labTestIncome += Number(item.totalPrice) || 0;
   });
 
-  totatIncome = totalPrice + price;
-
-  // Return the aggregated results
-  return { totatIncome };
+  // `totatIncome` keeps its historical spelling - HomepageComp and StatTiles read it.
+  return {
+    totatIncome: consultationIncome + labTestIncome,
+    consultationIncome,
+    labTestIncome,
+  };
 };
 
 export const calculateDiscountedPrice = (price, discountPercentage) => {
