@@ -35,6 +35,8 @@ import { MdEmail, MdPhone } from "react-icons/md";
  *   6. Diagnosis & advice (Advice + Notes)
  *   7. Test advices
  *   8. Signature + stamp
+ *   8b. Disclaimer — 5 legal points in a pale company-gold box (replaced the old
+ *      single "Not For Medico Legal Purpose" line)
  *   9. Footer (website / email / phone)
  *
  * Keep this order here only: this one component renders the prescription for
@@ -47,6 +49,26 @@ const A4_WIDTH_MM = 210; // A4 width in mm - used to map DOM rects into PDF unit
 // Where the stamp/signature go if a DOM rect can't be measured for any reason.
 const STAMP_FALLBACK_MM = { x: 150, y: 248, w: 45, h: 27 };
 const SIGNATURE_FALLBACK_MM = { x: 150, y: 222, w: 42, h: 25 };
+
+// Section labels on the sheet (Patient id / HOPI / Known Case of / Provisional
+// diagnosis / History of known allergy / Advice / Test advices) print bold, so
+// they stay readable on a printed or scanned copy of the prescription.
+const LABEL_WEIGHT = 700;
+
+// Legal disclaimer printed at the foot of every prescription. It replaced the
+// single "Not For Medico Legal Purpose" line, which is now its last point.
+const PRESCRIPTION_DISCLAIMER = [
+  "The information and advice provided here is provisional in nature as it is based on the limited information made available by the patient.",
+  "The patient is advised to visit in person for thorough examination at the earliest.",
+  "The information is confidential in nature and for recipient's use only.",
+  "The Prescription is generated on a Teleconsultation.",
+  "Not valid for medico-legal purpose.",
+];
+
+// Company gold (#916f38) at a light tint - the box the disclaimer prints in.
+const DISCLAIMER_BG = "#fdf6e4";
+const DISCLAIMER_BORDER = "#e3cf9f";
+const DISCLAIMER_TEXT = "#6b5526";
 
 // Map an element's on-screen box to millimetres relative to the print container.
 const getMmRect = (node, container) => {
@@ -124,6 +146,11 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
   // DOM anchors used to place the vector stamp / transparent signature in the PDF.
   const stampRef = useRef(null);
   const signatureRef = useRef(null);
+
+  // The patient's copy is only released signed: `signPrescription` fetches the
+  // signature and draws the stamp, so while either is missing they are the two
+  // gates that keep Send / Download locked.
+  const isSigned = Boolean(signatureUrl && stampUrl);
 
   useEffect(() => {
     const updateScale = () => {
@@ -273,7 +300,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
   };
 
   const handleDownloadPDF = async () => {
-    if (!signatureUrl || !stampUrl) {
+    if (!isSigned) {
       window.alert("Please sign the prescription before downloading.");
       return;
     }
@@ -315,6 +342,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
   };
 
   const handleCreatePDF = async () => {
+    if (!isSigned) {
+      window.alert("Please sign the prescription before sending.");
+      return;
+    }
     setLoading(true);
     try {
       const { canvas, stampRect, signatureRect } = await generateCanvas();
@@ -336,6 +367,28 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           prescriptionUrl,
           patientNo: data.patientNo || "",
           name: data.patientName || "",
+          prescriptionDetails: {
+            doctorId: data.doctorId,
+            doctorName: data.doctorName,
+            doctorPhone: data.doctorMobNo,
+            doctorRegistrationNo: data.doctorRegNo,
+            doctorSpeciality: data.doctorSepecialization,
+            doctorStampUrl: data.doctorStampUrl,
+            doctorSignatureUrl: data.doctorSignatureUrl,
+            patientId: data.patientId,
+            patientName: data.patientName,
+            patientAge: data.age,
+            patientGender: data.gender,
+            patientPhone: data.patientNo,
+            chiefComplaints: data.cheifCompalaints,
+            diagnosis: data.provisionalDiagnosis,
+            medicalHistory: data.knownCases,
+            allergies: data.anyDrugAllergy,
+            medicines: data.medicineInfo,
+            tests: data.testAdvices,
+            advice: data.advices,
+            notes: data.notes,
+          },
         }),
       });
 
@@ -505,7 +558,24 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 // padding: "14px 0 14px 0",
               }}
             >
-              <Image src="/images/Doctor/prescriptionlogo.jpg" alt="HealthPath Logo" width={400} height={300} priority={false} loading="lazy" style={{ width: "180px", mixBlendMode: "multiply" }} />
+              {/* Intrinsic 893x828; the props carry the real ratio so `height:
+                  auto` keeps the logo at 180x167 like the original <img> did.
+                  (height={300} + CSS width only made next/image print a 300px
+                  tall, stretched logo that pushed the whole sheet down.) */}
+              <Image
+                src="/images/Doctor/prescriptionlogo.jpg"
+                alt="HealthPath Logo"
+                width={893}
+                height={828}
+                priority={false}
+                loading="lazy"
+                style={{
+                  width: "180px",
+                  height: "auto",
+                  display: "block",
+                  mixBlendMode: "multiply",
+                }}
+              />
               <div style={{ textAlign: "right", lineHeight: "1.5" }}>
                 <div
                   style={{ fontSize: "16px", fontWeight: 700, color: "#111" }}
@@ -541,7 +611,10 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               }}
             >
               <div style={{ lineHeight: "1.6" }}>
-                <div>Patient id:&nbsp;{data.patientId}</div>
+                <div>
+                  <span style={{ fontWeight: LABEL_WEIGHT }}>Patient id:</span>
+                  &nbsp;{data.patientId}
+                </div>
                 <div>
                   {data.patientName}&nbsp;,&nbsp;{data.age}&nbsp;yr&nbsp;,&nbsp;
                   {data.gender ? data.gender.slice(0, 1).toUpperCase() : ""}
@@ -563,23 +636,23 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
               }}
             >
               <div style={{ flex: 1, paddingRight: "20px", lineHeight: "1.6" }}>
-                <div style={{ fontWeight: 500 }}>
+                <div style={{ fontWeight: LABEL_WEIGHT }}>
                   HOPI (History of present illness)
                 </div>
                 <div style={{ marginBottom: "8px" }}>
                   {data.cheifCompalaints || "—"}
                 </div>
-                <div style={{ fontWeight: 500 }}>Provisional diagnosis</div>
+                <div style={{ fontWeight: LABEL_WEIGHT }}>Provisional diagnosis</div>
                 <div>
                   {data.provisionalDiagnosis || data.underTreatmentSince || "—"}
                 </div>
               </div>
               <div style={{ flex: 1, paddingLeft: "20px", lineHeight: "1.6" }}>
-                <div style={{ fontWeight: 500 }}>Known Case of</div>
+                <div style={{ fontWeight: LABEL_WEIGHT }}>Known Case of</div>
                 <div style={{ marginBottom: "8px" }}>
                   {data.knownCases || "NA"}
                 </div>
-                <div style={{ fontWeight: 500 }}>History of known allergy</div>
+                <div style={{ fontWeight: LABEL_WEIGHT }}>History of known allergy</div>
                 <div>{data.anyDrugAllergy || "NA"}</div>
               </div>
             </div>
@@ -588,7 +661,24 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                 5. RX ICON ROW
             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
             <div style={{ marginTop: "8px", marginBottom: "4px" }}>
-              <Image src="/images/Doctor/RXIcon.png" alt="Rx" width={400} height={300} priority={false} loading="lazy" style={{ width: "34px", mixBlendMode: "multiply" }} />
+              {/* 512x512 source, printed at 34x34. Both dimensions must be set:
+                  next/image emits the width/height props as HTML attributes, so a
+                  CSS width alone left the 300px attribute height in place and the
+                  mark stretched into a full-page-height black strip. */}
+              <Image
+                src="/images/Doctor/RXIcon.png"
+                alt="Rx"
+                width={34}
+                height={34}
+                priority={false}
+                loading="lazy"
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  display: "block",
+                  mixBlendMode: "multiply",
+                }}
+              />
             </div>
 
             {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -711,7 +801,7 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                   the on-screen form and the standard block order documented at
                   the top of this file (every doctor profile prints this). */}
               <div style={{ flex: 1, paddingRight: "16px" }}>
-                <div>Advice &ndash;</div>
+                <div style={{ fontWeight: LABEL_WEIGHT }}>Advice &ndash;</div>
                 {showRichAdvice ? (
                   <div
                     className="rx-advice-rich"
@@ -756,7 +846,8 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
                   )
                 )}
                 <div style={{ marginTop: "8px" }}>
-                  Test advices &ndash;&nbsp;
+                  <span style={{ fontWeight: LABEL_WEIGHT }}>Test advices</span>
+                  &nbsp;&ndash;&nbsp;
                   <span>
                     {Array.isArray(data.testAdvices)
                       ? data.testAdvices.filter(Boolean).join(", ") || "NA"
@@ -806,20 +897,37 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
             </div>
 
             {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                8. FOOTER — website / email / phone
+                8. DISCLAIMER — the legal points, in the company's light yellow
             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
             <div
               style={{
-                borderBottom: BORDER,
-                paddingTop: "10px",
-                paddingBottom: "8px",
-                textAlign: "center",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "#333",
+                marginTop: "10px",
+                padding: "7px 10px 8px",
+                backgroundColor: DISCLAIMER_BG,
+                border: `1px solid ${DISCLAIMER_BORDER}`,
+                borderRadius: "3px",
+                fontSize: "9px",
+                lineHeight: "1.45",
+                color: DISCLAIMER_TEXT,
+                textAlign: "left",
               }}
             >
-              Not For Medico Legal Purpose
+              <div
+                style={{
+                  fontWeight: LABEL_WEIGHT,
+                  fontSize: "10px",
+                  marginBottom: "3px",
+                }}
+              >
+                Disclaimer
+              </div>
+              <ol style={{ margin: 0, paddingLeft: "14px" }}>
+                {PRESCRIPTION_DISCLAIMER.map((point) => (
+                  <li key={point} style={{ marginBottom: "1px" }}>
+                    {point}
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
           {/* end main content */}
@@ -874,14 +982,16 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       >
         <Button
           onClick={handleCreatePDF}
-          disabled={loading}
+          disabled={loading || !isSigned}
+          title={isSigned ? undefined : "Sign the prescription first"}
           style={{ backgroundColor: color_schema.yellow, border: "none" }}
         >
           <strong>{loading ? "Sending..." : "Send PDF"}</strong>
         </Button>
         <Button
           onClick={handleDownloadPDF}
-          disabled={loading}
+          disabled={loading || !isSigned}
+          title={isSigned ? undefined : "Sign the prescription first"}
           style={{ backgroundColor: "#3a5e1c", border: "none" }}
         >
           <strong>Download PDF</strong>
@@ -894,6 +1004,30 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
           <strong>{signNstampLoader ? "Signing..." : "Sign PDF"}</strong>
         </Button>
       </div>
+
+      {/* Send / Download stay locked until the signature and stamp are on the sheet. */}
+      {!isSigned && (
+        <div
+          style={{
+            fontSize: "13px",
+            color: "#8a6d3b",
+            textAlign: "center",
+            padding: "0 16px 16px",
+          }}
+        >
+          {!data.doctorSignatureUrl ? (
+            <>
+              No signature is saved on your profile yet &mdash; add your
+              signature under Profile, then sign and send this prescription.
+            </>
+          ) : (
+            <>
+              Sign the prescription first &mdash; without the signature and stamp
+              it can neither be sent nor downloaded.
+            </>
+          )}
+        </div>
+      )}
 
       <Preloader show={loading} />
     </div>

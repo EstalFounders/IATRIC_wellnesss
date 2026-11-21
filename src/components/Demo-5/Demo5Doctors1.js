@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { DoctorComponent } from "../Common/DoctorComponent";
 import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
+import cardStyles from "../Common/css/ViewDoctorListComp.module.css";
 import { ConsultationButton } from "../Common/commonUi";
 
 const ROTATE_INTERVAL_MS = 5000;
@@ -70,7 +71,7 @@ const DoctorsSection = () => {
           </div>
         </div>
         {/* END SECTION TITLE */}
-        <div className="row d-flex justify-content-center">
+        <div className={cardStyles["doctor-grid"]}>
           {/* Map over the array of doctors to render each doctor component */}
           {featuredDoctors.map((doctor, index) => (
             <DoctorCard key={index} doctor={doctor} />

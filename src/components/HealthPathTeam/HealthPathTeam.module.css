@@ -18,14 +18,17 @@
 .marquee {
   /* Card box, per breakpoint (desktop first). */
   --card-w: 268px;
-  --card-h: 356px;
+  --card-h: 368px;
   --card-gap: 10px;
   --card-pad-x: 22px;
   --card-pad-y: 22px;
   --avatar-size: 120px;
   --name-size: 18px;
-  --service-size: 14px;
-  --degree-size: 11.5px;
+  --service-size: 16px;
+  --degree-size: 13px;
+  /* The fee line has its own size (it used to reuse --degree-size) so it can be
+     enlarged without moving the education row above it. */
+  --fee-size: 13px;
   --cta-size: 16px;
 
   position: relative;
@@ -231,9 +234,9 @@
    every card keeps the same rhythm. */
 .fee {
   width: 100%;
-  height: calc(var(--degree-size) * 1.3);
+  height: calc(var(--fee-size) * 1.3);
   margin-top: 2px;
-  font-size: var(--degree-size);
+  font-size: var(--fee-size);
   font-weight: 600;
   line-height: 1.3;
   text-align: center;
@@ -290,13 +293,14 @@
 @media (max-width: 1199px) {
   .marquee {
     --card-w: 252px;
-    --card-h: 344px;
+    --card-h: 356px;
     --card-pad-x: 20px;
     --card-pad-y: 20px;
     --avatar-size: 112px;
     --name-size: 17px;
-    --service-size: 13px;
-    --degree-size: 11px;
+    --service-size: 15px;
+    --degree-size: 12.5px;
+    --fee-size: 12.5px;
     --cta-size: 15px;
   }
 }
@@ -305,11 +309,12 @@
 @media (max-width: 991px) {
   .marquee {
     --card-w: 240px;
-    --card-h: 328px;
+    --card-h: 340px;
     --avatar-size: 104px;
     --name-size: 17px;
-    --service-size: 13px;
-    --degree-size: 11px;
+    --service-size: 15px;
+    --degree-size: 12.5px;
+    --fee-size: 12.5px;
     --cta-size: 15px;
     --card-gap: 8px;
   }
@@ -319,13 +324,14 @@
 @media (max-width: 767px) {
   .marquee {
     --card-w: 228px;
-    --card-h: 316px;
+    --card-h: 328px;
     --card-pad-x: 16px;
     --card-pad-y: 18px;
     --avatar-size: 98px;
     --name-size: 16px;
-    --service-size: 12.5px;
-    --degree-size: 10.5px;
+    --service-size: 14px;
+    --degree-size: 12px;
+    --fee-size: 12px;
     --cta-size: 14px;
     --card-gap: 8px;
     padding: 12px 0;
@@ -344,13 +350,14 @@
 @media (max-width: 575px) {
   .marquee {
     --card-w: 212px;
-    --card-h: 302px;
+    --card-h: 314px;
     --card-pad-x: 14px;
     --card-pad-y: 16px;
     --avatar-size: 90px;
     --name-size: 15px;
-    --service-size: 12px;
-    --degree-size: 10px;
+    --service-size: 13.5px;
+    --degree-size: 11.5px;
+    --fee-size: 11.5px;
     --cta-size: 13px;
   }
 

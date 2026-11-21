@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { useDoctors } from "../../customUtils/useDoctors";
 import DoctorCard from "../Common/DoctorCard";
+import cardStyles from "../Common/css/ViewDoctorListComp.module.css";
 import { ConsultationButton } from "../Common/commonUi";
 
 const WhoWeAreDoctors1 = () => {
@@ -24,7 +25,7 @@ const WhoWeAreDoctors1 = () => {
           </div>
         </div>
         {/* END SECTION TITLE */}
-        <div className="row d-flex justify-content-center">
+        <div className={cardStyles["doctor-grid"]}>
           {/* Map over the array of doctors to render each doctor component */}
           {doctors.slice(0, 3).map((doctor, index) => (
             <DoctorCard key={index} doctor={doctor} />
