@@ -6,6 +6,7 @@ import Appointment from "../../src/models/appointmentSchema";
 import mongoose from "mongoose"; 
 import { logErrorToGoogleSheet } from "./helper";
 import { syncDoctorDetailsSheet } from "../../src/lib/doctorSheetSync";
+import { runInvoiceGeneration } from "../../src/lib/invoice/billing";
 
 
 // --- sub-handlers ---
@@ -110,7 +111,10 @@ async function savePrescription(req, res) {
 
     await prescription.save();
 
-    // Update appointment with prescription URL
+    // Update appointment with prescription URL. The appointment status is NOT
+    // touched here on purpose: a download/save means the doctor kept a copy, not
+    // that the patient received it. Only the send flow (/api/prescription) marks
+    // the consultation COMPLETED once WhatsApp delivery succeeded.
     if (appointmentId && mongoose.Types.ObjectId.isValid(appointmentId)) {
       await Appointment.findByIdAndUpdate(appointmentId, {
         prescriptionUrl: prescriptionPdfUrl,
@@ -211,6 +215,74 @@ async function syncDoctorSheet(req, res) {
   }
 }
 
+/**
+ * POST /api/helperApi?action=generateInvoices
+ *
+ * The midnight invoice run (cron job `invoiceGeneration`, src/cron/jobs.js):
+ *   1. create one COMPLETED invoice per mobile number for every completed
+ *      appointment / lab test that has no invoice yet (idempotent: the service
+ *      gets `invoiceId` stamped, see src/lib/invoice/billing.js),
+ *   2. store the invoice and its patient page link with whatsappStatus PENDING,
+ *   3. WhatsApp the link, then write SENT / FAILED on the invoice row.
+ * A failed WhatsApp never removes the invoice and never stops the loop.
+ *
+ * `?dryRun=1` reports what would be billed and neither writes nor sends.
+ * `x-cron-secret` is enforced only when CRON_SECRET is set (same as the sheet
+ * sync below).
+ */
+async function generateInvoices(req, res) {
+  const secret = String(process.env.CRON_SECRET || "").trim();
+  if (secret && String(req.headers["x-cron-secret"] || "").trim() !== secret) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const dryRun = ["1", "true"].includes(
+    String(req.query?.dryRun || "").toLowerCase()
+  );
+
+  // Prefer the origin of this request so the patient link is never localhost.
+  const proto = String(req.headers["x-forwarded-proto"] || "https")
+    .split(",")[0]
+    .trim();
+  const host = String(req.headers["x-forwarded-host"] || req.headers.host || "")
+    .split(",")[0]
+    .trim();
+
+  try {
+    await dbConnect();
+    const report = await runInvoiceGeneration({
+      apply: !dryRun,
+      baseUrl: host ? `${proto}://${host}` : undefined,
+    });
+
+    console.log(
+      "[INVOICE] helperApi - generateInvoices:",
+      JSON.stringify({
+        dryRun,
+        billables: report.billables,
+        drafts: report.drafts,
+        created: report.created.length,
+        failed: report.failed.length,
+        delivered: report.delivered.length,
+        deliveryFailed: report.deliveryFailed.length,
+        needsReview: report.needsReview.length,
+      })
+    );
+
+    res.status(200).json({ success: true, dryRun, ...report });
+  } catch (error) {
+    console.error("Error generating invoices:", error);
+    await logErrorToGoogleSheet({
+      apiName: "helperApi - generateInvoices",
+      errorMessage: error.message || "Failed to generate invoices",
+      errorCode: "500",
+      stackTrace: error.stack,
+      requestPayload: { dryRun },
+    });
+    res.status(500).json({ error: "Internal server error", message: error.message });
+  }
+}
+
 // --- main handler (single default export) ---
 
 export default async function handler(req, res) {
@@ -226,6 +298,10 @@ export default async function handler(req, res) {
 
   if (req.method === "POST" && action === "syncDoctorSheet") {
     return syncDoctorSheet(req, res);
+  }
+
+  if (req.method === "POST" && action === "generateInvoices") {
+    return generateInvoices(req, res);
   }
 
   res.status(400).json({ error: "Invalid action or method" });

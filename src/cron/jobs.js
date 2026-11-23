@@ -42,4 +42,15 @@ module.exports = [
     path: "/api/helperApi?action=syncDoctorSheet",
     timeoutMs: 2 * 60 * 1000,
   },
+  {
+    name: "invoiceGeneration",
+    envFlag: "CRON_INVOICE_GENERATION_ENABLED",
+    schedule: "0 0 * * *", // every day at midnight
+    // Bills every completed appointment / lab test that has no invoice yet
+    // (one invoice per mobile number), stores it, then WhatsApps the patient
+    // invoice page. Idempotent - `invoiceId` is stamped on each billed service.
+    // See src/lib/invoice/billing.js
+    path: "/api/helperApi?action=generateInvoices",
+    timeoutMs: 10 * 60 * 1000,
+  },
 ];

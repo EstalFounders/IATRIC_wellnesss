@@ -1,0 +1,173 @@
+/* src/components/superAdminComponent/css/FeedbackPanel.module.css
+   Only the bits the shared panel language does not cover: star rows, feedback
+   chips, the comment clamp and the rating-distribution bars. Everything else
+   (page shell, hero, cards, table, tiles, pagination) is reused from
+   ConsultationBooked.module.css so the two pages stay visually identical. */
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: #d6d9cf;
+  font-size: 0.9rem;
+  line-height: 0;
+}
+
+.starActive {
+  color: #916f38;
+}
+
+.ratingCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ratingValue {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #3f4c5a;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 190px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid #e4dfd0;
+  border-radius: 999px;
+  background: #fdf9ef;
+  color: #7a5c26;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.comment {
+  display: block;
+  max-width: 260px;
+  color: #52606d;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.commentMuted {
+  color: #9aa5b1;
+  font-style: italic;
+}
+
+.emptyCell {
+  color: #9aa5b1;
+  font-size: 0.82rem;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.filterLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.distribution {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.distributionRow {
+  display: grid;
+  grid-template-columns: 34px 1fr 46px;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #52606d;
+}
+
+.distributionTrack {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: #f0f2ec;
+  overflow: hidden;
+}
+
+.distributionBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b5f1d, #916f38);
+}
+
+.distributionCount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #3f4c5a;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.summaryColumnTitle {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.bigRating {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-family: "TT Ramillas", serif;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: #3b5f1d;
+}
+
+.bigRatingTotal {
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+.npsNote {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: #7b8794;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .comment {
+    max-width: 200px;
+  }
+}

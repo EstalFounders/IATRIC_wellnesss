@@ -48,6 +48,18 @@ export const medicine_cart_details_local_info = "medicineCartItems";
 export const labtest_cart_details_local_info = "labTestcartItems";
 export const single_call = "single_call";
 export const invoice_bill_yellow_color = "#d1bd9a";
+// Invoice statuses live in one place (src/constants/invoice.js) and are
+// re-exported here so the many `import { invoice_status } from constant` call
+// sites keep working. Add new values there, never inline.
+export {
+  INVOICE_STATUS as invoice_status,
+  INVOICE_STATUS_OPTIONS as invoice_status_options,
+  INVOICE_WHATSAPP_STATUS as invoice_whatsapp_status,
+  INVOICE_WHATSAPP_STATUS_OPTIONS as invoice_whatsapp_status_options,
+  INVOICE_WHATSAPP_STATUS_LABELS as invoice_whatsapp_status_labels,
+  INVOICE_SOURCE as invoice_source,
+} from "./constants/invoice";
+
 export const company_font_family = "TT Ramillas";
 export const isNow = "Now";
 export const SERVER_AVAILABLE_SLOTS_CODE = "304";
@@ -81,13 +93,14 @@ export const api = {
   userQuery: "/api/userQuery",
   joinUsQuery: "/api/joinUsQuery",
   getImageFomrFirebase: "/api/helper/getImageFromFirebase",
-  getInvoice: "/api/helper/generateInvoice",
-  uploadInvoice: "/api/helper/uploadInvoice",
+  getInvoices: "/api/helper/invoices",
   serviceOffered: "/api/superAdmin/serviceOffered",
   sendOtp: "/api/helper/whatsappConfirmationApi",
   serviceSuggestion: "/api/helper/getServiceSuggestion",
   helperApi: "/api/helperApi",
   consultationByMeetingId: "/api/getAppointmentId",
+  consultationFeedback: "/api/feedback",
+  consultationFeedbackList: "/api/feedback/list",
   marketingLogin: "/api/marketing/auth/login",
   marketingLogout: "/api/marketing/auth/logout",
   marketingSession: "/api/marketing/auth/session",

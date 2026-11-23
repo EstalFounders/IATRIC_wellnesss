@@ -442,17 +442,13 @@ test.describe('Appointment booking (sandbox payment)', () => {
     expect(typeof bookingBody?.serviceType).toBe('string');
     expect((bookingBody?.serviceType as string).length).toBeGreaterThan(0);
 
-    // ── 7. Step 4: the fee + secure payment only (sandbox) ─────────
-    // The appointment summary moved to the success screen: it must NOT be shown
-    // before paying anymore.
+    // ── 7. Straight to the gateway (sandbox) ────────────────────────
+    // `bookConsultation()` creates the Cashfree order and calls
+    // `cashfree.checkout()` in the same turn as the booking POST, so the old
+    // "fee + Pay Securely" step no longer exists: the stubbed SDK sends the
+    // browser to /payment/thankyou and the assertions below see the result.
+    // The appointment summary still belongs to the success screen only.
     await expect(page.getByText('Booking Summary')).toHaveCount(0);
-    await expect(
-      page.getByText('Your appointment details will be shown once the payment is confirmed.')
-    ).toBeVisible();
-    await expect(page.getByText(`Consultation Fee: ₹${CONSULTATION_FEE}`)).toBeVisible();
-    const payButton = page.locator('.consultation-btn', { hasText: 'Pay Securely' });
-    await expect(payButton).toBeVisible();
-    await payButton.click();
 
     await expect.poll(() => createOrderBody?.appointmentId).toBe(APPOINTMENT_ID);
     expect(createOrderBody).toMatchObject({
@@ -491,20 +487,20 @@ test.describe('Appointment booking (sandbox payment)', () => {
     expect(statusCalls[0]).toContain(`orderId=${ORDER_ID}`);
 
     // Appointment page confirmation state (verify-only return path).
-    // When returning from the sandbox checkout with ?appointmentId=<orderId> the app
-    // auto-verifies the order and switches to the appointment confirmation modal.
+    // Returning from the sandbox checkout with ?appointmentId=<orderId> no longer
+    // opens the booking modal: the appointment page hands the order to
+    // `/payment/thankyou`, which verifies it server-side and renders the
+    // confirmation (same screen as the direct checkout return).
     // Checked in its own page: a checkout return can leave a late navigation in flight on
     // the first page (seen on WebKit), which would race a page.goto() there.
     const statusCallsBeforeReturn = statusCalls.length;
     const returnPage = await context.newPage();
     await returnPage.goto(`/appointment?appointmentId=${ORDER_ID}`);
     // Fresh document => fresh client-side boot, so it gets the same first-paint budget.
-    await expect(returnPage.getByText('Thank you!')).toBeVisible({
+    await expect(returnPage.getByRole('heading', { name: 'Payment Successful!' })).toBeVisible({
       timeout: PAGE_READY_TIMEOUT,
     });
-    await expect(
-      returnPage.getByText('Your consultation has been confirmed.').first()
-    ).toBeVisible();
+    expect(returnPage.url()).toContain(`/payment/thankyou?appointmentId=${ORDER_ID}`);
 
     // The returned order id was re-verified server-side (auto-poll of /api/payment/status).
     await expect.poll(() => statusCalls.length).toBeGreaterThan(statusCallsBeforeReturn);
@@ -636,12 +632,9 @@ test.describe('Appointment booking (sandbox payment)', () => {
     // No second OTP round trip for the fallback booking.
     expect(whatsappCalls).toHaveLength(1);
 
-    // ── 4. Straight into the standard payment gateway ───────────────
-    await expect(page.getByText(`Consultation Fee: ₹${CONSULTATION_FEE}`)).toBeVisible({
-      timeout: PAGE_READY_TIMEOUT,
-    });
-    await page.locator('.consultation-btn', { hasText: 'Pay Securely' }).click();
-
+    // ── 4. Straight into the payment gateway ───────────────────────
+    // "Book" on a fallback slot books it and opens Cashfree in the same call, so
+    // the gateway stub takes over immediately (see the "Proceed to Pay" path).
     await expect.poll(() => createOrderBody?.appointmentId).toBe(APPOINTMENT_ID);
     await expect.poll(() => checkoutCalls.length).toBe(1);
     expect(checkoutCalls[0].mode).toBe('sandbox');
