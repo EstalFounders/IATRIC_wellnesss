@@ -6,7 +6,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../lib/firebase";
 import {
   api,
-  appointment_status,
   prescription_img_path,
   contact_no,
 } from "../../src/constant";
@@ -18,6 +17,7 @@ import Appointment from "../../src/models/appointmentSchema";
 import Prescription from "../../src/models/prescriptionSchema";
 import mongoose from "mongoose";
 import { dbConnect } from "../../src/lib/db";
+import { markAppointmentCompleted } from "../../src/lib/appointmentStatus";
 import { WHATSAPP_PRESCRIPTION_TEMPLATE } from "./utils/constants";
 import { formatPhoneNumber } from "./utils/commonmethod";
 import { logErrorToGoogleSheet } from "./helper";
@@ -85,19 +85,12 @@ export default async function handler(req, res) {
 
     console.log("prescriptionUrl", prescriptionUrl, "appointmentId", appointmentId);
 
-    let updateStatus = null;
-
-    // 1. Only query DB if appointmentId exists and is structurally a valid Mongoose ObjectId
-    if (appointmentId && mongoose.Types.ObjectId.isValid(appointmentId)) {
-      updateStatus = await Appointment.findByIdAndUpdate(
-        appointmentId,
-        {
-          prescriptionUrl: prescriptionUrl,
-          status: appointment_status.completed,
-        },
-        { new: true }
-      );
-    }
+    // Recipient fallbacks for the WhatsApp message. The booking is only *read*
+    // here: its status must stay untouched until the prescription actually
+    // reaches the patient (see the completion step after the send).
+    const appointmentInfo = validId(appointmentId)
+      ? await Appointment.findById(appointmentId).select("name patientMobNo").lean()
+      : null;
 
     // Store the prescription details. Kept separate so a failure here never blocks sending.
     if (prescriptionDetails && typeof prescriptionDetails === "object") {
@@ -129,8 +122,8 @@ export default async function handler(req, res) {
     let whatsapp = { sent: false };
     try {
       // Determine recipient details (use updated DB values, or fall back to payload fields)
-      const recipientNumber = patientNo || updateStatus?.patientMobNo || patientMobNo;
-      const recipientName = name || updateStatus?.name || "Patient";
+      const recipientNumber = patientNo || appointmentInfo?.patientMobNo || patientMobNo;
+      const recipientName = name || appointmentInfo?.name || "Patient";
 
       if (recipientNumber) {
         const result = await sendWhatsAppConfirmation(
@@ -157,7 +150,38 @@ export default async function handler(req, res) {
       whatsapp = { sent: false, reason: whatsappError.message || "whatsapp_error" };
     }
 
-    res.status(200).json({ status: "send successfully", whatsapp });
+    // 3. Finish the consultation.
+    // Only a prescription that was generated *and* delivered marks the booking
+    // COMPLETED - that status is what makes the consultation billable, so an
+    // undelivered message must leave it as it was. The PDF URL is still stored
+    // on a failed send so the panel can show/share the prescription.
+    let appointmentStatus = "";
+    if (validId(appointmentId)) {
+      if (whatsapp.sent) {
+        const completion = await markAppointmentCompleted(appointmentId, {
+          prescriptionUrl,
+          source: "prescription-send",
+        });
+        appointmentStatus = completion.appointment?.status || "";
+      } else {
+        try {
+          await Appointment.updateOne(
+            { _id: appointmentId },
+            { $set: { prescriptionUrl } },
+          );
+        } catch (linkError) {
+          // Not fatal: the prescription document itself is already stored.
+          console.error("Failed to store prescription URL:", linkError);
+        }
+      }
+    }
+
+    res.status(200).json({
+      status: whatsapp.sent ? "send successfully" : "prescription saved, whatsapp not sent",
+      whatsapp,
+      sent: Boolean(whatsapp.sent),
+      appointmentStatus,
+    });
   } catch (error) {
     console.error("Error:", error);
     await logErrorToGoogleSheet({

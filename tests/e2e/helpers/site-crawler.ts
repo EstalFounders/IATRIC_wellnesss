@@ -452,6 +452,25 @@ export async function waitForAppBoot(page: Page, timeout = 45_000) {
     .catch(() => {});
 }
 
+/** Chromium's wording when another navigation supersedes the one we awaited. */
+const ABORTED_NAVIGATION = /ERR_ABORTED|NS_BINDING_ABORTED|interrupted by another navigation/i;
+
+/** Playwright's wording for a navigation that never finished. */
+const NAVIGATION_TIMEOUT = /Timeout \d+ms exceeded/i;
+
+/** A self-inflicted abort is cheap to repeat. */
+const LOAD_RETRIES = 3;
+
+/**
+ * A stalled `next dev` (compile under memory pressure, HMR desync) answers on the
+ * next attempt, so a slow load gets one more chance. A page that is genuinely
+ * wedged fails both attempts, so a real hang is still reported.
+ */
+const TIMEOUT_RETRIES = 2;
+
+/** Per attempt, so 2 attempts stay well inside the 6 min page budget. */
+const GOTO_TIMEOUT_MS = 60_000;
+
 /**
  * `page.goto` + boot wait + a *best effort* networkidle.
  *
@@ -459,12 +478,88 @@ export async function waitForAppBoot(page: Page, timeout = 45_000) {
  * (`/payment/thankyou` every 3s, the appointment page's slot lookup) and would
  * never go idle - the classic source of crawler flakiness. A timeout here means
  * "the page is still busy", not "the page failed".
+ *
+ * Two failure modes are the *crawler* racing the app rather than a dead page, and
+ * both are handled here instead of failing the run:
+ *
+ *   - `ERR_ABORTED`: a `<Link>` click's SPA route fetch is still committing when
+ *     the reload starts, so whichever loses reports an abort. Retried, and when
+ *     the abort left a *different* path on screen (the app redirected itself) the
+ *     crawl simply continues on that page - `null` is returned instead of a
+ *     response.
+ *   - a navigation timeout: a `next dev` that stalls for a moment (compile under
+ *     memory pressure, HMR desync after a long crawl) never fires
+ *     `domcontentloaded`. The document is reset and the load retried once.
+ *
+ * Anything else - DNS/connection errors, HTTP failures, a second timeout - is
+ * rethrown, so real breakage is never masked.
  */
-export async function openPage(page: Page, url: string, timeout = 90_000) {
-  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
-  await waitForAppBoot(page);
-  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
-  return response;
+export async function openPage(page: Page, url: string, timeout = 90_000): Promise<Response | null> {
+  const attemptTimeout = Math.min(timeout, GOTO_TIMEOUT_MS);
+  const requested = pathnameOf(url);
+  let aborts = 0;
+  let timeouts = 0;
+
+  for (;;) {
+    // Let a redirect started by the previous click commit first: starting a new
+    // document request on top of a pending one is what makes Chromium abort it.
+    await page.waitForLoadState('domcontentloaded', { timeout: 5_000 }).catch(() => {});
+
+    try {
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: attemptTimeout });
+      await waitForAppBoot(page);
+      await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      if (ABORTED_NAVIGATION.test(message)) {
+        aborts += 1;
+        const landed = await page
+          .evaluate(() => ({ ready: document.readyState, path: location.pathname }))
+          .catch(() => null);
+
+        // `about:blank` still reports `readyState: 'complete'`, so the pathname is
+        // what separates "the redirect target is on screen" from "nothing loaded".
+        // A *different* path means the app redirected itself and that page is the
+        // one to crawl; the same path means the load really failed.
+        if (
+          landed &&
+          landed.ready !== 'loading' &&
+          landed.path !== 'blank' &&
+          landed.path !== requested
+        ) {
+          console.log(
+            `  · navigation to ${requested} was superseded (${landed.path}); continuing there`,
+          );
+          await waitForAppBoot(page);
+          await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+          return null;
+        }
+
+        if (aborts >= LOAD_RETRIES) throw error;
+        await page.waitForTimeout(200 * aborts);
+        continue;
+      }
+
+      if (!NAVIGATION_TIMEOUT.test(message)) throw error;
+
+      timeouts += 1;
+      if (timeouts >= TIMEOUT_RETRIES) {
+        throw new Error(
+          `${message}\n${requested} never reached domcontentloaded in ${attemptTimeout}ms, ` +
+            `${timeouts}× - the dev server is wedged or the page hangs on load.`,
+        );
+      }
+
+      console.log(
+        `  · ${requested} did not load in ${attemptTimeout}ms; retrying (${timeouts + 1}/${TIMEOUT_RETRIES})`,
+      );
+      // Drop the stuck document before asking for it again.
+      await page.goto('about:blank', { timeout: 5_000 }).catch(() => {});
+      await page.waitForTimeout(500 * timeouts);
+    }
+  }
 }
 
 /* -------------------------------------------------------------------------- */

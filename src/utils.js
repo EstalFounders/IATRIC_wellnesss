@@ -1,8 +1,5 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import {
-  invoice_img_path,
-  prescription_img_path,
-} from "./constant";
+import { invoice_img_path, prescription_img_path } from "./constant";
 import { storage } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -136,11 +133,22 @@ export const sendPrescriptionToFirebase = async (file, details) => {
   return url;
 };
 
-export const sendInvoiceToFirebase = async (file, invoiceNumber) => {
-  console.log(invoiceNumber, "invoice no", file, "file");
+/**
+ * Uploads a generated invoice PDF to Firebase Storage and returns its download
+ * URL - the invoice twin of `sendPrescriptionToFirebase` above, so both documents
+ * are produced the same way: html2canvas + jsPDF in the browser, uploaded here,
+ * and only the URL is stored in Mongo.
+ *
+ * @param {Blob} file - the jsPDF output blob
+ * @param {object} details - `{ invoiceNumber, patientName }`, used in the path
+ * @returns {Promise<string>} Firebase download URL
+ */
+export const sendInvoiceToFirebase = async (file, details) => {
   const storageRef = ref(
     storage,
-    `${invoice_img_path}/invoiceNo=${invoiceNumber}_${uuidv4()}`
+    `${invoice_img_path}invoiceNo=${details.invoiceNumber},patient=${
+      details.patientName || "NA"
+    }_${uuidv4()}`
   );
   const metadata = {
     contentType: file.type || "application/pdf",

@@ -67,6 +67,37 @@ function orDash(value) {
 }
 
 /**
+ * Percent-encodes only the characters that would break Fast2SMS' GET request.
+ *
+ * The SDK sends `variables_values` in the QUERY STRING and never encodes it
+ * (@readme/oas-to-har stores the value verbatim, fetch-har joins the HAR query
+ * entries with "&" and deliberately skips URLSearchParams). So a raw "&" inside
+ * a value - e.g. a Firebase link's "?alt=media&token=..." - terminates the
+ * parameter: everything after it, including the following "|"-separated
+ * variables, is silently dropped and those {{n}} slots arrive empty.
+ *
+ * Fast2SMS decodes the value once before template substitution (this is why
+ * `encodeFirebasePath` double-encodes the object path), so %26/%23/%2B reach
+ * WhatsApp as &/#/+ and the links survive intact.
+ *
+ * "%" itself is left untouched so the deliberate %25 from `encodeFirebasePath`
+ * still decays to the single % the Firebase API expects. "|" is never encoded
+ * either - it stays the variable separator whether Fast2SMS splits before or
+ * after decoding.
+ */
+function querySafe(value) {
+  return String(value === undefined || value === null ? "" : value)
+    .replace(/&/g, "%26")
+    .replace(/#/g, "%23")
+    .replace(/\+/g, "%2B");
+}
+
+/** Joins template variables with "|" after making each one query-string safe. */
+function joinVariables(values) {
+  return values.map(querySafe).join("|");
+}
+
+/**
  * Returns the Fast2SMS WhatsApp template ID and pipe-separated variable values
  * for the given template key and body object.
  * Variable order must match the {{1}}, {{2}}, ... placeholders in your approved Fast2SMS template.
@@ -76,7 +107,7 @@ export function buildWhatsAppPayload(template, body) {
     case WHATSAPP_CONFIRMATION_TEMPLATE:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
-        variables_values: [
+        variables_values: joinVariables([
           capitalize(body.patient_name),
           // Doctor names are sent exactly as stored in `doctors.name`: never
           // re-cased (`capitalize` rewrites the doctor's own spelling), never
@@ -85,7 +116,7 @@ export function buildWhatsAppPayload(template, body) {
           orDash(body.appointment_date),
           orDash(body.appointment_time),
           body.consultation_type,
-        ].join("|"),
+        ]),
       };
     case WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR:
       return {
@@ -94,7 +125,7 @@ export function buildWhatsAppPayload(template, body) {
         // the doctor reads "Hello <doctor>, consultation with <patient> ..."
         // instead of the patient-addressed copy of their own appointment.
         message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
-        variables_values: [
+        variables_values: joinVariables([
           // {{1}} the doctor themselves, verbatim as stored in `doctors.name`
           // (see the "never re-case a doctor name" note above).
           doctorDisplayName(body.doctor_name),
@@ -103,26 +134,27 @@ export function buildWhatsAppPayload(template, body) {
           orDash(body.appointment_date),
           orDash(body.appointment_time),
           body.consultation_type,
-        ].join("|"),
+        ]),
       };
     case WHATSAPP_REMINDER_TEMPLATE_PATIENT:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_PATIENT_ID,
-        variables_values: [
+        variables_values: joinVariables([
           capitalize(body.patient_name),
           doctorDisplayName(body.doctor_name),
           orDash(body.appointment_date),
           orDash(body.appointment_time),
-          // Plain app URL — no special chars, no encoding needed. orDash keeps a
+          // App URL - `joinVariables` already makes it query-string safe (a raw
+          // "&" here would truncate the payload). orDash keeps a
           // missing link from reaching WhatsApp as an empty {{5}} (rendered "*").
           orDash(body.meeting_url),
-        ].join("|"),
+        ]),
       };
 
     case WHATSAPP_REMINDER_TEMPLATE_DOCTOR:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_REMINDER_DOCTOR_ID,
-        variables_values: [
+        variables_values: joinVariables([
           // {{1}} doctor / {{2}} patient - the reminder template quotes the
           // doctor's own name back to them, so it must stay byte-identical to
           // `doctors.name` (see the note above).
@@ -130,29 +162,34 @@ export function buildWhatsAppPayload(template, body) {
           capitalize(body.patient_name),
           orDash(body.appointment_date),
           orDash(body.appointment_time),
-          // Plain app URL — no special chars, no encoding needed (see {{5}} note above).
+          // App URL - query-string safe via joinVariables (see {{5}} note above).
           orDash(body.meeting_url),
-        ].join("|"),
+        ]),
       };
 
     case WHATSAPP_PRESCRIPTION_TEMPLATE:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_PRESCRIPTION_ID,
-        variables_values: [
+        variables_values: joinVariables([
           capitalize(body.patient_name),
           encodeFirebasePath(body.prescription_url),
-        ].join("|"),
+        ]),
       };
 
     case WHATSAPP_INVOICE_TEMPLATE:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_INVOICE_ID,
-        variables_values: [
-          capitalize(body.patient_name),  // {{1}} Dear [name]
-          body.invoice_number,            // {{2}} Invoice No: [number]
-          body.total_amount,              // {{3}} Amount Paid: [amount]
-          encodeFirebasePath(body.invoice_url), // {{4}} Download [url]
-        ].join("|"),
+        // Approved body (3 variables - Fast2SMS rejects a var count that differs
+        // from the template's):
+        //   Hi {{1}}, … View your bill here: {{2}}. … share your quick feedback
+        //   here : {{3}} -
+        // The money slot is gone: the amount is printed in the invoice PDF, not
+        // in the message. Keep the order below identical to that body.
+        variables_values: joinVariables([
+          capitalize(body.patient_name), // {{1}} Hi [name],
+          encodeFirebasePath(body.invoice_url), // {{2}} View your bill here: [url]
+          orDash(body.feedback_url), // {{3}} feedback link for that appointment
+        ]),
       };
 
     case WHATSAPP_NUMBER_CONFIRMATION:
@@ -175,7 +212,7 @@ export function buildWhatsAppPayload(template, body) {
         // 8 variables, so all of them must be sent - Fast2SMS rejects a variable
         // count that differs from the template var_count.
         message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
-        variables_values: [
+        variables_values: joinVariables([
           body.admin_name,    // {{1}} Hello {{1}},
           body.alert_line,    // {{2}} You got a call back request from 98XXXXXXXX.
           body.action_line,   // {{3}} Please call them back ASAP.
@@ -184,7 +221,7 @@ export function buildWhatsAppPayload(template, body) {
           body.time_label,    // {{6}} {{6}}: {{7}}
           body.time_value,    // {{7}}
           body.footer,        // {{8}}
-        ].join("|"),
+        ]),
       };
     case WHATSAPP_DELIVERY_FAILURE_ALERT_TEMPLATE:
       return {
@@ -192,7 +229,7 @@ export function buildWhatsAppPayload(template, body) {
         // the same 8 variables as the callback alert above: Fast2SMS rejects a
         // variable count that differs from the approved template's var_count.
         message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
-        variables_values: [
+        variables_values: joinVariables([
           body.admin_name,    // {{1}} Hello {{1}},
           body.alert_line,    // {{2}} <message> could not be sent to 98XXXXXXXX.
           body.action_line,   // {{3}} Still failing after 3 attempts: <error>
@@ -201,7 +238,7 @@ export function buildWhatsAppPayload(template, body) {
           body.time_label,    // {{6}} Failed At
           body.time_value,    // {{7}}
           body.footer,        // {{8}}
-        ].join("|"),
+        ]),
       };
     case WHATSAPP_USER_QUERY_TEMPLATE:
       return {
@@ -214,7 +251,7 @@ export function buildWhatsAppPayload(template, body) {
         // 8 placeholders of the generic "doctor credentials" template:
         //   Hello {{1}}, / {{2}} / {{3}} / Details: {{4}}: {{5}} / {{6}}: {{7}} / {{8}}
         message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
-        variables_values: [
+        variables_values: joinVariables([
           doctorDisplayName(body.doctor_name),               // {{1}} verbatim, as stored
           body.greeting,                                    // {{2}}
           body.intro,                                       // {{3}}
@@ -223,13 +260,13 @@ export function buildWhatsAppPayload(template, body) {
           "Username",                                       // {{6}}
           body.username,                                    // {{7}}
           `Temporary Password: ${body.temp_password}`,      // {{8}}
-        ].join("|"),
+        ]),
       };
 
     default:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_BOOKING_ID,
-        variables_values: Object.values(body).join("|"),
+        variables_values: joinVariables(Object.values(body)),
       };
   }
 }

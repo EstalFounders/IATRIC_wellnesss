@@ -1,0 +1,326 @@
+/* InvoiceList.module.css - the invoice rows of the super-admin
+   /superAdmin/invoice page (src/components/superAdminComponent/invoice/
+   InvoiceCard.js + invoice.js).
+
+   Same visual language as css/LeaveRequest.module.css and
+   css/ConsultationBooked.module.css: brand green #3b5f1d rail, white 14px-radius
+   cards, muted uppercase labels, serif-free tabular figures.
+
+   Why a grid and not flex: the panel is a long list, so every row must line up
+   from top to bottom - same left text column, same 320px right column, same
+   right edge for badges, dropdown and button. Fixed track widths + `min-width:0`
+   on the children mean a long patient name or item list can never push the
+   side column around; it ellipsises/clamps instead. */
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 16px 24px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-left: 6px solid #3b5f1d;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-width: 0;
+}
+
+/* ── Left: invoice info ──────────────────────────────── */
+
+.info {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.invoiceNo {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3b5f1d;
+  font-variant-numeric: tabular-nums;
+}
+
+.facts {
+  display: grid;
+  /* Fixed first track so names/prices always start on the same x, flexible
+     second track so a long item list gets the remaining width. */
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 10px 32px;
+  min-width: 0;
+}
+
+.fact {
+  min-width: 0;
+}
+
+.factLabel {
+  display: block;
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #717171;
+}
+
+.factValue {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1f2933;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+/* One line only - keeps every card the same height and the grid intact. */
+.singleLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Two lines max for the item list; the full text stays in the title tooltip.
+   The min-height reserves exactly two lines so a one-item invoice and a
+   six-item invoice still produce the same row height. */
+.clamp2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  min-height: calc(1.4em * 2);
+}
+
+/* ── Right: status, meta and actions ─────────────────── */
+
+.side {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  text-align: right;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Geometry only - the colours stay in InvoiceCard.js next to the shared
+   status constants from src/constants/invoice.js. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 96px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.metaLine {
+  margin: 0;
+  max-width: 100%;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #717171;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.controlLabel {
+  font-size: 12px;
+  color: #717171;
+  white-space: nowrap;
+}
+
+.select {
+  width: 132px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  line-height: 1;
+  color: #1f2933;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  background: #f6f6f6;
+  color: #9aa0a6;
+}
+
+.select:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 1px;
+}
+
+/* Packs to the left of the "Status:" label, so the select stays flush with the
+   right edge of the card whether or not a save is in flight. */
+.saving {
+  font-size: 12px;
+  text-align: left;
+  color: #717171;
+  white-space: nowrap;
+}
+
+.viewBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148px;
+  height: 34px;
+  padding: 0 16px;
+  background: #916f38;
+  border: 1px solid #916f38;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.viewBtn:hover {
+  background: #7d612c;
+  border-color: #7d612c;
+}
+
+.viewBtn:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 2px;
+}
+
+/* ── Responsive: landscape tablets keep the two columns, narrower ─ */
+
+@media (max-width: 1024px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 296px;
+    gap: 12px 20px;
+    padding: 14px 16px;
+  }
+
+  .facts {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 8px 20px;
+  }
+
+  .select {
+    width: 100%;
+  }
+}
+
+/* ── Portrait tablets and phones: side column drops under the info ─ */
+
+@media (max-width: 860px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .facts {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .side {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .badgeRow,
+  .controls {
+    justify-content: flex-start;
+  }
+
+  /* Wrapping is allowed here - it cannot overflow, the card is full width. */
+  .metaLine {
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .select {
+    width: 132px;
+    flex: 0 1 180px;
+  }
+
+  .viewBtn {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .row {
+    padding: 14px 16px;
+    border-left-width: 4px;
+  }
+
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .controls {
+    flex-wrap: wrap;
+  }
+
+  .viewBtn {
+    width: 100%;
+  }
+}
+
+/* Row that was just created through "+ Create Invoice": flashes for a few
+   seconds (the class is removed by a timer in invoice.js) so the admin can see
+   the bill landed at the top of the list. Outline only - no layout shift. */
+.highlight {
+  outline: 3px solid #8bbf4d;
+  outline-offset: 2px;
+  animation: highlightFade 5s ease-out forwards;
+}
+
+@keyframes highlightFade {
+  0%,
+  60% {
+    outline-color: #8bbf4d;
+  }
+
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlight {
+    animation: none;
+  }
+}

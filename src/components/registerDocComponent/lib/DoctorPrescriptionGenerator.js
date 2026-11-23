@@ -393,7 +393,16 @@ const DocPrescriptionGeneratePdf = ({ data }) => {
       });
 
       if (response.ok) {
-        window.alert("Prescription sent successfully.");
+        const result = await response.json();
+        // The appointment only becomes COMPLETED when the message really went
+        // out, so never tell the doctor "sent" on a failed delivery.
+        if (result.sent) {
+          window.alert("Prescription sent successfully.");
+        } else {
+          window.alert(
+            "Prescription saved, but the WhatsApp message could not be delivered. The appointment is still open.",
+          );
+        }
       } else {
         window.alert("Something went wrong. Please try again.");
       }
