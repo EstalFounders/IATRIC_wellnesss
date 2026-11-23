@@ -240,6 +240,23 @@ export function buildWhatsAppPayload(template, body) {
           body.footer,        // {{8}}
         ]),
       };
+    case WHATSAPP_DELIVERY_FAILURE_ALERT_TEMPLATE:
+      return {
+        // Same generic template (FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID) and
+        // the same 8 variables as the callback alert above: Fast2SMS rejects a
+        // variable count that differs from the approved template's var_count.
+        message_id: process.env.FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID,
+        variables_values: [
+          body.admin_name,    // {{1}} Hello {{1}},
+          body.alert_line,    // {{2}} <message> could not be sent to 98XXXXXXXX.
+          body.action_line,   // {{3}} Still failing after 3 attempts: <error>
+          body.details_label, // {{4}} Appointment
+          body.details_value, // {{5}}
+          body.time_label,    // {{6}} Failed At
+          body.time_value,    // {{7}}
+          body.footer,        // {{8}}
+        ].join("|"),
+      };
     case WHATSAPP_USER_QUERY_TEMPLATE:
       return {
         message_id: process.env.FASTSMS_WA_TEMPLATE_OTP_ID,

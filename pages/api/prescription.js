@@ -118,6 +118,32 @@ export default async function handler(req, res) {
       }
     }
 
+    // Store the prescription details. Kept separate so a failure here never blocks sending.
+    if (prescriptionDetails && typeof prescriptionDetails === "object") {
+      try {
+        const doc = buildPrescriptionDoc(prescriptionDetails, appointmentId, prescriptionUrl);
+        if (doc.appointmentId) {
+          // Upsert so re-sending the same appointment's prescription doesn't create duplicates.
+          await Prescription.findOneAndUpdate(
+            { appointmentId: doc.appointmentId },
+            { $set: doc, $setOnInsert: { createdAt: new Date() } },
+            { upsert: true }
+          );
+        } else {
+          await Prescription.create([doc], { validateBeforeSave: false });
+        }
+      } catch (saveError) {
+        console.error("Failed to store prescription details:", saveError);
+        await logErrorToGoogleSheet({
+          apiName: "prescription - store details",
+          errorMessage: saveError.message || "Failed to store prescription",
+          errorCode: "500",
+          stackTrace: saveError.stack,
+          requestPayload: { appointmentId, name },
+        });
+      }
+    }
+
     // 2. WhatsApp Notification Flow
     let whatsapp = { sent: false };
     try {
