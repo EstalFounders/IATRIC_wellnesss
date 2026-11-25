@@ -10,8 +10,8 @@
     "test:crawl": "playwright test tests/e2e/site-crawler.spec.ts --project=\"Desktop Chrome\"",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "lint": "next lint"
-   
+    "lint": "next lint",
+    "medicines:upload": "node scripts/uploadMedicines.js"
   },
   "dependencies": {
     "@api/fast2sms": "file:.api/apis/fast2sms",
@@ -43,6 +43,7 @@
     "next-redux-wrapper": "^8.1.0",
     "node-cron": "^3.0.3",
     "openai": "^4.38.5",
+    "pdfjs-dist": "3.11.174",
     "puppeteer": "^24.7.2",
     "react": "^18.2.0",
     "react-bootstrap": "^1.6.1",
