@@ -12,7 +12,6 @@ const Dropdown = ({
   user,
   onLogout,
   handleShowLeaveReqestModel,
-  handleShowManageSlotsModel,
 }) => {
   console.log(user, "doctor name on right side menu");
   const router = useRouter();
@@ -36,7 +35,7 @@ const Dropdown = ({
       // The dedicated profile page replaced the "Edit Doctor Details" popup, so
       // the header no longer passes a `handleShowModel` callback.
       router.push("/registerDoc/profile");
-    if (item == "Manage Slots") handleShowManageSlotsModel();
+    if (item == "Availability") router.push("/registerDoc/profile#availability");
     if (item == "Leave Request") handleShowLeaveReqestModel();
     if (item == "Logout")
       try {
@@ -71,9 +70,9 @@ const Dropdown = ({
           </div>
           <div
             className={styles["dropdown-item"]}
-            onClick={() => handleItemClick("Manage Slots")}
+            onClick={() => handleItemClick("Availability")}
           >
-            Manage Slots
+            Availability
           </div>
           <div
             className={styles["dropdown-item"]}

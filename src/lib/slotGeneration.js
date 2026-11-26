@@ -9,6 +9,8 @@
 // The window written is derived from the doctor's `slotStartTime`/`slotEndTime`,
 // read as a UTC clock (the Add Doctor form stores the picked time as UTC).
 import Slot from "../models/slots";
+import { getWeeklyAvailability, timeToMinutes } from "../customUtils/weeklyAvailability";
+import { WORK_DAYS } from "../customUtils/workDays";
 
 /** Length of one bookable slot, mirrored by `/api/slots/fetchWeekSlots`. */
 export const SLOT_MINUTES = 20;
@@ -34,45 +36,30 @@ export async function generateSlotsForDoctor(
 ) {
   const slots = [];
 
-  // Validate required fields
-  if (!doctor.slotStartTime || !doctor.slotEndTime) {
-    console.warn(
-      `Doctor ${doctor._id} (${doctor.name}) has no slotStartTime or slotEndTime`
-    );
-    return 0;
-  }
-
-  const slotStartTime = new Date(doctor.slotStartTime);
-  const slotEndTime = new Date(doctor.slotEndTime);
-
-  // Get start/end times in minutes from midnight
-  const slotStartMinutes =
-    slotStartTime.getUTCHours() * 60 + slotStartTime.getUTCMinutes();
-  const slotEndMinutes =
-    slotEndTime.getUTCHours() * 60 + slotEndTime.getUTCMinutes();
-
-  // Validate time range
-  if (slotStartMinutes >= slotEndMinutes) {
-    console.warn(
-      `Invalid time range for doctor ${doctor._id}: Start (${slotStartTime}) must be before End (${slotEndTime})`
-    );
-    return 0;
-  }
+  const availability = getWeeklyAvailability(doctor);
+  if (!availability.length) return 0;
+  const unavailableDates = new Set(doctor.unavailableDates || []);
 
   // Generate slots for specified number of days
   for (let i = 0; i < numDays; i += 1) {
     const date = new Date(start.getTime() + i * 86400000);
-
-    // Calculate first available slot minute for today
-    let currentMinute = slotStartMinutes;
-
-    while (currentMinute < slotEndMinutes) {
+    const dateKey = date.toISOString().slice(0, 10);
+    if (unavailableDates.has(dateKey)) continue;
+    const dayName = WORK_DAYS[(date.getUTCDay() + 6) % 7];
+    const daySchedule = availability.find((entry) => entry.day === dayName);
+    if (!daySchedule) continue;
+    for (const range of daySchedule.ranges) {
+      const slotStartMinutes = timeToMinutes(range.startTime);
+      const slotEndMinutes = timeToMinutes(range.endTime);
+      if (slotStartMinutes === null || slotEndMinutes === null) continue;
+      let currentMinute = slotStartMinutes;
+      while (currentMinute + SLOT_MINUTES <= slotEndMinutes) {
       // Create start time for this slot
       const slotStart = new Date(
         Date.UTC(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate(),
           Math.floor(currentMinute / 60),
           currentMinute % 60
         )
@@ -91,6 +78,7 @@ export async function generateSlotsForDoctor(
 
       // Move to next interval
       currentMinute += SLOT_MINUTES;
+      }
     }
   }
 

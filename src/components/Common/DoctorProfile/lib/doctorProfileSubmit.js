@@ -14,6 +14,7 @@ import { appendWorkExperience } from "../../../../customUtils/workExperience";
 import { appendLanguages } from "../../../../customUtils/languages";
 import { formatLocation } from "../../../../customUtils/indiaLocations";
 import { toConsultationTypeEntries } from "../../../../utils/consultationFee";
+import { firstWeeklyRange } from "../../../../customUtils/weeklyAvailability";
 
 const isFile = (value) => typeof File !== "undefined" && value instanceof File;
 
@@ -162,6 +163,9 @@ export const submitDoctorUpdate = async (editedDoctor) => {
   // One field per entry, same as education + training below.
   appendLanguages(formData, editedDoctor.language);
   formData.append("workDays", editedDoctor.workDays);
+  if (editedDoctor.weeklyAvailability !== undefined) {
+    formData.append("weeklyAvailability", JSON.stringify(editedDoctor.weeklyAvailability));
+  }
   formData.append("overview", editedDoctor.overview);
   // One field per entry; blank rows are dropped and a blank field clears the
   // list on the API side.
@@ -199,8 +203,9 @@ export const submitDoctorUpdate = async (editedDoctor) => {
     formData.append("doctorSignatureUrl", editedDoctor.doctorSignatureUrl || "");
   }
   formData.append("doctorType", editedDoctor.doctorType);
-  formData.append("slotStartTime", editedDoctor.slotStartTime);
-  formData.append("slotEndTime", editedDoctor.slotEndTime);
+  const firstRange = firstWeeklyRange(editedDoctor.weeklyAvailability);
+  formData.append("slotStartTime", editedDoctor.slotStartTime || firstRange?.startTime || "");
+  formData.append("slotEndTime", editedDoctor.slotEndTime || firstRange?.endTime || "");
   // Certificates travel as two different multipart parts:
   //   * a stored Firebase URL -> `diplomasCertificatesUrls[i]` text field (the
   //     list the admin kept), and
@@ -320,4 +325,3 @@ export const saveDoctorProfile = async ({
     photoAlert,
   };
 };
-

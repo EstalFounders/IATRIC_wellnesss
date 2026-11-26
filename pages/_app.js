@@ -135,16 +135,12 @@ function MyApp({ Component, pageProps, router, ...rest }) {
   return (
     <Fragment>
       <Head>
-        <title>Health Path</title>
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
-        {(() => {
-          const PRIVATE = ['/superAdmin', '/registerDoc', '/marketing', '/payment/thankyou', '/labTest', '/meeting'];
-          return PRIVATE.some(r => router?.pathname?.startsWith(r)) ? 
-            <meta name="robots" content="noindex, nofollow" /> : null;
-        })()}
       </Head>
-      {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
+      {/* The only writer of title, description, canonical, Open Graph, Twitter
+          and robots tags - see src/marketing/components/SeoMetadata.js. It is
+          rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML. */}
       <SeoMetadata metadata={pageProps?.seoMetadata} />
       {/* Same reason: JSON-LD has to be in the HTML, not added after hydration. */}
       <PageStructuredData />

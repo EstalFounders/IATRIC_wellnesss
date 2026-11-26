@@ -24,20 +24,12 @@ import Doctor from "../../../src/models/doctorModel";
 import Slot from "../../../src/models/slots";
 import { dbConnect } from "../../../src/lib/db";
 import { logErrorToGoogleSheet } from "../helper";
-import { parseWorkDays } from "../../../src/customUtils/workDays";
+import { getWeeklyAvailability } from "../../../src/customUtils/weeklyAvailability";
+import { WORK_DAYS } from "../../../src/customUtils/workDays";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_LENGTH = 7;
 const SLOT_MINUTES = 20; // mirrors cron-jobs.js
-const DAY_NAMES = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
 const startOfUtcDay = (value) => {
   const date = new Date(value);
@@ -48,23 +40,22 @@ const startOfUtcDay = (value) => {
 const isoDay = (date) => date.toISOString().slice(0, 10);
 
 /** `slotStartTime` / `slotEndTime` are Dates whose UTC clock is the window. */
-const windowMinutes = (value) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.getUTCHours() * 60 + date.getUTCMinutes();
-};
-
 /**
  * The 20-minute slots cron-jobs.js would create for `day`, in the same order and
  * with the same `Date.UTC(...)` clock.
  */
-const buildWindowSlots = (doctor, day) => {
-  const from = windowMinutes(doctor.slotStartTime);
-  const to = windowMinutes(doctor.slotEndTime);
-  if (from === null || to === null || from >= to) return [];
+const buildWindowSlots = (availability, day) => {
+  const dayName = WORK_DAYS[(day.getUTCDay() + 6) % 7];
+  const schedule = availability.find((entry) => entry.day === dayName);
+  if (!schedule) return [];
 
   const slots = [];
-  for (let minute = from; minute < to; minute += SLOT_MINUTES) {
+  for (const range of schedule.ranges) {
+    const [fromHours, fromMinutes] = range.startTime.split(":").map(Number);
+    const [toHours, toMinutes] = range.endTime.split(":").map(Number);
+    const from = fromHours * 60 + fromMinutes;
+    const to = toHours * 60 + toMinutes;
+    for (let minute = from; minute + SLOT_MINUTES <= to; minute += SLOT_MINUTES) {
     const startTime = new Date(
       Date.UTC(
         day.getUTCFullYear(),
@@ -79,6 +70,7 @@ const buildWindowSlots = (doctor, day) => {
       endTime: new Date(startTime.getTime() + SLOT_MINUTES * 60000),
       isBooked: false,
     });
+    }
   }
   return slots;
 };
@@ -105,7 +97,7 @@ export default async function handler(req, res) {
 
   try {
     const doctor = await Doctor.findById(doctorId).select(
-      "name expertise workDays unavailableDates slotStartTime slotEndTime"
+      "name expertise workDays unavailableDates slotStartTime slotEndTime weeklyAvailability"
     );
     if (!doctor) {
       return res
@@ -137,23 +129,22 @@ export default async function handler(req, res) {
       return acc;
     }, {});
 
-    const workDays = parseWorkDays(doctor.workDays);
+    const availability = getWeeklyAvailability(doctor);
     // Free-text rows no parser understands ("as per clinic") must not blank the
     // whole week - treat every day as a working day for them.
-    const hasWorkDayRule = workDays.length > 0;
     const unavailableDates = doctor.unavailableDates || [];
 
     const days = [];
     for (let index = 0; index < WEEK_LENGTH; index += 1) {
       const day = new Date(weekStart.getTime() + index * DAY_MS);
       const date = isoDay(day);
-      const dayName = DAY_NAMES[day.getUTCDay()];
-      const isWorkDay = hasWorkDayRule ? workDays.includes(dayName) : true;
+       const dayName = WORK_DAYS[(day.getUTCDay() + 6) % 7];
+       const isWorkDay = availability.some((entry) => entry.day === dayName);
       const isUnavailable = unavailableDates.includes(date);
 
       const stored = slotsByDay[date] || [];
       const canGenerate = isWorkDay && !isUnavailable && stored.length === 0;
-      const slots = canGenerate ? buildWindowSlots(doctor, day) : stored;
+       const slots = canGenerate ? buildWindowSlots(availability, day) : stored;
 
       days.push({
         date,
@@ -175,6 +166,7 @@ export default async function handler(req, res) {
           workDays: doctor.workDays,
           slotStartTime: doctor.slotStartTime,
           slotEndTime: doctor.slotEndTime,
+          weeklyAvailability: availability,
         },
         weekStart: isoDay(weekStart),
         days,

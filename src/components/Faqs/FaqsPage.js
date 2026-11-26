@@ -12,7 +12,7 @@ const FaqsPage = () => {
           <div className="col-lg-10 offset-lg-1">
             <div className="questions-holder">
               {/* Title + intro */}
-              <h3 className="h3-md steelblue-color">{faqIntro.heading}</h3>
+              <h1 className="h3-md steelblue-color">{faqIntro.heading}</h1>
               <p>{faqIntro.text}</p>
 
               {/* QUESTIONS ACCORDION - one block per service/topic. The cards are

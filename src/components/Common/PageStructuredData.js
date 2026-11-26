@@ -3,6 +3,14 @@ import { useRouter } from "next/router";
 import { contact_no, email } from "../../constant";
 import { faqGroups, getFaqsForTopic } from "../../../data/faqs";
 import { resolveServiceKey, resolveServiceName } from "../../customUtils/serviceLinks";
+import { SITE_URL, SITE_NAME, SOCIAL_PROFILES } from "../../seo/siteConfig";
+import {
+  SERVICE_PAGE_SEO,
+  SPECIALITY_SEO,
+  getServiceSeo,
+  departmentQueryFor,
+  serviceQueryFor,
+} from "../../seo/servicesSeo";
 
 /**
  * Per-route JSON-LD, rendered from pages/_app.js *outside* <NoSsr>.
@@ -16,9 +24,10 @@ import { resolveServiceKey, resolveServiceName } from "../../customUtils/service
  * Add a route to STRUCTURED_DATA when its page is written; keep the facts in
  * sync with the page copy and src/constant.js.
  */
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.healthpath.co.in"
-).replace(/\/$/, "");
+// The origin now lives in src/seo/siteConfig.js, so JSON-LD, canonical URLs, the
+// sitemap and robots.txt can never disagree about www vs non-www again.
+const ORG_ID = `${SITE_URL}/#organization`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
 
 const physicianSchema = (doctorId, doctorName, specialty, educationTraining, languages) => ({
   "@context": "https://schema.org",
@@ -129,50 +138,249 @@ const faqStructuredData = () => ({
  * group that page actually shows (data/faqs.js), so the schema always matches the
  * visible Q&A. Returns null for a topic without a group of its own.
  */
-const topicStructuredData = (topic, path) => {
+const topicStructuredData = (topic, path, queryString = "") => {
   const group = getFaqsForTopic(topic);
+  const entry = getServiceSeo(topic);
 
-  if (!group?.items?.length) return null;
+  if (!group?.items?.length && !entry) return null;
 
-  const url = `${SITE_URL}${path}`;
+  const url = queryString
+    ? `${SITE_URL}${path}?${queryString}`
+    : `${SITE_URL}${path}`;
+  const isDepartment = path === "/department-single";
+  const name = entry?.h1 || group?.title || topic;
+  const parentName = isDepartment ? "All Departments" : "All Services";
+  const parentUrl = `${SITE_URL}${isDepartment ? "/all-departments" : "/all-services"}`;
 
-  return {
+  const graph = [
+    {
+      "@type": isDepartment ? "MedicalSpecialty" : "MedicalWebPage",
+      "@id": `${url}#topic`,
+      name,
+      url,
+      isPartOf: { "@id": WEBSITE_ID },
+      provider: { "@id": ORG_ID },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${url}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: `${SITE_URL}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: parentName,
+          item: parentUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name,
+          item: url,
+        },
+      ],
+    },
+  ];
+
+  // The same FAQ copy is rendered on the page (FaqSection), so the rich result
+  // always matches the visible Q&A. Topics without a group skip this node.
+  if (group?.items?.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${url}#faq`,
+      url,
+      name: "Frequently Asked Questions",
+      mainEntity: group.items.map(({ question, answer }) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    });
+  }
+
+  return { "@context": "https://schema.org", "@graph": graph };
+};
+
+/**
+ * Organisation + website graph, emitted on EVERY route.
+ *
+ * Nothing told Google which entity the site belongs to before this: the only
+ * Organization node lived on /about-us, so search had no site-level anchor for
+ * the logo, phone, social profiles or the site name.
+ */
+export const siteWideGraph = () => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "MedicalBusiness",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/images/logo.png`,
+      image: `${SITE_URL}/images/logo.png`,
+      telephone: contact_no,
+      email,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Sector 57",
+        addressLocality: "Gurgaon",
+        addressRegion: "Haryana",
+        postalCode: "122003",
+        addressCountry: "IN",
+      },
+      areaServed: { "@type": "Country", name: "India" },
+      sameAs: SOCIAL_PROFILES,
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ],
+          opens: "07:00",
+          closes: "22:00",
+        },
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": WEBSITE_ID,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      publisher: { "@id": ORG_ID },
+      inLanguage: "en-IN",
+    },
+  ],
+});
+
+/** ItemList node - one entry per speciality / service / post. */
+const itemListNode = (path, name, items) => ({
+  "@type": "ItemList",
+  "@id": `${SITE_URL}${path}#list`,
+  name,
+  numberOfItems: items.length,
+  itemListElement: items.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.name,
+    url: item.url,
+  })),
+});
+
+const specialityItems = () =>
+  SPECIALITY_SEO.map((entry) => ({
+    name: entry.h1,
+    url: `${SITE_URL}/department-single?${departmentQueryFor(entry)}`,
+  }));
+
+const serviceItems = () =>
+  SERVICE_PAGE_SEO.map((entry) => ({
+    name: entry.h1,
+    url: `${SITE_URL}/service-details?${serviceQueryFor(entry)}`,
+  }));
+
+const STRUCTURED_DATA = {
+  "/": {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "FAQPage",
-        "@id": `${url}#faq`,
-        url,
-        name: "Frequently Asked Questions",
-        mainEntity: group.items.map(({ question, answer }) => ({
-          "@type": "Question",
-          name: question,
-          acceptedAnswer: { "@type": "Answer", text: answer },
+        "@type": "MedicalClinic",
+        "@id": `${SITE_URL}/#clinic`,
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        image: `${SITE_URL}/images/logo.png`,
+        telephone: contact_no,
+        parentOrganization: { "@id": ORG_ID },
+        availableService: serviceItems().map((item) => ({
+          "@type": "MedicalProcedure",
+          name: item.name,
+          url: item.url,
         })),
       },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${url}#breadcrumb`,
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: `${SITE_URL}/`,
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: group.title,
-            item: `${SITE_URL}/faqs#${group.anchor}`,
-          },
-        ],
-      },
+      itemListNode("/", "Departments & Specialities", specialityItems()),
     ],
-  };
-};
-
-const STRUCTURED_DATA = {
+  },
+  "/appointment": {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_URL}/appointment#service`,
+    name: "Online and in-clinic doctor appointment",
+    serviceType: "Doctor consultation",
+    url: `${SITE_URL}/appointment`,
+    provider: { "@id": ORG_ID },
+    areaServed: { "@type": "Country", name: "India" },
+  },
+  "/all-departments": {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${SITE_URL}/all-departments#list`,
+    name: "All Departments & Specialities",
+    numberOfItems: specialityItems().length,
+    itemListElement: specialityItems().map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: item.url,
+    })),
+  },
+  "/all-services": itemListNode(
+    "/all-services",
+    "All Healthcare Services",
+    serviceItems()
+  ),
+  "/our-blog": {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "@id": `${SITE_URL}/our-blog#blog`,
+    url: `${SITE_URL}/our-blog`,
+    name: "HealthPath Health Blog",
+    publisher: { "@id": ORG_ID },
+    inLanguage: "en-IN",
+  },
+  "/pricing-1": {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    "@id": `${SITE_URL}/pricing-1#catalog`,
+    name: "HealthPath services",
+    url: `${SITE_URL}/pricing-1`,
+    provider: { "@id": ORG_ID },
+    itemListElement: serviceItems().map((item, index) => ({
+      "@type": "Offer",
+      position: index + 1,
+      itemOffered: { "@type": "Service", name: item.name, url: item.url },
+    })),
+  },
+  "/contacts-2": {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "@id": `${SITE_URL}/contacts-2#contact`,
+    url: `${SITE_URL}/contacts-2`,
+    mainEntity: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: contact_no,
+          email,
+          contactType: "customer support",
+          areaServed: "IN",
+          availableLanguage: ["en", "hi"],
+        },
+      ],
+    },
+  },
   "/about-us": {
     "@context": "https://schema.org",
     "@graph": [
@@ -292,11 +500,23 @@ export const resolveStructuredData = (pathname, query = {}, doctorData = null) =
     // first, then the human name, so a URL that carries only one of them still
     // resolves to a topic.
     const topic = resolveServiceKey(query) || resolveServiceName(query);
-    return topicStructuredData(topic, "/service-details");
+    const entry = getServiceSeo(topic);
+
+    return topicStructuredData(
+      topic,
+      "/service-details",
+      entry ? serviceQueryFor(entry) : ""
+    );
   }
 
   if (pathname === "/department-single") {
-    return topicStructuredData(query?.serviceName, "/department-single");
+    const entry = getServiceSeo(query?.serviceName);
+
+    return topicStructuredData(
+      entry?.key || query?.serviceName,
+      "/department-single",
+      entry ? departmentQueryFor(entry) : ""
+    );
   }
 
   if (pathname === "/our-blog/[slug]" && query.slug) {
@@ -313,17 +533,26 @@ const PageStructuredData = ({ doctorData = null }) => {
   // resolveStructuredData() above.
   const { pathname, query } = useRouter();
   const jsonLd = resolveStructuredData(pathname, query, doctorData);
-
-  if (!jsonLd) return null;
+  // The organisation / website graph ships on every route, so search always has
+  // a site-level entity even on pages with no schema of their own.
+  const siteGraph = siteWideGraph();
 
   return (
     <Head>
       <script
-        id="page-structured-data"
-        key={`structured-data-${pathname}`}
+        id="site-structured-data"
+        key="site-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteGraph) }}
       />
+      {jsonLd ? (
+        <script
+          id="page-structured-data"
+          key={`structured-data-${pathname}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      ) : null}
     </Head>
   );
 };
