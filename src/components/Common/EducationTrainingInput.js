@@ -1,10 +1,16 @@
 // EducationTrainingInput.js
 // Repeatable "MBBS - Johns Hopkins University" rows with an "Add More" button
-// for the doctor forms ("Add Doctor" and the shared edit-doctor modal). Rows use
-// inline styles, the convention for every panel/tag UI (see WorkDaysPicker).
+// for the doctor forms ("Add Doctor" and the shared edit-doctor modal). Optional
+// `suggestions` render as one-tap chips above the rows. Rows use inline styles,
+// the convention for every panel/tag UI (see WorkDaysPicker).
 import React from "react";
 import { MdDelete } from "react-icons/md";
 import { color_schema } from "../../constant";
+import {
+  appendSuggestion,
+  containsSuggestion,
+} from "../../customUtils/doctorSuggestions";
+import SuggestionChips from "./SuggestionChips";
 
 const rowStyle = {
   display: "flex",
@@ -60,11 +66,17 @@ const hintStyle = {
  * by `parseEducationTraining` on submit). `onChange` receives the whole array.
  * At least one row is always rendered, so a single remaining row cannot be
  * removed — there would be no input left to type in.
+ *
+ * `suggestions` is optional: when given (the Add Doctor form passes the common
+ * degrees), each entry renders as a chip that appends itself to the rows when
+ * clicked — in click order, never twice, so MBBS then MD ends up as
+ * ["MBBS", "MD"].
  */
 const EducationTrainingInput = ({
   value = [],
   onChange,
   placeholder = "e.g. MBBS - Johns Hopkins University",
+  suggestions = [],
 }) => {
   const rows =
     Array.isArray(value) && value.length > 0 ? value : [""]; // keep one row open
@@ -84,8 +96,19 @@ const EducationTrainingInput = ({
     onChange?.([...rows, ""]);
   };
 
+  const handlePickSuggestion = (suggestion) => {
+    onChange?.(appendSuggestion(rows, suggestion));
+  };
+
   return (
     <div>
+      <SuggestionChips
+        suggestions={suggestions}
+        isSelected={(suggestion) => containsSuggestion(rows, suggestion)}
+        onPick={handlePickSuggestion}
+        label="Common degrees"
+      />
+
       {rows.map((row, index) => (
         <div key={index} style={rowStyle}>
           <input
