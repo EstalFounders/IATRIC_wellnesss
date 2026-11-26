@@ -63,6 +63,16 @@ const doctorSchema = new Schema({
     type: String,
     required: [true, "Working days is required"],
   },
+  weeklyAvailability: {
+    type: [new Schema({
+      day: { type: String, required: true },
+      ranges: [{
+        startTime: { type: String, required: true },
+        endTime: { type: String, required: true },
+      }],
+    }, { _id: false })],
+    default: undefined,
+  },
   overview: {
     type: String,
     required: true,

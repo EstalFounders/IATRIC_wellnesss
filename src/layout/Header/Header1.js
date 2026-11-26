@@ -23,12 +23,12 @@ import { getLabTestCartItems } from "../../components/labTestComponent/common/Co
 import { fetchConsultations } from "../../components/ApiService/UtilService";
 import { useDispatch, useSelector } from "react-redux";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { handleServiceClick } from "../../components/Common/commonMethod";
 import { demo5ServiceHighlights } from "../../../data/services";
 import { resolveNavServiceIcon } from "../../../public/svgIcon/nav-service-icons";
 import { useGlobalData, mergeServiceLists, slugifyService } from "../../customUtils/useGlobalData";
 import { serviceDetailsPath, isComingSoonService, isConsultationService, isLabService, LAB_SERVICE_KEY, LAB_SERVICE_NAME } from "../../customUtils/serviceLinks";
 import { PAGE_MENU_ITEMS } from "../navigationItems";
+import { getServiceSeo, departmentQueryFor } from "../../seo/servicesSeo";
 
 // Quick Links > "Book Doctor Consultation": every pointer opens the booking form
 // with the consultation type preselected (AppointmentPage reads ?type=...).
@@ -107,23 +107,27 @@ const Header1 = ({ scrollToContact }) => {
     );
   };
 
-  // One row of the Our Speciality mega-menu: same icon + label layout, but the
-  // row runs the existing search/redirect handler instead of a link.
-  const renderSpeciality = (name, index) => (
-    <li key={name} className="nav-service-item">
-      <a
-        href="#"
-        className="nav-service-link"
-        onClick={(e) => {
-          e.preventDefault();
-          handleServiceClick(name, index, router);
-        }}
-      >
-        <NavServiceIcon label={name} />
-        <span className="nav-service-label">{name}</span>
-      </a>
-    </li>
-  );
+  // One row of the Our Speciality mega-menu. This used to be
+  // `<a href="#">` + an onClick redirect, so no crawler (and no middle-click,
+  // no "open in new tab") ever saw a single speciality link. It is a real href
+  // now, built from the SEO registry so it matches the page's canonical URL.
+  const renderSpeciality = (name) => {
+    const entry = getServiceSeo(name);
+    const href = entry
+      ? `/department-single?${departmentQueryFor(entry)}`
+      : `/department-single?serviceName=${encodeURIComponent(name)}`;
+
+    return (
+      <li key={name} className="nav-service-item">
+        <Link legacyBehavior href={href}>
+          <a className="nav-service-link">
+            <NavServiceIcon label={name} />
+            <span className="nav-service-label">{name}</span>
+          </a>
+        </Link>
+      </li>
+    );
+  };
 
   const hiddenRoutes = ["/appointment", "/some-other-route"];
 
@@ -228,7 +232,9 @@ const Header1 = ({ scrollToContact }) => {
                   <li><Link legacyBehavior href="/"><a className="nav-link">{t("nav.home")}</a></Link></li>
                   {/* OUR SPECIALITY */}
                   <li aria-haspopup="true">
-                    <a href="#">{t("nav.ourSpeciality")} <span className="wsarrow" /></a>
+                    <Link legacyBehavior href="/all-departments">
+                      <a>{t("nav.ourSpeciality")} <span className="wsarrow" /></a>
+                    </Link>
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">
@@ -242,7 +248,9 @@ const Header1 = ({ scrollToContact }) => {
                   {/* END OUR SPECIALITY */}
                   {/* SERVICES */}
                   <li aria-haspopup="true">
-                    <a href="#">{t("nav.servicesMenu")} <span className="wsarrow" /></a>
+                    <Link legacyBehavior href="/all-services">
+                      <a>{t("nav.servicesMenu")} <span className="wsarrow" /></a>
+                    </Link>
                     <div className="wsmegamenu clearfix">
                       <div className="container">
                         <div className="row">

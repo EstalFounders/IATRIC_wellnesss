@@ -9,6 +9,7 @@ import {
   FaPhoneAlt,
 } from "react-icons/fa";
 import { address, contact_no, email, Linkdn_url } from "../../constant";
+import { SPECIALITY_SEO, departmentQueryFor } from "../../seo/servicesSeo";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { dial, openSupportWhatsAppWeb } from "../../helper";
 import PopupDialog from "../../components/Common/PopupDialog";
@@ -175,6 +176,27 @@ const Footer4 = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        {/* POPULAR SPECIALITIES - crawlable links from every page. The header
+            mega-menu used to hide every speciality behind an onClick handler,
+            so search engines saw no route into the department pages. */}
+        <div className="row">
+          <div className="col-md-12">
+            <p className="footer-copyright text-center">
+              <strong>Popular Specialities: </strong>
+              {SPECIALITY_SEO.map((entry, index) => (
+                <span key={entry.key}>
+                  {index > 0 ? " | " : ""}
+                  <Link
+                    href={`/department-single?${departmentQueryFor(entry)}`}
+                    title={entry.h1}
+                  >
+                    {entry.param}
+                  </Link>
+                </span>
+              ))}
+            </p>
           </div>
         </div>
         {/* END FOOTER CONTENT */}

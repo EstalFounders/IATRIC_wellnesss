@@ -1,8 +1,8 @@
 import { dbConnect } from "../../../src/lib/db";
 import DoctorDetailsChangeReq from "../../../src/models/docDetailsChangeReqSchema";
-import multiparty from "multiparty";
-import GlobalVar from "../../../src/models/globalVarSchema";
 import Doctor from "../../../src/models/doctorModel";
+import { firstWeeklyRange, normalizeWeeklyAvailability, validateWeeklyAvailability } from "../../../src/customUtils/weeklyAvailability";
+import { generateSlotsForDoctor } from "../../../src/lib/slotGeneration";
 import { logErrorToGoogleSheet } from "../helper";
 
 export default async function handler(req, res) {
@@ -71,10 +71,27 @@ export default async function handler(req, res) {
       if (action === "approve") {
         console.log(request, "82", request.updatedFields);
         const id = request.doctorId.toString();
-        const fieldsToUpdate = request.updatedFields;
-        await Doctor.findByIdAndUpdate(id, fieldsToUpdate, {
+        const fieldsToUpdate = { ...request.updatedFields };
+        if (fieldsToUpdate.weeklyAvailability !== undefined) {
+          const error = validateWeeklyAvailability(fieldsToUpdate.weeklyAvailability);
+          if (error) return res.status(400).json({ error });
+          fieldsToUpdate.weeklyAvailability = normalizeWeeklyAvailability(fieldsToUpdate.weeklyAvailability);
+          const first = firstWeeklyRange(fieldsToUpdate.weeklyAvailability);
+          const asUtcDate = (time) => {
+            const [hours, minutes] = time.split(":").map(Number);
+            return new Date(Date.UTC(1970, 0, 1, hours, minutes));
+          };
+          fieldsToUpdate.slotStartTime = asUtcDate(first.startTime);
+          fieldsToUpdate.slotEndTime = asUtcDate(first.endTime);
+        }
+        const updatedDoctor = await Doctor.findByIdAndUpdate(id, fieldsToUpdate, {
           new: true,
         });
+        if (fieldsToUpdate.weeklyAvailability !== undefined) {
+          generateSlotsForDoctor(updatedDoctor).catch((slotError) =>
+            console.error(`Slot generation failed for doctor ${id}:`, slotError?.message || slotError)
+          );
+        }
         request.status = "approved";
         request.approvedAt = new Date();
 

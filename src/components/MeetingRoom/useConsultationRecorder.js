@@ -17,6 +17,11 @@ import {
   saveRecordingUrl,
   uploadConsultationRecording,
 } from "../../services/consultationRecording";
+import {
+  deletePendingRecording,
+  getPendingRecordings,
+  putPendingRecording,
+} from "../../services/recordingQueue";
 
 export const RECORDING_STATUS = {
   idle: "idle",
@@ -26,14 +31,28 @@ export const RECORDING_STATUS = {
   error: "error",
 };
 
-const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = 720;
-const FRAME_RATE = 25;
+const CANVAS_WIDTH = 960;
+const CANVAS_HEIGHT = 540;
+const FRAME_RATE = 12;
 const TIMESLICE_MS = 1000;
 // Explicit bitrates. Without them MediaRecorder falls back to a low default,
-// which is why the file looked soft and blocky.
-const VIDEO_BITS_PER_SECOND = 3_000_000;
-const AUDIO_BITS_PER_SECOND = 128_000;
+// which is why the file looked soft and blocky. They are deliberately modest:
+// the finished blob is uploaded after the call, and 3 Mbps produced ~23 MB per
+// minute - a 10 minute consultation could not finish uploading before the
+// doctor closed the tab, so the recording was lost. ~1 Mbps is ~7 MB/min.
+const VIDEO_BITS_PER_SECOND = 1_000_000;
+const AUDIO_BITS_PER_SECOND = 64_000;
+// The room auto-starts recording before the patient joins (and before
+// `getUserMedia` may have resolved on a slow laptop), so the recorder waits for
+// a usable stream instead of failing the whole consultation.
+const START_RETRY_MS = 2000;
+const MAX_START_RETRIES = 90; // ~3 minutes of waiting
+
+/** Every recorder step logs under one prefix, so a "not recording" report can be
+ * answered from the doctor's console instead of guessed at. */
+const log = (...args) => {
+  if (typeof console !== "undefined") console.info("[recording]", ...args);
+};
 
 /** Best codecs this browser can actually encode, most preferred first. */
 const pickMimeType = (hasVideo) => {
@@ -117,10 +136,22 @@ export default function useConsultationRecorder({
   const mountedRef = useRef(true);
   const statusRef = useRef(status);
   const remoteStreamRef = useRef(remoteStream);
+  // Auto-start bookkeeping: the recorder retries while the room still wants it.
+  const startRetryRef = useRef(null);
+  const startAttemptsRef = useRef(0);
+  const startRef = useRef(null);
+  const enabledRef = useRef(enabled);
+  // Key of the copy parked in IndexedDB and the meeting already resumed once.
+  const pendingKeyRef = useRef("");
+  const resumedRef = useRef("");
 
   useEffect(() => {
     remoteStreamRef.current = remoteStream;
   }, [remoteStream]);
+
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
 
   useEffect(() => {
     statusRef.current = status;
@@ -151,7 +182,49 @@ export default function useConsultationRecorder({
     }
   }, []);
 
-  /** Finalise the blob, upload it and store the URL on the appointment. */
+  /**
+   * Upload a finished blob and store its URL on the appointment. The copy in
+   * IndexedDB is deleted only after the URL is accepted, so a failed upload can
+   * be retried from the ended screen or on the next room visit instead of
+   * disappearing with the tab.
+   */
+  const uploadAndSave = useCallback(
+    async (blob, key) => {
+      if (!blob || !blob.size) return;
+      if (mountedRef.current) {
+        setError("");
+        setStatus(RECORDING_STATUS.uploading);
+      }
+      log("uploading", { meetingId, bytes: blob.size, type: blob.type });
+      try {
+        const url = await uploadConsultationRecording(blob, { meetingId });
+        log("uploaded", url);
+        await saveRecordingUrl({
+          appointmentId: consultation?._id,
+          meetingId,
+          recordingURL: url,
+        });
+        log("saved on the appointment", consultation?._id || meetingId);
+        if (key) {
+          await deletePendingRecording(key).catch(() => {});
+          if (pendingKeyRef.current === key) pendingKeyRef.current = "";
+        }
+        if (mountedRef.current) {
+          setRecordingURL(url);
+          setStatus(RECORDING_STATUS.saved);
+        }
+      } catch (err) {
+        console.error("[recording] upload failed:", err);
+        if (mountedRef.current) {
+          setError(err.message || "Failed to upload the recording.");
+          setStatus(RECORDING_STATUS.error);
+        }
+      }
+    },
+    [consultation, meetingId]
+  );
+
+  /** Finalise the blob, park it on this device, then upload it. */
   const handleStop = useCallback(async () => {
     clearInterval(drawTimerRef.current);
     drawTimerRef.current = null;
@@ -160,6 +233,10 @@ export default function useConsultationRecorder({
     const recordedMimeType = recorderRef.current?.mimeType || "";
     chunksRef.current = [];
     recorderRef.current = null;
+
+    // Show "saving" straight away: the ended screen renders while this handler is
+    // still assembling the blob, and it must not claim that nothing was recorded.
+    if (mountedRef.current) setStatus(RECORDING_STATUS.uploading);
 
     // Tear the mix graph down; the source streams themselves are owned by the
     // meeting room and are left untouched.
@@ -172,40 +249,70 @@ export default function useConsultationRecorder({
     audioDestinationRef.current = null;
     canvasRef.current = null;
 
-    if (startedAtRef.current) {
-      setDurationMs(Date.now() - startedAtRef.current);
-    }
+    const elapsed = startedAtRef.current ? Date.now() - startedAtRef.current : 0;
+    startedAtRef.current = 0;
+    if (mountedRef.current) setDurationMs(elapsed);
 
     const blob = new Blob(chunks, {
       type: recordedMimeType || (isAudioOnly ? "audio/webm" : "video/webm"),
     });
+    log("stopped", {
+      chunks: chunks.length,
+      bytes: blob.size,
+      ms: elapsed,
+      type: blob.type,
+    });
 
     if (!blob.size) {
-      if (mountedRef.current) setStatus(RECORDING_STATUS.idle);
+      // Silence here is what made "it is not recording" impossible to diagnose:
+      // the room simply went back to idle and nothing was ever saved.
+      if (mountedRef.current) {
+        setError(
+          "The recorder captured no data - the browser blocked it or the call ended before the first second."
+        );
+        setStatus(RECORDING_STATUS.error);
+      }
       return;
     }
 
-    if (mountedRef.current) setStatus(RECORDING_STATUS.uploading);
-
+    const key = `${meetingId || consultation?._id || "meeting"}_${Date.now()}`;
+    pendingKeyRef.current = key;
     try {
-      const url = await uploadConsultationRecording(blob, { meetingId });
-      await saveRecordingUrl({
+      await putPendingRecording({
+        key,
+        meetingId: meetingId || consultation?._id,
         appointmentId: consultation?._id,
-        meetingId,
-        recordingURL: url,
+        blob,
       });
-      if (mountedRef.current) {
-        setRecordingURL(url);
-        setStatus(RECORDING_STATUS.saved);
+      log("parked a local copy", key);
+    } catch (queueError) {
+      // No IndexedDB (private window / blocked storage): upload directly, the
+      // retry copy is a safety net, not a requirement.
+      console.warn("[recording] could not park a local copy:", queueError);
+    }
+
+    await uploadAndSave(blob, key);
+  }, [consultation, meetingId, isAudioOnly, uploadAndSave]);
+
+  /** Re-send a recording whose upload failed (ended screen "Retry", or a resume). */
+  const retryUpload = useCallback(async () => {
+    log("retry requested");
+    try {
+      const pending = await getPendingRecordings(meetingId || consultation?._id);
+      if (pending.length > 0) {
+        for (const item of pending) {
+          await uploadAndSave(item.blob, item.key);
+        }
+        return;
       }
     } catch (err) {
-      console.error("Failed to upload the consultation recording:", err);
-      if (mountedRef.current) {
-        setError(err.message || "Failed to upload the recording.");
-        setStatus(RECORDING_STATUS.error);
-      }
+      console.warn("[recording] retry could not read the queued recording:", err);
     }
-  }, [consultation, meetingId, isAudioOnly]);
+    if (mountedRef.current) {
+      setError("The recording is no longer stored on this device - it has to be recorded again.");
+      setStatus(RECORDING_STATUS.error);
+    }
+  }, [consultation, meetingId, uploadAndSave]);
 
   const start = useCallback(async () => {
     if (typeof window === "undefined") return;
@@ -216,10 +323,44 @@ export default function useConsultationRecorder({
       return;
     }
 
-    const localStream = localStreamRef?.current;
-    if (!localStream) return; // media not acquired yet
+    const localStream = localStreamRef?.current || null;
+    const remoteStreamNow = remoteStreamRef.current || null;
+    const localAudioTracks = localStream?.getAudioTracks?.().length || 0;
+    const remoteAudioTracks = remoteStreamNow?.getAudioTracks?.().length || 0;
+
+    // The room turns recording on before the patient joins and while
+    // `getUserMedia` may still be pending, so wait for a stream instead of
+    // returning silently (which left the room with no recording and no clue).
+    if (!localStream && !remoteStreamNow) {
+      if (enabledRef.current && startAttemptsRef.current < MAX_START_RETRIES) {
+        startAttemptsRef.current += 1;
+        log(`waiting for a media stream (attempt ${startAttemptsRef.current}/${MAX_START_RETRIES})`);
+        if (!startRetryRef.current) {
+          startRetryRef.current = setTimeout(() => {
+            startRetryRef.current = null;
+            startRef.current?.();
+          }, START_RETRY_MS);
+        }
+      } else {
+        setError("No microphone or camera stream is available to record.");
+        setStatus(RECORDING_STATUS.error);
+      }
+      return;
+    }
+
+    // An audio-only booking with no microphone anywhere would only produce a
+    // silent file, so say so instead of saving silence.
+    if (isAudioOnly && !localAudioTracks && !remoteAudioTracks) {
+      setError("No microphone audio is available to record this consultation.");
+      setStatus(RECORDING_STATUS.error);
+      return;
+    }
 
     try {
+      clearTimeout(startRetryRef.current);
+      startRetryRef.current = null;
+      startAttemptsRef.current = 0;
+
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const audioCtx = AudioCtx ? new AudioCtx() : null;
       audioCtxRef.current = audioCtx;
@@ -233,7 +374,7 @@ export default function useConsultationRecorder({
         // which would record silence.
         audioCtx.resume?.().catch(() => {});
         connectAudio(localStream);
-        connectAudio(remoteStreamRef.current);
+        connectAudio(remoteStreamNow);
       }
 
       const tracks = [];
@@ -298,6 +439,13 @@ export default function useConsultationRecorder({
       recorderRef.current = recorder;
       startedAtRef.current = Date.now();
       recorder.start(TIMESLICE_MS);
+      log("started", {
+        mimeType: recorder.mimeType || mimeType || "browser default",
+        audioSources: (localAudioTracks ? 1 : 0) + (remoteAudioTracks ? 1 : 0),
+        video: !isAudioOnly,
+        fps: isAudioOnly ? 0 : FRAME_RATE,
+        videoBitsPerSecond: isAudioOnly ? 0 : VIDEO_BITS_PER_SECOND,
+      });
 
       setError("");
       setStatus(RECORDING_STATUS.recording);
@@ -337,14 +485,45 @@ export default function useConsultationRecorder({
     }
   }, []);
 
+  // Keep the latest `start` reachable from the retry timer without a self
+  // reference inside its own useCallback.
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
+
   // Auto-start when the call becomes recordable, auto-stop when it no longer is.
   useEffect(() => {
     if (enabled) {
       start();
-    } else if (recorderRef.current) {
-      stop();
+    } else {
+      clearTimeout(startRetryRef.current);
+      startRetryRef.current = null;
+      startAttemptsRef.current = 0;
+      if (recorderRef.current) stop();
     }
   }, [enabled, start, stop]);
+
+  // Resume uploads that were interrupted last time (tab closed, network dropped):
+  // the blob is still in IndexedDB, so the recording is not lost. Runs once per
+  // meeting - the room is only remounted after a call.
+  useEffect(() => {
+    const id = meetingId || consultation?._id;
+    if (!id || resumedRef.current === id) return;
+    resumedRef.current = id;
+    (async () => {
+      try {
+        const pending = await getPendingRecordings(id);
+        if (!mountedRef.current || pending.length === 0) return;
+        log(`resuming ${pending.length} queued recording(s)`, id);
+        for (const item of pending) {
+          if (!mountedRef.current) return;
+          await uploadAndSave(item.blob, item.key);
+        }
+      } catch (err) {
+        console.warn("[recording] could not resume queued recordings:", err);
+      }
+    })();
+  }, [consultation?._id, meetingId, uploadAndSave]);
 
   // The peer may connect after recording has already begun; fold their audio into
   // the live mix (the canvas reads the remote <video> every frame already).
@@ -366,6 +545,7 @@ export default function useConsultationRecorder({
         }
       }
       clearInterval(drawTimerRef.current);
+      clearTimeout(startRetryRef.current);
       try {
         audioCtxRef.current?.close();
       } catch (err) {
@@ -386,5 +566,6 @@ export default function useConsultationRecorder({
     durationMs,
     start,
     stop,
+    retryUpload,
   };
 }

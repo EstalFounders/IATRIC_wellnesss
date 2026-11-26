@@ -1,13 +1,22 @@
 User-agent: *
 Allow: /
+# Private tools and app screens.
 Disallow: /superAdmin/
 Disallow: /registerDoc/
 Disallow: /marketing/
 Disallow: /api/
 Disallow: /payment/
-Disallow: /labTest/
 Disallow: /meeting/
-Disallow: /_next/
+Disallow: /feedback
+Disallow: /all
+# Logged-in lab / pharmacy flows and staff records (their public story lives on
+# /service-details). /_next/ is deliberately NOT blocked - Google needs the CSS
+# and JS to render the pages.
+Disallow: /labTest/
+Disallow: /medicine/
+Disallow: /nursing-staff/
+# Legacy duplicate of /our-blog (301s there).
+Disallow: /blog/
 
 Sitemap: https://healthpath.co.in/sitemap.xml
 

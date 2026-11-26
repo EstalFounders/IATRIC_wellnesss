@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
 import styles from "./TimetablePage.module.css";
+import { formatWeeklyAvailability } from "../../customUtils/weeklyAvailability";
 import { formatTime } from "../helper";
 import { doctorDisplayName } from "../../utils/doctorName";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
@@ -151,7 +152,9 @@ const TimetablePage = () => {
 
   const doctor = week?.doctor;
   const hoursLabel =
-    doctor?.slotStartTime && doctor?.slotEndTime
+    doctor?.weeklyAvailability?.length
+      ? formatWeeklyAvailability(doctor.weeklyAvailability)
+      : doctor?.slotStartTime && doctor?.slotEndTime
       ? `${formatTime(doctor.slotStartTime)} - ${formatTime(doctor.slotEndTime)}`
       : "";
   const hasAnySlot = days.some((day) => day.slots.length > 0);

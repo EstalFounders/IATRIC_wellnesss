@@ -1,0 +1,146 @@
+.editor {
+  width: 100%;
+}
+
+.dayGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  align-items: start;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dayButton {
+  min-width: 52px;
+  padding: 7px 12px;
+  border: 1px solid #3b5f1d;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b5f1d;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dayButton:hover,
+.dayButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 95, 29, 0.15);
+}
+
+.dayButtonSelected {
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.dayPanel {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px 10px;
+  border: 1px solid #ececec;
+  border-left: 3px solid #916f38;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dayLegend {
+  padding: 0 6px;
+  color: #3b5f1d;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.rangeRow {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.timeField {
+  display: flex;
+  flex: 1 1 120px;
+  flex-direction: column;
+  gap: 4px;
+  color: #3f4c5a;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.timeInput {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #cfd6dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f2933;
+  font-size: 0.9rem;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: #3b5f1d;
+  box-shadow: 0 0 0 3px rgba(59, 95, 29, 0.15);
+}
+
+.secondaryButton,
+.removeButton {
+  padding: 7px 12px;
+  border: 1px solid #3b5f1d;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b5f1d;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryButton:hover,
+.secondaryButton:focus-visible {
+  background: #f4f7f0;
+}
+
+.removeButton {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.removeButton:disabled {
+  border-color: #d9dee3;
+  color: #9aa5b1;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 8px;
+  color: #c62828;
+  font-size: 0.8rem;
+}
+
+.empty {
+  display: block;
+  margin-top: 8px;
+  color: #9aa5b1;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 576px) {
+  .dayGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timeField {
+    flex-basis: 110px;
+  }
+}

@@ -23,6 +23,27 @@ const brandTheme = createTheme({
   typography: { fontFamily: '"TT Ramillas", serif' },
 });
 
+// `/appointment` is the busiest conversion page and also the heaviest route: the
+// appointment component alone is ~1,270 lines and pulls in react-datepicker, the
+// Cashfree SDK, five modals, doctor cards and the FAQ blocks. Most of its entry
+// points are `ConsultationButton`, which navigates with `router.push` - and
+// `router.push` never prefetches - so the chunk only started downloading after the
+// tap. On a slow phone that missed Next's internal 3.8s route deadline and surfaced
+// as `Route did not complete loading: /appointment` (a dead-looking tap).
+// Warming the route while the browser is idle puts it in Next's route cache, so the
+// tap becomes instant. Next dedupes prefetches: one request per page view.
+const APPOINTMENT_ROUTE = "/appointment";
+// Same areas _app already keeps out of search (see the robots meta below) plus the
+// full-screen call room: warming a public booking page there is pointless.
+const PREFETCH_SKIP_PREFIXES = [
+  "/superAdmin",
+  "/registerDoc",
+  "/marketing",
+  "/meeting",
+  "/payment/thankyou",
+  "/labTest",
+];
+
 function MyApp({ Component, pageProps, router, ...rest }) {
   const [loader, setLoader] = useState(true);
   // `useWrappedStore` reads the page props off the object it is given; it used to
@@ -68,19 +89,58 @@ function MyApp({ Component, pageProps, router, ...rest }) {
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
   }, [router.events]);
 
+  // Prefetch /appointment once the current page is idle. Errors (offline, 404) are
+  // ignored: the tap then simply loads the chunk the normal way, exactly as before.
+  const routePath = typeof router?.pathname === "string" ? router.pathname : "";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    if (!routePath || routePath === APPOINTMENT_ROUTE) return undefined;
+    if (PREFETCH_SKIP_PREFIXES.some((prefix) => routePath.startsWith(prefix))) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    const warm = () => {
+      if (cancelled) return;
+      try {
+        // `router.prefetch` is a prototype method (uses `this`), so it must be
+        // called on `router`, never detached.
+        Promise.resolve(router.prefetch(APPOINTMENT_ROUTE)).catch(() => {});
+      } catch (_) {
+        /* a failed prefetch must never break the page */
+      }
+    };
+
+    // requestIdleCallback keeps this off the first paint / hydration path;
+    // older Safari only has the setTimeout fallback.
+    const handle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(warm, { timeout: 2000 })
+        : setTimeout(warm, 1200);
+
+    return () => {
+      cancelled = true;
+      if (
+        typeof window.requestIdleCallback === "function" &&
+        typeof window.cancelIdleCallback === "function"
+      ) {
+        window.cancelIdleCallback(handle);
+      } else {
+        clearTimeout(handle);
+      }
+    };
+  }, [routePath, router]);
+
   return (
     <Fragment>
       <Head>
-        <title>Health Path</title>
         <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" />
         <link rel="icon" href="images/logo.png" type="image/x-icon"></link>
-        {(() => {
-          const PRIVATE = ['/superAdmin', '/registerDoc', '/marketing', '/payment/thankyou', '/labTest', '/meeting'];
-          return PRIVATE.some(r => router?.pathname?.startsWith(r)) ? 
-            <meta name="robots" content="noindex, nofollow" /> : null;
-        })()}
       </Head>
-      {/* Rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML */}
+      {/* The only writer of title, description, canonical, Open Graph, Twitter
+          and robots tags - see src/marketing/components/SeoMetadata.js. It is
+          rendered outside <NoSsr>/<PersistGate> so the tags are in the SSR HTML. */}
       <SeoMetadata metadata={pageProps?.seoMetadata} />
       {/* Same reason: JSON-LD has to be in the HTML, not added after hydration. */}
       <PageStructuredData />

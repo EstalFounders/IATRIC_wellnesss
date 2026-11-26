@@ -279,7 +279,11 @@ export default function AllSpecialityCards({
   showHeading = true,
   heading = "Our Specialities",
   subHeading = "Pick a department to meet the right specialist or book a consultation in a few clicks.",
+  // The page owns the <h1>; on /all-departments this block is the page heading,
+  // everywhere else it is a section heading.
+  headingAs = "h2",
 }) {
+  const HeadingTag = headingAs;
   const [query, setQuery] = useState("");
   const { doctors, isLoaded } = useDoctors();
 
@@ -314,7 +318,7 @@ export default function AllSpecialityCards({
         <div className="speciality-head">
           <div className="speciality-head-text">
             {showHeading && heading ? (
-              <h2 className="speciality-heading">{heading}</h2>
+              <HeadingTag className="speciality-heading">{heading}</HeadingTag>
             ) : null}
             {showHeading && subHeading ? (
               <p className="speciality-subheading">{subHeading}</p>

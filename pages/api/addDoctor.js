@@ -20,6 +20,7 @@ import { parseEducationTraining } from "../../src/customUtils/educationTraining"
 import { parseLanguages } from "../../src/customUtils/languages";
 import { parseLocation } from "../../src/customUtils/indiaLocations";
 import { parseWorkExperience } from "../../src/customUtils/workExperience";
+import { firstWeeklyRange, normalizeWeeklyAvailability, validateWeeklyAvailability } from "../../src/customUtils/weeklyAvailability";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE } from "./utils/constants";
 import { getDoctorCredentialsMessageBody } from "./utils/whatsappMessageBodies";
@@ -432,6 +433,34 @@ function parseConsultationTypes(raw) {
     .filter(Boolean);
 }
 
+function parseWeeklyAvailability(fields) {
+  if (fields.weeklyAvailability === undefined) return { present: false };
+  let parsed;
+  try {
+    parsed = JSON.parse(String(fields.weeklyAvailability[0] || ""));
+  } catch {
+    throw new Error("Weekly availability must be valid JSON.");
+  }
+  const error = validateWeeklyAvailability(parsed);
+  if (error) throw new Error(error);
+  return { present: true, value: normalizeWeeklyAvailability(parsed) };
+}
+
+function isWeeklyAvailabilityError(error) {
+  return error?.message === "Weekly availability must be valid JSON." ||
+    /must have|invalid time|overlapping|invalid or duplicate day|Select at least/.test(error?.message || "");
+}
+
+function availabilitySummary(value) {
+  const first = firstWeeklyRange(value);
+  if (!first) return {};
+  const asUtcDate = (time) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return new Date(Date.UTC(1970, 0, 1, hours, minutes));
+  };
+  return { slotStartTime: asUtcDate(first.startTime), slotEndTime: asUtcDate(first.endTime) };
+}
+
 export const config = {
   api: {
     bodyParser: false,
@@ -572,6 +601,7 @@ export default async function handler(req, res) {
           const rawPassword = generateTempPassword();
           const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
+          const weekly = parseWeeklyAvailability(fields);
           const stringFields = Object.fromEntries(
             Object.entries(fields).map(([key, value]) => [
               key,
@@ -612,6 +642,7 @@ export default async function handler(req, res) {
                   .split(",")
                   .map((type) => type.trim())
               : [], // Convert to array & trim spaces
+            ...(weekly.present ? { weeklyAvailability: weekly.value, ...availabilitySummary(weekly.value) } : {}),
           });
 
           console.log(addedDoctor._id, "Doctor Added");
@@ -655,6 +686,9 @@ export default async function handler(req, res) {
           // Assuming the rest of your code to handle the response and database operations
         } catch (error) {
           console.error("Error uploading files:", error);
+          if (isWeeklyAvailabilityError(error)) {
+            return res.status(400).json({ error: error.message, message: error.message });
+          }
           // Corrupt or unsupported picture (a truncated JPG, a PDF in the picture
           // slot, ...): answer with the reason so the form can show it.
           if (rejectBadUpload(res, error)) return;
@@ -766,7 +800,9 @@ export default async function handler(req, res) {
         // answered right here: 400 with the reason for a bad image (or a document
         // in the picture/signature slot), 500 otherwise.
         let preparedUploads;
+        let weekly = { present: false };
         try {
+          weekly = parseWeeklyAvailability(fields);
           assertImageUpload(profilePictureFile, "profile picture");
           assertImageUpload(doctorSignatureFile, "digital signature");
           preparedUploads = await prepareUploads([
@@ -776,6 +812,9 @@ export default async function handler(req, res) {
           ]);
         } catch (error) {
           console.error("Could not process the uploaded files:", error);
+          if (isWeeklyAvailabilityError(error)) {
+            return res.status(400).json({ error: error.message, message: error.message });
+          }
           if (rejectBadUpload(res, error)) return;
           return res
             .status(500)
@@ -922,6 +961,11 @@ export default async function handler(req, res) {
           ),
         };
 
+        if (weekly.present) {
+          updateData.weeklyAvailability = weekly.value;
+          Object.assign(updateData, availabilitySummary(weekly.value));
+        }
+
         // Location - only touch it when the client sends it (the doctor-panel
         // approval PUT never sends it, so it must keep the stored value).
         if (location !== null) {
@@ -998,7 +1042,9 @@ export default async function handler(req, res) {
           String(existingDoctor.slotStartTime ?? "") !==
             String(updatedDoctor.slotStartTime ?? "") ||
           String(existingDoctor.slotEndTime ?? "") !==
-            String(updatedDoctor.slotEndTime ?? "");
+          String(updatedDoctor.slotEndTime ?? "") ||
+          JSON.stringify(existingDoctor.weeklyAvailability || []) !==
+            JSON.stringify(updatedDoctor.weeklyAvailability || []);
         if (slotWindowChanged) {
           generateSlotsForDoctor(updatedDoctor).catch((slotError) => {
             console.error(
@@ -1045,8 +1091,11 @@ export default async function handler(req, res) {
 
         res.status(200).json({ success: true });
       });
-    } catch (error) {
-      console.error("Error updating doctor:", error);
+        } catch (error) {
+          console.error("Error updating doctor:", error);
+          if (isWeeklyAvailabilityError(error)) {
+            return res.status(400).json({ error: error.message, message: error.message });
+          }
       if (rejectBadUpload(res, error)) return;
       if (sendDoctorWriteError(res, error)) return;
       await logErrorToGoogleSheet({

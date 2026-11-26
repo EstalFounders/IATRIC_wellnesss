@@ -126,7 +126,7 @@ const OurBlogPage = () => {
           {/* SECTION TITLE */}
           <div className="row">
             <div className="col-lg-10 offset-lg-1 section-title">
-              <h3 className="h3-md text-dark">Our Blog</h3>
+              <h1 className="h3-md text-dark">Our Blog</h1>
               <div>
                 Health tips, patient stories and clinic updates from our team.
               </div>

@@ -34,6 +34,7 @@ import {
 } from "../../../customUtils/educationTraining";
 import { formatLanguagesLabel } from "../../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../../customUtils/workDays";
+import { formatWeeklyAvailability } from "../../../customUtils/weeklyAvailability";
 import { formatWorkExperienceLabel } from "../../../customUtils/workExperience";
 import { doctorDisplayName } from "../../../utils/doctorName";
 import { consultationTypeNames, formatConsultationTypePrices } from "../../../utils/consultationFee";
@@ -62,6 +63,7 @@ const formatDay = (value) => {
 
 /** Both slot bounds are full Dates; only the clock part is meaningful. */
 const formatSlotWindow = (doctor) => {
+  if (doctor.weeklyAvailability?.length) return formatWeeklyAvailability(doctor.weeklyAvailability);
   const from = doctor.slotStartTime ? convertDateIntoTime(doctor.slotStartTime) : "";
   const to = doctor.slotEndTime ? convertDateIntoTime(doctor.slotEndTime) : "";
   if (!from && !to) return "";
