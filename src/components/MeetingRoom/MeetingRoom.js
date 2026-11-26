@@ -27,8 +27,11 @@ const getFileIcon = (type) => {
 const RecordingIndicator = ({ isRecording, isUploading, isSaved, hasError, error }) => {
   if (hasError) {
     return (
-      <div className={styles.recordingBadge} title={error || "Recording failed"}>
-        ⚠️ Recording failed
+      <div
+        className={`${styles.recordingBadge} ${styles.recordingBadgeError}`}
+        title={error || "Recording failed"}
+      >
+        ⚠️ {error || "Recording failed"}
       </div>
     );
   }
@@ -400,8 +403,13 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
     error: recordingError,
     start: startRecording,
     stop: stopRecording,
+    retryUpload,
   } = useConsultationRecorder({
-    enabled: isDoctor && meetingState === "active" && localMediaReady,
+    // Recording no longer waits for `localMediaReady`: a desktop without a
+    // camera (or with a denied permission) never set that flag, so the whole
+    // consultation silently went unrecorded. The recorder itself now waits for
+    // whichever stream appears (the peer's is enough) and reports the failure.
+    enabled: isDoctor && meetingState === "active",
     consultation,
     meetingId: mid,
     localStreamRef,
@@ -827,9 +835,38 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
         setLocalMediaReady(true);
       } catch (err) {
         console.error("getUserMedia error:", err);
+        // A camera-less or permission-denied desktop should still record (and
+        // still consult): retry mic-only before giving up on local media.
+        if (!isAudioOnly) {
+          try {
+            const audioOnlyStream = await navigator.mediaDevices.getUserMedia({
+              video: false,
+              audio: true,
+            });
+            localStreamRef.current = audioOnlyStream;
+            setIsVideoOn(false);
+            setIsAudioOn(true);
+            setLocalMediaReady(true);
+            if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
+            setCameraToast({
+              icon: "🎙️",
+              message: "Camera unavailable - continuing with microphone only",
+            });
+            cameraToastTimerRef.current = setTimeout(() => setCameraToast(null), 4000);
+            return;
+          } catch (audioErr) {
+            console.error("getUserMedia audio-only fallback error:", audioErr);
+          }
+        }
         setIsVideoOn(false);
         setIsAudioOn(false);
         setLocalMediaReady(false);
+        if (cameraToastTimerRef.current) clearTimeout(cameraToastTimerRef.current);
+        setCameraToast({
+          icon: "⚠️",
+          message: "No camera or microphone access - the consultation is not being recorded",
+        });
+        cameraToastTimerRef.current = setTimeout(() => setCameraToast(null), 6000);
       }
     };
     initMedia();
@@ -1019,9 +1056,26 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
   };
 
   const endCall = () => {
+    // Stop the recorder *before* the room switches to the ended screen: that
+    // unmounts the live video elements the recorder paints from, and the upload
+    // (which happens on stop) must start while the tab is still on the call.
+    stopRecording();
     if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
     setMeetingState("ended");
   };
+
+  // Warn before closing the tab while the recording is still uploading - a
+  // closed tab aborts the request and used to lose the whole consultation.
+  useEffect(() => {
+    if (!isUploading) return;
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isUploading]);
 
   // ---- Chat ----
   const handleSendMessage = (text) => {
@@ -1095,6 +1149,45 @@ export default function MeetingRoom({ consultation, userType, meetingId }) {
           <div className={styles.endedIcon}>📞</div>
           <div className={styles.endedTitle}>Consultation Ended</div>
           <div className={styles.endedDuration}>Duration: {formattedTime}</div>
+          {/* The recording is uploaded when the call stops, i.e. right here. Show
+              its state and keep a retry within reach: this screen is the last
+              thing the doctor sees before closing the tab. */}
+          {isDoctor && (
+            <div className={styles.recordingSaveState}>
+              {isUploading && (
+                <span className={styles.recordingSaveText}>
+                  <span className={styles.recordingDot} />
+                  Saving the consultation recording - keep this tab open…
+                </span>
+              )}
+              {/* `endCall` stops the recorder first, so this covers the moment
+                  between the click and the finalised blob. */}
+              {isRecording && !isUploading && !isSaved && !hasError && (
+                <span className={styles.recordingSaveText}>
+                  <span className={styles.recordingDot} />
+                  Finishing the recording…
+                </span>
+              )}
+              {isSaved && (
+                <span className={styles.recordingSaveText}>
+                  ✅ Recording saved to this appointment
+                </span>
+              )}
+              {hasError && (
+                <span className={styles.recordingSaveText}>
+                  ⚠️ {recordingError || "The recording could not be saved."}
+                  <button type="button" className={styles.recordingRetry} onClick={retryUpload}>
+                    Retry upload
+                  </button>
+                </span>
+              )}
+              {!isRecording && !isUploading && !isSaved && !hasError && (
+                <span className={styles.recordingSaveText}>
+                  No recording was saved for this consultation.
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
