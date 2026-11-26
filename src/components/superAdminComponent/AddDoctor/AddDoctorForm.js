@@ -18,7 +18,8 @@ import {
   DoctorType,
   superAdminConsultationtype,
 } from "../../../constant.js";
-import WorkDaysPicker from "../../Common/WorkDaysPicker.js";
+import WeeklyAvailabilityEditor from "../../Common/WeeklyAvailabilityEditor.js";
+import { validateWeeklyAvailability } from "../../../customUtils/weeklyAvailability.js";
 import EducationTrainingInput from "../../Common/EducationTrainingInput.js";
 import WorkExperienceInput from "../../Common/WorkExperienceInput.js";
 import LanguageInput from "../../Common/LanguageInput.js";
@@ -33,7 +34,7 @@ import {
   parseLanguages,
 } from "../../../customUtils/languages.js";
 import CustomDialog from "../../CustomPopup.js";
-import { convertTimeIntoDate, isMobileValid } from "../../../helper.js";
+import { isMobileValid } from "../../../helper.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice.js";
 import { fetchAllDoctors } from "../../../store/slices/bookingWebsite/allDoctorsPageSlice.js";
@@ -100,15 +101,13 @@ const AddDoctorForm = () => {
   const [profilePicture, setprofilePicture] = useState("");
   const [doctorSignature, setDoctorSignature] = useState("");
   const [loader, setLoader] = useState(false);
-  const [slotStartTime, setSlotStartTime] = useState("09:00");
-  const [slotEndTime, setSlotEndTime] = useState("21:00");
+  const [weeklyAvailability, setWeeklyAvailability] = useState([]);
   const [message, setMessage] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedService, setSelectedService] = useState([]);
   // Array of canonical day names; mirrored into doctorDetails.workDays as a
   // comma-joined string, which is what the API stores.
-  const [selectedWorkDays, setSelectedWorkDays] = useState([]);
   const [workDaysError, setWorkDaysError] = useState("");
   // Draft rows for the repeatable education/training inputs; blank rows are
   // filtered out on submit by `appendEducationTraining`.
@@ -233,13 +232,13 @@ const AddDoctorForm = () => {
   };
 
   // <WorkDaysPicker /> already returns a Monday -> Sunday ordered array.
-  const handleWorkDaysChange = (days) => {
-    setSelectedWorkDays(days);
+  const handleWeeklyAvailabilityChange = (availability) => {
+    setWeeklyAvailability(availability);
     setDoctorDetails((prevDetails) => ({
       ...prevDetails,
-      workDays: days.join(","),
+      workDays: availability.map(({ day }) => day).join(","),
     }));
-    if (days.length > 0) setWorkDaysError("");
+    if (availability.length > 0) setWorkDaysError("");
   };
 
   // Languages - draft rows in, array out; `editedDoctor`-style payloads and the
@@ -273,15 +272,13 @@ const AddDoctorForm = () => {
     setIsShareEditable(false);
     setSelectedTypes([]);
     setSelectedService([]);
-    setSelectedWorkDays([]);
+    setWeeklyAvailability([]);
     setEducationItems([""]);
     setWorkExperienceItems([""]);
     setLanguageItems([""]);
     setprofilePicture("");
     setDoctorSignature("");
     setDiplomasCertificates([]);
-    setSlotStartTime("09:00");
-    setSlotEndTime("21:00");
     setWorkDaysError("");
     setLanguageError("");
     setWorkExperienceError("");
@@ -380,8 +377,9 @@ const AddDoctorForm = () => {
 
     // The day picker keeps its own array state; the inline message under the
     // chips is set here so it appears together with the missing-field dialog.
-    const hasWorkDays = selectedWorkDays.length > 0;
-    setWorkDaysError(hasWorkDays ? "" : "Please select at least one workday");
+    const scheduleError = validateWeeklyAvailability(weeklyAvailability);
+    const hasWorkDays = !scheduleError;
+    setWorkDaysError(scheduleError);
 
     const missingFields = MANDATORY_TEXT_FIELDS.filter(
       ([key]) => !String(doctorDetails[key] ?? "").trim(),
@@ -451,6 +449,7 @@ const AddDoctorForm = () => {
     // One field per entry; a blank field clears the list on the API side.
     appendLanguages(formData, languageItems);
     formData.append("workDays", doctorDetails.workDays);
+    formData.append("weeklyAvailability", JSON.stringify(weeklyAvailability));
     formData.append("overview", doctorDetails.overview);
     // One field per entry; a blank field clears the list on the API side.
     appendEducationTraining(formData, educationItems);
@@ -464,14 +463,6 @@ const AddDoctorForm = () => {
     formData.append("locationCity", location.city || "");
     formData.append("profilePicture", profilePicture);
     formData.append("doctorType", doctorDetails.doctorType);
-    formData.append(
-      "slotStartTime",
-      doctorDetails.slotStartTime || convertTimeIntoDate(slotStartTime),
-    );
-    formData.append(
-      "slotEndTime",
-      doctorDetails.slotEndTime || convertTimeIntoDate(slotEndTime),
-    );
     formData.append("doctorShare", doctorDetails.doctorShare);
     diplomasCertificates.forEach((certificate, index) => {
       formData.append(`diplomasCertificates[${index}]`, certificate);
@@ -934,42 +925,12 @@ const AddDoctorForm = () => {
                     <span className={styles.label}>
                       Work Days <span className={styles.req}>*</span>
                     </span>
-                    <WorkDaysPicker
-                      value={selectedWorkDays}
-                      onChange={handleWorkDaysChange}
+                    <WeeklyAvailabilityEditor
+                      value={weeklyAvailability}
+                      onChange={handleWeeklyAvailabilityChange}
                       error={workDaysError}
                     />
                   </div>
-                </Col>
-                <Col md={6}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>Start time</span>
-                    <input
-                      type="time"
-                      id="slotStartTime"
-                      name="slotStartTime"
-                      value={slotStartTime}
-                      onChange={handleChange}
-                      min="07:00"
-                      max="22:00"
-                      className={styles.input}
-                    />
-                  </label>
-                </Col>
-                <Col md={6}>
-                  <label className={styles.field}>
-                    <span className={styles.label}>End time</span>
-                    <input
-                      type="time"
-                      id="slotEndTime"
-                      name="slotEndTime"
-                      value={slotEndTime}
-                      onChange={handleChange}
-                      min={slotStartTime}
-                      max="22:00"
-                      className={styles.input}
-                    />
-                  </label>
                 </Col>
               </Row>
             </section>

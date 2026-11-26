@@ -16,7 +16,7 @@ import {
   getReminderMessageBodyPatient,
   getReminderMessageBodyDoctor,
 } from "../../pages/api/utils/whatsappMessageBodies";
-import { sendWhatsAppConfirmation } from "../../pages/api/lib/communication";
+import { sendWhatsAppWithRetry } from "../../pages/api/lib/communication";
 import {
   WHATSAPP_CONFIRMATION_TEMPLATE,
   WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
@@ -192,14 +192,23 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
   });
 
   // WhatsApp confirmation is best-effort: a failure here must never break
-  // the already-verified payment/appointment confirmation response.
+  // the already-verified payment/appointment confirmation response. Each send
+  // is retried 3 times back-to-back first, and the support number is alerted
+  // when even those attempts fail (see sendWhatsAppWithRetry).
   if (patientWhatsAppNumber) {
     try {
-      await sendWhatsAppConfirmation(
+      const patientSend = await sendWhatsAppWithRetry(
         patientWhatsAppNumber,
         confirmMessageBody,
         WHATSAPP_CONFIRMATION_TEMPLATE,
+        {
+          label: "Patient booking confirmation",
+          appointmentId: String(appointment._id),
+        },
       );
+      if (!patientSend.sent) {
+        throw patientSend.lastError || new Error("WhatsApp send failed");
+      }
     } catch (waErr) {
       messagingFailed = true;
       console.error(
@@ -230,14 +239,21 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
 
   if (doctorWhatsAppNumber) {
     try {
-      await sendWhatsAppConfirmation(
+      const doctorSend = await sendWhatsAppWithRetry(
         doctorWhatsAppNumber,
         // Same body object as the patient send: `buildWhatsAppPayload` swaps
         // {{1}}/{{2}} for this template key, so the doctor reads their own name
         // first and the patient's second (mirrors the reminder pair).
         confirmMessageBody,
         WHATSAPP_CONFIRMATION_TEMPLATE_DOCTOR,
+        {
+          label: "Doctor booking confirmation",
+          appointmentId: String(appointment._id),
+        },
       );
+      if (!doctorSend.sent) {
+        throw doctorSend.lastError || new Error("WhatsApp send failed");
+      }
     } catch (waErr) {
       messagingFailed = true;
       console.error(
@@ -324,11 +340,18 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     );
 
     try {
-      await sendWhatsAppConfirmation(
+      const patientReminderSend = await sendWhatsAppWithRetry(
         patientWhatsAppNumber,
         reminderPatientBody,
         WHATSAPP_REMINDER_TEMPLATE_PATIENT,
+        {
+          label: "Patient meeting link (now booking)",
+          appointmentId: String(appointment._id),
+        },
       );
+      if (!patientReminderSend.sent) {
+        throw patientReminderSend.lastError || new Error("WhatsApp send failed");
+      }
     } catch (waErr) {
       messagingFailed = true;
       console.error(
@@ -353,11 +376,18 @@ export async function confirmAppointmentAfterPayment({ paymentId }) {
     }
 
     try {
-      await sendWhatsAppConfirmation(
+      const doctorReminderSend = await sendWhatsAppWithRetry(
         doctorWhatsAppNumber,
         reminderDoctorBody,
         WHATSAPP_REMINDER_TEMPLATE_DOCTOR,
+        {
+          label: "Doctor meeting link (now booking)",
+          appointmentId: String(appointment._id),
+        },
       );
+      if (!doctorReminderSend.sent) {
+        throw doctorReminderSend.lastError || new Error("WhatsApp send failed");
+      }
     } catch (waErr) {
       messagingFailed = true;
       console.error(

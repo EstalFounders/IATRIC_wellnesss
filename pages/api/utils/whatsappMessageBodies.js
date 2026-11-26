@@ -188,6 +188,28 @@ export const getConfirmMessageBody = (startTime, docName, patientName, consultat
     };
   };
 
+  // Body for the generic 8-variable WhatsApp template when a patient/doctor
+  // message could not be delivered after every retry
+  // (communication.js → sendWhatsAppWithRetry). Same template, same variable
+  // order as getCallbackSupportAlertBody, so the approved template is reused.
+  export const getWhatsAppFailureAlertBody = (details = {}) => {
+    const label = asTemplateValue(details.label, "WhatsApp message", 60);
+    const recipient = asTemplateValue(details.recipient, "unknown number", 20);
+    const errorText = asTemplateValue(details.error, "unknown error", 120);
+    const attempts = String(details.attempts ?? "");
+
+    return {
+      admin_name: "Admin",                                       // {{1}}
+      alert_line: `${label} could not be sent to ${recipient}.`,  // {{2}}
+      action_line: `Still failing after ${attempts || "all"} attempts: ${errorText}`, // {{3}}
+      details_label: "Appointment",                              // {{4}}
+      details_value: asTemplateValue(details.appointmentId, "-", 40), // {{5}}
+      time_label: "Failed At",                                   // {{6}}
+      time_value: asTemplateValue(details.failedAt, "-", 40),     // {{7}}
+      footer: "WhatsApp retry - HealthPath",                      // {{8}}
+    };
+  };
+
   // --- Note on formatData and extractTime ---
   // If you want these functions to be truly self-contained and format dates,
   // you would either import formatData/extractTime from your date utility file

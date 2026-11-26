@@ -22,11 +22,7 @@ import {
   FaUserMd,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  convertDateIntoTime,
-  convertTimeIntoDate,
-  isMobileValid,
-} from "../../../helper";
+import { isMobileValid } from "../../../helper";
 import {
   api,
   DoctorType,
@@ -34,11 +30,11 @@ import {
   userTypeConstant,
 } from "../../../constant";
 import { setServiceOffered } from "../../../store/slices/superAdmin/homepageSlice";
-import WorkDaysPicker from "../WorkDaysPicker";
+import WeeklyAvailabilityEditor from "../WeeklyAvailabilityEditor";
 import EducationTrainingInput from "../EducationTrainingInput";
 import WorkExperienceInput from "../WorkExperienceInput";
 import LanguageInput from "../LanguageInput";
-import { formatWorkDays, parseWorkDays } from "../../../customUtils/workDays";
+import { firstWeeklyRange, getWeeklyAvailability, validateWeeklyAvailability } from "../../../customUtils/weeklyAvailability";
 import { parseEducationTraining } from "../../../customUtils/educationTraining";
 import { parseWorkExperience } from "../../../customUtils/workExperience";
 import { doctorDisplayName } from "../../../utils/doctorName";
@@ -107,12 +103,7 @@ const DoctorProfileForm = ({
       : ""
   );
 
-  const [slotStartTime, setSlotStartTime] = useState(
-    convertDateIntoTime(editedDoctor.slotStartTime) || "09:00"
-  );
-  const [slotEndTime, setSlotEndTime] = useState(
-    convertDateIntoTime(editedDoctor.slotEndTime) || "21:00"
-  );
+  const [weeklyAvailability, setWeeklyAvailability] = useState(() => getWeeklyAvailability(doctor));
 
   const [selectedTypes, setSelectedTypes] = useState(() =>
     toConsultationTypeEntries(editedDoctor.consultationType)
@@ -125,9 +116,6 @@ const DoctorProfileForm = ({
   // a comma-joined string: the doctor document stores a String and the approval
   // flow (`doctorUpdateReq`) compares strings. A legacy value (\"mon-sunday\") is
   // parsed here and only rewritten on a click.
-  const [selectedWorkDays, setSelectedWorkDays] = useState(
-    parseWorkDays(doctor.workDays)
-  );
   const [workDaysError, setWorkDaysError] = useState("");
 
   // Draft rows for the repeatable education/training inputs.
@@ -167,24 +155,15 @@ const DoctorProfileForm = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "slotStartTime" || name === "slotEndTime") {
-      const updatedTime = convertTimeIntoDate(value);
-      if (name === "slotStartTime") {
-        setSlotStartTime(value);
-        setEditedDoctor({
-          ...editedDoctor,
-          slotStartTime: updatedTime,
-        });
-      } else {
-        setSlotEndTime(value);
-        setEditedDoctor({
-          ...editedDoctor,
-          slotEndTime: updatedTime,
-        });
-      }
-    } else {
-      setEditedDoctor({ ...editedDoctor, [name]: value });
-    }
+    setEditedDoctor({ ...editedDoctor, [name]: value });
+  };
+
+  const handleTotalYearsChange = (e) => {
+    const value = e.target.value;
+    setEditedDoctor({
+      ...editedDoctor,
+      totalyearofexperience: value === "" ? "" : Number(value),
+    });
   };
 
   const handleTotalYearsChange = (e) => {
@@ -324,10 +303,22 @@ const DoctorProfileForm = ({
 
   // Work days - the picker returns an ordered array, the payload keeps the
   // comma-joined string the API and the approval diffing already use.
-  const handleWorkDaysChange = (days) => {
-    setSelectedWorkDays(days);
-    setEditedDoctor({ ...editedDoctor, workDays: formatWorkDays(days) });
-    if (days.length > 0) setWorkDaysError("");
+  const handleWeeklyAvailabilityChange = (availability) => {
+    setWeeklyAvailability(availability);
+    const first = firstWeeklyRange(availability);
+    const asUtcDate = (time) => {
+      if (!time) return undefined;
+      const [hours, minutes] = time.split(":").map(Number);
+      return new Date(Date.UTC(1970, 0, 1, hours, minutes));
+    };
+    setEditedDoctor({
+      ...editedDoctor,
+      weeklyAvailability: availability,
+      workDays: availability.map(({ day }) => day).join(","),
+      slotStartTime: asUtcDate(first?.startTime),
+      slotEndTime: asUtcDate(first?.endTime),
+    });
+    if (availability.length > 0) setWorkDaysError("");
   };
 
   // Education + training - the rows are stored as an array of trimmed strings
@@ -404,8 +395,9 @@ const DoctorProfileForm = ({
 
   const handleSubmit = (event) => {
     event?.preventDefault?.();
-    if (selectedWorkDays.length === 0) {
-      setWorkDaysError("Please select at least one workday");
+    const availabilityError = validateWeeklyAvailability(weeklyAvailability);
+    if (availabilityError) {
+      setWorkDaysError(availabilityError);
       return;
     }
     if (parseLanguages(languageItems).length === 0) {
@@ -486,7 +478,7 @@ const DoctorProfileForm = ({
                 <FaUserCircle /> Personal details
               </h2>
               <Row>
-                <Col md={6}>
+                <Col md={12}>
                   <Form.Group>
                     <Form.Label className={styles.label}>Name</Form.Label>
                     <Form.Control
@@ -547,7 +539,7 @@ const DoctorProfileForm = ({
               </Row>
             </div>
 
-            <div className={styles.card}>
+            <div className={styles.card} id="availability">
               <h2 className={styles.cardTitle}>
                 <FaStethoscope /> Professional details
               </h2>
@@ -651,43 +643,13 @@ const DoctorProfileForm = ({
                 <FaCalendarCheck /> Availability
               </h2>
               <Row>
-                <Col md={6}>
+                <Col md={12}>
                   <Form.Group>
                     <Form.Label className={styles.label}>Work Days</Form.Label>
-                    <WorkDaysPicker
-                      value={selectedWorkDays}
-                      onChange={handleWorkDaysChange}
+                    <WeeklyAvailabilityEditor
+                      value={weeklyAvailability}
+                      onChange={handleWeeklyAvailabilityChange}
                       error={workDaysError}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label className={styles.label}>Start time</Form.Label>
-                    <input
-                      type="time"
-                      id="slotStartTime"
-                      name="slotStartTime"
-                      value={slotStartTime}
-                      onChange={handleChange}
-                      min="07:00"
-                      max="22:00"
-                      className={styles.timeInput}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label className={styles.label}>End time</Form.Label>
-                    <input
-                      type="time"
-                      id="slotEndTime"
-                      name="slotEndTime"
-                      value={slotEndTime}
-                      onChange={handleChange}
-                      min="07:00"
-                      max="22:00"
-                      className={styles.timeInput}
                     />
                   </Form.Group>
                 </Col>

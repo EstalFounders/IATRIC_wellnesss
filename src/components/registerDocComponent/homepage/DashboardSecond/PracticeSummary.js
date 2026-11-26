@@ -15,6 +15,7 @@ import { FaFileContract } from "react-icons/fa";
 import { convertDateIntoTime } from "../../../../helper";
 import { formatConsultationTypePrices } from "../../../../utils/consultationFee";
 import { formatWorkDaysLabel } from "../../../../customUtils/workDays";
+import { formatWeeklyAvailability } from "../../../../customUtils/weeklyAvailability";
 import styles from "../../css/HomePage.module.css";
 
 const CONTRACT_ROUTE = "/registerDoc/contract";
@@ -35,6 +36,7 @@ const formatDay = (value) => {
 
 /** Both slot bounds are full Dates; only the clock part is meaningful. */
 const formatSlotWindow = (doctor) => {
+  if (doctor.weeklyAvailability?.length) return formatWeeklyAvailability(doctor.weeklyAvailability);
   const from = doctor.slotStartTime
     ? convertDateIntoTime(doctor.slotStartTime)
     : "";

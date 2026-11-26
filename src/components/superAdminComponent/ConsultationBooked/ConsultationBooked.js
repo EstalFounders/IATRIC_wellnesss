@@ -14,6 +14,7 @@
 // Every style lives in css/ConsultationBooked.module.css.
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { FaCalendarCheck, FaPlus, FaSync } from "react-icons/fa";
 import { api, appointment_status } from "../../../constant";
@@ -66,9 +67,18 @@ const FILTERS = [
 
 const ConsultationBookedComp = () => {
   const dispatch = useDispatch();
-  const [selectedBookingType, setSelectedBookingType] = useState(
-    appointment_status.total
-  );
+  const router = useRouter();
+  // First paint already honours a deep link (/…?filter=PENDING), so the table
+  // never flashes "every consultation" before the effect below applies it.
+  const [selectedBookingType, setSelectedBookingType] = useState(() => {
+    const initial =
+      typeof router.query.filter === "string"
+        ? router.query.filter.trim().toUpperCase()
+        : "";
+    return FILTERS.some((filter) => filter.key === initial)
+      ? initial
+      : appointment_status.total;
+  });
   // The page-wide consultation-date range: both "" = every date (the default),
   // one "" = an open end. Each value is a plain YYYY-MM-DD calendar day, which
   // is exactly what istDayKey() prints, so the two compare without any timezone
@@ -119,6 +129,37 @@ const ConsultationBookedComp = () => {
   useEffect(() => {
     loadBookings();
   }, [loadBookings]);
+
+  // A deep link preselects a tile: /superAdmin/consultationBooked?filter=PENDING
+  // is what the home page's "Pending bookings" queue opens. An unknown or
+  // missing value falls back to Total, and the param is re-read on every change
+  // so clicking that queue again (while already on this page) re-applies it.
+  const queryFilter =
+    typeof router.query.filter === "string" ? router.query.filter : "";
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const match = FILTERS.find(
+      (filter) => filter.key === queryFilter.trim().toUpperCase()
+    );
+    setSelectedBookingType(match ? match.key : appointment_status.total);
+  }, [router.isReady, queryFilter]);
+
+  // Tile clicks stay in the URL (shareable, back-button friendly) without
+  // re-running the data load.
+  const selectFilter = useCallback(
+    (key) => {
+      setSelectedBookingType(key);
+      router.replace(
+        key === appointment_status.total
+          ? { pathname: router.pathname, query: {} }
+          : { pathname: router.pathname, query: { filter: key } },
+        undefined,
+        { shallow: true, scroll: false }
+      );
+    },
+    [router]
+  );
 
   const activeFilter =
     FILTERS.find((filter) => filter.key === selectedBookingType) || FILTERS[0];
@@ -392,7 +433,7 @@ const ConsultationBookedComp = () => {
               type="button"
               className={`${styles.tile} ${active ? styles.tileActive : ""}`}
               aria-pressed={active}
-              onClick={() => setSelectedBookingType(filter.key)}
+              onClick={() => selectFilter(filter.key)}
             >
               <span className={styles.tileLabel}>{filter.label}</span>
               <span

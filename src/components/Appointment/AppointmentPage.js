@@ -438,7 +438,7 @@ const AppointmentPage = () => {
         },
       );
       // The verify-only checkout - redirect to thankyou page for verification.
-      const returnUrl = `${window.location.origin}/payment/thankyou?appointmentId=${appointmentIdFromReturn}`;
+      const returnUrl = `${window.location.origin}/payment/thankyou?appointmentId=${orderIdFromReturn}`;
       window.location.href = returnUrl;
     }
   }, [router.query]);

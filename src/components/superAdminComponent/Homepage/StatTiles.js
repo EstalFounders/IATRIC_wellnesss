@@ -45,7 +45,7 @@ const StatTiles = ({
       key: "earnings",
       label: "Total earning",
       value: `${price_symbol}${totalIncome.toLocaleString("en-IN")}`,
-      hint: "Consultations + completed lab tests",
+      hint: "Paid consultations + paid lab tests",
       icon: <FaMoneyBill />,
       earning: true,
       // Display only: there is no earnings page to open any more.

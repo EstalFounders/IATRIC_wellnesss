@@ -6,6 +6,7 @@ import {
   slugifyService,
   useGlobalData,
 } from "../../customUtils/useGlobalData";
+import { getServiceSeo } from "../../seo/servicesSeo";
 
 // Word-phrase + alias matching shared with department-single.js, so a card named
 // "General Medicine" / "Gynaecology" resolves to the stored speciality
@@ -95,9 +96,12 @@ const DepartmentPage = ({ serviceName, id }) => {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <h3 className="h3-md text-center mb-3">
-                {departmentDetails.name}
-              </h3>
+              {/* The page's one and only H1 - PageBanner renders no heading, and
+                  keyword form ("Dermatology & Skin Care Specialists") beats the
+                  bare DB name for search, so it comes from the SEO registry. */}
+              <h1 className="h3-md text-center mb-3">
+                {getServiceSeo(serviceName)?.h1 || departmentDetails.name}
+              </h1>
               <p className="h5 box-list grey-color">
                 {departmentDetails.description}
               </p>

@@ -14,6 +14,9 @@ import {
   Tab,
   Alert,
 } from "@mui/material";
+import {
+  getServiceSeo,
+} from "../../seo/servicesSeo";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
 import NursingStaffSection from "./NursingStaffSection";
 import { address, callToBook, color_schema, contact_no, imageBlurDataUrl } from "../../constant";
@@ -952,11 +955,14 @@ const ServiceDetail = () => {
   };
 
   if (!medical_service) {
-    // No dedicated content block for this service: show the clean service name
-    // and a booking CTA instead of a dead end.
-    const fallbackTitle = serviceName
+    // No dedicated content block for this service (the specialities reach this
+    // page). The SEO registry still knows the topic, so the page gets its
+    // keyword H1 and the same title/description the SSR <head> already carries
+    // instead of a bare <h4> and a client-only generic title.
+    const seo = getServiceSeo(serviceName);
+    const fallbackTitle = seo?.title || (serviceName
       ? `${serviceName} | HealthPath`
-      : "Our Services | HealthPath";
+      : "Our Services | HealthPath");
 
     return (
       <Container maxWidth="md" sx={{ py: 6 }}>
@@ -965,15 +971,16 @@ const ServiceDetail = () => {
           <meta
             name="description"
             content={
-              serviceName
+              seo?.description ||
+              (serviceName
                 ? `Book ${serviceName} services with HealthPath - online consultation, home visits and clinic care.`
-                : "Explore the services offered by HealthPath and book a consultation."
+                : "Explore the services offered by HealthPath and book a consultation.")
             }
           />
         </Head>
 
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          {serviceName || "Our Services"}
+        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+          {seo?.h1 || serviceName || "Our Services"}
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" paragraph>
           {getServiceDescription(serviceName) ||

@@ -45,6 +45,11 @@ export const SidebarData = [
     icon: <IoIcons.IoIosPricetags />,
   },
   {
+    title: "Consultation feedback",
+    path: "/superAdmin/feedback",
+    icon: <FaIcons.FaStar />,
+  },
+  {
     title: "Update requests",
     path: "/superAdmin/viewAllDoctorUpdateRequest",
     icon: <MdUpdate />,

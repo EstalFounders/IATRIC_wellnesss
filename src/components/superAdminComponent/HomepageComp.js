@@ -154,7 +154,7 @@ export default function HomepageComp() {
 
       <section className={styles.card}>
         <h2 className={styles.cardTitle}>Pending approvals</h2>
-        <PendingApprovals />
+        <PendingApprovals isLoading={isLoading} />
       </section>
 
       <section className={styles.card}>

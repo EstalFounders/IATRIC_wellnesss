@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useCallback, useEffect, useState } from "react";
+import { api, company_registrated_name } from "../../../constant";
+import { INVOICE_BILL_FROM_CUSTOM } from "../../../constants/invoice";
 
 const inputStyle = {
   padding: "6px 10px",
@@ -18,90 +19,244 @@ const labelStyle = {
 };
 
 const emptyItem = () => ({
-  id: uuidv4(),
   name: "",
-  hsn: "",
-  qty: "",
+  hsn: 0,
+  quantity: 1,
   discount: 0,
-  price: "",
+  price: 0,
   serviceType: "Manual",
 });
 
-const CreateInvoiceModal = ({ onClose, onSubmit }) => {
+const toAmount = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) && num > 0 ? num : 0;
+};
+
+// "+ Create Invoice" - manual bill on the SuperAdmin invoice panel.
+//
+// The dropdown at the top lists the completed appointments / lab tests that have
+// no invoice yet (GET /api/helper/invoices?unbilled=1, the same grouping the
+// midnight cron uses). Picking one prefills the patient + line items; the admin
+// can still edit everything or start from a blank bill ("-- New bill --").
+// POST /api/helper/invoices?action=create recomputes the totals server-side and
+// stamps `invoiceId` on the linked services, so the cron will not bill them again.
+const CreateInvoiceModal = ({ onClose, onCreated }) => {
+  const [groups, setGroups] = useState([]);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [selectedKey, setSelectedKey] = useState("");
+  const [services, setServices] = useState([]);
   const [form, setForm] = useState({
     name: "",
-    doctorName: "",
     mobNo: "",
     address: "",
-    invoiceNumber: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
+    doctorName: "",
     gst: 0,
     freight: 0,
     tax: 0,
-    item: [emptyItem()],
   });
+  const [items, setItems] = useState([emptyItem()]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  // "Bill From": presets come from GET ?billFrom=1 (registered company + every
+  // entity already used on an invoice); the last option lets the admin type a
+  // new one, which is then stored on the invoice and reused as a preset.
+  const [billFromOptions, setBillFromOptions] = useState([
+    company_registrated_name,
+  ]);
+  const [billFrom, setBillFrom] = useState(company_registrated_name);
+  const [customBillFrom, setCustomBillFrom] = useState("");
+
+  const loadUnbilled = useCallback(async () => {
+    setLoadingGroups(true);
+    try {
+      const response = await fetch(`${api.getInvoices}?unbilled=1`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not load unbilled services");
+      }
+      setGroups(Array.isArray(data.groups) ? data.groups : []);
+    } catch (err) {
+      console.error("Error loading unbilled services:", err);
+      setGroups([]);
+    } finally {
+      setLoadingGroups(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUnbilled();
+  }, [loadUnbilled]);
+
+  // "Bill From" presets. Failure is non-fatal: the registered company name is
+  // always selectable and the "+ Add new..." entry still works.
+  const loadBillFromOptions = useCallback(async () => {
+    try {
+      const response = await fetch(`${api.getInvoices}?billFrom=1`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not load Bill From options");
+      }
+      const values = Array.isArray(data.billFrom) ? data.billFrom : [];
+      setBillFromOptions([
+        ...new Set(
+          [company_registrated_name, ...values]
+            .map((value) => String(value || "").trim())
+            .filter(Boolean),
+        ),
+      ]);
+    } catch (err) {
+      console.error("Error loading Bill From options:", err);
+      setBillFromOptions([company_registrated_name]);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBillFromOptions();
+  }, [loadBillFromOptions]);
+
+  const applyGroup = (key) => {
+    setSelectedKey(key);
+    setError("");
+    const group = groups.find((entry) => entry.key === key);
+
+    if (!group) {
+      setServices([]);
+      setForm({
+        name: "",
+        mobNo: "",
+        address: "",
+        doctorName: "",
+        gst: 0,
+        freight: 0,
+        tax: 0,
+      });
+      setItems([emptyItem()]);
+      return;
+    }
+
+    setServices(group.services || []);
+    setForm({
+      name: group.patientName || "",
+      mobNo: String(group.mobNo || ""),
+      address: group.address || "",
+      doctorName: group.doctorName || "",
+      gst: 0,
+      freight: 0,
+      tax: 0,
+    });
+    setItems(
+      (group.items || []).map((item) => ({
+        name: item.name || "",
+        hsn: item.hsn || 0,
+        quantity: item.quantity || 1,
+        discount: item.discount || 0,
+        price: item.price || 0,
+        serviceType: item.serviceType || "Manual",
+      })),
+    );
+  };
 
   const updateField = (field, value) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const updateItem = (index, field, value) =>
-    setForm((prev) => ({
-      ...prev,
-      item: prev.item.map((it, i) =>
-        i === index ? { ...it, [field]: value } : it
+    setItems((prev) =>
+      prev.map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item,
       ),
-    }));
+    );
 
-  const addItem = () =>
-    setForm((prev) => ({ ...prev, item: [...prev.item, emptyItem()] }));
+  const addItem = () => setItems((prev) => [...prev, emptyItem()]);
 
   const removeItem = (index) =>
-    setForm((prev) => ({
-      ...prev,
-      item: prev.item.filter((_, i) => i !== index),
-    }));
+    setItems((prev) => prev.filter((_, idx) => idx !== index));
 
-  const computedSubTotal = form.item.reduce((acc, it) => {
-    const total =
-      (parseFloat(it.price) || 0) * (parseFloat(it.qty) || 0) -
-      (parseFloat(it.discount) || 0);
-    return acc + Math.max(0, total);
-  }, 0);
+  const subTotal = Number(
+    items
+      .reduce(
+        (sum, item) =>
+          sum +
+          Math.max(
+            0,
+            toAmount(item.price) * (toAmount(item.quantity) || 1) -
+              toAmount(item.discount),
+          ),
+        0,
+      )
+      .toFixed(2),
+  );
+  const totalPrice = Number(
+    (
+      subTotal +
+      toAmount(form.gst) +
+      toAmount(form.freight) +
+      toAmount(form.tax)
+    ).toFixed(2),
+  );
 
-  const computedTotal =
-    computedSubTotal +
-    (parseFloat(form.gst) || 0) +
-    (parseFloat(form.freight) || 0) +
-    (parseFloat(form.tax) || 0);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (saving) return;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const payload = {
-      ...form,
-      mobNo: parseFloat(form.mobNo),
-      gst: parseFloat(form.gst) || 0,
-      freight: parseFloat(form.freight) || 0,
-      tax: parseFloat(form.tax) || 0,
-      subTotal: computedSubTotal,
-      totalPrice: computedTotal,
-      item: form.item.map((it) => {
-        const qty = parseFloat(it.qty) || 1;
-        const price = parseFloat(it.price) || 0;
-        const discount = parseFloat(it.discount) || 0;
-        return {
-          id: it.id,
-          name: it.name,
-          hsn: parseFloat(it.hsn) || 0,
-          qty,
-          quantity: qty,
-          discount,
-          price,
-          totalPrice: Math.max(0, price * qty - discount),
-          serviceType: "Manual",
-        };
-      }),
-    };
-    onSubmit(payload);
+    const isCustomBillFrom = billFrom === INVOICE_BILL_FROM_CUSTOM;
+    const billFromName = isCustomBillFrom
+      ? customBillFrom.trim()
+      : String(billFrom || "").trim();
+
+    if (isCustomBillFrom && !billFromName) {
+      setError("Enter the name of the new Bill From entity.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${api.getInvoices}?action=create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          billFrom: billFromName || company_registrated_name,
+          mobNo: String(form.mobNo || "").trim(),
+          gst: toAmount(form.gst),
+          freight: toAmount(form.freight),
+          tax: toAmount(form.tax),
+          item: items.map((item) => ({
+            ...item,
+            quantity: toAmount(item.quantity) || 1,
+            price: toAmount(item.price),
+            discount: toAmount(item.discount),
+            hsn: toAmount(item.hsn),
+          })),
+          services,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not create the invoice");
+      }
+      // Keep the new entity in the dropdown straight away (the next GET
+      // ?billFrom=1 returns it from the saved invoices).
+      if (isCustomBillFrom && billFromName) {
+        setBillFromOptions((prev) => [...new Set([...prev, billFromName])]);
+        setBillFrom(billFromName);
+        setCustomBillFrom("");
+      }
+      if (onCreated) onCreated(data.invoice);
+    } catch (err) {
+      console.error("Error creating invoice:", err);
+      setError(err.message || "Could not create the invoice");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const selectedGroup = groups.find((group) => group.key === selectedKey);
 
   return (
     <div
@@ -123,15 +278,14 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
           borderRadius: "8px",
           padding: "clamp(16px, 4vw, 28px)",
           width: "100%",
-          maxWidth: "720px",
+          maxWidth: "820px",
           margin: "auto",
           boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
         }}
       >
-        {/* Header */}
         <div
           className="d-flex justify-content-between align-items-center"
-          style={{ marginBottom: "20px" }}
+          style={{ marginBottom: "16px" }}
         >
           <h5 style={{ margin: 0, fontSize: "clamp(16px, 4vw, 20px)" }}>
             Create Invoice
@@ -153,8 +307,82 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
           </button>
         </div>
 
+        {error ? (
+          <div className="alert alert-danger py-2" role="alert">
+            {error}
+          </div>
+        ) : null}
+
         <form onSubmit={handleSubmit}>
-          {/* Row 1 — Name + Mobile */}
+          <div className="mb-3">
+            <label style={labelStyle} htmlFor="invoice-unbilled">
+              Bill from completed services{" "}
+              {loadingGroups
+                ? "(loading...)"
+                : `(${groups.length} awaiting an invoice)`}
+            </label>
+            <select
+              id="invoice-unbilled"
+              style={inputStyle}
+              value={selectedKey}
+              onChange={(event) => applyGroup(event.target.value)}
+            >
+              <option value="">-- New bill (manual) --</option>
+              {groups.map((group) => (
+                <option key={group.key} value={group.key}>
+                  {`${group.patientName} | ${group.mobNo} | ₹ ${group.totalPrice}`}
+                </option>
+              ))}
+            </select>
+            {selectedGroup && selectedGroup.needsReview.length ? (
+              <div className="small mt-1" style={{ color: "#664d03" }}>
+                No rate card row for: {selectedGroup.needsReview.join(", ")} -
+                GST/HSN left at 0.
+              </div>
+            ) : null}
+          </div>
+
+          <div className="row g-3 mb-3">
+            <div className="col-12 col-sm-6">
+              <label style={labelStyle} htmlFor="invoice-bill-from">
+                Bill From
+              </label>
+              <select
+                id="invoice-bill-from"
+                style={inputStyle}
+                value={billFrom}
+                onChange={(event) => {
+                  setBillFrom(event.target.value);
+                  setError("");
+                }}
+              >
+                {billFromOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+                <option value={INVOICE_BILL_FROM_CUSTOM}>
+                  + Add new Bill From...
+                </option>
+              </select>
+            </div>
+            {billFrom === INVOICE_BILL_FROM_CUSTOM ? (
+              <div className="col-12 col-sm-6">
+                <label style={labelStyle} htmlFor="invoice-bill-from-new">
+                  New Bill From name *
+                </label>
+                <input
+                  id="invoice-bill-from-new"
+                  type="text"
+                  style={inputStyle}
+                  placeholder="Entity / clinic name"
+                  value={customBillFrom}
+                  onChange={(event) => setCustomBillFrom(event.target.value)}
+                />
+              </div>
+            ) : null}
+          </div>
+
           <div className="row g-3 mb-3">
             <div className="col-12 col-sm-6">
               <label style={labelStyle}>Patient Name *</label>
@@ -164,24 +392,21 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
                 style={inputStyle}
                 placeholder="Enter patient name"
                 value={form.name}
-                onChange={(e) => updateField("name", e.target.value)}
+                onChange={(event) => updateField("name", event.target.value)}
               />
             </div>
             <div className="col-12 col-sm-6">
               <label style={labelStyle}>Mobile No *</label>
               <input
                 required
-                type="number"
+                type="tel"
+                inputMode="numeric"
                 style={inputStyle}
-                placeholder="Enter mobile number"
+                placeholder="10-digit mobile number"
                 value={form.mobNo}
-                onChange={(e) => updateField("mobNo", e.target.value)}
+                onChange={(event) => updateField("mobNo", event.target.value)}
               />
             </div>
-          </div>
-
-          {/* Row 2 — Doctor Name */}
-          <div className="row g-3 mb-3">
             <div className="col-12 col-sm-6">
               <label style={labelStyle}>Doctor Name</label>
               <input
@@ -189,234 +414,176 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
                 style={inputStyle}
                 placeholder="Enter doctor name"
                 value={form.doctorName}
-                onChange={(e) => updateField("doctorName", e.target.value)}
+                onChange={(event) =>
+                  updateField("doctorName", event.target.value)
+                }
               />
             </div>
-          </div>
-
-          {/* Row 3 — Address */}
-          <div className="row g-3 mb-3">
-            <div className="col-12">
-              <label style={labelStyle}>Address</label>
-              <textarea
-                rows={2}
-                style={{ ...inputStyle, resize: "vertical" }}
-                placeholder="Enter patient address"
-                value={form.address}
-                onChange={(e) => updateField("address", e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Row 3 — Invoice Number */}
-          <div className="row g-3 mb-3">
             <div className="col-12 col-sm-6">
-              <label style={labelStyle}>Invoice Number *</label>
+              <label style={labelStyle}>Address</label>
               <input
-                required
                 type="text"
                 style={inputStyle}
-                value={form.invoiceNumber}
-                onChange={(e) => updateField("invoiceNumber", e.target.value)}
+                placeholder="Enter address"
+                value={form.address}
+                onChange={(event) => updateField("address", event.target.value)}
               />
             </div>
           </div>
 
-          {/* Items */}
-          <div className="mb-3">
-            <p style={{ fontWeight: "600", marginBottom: "8px", fontSize: "14px" }}>
-              Items
-            </p>
-
-            {form.item.map((it, index) => (
-              <div
-                key={it.id}
-                style={{
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "6px",
-                  padding: "12px",
-                  marginBottom: "10px",
-                  backgroundColor: "#fafafa",
-                }}
-              >
-                {/* Item top row: Name / HSN / Qty / Remove */}
-                <div className="row g-2 mb-2">
-                  <div className="col-12 col-sm-5">
-                    <label style={labelStyle}>Name *</label>
-                    <input
-                      required
-                      type="text"
-                      style={inputStyle}
-                      placeholder="Item name"
-                      value={it.name}
-                      onChange={(e) => updateItem(index, "name", e.target.value)}
-                    />
-                  </div>
-                  <div className="col-6 col-sm-3">
-                    <label style={labelStyle}>HSN</label>
-                    <input
-                      type="number"
-                      min="0"
-                      style={inputStyle}
-                      placeholder="HSN code"
-                      value={it.hsn}
-                      onChange={(e) => updateItem(index, "hsn", e.target.value)}
-                    />
-                  </div>
-                  <div className="col-6 col-sm-2">
-                    <label style={labelStyle}>Qty *</label>
-                    <input
-                      required
-                      type="number"
-                      min="1"
-                      style={inputStyle}
-                      placeholder="1"
-                      value={it.qty}
-                      onChange={(e) => updateItem(index, "qty", e.target.value)}
-                    />
-                  </div>
-                  {form.item.length > 1 && (
-                    <div className="col-12 col-sm-2 d-flex align-items-end">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger w-100"
-                        onClick={() => removeItem(index)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Item bottom row: Price / Discount / Total */}
-                <div className="row g-2">
-                  <div className="col-12 col-sm-4">
-                    <label style={labelStyle}>Price (₹) *</label>
-                    <input
-                      required
-                      type="number"
-                      min="0"
-                      style={inputStyle}
-                      placeholder="0"
-                      value={it.price}
-                      onChange={(e) => updateItem(index, "price", e.target.value)}
-                    />
-                  </div>
-                  <div className="col-6 col-sm-4">
-                    <label style={labelStyle}>Discount (₹)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      style={inputStyle}
-                      placeholder="0"
-                      value={it.discount}
-                      onChange={(e) =>
-                        updateItem(index, "discount", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="col-6 col-sm-4">
-                    <label style={labelStyle}>Item Total</label>
-                    <input
-                      readOnly
-                      type="text"
-                      style={{ ...inputStyle, backgroundColor: "#f0f0f0", color: "#333" }}
-                      value={`₹ ${Math.max(
-                        0,
-                        (parseFloat(it.price) || 0) *
-                          (parseFloat(it.qty) || 0) -
-                          (parseFloat(it.discount) || 0)
-                      ).toFixed(2)}`}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-
+          <div className="table-responsive mb-2">
+            <table className="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th style={{ minWidth: "150px" }}>Description</th>
+                  <th style={{ width: "70px" }}>HSN</th>
+                  <th style={{ width: "60px" }}>Qty</th>
+                  <th style={{ width: "85px" }}>Discount</th>
+                  <th style={{ width: "95px" }}>Price</th>
+                  <th style={{ width: "80px" }}>Total</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => {
+                  const lineTotal = Math.max(
+                    0,
+                    toAmount(item.price) * (toAmount(item.quantity) || 1) -
+                      toAmount(item.discount),
+                  );
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <input
+                          required
+                          type="text"
+                          style={inputStyle}
+                          placeholder="Service / test"
+                          value={item.name}
+                          onChange={(event) =>
+                            updateItem(index, "name", event.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          style={inputStyle}
+                          value={item.hsn}
+                          onChange={(event) =>
+                            updateItem(index, "hsn", event.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          style={inputStyle}
+                          value={item.quantity}
+                          onChange={(event) =>
+                            updateItem(index, "quantity", event.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          style={inputStyle}
+                          value={item.discount}
+                          onChange={(event) =>
+                            updateItem(index, "discount", event.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          style={inputStyle}
+                          value={item.price}
+                          onChange={(event) =>
+                            updateItem(index, "price", event.target.value)
+                          }
+                        />
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>₹ {lineTotal}</td>
+                      <td>
+                        {items.length > 1 ? (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => removeItem(index)}
+                            title="Remove item"
+                          >
+                            ✕
+                          </button>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
             <button
               type="button"
               className="btn btn-sm btn-outline-primary"
               onClick={addItem}
             >
-              + Add Item
+              + Add item
             </button>
           </div>
 
-          {/* Taxes */}
           <div className="row g-3 mb-3">
-            <div className="col-12 col-sm-4">
-              <label style={labelStyle}>GST (₹)</label>
+            <div className="col-6 col-sm-3">
+              <label style={labelStyle}>GST</label>
               <input
                 type="number"
                 min="0"
                 style={inputStyle}
-                placeholder="0"
                 value={form.gst}
-                onChange={(e) => updateField("gst", e.target.value)}
+                onChange={(event) => updateField("gst", event.target.value)}
               />
             </div>
-            <div className="col-12 col-sm-4">
-              <label style={labelStyle}>Freight (₹)</label>
+            <div className="col-6 col-sm-3">
+              <label style={labelStyle}>Freight</label>
               <input
                 type="number"
                 min="0"
                 style={inputStyle}
-                placeholder="0"
                 value={form.freight}
-                onChange={(e) => updateField("freight", e.target.value)}
+                onChange={(event) => updateField("freight", event.target.value)}
               />
             </div>
-            <div className="col-12 col-sm-4">
-              <label style={labelStyle}>Tax (₹)</label>
+            <div className="col-6 col-sm-3">
+              <label style={labelStyle}>Tax</label>
               <input
                 type="number"
                 min="0"
                 style={inputStyle}
-                placeholder="0"
                 value={form.tax}
-                onChange={(e) => updateField("tax", e.target.value)}
+                onChange={(event) => updateField("tax", event.target.value)}
               />
             </div>
-          </div>
-
-          {/* Summary */}
-          <div
-            className="row g-2 mb-4"
-            style={{
-              backgroundColor: "#f3f4f6",
-              borderRadius: "6px",
-              padding: "12px 8px",
-              margin: "0 0 16px 0",
-            }}
-          >
-            <div className="col-6">
-              <span style={{ fontSize: "13px", color: "#555" }}>Subtotal</span>
-              <div style={{ fontWeight: "600" }}>₹ {computedSubTotal.toFixed(2)}</div>
-            </div>
-            <div className="col-6 text-end">
-              <span style={{ fontSize: "13px", color: "#555" }}>Total</span>
-              <div style={{ fontWeight: "700", fontSize: "16px" }}>
-                ₹ {computedTotal.toFixed(2)}
-              </div>
+            <div className="col-6 col-sm-3 d-flex flex-column justify-content-end">
+              <div className="small text-muted">Subtotal: ₹ {subTotal}</div>
+              <div className="font-weight-bold">Total: ₹ {totalPrice}</div>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="d-flex flex-column flex-sm-row justify-content-end" style={{ gap: "8px" }}>
+          <div className="d-flex justify-content-end gap-2">
             <button
               type="button"
-              className="btn btn-secondary"
-              style={{ minWidth: "100px" }}
+              className="btn btn-outline-secondary"
               onClick={onClose}
+              disabled={saving}
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{ minWidth: "140px" }}
-            >
-              Preview Invoice
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? "Saving..." : "Create invoice"}
             </button>
           </div>
         </form>
@@ -426,3 +593,5 @@ const CreateInvoiceModal = ({ onClose, onSubmit }) => {
 };
 
 export default CreateInvoiceModal;
+
+

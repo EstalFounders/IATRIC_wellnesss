@@ -23,6 +23,14 @@ export const WHATSAPP_CALLBACK_REQUEST_TEMPLATE = "callback_request_admin";
 // "You got a call back request from <phone>. Please call them back ASAP.".
 export const WHATSAPP_CALLBACK_SUPPORT_TEMPLATE = "callback_support_admin";
 export const WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE = "doctor_credentials";
+// Internal alert sent to SUPPORT_NOTIFICATION_PHONE_NUMBER when a patient/doctor
+// message still could not be delivered after every retry. Reuses the generic
+// 8-variable template (FASTSMS_WA_TEMPLATE_DOCTOR_CREDENTIALS_ID) that the
+// callback alert already sends, so no new template id is needed.
+export const WHATSAPP_DELIVERY_FAILURE_ALERT_TEMPLATE = "whatsapp_delivery_failure_admin";
+// How many times one WhatsApp message is attempted (back-to-back, no wait)
+// before the internal failure alert is sent.
+export const WHATSAPP_SEND_ATTEMPTS = 3;
 
 // Fast2SMS WhatsApp Business API
 export const FASTSMS_API = {
