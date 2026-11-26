@@ -231,6 +231,48 @@
   50% { opacity: 0.3; }
 }
 
+/* A recorder failure has to be readable, not just a red dot. */
+.recordingBadgeError {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Recording Save State (ended screen) ---- */
+.recordingSaveState {
+  margin-top: 8px;
+  max-width: 560px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.recordingSaveText {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.recordingRetry {
+  margin-left: 4px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recordingRetry:hover {
+  background: #f0f7eb;
+}
+
 /* ---- Video Grid ---- */
 .videoGrid {
   flex: 1;

@@ -54,6 +54,52 @@ function micOffIndicator(page: Page) {
   return page.locator('[class*="participantMicOff"]');
 }
 
+/**
+ * Fakes the Firebase Storage upload used by `uploadConsultationRecording`.
+ *
+ * `uploadBytes` sends a single `multipart/related` POST to
+ * `/v0/b/<bucket>/o?name=<fullPath>` and reads the object metadata back from the
+ * response body; `getDownloadURL` then re-reads that metadata (`downloadTokens`
+ * is what becomes the `?alt=media&token=...` link). Both are answered here, with
+ * permissive CORS headers because Playwright fulfils the request but the browser
+ * still enforces CORS.
+ *
+ * Without this the suite pushed every test recording into the real bucket - 883
+ * `e2e-meeting-*` objects had piled up in `images/consultationRecording/`.
+ */
+async function stubFirebaseStorage(page: Page): Promise<void> {
+  const cors = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, OPTIONS',
+    'access-control-allow-headers': '*',
+    'access-control-expose-headers': '*',
+  };
+  // Object being written, taken from the upload URL's `name` parameter.
+  let objectPath = 'images/consultationRecording/e2e-recording.webm';
+
+  await page.route('**/firebasestorage.googleapis.com/**', async (route) => {
+    const request = route.request();
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: cors, body: '' });
+      return;
+    }
+    const nameParam = new URL(request.url()).searchParams.get('name');
+    if (nameParam) objectPath = nameParam;
+
+    await route.fulfill({
+      status: 200,
+      headers: { ...cors, 'content-type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        bucket: 'e2e.appspot.com',
+        name: objectPath,
+        fullPath: objectPath,
+        contentType: 'video/webm',
+        downloadTokens: 'e2e-download-token',
+      }),
+    });
+  });
+}
+
 /** Mocks API + socket, opens the URL and waits for the room to be interactive. */
 async function openRoom(
   page: Page,
@@ -257,6 +303,17 @@ test.describe('video consultation', () => {
   });
 
   test('doctor: remote camera changes raise a notification and ending closes the room', async ({ page }) => {
+    // Ending the call finalises the automatic recording, so keep the Firebase
+    // upload and the URL POST on the test side (no bucket or DB writes).
+    await stubFirebaseStorage(page);
+    await page.route('**/api/recording**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'saved' }),
+      })
+    );
+
     const socket = await openRoom(page, 'doctor', 'Video');
 
     socket.emitFromServer('participant-camera-toggle', { isVideoOn: false, role: 'patient' });
@@ -265,12 +322,25 @@ test.describe('video consultation', () => {
     socket.emitFromServer('participant-camera-toggle', { isVideoOn: true, role: 'patient' });
     await expect(page.getByText(`${PATIENT_NAME} turned on camera`)).toBeVisible();
 
+    // Let the automatic recording start, so ending the call exercises the real
+    // finalise → upload path instead of the "nothing was recorded" branch.
+    await expect(page.getByTitle('Stop Recording')).toBeVisible({ timeout: 30_000 });
+
     await page.getByTitle('End Call').click();
 
     await expect(page.getByText('Consultation Ended')).toBeVisible();
     await expect(page.getByText(/^Duration: \d{2}:\d{2}$/)).toBeVisible();
     await expect(page.getByTitle('End Call')).toHaveCount(0);
     await expect(page.locator('video')).toHaveCount(0);
+
+    // `endCall` finalises the recording before the ended screen renders, so that
+    // screen must report the outcome instead of looking like a dead end (the
+    // upload is what used to be lost here).
+    await expect(
+      page.getByText(
+        /Recording saved to this appointment|Saving the consultation recording|Finishing the recording|recorder captured no data/
+      )
+    ).toBeVisible({ timeout: 30_000 });
   });
 });
 
@@ -312,15 +382,24 @@ test.describe('meeting controls', () => {
   });
 
   test('doctor: the record control mirrors the automatic consultation recording', async ({ page }) => {
-    // The recorder POSTs the finished WebM blob when it stops; stub the upload so
-    // the test never sends a recording to the API.
-    await page.route('**/api/recording**', (route) =>
-      route.fulfill({
+    // The recorder uploads the finished WebM to Firebase Storage and POSTs the
+    // resulting URL to /api/recording. Both hops are stubbed so the test never
+    // writes a recording into the production bucket or the database, and the
+    // payload the API receives is asserted below.
+    await stubFirebaseStorage(page);
+    const recordedPayloads: Array<{
+      appointmentId?: string;
+      meetingId?: string;
+      recordingURL?: string;
+    }> = [];
+    await page.route('**/api/recording**', async (route) => {
+      recordedPayloads.push(route.request().postDataJSON());
+      await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ success: true, recordingURL: 'https://example.test/recording.webm' }),
-      })
-    );
+        body: JSON.stringify({ status: 'saved', recordingURL: 'https://example.test/recording.webm' }),
+      });
+    });
 
     await openRoom(page, 'doctor', 'Video');
     await waitForLocalMedia(page);
@@ -339,8 +418,8 @@ test.describe('meeting controls', () => {
       'MediaRecorder / canvas.captureStream cannot record in this browser'
     );
 
-    // `useConsultationRecorder` starts by itself once the room is recordable
-    // (doctor + active + local media), so the control offers Stop, not Record.
+    // `useConsultationRecorder` starts by itself as soon as the room is active
+    // for the doctor, so the control offers Stop, not Record.
     await expect(page.getByTitle('Record', { exact: true })).toHaveCount(0);
     await expect(page.getByTitle('Stop Recording')).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText('Recording')).toBeVisible();
@@ -354,6 +433,13 @@ test.describe('meeting controls', () => {
     // Stopping hands the file to the (stubbed) upload and idles the control.
     await expect(page.getByTitle('Record', { exact: true })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTitle('End Call')).toBeVisible();
+
+    // The whole save path is observable: the header confirms the upload and the
+    // API received the meeting id with the Firebase download URL.
+    await expect(page.getByText('✅ Recording saved')).toBeVisible({ timeout: 30_000 });
+    expect(recordedPayloads).toHaveLength(1);
+    expect(recordedPayloads[0].meetingId).toBe(MEETING_ID);
+    expect(recordedPayloads[0].recordingURL).toContain('/o/images%2FconsultationRecording%2Fmeeting');
   });
 });
 
