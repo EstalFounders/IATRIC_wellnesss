@@ -166,6 +166,14 @@ const DoctorProfileForm = ({
     });
   };
 
+  const handleTotalYearsChange = (e) => {
+    const value = e.target.value;
+    setEditedDoctor({
+      ...editedDoctor,
+      totalyearofexperience: value === "" ? "" : Number(value),
+    });
+  };
+
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
