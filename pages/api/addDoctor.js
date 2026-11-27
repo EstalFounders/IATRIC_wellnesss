@@ -4,6 +4,7 @@ import {
   certificate_img_path,
   doctorSignature_img_path,
   doctorStamp_img_path,
+  panCard_img_path,
   profilePicture_img_path,
   storage_bucket_url,
 } from "../../src/constant";
@@ -20,6 +21,10 @@ import { parseEducationTraining } from "../../src/customUtils/educationTraining"
 import { parseLanguages } from "../../src/customUtils/languages";
 import { parseLocation } from "../../src/customUtils/indiaLocations";
 import { parseWorkExperience } from "../../src/customUtils/workExperience";
+import {
+  BANK_TEXT_FIELDS,
+  parseBankDetailsPayload,
+} from "../../src/customUtils/bankDetails";
 import { firstWeeklyRange, normalizeWeeklyAvailability, validateWeeklyAvailability } from "../../src/customUtils/weeklyAvailability";
 import { sendWhatsAppConfirmation } from "./lib/communication";
 import { WHATSAPP_DOCTOR_CREDENTIALS_TEMPLATE } from "./utils/constants";
@@ -377,6 +382,20 @@ function rejectBadUpload(res, error) {
 }
 
 /**
+ * Answers an invalid PAN / IFSC / account number with a 400 the Add Doctor
+ * wizard shows on the offending field. `fields` keeps every per-field message,
+ * `message` is the one line the dialog shows.
+ */
+function sendBankValidationError(res, errors) {
+  res.status(400).json({
+    error: Object.values(errors)[0],
+    message: Object.values(errors)[0],
+    fields: errors,
+  });
+  return true;
+}
+
+/**
  * Builds the doctor's `location` value from the multiparty fields. The Add
  * Doctor form now sends `locationState` + `locationCity`; the doctor-panel edit
  * form still sends a single `location` string. Returns null when the client
@@ -428,7 +447,16 @@ function parseConsultationTypes(raw) {
       if (!name) return null;
       const numeric = Number(entry?.price);
       const price = Number.isFinite(numeric) && numeric >= 0 ? numeric : null;
-      return { name, price };
+      // Optional clinic details typed per consultation type in Add Doctor step
+      // 3; stored only when provided so older payloads are unchanged.
+      const clinicName = String(entry?.clinicName || "").trim();
+      const clinicLocation = String(entry?.clinicLocation || "").trim();
+      return {
+        name,
+        price,
+        ...(clinicName ? { clinicName } : {}),
+        ...(clinicLocation ? { clinicLocation } : {}),
+      };
     })
     .filter(Boolean);
 }
@@ -507,6 +535,19 @@ export default async function handler(req, res) {
             .filter((key) => key.startsWith("diplomasCertificates"))
             .map((key) => files[key][0]); // Assuming each field has only one file
 
+          // PAN card scan (optional, step 4 of the Add Doctor wizard). A scan may
+          // be a PDF, so it is stored exactly as uploaded - never passed through
+          // the image converter.
+          const panCardFile = files.panCard && files.panCard[0];
+
+          // Banking details are optional, but a value that IS provided must be
+          // well formed. Answered here, before a single object is written to
+          // Storage, so a typo cannot leave orphan files behind.
+          const bank = parseBankDetailsPayload(fields);
+          if (bank.errors) {
+            return sendBankValidationError(res, bank.errors);
+          }
+
           // The picture, the signature and the stamp are always rendered inside an
           // `<img>`: a PDF in one of those slots can never be shown, so it is
           // refused here instead of being stored as an invisible "picture".
@@ -521,6 +562,7 @@ export default async function handler(req, res) {
             doctorSignatureFile,
             doctorStampFile,
             profilePictureFile,
+            panCardFile,
             ...diplomasCertificatesFiles,
           ]);
 
@@ -595,6 +637,19 @@ export default async function handler(req, res) {
             })
           );
 
+          // PAN card scan - uploaded as-is (a PDF scan is a valid PAN card).
+          let panCardUrl;
+          if (panCardFile) {
+            const { buffer, contentType, extension } =
+              preparedUploads.get(panCardFile);
+            const panCardRef = ref(
+              storage,
+              `${panCard_img_path}/${fields.name[0]}${uuidv4()}${extension}`
+            );
+            await uploadBytes(panCardRef, buffer, { contentType });
+            panCardUrl = await getDownloadURL(panCardRef);
+          }
+
           // No password is collected on the form any more: every new doctor gets
           // an auto-generated temporary password, hashed, and it is sent to them
           // over WhatsApp below.
@@ -614,6 +669,9 @@ export default async function handler(req, res) {
           delete stringFields.locationState;
           delete stringFields.locationCity;
           delete stringFields.workExperience;
+          // PAN / bank values are mapped onto `panNumber` + `bankDetails` below;
+          // the flat multipart keys must not reach the document.
+          for (const field of BANK_TEXT_FIELDS) delete stringFields[field];
           const addedDoctor = await Doctor.create({
             ...withNormalisedIdentityFields(
               stripRemovedDoctorFields(stringFields)
@@ -634,6 +692,11 @@ export default async function handler(req, res) {
             diplomasCertificatesUrls,
             doctorStampUrl,
             doctorSignatureUrl,
+            // Statutory / payout details (wizard step 4). Optional: absent when the
+            // admin skipped the step, written here when they filled it in.
+            ...(bank.panNumber ? { panNumber: bank.panNumber } : {}),
+            ...(bank.bankDetails ? { bankDetails: bank.bankDetails } : {}),
+            ...(panCardUrl ? { panCardUrl } : {}),
             consultationType: parseConsultationTypes(
               fields.consultationType?.[0]
             ),
@@ -768,8 +831,12 @@ export default async function handler(req, res) {
     try {
       const { id } = req.query;
 
-      // Fetch the doctor by ID
-      const existingDoctor = await Doctor.findById(id);
+      // Fetch the doctor by ID. `panCardUrl` is `select: false` (payout data must
+      // never travel with the public listing), so it is opted into explicitly here
+      // - otherwise a replaced PAN card could not be cleaned up.
+      const existingDoctor = await Doctor.findById(id).select(
+        "+panNumber +bankDetails +panCardUrl"
+      );
       console.log(existingDoctor, "existing doctor");
 
       if (!existingDoctor) {
@@ -794,6 +861,16 @@ export default async function handler(req, res) {
         const doctorSignatureFile =
           files.digitalSignature && files.digitalSignature[0];
 
+        // PAN card scan: a newly picked file replaces the stored one.
+        const panCardFile = files.panCard && files.panCard[0];
+
+        // Banking details are optional (the doctor-panel approval PUT sends none),
+        // but a provided value must be valid - answered before any upload.
+        const bank = parseBankDetailsPayload(fields);
+        if (bank.errors) {
+          return sendBankValidationError(res, bank.errors);
+        }
+
         // Every uploaded picture is converted to PNG ONCE, before anything is
         // written to Storage. `form.parse`'s callback has no outer error boundary
         // (an async throw would leave the request hanging), so the failure is
@@ -808,6 +885,7 @@ export default async function handler(req, res) {
           preparedUploads = await prepareUploads([
             profilePictureFile,
             doctorSignatureFile,
+            panCardFile,
             ...diplomasCertificatesFiles,
           ]);
         } catch (error) {
@@ -893,6 +971,22 @@ export default async function handler(req, res) {
           uploadedCertificateUrls.push(await getDownloadURL(certificateRef));
         }
 
+        // PAN card: kept when no new scan is picked; the replaced object is deleted
+        // once the MongoDB write below succeeds.
+        let panCardUrl = existingDoctor.panCardUrl;
+        if (panCardFile) {
+          const { buffer, contentType, extension } =
+            preparedUploads.get(panCardFile);
+          const panCardRef = ref(
+            storage,
+            `${panCard_img_path}/${
+              fields.name?.[0] || existingDoctor.name || "doctor"
+            }${uuidv4()}${extension}`
+          );
+          await uploadBytes(panCardRef, buffer, { contentType });
+          panCardUrl = await getDownloadURL(panCardRef);
+        }
+
         const diplomasCertificatesUrls =
           diplomasCertificatesFiles.length === 0 && !clientSentCertificateList
             ? // Nothing about the certificates was submitted (the doctor-panel
@@ -920,6 +1014,9 @@ export default async function handler(req, res) {
         delete stringFields.locationState;
         delete stringFields.locationCity;
         delete stringFields.workExperience;
+        // PAN / bank values are mapped onto `panNumber` + `bankDetails` below, and
+        // the flat keys must never reach the document.
+        for (const field of BANK_TEXT_FIELDS) delete stringFields[field];
         // Certificate URLs are handled above (kept list + freshly uploaded files);
         // the raw `diplomasCertificatesUrls[i]` keys must not reach the document.
         Object.keys(stringFields)
@@ -1010,6 +1107,17 @@ export default async function handler(req, res) {
           updateData.totalyearofexperience =
             Number(fields.totalyearofexperience?.[0]) || 0;
         }
+
+        // Statutory / payout details - only touched when the client sent them. The
+        // doctor-panel approval PUT sends none, so the stored values survive it.
+        if (bank.present) {
+          updateData.panNumber = bank.panNumber;
+          // An emptied step clears the sub-document instead of leaving it behind.
+          updateData.bankDetails = bank.bankDetails || {};
+        }
+        if (panCardFile) {
+          updateData.panCardUrl = panCardUrl;
+        }
         // The generic field spread above would copy a submitted password into
         // the document as plain text. Hash a new password, or drop the field so
         // an edit without a password keeps the stored hash.
@@ -1089,6 +1197,16 @@ export default async function handler(req, res) {
         }
         console.log("deleted removed diplomas");
 
+        // A replaced PAN card: the old scan is unreferenced once the save above
+        // succeeded, so it can be removed from Storage.
+        if (
+          panCardFile &&
+          existingDoctor.panCardUrl &&
+          panCardUrl !== existingDoctor.panCardUrl
+        ) {
+          await deleteStoredFirebaseObject(existingDoctor.panCardUrl, "old PAN card");
+        }
+
         res.status(200).json({ success: true });
       });
         } catch (error) {
@@ -1113,7 +1231,9 @@ export default async function handler(req, res) {
     const { id } = req.query;
     console.log(id, "id in server");
     try {
-      const doctor = await Doctor.findById(id);
+      // `panCardUrl` is `select: false`, so it must be opted into here or the
+      // deleted doctor's PAN card would stay in the bucket forever.
+      const doctor = await Doctor.findById(id).select("+panCardUrl");
       if (!doctor) {
         return res.status(404).json({ message: "Doctor not found" });
       }
@@ -1146,6 +1266,7 @@ export default async function handler(req, res) {
         doctor.doctorSignatureUrl,
         "doctor signature"
       );
+      await deleteStoredFirebaseObject(doctor.panCardUrl, "PAN card");
 
       console.log("deleted old doctor signature");
 

@@ -121,12 +121,25 @@ export const consultationTypeNames = (list) =>
 export const consultationTypePrice = (entry) =>
   typeof entry === "string" ? null : toFee(entry?.price);
 
+/** Trimmed optional clinic text of one entry ("" for legacy string entries). */
+const clinicText = (entry, key) =>
+  typeof entry === "string" ? "" : String(entry?.[key] ?? "").trim();
+
 export const toConsultationTypeEntries = (list) =>
   (Array.isArray(list) ? list : [])
-    .map((entry) => ({
-      name: consultationTypeName(entry),
-      price: consultationTypePrice(entry),
-    }))
+    .map((entry) => {
+      const clinicName = clinicText(entry, "clinicName");
+      const clinicLocation = clinicText(entry, "clinicLocation");
+      // The two clinic keys are optional (Add Doctor step 3) and are kept in a
+      // stable order, so the doctor-panel save (doctorProfileSubmit) preserves
+      // them and still compares equal when nothing changed.
+      return {
+        name: consultationTypeName(entry),
+        price: consultationTypePrice(entry),
+        ...(clinicName ? { clinicName } : {}),
+        ...(clinicLocation ? { clinicLocation } : {}),
+      };
+    })
     .filter((entry) => entry.name);
 
 /** "Audio ₹500 · Video ₹700" from `consultationType`; "" when no prices set. */

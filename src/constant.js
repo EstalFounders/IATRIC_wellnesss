@@ -15,6 +15,9 @@ export const certificate_img_path = `${IMAGES_ROOT}/doctorCertificate/`;
 export const profilePicture_img_path = `${IMAGES_ROOT}/doctorPicture/`;
 export const doctorStamp_img_path = `${IMAGES_ROOT}/doctorStamp/`;
 export const doctorSignature_img_path = `${IMAGES_ROOT}/doctorSignature/`;
+// PAN card scan, uploaded from step 4 (Banking & statutory) of the Add Doctor
+// wizard. Kept out of the public doctor listing like every other payout field.
+export const panCard_img_path = `${IMAGES_ROOT}/doctorPanCard/`;
 export const prescription_img_path = `${IMAGES_ROOT}/prescription/`;
 export const invoice_img_path = `${IMAGES_ROOT}/invoice/`;
 export const staffProfilePicture_img_path = `${IMAGES_ROOT}/staff/profilePicture/`;

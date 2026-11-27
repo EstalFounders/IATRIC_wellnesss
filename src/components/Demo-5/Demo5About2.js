@@ -22,19 +22,26 @@ const Demo5About2 = () => {
   const [otpMobNo, setOtpMobNo] = useState("");
   const { t } = useLanguage();
 
-  const handleCalltoBookPopupSubmit = async (mobNo) => {
-    setIsCalltoBookDialog(false);
+  /**
+   * Saves the callback request only after the OTP step succeeded. The verified
+   * `otp` is forwarded so POST /api/userQuery can redeem the one-time marker
+   * the WhatsApp OTP endpoint wrote for this mobile number.
+   */
+  const submitCallbackRequest = async (mobNo, otp) => {
     try {
       const res = await fetch(api.userQuery, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile_number: Number(mobNo) }),
+        body: JSON.stringify({ mobile_number: Number(mobNo), otp }),
       });
-      if (!res.ok) throw new Error("Request failed");
-      setResponse(t("demo5.about.queryOk"));
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || t("common.errorTryAgain"));
+      }
+      setResponse(t("ctb.okRequested"));
       setSeverity("success");
-    } catch {
-      setResponse(t("common.errorTryAgain"));
+    } catch (error) {
+      setResponse(error?.message || t("common.errorTryAgain"));
       setSeverity("error");
     }
     setOpenSnackBar(true);
@@ -74,9 +81,9 @@ const consultationTypes = useSelector(
     setOtpConfirmationPopup(true);
   };
 
-  const handleOtpConfirm = () => {
+  const handleOtpConfirm = (otp) => {
     setOtpConfirmationPopup(false);
-    handleCalltoBookPopupSubmit(otpMobNo);
+    submitCallbackRequest(otpMobNo, otp);
   };
 
   return (
@@ -129,7 +136,6 @@ const consultationTypes = useSelector(
                 <CalltoBookPopup
                   show={isCalltoBookDialog}
                   onClose={handleCloseCalltoBookDialog}
-                  onSubmit={handleCalltoBookPopupSubmit}
                   onOtpRequired={handleOtpRequired}
                 />
               </div>

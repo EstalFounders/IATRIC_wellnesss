@@ -16,16 +16,25 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
   const { t } = useLanguage();
 
   const handleSubmit = () => {
-    if (!mobNo.trim()) {
+    const mobile = mobNo.trim();
+    if (!mobile) {
       setResponse(t("ctb.errEmpty"));
       return;
     }
-    if (!isMobileValid(mobNo)) {
+    if (!isMobileValid(mobile)) {
       setResponse(t("ctb.errInvalid"));
       return;
     }
     setResponse("");
-    onOtpRequired(mobNo);
+    // Hosts with a verification step take over; the rest keep the legacy
+    // single-shot submit. Guarding the call keeps /service-details (which did
+    // not pass `onOtpRequired`) from throwing a TypeError on submit.
+    if (onOtpRequired) {
+      onOtpRequired(mobile);
+    } else {
+      onSubmit?.(mobile);
+    }
+    setMobNo("");
   };
 
   return (
@@ -84,6 +93,8 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
 
         <input
           type="tel"
+          inputMode="numeric"
+          maxLength={10}
           className="form-control form-control-lg rounded-pill px-4"
           style={{
             border: `2px solid ${color_schema.green}`,
@@ -91,7 +102,15 @@ const CalltoBookPopup = ({ show, onClose, onSubmit, onOtpRequired }) => {
           }}
           placeholder={t("ctb.placeholder")}
           value={mobNo}
-          onChange={(e) => setMobNo(e.target.value)}
+          onChange={(e) =>
+            setMobNo(e.target.value.replace(/\D/g, "").slice(0, 10))
+          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
         />
 
         {response && (

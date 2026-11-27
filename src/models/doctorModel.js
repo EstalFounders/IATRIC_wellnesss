@@ -102,12 +102,19 @@ const doctorSchema = new Schema({
   consultationType: {
     // Array of `{ name, price }` entries; legacy string entries are tolerated
     // by every reader (see consultationTypeName in src/utils/consultationFee.js).
+    // Entries may also carry the optional `clinicName` / `clinicLocation` typed
+    // in Add Doctor step 3 - `Array` stores them as-is (a sub-schema would strip
+    // the keys).
     type: Array,
     required: true,
   },
   serviceOffered: {
+    // Optional for now: the Add Doctor form renders the field disabled (see
+    // SERVICES_OFFERED_ENABLED in lib/addDoctorSteps.js) and sends `[]` when the
+    // admin leaves it alone. `required: true` on an array rejects an empty
+    // array, so it has to be off while the field is turned off.
     type: Array,
-    required: true,
+    required: false,
   },
   location: {
     // Structured `{ state, city }` (set by the Add Doctor form's India location
@@ -150,6 +157,41 @@ const doctorSchema = new Schema({
   doctorSignatureUrl: {
     type: String,
     required: false,
+  },
+  // ── Statutory / payout details (Add Doctor wizard, step 4) ────────────────
+  // All optional: a doctor can be registered first and the banking details added
+  // later. Every field here is `select: false` on purpose - GET /api/addDoctor is
+  // a PUBLIC endpoint that returns whole documents, so a PAN or an account number
+  // must never travel with the doctor listing. Read them explicitly:
+  //   Doctor.findById(id).select("+panNumber +bankDetails +panCardUrl")
+  panNumber: {
+    type: String,
+    trim: true,
+    uppercase: true,
+    required: false,
+    select: false,
+    // The API validates with its own friendly message (customUtils/bankDetails);
+    // this stays loose so it can never reject a request the API accepted.
+    match: [/^[A-Z]{5}[0-9]{4}[A-Z]$|^$/, "PAN number is invalid"],
+  },
+  bankDetails: {
+    type: new Schema(
+      {
+        accountHolderName: { type: String, trim: true },
+        accountNumber: { type: String, trim: true },
+        ifscCode: { type: String, trim: true, uppercase: true },
+        bankName: { type: String, trim: true },
+        branchName: { type: String, trim: true },
+      },
+      { _id: false }
+    ),
+    required: false,
+    select: false,
+  },
+  panCardUrl: {
+    type: String,
+    required: false,
+    select: false,
   },
   doctorType: {
     type: String,

@@ -43,13 +43,27 @@ export function LanguageProvider({ children }) {
     }
   }, []);
 
+  // `vars` is optional (every existing call passes two arguments): the selected
+  // string may carry `{name}` placeholders - `t("doctor.experienceYears", "", { n: 7 })`.
+  // An unknown placeholder is left untouched instead of printing "undefined".
   const t = useCallback(
-    (key, fallback) => {
+    (key, fallback, vars) => {
       const dict = translations[lang] || {};
       const english = translations.en || {};
-      if (dict[key] !== undefined) return dict[key];
-      if (english[key] !== undefined) return english[key];
-      return fallback !== undefined ? fallback : key;
+      const template =
+        dict[key] !== undefined
+          ? dict[key]
+          : english[key] !== undefined
+          ? english[key]
+          : fallback !== undefined
+          ? fallback
+          : key;
+
+      if (!vars || typeof template !== "string") return template;
+
+      return template.replace(/\{(\w+)\}/g, (match, name) =>
+        vars[name] === undefined || vars[name] === null ? match : String(vars[name])
+      );
     },
     [lang]
   );

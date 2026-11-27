@@ -17,46 +17,116 @@
   text-align: center;
 }
 
-/* Card: centered, breathable, and always the full height of its grid cell. */
+/* Card: a full-height, self-contained tile. The media band carries the photo and
+   the availability pill, the body the identity + fees, the footer the CTAs - so a
+   card with missing details simply drops rows instead of changing shape. */
 .doctor-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
   height: 100%;
-  padding: 1.5rem;
+  overflow: hidden;
   box-sizing: border-box;
   text-align: center;
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e6e9ef;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 14px 28px -24px rgba(15, 23, 42, 0.4);
   cursor: pointer;
-  transition: box-shadow 180ms ease, transform 180ms ease,
-    border-color 180ms ease;
+  animation: card-in 320ms ease both;
+  transition: box-shadow 200ms ease, transform 200ms ease,
+    border-color 200ms ease;
 }
 
 .doctor-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(59, 95, 29, 0.25);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.09);
+  transform: translateY(-4px);
+  border-color: rgba(59, 95, 29, 0.28);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06),
+    0 24px 42px -26px rgba(59, 95, 29, 0.55);
 }
 
-.doctor-card:focus-visible {
-  outline: 3px solid rgba(59, 95, 29, 0.45);
-  outline-offset: 2px;
+/* Keyboard users never focus the article itself (it is not a link), so the ring
+   belongs on the controls inside it - see .doctor-name-link. */
+.doctor-card:focus-within {
+  border-color: rgba(59, 95, 29, 0.28);
 }
 
-/* Circular avatar with a subtle brand ring. */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tinted header band: photo centred, status pill pinned to the top-right. */
+.doctor-card-media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.55rem 1rem 1.15rem;
+  background: radial-gradient(
+    120% 130% at 50% 0%,
+    #eef6e4 0%,
+    #f7fbf2 55%,
+    #ffffff 100%
+  );
+  border-bottom: 1px solid #f1f4ee;
+}
+
+.doctor-status {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  max-width: calc(100% - 1.4rem);
+  padding: 0.24rem 0.58rem;
+  overflow: hidden;
+  color: #2f4a17;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid rgba(59, 95, 29, 0.22);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.doctor-status i {
+  color: #3b5f1d;
+  font-size: 0.6rem;
+}
+
+/* Not working today (or no days stored): quietly muted, still informative. */
+.doctor-status--muted {
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.doctor-status--muted i {
+  color: #b08d4f;
+}
+
+/* Circular avatar with a white ring and a soft brand glow. */
 .doctor-avatar {
   position: relative;
-  width: 96px;
-  height: 96px;
-  margin-bottom: 0.9rem;
+  width: 104px;
+  height: 104px;
   overflow: hidden;
   background-color: #eaf5e0;
-  border: 2px solid #fff;
+  border: 3px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(59, 95, 29, 0.18);
+  box-shadow: 0 0 0 3px rgba(59, 95, 29, 0.13),
+    0 14px 22px -16px rgba(59, 95, 29, 0.75);
 }
 
 .doctor-avatar-img {
@@ -66,174 +136,222 @@
 }
 
 .doctor-card:hover .doctor-avatar-img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
-.doctor-name {
+/* Identity block. */
+.doctor-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.95rem 1.15rem 0;
+}
+
+.doctor-name-link {
   width: 100%;
-  margin: 0 0 0.2rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.doctor-name-link:hover .doctor-name {
+  color: #3b5f1d;
+}
+
+.doctor-name-link:focus-visible {
+  outline: 2px solid #3b5f1d;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Two lines maximum - long names wrap instead of being cut mid-word. */
+.doctor-name {
+  display: -webkit-box;
+  margin: 0;
   overflow: hidden;
-  color: #1f2937;
-  font-size: 1.05rem;
+  color: #16233a;
+  font-size: 1.1rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  transition: color 180ms ease;
+}
+
+/* Speciality pills: the first two read at a glance, the rest fold into "+N". */
+.doctor-specialities {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doctor-speciality-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.6rem;
+  overflow: hidden;
+  color: #2f4a17;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #eef6e4;
+  border: 1px solid #dbe9c9;
+  border-radius: 999px;
+}
+
+.doctor-speciality-chip--more {
+  color: #6b7280;
+  background: #f4f5f7;
+  border-color: #e5e7eb;
+}
+
+.doctor-speciality-missing {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.78rem;
+}
+
+/* Consultation modes + fees, separated from the identity block by a dashed rule. */
+.doctor-fees {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0.15rem 0 0;
+  padding: 0.7rem 0 0;
+  list-style: none;
+  border-top: 1px dashed #e8ecf1;
+}
+
+.doctor-fee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+  line-height: 1.35;
+}
+
+.doctor-fee-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  color: #4b5563;
+  font-weight: 600;
+  text-align: left;
+}
+
+.doctor-fee-name i {
+  flex: 0 0 auto;
+  color: #916f38;
+  font-size: 0.78rem;
+}
+
+.doctor-fee-name > span {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Consistent two-line reservation keeps adjacent cards aligned. */
-.doctor-specialty {
-  display: -webkit-box;
-  min-height: 2.2rem;
-  margin: 0 0 0.15rem;
-  overflow: hidden;
-  color: #916f38;
-  font-size: 0.72rem;
+.doctor-fee-price {
+  flex: 0 0 auto;
+  color: #2f4a17;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1.5;
-  text-transform: uppercase;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  white-space: nowrap;
 }
 
-.doctor-experience {
-  display: -webkit-box;
-  margin: 0 0 0.15rem;
-  overflow: hidden;
-  color: #6b7280;
-  font-size: 0.82rem;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.doctor-fee-price--free {
+  color: #3b5f1d;
 }
 
-/* Only the label is bold: the value (`7 years`) keeps the row's regular weight. */
-.doctor-experience-label {
-  color: #4b5563;
-  font-weight: 700;
+.doctor-fees-empty {
+  margin: 0.15rem 0 0;
+  padding: 0.6rem 0 0;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  border-top: 1px dashed #e8ecf1;
+  width: 100%;
 }
 
-.doctor-qualifications {
-  display: -webkit-box;
-  min-height: 2.2rem;
-  margin: 0 0 0.15rem;
-  overflow: hidden;
-  color: #6b7280;
-  font-size: 0.82rem;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+
+/* Footer pinned to the bottom so buttons line up across a row of uneven cards. */
+.doctor-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+  margin-top: auto;
+  padding: 0.9rem 1.15rem 1.05rem;
+  box-sizing: border-box;
 }
 
-/* Expanded by the More toggle: drop the clamp and let the card grow. */
-.doctor-qualifications--expanded {
-  display: block;
-  overflow: visible;
-  -webkit-line-clamp: unset;
+/* Primary CTA: one full-width row, brand green. */
+.book-button {
+  width: 100%;
+  padding: 0.62rem 0.9rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  border-radius: 10px !important;
+  text-align: center !important;
+  box-sizing: border-box;
 }
 
-/* Inline text-style toggle, centered under the clamped education line. */
-.doctor-more-btn {
-  margin: 0 0 0.35rem;
-  padding: 0;
+/* Secondary action: a quiet text link with an arrow, no competing button chrome. */
+.doctor-profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  align-self: center;
+  padding: 0.2rem 0.1rem;
   color: #3b5f1d;
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  line-height: 1.2;
-  text-decoration: underline;
   background: none;
   border: 0;
+  border-radius: 6px;
   cursor: pointer;
+  transition: color 180ms ease;
 }
 
-/* No UA ring on mouse focus; keyboard users still get a visible green ring. */
-.doctor-more-btn:focus {
-  outline: none;
+.doctor-profile-link i {
+  font-size: 0.72rem;
+  transition: transform 180ms ease;
 }
 
-.doctor-more-btn:hover,
-.doctor-more-btn:focus-visible {
+.doctor-profile-link:hover {
   color: #2f4a17;
+  text-decoration: underline;
 }
 
-.doctor-more-btn:focus-visible {
-  border-radius: 4px;
+.doctor-profile-link:hover i {
+  transform: translateX(3px);
+}
+
+.doctor-profile-link:focus-visible {
   outline: 2px solid #3b5f1d;
   outline-offset: 3px;
 }
 
-.doctor-fee {
-  margin: 0;
-  color: #916f38;
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.doctor-fee-muted {
-  margin: 0;
-  color: #9ca3af;
-  font-size: 0.82rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-/* Footer: centered Book Now + View Profile CTAs pinned to the bottom. */
-.doctor-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem;
-  width: 100%;
-  margin-top: auto;
-  padding-top: 1rem;
-}
-
-.book-button,
-.profile-button {
-  display: flex;
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: 170px;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  padding: 0.55rem 1rem !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-  line-height: 1.25 !important;
-  white-space: normal !important;
-  border-radius: 8px !important;
-}
-
-.book-button {
-  color: #fff !important;
-  background: #3b5f1d !important;
-  border: 1px solid #3b5f1d !important;
-  box-shadow: none !important;
-}
-
-.book-button:hover,
-.book-button:focus-visible {
-  background: #2d4b16 !important;
-  border-color: #2d4b16 !important;
-}
-
-.book-button:focus-visible {
-  outline: 3px solid rgba(145, 111, 56, 0.35);
-  outline-offset: 2px;
-}
-
-@media (min-width: 576px) {
+/* 2 columns from 768px, 3 from 1024px. */
+@media (min-width: 768px) {
   .view-doctor-list-container,
   .doctor-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
   .view-doctor-list-container,
   .doctor-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -243,19 +361,49 @@
 @media (max-width: 575px) {
   .view-doctor-list-container,
   .doctor-grid {
-    gap: 1rem;
-    padding: 1rem 0;
+    gap: 1.1rem;
+    padding: 1.25rem;
+  }
+
+  .doctor-card-media {
+    padding: 1.3rem 0.85rem 1rem;
   }
 
   .doctor-avatar {
-    width: 84px;
-    height: 84px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .doctor-card-body {
+    padding: 0.85rem 1rem 0;
+  }
+
+  .doctor-card-footer {
+    padding: 0.85rem 1rem 0.95rem;
+  }
+
+  .doctor-name {
+    font-size: 1rem;
   }
 }
 
+/* Motion is decoration only: hover lift, fade-in and image zoom all switch off. */
 @media (prefers-reduced-motion: reduce) {
-  .doctor-card,
-  .doctor-avatar-img {
+  .doctor-card {
+    animation: none;
     transition: none;
   }
+
+  .doctor-card:hover {
+    transform: none;
+  }
+
+  .doctor-avatar-img,
+  .doctor-card:hover .doctor-avatar-img,
+  .doctor-profile-link i,
+  .doctor-profile-link:hover i {
+    transition: none;
+    transform: none;
+  }
 }
+

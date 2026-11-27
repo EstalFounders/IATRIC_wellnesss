@@ -136,7 +136,9 @@ const OtpConfirmationPopup = ({
       if (!res.ok) {
         throw new Error(data.error || data.message || t("otp.errInvalid"));
       }
-      onConfirm();
+      // Hosts that persist the request after verification need the exact code
+      // that the server just accepted (the host re-sends it to /api/userQuery).
+      onConfirm?.(enteredCode);
     } catch (error) {
       setError(error.message);
       console.error("Failed to verify OTP", error);
@@ -183,6 +185,7 @@ const OtpConfirmationPopup = ({
               type="text"
               maxLength="1"
               inputMode="numeric"
+              autoComplete={index === 0 ? "one-time-code" : "off"}
               aria-label={`OTP digit ${index + 1}`}
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
