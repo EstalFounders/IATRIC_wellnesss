@@ -74,7 +74,7 @@ const DoctorsSection = () => {
         <div className={cardStyles["doctor-grid"]}>
           {/* Map over the array of doctors to render each doctor component */}
           {featuredDoctors.map((doctor, index) => (
-            <DoctorCard key={index} doctor={doctor} />
+            <DoctorCard key={doctor._id || doctor.email || index} doctor={doctor} />
           ))}
         </div>
         {/* End row */}

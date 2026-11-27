@@ -11,9 +11,17 @@ import {
   getCallbackSupportAlertBody,
 } from "./utils/whatsappMessageBodies";
 import { rateLimit } from "../../src/lib/rateLimiter";
+import {
+  isRedisAvailable,
+  redisDel,
+  redisGet,
+  redisSetNX,
+} from "../../src/lib/redis";
 import { logErrorToGoogleSheet } from "./helper";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const OTP_REGEX = /^\d{6}$/;
+const OTP_VERIFIED_TTL_SECONDS = 300; // matches the OTP endpoint's marker TTL
 
 /**
  * Normalises a public query submission.
@@ -65,6 +73,69 @@ function normalizeQueryPayload(body) {
   }
 
   return { error: "A valid phone number or email address is required" };
+}
+
+/**
+ * Enforces "verify before save" for requests that carry an `otp`.
+ *
+ * The WhatsApp OTP endpoint stores `otp:appointment:verified:<mobile>:<otp>`
+ * for 5 minutes after a successful verification; this function requires that
+ * marker for the exact mobile number being saved and claims a one-time
+ * consumption slot so a single verified code cannot create multiple queries.
+ *
+ * Requests without an `otp` field (contacts page, join-us, the demo-5 contact
+ * section, ...) keep the legacy one-shot behaviour on purpose.
+ *
+ * Returns `{}` when the request is not OTP-gated, `{ errorStatus, error }`
+ * when it must be rejected, or `{ verifiedKey, consumeKey }` when the caller
+ * has to release the markers around the save.
+ */
+async function redeemCallbackOtp(body, payload) {
+  const rawOtp = body?.otp;
+  if (rawOtp === undefined || rawOtp === null || String(rawOtp).trim() === "") {
+    return {};
+  }
+
+  const otp = String(rawOtp).trim();
+  if (!OTP_REGEX.test(otp)) {
+    return { errorStatus: 400, error: "A valid 6-digit OTP is required" };
+  }
+
+  const mobile = payload?.mobile_number;
+  if (!mobile) {
+    return {
+      errorStatus: 400,
+      error: "OTP verification is only available for mobile numbers",
+    };
+  }
+
+  const verifiedKey = `otp:appointment:verified:${mobile}:${otp}`;
+  const verified = await redisGet(verifiedKey);
+  if (!verified) {
+    // redisGet returns null both for a miss and for an outage; only treat it
+    // as a missing verification when Redis is actually reachable.
+    if (!isRedisAvailable()) {
+      return {
+        errorStatus: 503,
+        error: "Number verification is temporarily unavailable. Please try again.",
+      };
+    }
+    return {
+      errorStatus: 400,
+      error: "Verify the mobile number before submitting the request",
+    };
+  }
+
+  const consumeKey = `otp:userquery:used:${mobile}:${otp}`;
+  const claimed = await redisSetNX(consumeKey, "1", OTP_VERIFIED_TTL_SECONDS);
+  if (!claimed) {
+    return {
+      errorStatus: 409,
+      error: "This request has already been submitted",
+    };
+  }
+
+  return { verifiedKey, consumeKey };
 }
 
 /**
@@ -200,6 +271,9 @@ export default async function handler(req, res) {
 //   }
 
   if (req.method === "POST") {
+    // Released again when the save fails, so a transient database error does
+    // not force the visitor through a second OTP round.
+    let otpConsumeKey = null;
     try {
       // Rate limit user queries per IP to prevent spam
       const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
@@ -225,7 +299,23 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: validationError });
       }
 
+      // Popup callback requests must prove phone ownership before the query is
+      // persisted. Legacy callers send no `otp` and skip this block.
+      const otpCheck = await redeemCallbackOtp(req.body, payload);
+      if (otpCheck.errorStatus) {
+        return res
+          .status(otpCheck.errorStatus)
+          .json({ message: otpCheck.error });
+      }
+      otpConsumeKey = otpCheck.consumeKey || null;
+
       const savedQuery = await Query.create(payload);
+
+      // The verification is now spent: it can never be replayed for a second
+      // request. The consumption slot stays for its TTL as the idempotency guard.
+      if (otpCheck.verifiedKey) {
+        await redisDel(otpCheck.verifiedKey);
+      }
 
       // Notify the admin on WhatsApp. Deliberately isolated: the request is already
       // persisted, so a rejected or skipped send must not turn the 201 into an error -
@@ -235,12 +325,18 @@ export default async function handler(req, res) {
       res.status(201).json({ ...savedQuery.toObject(), whatsapp });
     } catch (error) {
       console.log(error, "error");
+      if (otpConsumeKey) {
+        await redisDel(otpConsumeKey);
+      }
       await logErrorToGoogleSheet({
         apiName: "userQuery - POST",
         errorMessage: error.message || "Failed to create user query",
         errorCode: "500",
         stackTrace: error.stack,
-        requestPayload: req.body,
+        // Never copy the OTP itself into the error sheet.
+        requestPayload: req.body
+          ? { ...req.body, otp: req.body.otp ? "[redacted]" : undefined }
+          : undefined,
       });
       res
         .status(500)

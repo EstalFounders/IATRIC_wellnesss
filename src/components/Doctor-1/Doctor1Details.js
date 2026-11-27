@@ -15,6 +15,10 @@ import { formatLanguagesLabel } from "../../customUtils/languages";
 import { formatWorkDaysLabel } from "../../customUtils/workDays";
 import { doctorDisplayName } from "../../utils/doctorName";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
+import {
+  doctorSpecialities,
+  doctorSpecialityLabel,
+} from "../../utils/doctorSpeciality";
 
 /** Missing / unreadable picture: the bundled avatar instead of a broken image. */
 const FALLBACK_PHOTO = "images/doctor-1.jpg";
@@ -42,13 +46,17 @@ const documentCardStyle = {
 
 const Doctor1Details = () => {
   const doctorInfo = useSelector((state) => state.allDoctorS.doctorInfo) || {};
+  // The speciality captured in Add Doctor step 2 (`expertise`), falling back to the
+  // legacy services list - the exact accessor the public doctor cards use, so the
+  // card and this page always name the same speciality.
+  const specialities = doctorSpecialities(doctorInfo);
+  const specialityLabel = doctorSpecialityLabel(doctorInfo);
   // A stored object can still be a document (legacy records uploaded before the
   // API refused them) or fail to load, so the <img> needs a fallback.
   const [photoFailed, setPhotoFailed] = useState(false);
   const [brokenCertificates, setBrokenCertificates] = useState([]);
   const {
     name,
-    expertise,
     overview,
     educationTraining,
     workExperience,
@@ -58,7 +66,6 @@ const Doctor1Details = () => {
     doctorRegistrationNo,
     price,
     profilePictureUrl,
-    serviceOffered,
     slotStartTime,
     slotEndTime,
     consultationType,
@@ -92,7 +99,9 @@ const Doctor1Details = () => {
               <div className="doctor-data white-color">
                 {/* Name */}
                 <h2 className="h2-xs">{doctorDisplayName(name)}</h2>
-                <h5 className="h5-md">{expertise}</h5>
+                {specialityLabel ? (
+                  <h5 className="h5-md">{specialityLabel}</h5>
+                ) : null}
               </div>
             </div>
           </div>
@@ -131,12 +140,16 @@ const Doctor1Details = () => {
                       <tr>
                         <td>Areas of Expertise</td>
                         <td>
-                          {serviceOffered.map((service, index) => (
-                            <span key={index}>
-                              <i className="fas fa-angle-double-right" />
-                              {service}
-                            </span>
-                          ))}
+                          {specialities.length ? (
+                            specialities.map((speciality, index) => (
+                              <span key={`${speciality}-${index}`}>
+                                <i className="fas fa-angle-double-right" />
+                                {speciality}
+                              </span>
+                            ))
+                          ) : (
+                            "Not provided"
+                          )}
                         </td>
                       </tr>
                       <tr>

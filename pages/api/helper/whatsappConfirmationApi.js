@@ -72,11 +72,15 @@ async function handleSendOtp(req, res, mobile) {
 }
 
 async function handleVerifyOtp(req, res, mobile) {
-  const name = String(req.body?.name ?? "").trim();
+  const rawName = String(req.body?.name ?? "").trim();
   const otp = String(req.body?.otp ?? "").trim();
-  if (!name || name.length > 120 || !/^\d{6}$/.test(otp)) {
-    return res.status(400).json({ error: "A valid name and 6-digit OTP are required" });
+  if (rawName.length > 120 || !/^\d{6}$/.test(otp)) {
+    return res.status(400).json({ error: "A valid 6-digit OTP is required" });
   }
+
+  // The callback popups collect only a mobile number, while the booking flow
+  // always sends the patient's name. A verification without a name is still
+  // valid - it just has no appointment contact to add to the Google Sheet.
 
   const mobileLimit = await rateLimit({
     key: `rl:otp:verify:mobile:${mobile}`,
@@ -123,15 +127,19 @@ async function handleVerifyOtp(req, res, mobile) {
 
   await redisDel(`otp:${mobile}`);
 
-  // Start the optional sheet write without delaying the successful OTP response.
-  void logAppointmentContactToGoogleSheet({ name, mobileNumber: mobile }).catch(
-    (error) => {
+  // Start the optional sheet write without delaying the successful OTP
+  // response. Only named (appointment) verifications create a contact row.
+  if (rawName) {
+    void logAppointmentContactToGoogleSheet({
+      name: rawName,
+      mobileNumber: mobile,
+    }).catch((error) => {
       console.error(
         "Failed to log verified appointment contact to Google Sheets:",
         error,
       );
-    },
-  );
+    });
+  }
 
   // Spreadsheet logging is best-effort: a Sheets outage must not block booking.
   return res.status(200).json({ success: true, message: "OTP verified" });

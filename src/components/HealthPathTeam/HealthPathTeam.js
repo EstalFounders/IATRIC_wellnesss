@@ -20,6 +20,7 @@ import {
 } from "../../customUtils/educationTraining";
 import { setDoctorInfo } from "../../store/slices/bookingWebsite/allDoctorsPageSlice";
 import { formatConsultationTypePrices } from "../../utils/consultationFee";
+import { formatSpecialityLine } from "../../customUtils/doctorSuggestions";
 import styles from "./HealthPathTeam.module.css";
 
 /**
@@ -86,17 +87,22 @@ const shuffle = (items) => {
 };
 
 /**
- * "Service offered" line for a card.
+ * Speciality line for a card.
  *
- * Doctors carry an array of specialities (`serviceOffered`) plus an optional
- * free-text `expertise`; nursing staff carry a single `jobTitle`.
+ * The doctor's own specialities (`expertise`, filled by the Add Doctor wizard -
+ * one or several, stored comma-joined) are what the profile page and the
+ * speciality filter list, so they lead; the service names follow when a doctor
+ * has no speciality on file, and nursing staff print their `jobTitle`.
  */
 const formatServiceOffered = (member) => {
   if (member.type === "doctor") {
+    const speciality = formatSpecialityLine(member.expertise);
+    if (speciality) return oneLine(speciality);
+
     const offered = Array.isArray(member.serviceOffered)
       ? member.serviceOffered.filter(Boolean).join(", ")
       : "";
-    return oneLine(offered || member.expertise || "Doctor Consultation");
+    return oneLine(offered || "Doctor Consultation");
   }
   return oneLine(member.jobTitle || "Nursing Care");
 };

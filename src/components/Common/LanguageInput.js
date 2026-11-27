@@ -1,9 +1,11 @@
 // LanguageInput.js
 // Repeatable language rows ("English", "Hindi") with a "+ Add Language" button
 // for the doctor forms ("Add Doctor" and the shared edit-doctor modal). Optional
-// `suggestions` render as one-tap chips above the rows. Rows use inline styles,
-// the convention for every panel/tag UI (see WorkDaysPicker).
-import React from "react";
+// `suggestions` render as one-tap chips above the rows; optional `options` fill a
+// datalist behind each row, so typing offers every language while free text is
+// still accepted. Rows use inline styles, the convention for every panel/tag UI
+// (see WorkDaysPicker).
+import React, { useId } from "react";
 import { MdDelete } from "react-icons/md";
 import { color_schema } from "../../constant";
 import {
@@ -70,6 +72,10 @@ const hintStyle = {
  * `suggestions` is optional: when given (the Add Doctor form passes the common
  * languages), each entry renders as a chip that appends itself to the rows when
  * clicked — in click order, never twice.
+ *
+ * `options` is optional too: it becomes the datalist behind every row, so the
+ * full list of languages is one keystroke away. A datalist only suggests, so a
+ * language that is not in it can still be typed.
  */
 const LanguageInput = ({
   value = [],
@@ -77,7 +83,11 @@ const LanguageInput = ({
   error = "",
   placeholder = "e.g. English",
   suggestions = [],
+  options = [],
 }) => {
+  const datalistId = useId();
+  const hasOptions = Array.isArray(options) && options.length > 0;
+
   const rows =
     Array.isArray(value) && value.length > 0 ? value : [""]; // keep one row open
 
@@ -116,6 +126,7 @@ const LanguageInput = ({
             value={row}
             placeholder={placeholder}
             aria-label={`Language ${index + 1}`}
+            list={hasOptions ? datalistId : undefined}
             onChange={(event) => handleRowChange(index, event.target.value)}
             style={inputStyle}
           />
@@ -132,6 +143,14 @@ const LanguageInput = ({
         </div>
       ))}
 
+      {hasOptions ? (
+        <datalist id={datalistId}>
+          {options.map((option) => (
+            <option key={option} value={option} />
+          ))}
+        </datalist>
+      ) : null}
+
       <button type="button" onClick={handleAddRow} style={addButtonStyle}>
         + Add Language
       </button>
@@ -141,7 +160,11 @@ const LanguageInput = ({
           {error}
         </div>
       ) : (
-        <p style={hintStyle}>Blank entries are not saved.</p>
+        <p style={hintStyle}>
+          {hasOptions
+            ? "Blank entries are not saved - start typing to see every language."
+            : "Blank entries are not saved."}
+        </p>
       )}
     </div>
   );

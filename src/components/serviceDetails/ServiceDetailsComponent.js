@@ -13,15 +13,18 @@ import {
   Tabs,
   Tab,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import {
   getServiceSeo,
 } from "../../seo/servicesSeo";
 import IconRenderer from "./IconRenderer"; // adjust path as needed
 import NursingStaffSection from "./NursingStaffSection";
-import { address, callToBook, color_schema, contact_no, imageBlurDataUrl } from "../../constant";
+import { api, address, callToBook, color_schema, contact_no, imageBlurDataUrl } from "../../constant";
 import { ConsultationButton } from "../Common/commonUi";
 import CalltoBookPopup from "../Common/CalltoBookPopup";
+import WhatsappConfirmationModel from "../Appointment/modal/WhatsappConfirmationModel";
+import OtpConfirmationPopup from "../Appointment/OtpConfirmationPopup";
 import {
   getServiceDescription,
   resolveServiceKey,
@@ -886,6 +889,15 @@ const ServiceDetail = () => {
   const router = useRouter();
   const { t } = useLanguage();
   const [isCalltoBookDialog, setIsCalltoBookDialog] = useState(false);
+  // Callback requests on this page are verified with a WhatsApp OTP before the
+  // query is saved, so the number that passed verification is kept here.
+  const [otpMobNo, setOtpMobNo] = useState("");
+  const [otpConfirmationPopup, setOtpConfirmationPopup] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   // Active panel of the optional coverage tabs (`tabs` in a serviceDetails block).
   const [activeDetailTab, setActiveDetailTab] = useState(0);
   // Photos that failed to load. A service card can declare an `image`; if that
@@ -950,8 +962,45 @@ const ServiceDetail = () => {
   };
 
   const handleCalltoBookPopupSubmit = (mobNo) => {
-    setMobNo(mobNo);
+    setOtpMobNo(mobNo);
+    setIsCalltoBookDialog(false);
     setOtpConfirmationPopup(true);
+  };
+
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  /**
+   * Persists the callback request once the OTP step succeeded. The verified
+   * `otp` is forwarded so POST /api/userQuery can redeem the one-time marker
+   * the WhatsApp OTP endpoint wrote for this number.
+   */
+  const handleOtpConfirm = async (otp) => {
+    setOtpConfirmationPopup(false);
+    try {
+      const res = await fetch(api.userQuery, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile_number: Number(otpMobNo), otp }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || t("common.errorTryAgain"));
+      }
+      setSnackbar({
+        open: true,
+        message: t("ctb.okRequested"),
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error?.message || t("common.errorTryAgain"),
+        severity: "error",
+      });
+    }
   };
 
   if (!medical_service) {
@@ -1426,9 +1475,44 @@ const ServiceDetail = () => {
         <CalltoBookPopup
           show={isCalltoBookDialog}
           onClose={handleCloseCalltoBookDialog}
-          onSubmit={handleCalltoBookPopupSubmit}
+          onOtpRequired={handleCalltoBookPopupSubmit}
         />
       </Container>
+
+      {/* OTP step for the callback popup: the request is only sent to
+          /api/userQuery after the server confirms the WhatsApp OTP. */}
+      <WhatsappConfirmationModel
+        isOpen={otpConfirmationPopup}
+        onClose={() => setOtpConfirmationPopup(false)}
+      >
+        <OtpConfirmationPopup mobile={otpMobNo} onConfirm={handleOtpConfirm} />
+      </WhatsappConfirmationModel>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackBar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity={snackbar.severity}
+          sx={{
+            width: "100%",
+            maxWidth: { xs: "calc(100vw - 32px)", sm: 480 },
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            "& .MuiAlert-message": {
+              flex: 1,
+              textAlign: "center",
+              wordBreak: "break-word",
+            },
+          }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

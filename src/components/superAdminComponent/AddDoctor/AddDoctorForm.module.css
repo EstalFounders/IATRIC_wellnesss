@@ -142,6 +142,41 @@
   cursor: not-allowed;
 }
 
+/* The "add manually" row under the speciality dropdown (free-text input + Add
+   button). */
+.inlineAdd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.inlineAdd > input {
+  flex: 1 1 auto;
+}
+
+.inlineAddButton {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  border: 1px solid #3b5f1d;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #3b5f1d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inlineAddButton:hover:not(:disabled) {
+  background: #f1f6ec;
+}
+
+.inlineAddButton:disabled {
+  border-color: #cfd6dd;
+  color: #9aa5b1;
+  cursor: not-allowed;
+}
+
 .textarea {
   min-height: 110px;
   resize: vertical;
@@ -306,4 +341,766 @@
   .railCard {
     position: static;
   }
+}
+
+/* ── Wizard: hero extras ────────────────────────────── */
+
+.heroText {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.linkBtn {
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  color: #3b5f1d;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.linkBtn:hover {
+  color: #2d4a16;
+}
+
+.linkBtn:disabled {
+  color: #9aa5b1;
+  cursor: not-allowed;
+}
+
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  border: 1px solid #e8e3c8;
+  border-radius: 10px;
+  background: #fdfbf2;
+  color: #6b6127;
+  font-size: 0.88rem;
+}
+
+/* ── Wizard: stepper ────────────────────────────────── */
+
+.stepper {
+  margin-top: 20px;
+}
+
+.stepList {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.stepItem {
+  flex: 1 1 0;
+  min-width: 92px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 6px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #fff;
+  color: #7b8794;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.step:hover {
+  border-color: #c9d6bd;
+  color: #3b5f1d;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f4ee;
+  color: #7b8794;
+  font-size: 0.8rem;
+}
+
+.stepLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.stepActive {
+  border-color: #3b5f1d;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  box-shadow: 0 1px 3px rgba(59, 95, 29, 0.12);
+}
+
+.stepActive .stepNumber {
+  background: #3b5f1d;
+  color: #fff;
+}
+
+.stepDone .stepNumber {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.progress {
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: #edf0ec;
+  overflow: hidden;
+}
+
+.progressBar {
+  display: block;
+  height: 100%;
+  background: #3b5f1d;
+  transition: width 0.25s ease;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Wizard: step header ────────────────────────────── */
+
+.stepHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f2ee;
+}
+
+.stepHeaderIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-size: 1.1rem;
+}
+
+.stepHeaderTitle {
+  margin: 0 0 2px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.stepHeaderText {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #52606d;
+}
+
+.stepHeaderNote {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: #8e8333;
+}
+
+/* ── Wizard: step controls ──────────────────────────── */
+
+.choiceRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.choiceCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 140px;
+  padding: 12px 14px;
+  border: 1px solid #cfd6dd;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #3f4c5a;
+  cursor: pointer;
+}
+
+.choiceCard input {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b5f1d;
+  cursor: pointer;
+}
+
+.choiceCardSelected {
+  border-color: #3b5f1d;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-weight: 600;
+}
+
+/* ── Wizard: step sections (step 3 layout) ──────────── */
+
+.stepSection {
+  min-width: 0;
+  margin-bottom: 20px;
+}
+
+.stepSectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stepSectionTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3f4c5a;
+}
+
+.sectionBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f4f7f0;
+  color: #3b5f1d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.twoUp {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.feeRows {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  background: #fdfdfb;
+}
+
+.subLabel {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7b8794;
+}
+
+.feeRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.feeName {
+  flex: 1 1 110px;
+  min-width: 0;
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feeInputWrap {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.feeCurrency {
+  color: #7b8794;
+  font-size: 0.85rem;
+}
+
+.feeInput {
+  width: 110px;
+}
+
+.feeRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: 1px solid #e3e7ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #7b8794;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.feeRemove:hover,
+.feeRemove:focus-visible {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+/* One consultation type = the fee row plus its optional clinic details. */
+.feeBlock {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #edf0f2;
+}
+
+.feeBlock:first-of-type {
+  padding-top: 0;
+}
+
+.feeBlock:last-of-type {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.clinicRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-left: 4px;
+}
+
+.clinicInput {
+  width: 100%;
+  height: 34px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* A section that is kept on the page but turned off (services offered). */
+.sectionOff {
+  padding: 12px 14px;
+  border: 1px dashed #e3e7ea;
+  border-radius: 10px;
+  background: #fbfbfa;
+}
+
+.badgeOff {
+  background: #f1f3f5;
+  color: #7b8794;
+}
+
+.emptyNote {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px dashed #dde3e8;
+  border-radius: 10px;
+  color: #7b8794;
+  font-size: 0.85rem;
+}
+
+.summaryStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 4px 0 10px;
+  padding: 10px 14px;
+  border: 1px solid #eef2e8;
+  border-radius: 10px;
+  background: #f7f9f4;
+}
+
+.summaryChip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: #52606d;
+  font-size: 0.82rem;
+}
+
+.summaryChip strong {
+  color: #3b5f1d;
+  font-size: 0.95rem;
+}
+
+.inlineControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.readonlyInput {
+  background: #f3f5f7;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #3b5f1d;
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: #f4f7f0;
+}
+
+/* ── Wizard: preview ────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ececec;
+}
+
+.tab {
+  padding: 9px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: #52606d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #3b5f1d;
+}
+
+.tabActive {
+  color: #3b5f1d;
+  border-bottom-color: #3b5f1d;
+}
+
+.previewGrid {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.previewCard {
+  width: 100%;
+  max-width: 360px;
+}
+
+/* Compact profile-page preview (uses the site's own formatters). */
+.profilePreview {
+  width: 100%;
+  max-width: 560px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 18px;
+  background: #fdfdfb;
+}
+
+.profilePreviewHero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f2ee;
+}
+
+.profilePreviewAvatar {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #edf3e6;
+}
+
+.profilePreviewName {
+  margin: 0 0 2px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1f2933;
+  font-family: "TT Ramillas", serif;
+}
+
+.profilePreviewExpertise {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  color: #52606d;
+}
+
+.profilePreviewFee {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3b5f1d;
+}
+
+.profilePreviewRows {
+  margin: 14px 0 0;
+}
+
+.profilePreviewRow {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 0.88rem;
+}
+
+.profilePreviewRow dt {
+  flex: 0 0 130px;
+  color: #7b8794;
+  font-weight: 600;
+}
+
+.profilePreviewRow dd {
+  margin: 0;
+  color: #1f2933;
+}
+
+.profilePreviewOverview {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f2ee;
+}
+
+.profilePreviewRowLabel {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8e8333;
+}
+
+.profilePreviewText {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #3f4c5a;
+  white-space: pre-line;
+}
+
+/* ── Wizard: completeness checklist ─────────────────── */
+
+.checklist {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.checklistCount {
+  margin: -6px 0 12px;
+  font-size: 0.82rem;
+  color: #7b8794;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  color: #3f4c5a;
+}
+
+
+/* ── Wizard: sticky footer ──────────────────────────── */
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 14px 20px;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.footerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: auto;
+  min-width: 0;
+}
+
+.footerStep {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #3b5f1d;
+}
+
+.footerNote {
+  font-size: 0.8rem;
+  color: #7b8794;
+}
+
+.footerButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Success panel ──────────────────────────────────── */
+
+.successPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 36px 22px 30px;
+  text-align: center;
+}
+
+.successIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 1.9rem;
+}
+
+.successActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 16px 18px;
+  }
+
+  .heroTitle {
+    font-size: 1.3rem;
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .stepItem {
+    min-width: 56px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footerButtons {
+    justify-content: space-between;
+  }
+
+  .footerButtons .primaryBtn {
+    flex: 1 1 auto;
+  }
+
+  .twoUp {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .feeInput {
+    width: 96px;
+  }
+
+  .clinicRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profilePreviewRow {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .profilePreviewRow dt {
+    flex: 0 0 auto;
+  }
+}
+
+.checklistDone {
+  color: #2e7d32;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.checklistTodo {
+  color: #cfd6dd;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.checklistLabel {
+  flex: 1 1 0;
+  line-height: 1.4;
+}
+
+.checklistLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #3b5f1d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
 }
