@@ -30,6 +30,10 @@ import {
   parseEducationTraining,
 } from "../../../customUtils/educationTraining.js";
 import {
+  DEGREE_SUGGESTIONS,
+  LANGUAGE_SUGGESTIONS,
+} from "../../../customUtils/doctorSuggestions.js";
+import {
   appendWorkExperience,
   parseWorkExperience,
 } from "../../../customUtils/workExperience.js";
